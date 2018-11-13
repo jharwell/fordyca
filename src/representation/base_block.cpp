@@ -32,7 +32,7 @@ namespace math = rcppsw::math;
  *  Static Variables
  ******************************************************************************/
 math::dcoord2 base_block::kOutOfSightDLoc = math::dcoord2(1000, 1000);
-argos::CVector2 base_block::kOutOfSightRLoc = argos::CVector2(1000.0, 1000.0);
+rmath::vector2d base_block::kOutOfSightRLoc = rmath::vector2d(1000.0, 1000.0);
 
 /******************************************************************************
  * Member Functions

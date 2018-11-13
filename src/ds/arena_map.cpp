@@ -42,8 +42,8 @@ NS_START(fordyca, ds);
 arena_map::arena_map(const struct params::arena::arena_map_params* params)
     : ER_CLIENT_INIT("fordyca.ds.arena_map"),
       decorator(params->grid.resolution,
-                static_cast<size_t>(params->grid.upper.GetX()),
-                static_cast<size_t>(params->grid.upper.GetY())),
+                static_cast<uint>(params->grid.upper.x()),
+                static_cast<uint>(params->grid.upper.y())),
       m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
                    .create_blocks()),
       m_caches(),
@@ -64,7 +64,7 @@ bool arena_map::initialize(void) {
   return m_block_dispatcher.initialize();
 } /* initialize() */
 
-__rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
+__rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   /*
    * Caches hide blocks, add even though a robot may technically be standing on
    * a block, if it is also standing in a cache, that takes priority.
@@ -81,7 +81,7 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
   return -1;
 } /* robot_on_block() */
 
-__rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
+__rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
   for (auto& c : m_caches) {
     if (c->contains_point(pos)) {
       return c->id();

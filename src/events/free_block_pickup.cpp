@@ -81,15 +81,14 @@ void free_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
                 rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
-  argos::CVector2 old_r(m_block->real_loc().GetX(), m_block->real_loc().GetY());
+  rmath::vector2d old_r = m_block->real_loc();
   events::cell_empty op(cell_op::x(), cell_op::y());
   map.accept(op);
   m_block->accept(*this);
-  ER_INFO("arena_map: fb%u: block%d from (%f, %f) -> (%u, %u)",
+  ER_INFO("arena_map: fb%u: block%d from %s -> (%u, %u)",
           m_robot_index,
           m_block->id(),
-          old_r.GetX(),
-          old_r.GetY(),
+          old_r.to_str().c_str(),
           cell_op::x(),
           cell_op::y());
 } /* visit() */

@@ -64,11 +64,11 @@ bool base_controller::block_detected(void) const {
   return m_saa->sensing()->block_detected();
 } /* block_detected() */
 
-void base_controller::robot_loc(argos::CVector2 loc) {
+void base_controller::position(const rmath::vector2d& loc) {
   m_saa->sensing()->position(loc);
 }
 
-__rcsw_pure argos::CVector2 base_controller::robot_loc(void) const {
+__rcsw_pure rmath::vector2d base_controller::position(void) const {
   return m_saa->sensing()->position();
 }
 

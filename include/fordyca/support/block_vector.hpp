@@ -32,7 +32,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_block; }
+namespace representation {
+class base_block;
+}
 NS_START(support);
 
 using block_vector_type = std::shared_ptr<representation::base_block>;
@@ -40,7 +42,7 @@ using block_vector_type = std::shared_ptr<representation::base_block>;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using block_vector =  std::vector<block_vector_type>;
+using block_vector = std::vector<block_vector_type>;
 
 NS_END(support, fordyca);
 

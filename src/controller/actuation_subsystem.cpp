@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
 #include "fordyca/params/actuation_params.hpp"
 
 /*******************************************************************************

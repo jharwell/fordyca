@@ -45,22 +45,21 @@ new_cache_selector::new_cache_selector(
  ******************************************************************************/
 representation::perceived_block new_cache_selector::calc_best(
     const std::list<representation::perceived_block>& new_caches,
-    argos::CVector2 robot_loc) {
+    const rmath::vector2d& position) {
   representation::perceived_block best;
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
   for (auto& c : new_caches) {
     math::new_cache_utility u(c.ent->real_loc(),
-                              boost::get<argos::CVector2>(
+                              boost::get<rmath::vector2d>(
                                   mc_matrix->find(cselm::kNestLoc)->second));
 
-    double utility = u.calc(robot_loc, c.density.last_result());
+    double utility = u.calc(position, c.density.last_result());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
-    ER_DEBUG("Utility for block%d@(%f,%f) [%u,%u], density=%f: %f",
+    ER_DEBUG("Utility for block%d@%s [%u,%u], density=%f: %f",
              c.ent->id(),
-             best.ent->real_loc().GetX(),
-             best.ent->real_loc().GetY(),
+             best.ent->real_loc().to_str().c_str(),
              c.ent->discrete_loc().first,
              c.ent->discrete_loc().second,
              c.density.last_result(),
@@ -74,10 +73,9 @@ representation::perceived_block new_cache_selector::calc_best(
 
   ER_ASSERT(nullptr != best.ent, "No best new cache found?");
 
-  ER_INFO("Best utility: block%d@(%f,%f) [%u,%u]: %f",
+  ER_INFO("Best utility: block%d@%s [%u,%u]: %f",
           best.ent->id(),
-          best.ent->real_loc().GetX(),
-          best.ent->real_loc().GetY(),
+          best.ent->real_loc().to_str().c_str(),
           best.ent->discrete_loc().first,
           best.ent->discrete_loc().second,
           max_utility);

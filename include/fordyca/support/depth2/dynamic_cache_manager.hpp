@@ -27,7 +27,6 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"

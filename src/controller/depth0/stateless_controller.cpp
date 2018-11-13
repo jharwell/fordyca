@@ -97,12 +97,12 @@ __rcsw_pure double stateless_controller::distance(void) const {
    * because of the prev/current location not being set up properly yet.
    */
   if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->sensing()->heading().Length();
+    return saa_subsystem()->sensing()->heading().length();
   }
   return 0;
 } /* distance() */
 
-argos::CVector2 stateless_controller::velocity(void) const {
+rmath::vector2d stateless_controller::velocity(void) const {
   /*
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
@@ -110,7 +110,7 @@ argos::CVector2 stateless_controller::velocity(void) const {
   if (saa_subsystem()->sensing()->tick() > 1) {
     return saa_subsystem()->linear_velocity();
   }
-  return argos::CVector2(0, 0);
+  return rmath::vector2d(0, 0);
 } /* velocity() */
 
 using namespace argos; // NOLINT

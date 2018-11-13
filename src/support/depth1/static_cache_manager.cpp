@@ -42,7 +42,7 @@ using ds::arena_grid;
 static_cache_manager::static_cache_manager(
     const struct params::caches::caches_params* params,
     ds::arena_grid* const arena_grid,
-    const argos::CVector2& cache_loc)
+    const rmath::vector2d& cache_loc)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_manager"),
       mc_cache_params(*params),
@@ -101,10 +101,9 @@ std::pair<bool, ds::block_vector> static_cache_manager::calc_blocks_for_creation
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
     ER_ASSERT(to_use.size() - count < representation::base_cache::kMinBlocks,
-              "For new cache @(%f, %f) [%u, %u]: %zu blocks SHOULD be "
+              "For new cache @%s [%u, %u]: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
-              mc_cache_loc.GetX(),
-              mc_cache_loc.GetY(),
+              mc_cache_loc.to_str().c_str(),
               dcenter.first,
               dcenter.second,
               to_use.size() - count,
@@ -114,10 +113,9 @@ std::pair<bool, ds::block_vector> static_cache_manager::calc_blocks_for_creation
   }
   if (to_use.size() < mc_cache_params.static_.size) {
     ER_WARN(
-        "Not enough free blocks to meet min size for new cache @(%f, %f) [%u, "
+        "Not enough free blocks to meet min size for new cache@%s [%u, "
         "%u] (%zu < %u)",
-        mc_cache_loc.GetX(),
-        mc_cache_loc.GetY(),
+        mc_cache_loc.to_str().c_str(),
         dcenter.first,
         dcenter.second,
         to_use.size(),
@@ -156,9 +154,8 @@ std::pair<bool, ds::cache_vector> static_cache_manager::create(
   auto pair = calc_blocks_for_creation(blocks);
   ds::cache_vector created;
   if (!pair.first) {
-    ER_WARN("Unable to create static cache @(%f, %f): Not enough free blocks",
-            mc_cache_loc.GetX(),
-            mc_cache_loc.GetY());
+    ER_WARN("Unable to create static cache @%s: Not enough free blocks",
+            mc_cache_loc.to_str().c_str());
     return std::make_pair(false, created);
   }
   /* no existing caches, so empty vector */

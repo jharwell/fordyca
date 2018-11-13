@@ -46,7 +46,7 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
   std::string val;
   std::vector<std::string> res;
   res = parser.parse(cnode.GetAttribute("nest"));
-  m_params->nest.Set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
+  m_params->nest.set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
 
   m_priorities.parse(cnode);
   m_params->priorities = *m_priorities.parse_results();

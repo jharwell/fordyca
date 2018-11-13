@@ -44,9 +44,9 @@ existing_cache_selector::existing_cache_selector(
  ******************************************************************************/
 representation::perceived_cache existing_cache_selector::calc_best(
     const std::list<representation::perceived_cache>& existing_caches,
-    argos::CVector2 robot_loc) {
+    const rmath::vector2d& position) {
   representation::perceived_cache best;
-  ER_ASSERT(!existing_caches.empty(), "no known existing caches");
+  ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
   for (auto& c : existing_caches) {
@@ -59,18 +59,18 @@ representation::perceived_cache existing_cache_selector::calc_best(
      * This threshold prevents that behavior, forcing robots to at least LEAVE
      * the cache, even if they will then immediately return to it.
      */
-    if ((robot_loc - c.ent->real_loc()).Length() <=
+    if ((position - c.ent->real_loc()).length() <=
         std::max(c.ent->xsize(), c.ent->ysize())) {
       ER_WARN("Ignoring cache%d in search: robot currently inside it",
               c.ent->id());
       continue;
     }
     math::existing_cache_utility u(c.ent->real_loc(),
-                                   boost::get<argos::CVector2>(
+                                   boost::get<rmath::vector2d>(
                                        mc_matrix->find("nest_loc")->second));
 
     double utility =
-        u.calc(robot_loc, c.density.last_result(), c.ent->n_blocks());
+        u.calc(position, c.density.last_result(), c.ent->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for existing_cache%d loc=(%u, %u), density=%f: %f",
              c.ent->id(),
@@ -86,10 +86,9 @@ representation::perceived_cache existing_cache_selector::calc_best(
   } /* for(existing_cache..) */
 
   if (nullptr != best.ent) {
-    ER_INFO("Best utility: existing_cache%d at (%f, %f) [%u, %u]: %f",
+    ER_INFO("Best utility: existing_cache%d@%s [%u, %u]: %f",
             best.ent->id(),
-            best.ent->real_loc().GetX(),
-            best.ent->real_loc().GetY(),
+            best.ent->real_loc().to_str().c_str(),
             best.ent->discrete_loc().first,
             best.ent->discrete_loc().second,
             max_utility);

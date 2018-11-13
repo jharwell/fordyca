@@ -27,12 +27,11 @@
 #include <vector>
 #include <utility>
 
-#include <argos3/core/utility/math/vector2.h>
-
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -47,6 +46,7 @@ class arena_cache;
 }
 NS_START(support, depth1);
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -63,7 +63,7 @@ class static_cache_manager : public base_cache_manager,
  public:
   static_cache_manager(const struct params::caches::caches_params* params,
                        ds::arena_grid* arena_grid,
-                       const argos::CVector2& cache_loc);
+                       const rmath::vector2d& cache_loc);
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
@@ -101,7 +101,7 @@ class static_cache_manager : public base_cache_manager,
 
   // clang-format off
   const params::caches::caches_params mc_cache_params;
-  const argos::CVector2               mc_cache_loc;
+  const rmath::vector2d               mc_cache_loc;
   // clang-format on
 };
 

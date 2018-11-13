@@ -132,7 +132,7 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+  auto coord = math::rcoord_to_dcoord(controller.position(),
                                       arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
@@ -182,7 +182,8 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
 
 argos::CColor depth1_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  if (arena_map()->nest().contains_point(plane_pos)) {
+  rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
+  if (arena_map()->nest().contains_point(tmp)) {
     return argos::CColor(arena_map()->nest().color().red(),
                          arena_map()->nest().color().green(),
                          arena_map()->nest().color().blue());
@@ -192,7 +193,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
    * so that you don't have blocks renderin inside of caches.
    */
   for (auto& cache : arena_map()->caches()) {
-    if (cache->contains_point(plane_pos)) {
+    if (cache->contains_point(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
                            cache->color().blue());
@@ -207,7 +208,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
      * when they are not actually (when blocks are picked up their correct color
      * is shown through visualization).
      */
-    if (block->contains_point(plane_pos)) {
+    if (block->contains_point(tmp)) {
       return argos::CColor::BLACK;
     }
   } /* for(&block..) */
@@ -297,9 +298,9 @@ void depth1_loop_functions::cache_handling_init(
      * Regardless of how many foragers/etc there are, always create an
      * initial cache.
      */
-    argos::CVector2 cache_loc = argos::CVector2(
-        (arena_map()->xrsize() + arena_map()->nest().real_loc().GetX()) / 2.0,
-        arena_map()->nest().real_loc().GetY());
+    rmath::vector2d cache_loc = rmath::vector2d(
+        (arena_map()->xrsize() + arena_map()->nest().real_loc().x()) / 2.0,
+        arena_map()->nest().real_loc().y());
 
     m_cache_manager = rcppsw::make_unique<static_cache_manager>(
         cachep, &arena_map()->decoratee(), cache_loc);

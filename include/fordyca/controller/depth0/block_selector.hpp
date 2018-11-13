@@ -29,11 +29,13 @@
 #include "rcppsw/er/client.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -64,11 +66,11 @@ class block_selector: public rcppsw::er::client<block_selector> {
    */
   representation::perceived_block calc_best(
       const perceived_block_list& blocks,
-      argos::CVector2 robot_loc);
+      const rmath::vector2d& position);
 
  private:
   bool block_is_excluded(
-      const argos::CVector2& robot_loc,
+      const rmath::vector2d& position,
       const representation::base_block* block) const;
 
   /**

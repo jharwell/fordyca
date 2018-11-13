@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <random>
-#include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -66,7 +65,7 @@ class acquire_existing_cache_fsm : public acquire_goal_fsm,
   bool acquire_known_goal(void) override;
   bool cache_acquired_cb(bool explore_result) const;
   bool explore_goal_reached(void) const;
-  bool select_cache_for_acquisition(argos::CVector2 * acquisition);
+  bool select_cache_for_acquisition(rmath::vector2d * acquisition);
 
   // clang-format off
   const controller::cache_sel_matrix* mc_sel_matrix;

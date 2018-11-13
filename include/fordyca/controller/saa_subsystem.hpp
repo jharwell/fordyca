@@ -44,6 +44,7 @@ struct sensing_params;
 } // namespace params
 
 NS_START(controller);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -65,9 +66,9 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
                 struct base_sensing_subsystem::sensor_list* sensor_list);
 
   /* BOID interface */
-  argos::CVector2 linear_velocity(void) const override {
-    return argos::CVector2(m_actuation->differential_drive().current_speed(),
-                           m_sensing->heading().Angle());
+  rmath::vector2d linear_velocity(void) const override {
+    return rmath::vector2d(m_actuation->differential_drive().current_speed(),
+                           m_sensing->heading().angle());
   }
   double angular_velocity(void) const override {
     return (m_actuation->differential_drive().right_linspeed() -
@@ -77,7 +78,7 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
   double max_speed(void) const override {
     return m_actuation->differential_drive().max_speed();
   }
-  argos::CVector2 position(void) const override {
+  rmath::vector2d position(void) const override {
     return m_sensing->position();
   }
 

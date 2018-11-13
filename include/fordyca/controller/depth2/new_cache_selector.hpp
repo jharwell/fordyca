@@ -25,9 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
+
 #include "fordyca/representation/perceived_block.hpp"
 
 /*******************************************************************************
@@ -35,6 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca, controller);
 class cache_sel_matrix;
+namespace rmath = rcppsw::math;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -66,7 +68,7 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
    */
   representation::perceived_block calc_best(
       const std::list<representation::perceived_block>& new_caches,
-      argos::CVector2 robot_loc);
+      const rmath::vector2d& position);
 
  private:
   // clang-format off

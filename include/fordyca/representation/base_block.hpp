@@ -63,7 +63,7 @@ class base_block : public multicell_entity,
    * them up, for visualization/rending purposes.
    */
   static rcppsw::math::dcoord2 kOutOfSightDLoc;
-  static argos::CVector2 kOutOfSightRLoc;
+  static rmath::vector2d kOutOfSightRLoc;
 
   /**
    * @param dim 2 element vector of the dimensions of the block.
@@ -145,10 +145,11 @@ class base_block : public multicell_entity,
     return kOutOfSightDLoc == discrete_loc() || kOutOfSightRLoc == real_loc();
   }
   /**
-   * @brief Get the ID/index of the robot that is currently carrying this base_block
+   * @brief Get the ID/index of the robot that is currently carrying this
+   * block
    *
    * @return The robot index, or -1 if no robot is currently carrying this
-   * base_block.
+   * block.
    */
   int robot_id(void) const { return m_robot_id; }
 
@@ -163,9 +164,9 @@ class base_block : public multicell_entity,
    *
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
-  bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).contains(point.GetX()) &&
-           yspan(real_loc()).contains(point.GetY());
+  bool contains_point(const rmath::vector2d& point) const {
+    return xspan(real_loc()).contains(point.x()) &&
+           yspan(real_loc()).contains(point.y());
   }
 
  private:

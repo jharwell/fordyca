@@ -49,7 +49,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
  * General Member Functions
  ******************************************************************************/
 bool acquire_new_cache_fsm::select_cache_for_acquisition(
-    argos::CVector2* const acquisition) {
+    rmath::vector2d* const acquisition) {
   controller::depth2::new_cache_selector selector(mc_sel_matrix);
 
   /* A "new" cache is the same as a single block  */
@@ -63,10 +63,9 @@ bool acquire_new_cache_fsm::select_cache_for_acquisition(
   if (nullptr == best.ent) {
     return false;
   }
-  ER_INFO("Select new cache%d@(%f,%f) [%u, %u], utility=%f for acquisition",
+  ER_INFO("Select new cache%d@%s [%u, %u], utility=%f for acquisition",
           best.ent->id(),
-          best.ent->real_loc().GetX(),
-          best.ent->real_loc().GetY(),
+          best.ent->real_loc().to_str().c_str(),
           best.ent->discrete_loc().first,
           best.ent->discrete_loc().second,
           best.density.last_result());
@@ -76,15 +75,14 @@ bool acquire_new_cache_fsm::select_cache_for_acquisition(
 
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration");
-  argos::CVector2 position = saa_subsystem()->sensing()->position();
+  rmath::vector2d position = saa_subsystem()->sensing()->position();
   for (auto& b : map()->blocks()) {
-    if ((b->real_loc() - position).Length() <= vector_fsm::kCACHE_ARRIVAL_TOL) {
+    if ((b->real_loc() - position).length() <= vector_fsm::kCACHE_ARRIVAL_TOL) {
       return true;
     }
   } /* for(&b..) */
-  ER_WARN("Robot arrived at location (%f,%f), but no known block within range.",
-          position.GetX(),
-          position.GetY());
+  ER_WARN("Robot arrived at location %s, but no known block within range.",
+          position.to_str().c_str());
   return false;
 } /* cache_acquired_cb() */
 
@@ -104,7 +102,7 @@ bool acquire_new_cache_fsm::acquire_known_goal(void) {
      * vectoring toward any of them.
      */
     if (!vector_fsm().task_running()) {
-      argos::CVector2 best;
+      rmath::vector2d best;
       if (!select_cache_for_acquisition(&best)) {
         return false;
       }

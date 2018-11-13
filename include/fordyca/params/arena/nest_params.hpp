@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/params/base_params.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -32,6 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Structure Definitions
@@ -41,7 +41,7 @@ NS_START(fordyca, params);
  * @ingroup params arena
  */
 struct nest_params : public rcppsw::params::base_params {
-  argos::CVector2 center{};
+  rmath::vector2d center{};
   rcppsw::math::vector2d dims{};
 };
 

@@ -28,11 +28,10 @@
 #include <tuple>
 #include <functional>
 #include <vector>
-
-#include <argos3/core/utility/math/vector2.h>
 #include <nlopt.hpp>
 
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,6 +43,7 @@ class base_block;
 }
 NS_START(controller);
 class cache_sel_matrix;
+namespace rmath = rcppsw::math;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -70,13 +70,13 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
     double                      block_prox_dist{0.0};
   };
   struct nest_constraint_data {
-    argos::CVector2      nest_loc{};
+    rmath::vector2d      nest_loc{};
     cache_site_selector* selector{nullptr};
     double               nest_prox_dist{0.0};
   };
   struct site_utility_data {
-    argos::CVector2 robot_loc{};
-    argos::CVector2 nest_loc{};
+    rmath::vector2d position{};
+    rmath::vector2d nest_loc{};
   };
 
   using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
@@ -98,9 +98,9 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    *
    * @return The local of the best cache site.
    */
-  argos::CVector2 calc_best(const cache_list& known_caches,
+  rmath::vector2d calc_best(const cache_list& known_caches,
                             const block_list& known_blocks,
-                            argos::CVector2 robot_loc);
+                            rmath::vector2d position);
 
   void cc_violated(uint id) { m_cc_violations[id] = true; }
   void cc_satisfied(uint id) { m_cc_violations[id] = false; }
@@ -152,13 +152,13 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    */
   void constraints_create(const cache_list& known_caches,
                           const block_list& known_blocks,
-                          const argos::CVector2& nest_loc,
+                          const rmath::vector2d& nest_loc,
                           constraint_set* constraints);
 
 
   void opt_initialize(const cache_list& known_caches,
                       const block_list& known_blocks,
-                      argos::CVector2 robot_loc,
+                      rmath::vector2d position,
                       constraint_set* constraints,
                       struct site_utility_data* utility_data,
                       std::vector<double>* initial_guess);

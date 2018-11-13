@@ -44,7 +44,7 @@ constexpr char cache_sel_matrix::kSiteYRange[];
  ******************************************************************************/
 cache_sel_matrix::cache_sel_matrix(
     const struct params::cache_sel_matrix_params* const params,
-    const argos::CVector2& nest_loc) {
+    const rmath::vector2d& nest_loc) {
   this->insert(std::make_pair(kNestLoc, nest_loc));
   this->insert(std::make_pair(kCacheProxDist, params->cache_prox_dist));
   this->insert(std::make_pair(kBlockProxDist, params->block_prox_dist));

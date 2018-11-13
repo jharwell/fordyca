@@ -27,9 +27,9 @@
 #include <algorithm>
 
 #include <argos3/core/utility/math/rng.h>
-#include <argos3/core/utility/math/vector2.h>
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
@@ -152,12 +152,12 @@ class vector_fsm : public base_foraging_fsm,
    * to tell the FSM where to travel to next.
    */
   struct goal_data : public state_machine::event_data {
-    goal_data(argos::CVector2 loc_, double tolerance_)
+    goal_data(rmath::vector2d loc_, double tolerance_)
         : tolerance(tolerance_), loc(loc_) {}
     goal_data(void) : loc() {}
 
     double tolerance{0.0};
-    argos::CVector2 loc;
+    rmath::vector2d loc;
   };
 
   struct fsm_state {
@@ -187,7 +187,7 @@ class vector_fsm : public base_foraging_fsm,
    * @return The vector, specified with the tail at the robot and the head
    * pointing towards the goal.
    */
-  argos::CVector2 calc_vector_to_goal(const argos::CVector2& goal);
+  rmath::vector2d calc_vector_to_goal(const rmath::vector2d& goal);
 
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);

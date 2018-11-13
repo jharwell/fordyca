@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/free_block_drop.hpp"
-#include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
@@ -140,10 +139,9 @@ void free_block_drop::visit(
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
   if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
       !polled->task_aborted()) {
-    ER_INFO("Added block%d@(%f,%f) to exception list",
+    ER_INFO("Added block%d@%s to exception list",
             m_block->id(),
-            m_block->real_loc().GetX(),
-            m_block->real_loc().GetY());
+            m_block->real_loc().to_str().c_str());
     controller.block_sel_matrix()->sel_exception_add(m_block->id());
     controller.bsel_exception_added(true);
   }

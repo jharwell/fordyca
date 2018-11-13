@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <sstream>
 #include <string>
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/radians.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
@@ -45,6 +46,7 @@ struct sensing_params;
 
 NS_START(controller);
 namespace hal = rcppsw::robotics::hal;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -115,12 +117,12 @@ class base_sensing_subsystem {
    * of self-localizing. That's not the point of this project, and this was much
    * faster/easier.
    */
-  argos::CVector2 position(void) const { return m_position; }
+  rmath::vector2d position(void) const { return m_position; }
 
   /**
    * @brief Set the robot's current location.
    */
-  void position(argos::CVector2 position) {
+  void position(rmath::vector2d position) {
     m_prev_position = m_position;
     m_position = position;
   }
@@ -139,7 +141,7 @@ class base_sensing_subsystem {
    * @brief Get the robot's heading, which is computed from the previous 2
    * calculated (ahem set) robot positions.
    */
-  argos::CVector2 heading(void) const { return m_position - m_prev_position; }
+  rmath::vector2d heading(void) const { return m_position - m_prev_position; }
 
   /**
    * @brief Get the angle of the current robot's heading. A shortcut to help
@@ -147,7 +149,7 @@ class base_sensing_subsystem {
    *
    * @return The heading angle.
    */
-  argos::CRadians heading_angle(void) const { return heading().Angle(); }
+  rmath::radians heading_angle(void) const { return heading().angle(); }
 
   /**
    * @brief Figure out if a threatening obstacle exists near to the robot's
@@ -170,20 +172,20 @@ class base_sensing_subsystem {
    * and those that fall within a specific angle range (i.e. obstacles behind
    * the robot are ignored).
    */
-  argos::CVector2 find_closest_obstacle(void) const;
+  rmath::vector2d find_closest_obstacle(void) const;
 
  private:
   /**
    * @brief Determine if the obstacle represented by its closest point to the
    * robot is threatening.
    */
-  bool obstacle_is_threatening(const argos::CVector2& obstacle) const;
+  bool obstacle_is_threatening(const rmath::vector2d& obstacle) const;
 
   // clang-format off
   uint               m_tick;
   const double       mc_obstacle_delta;
-  argos::CVector2    m_position;
-  argos::CVector2    m_prev_position;
+  rmath::vector2d    m_position;
+  rmath::vector2d    m_prev_position;
   struct sensor_list m_sensors;
   // clang-format off
 };

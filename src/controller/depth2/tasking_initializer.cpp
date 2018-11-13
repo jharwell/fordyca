@@ -153,28 +153,28 @@ void tasking_initializer::depth2_exec_est_init(
           ->tab_child(graph()->root_tab(), graph()->root_tab()->child2())
           ->last_subtask(cache_collector);
     }
-    rmath::rangeui cs_bounds = task_params->exec_est.ranges.find("cache_starter")->second;
-    rmath::rangeui cf_bounds = task_params->exec_est.ranges.find("cache_finisher")->second;
-    rmath::rangeui ct_bounds = task_params->exec_est.ranges.find("cache_transferer")->second;
-    rmath::rangeui cc_bounds = task_params->exec_est.ranges.find("cache_collector")->second;
+    rmath::rangeu cs_bounds =
+        task_params->exec_est.ranges.find("cache_starter")->second;
+    rmath::rangeu cf_bounds =
+        task_params->exec_est.ranges.find("cache_finisher")->second;
+    rmath::rangeu ct_bounds =
+        task_params->exec_est.ranges.find("cache_transferer")->second;
+    rmath::rangeu cc_bounds =
+        task_params->exec_est.ranges.find("cache_collector")->second;
 
-    ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
+    ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
             cache_starter->name().c_str(),
-            cs_bounds.lb(),
-            cs_bounds.ub(),
+            cs_bounds.to_str().c_str(),
             cache_finisher->name().c_str(),
-            cf_bounds.lb(),
-            cf_bounds.ub());
+            cf_bounds.to_str().c_str());
     cache_starter->exec_estimate_init(cs_bounds);
     cache_finisher->exec_estimate_init(cf_bounds);
 
-    ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
+    ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
             cache_transferer->name().c_str(),
-            ct_bounds.lb(),
-            ct_bounds.ub(),
+            ct_bounds.to_str().c_str(),
             cache_collector->name().c_str(),
-            cc_bounds.lb(),
-            cc_bounds.ub());
+            cc_bounds.to_str().c_str());
     cache_transferer->exec_estimate_init(ct_bounds);
     cache_collector->exec_estimate_init(cc_bounds);
   }

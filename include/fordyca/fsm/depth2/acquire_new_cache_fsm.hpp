@@ -64,7 +64,7 @@ class acquire_new_cache_fsm : public acquire_goal_fsm,
   acquisition_goal_type acquisition_goal(void) const override;
 
  private:
-  bool select_cache_for_acquisition(argos::CVector2 * acquisition);
+  bool select_cache_for_acquisition(rmath::vector2d * acquisition);
   bool acquire_known_goal(void) override;
   bool cache_acquired_cb(bool explore_result) const;
 

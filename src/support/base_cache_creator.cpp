@@ -49,7 +49,7 @@ base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
  ******************************************************************************/
 std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_cache(
     block_list blocks,
-    const argos::CVector2& center) {
+    const rmath::vector2d& center) {
   /*
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
@@ -94,20 +94,15 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
   ds::block_vector block_vec(blocks.begin(), blocks.end());
   auto ret = rcppsw::make_unique<representation::arena_cache>(
       m_cache_dim, m_grid->resolution(), center, block_vec, -1);
-  ER_INFO(
-      "Create cache%d@(%f,%f) [%u,%u], xspan=[%f-%f],yspan=[%f-%f] with %zu "
-      "blocks [%s]",
-      ret->id(),
-      ret->real_loc().GetX(),
-      ret->real_loc().GetY(),
-      ret->discrete_loc().first,
-      ret->discrete_loc().second,
-      ret->xspan(ret->real_loc()).lb(),
-      ret->xspan(ret->real_loc()).ub(),
-      ret->yspan(ret->real_loc()).lb(),
-      ret->yspan(ret->real_loc()).ub(),
-      ret->n_blocks(),
-      s.c_str());
+  ER_INFO("Create cache%d@%s [%u,%u], xspan=%s,yspan=%s with %zu blocks [%s]",
+          ret->id(),
+          ret->real_loc().to_str().c_str(),
+          ret->discrete_loc().first,
+          ret->discrete_loc().second,
+          ret->xspan(ret->real_loc()).to_str().c_str(),
+          ret->yspan(ret->real_loc()).to_str().c_str(),
+          ret->n_blocks(),
+          s.c_str());
   return ret;
 } /* create_single_cache() */
 

@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
-#include <argos3/core/utility/math/vector2.h>
 #include <string>
 #include "fordyca/fsm/new_direction_data.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 
 /*******************************************************************************
@@ -43,6 +43,8 @@ class actuation_subsystem;
 } // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
+
 NS_START(fsm);
 
 /*******************************************************************************
@@ -105,7 +107,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    *
    * @return The same vector, but with a new angle.
    */
-  argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+  rmath::vector2d randomize_vector_angle(const rmath::vector2d& vector);
 
   const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
@@ -218,7 +220,7 @@ class base_foraging_fsm : public state_machine::hfsm,
   uint                             m_avoidance_start{0};
   uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
-  argos::CRadians                  m_new_dir;
+  rmath::radians                   m_new_dir;
   argos::CRandom::CRNG*            m_rng;
   controller::saa_subsystem* const m_saa;
   // clang-format on

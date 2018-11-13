@@ -33,6 +33,11 @@
 NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
+ * Class Constants
+ ******************************************************************************/
+const rmath::vector2d dynamic_cache_creator::kInvalidCacheCenter{-1.0, -1.0};
+
+/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 dynamic_cache_creator::dynamic_cache_creator(ds::arena_grid* const grid,
@@ -83,26 +88,24 @@ ds::cache_vector dynamic_cache_creator::create_all(
        * able to create a cache.
        */
       if ((candidate_blocks[i]->real_loc() - candidate_blocks[j]->real_loc())
-              .Length() <= m_min_dist) {
+              .length() <= m_min_dist) {
         /*
          * We don't want to double add any blocks.
          */
         if (std::find(cache_i_blocks.begin(),
                       cache_i_blocks.end(),
                       candidate_blocks[i]) == cache_i_blocks.end()) {
-          ER_TRACE("Add block %zu: (%f, %f)",
+          ER_TRACE("Add block %zu@%s",
                    i,
-                   candidate_blocks[i]->real_loc().GetX(),
-                   candidate_blocks[i]->real_loc().GetY());
+                   candidate_blocks[i]->real_loc().to_str().c_str());
           cache_i_blocks.push_back(candidate_blocks[i]);
         }
         if (std::find(cache_i_blocks.begin(),
                       cache_i_blocks.end(),
                       candidate_blocks[j]) == cache_i_blocks.end()) {
-          ER_TRACE("Add block %zu: (%f, %f)",
+          ER_TRACE("Add block %zu:@%s",
                    j,
-                   candidate_blocks[j]->real_loc().GetX(),
-                   candidate_blocks[j]->real_loc().GetY());
+                   candidate_blocks[j]->real_loc().to_str().c_str());
           cache_i_blocks.push_back(candidate_blocks[j]);
         }
       }
@@ -120,10 +123,12 @@ ds::cache_vector dynamic_cache_creator::create_all(
        */
       ds::cache_vector avoid = existing_caches;
       avoid.insert(avoid.end(), caches.begin(), caches.end());
-      argos::CVector2 center = calc_center(cache_i_blocks, avoid);
-      auto cache_p = std::shared_ptr<representation::arena_cache>(
-          create_single_cache(cache_i_blocks, center));
-      caches.push_back(cache_p);
+      rmath::vector2d center = calc_center(cache_i_blocks, avoid);
+      if (kInvalidCacheCenter != center) {
+        auto cache_p = std::shared_ptr<representation::arena_cache>(
+            create_single_cache(cache_i_blocks, center));
+        caches.push_back(cache_p);
+      }
 
       /* Need to make sure we don't use these blocks in any other caches */
       used_blocks.insert(used_blocks.end(),
@@ -137,26 +142,26 @@ ds::cache_vector dynamic_cache_creator::create_all(
   return caches;
 } /* create() */
 
-argos::CVector2 dynamic_cache_creator::calc_center(
+rmath::vector2d dynamic_cache_creator::calc_center(
     const block_list& blocks,
     const ds::cache_vector& existing_caches) const {
   double sumx = std::accumulate(
       std::begin(blocks), std::end(blocks), 0.0, [](double sum, const auto& b) {
-        return sum + b->real_loc().GetX();
+        return sum + b->real_loc().x();
       });
   double sumy = std::accumulate(
       std::begin(blocks), std::end(blocks), 0.0, [](double sum, const auto& b) {
-        return sum + b->real_loc().GetY();
+        return sum + b->real_loc().y();
       });
 
-  argos::CVector2 center(sumx / blocks.size(), sumy / blocks.size());
-  ER_DEBUG("Guess center=(%f,%f)", center.GetX(), center.GetY());
+  rmath::vector2d center(sumx / blocks.size(), sumy / blocks.size());
+  ER_DEBUG("Guess center=%s", center.to_str().c_str());
 
   /* If no existing caches, no possibility for conflict */
   if (existing_caches.empty()) {
     return center;
   }
-  std::string s =
+  std::string ec_str =
       std::accumulate(existing_caches.begin(),
                       existing_caches.end(),
                       std::string(),
@@ -164,7 +169,7 @@ argos::CVector2 dynamic_cache_creator::calc_center(
                         return a + "c" + std::to_string(b->id()) + ",";
                       });
 
-  ER_DEBUG("Deconflict caches=[%s]", s.c_str());
+  ER_DEBUG("Deconflict caches=[%s]", ec_str.c_str());
 
   /*
    * Every time we find an overlap we have to re-test all of the caches we've
@@ -172,7 +177,7 @@ argos::CVector2 dynamic_cache_creator::calc_center(
    * just made in x or y might have just caused an overlap.
    */
   uint i;
-  for (i = 0; i < existing_caches.size() * kOVERLAP_SEARCH_MAX_TRIES; ++i) {
+  for (i = 0; i < kOVERLAP_SEARCH_MAX_TRIES; ++i) {
     bool conflict = false;
     for (size_t j = 0; j < existing_caches.size(); ++j) {
       if (i == j) {
@@ -189,19 +194,33 @@ argos::CVector2 dynamic_cache_creator::calc_center(
   } /* for(i..) */
 
   /*
-   * @todo This will definitely need to be changed later, because it may very
-   * well be possible to have blocks close together that nevertheless cannot
-   * create a cache because of potential overlaps.
+   * We have a set # of tries to fiddle with the new cache center, and if we
+   * can't find anything conflict free in that many, bail out.
    */
-  ER_ASSERT(i < existing_caches.size() * kOVERLAP_SEARCH_MAX_TRIES,
-            "Unable to find location that did not conflict with all caches");
+  if (i >= kOVERLAP_SEARCH_MAX_TRIES) {
+    std::string b_str =
+        std::accumulate(blocks.begin(),
+                        blocks.end(),
+                        std::string(),
+                        [&](const std::string& a, const auto& b) {
+                          return a + "b" + std::to_string(b->id()) + ",";
+                        });
+
+    ER_WARN(
+        "No conflict-free center for new cache found in %u tries caches=[%s], "
+        "blocks=[%s]",
+        kOVERLAP_SEARCH_MAX_TRIES,
+        ec_str.c_str(),
+        b_str.c_str());
+    return kInvalidCacheCenter;
+  }
 
   return center;
 } /* calc_center() */
 
 bool dynamic_cache_creator::deconflict_cache_center(
     const representation::base_cache& cache,
-    argos::CVector2& center) const {
+    rmath::vector2d& center) const {
   std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
   std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
 
@@ -221,36 +240,24 @@ bool dynamic_cache_creator::deconflict_cache_center(
   double y_min = exc_yspan.span() * 1.5;
 
   if (newc_xspan.overlaps_with(exc_xspan)) {
-    ER_TRACE(
-        "xspan=[%f,%f] overlap cache%d@(%f,%f) xspan=[%f-%f] center=(%f,%f)",
-        newc_xspan.lb(),
-        newc_xspan.ub(),
-        cache.id(),
-        cache.real_loc().GetX(),
-        cache.real_loc().GetY(),
-        exc_xspan.lb(),
-        exc_xspan.ub(),
-        center.GetX(),
-        center.GetY());
-    center.SetX(std::max(
-        x_min,
-        std::min(x_max, center.GetX() + xrnd(m_rng) * newc_xspan.span())));
+    ER_TRACE("xspan=%s overlap cache%d@%s xspan=%s center=%s",
+             newc_xspan.to_str().c_str(),
+             cache.id(),
+             cache.real_loc().to_str().c_str(),
+             exc_xspan.to_str().c_str(),
+             center.to_str().c_str());
+    center.x(std::max(
+        x_min, std::min(x_max, center.x() + xrnd(m_rng) * newc_xspan.span())));
     return false;
   } else if (newc_yspan.overlaps_with(exc_yspan)) {
-    ER_TRACE(
-        "yspan=[%f,%f] overlap cache%d@(%f,%f) yspan=[%f-%f] center=(%f,%f)",
-        newc_xspan.lb(),
-        newc_xspan.ub(),
-        cache.id(),
-        cache.real_loc().GetX(),
-        cache.real_loc().GetY(),
-        exc_yspan.lb(),
-        exc_yspan.ub(),
-        center.GetX(),
-        center.GetY());
-    center.SetY(std::max(
-        y_min,
-        std::min(y_max, center.GetY() + yrnd(m_rng) * newc_yspan.span())));
+    ER_TRACE("yspan=%s overlap cache%d@%s yspan=%s center=%s",
+             newc_xspan.to_str().c_str(),
+             cache.id(),
+             cache.real_loc().to_str().c_str(),
+             exc_yspan.to_str().c_str(),
+             center.to_str().c_str());
+    center.y(std::max(
+        y_min, std::min(y_max, center.y() + yrnd(m_rng) * newc_yspan.span())));
     return false;
   }
   return true;
@@ -275,18 +282,14 @@ bool dynamic_cache_creator::creation_sanity_checks(
         auto c2_yspan = c2->yspan(c2->real_loc());
         ER_ASSERT(!(c1_xspan.overlaps_with(c2_xspan) &&
                     c1_yspan.overlaps_with(c2_yspan)),
-                  "Cache%d xspan=[%f-%f], yspan=[%f,%f] overlaps cache%d "
-                  "xspan=[%f-%f],yspan=[%f,%f]",
+                  "Cache%d xspan=%s, yspan=%s overlaps cache%d "
+                  "xspan=%s,yspan=%s",
                   c1->id(),
-                  c1_xspan.lb(),
-                  c1_xspan.ub(),
-                  c1_yspan.lb(),
-                  c1_yspan.ub(),
+                  c1_xspan.to_str().c_str(),
+                  c1_yspan.to_str().c_str(),
                   c2->id(),
-                  c2_xspan.lb(),
-                  c2_xspan.ub(),
-                  c2_yspan.lb(),
-                  c2_yspan.ub());
+                  c2_xspan.to_str().c_str(),
+                  c2_yspan.to_str().c_str());
       } /* for(&b..) */
     }   /* for(&c2..) */
   }     /* for(&c1..) */

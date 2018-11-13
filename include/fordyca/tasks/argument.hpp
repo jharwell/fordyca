@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "fordyca/controller/foraging_signal.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "rcppsw/task_allocation/taskable_argument.hpp"
@@ -48,15 +47,15 @@ namespace task_allocation = rcppsw::task_allocation;
  */
 class vector_argument : public task_allocation::taskable_argument {
  public:
-  vector_argument(double tolerance, const argos::CVector2& v)
+  vector_argument(double tolerance, const rmath::vector2d& v)
       : m_tolerance(tolerance), m_vector(v) {}
 
-  const argos::CVector2& vector(void) const { return m_vector; }
+  const rmath::vector2d& vector(void) const { return m_vector; }
   double tolerance(void) const { return m_tolerance; }
 
  private:
   double m_tolerance;
-  argos::CVector2 m_vector;
+  rmath::vector2d m_vector;
 };
 
 /**

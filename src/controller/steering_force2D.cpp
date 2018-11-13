@@ -28,6 +28,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -44,22 +45,22 @@ steering_force2D::steering_force2D(
  * Member Functions
  ******************************************************************************/
 void steering_force2D::phototaxis(void) {
-  argos::CVector2 force = m_phototaxis_force();
+  rmath::vector2d force = m_phototaxis_force();
   ER_DEBUG("Phototaxis force: (%f, %f)@%f [%f]",
-           force.GetX(),
-           force.GetY(),
-           force.Angle().GetValue(),
-           force.Length());
+           force.x(),
+           force.y(),
+           force.angle().value(),
+           force.length());
   accum_force(force);
 } /* phototaxis() */
 
 void steering_force2D::anti_phototaxis(void) {
-  argos::CVector2 force = -m_phototaxis_force();
+  rmath::vector2d force = -m_phototaxis_force();
   ER_DEBUG("Anti-phototaxis force: (%f, %f)@%f [%f]",
-           force.GetX(),
-           force.GetY(),
-           force.Angle().GetValue(),
-           force.Length());
+           force.x(),
+           force.y(),
+           force.angle().value(),
+           force.length());
   accum_force(force);
 } /* anti_phototaxis() */
 

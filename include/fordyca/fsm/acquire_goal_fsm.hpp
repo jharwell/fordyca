@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
-#include <argos3/core/utility/math/vector2.h>
 #include <functional>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"

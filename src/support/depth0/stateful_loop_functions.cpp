@@ -115,7 +115,7 @@ void stateful_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
+  auto coord = math::rcoord_to_dcoord(controller.position(),
                                       arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
@@ -125,7 +125,8 @@ void stateful_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
 __rcsw_pure argos::CColor stateful_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  if (arena_map()->nest().contains_point(plane_pos)) {
+  rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
+  if (arena_map()->nest().contains_point(tmp)) {
     return argos::CColor(arena_map()->nest().color().red(),
                          arena_map()->nest().color().green(),
                          arena_map()->nest().color().blue());
@@ -139,7 +140,7 @@ __rcsw_pure argos::CColor stateful_loop_functions::GetFloorColor(
      * when they are not actually (when blocks are picked up their correct color
      * is shown through visualization).
      */
-    if (arena_map()->blocks()[i]->contains_point(plane_pos)) {
+    if (arena_map()->blocks()[i]->contains_point(tmp)) {
       return argos::CColor::BLACK;
     }
   } /* for(i..) */

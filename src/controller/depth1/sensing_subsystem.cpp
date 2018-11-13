@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
 
 /*******************************************************************************
  * Namespaces

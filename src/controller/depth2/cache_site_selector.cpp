@@ -34,7 +34,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth2);
-namespace rmath = rcppsw::math;
 using cselm = cache_sel_matrix;
 
 /*******************************************************************************
@@ -48,14 +47,14 @@ cache_site_selector::cache_site_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-argos::CVector2 cache_site_selector::calc_best(const cache_list& known_caches,
+rmath::vector2d cache_site_selector::calc_best(const cache_list& known_caches,
                                                const block_list& known_blocks,
-                                               argos::CVector2 robot_loc) {
+                                               rmath::vector2d position) {
   double max_utility;
   std::vector<double> point;
   constraint_set constraints;
   struct site_utility_data u;
-  opt_initialize(known_caches, known_blocks, robot_loc, &constraints, &u, &point);
+  opt_initialize(known_caches, known_blocks, position, &constraints, &u, &point);
 
   /*
    * @bug Sometimes NLopt just fails with a generic error code and I don't
@@ -84,18 +83,18 @@ argos::CVector2 cache_site_selector::calc_best(const cache_list& known_caches,
           bc_count,
           m_nc_violations);
 
-  return argos::CVector2(point[0], point[1]);
+  return rmath::vector2d(point[0], point[1]);
 } /* calc_best() */
 
 void cache_site_selector::opt_initialize(
     const cache_list& known_caches,
     const block_list& known_blocks,
-    argos::CVector2 robot_loc,
+    rmath::vector2d position,
     constraint_set* const constraints,
     struct site_utility_data* const utility_data,
     std::vector<double>* const initial_guess) {
-  argos::CVector2 nest_loc =
-      boost::get<argos::CVector2>(mc_matrix->find(cselm::kNestLoc)->second);
+  rmath::vector2d nest_loc =
+      boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
 
   std::string baccum;
   std::for_each(known_blocks.begin(), known_blocks.end(), [&](const auto& b) {
@@ -126,18 +125,18 @@ void cache_site_selector::opt_initialize(
   m_cc_violations.reserve(std::get<0>(*constraints).size());
   m_bc_violations.reserve(std::get<1>(*constraints).size());
 
-  auto xrange = boost::get<rmath::rangeui>(
-      mc_matrix->find(cselm::kSiteXRange)->second);
-  auto yrange = boost::get<rmath::rangeui>(
-      mc_matrix->find(cselm::kSiteYRange)->second);
-  *utility_data = {robot_loc, nest_loc};
+  auto xrange =
+      boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteXRange)->second);
+  auto yrange =
+      boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteYRange)->second);
+  *utility_data = {position, nest_loc};
   m_alg.set_max_objective(&__site_utility_func, utility_data);
   m_alg.set_ftol_rel(kUTILITY_TOL);
   m_alg.set_stopval(1000000);
-  m_alg.set_lower_bounds({static_cast<double>(xrange.lb()),
-                          static_cast<double>(yrange.lb())});
-  m_alg.set_upper_bounds({static_cast<double>(xrange.ub()),
-                          static_cast<double>(yrange.ub())});
+  m_alg.set_lower_bounds(
+      {static_cast<double>(xrange.lb()), static_cast<double>(yrange.lb())});
+  m_alg.set_upper_bounds(
+      {static_cast<double>(xrange.ub()), static_cast<double>(yrange.ub())});
   m_alg.set_maxeval(kMAX_ITERATIONS);
   m_alg.set_default_initial_step({1.0, 1.0});
 
@@ -145,18 +144,16 @@ void cache_site_selector::opt_initialize(
   uint x = std::min((std::rand() % xrange.ub()) + 1, xrange.ub());
   uint y = std::min((std::rand() % yrange.ub()) + 1, yrange.ub());
   *initial_guess = {static_cast<double>(x), static_cast<double>(y)};
-  ER_INFO("Initial guess: (%u,%u), xrange=[%u-%u], yrange=[%u-%u]",
+  ER_INFO("Initial guess: (%u,%u), xrange=%s, yrange=%s",
           x,
           y,
-          xrange.lb(),
-          xrange.ub(),
-          yrange.lb(),
-          yrange.ub());
+          xrange.to_str().c_str(),
+          yrange.to_str().c_str());
 } /* opt_initialize() */
 
 void cache_site_selector::constraints_create(const cache_list& known_caches,
                                              const block_list& known_blocks,
-                                             const argos::CVector2& nest_loc,
+                                             const rmath::vector2d& nest_loc,
                                              constraint_set* const constraints) {
   for (auto& c : known_caches) {
     std::get<0>(*constraints)
@@ -208,7 +205,7 @@ __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
   cache_site_selector::cache_constraint_data* c =
       reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
   double val = c->cache_prox_dist -
-               (argos::CVector2(x[0], x[1]) - c->cache->real_loc()).Length();
+               (rmath::vector2d(x[0], x[1]) - c->cache->real_loc()).length();
 
   if (val > 0) {
     c->selector->cc_violated(c->cache->id());
@@ -227,7 +224,7 @@ __rcsw_pure double __nest_constraint_func(const std::vector<double>& x,
   cache_site_selector::nest_constraint_data* c =
       reinterpret_cast<cache_site_selector::nest_constraint_data*>(data);
   double val =
-      c->nest_prox_dist - (argos::CVector2(x[0], x[1]) - c->nest_loc).Length();
+      c->nest_prox_dist - (rmath::vector2d(x[0], x[1]) - c->nest_loc).length();
   if (val > 0) {
     c->selector->nc_violated();
   } else {
@@ -246,7 +243,7 @@ __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
   cache_site_selector::block_constraint_data* c =
       reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
   double val = c->block_prox_dist -
-               (argos::CVector2(x[0], x[1]) - c->block->real_loc()).Length();
+               (rmath::vector2d(x[0], x[1]) - c->block->real_loc()).length();
   if (val > 0) {
     c->selector->bc_violated(c->block->id());
   } else {
@@ -268,8 +265,8 @@ __rcsw_pure double __site_utility_func(const std::vector<double>& x,
   }
   cache_site_selector::site_utility_data* d =
       reinterpret_cast<cache_site_selector::site_utility_data*>(data);
-  argos::CVector2 point(x[0], x[1]);
-  return math::cache_site_utility(d->robot_loc, d->nest_loc)(point);
+  rmath::vector2d point(x[0], x[1]);
+  return math::cache_site_utility(d->position, d->nest_loc)(point);
 } /* __site_utility_func() */
 
 NS_END(depth2, controller, fordyca);

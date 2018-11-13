@@ -43,7 +43,6 @@ namespace fsm { namespace depth0 { class stateless_fsm; }}
 NS_START(controller);
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
-namespace er = rcppsw::er;
 NS_START(depth0);
 
 /*******************************************************************************
@@ -74,7 +73,7 @@ class stateless_controller : public base_controller,
 
   /* distance metrics */
   double distance(void) const override;
-  argos::CVector2 velocity(void) const override;
+  rmath::vector2d velocity(void) const override;
 
   /* goal acquisition metrics */
   bool is_exploring_for_goal(void) const override{ return false; }

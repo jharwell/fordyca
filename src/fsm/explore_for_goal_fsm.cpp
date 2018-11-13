@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 

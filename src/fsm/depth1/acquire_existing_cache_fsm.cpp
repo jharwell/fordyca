@@ -52,7 +52,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
  * Member Functions
  ******************************************************************************/
 bool acquire_existing_cache_fsm::select_cache_for_acquisition(
-    argos::CVector2* const acquisition) {
+    rmath::vector2d* const acquisition) {
   controller::depth1::existing_cache_selector selector(mc_sel_matrix);
   representation::perceived_cache best =
       selector.calc_best(map()->perceived_caches(), base_sensors()->position());
@@ -63,14 +63,12 @@ bool acquire_existing_cache_fsm::select_cache_for_acquisition(
   if (nullptr == best.ent) {
     return false;
   }
-  ER_INFO(
-      "Selected existing cache%d@(%f,%f) [%u,%u], utility=%f for acquisition",
-      best.ent->id(),
-      best.ent->real_loc().GetX(),
-      best.ent->real_loc().GetY(),
-      best.ent->discrete_loc().first,
-      best.ent->discrete_loc().second,
-      best.density.last_result());
+  ER_INFO("Selected existing cache%d@%s [%u,%u], utility=%f for acquisition",
+          best.ent->id(),
+          best.ent->real_loc().to_str().c_str(),
+          best.ent->discrete_loc().first,
+          best.ent->discrete_loc().second,
+          best.density.last_result());
 
   /*
    * Now that we have the location of the best cache, we need to pick a random
@@ -81,21 +79,15 @@ bool acquire_existing_cache_fsm::select_cache_for_acquisition(
    */
   auto xrange = best.ent->xspan(best.ent->real_loc());
   auto yrange = best.ent->yspan(best.ent->real_loc());
-  std::uniform_real_distribution<double> xrnd(xrange.lb(),
-                                              xrange.ub());
-  std::uniform_real_distribution<double> yrnd(yrange.lb(),
-                                              yrange.ub());
+  std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
+  std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
 
-  *acquisition = argos::CVector2(xrnd(m_rd), yrnd(m_rd));
-  ER_INFO(
-      "Selected point (%f,%f) inside cache%d: xrange=[%f-%f], yrange=[%f-%f]",
-      acquisition->GetX(),
-      acquisition->GetY(),
-      best.ent->id(),
-      xrange.lb(),
-      xrange.ub(),
-      yrange.lb(),
-      yrange.ub());
+  *acquisition = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
+  ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
+          acquisition->to_str().c_str(),
+          best.ent->id(),
+          xrange.to_str().c_str(),
+          yrange.to_str().c_str());
   return true;
 } /* select_cache_for_acquisition() */
 
@@ -137,7 +129,7 @@ bool acquire_existing_cache_fsm::acquire_known_goal(void) {
      * vectoring toward any of them.
      */
     if (!vector_fsm().task_running()) {
-      argos::CVector2 best;
+      rmath::vector2d best;
       /*
      * If this happens, all the blocks we know of are too close for us to vector
      * to.

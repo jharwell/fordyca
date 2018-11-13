@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <list>
 #include <vector>
 
@@ -32,8 +31,10 @@
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/support/cache_vector.hpp"
+#include "rcppsw/math/vector2.hpp"
+
 #include "fordyca/support/block_vector.hpp"
+#include "fordyca/support/cache_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,6 +46,7 @@ class base_block;
 } // namespace representation
 NS_START(support);
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -98,7 +100,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
   ds::arena_grid* grid(void) { return m_grid; }
   std::unique_ptr<representation::arena_cache> create_single_cache(
       block_list blocks,
-      const argos::CVector2& center);
+      const rmath::vector2d& center);
 
  private:
   // clang-format off

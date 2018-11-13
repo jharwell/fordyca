@@ -140,18 +140,18 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
       uint v_ybase = (*v.first.origin()).loc().second;
       uint other_xbase = (*other.first.origin()).loc().first;
       uint other_ybase = (*other.first.origin()).loc().second;
-      math::rangeui v_xrange(v_xbase + v.first.index_bases()[0],
-                             v_xbase + v.first.index_bases()[0] +
-                             v.first.shape()[0]);
-      math::rangeui v_yrange(v_ybase + v.first.index_bases()[1],
-                             v_ybase + v.first.index_bases()[1] +
-                             v.first.shape()[1]);
-      math::rangeui other_xrange(other_xbase + other.first.index_bases()[0],
-                                 other_xbase + other.first.index_bases()[0] +
-                                 other.first.shape()[0]);
-      math::rangeui other_yrange(other_ybase + other.first.index_bases()[1],
-                                 other_ybase + other.first.index_bases()[1] +
-                                 other.first.shape()[1]);
+      math::rangeu v_xrange(v_xbase + v.first.index_bases()[0],
+                            v_xbase + v.first.index_bases()[0] +
+                                v.first.shape()[0]);
+      math::rangeu v_yrange(v_ybase + v.first.index_bases()[1],
+                            v_ybase + v.first.index_bases()[1] +
+                                v.first.shape()[1]);
+      math::rangeu other_xrange(other_xbase + other.first.index_bases()[0],
+                                other_xbase + other.first.index_bases()[0] +
+                                    other.first.shape()[0]);
+      math::rangeu other_yrange(other_ybase + other.first.index_bases()[1],
+                                other_ybase + other.first.index_bases()[1] +
+                                    other.first.shape()[1]);
 
       return v_xrange.overlaps_with(other_xrange) &&
              v_yrange.overlaps_with(other_yrange);

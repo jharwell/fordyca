@@ -25,14 +25,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <utility>
 #include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * namespaces
  ******************************************************************************/
 NS_START(fordyca, math);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Functions
@@ -42,21 +43,21 @@ NS_START(fordyca, math);
  * specified resolution.
  */
 __rcsw_pure static inline rcppsw::math::dcoord2 rcoord_to_dcoord(
-    const argos::CVector2& r_coord,
+    const rmath::vector2d& r_coord,
     double resolution) {
   return rcppsw::math::dcoord2(
-      static_cast<size_t>(std::round(r_coord.GetX() / resolution)),
-      static_cast<size_t>(std::round(r_coord.GetY() / resolution)));
+      static_cast<uint>(std::round(r_coord.x() / resolution)),
+      static_cast<uint>(std::round(r_coord.y() / resolution)));
 }
 
 /**
  * @brief Translate discrete coordinates to real (continuous) ones using the
  * specified resolution.
  */
-__rcsw_pure static inline argos::CVector2 dcoord_to_rcoord(
+__rcsw_pure static inline rmath::vector2d dcoord_to_rcoord(
     const rcppsw::math::dcoord2& d_coord,
     double resolution) {
-  return argos::CVector2(d_coord.first * resolution,
+  return rmath::vector2d(d_coord.first * resolution,
                          d_coord.second * resolution);
 }
 

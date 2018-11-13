@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
@@ -132,7 +130,7 @@ class stateful_controller : public stateless_controller,
  private:
   // clang-format off
   bool                                       m_display_los{false};
-  argos::CVector2                            m_light_loc;
+  rmath::vector2d                            m_light_loc;
   std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
   std::unique_ptr<fsm::depth0::stateful_fsm> m_fsm;

@@ -28,17 +28,18 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace rmath = rcppsw::math;
 namespace params {
 class loop_function_repository;
 }
 NS_START(support, depth0);
 class stateless_metrics_aggregator;
-
 /*******************************************************************************
  * Classes
  ******************************************************************************/

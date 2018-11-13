@@ -54,7 +54,7 @@ class arena_cache
  public:
   arena_cache(double dimension,
               double resolution,
-              argos::CVector2 center,
+              rmath::vector2d center,
               const block_vector& blocks,
               int id);
 

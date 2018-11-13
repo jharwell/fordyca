@@ -37,6 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -121,10 +122,9 @@ __rcsw_pure bool random_distributor::verify_block_dist(
            "Block%d real coordinates still out of sight after distribution",
            block.id());
 
-  ER_DEBUG("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
+  ER_DEBUG("Block%d@%s [%u, %u] ptr=%p",
            block.id(),
-           block.real_loc().GetX(),
-           block.real_loc().GetY(),
+           block.real_loc().to_str().c_str(),
            block.discrete_loc().first,
            block.discrete_loc().second,
            reinterpret_cast<const void*>(cell->block().get()));
@@ -137,10 +137,8 @@ error:
 bool random_distributor::find_avail_coord(const entity_list& entities,
                                           std::vector<uint>& coordv) {
   uint abs_x, abs_y, rel_x, rel_y;
-  rcppsw::math::rangeui area_xrange(m_grid.index_bases()[0],
-                                    m_grid.shape()[0]);
-  rcppsw::math::rangeui area_yrange(m_grid.index_bases()[1],
-                                    m_grid.shape()[1]);
+  rcppsw::math::rangeu area_xrange(m_grid.index_bases()[0], m_grid.shape()[0]);
+  rcppsw::math::rangeu area_yrange(m_grid.index_bases()[1], m_grid.shape()[1]);
 
   /* -1 because we are working with array indices */
   std::uniform_int_distribution<uint> xdist(area_xrange.lb(),
@@ -154,13 +152,10 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
     rel_y = area_xrange.span() > 0 ? ydist(m_rng) : m_grid.index_bases()[1];
     abs_x = rel_x + (*m_grid.origin()).loc().first;
     abs_y = rel_y + (*m_grid.origin()).loc().second;
-  } while (std::any_of(entities.begin(),
-                       entities.end(),
-                       [&](const auto* ent) {
-                         return entity_contains_coord(ent, abs_x, abs_y) &&
-                             count++ <= kMAX_DIST_TRIES;
-                       }
-                       ));
+  } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
+    return entity_contains_coord(ent, abs_x, abs_y) &&
+           count++ <= kMAX_DIST_TRIES;
+  }));
   if (count <= kMAX_DIST_TRIES) {
     coordv = std::vector<uint>({rel_x, rel_y, abs_x, abs_y});
     return true;
@@ -172,36 +167,32 @@ bool random_distributor::entity_contains_coord(
     const representation::multicell_entity* const entity,
     double abs_x,
     double abs_y) {
-  auto movable = dynamic_cast<const representation::movable_cell_entity*>(entity);
-  argos::CVector2 coord = math::dcoord_to_rcoord(rcppsw::math::dcoord2(abs_x,
-                                                                     abs_y),
-                                               m_resolution);
-if (nullptr != movable) {
-  auto ent_xspan = entity->xspan(movable->real_loc());
-  auto ent_yspan = entity->yspan(movable->real_loc());
-  ER_TRACE("(movable entity) rcoord=(%f, %f), xspan=[%f-%f],yspan=[%f-%f]",
-      coord.GetX(),
-      coord.GetY(),
-      ent_xspan.lb(),
-      ent_xspan.ub(),
-      ent_yspan.lb(),
-      ent_yspan.ub());
-  return ent_xspan.contains(coord.GetX()) && ent_yspan.contains(coord.GetY());
-}
+  auto movable =
+      dynamic_cast<const representation::movable_cell_entity*>(entity);
+  rmath::vector2d coord =
+      math::dcoord_to_rcoord(rcppsw::math::dcoord2(abs_x, abs_y), m_resolution);
+  if (nullptr != movable) {
+    auto ent_xspan = entity->xspan(movable->real_loc());
+    auto ent_yspan = entity->yspan(movable->real_loc());
+    ER_TRACE("(movable entity) rcoord=%s, xspan=%s,yspan=%s",
+             coord.to_str().c_str(),
+             ent_xspan.to_str().c_str(),
+             ent_yspan.to_str().c_str());
+    return ent_xspan.contains(coord.x()) && ent_yspan.contains(coord.y());
+  }
 
-auto immovable = dynamic_cast<const representation::immovable_cell_entity*>(entity);
-ER_ASSERT(nullptr != immovable, "Cell entity is neither movable nor immovable");
-auto ent_xspan = entity->xspan(immovable->real_loc());
-auto ent_yspan = entity->yspan(immovable->real_loc());
+  auto immovable =
+      dynamic_cast<const representation::immovable_cell_entity*>(entity);
+  ER_ASSERT(nullptr != immovable,
+            "Cell entity is neither movable nor immovable");
+  auto ent_xspan = entity->xspan(immovable->real_loc());
+  auto ent_yspan = entity->yspan(immovable->real_loc());
 
-ER_TRACE("(immovable entity) rcoord=(%f, %f), xspan=[%f-%f],yspan=[%f-%f]",
-    coord.GetX(),
-    coord.GetY(),
-    ent_xspan.lb(),
-    ent_xspan.ub(),
-    ent_yspan.lb(),
-    ent_yspan.ub());
-return ent_xspan.contains(coord.GetX()) && ent_yspan.contains(coord.GetY());
+  ER_TRACE("(immovable entity) rcoord=%s, xspan=%s,yspan=%s",
+           coord.to_str().c_str(),
+           ent_xspan.to_str().c_str(),
+           ent_yspan.to_str().c_str());
+  return ent_xspan.contains(coord.x()) && ent_yspan.contains(coord.y());
 } /* entity_contains_coord() */
 
 NS_END(block_dist, support, fordyca);

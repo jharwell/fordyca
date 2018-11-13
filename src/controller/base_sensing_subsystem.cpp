@@ -24,10 +24,6 @@
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include <limits>
 
-#include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/core/utility/datatypes/color.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
 #include "fordyca/params/sensing_params.hpp"
 
 /*******************************************************************************
@@ -70,21 +66,21 @@ bool base_sensing_subsystem::in_nest(void) const {
 } /* in_nest() */
 
 __rcsw_pure bool base_sensing_subsystem::obstacle_is_threatening(
-    const argos::CVector2& obstacle) const {
-  argos::CRange<argos::CRadians> range(argos::CRadians(-5 * M_PI / 6),
-                                       argos::CRadians(5 * M_PI / 6));
-  return obstacle.Length() >= mc_obstacle_delta &&
-         range.WithinMinBoundIncludedMaxBoundIncluded(obstacle.Angle());
+    const rmath::vector2d& obstacle) const {
+  rmath::range<rmath::radians> range(rmath::radians(-5 * M_PI / 6),
+                                     rmath::radians(5 * M_PI / 6));
+  return obstacle.length() >= mc_obstacle_delta &&
+         range.contains(obstacle.angle());
 } /* obstacle_is_threatening() */
 
-argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
-  argos::CVector2 closest(0, 0);
+rmath::vector2d base_sensing_subsystem::find_closest_obstacle(void) const {
+  rmath::vector2d closest(0, 0);
 
   for (auto& r : m_sensors.proximity.readings()) {
-    argos::CVector2 obstacle(r.value, argos::CRadians(r.angle));
+    rmath::vector2d obstacle(r.value, rmath::radians(r.angle));
     if (obstacle_is_threatening(obstacle)) {
-      if ((position() - obstacle).Length() < closest.Length() ||
-          closest.Length() <= std::numeric_limits<double>::epsilon()) {
+      if ((position() - obstacle).length() < closest.length() ||
+          closest.length() <= std::numeric_limits<double>::epsilon()) {
         closest = obstacle;
       }
     }
@@ -93,7 +89,7 @@ argos::CVector2 base_sensing_subsystem::find_closest_obstacle(void) const {
 } /* find_closest_obstacle() */
 
 bool base_sensing_subsystem::threatening_obstacle_exists(void) const {
-  return find_closest_obstacle().Length() > 0;
+  return find_closest_obstacle().length() > 0;
 } /* threatening_obstacle_exists() */
 
 bool base_sensing_subsystem::block_detected(void) const {

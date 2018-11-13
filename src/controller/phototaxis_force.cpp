@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/phototaxis_force.hpp"
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/params/phototaxis_force_params.hpp"
 
@@ -42,14 +41,14 @@ phototaxis_force::phototaxis_force(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-argos::CVector2 phototaxis_force::operator()() const {
-  argos::CVector2 accum;
+rmath::vector2d phototaxis_force::operator()() const {
+  rmath::vector2d accum;
 
   for (auto& r : m_sensors->light().readings()) {
-    accum += argos::CVector2(r.value, argos::CRadians(r.angle));
+    accum += rmath::vector2d(r.value, rmath::radians(r.angle));
   } /* for(r..) */
 
-  return argos::CVector2(1.0, accum.Angle()) * m_max;
+  return rmath::vector2d(1.0, accum.angle()) * m_max;
 } /* operator()() */
 
 NS_END(controller, fordyca);

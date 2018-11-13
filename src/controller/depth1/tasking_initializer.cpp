@@ -126,22 +126,20 @@ void tasking_initializer::depth1_exec_est_init(
       m_graph->root_tab()->last_subtask(collector);
     }
 
-    rmath::rangeui g_bounds = task_params->exec_est.ranges.find("generalist")->second;
+    rmath::rangeu g_bounds =
+        task_params->exec_est.ranges.find("generalist")->second;
 
-    rmath::rangeui h_bounds = task_params->exec_est.ranges.find("harvester")->second;
-    rmath::rangeui c_bounds = task_params->exec_est.ranges.find("collector")->second;
-    ER_INFO(
-        "Seeding exec estimate for tasks: '%s'=[%u,%u] '%s'=[%u,%u], "
-        "'%s'=[%u,%u]",
-        generalist->name().c_str(),
-        g_bounds.lb(),
-        g_bounds.ub(),
-        harvester->name().c_str(),
-        h_bounds.lb(),
-        h_bounds.ub(),
-        collector->name().c_str(),
-        c_bounds.lb(),
-        c_bounds.ub());
+    rmath::rangeu h_bounds =
+        task_params->exec_est.ranges.find("harvester")->second;
+    rmath::rangeu c_bounds =
+        task_params->exec_est.ranges.find("collector")->second;
+    ER_INFO("Seeding exec estimate for tasks: '%s'=%s '%s'=%s '%s'=%s",
+            generalist->name().c_str(),
+            g_bounds.to_str().c_str(),
+            harvester->name().c_str(),
+            h_bounds.to_str().c_str(),
+            collector->name().c_str(),
+            c_bounds.to_str().c_str());
     static_cast<ta::polled_task*>(generalist)->exec_estimate_init(g_bounds);
     static_cast<ta::polled_task*>(harvester)->exec_estimate_init(h_bounds);
     static_cast<ta::polled_task*>(collector)->exec_estimate_init(c_bounds);

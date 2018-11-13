@@ -24,13 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
 #include <vector>
 
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,8 +40,9 @@ namespace params {
 struct block_sel_matrix_params;
 }
 NS_START(controller);
+namespace rmath = rcppsw::math;
 using block_sel_variant =
-    boost::variant<double, argos::CVector2, std::vector<int>>;
+    boost::variant<double, rmath::vector2d, std::vector<int>>;
 
 /*******************************************************************************
  * Class Definitions

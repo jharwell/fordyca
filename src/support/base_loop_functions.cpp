@@ -24,17 +24,18 @@
 #include "fordyca/support/base_loop_functions.hpp"
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
 namespace alg = rcppsw::algorithm;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -94,8 +95,8 @@ std::vector<double> base_loop_functions::nearest_neighbors(void) const {
 
   for (auto& entity_pair : robots) {
     auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    argos::CVector2 pos;
-    pos.Set(const_cast<argos::CFootBotEntity&>(robot)
+    rmath::vector2d pos;
+    pos.set(const_cast<argos::CFootBotEntity&>(robot)
                 .GetEmbodiedEntity()
                 .GetOriginAnchor()
                 .Position.GetX(),
@@ -103,7 +104,7 @@ std::vector<double> base_loop_functions::nearest_neighbors(void) const {
                 .GetEmbodiedEntity()
                 .GetOriginAnchor()
                 .Position.GetY());
-    v.push_back(rcppsw::math::vector2d(pos.GetX(), pos.GetY()));
+    v.push_back(pos);
   } /* for(&entity..) */
 
   /*

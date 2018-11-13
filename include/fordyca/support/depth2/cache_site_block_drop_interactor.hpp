@@ -31,11 +31,13 @@
 #include "fordyca/events/block_proximity.hpp"
 #include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Classes
@@ -106,13 +108,12 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
   using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
   using penalty_status = typename block_op_penalty_handler<T>::penalty_status;
 
-  void block_proximity_notify(T& controller, std::pair<int, argos::CVector2> block_pair) {
-    ER_WARN("%s cannot drop block in cache site (%f, %f): Block%d too close (%f <= %f)",
+  void block_proximity_notify(T& controller, std::pair<int, rmath::vector2d> block_pair) {
+    ER_WARN("%s cannot drop block in cache site %s: Block%d too close (%f <= %f)",
             controller.GetId().c_str(),
-            controller.robot_loc().GetX(),
-            controller.robot_loc().GetY(),
+            controller.position().to_str().c_str(),
             block_pair.first,
-            block_pair.second.Length(),
+            block_pair.second.length(),
             m_cache_manager->block_proximity_dist());
     events::block_proximity prox(m_map->blocks()[block_pair.first]->clone());
     controller.visitor::template visitable_any<T>::accept(prox);
@@ -158,7 +159,7 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
   void perform_cache_site_block_drop(T& controller,
                                      const temporal_penalty<T>& penalty) {
     events::free_block_drop drop_op(m_map->blocks()[penalty.id()],
-                                    math::rcoord_to_dcoord(controller.robot_loc(),
+                                    math::rcoord_to_dcoord(controller.position(),
                                                            m_map->grid_resolution()),
                                     m_map->grid_resolution());
 

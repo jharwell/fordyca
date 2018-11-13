@@ -36,9 +36,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace prototype = rcppsw::patterns::prototype;
-
 NS_START(fordyca, representation);
+namespace prototype = rcppsw::patterns::prototype;
 
 /*******************************************************************************
  * Class Definitions
@@ -76,7 +75,7 @@ class base_cache : public multicell_entity,
    */
   base_cache(double dimension,
              double resolution,
-             argos::CVector2 center,
+             rmath::vector2d center,
              const std::vector<std::shared_ptr<base_block>>& blocks,
              int id);
 
@@ -120,9 +119,9 @@ class base_cache : public multicell_entity,
    *
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
-  bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).contains(point.GetX()) &&
-           yspan(real_loc()).contains(point.GetY());
+  bool contains_point(const rmath::vector2d& point) const {
+    return xspan(real_loc()).contains(point.x()) &&
+           yspan(real_loc()).contains(point.y());
   }
 
   /**

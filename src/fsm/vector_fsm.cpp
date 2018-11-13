@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/vector_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
 
@@ -87,23 +84,22 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       ER_DEBUG("Frequent collision: last=%u curr=%u",
                m_state.last_collision_time,
                base_sensors()->tick());
-      argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
+      rmath::vector2d new_dir = randomize_vector_angle(rmath::vector2d::X);
       internal_event(ST_NEW_DIRECTION,
-                     rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
+                     rcppsw::make_unique<new_direction_data>(new_dir.angle()));
     } else {
-      argos::CVector2 obs = base_sensors()->find_closest_obstacle();
-      ER_DEBUG("Found threatening obstacle: (%f, %f)@%f [%f]",
-               obs.GetX(),
-               obs.GetY(),
-               obs.Angle().GetValue(),
-               obs.Length());
+      rmath::vector2d obs = base_sensors()->find_closest_obstacle();
+      ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
+               obs.to_str().c_str(),
+               obs.angle().value(),
+               obs.length());
       saa_subsystem()->steering_force().avoidance(obs);
       /*
        * If we are currently spinning in place (hard turn), we have 0 linear
        * velocity, and that does not play well with the arrival force
        * calculations. To fix this, and a bit of wander force.
        */
-      if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
+      if (saa_subsystem()->linear_velocity().length() <= 0.1) {
         saa_subsystem()->steering_force().wander();
       }
       saa_subsystem()->apply_steering_force(std::make_pair(false, false));
@@ -141,14 +137,12 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   auto* goal = dynamic_cast<const struct goal_data*>(data);
   if (nullptr != goal) {
     m_goal_data = *goal;
-    ER_INFO("Target=(%f,%f), robot=(%f,%f)",
-            m_goal_data.loc.GetX(),
-            m_goal_data.loc.GetY(),
-            saa_subsystem()->sensing()->position().GetX(),
-            saa_subsystem()->sensing()->position().GetY());
+    ER_INFO("Target=%s, robot=%s",
+            m_goal_data.loc.to_str().c_str(),
+            saa_subsystem()->sensing()->position().to_str().c_str());
   }
 
-  if ((m_goal_data.loc - base_sensors()->position()).Length() <=
+  if ((m_goal_data.loc - base_sensors()->position()).length() <=
       m_goal_data.tolerance) {
     internal_event(ST_ARRIVED,
                    rcppsw::make_unique<struct goal_data>(m_goal_data));
@@ -175,9 +169,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
 
 FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   if (ST_ARRIVED != last_state()) {
-    ER_DEBUG("Executing ST_ARRIVED: target (%f, %f) within %f tolerance",
-             data->loc.GetX(),
-             data->loc.GetY(),
+    ER_DEBUG("Executing ST_ARRIVED: target=%s, tol=%f",
+             data->loc.to_str().c_str(),
              data->tolerance);
   }
   return controller::foraging_signal::HANDLED;
@@ -241,8 +234,8 @@ void vector_fsm::init(void) {
   state_machine::simple_fsm::init();
 } /* init() */
 
-__rcsw_pure argos::CVector2 vector_fsm::calc_vector_to_goal(
-    const argos::CVector2& goal) {
+__rcsw_pure rmath::vector2d vector_fsm::calc_vector_to_goal(
+    const rmath::vector2d& goal) {
   return goal - base_sensors()->position();
 } /* calc_vector_to_goal() */
 

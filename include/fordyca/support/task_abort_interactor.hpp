@@ -126,7 +126,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     bool conflict = false;
     for (auto& cache : m_map->caches()) {
       if (loop_utils::block_drop_overlap_with_cache(
-              controller.block(), cache, controller.robot_loc())) {
+              controller.block(), cache, controller.position())) {
         conflict = true;
       }
     } /* for(cache..) */
@@ -143,14 +143,14 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
      * is the only one a robot knows about (see #242).
      */
     if (loop_utils::block_drop_overlap_with_nest(
-            controller.block(), m_map->nest(), controller.robot_loc()) ||
+            controller.block(), m_map->nest(), controller.position()) ||
         loop_utils::block_drop_near_arena_boundary(
-            *m_map, controller.block(), controller.robot_loc())) {
+            *m_map, controller.block(), controller.position())) {
       conflict = true;
     }
     events::free_block_drop drop_op(
         controller.block(),
-        math::rcoord_to_dcoord(controller.robot_loc(), m_map->grid_resolution()),
+        math::rcoord_to_dcoord(controller.position(), m_map->grid_resolution()),
         m_map->grid_resolution());
     if (!conflict) {
       controller.visitor::template visitable_any<T>::accept(drop_op);

@@ -39,7 +39,7 @@ constexpr size_t base_cache::kMinBlocks;
  ******************************************************************************/
 base_cache::base_cache(double dimension,
                        double resolution,
-                       argos::CVector2 center,
+                       rmath::vector2d center,
                        const std::vector<std::shared_ptr<base_block>>& blocks,
                        int id)
     : multicell_entity(rcppsw::math::vector2d(dimension, dimension),

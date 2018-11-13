@@ -24,14 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/sigmoid.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, math);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -58,16 +59,16 @@ NS_START(fordyca, math);
 class cache_site_utility : public rcppsw::math::sigmoid,
                            public rcppsw::er::client<cache_site_utility> {
  public:
-  cache_site_utility(const argos::CVector2& robot_loc,
-                     const argos::CVector2& nest_loc);
+  cache_site_utility(const rmath::vector2d& position,
+                     const rmath::vector2d& nest_loc);
 
-  double calc(const argos::CVector2& site_loc);
-  double operator()(const argos::CVector2& site_loc) { return calc(site_loc); }
+  double calc(const rmath::vector2d& site_loc);
+  double operator()(const rmath::vector2d& site_loc) { return calc(site_loc); }
 
  private:
   // clang-format off
-  const argos::CVector2 mc_robot_loc;
-  const argos::CVector2 mc_nest_loc;
+  const rmath::vector2d mc_position;
+  const rmath::vector2d mc_nest_loc;
   // clang-format on
 };
 

@@ -24,13 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/range.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,6 +41,7 @@ struct cache_sel_matrix_params;
 }
 NS_START(controller);
 namespace rmath = rcppsw::math;
+using cache_sel_variant = boost::variant<double, rmath::vector2d, rmath::rangeu>;
 
 /*******************************************************************************
  * Class Definitions
@@ -60,9 +61,7 @@ namespace rmath = rcppsw::math;
  * This class may be separated into those components in the future if it makes
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
-class cache_sel_matrix
-    : public std::map<std::string,
-                      boost::variant<double, argos::CVector2, rmath::rangeui>> {
+class cache_sel_matrix : public std::map<std::string, cache_sel_variant> {
  public:
   static constexpr char kNestLoc[] = "nest_loc";
   static constexpr char kCacheProxDist[] = "cache_prox_dist";
@@ -72,7 +71,7 @@ class cache_sel_matrix
   static constexpr char kSiteYRange[] = "site_yrange";
 
   cache_sel_matrix(const struct params::cache_sel_matrix_params* params,
-                   const argos::CVector2& nest_loc);
+                   const rmath::vector2d& nest_loc);
 };
 
 NS_END(controller, fordyca);

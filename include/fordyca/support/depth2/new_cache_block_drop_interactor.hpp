@@ -105,13 +105,12 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
   using penalty_status = typename block_op_penalty_handler<T>::penalty_status;
 
-    void cache_proximity_notify(T& controller, std::pair<int, argos::CVector2> cache_pair) {
-    ER_WARN("%s cannot drop block in new cache@(%f, %f): Cache%d too close (%f <= %f)",
+    void cache_proximity_notify(T& controller, std::pair<int, rmath::vector2d> cache_pair) {
+    ER_WARN("%s cannot drop block in new cache@%s: Cache%d too close (%f <= %f)",
             controller.GetId().c_str(),
-            controller.robot_loc().GetX(),
-            controller.robot_loc().GetY(),
+            controller.position().to_str().c_str(),
             cache_pair.first,
-            cache_pair.second.Length(),
+            cache_pair.second.length(),
             m_cache_manager->cache_proximity_dist());
     events::cache_found prox(m_map->caches()[cache_pair.first]->clone());
     controller.visitor::template visitable_any<T>::accept(prox);
@@ -142,12 +141,11 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
      * said cache, then abort the drop and tell the robot about the undiscovered
      * cache so that it will update its state and pick a different new cache.
      */
-      ER_WARN("%s cannot drop block in cache site (%f, %f): Cache%d too close (%f <= %f)",
+      ER_WARN("%s cannot drop block in cache site %s: Cache%d too close (%f <= %f)",
               controller.GetId().c_str(),
-              controller.robot_loc().GetX(),
-              controller.robot_loc().GetY(),
+              controller.position().to_str().c_str(),
               cache_pair.first,
-              cache_pair.second.Length(),
+              cache_pair.second.length(),
               m_cache_manager->cache_proximity_dist());
       events::cache_found prox(m_map->caches()[cache_pair.first]);
       controller.visitor::template visitable_any<T>::accept(prox);
@@ -166,7 +164,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   void perform_new_cache_block_drop(T& controller,
                                     const temporal_penalty<T>& penalty) {
     events::free_block_drop drop_op(m_map->blocks()[penalty.id()],
-                                    math::rcoord_to_dcoord(controller.robot_loc(),
+                                    math::rcoord_to_dcoord(controller.position(),
                                                            m_map->grid_resolution()),
                                     m_map->grid_resolution());
 

@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"

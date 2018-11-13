@@ -32,7 +32,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class arena_cache; }
+namespace representation {
+class arena_cache;
+}
 NS_START(support);
 
 using cache_vector_type = std::shared_ptr<representation::arena_cache>;
@@ -40,7 +42,7 @@ using cache_vector_type = std::shared_ptr<representation::arena_cache>;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using cache_vector =  std::vector<cache_vector_type>;
+using cache_vector = std::vector<cache_vector_type>;
 
 NS_END(support, fordyca);
 

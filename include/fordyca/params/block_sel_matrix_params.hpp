@@ -24,14 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "fordyca/params/block_priority_params.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Structure Definitions
@@ -43,7 +44,7 @@ NS_START(fordyca, params);
  * @brief XML parameters for the \ref block_sel_matrix
  */
 struct block_sel_matrix_params : public rcppsw::params::base_params {
-  argos::CVector2 nest{};
+  rmath::vector2d nest{};
   struct block_priority_params priorities {};
 };
 

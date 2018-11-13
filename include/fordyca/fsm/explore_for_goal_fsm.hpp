@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
-#include <argos3/core/utility/math/vector2.h>
 #include <functional>
 #include "fordyca/controller/explore_behavior.hpp"
 #include "fordyca/fsm/base_explore_fsm.hpp"

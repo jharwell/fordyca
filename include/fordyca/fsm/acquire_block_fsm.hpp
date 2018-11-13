@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <map>
 
 #include "fordyca/controller/block_sel_matrix.hpp"

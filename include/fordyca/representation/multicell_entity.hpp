@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/representation/base_cell_entity.hpp"
@@ -52,11 +51,10 @@ namespace rmath = rcppsw::math;
  */
 class multicell_entity : public base_cell_entity {
  public:
-  multicell_entity(const rcppsw::math::vector2d& dim,
-                   const rcppsw::utils::color& color)
+  multicell_entity(const rmath::vector2d& dim, const rcppsw::utils::color& color)
       : multicell_entity{dim, color, -1} {}
 
-  multicell_entity(const rcppsw::math::vector2d& dim,
+  multicell_entity(const rmath::vector2d& dim,
                    const rcppsw::utils::color& color,
                    int id)
       : base_cell_entity(color, id), m_dim(dim) {}
@@ -68,9 +66,8 @@ class multicell_entity : public base_cell_entity {
    *
    * @param loc The entities current location.
    */
-  rmath::ranged xspan(const argos::CVector2& loc) const {
-    return rmath::ranged(loc.GetX() - 0.5 * m_dim.x(),
-                         loc.GetX() + 0.5 * m_dim.x());
+  rmath::ranged xspan(const rmath::vector2d& loc) const {
+    return rmath::ranged(loc.x() - 0.5 * m_dim.x(), loc.x() + 0.5 * m_dim.x());
   }
 
   /**
@@ -80,9 +77,8 @@ class multicell_entity : public base_cell_entity {
    * @param loc The entities current location.
    */
 
-  rmath::ranged yspan(const argos::CVector2& loc) const {
-    return rmath::ranged(loc.GetY() - 0.5 * m_dim.y(),
-                         loc.GetY() + 0.5 * m_dim.y());
+  rmath::ranged yspan(const rmath::vector2d& loc) const {
+    return rmath::ranged(loc.y() - 0.5 * m_dim.y(), loc.y() + 0.5 * m_dim.y());
   }
 
   /**
@@ -97,11 +93,11 @@ class multicell_entity : public base_cell_entity {
    */
   double ysize(void) const { return m_dim.y(); }
 
-  const rcppsw::math::vector2d& dims(void) const { return m_dim; }
+  const rmath::vector2d& dims(void) const { return m_dim; }
 
  private:
   // clang-format off
-  rcppsw::math::vector2d m_dim;
+  rmath::vector2d m_dim;
   // clang-format on
 };
 
