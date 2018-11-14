@@ -68,10 +68,10 @@ class stateless_fsm : public base_foraging_fsm,
   stateless_fsm& operator=(const stateless_fsm& fsm) = delete;
 
   /* collision metrics */
-  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
-  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
-  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
-  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
+  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

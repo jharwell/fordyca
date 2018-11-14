@@ -23,12 +23,16 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_drop.hpp"
 
+#include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -40,6 +44,8 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 using ds::arena_grid;
+using ds::occupancy_grid;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -122,6 +128,7 @@ void free_block_drop::visit(
  ******************************************************************************/
 void free_block_drop::visit(
     controller::depth2::greedy_recpart_controller& controller) {
+  controller.ndc_push();
   auto* task =
       dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
@@ -146,20 +153,31 @@ void free_block_drop::visit(
     controller.bsel_exception_added(true);
   }
   task->accept(*this);
+  controller.perception()->map()->accept(*this);
+  ER_INFO("Dropped block%d@%s",
+          m_block->id(),
+          m_block->real_loc().to_str().c_str());
+
   controller.block(nullptr);
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_drop::visit(ds::perceived_arena_map& map) {
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+  cell.accept(*this);
 } /* visit() */
 
 void free_block_drop::visit(tasks::depth2::cache_starter& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void free_block_drop::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void free_block_drop::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+void free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 NS_END(events, fordyca);

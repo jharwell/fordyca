@@ -89,34 +89,34 @@ void cache_finisher::active_interface_update(int) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_finisher,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_finisher,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         cache_finisher,
+                         is_exploring_for_goal,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         cache_finisher,
+                         is_vectoring_to_goal,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_finisher,
-                        goal_acquired,
-                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         cache_finisher,
+                         goal_acquired,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        cache_finisher,
-                        acquisition_goal,
-                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         cache_finisher,
+                         acquisition_goal,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        cache_finisher,
-                        block_transport_goal,
-                        static_cast<fsm::depth2::block_to_new_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         cache_finisher,
+                         block_transport_goal,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling

@@ -30,7 +30,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/acquire_block_fsm.hpp"
+#include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,7 +71,9 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   void task_reset(void) override { init(); }
   void task_start(const task_allocation::taskable_argument*) override {}
 
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+  bool task_finished(void) const override {
+    return ST_FINISHED == current_state();
+  }
   bool task_running(void) const override {
     return !(ST_FINISHED == current_state() || ST_START == current_state());
   }
@@ -83,8 +85,8 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   bool goal_acquired(void) const override;
   acquisition_goal_type acquisition_goal(void) const override;
 
@@ -142,7 +144,7 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  acquire_block_fsm m_block_fsm;
+  acquire_free_block_fsm m_block_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

@@ -41,10 +41,14 @@
     <priority value ="trace" />
   </category>
   <category name="fordyca.controller.perception" >
-    <priority value ="info" />
+    <priority value ="all" />
   </category>
+  
   <category name="fordyca.ds.arena_map" >
     <priority value ="info" />
+  </category>
+  <category name="fordyca.ds.perceived_arena_map" >
+    <priority value ="all" />
   </category>
 
  </log4j:configuration>

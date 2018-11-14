@@ -158,14 +158,14 @@ __rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) cons
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool,
-                   free_block_to_nest_fsm,
-                   is_exploring_for_goal,
-                   m_block_fsm);
-FSM_WRAPPER_DEFINE(bool,
-                   free_block_to_nest_fsm,
-                   is_vectoring_to_goal,
-                   m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool,
+                    free_block_to_nest_fsm,
+                    is_exploring_for_goal,
+                    m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool,
+                    free_block_to_nest_fsm,
+                    is_vectoring_to_goal,
+                    m_block_fsm);
 
 acquisition_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||

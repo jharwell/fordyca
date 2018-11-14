@@ -110,30 +110,30 @@ void cache_transferer::accept(events::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     bool,
     cache_transferer,
     is_exploring_for_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     bool,
     cache_transferer,
     is_vectoring_to_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     bool,
     cache_transferer,
     goal_acquired,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     acquisition_goal_type,
     cache_transferer,
     acquisition_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     transport_goal_type,
     cache_transferer,
     block_transport_goal,

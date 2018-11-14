@@ -174,14 +174,14 @@ void base_perception_subsystem::processed_los_verify(
 
       if (cell1.state_has_block() || cell1.state_is_empty()) {
         ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
-                  "LOS/PAM disagree on state of cell at (%u, %u): %d/%d",
+                  "LOS/PAM disagree on state of cell@(%u, %u): %d/%d",
                   d.first,
                   d.second,
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
         if (cell1.state_has_block()) {
           ER_ASSERT(cell1.block()->id() == cell2.block()->id(),
-                    "LOS/PAM disagree on block id in cell at (%u, %u): %d/%d",
+                    "LOS/PAM disagree on block id in cell@(%u, %u): %d/%d",
                     d.first,
                     d.second,
                     cell1.block()->id(),

@@ -1,7 +1,7 @@
 /**
- * @file depth1_qt_user_functions.hpp
+ * @file depth2_qt_user_functions.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -17,39 +17,36 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_QT_USER_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateful_qt_user_functions.hpp"
+#include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class depth1_qt_user_functions
- * @ingroup support depth1
+ * @class depth2_qt_user_functions
+ * @ingroup support depth2
  *
- * @brief Contains hooks for Qt to draw the visualizations related to depth 1
+ * @brief Contains hooks for Qt to draw the visualizations related to depth 2
  * task decomposition:
  *
- * - Task name
  */
-class depth1_qt_user_functions : public depth0::stateful_qt_user_functions {
+class depth2_qt_user_functions : public depth1::depth1_qt_user_functions {
  public:
-  depth1_qt_user_functions(void);
-  ~depth1_qt_user_functions(void) override = default;
-
-  void Draw(argos::CFootBotEntity& c_entity) override;
+  depth2_qt_user_functions(void) = default;
+  ~depth2_qt_user_functions(void) override = default;
 };
 
-NS_END(depth1, support, fordyca);
+NS_END(depth2, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_DEPTH2_QT_USER_FUNCTIONS_HPP_ */

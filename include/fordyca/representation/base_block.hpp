@@ -62,8 +62,8 @@ class base_block : public multicell_entity,
    * @brief Out of sight location base_blocks are moved to when a robot picks
    * them up, for visualization/rending purposes.
    */
-  static rcppsw::math::dcoord2 kOutOfSightDLoc;
-  static rmath::vector2d kOutOfSightRLoc;
+  static const rcppsw::math::dcoord2 kOutOfSightDLoc;
+  static const rmath::vector2d kOutOfSightRLoc;
 
   /**
    * @param dim 2 element vector of the dimensions of the block.
@@ -84,7 +84,7 @@ class base_block : public multicell_entity,
       : multicell_entity(dim, color, id), movable_cell_entity() {}
 
   __rcsw_pure bool operator==(const base_block& other) const {
-    return (this->id() == other.id());
+    return this->id() == other.id();
   }
   ~base_block(void) override = default;
 

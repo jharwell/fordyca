@@ -37,9 +37,9 @@ class greedy_recpart_controller;
 namespace representation {
 class base_block;
 }
-namespace fsm { namespace depth1 {
+namespace fsm {
 class block_to_goal_fsm;
-}} // namespace fsm::depth1
+} // namespace fsm
 namespace tasks { namespace depth2 {
 class cache_starter;
 }} // namespace tasks::depth2
@@ -59,7 +59,7 @@ namespace visitor = rcppsw::patterns::visitor;
  */
 class block_proximity
     : public visitor::visit_set<controller::depth2::greedy_recpart_controller,
-                                fsm::depth1::block_to_goal_fsm,
+                                fsm::block_to_goal_fsm,
                                 tasks::depth2::cache_starter>,
       public rcppsw::er::client<block_proximity> {
  public:
@@ -72,7 +72,7 @@ class block_proximity
 
   /* depth2 foraging */
   void visit(controller::depth2::greedy_recpart_controller& controller) override;
-  void visit(fsm::depth1::block_to_goal_fsm& task) override;
+  void visit(fsm::block_to_goal_fsm& task) override;
   void visit(tasks::depth2::cache_starter& task) override;
 
  private:

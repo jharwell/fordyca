@@ -115,34 +115,34 @@ void collector::accept(events::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        collector,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        collector,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         collector,
+                         is_exploring_for_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         collector,
+                         is_vectoring_to_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        collector,
-                        goal_acquired,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         collector,
+                         goal_acquired,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        collector,
-                        acquisition_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         collector,
+                         acquisition_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        collector,
-                        block_transport_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         collector,
+                         block_transport_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

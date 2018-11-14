@@ -24,11 +24,10 @@
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
 /*******************************************************************************
@@ -41,20 +40,25 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_goal_fsm::acquire_goal_fsm(
     controller::saa_subsystem* saa,
-    const ds::perceived_arena_map* const map,
-    std::function<bool(void)> explore_goal_reached_cb)
+    const acquisition_goal_ftype& acquisition_goal,
+    const goal_candidates_ftype& candidates_exist_cb,
+    const goal_select_ftype& goal_select,
+    const std::function<bool(bool)>& goal_acquired_cb,
+    const std::function<bool(void)>& explore_term_cb)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(fsm_acquire_goal, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       exit_fsm_acquire_goal(),
-      mc_map(map),
       m_vector_fsm(saa),
       m_explore_fsm(saa,
                     std::make_unique<controller::random_explore_behavior>(saa),
-                    explore_goal_reached_cb),
-      m_goal_acquired_cb(nullptr),
+                    explore_term_cb),
+      m_acquisition_goal(acquisition_goal),
+      m_candidates_exist(candidates_exist_cb),
+      m_goal_select(goal_select),
+      m_goal_acquired_cb(goal_acquired_cb),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
                                                nullptr,
@@ -129,6 +133,13 @@ bool acquire_goal_fsm::is_vectoring_to_goal(void) const {
   return current_state() == ST_ACQUIRE_GOAL && m_vector_fsm.task_running();
 } /* is_vectoring_to_goal() */
 
+acquisition_goal_type acquire_goal_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_GOAL == current_state()) {
+    return m_acquisition_goal();
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
@@ -137,21 +148,6 @@ void acquire_goal_fsm::init(void) {
   m_vector_fsm.task_reset();
   m_explore_fsm.task_reset();
 } /* init() */
-
-bool acquire_goal_fsm::acquire_unknown_goal(void) {
-  if (!m_explore_fsm.task_running()) {
-    m_explore_fsm.task_reset();
-    m_explore_fsm.task_start(nullptr);
-  }
-  m_explore_fsm.task_execute();
-  if (m_explore_fsm.task_finished()) {
-    if (m_goal_acquired_cb) {
-      return m_goal_acquired_cb(true);
-    }
-    return true;
-  }
-  return false;
-} /* acquire_unknown_goal() */
 
 bool acquire_goal_fsm::acquire_goal(void) {
   /*
@@ -173,6 +169,64 @@ bool acquire_goal_fsm::acquire_goal(void) {
   }
   return true;
 } /* acquire_goal() */
+
+bool acquire_goal_fsm::acquire_unknown_goal(void) {
+  if (!m_explore_fsm.task_running()) {
+    m_explore_fsm.task_reset();
+    m_explore_fsm.task_start(nullptr);
+  }
+  m_explore_fsm.task_execute();
+  if (m_explore_fsm.task_finished()) {
+    return m_goal_acquired_cb(true);
+  }
+  return false;
+} /* acquire_unknown_goal() */
+
+bool acquire_goal_fsm::acquire_known_goal(void) {
+  /*
+   * If we don't know of any blocks and we are not current vectoring towards
+   * one, then there is no way we can acquire a known block, so bail out.
+   */
+  if (!m_candidates_exist() && !m_vector_fsm.task_running()) {
+    return false;
+  }
+
+  if (m_candidates_exist() && !m_vector_fsm.task_running()) {
+    /*
+     * If we get here, we must know of some candidates/perceived entities of
+     * interest, but not be currently vectoring toward any of them.
+     */
+    auto selection = m_goal_select();
+
+    /*
+     * If this happens, all the entities we know of are too close for us to
+     * vector to, or there was some other issue with selecting one.
+     */
+    if (false == std::get<0>(selection)) {
+      return false;
+    }
+
+    m_explore_fsm.task_reset();
+    m_vector_fsm.task_reset();
+
+    ER_INFO("Start acquiring goal@%s tol=%f",
+            std::get<1>(selection).to_str().c_str(),
+            std::get<2>(selection));
+    tasks::vector_argument v(std::get<2>(selection), std::get<1>(selection));
+    m_vector_fsm.task_start(&v);
+  }
+
+  /* we are vectoring */
+  if (!m_vector_fsm.task_finished()) {
+    m_vector_fsm.task_execute();
+  }
+
+  if (m_vector_fsm.task_finished()) {
+    m_vector_fsm.task_reset();
+    return m_goal_acquired_cb(false);
+  }
+  return false;
+} /* acquire_known_block() */
 
 void acquire_goal_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,

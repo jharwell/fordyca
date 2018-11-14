@@ -70,8 +70,8 @@ class stateful_controller : public stateless_controller,
   void Reset(void) override;
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
+  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* world model metrics */
   uint cell_state_inaccuracies(uint state) const override;
@@ -79,7 +79,7 @@ class stateful_controller : public stateless_controller,
   double unknown_percentage(void) const override;
 
   /* block transportation */
-  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
 
   /**

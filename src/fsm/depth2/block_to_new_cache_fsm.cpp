@@ -37,17 +37,18 @@ block_to_new_cache_fsm::block_to_new_cache_fsm(
     const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
-    : block_to_goal_fsm(bsel_matrix, saa, map),
-      m_cache_fsm(csel_matrix, saa, map) {}
+    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
+      m_cache_fsm(csel_matrix, saa, map),
+      m_block_fsm(bsel_matrix, saa, map) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
 acquisition_goal_type block_to_new_cache_fsm::acquisition_goal(void) const {
-  if (block_fsm().task_running() ||
+  if (ST_ACQUIRE_BLOCK == current_state() ||
       ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;
-  } else if (m_cache_fsm.task_running() ||
+  } else if (ST_TRANSPORT_TO_GOAL == current_state() ||
              ST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return acquisition_goal_type::kNewCache;
   }

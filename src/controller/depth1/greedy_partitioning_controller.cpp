@@ -157,23 +157,23 @@ void greedy_partitioning_controller::executive(
 /*******************************************************************************
  * Block Transportation
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        greedy_partitioning_controller,
-                        block_transport_goal,
-                        current_task());
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         greedy_partitioning_controller,
+                         block_transport_goal,
+                         current_task());
 
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        greedy_partitioning_controller,
-                        acquisition_goal,
-                        current_task());
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         greedy_partitioning_controller,
+                         acquisition_goal,
+                         current_task());
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        greedy_partitioning_controller,
-                        goal_acquired,
-                        current_task());
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         greedy_partitioning_controller,
+                         goal_acquired,
+                         current_task());
 
 /*******************************************************************************
  * Task Distribution Metrics

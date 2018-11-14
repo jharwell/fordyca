@@ -26,9 +26,9 @@ n * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
 #include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "fordyca/fsm/depth0/stateless_fsm.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -99,10 +99,10 @@ void block_vanished::visit(tasks::depth0::generalist& task) {
 } /* visit() */
 
 void block_vanished::visit(tasks::depth1::harvester& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void block_vanished::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+void block_vanished::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -129,11 +129,11 @@ void block_vanished::visit(
 } /* visit() */
 
 void block_vanished::visit(tasks::depth2::cache_starter& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void block_vanished::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

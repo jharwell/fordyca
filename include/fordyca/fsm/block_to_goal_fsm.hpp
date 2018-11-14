@@ -18,34 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_GOAL_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_GOAL_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_BLOCK_TO_GOAL_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_BLOCK_TO_GOAL_FSM_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/task_allocation/taskable.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/acquire_block_fsm.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, fsm);
 
-namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
-namespace ds { class perceived_arena_map; }
+namespace rfsm = rcppsw::patterns::state_machine;
+namespace er = rcppsw::er;
+namespace ta = rcppsw::task_allocation;
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using transport_goal_type = fsm::block_transporter::goal_type;
 
-NS_START(fsm);
-
-using transport_goal_type = block_transporter::goal_type;
-
-NS_START(depth1);
+class acquire_goal_fsm;
+class acquire_free_block_fsm;
 
 /*******************************************************************************
  * Class Definitions
@@ -61,24 +60,27 @@ NS_START(depth1);
  * or via random exploration), pickup the block and bring it to its chosen
  * goal. Once it has done that it will signal that its task is complete.
  */
-class block_to_goal_fsm : public base_foraging_fsm,
-                          public er::client<block_to_goal_fsm>,
+class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
+                          public base_foraging_fsm,
+                          public ta::taskable,
                           public metrics::fsm::goal_acquisition_metrics,
-                          public task_allocation::taskable,
-                          public block_transporter,
+                          public fsm::block_transporter,
                           public visitor::visitable_any<block_to_goal_fsm> {
  public:
-  block_to_goal_fsm(const controller::block_sel_matrix* sel_matrix,
-                    controller::saa_subsystem* saa,
-                    ds::perceived_arena_map* map);
+  block_to_goal_fsm(acquire_goal_fsm* goal_fsm,
+                    acquire_goal_fsm* block_fsm,
+                    controller::saa_subsystem* saa);
+  ~block_to_goal_fsm(void) override = default;
 
   block_to_goal_fsm(const block_to_goal_fsm& fsm) = delete;
   block_to_goal_fsm& operator=(const block_to_goal_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const task_allocation::taskable_argument * arg) override;
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
+  void task_start(const ta::taskable_argument* arg) override;
+  bool task_finished(void) const override {
+    return ST_FINISHED == current_state();
+  }
   bool task_running(void) const override {
     return !(ST_FINISHED == current_state() || ST_START == current_state());
   }
@@ -105,9 +107,9 @@ class block_to_goal_fsm : public base_foraging_fsm,
   enum fsm_states {
     ST_START,
     /**
-     * Superstate for acquiring a free block.
+     * Superstate for acquiring a block (free or from a cache).
      */
-    ST_ACQUIRE_FREE_BLOCK,
+    ST_ACQUIRE_BLOCK,
 
     /**
      * A block has been acquired--wait for area to send the block pickup signal.
@@ -131,25 +133,19 @@ class block_to_goal_fsm : public base_foraging_fsm,
     ST_MAX_STATES,
   };
 
-  virtual acquire_goal_fsm& goal_fsm(void) = 0;
-  const acquire_goal_fsm& goal_fsm(void) const {
-    return const_cast<block_to_goal_fsm*>(this)->goal_fsm(); }
-  const acquire_block_fsm& block_fsm(void) const { return m_block_fsm; }
+  const acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
+  const acquire_goal_fsm* block_fsm(void) const { return m_block_fsm; }
 
  private:
-  constexpr static uint kPICKUP_TIMEOUT = 100;
-
   /* inherited states */
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* block to goal states */
-  HFSM_STATE_DECLARE(block_to_goal_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_free_block);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup,
-                     state_machine::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, start, rfsm::event_data);
+  HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_block);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, transport_to_goal);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop,
-                     state_machine::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
 
   /**
@@ -159,17 +155,17 @@ class block_to_goal_fsm : public base_foraging_fsm,
    * states in \enum fsm_states, or things will not work correctly.
    */
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
-  return &mc_state_map[index];
+    return &mc_state_map[index];
   }
 
   // clang-format off
-  uint              m_pickup_count;
-  acquire_block_fsm m_block_fsm;
+  acquire_goal_fsm* const  m_goal_fsm;
+  acquire_goal_fsm * const m_block_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
-NS_END(depth1, fsm, fordyca);
+NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH1_BLOCK_TO_GOAL_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_BLOCK_TO_GOAL_FSM_HPP_ */

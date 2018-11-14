@@ -141,8 +141,10 @@ void cache_site_selector::opt_initialize(
   m_alg.set_default_initial_step({1.0, 1.0});
 
   /* Initial guess: random point in the arena */
-  uint x = std::min((std::rand() % xrange.ub()) + 1, xrange.ub());
-  uint y = std::min((std::rand() % yrange.ub()) + 1, yrange.ub());
+  uint x = std::max(std::min((std::rand() % xrange.ub()) + 1, xrange.ub()),
+                    xrange.lb());
+  uint y = std::max(std::min((std::rand() % yrange.ub()) + 1, yrange.ub()),
+                             yrange.lb());
   *initial_guess = {static_cast<double>(x), static_cast<double>(y)};
   ER_INFO("Initial guess: (%u,%u), xrange=%s, yrange=%s",
           x,

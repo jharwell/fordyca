@@ -36,6 +36,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Classes
@@ -112,7 +113,20 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
             cache_pair.first,
             cache_pair.second.length(),
             m_cache_manager->cache_proximity_dist());
-    events::cache_found prox(m_map->caches()[cache_pair.first]->clone());
+    /*
+     * Because caches can be dynamically created/destroyed, we cannot rely on
+     * the index position of cache i to be the same as its ID, so we need to
+     * search for the correct cache.
+     */
+    auto it = std::find_if(m_map->caches().begin(),
+                           m_map->caches().end(),
+                           [&](const auto& c) {
+                             return c->id() == cache_pair.first;
+                           });
+    ER_ASSERT(m_map->caches().end() != it,
+              "FATAL: Cache%d does not exist?",
+              cache_pair.first);
+    events::cache_found prox(*it);
     controller.visitor::template visitable_any<T>::accept(prox);
   }
 
@@ -147,7 +161,19 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
               cache_pair.first,
               cache_pair.second.length(),
               m_cache_manager->cache_proximity_dist());
-      events::cache_found prox(m_map->caches()[cache_pair.first]);
+
+      /*
+       * Because caches can be dynamically created/destroyed, we cannot rely on
+       * the index position of cache i to be the same as its ID, so we need to
+       * search for the correct cache.
+       */
+      auto it = std::find_if(m_map->caches().begin(),
+                             m_map->caches().end(),
+                             [&](const auto& c) { return c->id() == p.id(); });
+      ER_ASSERT(m_map->caches().end() != it,
+                "FATAL: Cache%d does not exist?",
+                cache_pair.first);
+      events::cache_found prox(*it);
       controller.visitor::template visitable_any<T>::accept(prox);
     } else {
       perform_new_cache_block_drop(controller, p);

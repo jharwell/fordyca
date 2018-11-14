@@ -29,8 +29,14 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace state_machine = rcppsw::patterns::state_machine;
 namespace utils = rcppsw::utils;
+
+/*******************************************************************************
+ * Class Constants
+ ******************************************************************************/
+constexpr double vector_fsm::kCACHE_ARRIVAL_TOL;
+constexpr double vector_fsm::kBLOCK_ARRIVAL_TOL;
+constexpr double vector_fsm::kCACHE_SITE_ARRIVAL_TOL;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -129,7 +135,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
   }
   return controller::foraging_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
+FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data) {
   if (ST_VECTOR != last_state()) {
     ER_DEBUG("Executing ST_VECTOR");
   }
@@ -225,13 +231,12 @@ void vector_fsm::task_start(
 } /* task_start() */
 
 void vector_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 void vector_fsm::init(void) {
   actuators()->reset();
-  state_machine::simple_fsm::init();
+  rfsm::simple_fsm::init();
 } /* init() */
 
 __rcsw_pure rmath::vector2d vector_fsm::calc_vector_to_goal(
