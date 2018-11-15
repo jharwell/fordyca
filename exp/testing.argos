@@ -316,7 +316,30 @@
   <!-- * Physics engines * -->
   <!-- ******************* -->
   <physics_engines>
-    <dynamics2d id="dyn2d"/>
+    <dynamics2d id="dyn2d0">
+     <boundaries>
+	<top height="1" />
+	<bottom height="0" />
+	<sides>
+	  <vertex point="0,0" />
+	  <vertex point="6,0" />
+	  <vertex point="6,6" />
+	  <vertex point="0,6" />
+	</sides>
+     </boundaries>
+    </dynamics2d>
+    <dynamics2d id="dyn2d1">
+     <boundaries>
+	<top height="1" />
+	<bottom height="0" />
+	<sides>
+	  <vertex point="6,0" />
+	  <vertex point="12,0" />
+	  <vertex point="12,6" />
+	  <vertex point="6,6" />
+	</sides>
+     </boundaries>
+     </dynamics2d>
   </physics_engines>
 
   <!-- ********* -->
