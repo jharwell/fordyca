@@ -88,25 +88,28 @@ HFSM_STATE_DEFINE(stateful_fsm, block_to_nest, state_machine::event_data) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool, stateful_fsm, in_collision_avoidance, m_block_fsm);
-FSM_WRAPPER_DEFINE(bool, stateful_fsm, entered_collision_avoidance, m_block_fsm);
-FSM_WRAPPER_DEFINE(bool, stateful_fsm, exited_collision_avoidance, m_block_fsm);
-FSM_WRAPPER_DEFINE(uint, stateful_fsm, collision_avoidance_duration, m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool, stateful_fsm, in_collision_avoidance, m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool, stateful_fsm, entered_collision_avoidance, m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool, stateful_fsm, exited_collision_avoidance, m_block_fsm);
+FSM_WRAPPER_DEFINEC(uint,
+                    stateful_fsm,
+                    collision_avoidance_duration,
+                    m_block_fsm);
 
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool, stateful_fsm, is_exploring_for_goal, m_block_fsm);
-FSM_WRAPPER_DEFINE(bool, stateful_fsm, is_vectoring_to_goal, m_block_fsm);
-FSM_WRAPPER_DEFINE(acquisition_goal_type,
-                   stateful_fsm,
-                   acquisition_goal,
-                   m_block_fsm);
-FSM_WRAPPER_DEFINE(transport_goal_type,
-                   stateful_fsm,
-                   block_transport_goal,
-                   m_block_fsm);
-FSM_WRAPPER_DEFINE(bool, stateful_fsm, goal_acquired, m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool, stateful_fsm, is_exploring_for_goal, m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool, stateful_fsm, is_vectoring_to_goal, m_block_fsm);
+FSM_WRAPPER_DEFINEC(acquisition_goal_type,
+                    stateful_fsm,
+                    acquisition_goal,
+                    m_block_fsm);
+FSM_WRAPPER_DEFINEC(transport_goal_type,
+                    stateful_fsm,
+                    block_transport_goal,
+                    m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool, stateful_fsm, goal_acquired, m_block_fsm);
 
 /*******************************************************************************
  * General Member Functions

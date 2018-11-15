@@ -23,7 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
 
@@ -57,10 +58,10 @@ void cache_proximity::visit(
 } /* visit() */
 
 void cache_proximity::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void cache_proximity::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+void cache_proximity::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::CACHE_PROXIMITY,
                    state_machine::event_type::NORMAL);
 } /* visit() */

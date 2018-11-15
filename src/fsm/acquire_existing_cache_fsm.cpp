@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
+#include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/controller/base_sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/depth1/sensing_subsystem.hpp"
@@ -31,31 +31,39 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, depth1);
-namespace depth1 = controller::depth1;
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
-    const controller::cache_sel_matrix* sel_matrix,
+    const controller::cache_sel_matrix* matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
-    : acquire_goal_fsm(
+    : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
+      acquire_goal_fsm(
           saa,
-          map,
-          std::bind(&acquire_existing_cache_fsm::explore_goal_reached, this)),
-      ER_CLIENT_INIT("fordyca.fsm.depth1.acquire_existing_cache"),
-      mc_sel_matrix(sel_matrix) {}
+          std::bind(&acquire_existing_cache_fsm::acquisition_goal_internal,
+                    this),
+          std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
+          std::bind(&acquire_existing_cache_fsm::existing_cache_select, this),
+          std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
+                    this,
+                    std::placeholders::_1),
+          std::bind(&acquire_existing_cache_fsm::cache_exploration_term_cb,
+                    this)),
+      mc_matrix(matrix),
+      mc_map(map) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool acquire_existing_cache_fsm::select_cache_for_acquisition(
-    rmath::vector2d* const acquisition) {
-  controller::depth1::existing_cache_selector selector(mc_sel_matrix);
+bool acquire_existing_cache_fsm::calc_acquisition_location(
+    rmath::vector2d* const loc) {
+  controller::depth1::existing_cache_selector selector(mc_matrix);
   representation::perceived_cache best =
-      selector.calc_best(map()->perceived_caches(), base_sensors()->position());
+      selector.calc_best(mc_map->perceived_caches(),
+                         saa_subsystem()->sensing()->position());
   /*
    * If this happens, all the cachess we know of are too close for us to vector
    * to.
@@ -82,24 +90,42 @@ bool acquire_existing_cache_fsm::select_cache_for_acquisition(
   std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
   std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
 
-  *acquisition = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
+  *loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
   ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
-          acquisition->to_str().c_str(),
+          loc->to_str().c_str(),
           best.ent->id(),
           xrange.to_str().c_str(),
           yrange.to_str().c_str());
   return true;
-} /* select_cache_for_acquisition() */
+} /* calc_acquisition_location() */
 
-bool acquire_existing_cache_fsm::explore_goal_reached(void) const {
-  const auto& sensors =
-      std::static_pointer_cast<const depth1::sensing_subsystem>(base_sensors());
+bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
+  auto sensors =
+      std::static_pointer_cast<const controller::depth1::sensing_subsystem>(
+          saa_subsystem()->sensing());
   return sensors->cache_detected();
-} /* explore_goal_reached() */
+} /* cache_exploration_term_cb() */
+
+acquire_goal_fsm::candidate_type acquire_existing_cache_fsm::existing_cache_select(
+    void) {
+  rmath::vector2d loc;
+  if (!calc_acquisition_location(&loc)) {
+    return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
+  } else {
+    return acquire_goal_fsm::candidate_type(true,
+                                            loc,
+                                            vector_fsm::kCACHE_ARRIVAL_TOL);
+  }
+} /* existing_cache_select() */
+
+bool acquire_existing_cache_fsm::candidates_exist(void) const {
+  return !mc_map->perceived_caches().empty();
+} /* candidates() */
 
 bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
-  const auto& sensors =
-      std::static_pointer_cast<const depth1::sensing_subsystem>(base_sensors());
+  auto sensors =
+      std::static_pointer_cast<const controller::depth1::sensing_subsystem>(
+          saa_subsystem()->sensing());
   if (explore_result) {
     ER_ASSERT(sensors->cache_detected(),
               "No cache detected after successful exploration?");
@@ -113,57 +139,9 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   }
 } /* cache_acquired_cb() */
 
-bool acquire_existing_cache_fsm::acquire_known_goal(void) {
-  std::list<representation::perceived_cache> caches = map()->perceived_caches();
-  /*
-   * If we don't know of any caches and we are not current vectoring towards
-   * one, then there is no way we can acquire a known cache, so bail out.
-   */
-  if (caches.empty() && !vector_fsm().task_running()) {
-    return false;
-  }
-
-  if (!caches.empty() && !vector_fsm().task_running()) {
-    /*
-     * If we get here, we must know of some caches, but not be currently
-     * vectoring toward any of them.
-     */
-    if (!vector_fsm().task_running()) {
-      rmath::vector2d best;
-      /*
-     * If this happens, all the blocks we know of are too close for us to vector
-     * to.
-     */
-      if (!select_cache_for_acquisition(&best)) {
-        return false;
-      }
-      tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, best);
-      explore_fsm().task_reset();
-      vector_fsm().task_reset();
-      vector_fsm().task_start(&v);
-    }
-  }
-
-  /* we are vectoring */
-  if (!vector_fsm().task_finished()) {
-    vector_fsm().task_execute();
-  }
-
-  if (vector_fsm().task_finished()) {
-    vector_fsm().task_reset();
-    return cache_acquired_cb(false);
-  }
-  return false;
-} /* acquire_known_goal() */
-
-/*******************************************************************************
- * FSM Metrics
- ******************************************************************************/
-acquisition_goal_type acquire_existing_cache_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_GOAL == current_state()) {
-    return acquisition_goal_type::kExistingCache;
-  }
-  return acquisition_goal_type::kNone;
+acquisition_goal_type acquire_existing_cache_fsm::acquisition_goal_internal(
+    void) const {
+  return acquisition_goal_type::kExistingCache;
 } /* acquisition_goal() */
 
-NS_END(depth1, controller, fordyca);
+NS_END(controller, fordyca);

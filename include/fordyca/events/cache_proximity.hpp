@@ -38,9 +38,9 @@ namespace controller { namespace depth2 {
 class greedy_recpart_controller;
 }} // namespace controller::depth2
 
-namespace fsm { namespace depth1 {
+namespace fsm {
 class block_to_goal_fsm;
-}} // namespace fsm::depth1
+} // namespace fsm
 namespace tasks { namespace depth2 {
 class cache_finisher;
 }} // namespace tasks::depth2
@@ -61,7 +61,7 @@ class cache_proximity
     : public rcppsw::er::client<cache_proximity>,
       public visitor::visit_set<controller::depth2::greedy_recpart_controller,
                                 tasks::depth2::cache_finisher,
-                                fsm::depth1::block_to_goal_fsm> {
+                                fsm::block_to_goal_fsm> {
  public:
   explicit cache_proximity(uint cache_id);
   ~cache_proximity(void) override = default;
@@ -72,7 +72,7 @@ class cache_proximity
   /* depth2 foraging */
   void visit(controller::depth2::greedy_recpart_controller& controller) override;
   void visit(tasks::depth2::cache_finisher& task) override;
-  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
+  void visit(fsm::block_to_goal_fsm& fsm) override;
 
  private:
   // clang-format off

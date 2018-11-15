@@ -158,15 +158,15 @@ cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool,
-                   cached_block_to_nest_fsm,
-                   is_exploring_for_goal,
-                   m_cache_fsm);
+FSM_WRAPPER_DEFINEC(bool,
+                    cached_block_to_nest_fsm,
+                    is_exploring_for_goal,
+                    m_cache_fsm);
 
-FSM_WRAPPER_DEFINE(bool,
-                   cached_block_to_nest_fsm,
-                   is_vectoring_to_goal,
-                   m_cache_fsm);
+FSM_WRAPPER_DEFINEC(bool,
+                    cached_block_to_nest_fsm,
+                    is_vectoring_to_goal,
+                    m_cache_fsm);
 
 bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kExistingCache == acquisition_goal()) {

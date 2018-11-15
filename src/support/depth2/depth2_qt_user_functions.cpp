@@ -1,7 +1,7 @@
 /**
- * @file qt_user_functions.cpp
+ * @file depth2_qt_user_functions.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,54 +21,27 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * @todo Figure out how to remove this warning properly.
- */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
-#include "fordyca/support/depth0/stateful_qt_user_functions.hpp"
+#include "fordyca/support/depth2/depth2_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
-
-#include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/support/los_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
-
-/*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-stateful_qt_user_functions::stateful_qt_user_functions() {
-  RegisterUserFunction<stateful_qt_user_functions, argos::CFootBotEntity>(
-      &stateful_qt_user_functions::Draw);
-}
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateful_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  stateless_qt_user_functions::Draw(c_entity);
 
-  auto& controller = dynamic_cast<controller::depth0::stateful_controller&>(
-      c_entity.GetControllableEntity().GetController());
-
-  if (controller.display_los()) {
-    los_visualizer(this).draw(controller.los(),
-                              controller.perception()->map()->grid_resolution());
-  }
-}
-
-using namespace argos;
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-REGISTER_QTOPENGL_USER_FUNCTIONS(stateful_qt_user_functions,
-                                 "stateful_qt_user_functions"); // NOLINT
+REGISTER_QTOPENGL_USER_FUNCTIONS(depth2_qt_user_functions,
+                                 "depth2_qt_user_functions");
 #pragma clang diagnostic pop
 
-NS_END(depth0, support, fordyca);
+NS_END(support, fordyca, depth2);

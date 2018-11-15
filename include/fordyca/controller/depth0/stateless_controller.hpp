@@ -78,8 +78,8 @@ class stateless_controller : public base_controller,
   /* goal acquisition metrics */
   bool is_exploring_for_goal(void) const override{ return false; }
   bool is_vectoring_to_goal(void) const override{ return false; }
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
+  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block manipulation metrics */
   bool free_pickup_event(void) const override { return m_free_pickup_event; }
@@ -89,7 +89,7 @@ class stateless_controller : public base_controller,
   uint penalty_served(void) const override { return m_penalty; }
 
   /* block transportation */
-  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   const fsm::depth0::stateless_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::stateless_fsm* fsm(void) { return m_fsm.get(); }

@@ -24,9 +24,10 @@
 #include "fordyca/events/block_proximity.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 
@@ -56,10 +57,10 @@ void block_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(tasks::depth2::cache_starter& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void block_proximity::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+void block_proximity::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PROXIMITY,
                    state_machine::event_type::NORMAL);
 } /* visit() */

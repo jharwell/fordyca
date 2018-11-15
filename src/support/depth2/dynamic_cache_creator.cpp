@@ -35,7 +35,7 @@ NS_START(fordyca, support, depth2);
 /*******************************************************************************
  * Class Constants
  ******************************************************************************/
-const rmath::vector2d dynamic_cache_creator::kInvalidCacheCenter{-1.0, -1.0};
+const rmath::vector2i dynamic_cache_creator::kInvalidCacheCenter{-1, -1};
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -123,10 +123,17 @@ ds::cache_vector dynamic_cache_creator::create_all(
        */
       ds::cache_vector avoid = existing_caches;
       avoid.insert(avoid.end(), caches.begin(), caches.end());
-      rmath::vector2d center = calc_center(cache_i_blocks, avoid);
+      rmath::vector2i center = calc_center(cache_i_blocks, avoid);
+
+      /*
+       * We convert to discrete and then back to real coordinates so that our
+       * cache's real location is always on an even multiple of the grid size,
+       * which keeps asserts about cache extent from triggering right after
+       * creation, which can happen otherwise.
+       */
       if (kInvalidCacheCenter != center) {
         auto cache_p = std::shared_ptr<representation::arena_cache>(
-            create_single_cache(cache_i_blocks, center));
+            create_single_cache(cache_i_blocks, rmath::ivec2dvec(center)));
         caches.push_back(cache_p);
       }
 
@@ -142,7 +149,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
   return caches;
 } /* create() */
 
-rmath::vector2d dynamic_cache_creator::calc_center(
+rmath::vector2i dynamic_cache_creator::calc_center(
     const block_list& blocks,
     const ds::cache_vector& existing_caches) const {
   double sumx = std::accumulate(
@@ -154,7 +161,7 @@ rmath::vector2d dynamic_cache_creator::calc_center(
         return sum + b->real_loc().y();
       });
 
-  rmath::vector2d center(sumx / blocks.size(), sumy / blocks.size());
+  rmath::vector2i center(sumx / blocks.size(), sumy / blocks.size());
   ER_DEBUG("Guess center=%s", center.to_str().c_str());
 
   /* If no existing caches, no possibility for conflict */
@@ -176,15 +183,11 @@ rmath::vector2d dynamic_cache_creator::calc_center(
    * already verified won't overlap with our new cache, because the move we
    * just made in x or y might have just caused an overlap.
    */
-  uint i;
-  for (i = 0; i < kOVERLAP_SEARCH_MAX_TRIES; ++i) {
+  uint i = 0;
+  while (i++ < kOVERLAP_SEARCH_MAX_TRIES) {
     bool conflict = false;
     for (size_t j = 0; j < existing_caches.size(); ++j) {
-      if (i == j) {
-        continue;
-      }
       if (!deconflict_cache_center(*existing_caches[j], center)) {
-        j = 0;
         conflict = true;
       }
     } /* for(j..) */
@@ -206,12 +209,10 @@ rmath::vector2d dynamic_cache_creator::calc_center(
                           return a + "b" + std::to_string(b->id()) + ",";
                         });
 
-    ER_WARN(
-        "No conflict-free center for new cache found in %u tries caches=[%s], "
-        "blocks=[%s]",
-        kOVERLAP_SEARCH_MAX_TRIES,
-        ec_str.c_str(),
-        b_str.c_str());
+    ER_WARN("No conflict-free center found in %u tries: caches=[%s],blocks=[%s]",
+            kOVERLAP_SEARCH_MAX_TRIES,
+            ec_str.c_str(),
+            b_str.c_str());
     return kInvalidCacheCenter;
   }
 
@@ -220,14 +221,14 @@ rmath::vector2d dynamic_cache_creator::calc_center(
 
 bool dynamic_cache_creator::deconflict_cache_center(
     const representation::base_cache& cache,
-    rmath::vector2d& center) const {
+    rmath::vector2i& center) const {
   std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
   std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
 
   auto exc_xspan = cache.xspan(cache.real_loc());
   auto exc_yspan = cache.yspan(cache.real_loc());
-  auto newc_xspan = cache.xspan(center);
-  auto newc_yspan = cache.yspan(center);
+  auto newc_xspan = cache.xspan(rmath::ivec2dvec(center, grid()->resolution()));
+  auto newc_yspan = cache.yspan(rmath::ivec2dvec(center, grid()->resolution()));
 
   /*
    * All caches are the same size, so we can just grab an [x,y] span from the
@@ -239,6 +240,8 @@ bool dynamic_cache_creator::deconflict_cache_center(
   double y_max = grid()->yrsize() - exc_yspan.span() * 1.5;
   double y_min = exc_yspan.span() * 1.5;
 
+  double delta = xrnd(m_rng) * newc_xspan.span();
+
   if (newc_xspan.overlaps_with(exc_xspan)) {
     ER_TRACE("xspan=%s overlap cache%d@%s xspan=%s center=%s",
              newc_xspan.to_str().c_str(),
@@ -246,18 +249,16 @@ bool dynamic_cache_creator::deconflict_cache_center(
              cache.real_loc().to_str().c_str(),
              exc_xspan.to_str().c_str(),
              center.to_str().c_str());
-    center.x(std::max(
-        x_min, std::min(x_max, center.x() + xrnd(m_rng) * newc_xspan.span())));
+    center.x(std::max(x_min, std::min(x_max, center.x() + delta)));
     return false;
   } else if (newc_yspan.overlaps_with(exc_yspan)) {
     ER_TRACE("yspan=%s overlap cache%d@%s yspan=%s center=%s",
-             newc_xspan.to_str().c_str(),
+             newc_yspan.to_str().c_str(),
              cache.id(),
              cache.real_loc().to_str().c_str(),
              exc_yspan.to_str().c_str(),
              center.to_str().c_str());
-    center.y(std::max(
-        y_min, std::min(y_max, center.y() + yrnd(m_rng) * newc_yspan.span())));
+    center.y(std::max(y_min, std::min(y_max, center.y() + delta)));
     return false;
   }
   return true;

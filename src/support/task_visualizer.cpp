@@ -1,7 +1,7 @@
 /**
- * @file depth1_qt_user_functions.hpp
+ * @file task_visualizer.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -17,39 +17,32 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateful_qt_user_functions.hpp"
+#include "fordyca/support/task_visualizer.hpp"
+
+#include <argos3/core/utility/datatypes/color.h>
+#include <argos3/core/utility/math/quaternion.h>
+#include <argos3/core/utility/math/vector3.h>
+#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
+#include "rcppsw/task_allocation/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Classes
+ * Member Functions
  ******************************************************************************/
-/**
- * @class depth1_qt_user_functions
- * @ingroup support depth1
- *
- * @brief Contains hooks for Qt to draw the visualizations related to depth 1
- * task decomposition:
- *
- * - Task name
- */
-class depth1_qt_user_functions : public depth0::stateful_qt_user_functions {
- public:
-  depth1_qt_user_functions(void);
-  ~depth1_qt_user_functions(void) override = default;
+void task_visualizer::draw(const ta::logical_task* const current_task) {
+  if (nullptr != current_task) {
+    m_qt->DrawText(argos::CVector3(0.0, 0.0, m_text_vis_offset),
+                   current_task->name(),
+                   argos::CColor::BLUE);
+  }
+}
 
-  void Draw(argos::CFootBotEntity& c_entity) override;
-};
-
-NS_END(depth1, support, fordyca);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_DEPTH1_QT_USER_FUNCTIONS_HPP_ */
+NS_END(support, fordyca);

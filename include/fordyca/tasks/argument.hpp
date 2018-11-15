@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/foraging_signal.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "rcppsw/task_allocation/taskable_argument.hpp"
 
@@ -32,7 +33,8 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-namespace task_allocation = rcppsw::task_allocation;
+namespace rmath = rcppsw::math;
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
@@ -45,11 +47,12 @@ namespace task_allocation = rcppsw::task_allocation;
  * \ref rcppsw.task_allocation.taskable function which contains a vector, mostly
  * likely representing an arena location.
  */
-class vector_argument : public task_allocation::taskable_argument {
+class vector_argument : public ta::taskable_argument {
  public:
   vector_argument(double tolerance, const rmath::vector2d& v)
       : m_tolerance(tolerance), m_vector(v) {}
 
+  ~vector_argument(void) override = default;
   const rmath::vector2d& vector(void) const { return m_vector; }
   double tolerance(void) const { return m_tolerance; }
 
@@ -67,7 +70,7 @@ class vector_argument : public task_allocation::taskable_argument {
  * a foraging signal,
  * for use in specifying initial conditions/commands for certain state machines.
  */
-class foraging_signal_argument : public task_allocation::taskable_argument {
+class foraging_signal_argument : public ta::taskable_argument {
  public:
   explicit foraging_signal_argument(controller::foraging_signal::type s)
       : m_signal(s) {}

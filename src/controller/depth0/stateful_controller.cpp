@@ -147,17 +147,17 @@ void stateful_controller::Reset(void) {
   m_perception->reset();
 } /* Reset() */
 
-FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
-                       stateful_controller,
-                       block_transport_goal,
-                       m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                        stateful_controller,
+                        block_transport_goal,
+                        m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                       stateful_controller,
-                       acquisition_goal,
-                       m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                        stateful_controller,
+                        acquisition_goal,
+                        m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(bool, stateful_controller, goal_acquired, m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(bool, stateful_controller, goal_acquired, m_fsm);
 
 /*******************************************************************************
  * World Model Metrics

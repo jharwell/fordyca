@@ -71,19 +71,19 @@ class stateful_fsm : public base_foraging_fsm,
                ds::perceived_arena_map* map);
 
   /* collision metrics */
-  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
-  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
-  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
-  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
+  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
+  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   void init(void) override;
 

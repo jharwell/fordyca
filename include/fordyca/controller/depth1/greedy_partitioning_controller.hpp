@@ -90,11 +90,11 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   int current_task_tab(void) const override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
+  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Get the current task the controller is executing.

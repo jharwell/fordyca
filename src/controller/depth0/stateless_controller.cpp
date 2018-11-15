@@ -76,17 +76,17 @@ void stateless_controller::ControlStep(void) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE_PTR(bool, stateless_controller, goal_acquired, m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(bool, stateless_controller, goal_acquired, m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                       stateless_controller,
-                       acquisition_goal,
-                       m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                        stateless_controller,
+                        acquisition_goal,
+                        m_fsm);
 
-FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
-                       stateless_controller,
-                       block_transport_goal,
-                       m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                        stateless_controller,
+                        block_transport_goal,
+                        m_fsm);
 
 /*******************************************************************************
  * Distance Metrics

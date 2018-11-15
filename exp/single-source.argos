@@ -120,8 +120,8 @@
             cache_prox_dist="1.0"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
-            site_xrange="1:11"
-            site_yrange="1:5"
+            site_xrange="2:10"
+            site_yrange="2.5:3"
             />
         <sensing>
           <proximity_sensor angle_range="-1.1:1.1"
@@ -350,7 +350,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="depth1_qt_user_functions" />
+      <user_functions label="depth2_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

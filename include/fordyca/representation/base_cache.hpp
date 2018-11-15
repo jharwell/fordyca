@@ -38,6 +38,7 @@
  ******************************************************************************/
 NS_START(fordyca, representation);
 namespace prototype = rcppsw::patterns::prototype;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -75,7 +76,7 @@ class base_cache : public multicell_entity,
    */
   base_cache(double dimension,
              double resolution,
-             rmath::vector2d center,
+             const rmath::vector2d& center,
              const std::vector<std::shared_ptr<base_block>>& blocks,
              int id);
 

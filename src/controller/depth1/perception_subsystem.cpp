@@ -97,17 +97,13 @@ void perception_subsystem::process_los(
              cache->discrete_loc().second,
              cache->n_blocks());
     auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
-    auto& density =
-        map()->access<occupancy_grid::kPheromone>(cache->discrete_loc());
 
     if (!cell.state_has_cache()) {
-      ER_INFO("Discovered cache%d(%u, %u): %zu blocks (density=%f, state=%d)",
+      ER_INFO("Discovered cache%d(%u, %u): %zu blocks",
               cache->id(),
               cache->discrete_loc().first,
               cache->discrete_loc().second,
-              cache->n_blocks(),
-              density.last_result(),
-              cell.fsm().current_state());
+              cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
       ER_INFO("Fixed cache%d@(%u, %u) block count: %zu blocks -> %zu blocks",

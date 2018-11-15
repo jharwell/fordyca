@@ -21,14 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * @todo Figure out how to work remove this warning properly.
- */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/support/task_visualizer.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
@@ -54,11 +52,9 @@ void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   auto& controller = dynamic_cast<controller::greedy_partitioning_controller&>(
       c_entity.GetControllableEntity().GetController());
 
-  if (controller.display_task() && nullptr != controller.current_task()) {
-    DrawText(
-        argos::CVector3(0.0, 0.0, 0.75),
-        dynamic_cast<ta::executable_task*>(controller.current_task())->name(),
-        argos::CColor::BLUE);
+  if (controller.display_task()) {
+    task_visualizer(this, 0.75)
+        .draw(dynamic_cast<ta::logical_task*>(controller.current_task()));
   }
 }
 
@@ -69,6 +65,6 @@ using namespace argos; // NOLINT
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 REGISTER_QTOPENGL_USER_FUNCTIONS(depth1_qt_user_functions,
                                  "depth1_qt_user_functions");
-#pragma Clang diagnostic pop
+#pragma clang diagnostic pop
 
 NS_END(support, fordyca, depth1);

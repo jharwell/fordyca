@@ -117,34 +117,34 @@ void harvester::accept(events::block_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         harvester,
+                         is_exploring_for_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         harvester,
+                         is_vectoring_to_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        goal_acquired,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         harvester,
+                         goal_acquired,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        harvester,
-                        acquisition_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         harvester,
+                         acquisition_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        harvester,
-                        block_transport_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         harvester,
+                         block_transport_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

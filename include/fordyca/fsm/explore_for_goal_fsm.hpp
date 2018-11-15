@@ -65,12 +65,13 @@ class explore_for_goal_fsm : public base_explore_fsm,
   explore_for_goal_fsm(controller::saa_subsystem* saa,
                        std::unique_ptr<controller::explore_behavior> behavior,
                        std::function<bool(void)> goal_detect);
+  ~explore_for_goal_fsm(void) override = default;
 
   /* collision metrics */
-  FSM_WRAPPER_DECLARE(bool, in_collision_avoidance);
-  FSM_WRAPPER_DECLARE(bool, entered_collision_avoidance);
-  FSM_WRAPPER_DECLARE(bool, exited_collision_avoidance);
-  FSM_WRAPPER_DECLARE(uint, collision_avoidance_duration);
+  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
 
   /* taskable overrides */
   bool task_finished(void) const override {

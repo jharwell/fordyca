@@ -37,8 +37,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace state_machine = rcppsw::patterns::state_machine;
-namespace task_allocation = rcppsw::task_allocation;
+namespace rfsm = rcppsw::patterns::state_machine;
+namespace ta = rcppsw::task_allocation;
 
 NS_START(fsm);
 
@@ -62,7 +62,7 @@ NS_START(fsm);
  */
 class vector_fsm : public base_foraging_fsm,
                    public er::client<vector_fsm>,
-                   public task_allocation::taskable {
+                   public ta::taskable {
  public:
   /**
    * @brief The tolerance within which a robot's location has to be in order to
@@ -151,7 +151,7 @@ class vector_fsm : public base_foraging_fsm,
    * @brief A structure containing all the information needed for the controller
    * to tell the FSM where to travel to next.
    */
-  struct goal_data : public state_machine::event_data {
+  struct goal_data : public rfsm::event_data {
     goal_data(rmath::vector2d loc_, double tolerance_)
         : tolerance(tolerance_), loc(loc_) {}
     goal_data(void) : loc() {}
@@ -190,12 +190,12 @@ class vector_fsm : public base_foraging_fsm,
   rmath::vector2d calc_vector_to_goal(const rmath::vector2d& goal);
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, state_machine::event_data);
+  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, rfsm::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
 
   /* vector states */
   HFSM_STATE_DECLARE_ND(vector_fsm, start);
-  HFSM_STATE_DECLARE(vector_fsm, vector, state_machine::event_data);
+  HFSM_STATE_DECLARE(vector_fsm, vector, rfsm::event_data);
   HFSM_STATE_DECLARE_ND(vector_fsm, collision_avoidance);
   HFSM_STATE_DECLARE_ND(vector_fsm, collision_recovery);
   HFSM_STATE_DECLARE(vector_fsm, arrived, struct goal_data);

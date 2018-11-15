@@ -32,6 +32,7 @@
 NS_START(fordyca);
 
 namespace controller { class cache_sel_matrix; }
+namespace ds { class perceived_arena_map; }
 
 NS_START(fsm, depth2);
 
@@ -53,26 +54,30 @@ NS_START(fsm, depth2);
  * robot arrives at its chosen site and there is already a cache there or there
  * is one very close by.
  */
-class acquire_cache_site_fsm : public acquire_goal_fsm,
-                               public er::client<acquire_cache_site_fsm> {
+class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
+                               public acquire_goal_fsm {
  public:
-  acquire_cache_site_fsm(
-      const controller::cache_sel_matrix* csel_matrix,
-      controller::saa_subsystem* saa,
-      ds::perceived_arena_map* map);
+  acquire_cache_site_fsm(const controller::cache_sel_matrix* matrix,
+                         controller::saa_subsystem* saa,
+                         ds::perceived_arena_map* map);
+  ~acquire_cache_site_fsm(void) override = default;
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
   acquire_cache_site_fsm& operator=(const acquire_cache_site_fsm& fsm) = delete;
 
-  /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
-
  private:
-  bool acquire_known_goal(void) override;
+  /*
+   * See \ref acquire_goal_fsm for the purpose of these callbacks.
+   */
+  acquisition_goal_type acquisition_goal_internal(void) const;
+  acquire_goal_fsm::candidate_type site_select(void) const;
+  bool candidates_exist(void) const { return true; }
+  bool site_exploration_term_cb(void) const;
   bool site_acquired_cb(bool explore_result) const;
 
   // clang-format off
   const controller::cache_sel_matrix* const mc_matrix;
+  const ds::perceived_arena_map*      const mc_map;
   // clang-format on
 };
 

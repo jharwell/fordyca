@@ -65,7 +65,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * @brief Sentinel value to return if no valid cache center can be found for a
    * set of candidate blocks using the specified # of attempts.
    */
-  static const rmath::vector2d kInvalidCacheCenter;
+  static const rmath::vector2i kInvalidCacheCenter;
 
   /**
    * @brief Calculate the center of the new cache that will be constructed from
@@ -81,7 +81,7 @@ class dynamic_cache_creator : public base_cache_creator,
    *
    * @return Coordinates of the new cache.
    */
-  rmath::vector2d calc_center(const block_list& blocks,
+  rmath::vector2i calc_center(const block_list& blocks,
                               const ds::cache_vector& existing_caches) const;
 
   /**
@@ -96,7 +96,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * @return \c TRUE if there were no conflicts, \c FALSE otherwise.
    */
   bool deconflict_cache_center(const representation::base_cache& cache,
-                               rmath::vector2d& center) const;
+                               rmath::vector2i& center) const;
   // clang-format off
   double                             m_min_dist;
   uint                               m_min_blocks;

@@ -30,13 +30,14 @@
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 /*******************************************************************************
@@ -46,6 +47,7 @@ NS_START(fordyca, events);
 using ds::arena_grid;
 using ds::occupancy_grid;
 using representation::base_cache;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -236,14 +238,14 @@ void cached_block_pickup::visit(tasks::depth1::collector& task) {
       ->accept(*this);
 } /* visit() */
 
-void cached_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+void cached_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -251,16 +253,24 @@ void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
  ******************************************************************************/
 void cached_block_pickup::visit(
     controller::depth2::greedy_recpart_controller& controller) {
+  controller.ndc_push();
+  controller.perception()->map()->accept(*this);
+  controller.block(m_pickup_block);
   auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non existing cache interactor task %s causing cached block pickup",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
   task->accept(*this);
+  controller.ndc_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::depth2::cache_transferer& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+} /* visit() */
+void cached_block_pickup::visit(tasks::depth2::cache_collector& task) {
+  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -41,9 +41,7 @@ class stateless_fsm;
 class stateful_fsm;
 class free_block_to_nest_fsm;
 } // namespace depth0
-namespace depth1 {
 class block_to_goal_fsm;
-}
 } // namespace fsm
 namespace controller {
 namespace depth0 {
@@ -94,7 +92,7 @@ class free_block_pickup
                                 fsm::depth0::stateless_fsm,
                                 fsm::depth0::stateful_fsm,
                                 fsm::depth0::free_block_to_nest_fsm,
-                                fsm::depth1::block_to_goal_fsm,
+                                fsm::block_to_goal_fsm,
                                 tasks::depth0::generalist,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_starter,
@@ -125,7 +123,7 @@ class free_block_pickup
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
   void visit(
       controller::depth1::greedy_partitioning_controller& controller) override;
-  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
+  void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(tasks::depth1::harvester& task) override;
 
