@@ -41,6 +41,8 @@
 #include "fordyca/representation/cube_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
+#include "fordyca/events/block_found.hpp"
+#include "fordyca/math/utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -256,7 +258,7 @@ void stateful_controller::perform_communication(void) {
 
     rcppsw::swarm::pheromone_density& density = perception()->map()->
       access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
-    packet.data.push_back(static_cast<uint8_t>(density.last_result()));
+    packet.data.push_back(static_cast<uint8_t>(density.last_result() * 10));
 
     saa_subsystem()->actuation()->start_sending_message(packet);
   } else {
@@ -271,55 +273,62 @@ void stateful_controller::integrate_recieved_packet(hal::wifi_packet packet) {
   int state = static_cast<int>(packet.data[2]);
   int ent_id = static_cast<int>(packet.data[3]);
   // type of block (if it's not a block it will be -1)
-  int type = static_cast<int>(packet.data[4]);
-  int pheromone_density = static_cast<int>(packet.data[5]);
 
-  if (state != 1) {
+  rcppsw::math::dcoord2 disc_loc = rcppsw::math::dcoord2(x_coord, y_coord);
+
+  auto rcoord_vector = fordyca::math::dcoord_to_rcoord(disc_loc,
+    perception()->map()->grid_resolution());
+
+
+  int type = static_cast<int>(packet.data[4]);
+  double pheromone_density = static_cast<double>(packet.data[5]) / 10;
+
+  if (state > 2) {
     rcppsw::swarm::pheromone_density& density = perception()->map()->
       access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
 
-      // If the recieved pheromone density is less than the known, don't
-      // integrate the recieved information.
-      if (density.last_result() > pheromone_density) {
-        return;
-      }
-
-    density.pheromone_set(static_cast<double>(pheromone_density));
+    // If the recieved pheromone density is less than the known, don't
+    // integrate the recieved information.
+    if (density.last_result() + 0.001 >= pheromone_density) {
+      return;
+    }
 
     // blocks
     if (state == 3) {
       // ramp block
       if (type == 2) {
         std::shared_ptr<representation::ramp_block> block_ptr (new
-          representation::ramp_block(rcppsw::math::vector2d(x_coord, y_coord),
-          ent_id));
+          representation::ramp_block(rcppsw::math::vector2d(2, 1), ent_id));
+        block_ptr->real_loc(rcoord_vector);
+        block_ptr->discrete_loc(disc_loc);
 
-        perception()->map()->block_add(block_ptr);
+        perception()->map()->accept(*(new fordyca::events::block_found(block_ptr)));
       // cube block
     } else if (type == 3) {
         std::shared_ptr<representation::cube_block> block_ptr (new
-          representation::cube_block(rcppsw::math::vector2d(x_coord, y_coord),
-          ent_id));
+          representation::cube_block(rcppsw::math::vector2d(1, 1), ent_id));
+        block_ptr->real_loc(rcoord_vector);
+        block_ptr->discrete_loc(disc_loc);
 
-        perception()->map()->block_add(block_ptr);
+        perception()->map()->accept(*(new fordyca::events::block_found(block_ptr)));
       } /* if type */
+
+      density.pheromone_set(pheromone_density);
     // caches
     } else {
       // TODO: Add caches to percieved_arena_map
 
-    } /* if (state == 1) / else */
-  } /* if (state != -1) */
+    } /* if (state == 3) / else */
+  } /* if (state > 2) */
 } /* integrate_recieved_packet */
 
 argos::CVector2 stateful_controller::get_most_valuable_cell(void) {
   argos::CVector2 cell_coords;
 
-  // TODO: Get information on where the nest is!!!!
-  int nest_x_coord = 2;
-  int nest_y_coord = 3;
+  int nest_x_coord = boost::get<argos::CVector2>(m_block_sel_matrix->find("nest_loc")->second).GetX();
+  int nest_y_coord = boost::get<argos::CVector2>(m_block_sel_matrix->find("nest_loc")->second).GetY();
 
-  int communicated_cell_value = 99999;
-  // int communicated_cell_value = 0;
+  int communicated_cell_value = 0;
   int current_cell_value = 0;
 
   int arena_x_coord = static_cast<int>(m_arena_x);
@@ -329,12 +338,21 @@ argos::CVector2 stateful_controller::get_most_valuable_cell(void) {
 
   for (int i = 0; i < arena_x_coord; ++i) {
     for (int j = 0; j < arena_y_coord; ++j) {
+      // Current cell
       ds::cell2D current_cell = perception()->map()->
         access<ds::occupancy_grid::kCell>(i, j);
+
+      // Current cell density
+      rcppsw::swarm::pheromone_density& density = perception()->map()->
+        access<ds::occupancy_grid::kPheromone>(i, j);
+
       if (current_cell.state_has_block()) {
+        // Distance from the nest * number of blocks * pheromone density
         current_cell_value = ((((i - nest_x_coord)^2) +
-          ((j - nest_y_coord)^2))^(1/2)) / current_cell.block_count();
-        if (current_cell_value < communicated_cell_value) {
+          ((j - nest_y_coord)^2))^(1/2)) * current_cell.block_count() *
+           density.last_result();
+        // current_cell_value = current_cell.block_count();
+        if (current_cell_value > communicated_cell_value) {
           communicated_cell_value = current_cell_value;
           cell_x = i;
           cell_y = j;
@@ -342,10 +360,7 @@ argos::CVector2 stateful_controller::get_most_valuable_cell(void) {
       } /* if cell has block */
     } /* for(j..) */
   } /* for(i..) */
-  if (cell_x != 0 || cell_y != 0) {
-    std::cout << "Arena x: " << arena_x_coord << " and y: " << arena_y_coord << std::endl;
-    std::cout << "Most Valuable X coord: " << cell_x << " and the most valuable y: " << cell_y << std::endl;
-  }
+
   cell_coords.SetX(cell_x);
   cell_coords.SetY(cell_y);
   return cell_coords;
