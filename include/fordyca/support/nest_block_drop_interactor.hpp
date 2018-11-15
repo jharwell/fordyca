@@ -95,7 +95,7 @@ class nest_block_drop_interactor
   }
 
  private:
-  typedef typename block_op_penalty_handler<T>::penalty_src penalty_type;
+  using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
 
   /**
    * @brief Determine if a robot is waiting to drop a block in the nest, and if

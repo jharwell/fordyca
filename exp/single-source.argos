@@ -210,7 +210,7 @@
       <blocks>
         <manipulation_penalty>
           <waveform
-              type="Constant"
+              type="Null"
               frequency="0.01"
               amplitude="50"
               offset="10"/>

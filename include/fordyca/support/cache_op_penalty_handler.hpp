@@ -131,14 +131,9 @@ class cache_op_penalty_handler
    * otherwise.
    */
   bool existing_cache_op_filter(const T& controller) const {
-    if (nullptr == controller.current_task()) {
-      return false;
-    }
-
     int cache_id = loop_utils::robot_on_cache(controller, *m_map);
-    return (controller.current_task()->goal_acquired() &&
-            acquisition_goal_type::kExistingCache ==
-                controller.current_task()->acquisition_goal() &&
+    return (controller.goal_acquired() &&
+            acquisition_goal_type::kExistingCache == controller.acquisition_goal() &&
             -1 != cache_id);
   }
 

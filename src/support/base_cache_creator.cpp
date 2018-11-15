@@ -60,16 +60,31 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
   rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center, grid()->resolution());
   ds::cell2D& cell = m_grid->access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
-    ER_ASSERT(cell.block(), "Cell does not have block");
+    ER_ASSERT(nullptr != cell.block(),
+              "Cell@(%u,%u) does not have block",
+              cell.loc().first, cell.loc().second);
 
     /*
-     * We use insert() instead of push_back() here so that it there was a
-     * leftover block on the cell where a cache used to be that is also where
-     * this cache is being created, it becomes the "front" of the cache, and
-     * will be the first block picked up by a robot from the new cache. This
-     * helps to ensure fairness/better statistics for the simulations.
+     * If the host cell for the cache already contains a block, we don't want to
+     * unconditionally add said block to the list of blocks for the new cache,
+     * because if the cache was created using some function of free blocks in
+     * the arena, then that block could already be in the list, and we would be
+     * double adding it, which will cause problems later (dynamic cache
+     * creation). However, it may also NOT be in the list of blocks to use for
+     * the new cache, in which case we need to add in (static cache creation).
      */
-    blocks.insert(blocks.begin(), cell.block());
+    if (blocks.end() == std::find(blocks.begin(),
+                                  blocks.end(),
+                                  cell.block())) {
+      /*
+       * We use insert() instead of push_back() here so that it there was a
+       * leftover block on the cell where a cache used to be that is also where
+       * this cache is being created, it becomes the "front" of the cache, and
+       * will be the first block picked up by a robot from the new cache. This
+       * helps to ensure fairness/better statistics for the simulations.
+       */
+      blocks.insert(blocks.begin(), cell.block());
+    }
   }
 
   /*
@@ -123,15 +138,6 @@ base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existi
   rmath::vector2i new_center = center;
 
   /*
-   * We need to be sure the center of the new cache is not near the arena
-   * boundaries, in order to avoid all sorts of weird corner cases.
-   */
-  double x_max = grid()->xrsize() - exc_xspan.span() * 2;
-  double x_min = exc_xspan.span() * 2;
-  double y_max = grid()->yrsize() - exc_yspan.span() * 2;
-  double y_min = exc_yspan.span() * 2;
-
-  /*
    * Now that our center is comfortably in the middle of the arena, we need to
    * deconflict it with all known caches. We move the cache by unings of the
    * cache size (all caches are the same size), in order to preserve having the
@@ -151,7 +157,7 @@ base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existi
              exc_xspan.to_str().c_str(),
              center.to_str().c_str(),
              x_delta);
-    new_center.x(std::max(x_min, std::min(x_max, new_center.x() + x_delta)));
+    new_center.x(new_center.x() + x_delta);
     x_conflict = true;
   } else if (newc_yspan.overlaps_with(exc_yspan)) {
     ER_TRACE("yspan=%s overlap cache%d@%s [yspan=%s center=%s], y_delta=%f",
@@ -161,7 +167,7 @@ base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existi
              exc_yspan.to_str().c_str(),
              center.to_str().c_str(),
              y_delta);
-    new_center.y(std::max(y_min, std::min(y_max, new_center.y() + y_delta)));
+    new_center.y(new_center.y() + y_delta);
     y_conflict = true;
   }
   return std::make_pair(x_conflict && y_conflict, new_center);

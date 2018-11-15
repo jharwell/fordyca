@@ -232,7 +232,8 @@ class block_op_penalty_handler
    * and the reason why. (\c FALSE, -1) otherwise.
    */
   filter_status_type nest_drop_filter(const T& controller) const {
-    if (!(controller.in_nest() && controller.goal_acquired())) {
+    if (!(controller.in_nest() && controller.goal_acquired() &&
+          transport_goal_type::kNest == controller.block_transport_goal())) {
       return filter_status_type(true, kStatusControllerNotReady);
     }
     return filter_status_type(false, kStatusOK);
@@ -249,7 +250,8 @@ class block_op_penalty_handler
   filter_status_type cache_site_drop_filter(const T& controller,
                                             double block_prox_dist) const {
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kCacheSite == controller.acquisition_goal())) {
+          acquisition_goal_type::kCacheSite == controller.acquisition_goal() &&
+          transport_goal_type::kCacheSite == controller.block_transport_goal())) {
       return filter_status_type(true, kStatusControllerNotReady);
     }
     int block_id = loop_utils::cache_site_block_proximity(controller,
@@ -273,7 +275,8 @@ class block_op_penalty_handler
   filter_status_type new_cache_drop_filter(const T& controller,
                                            double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kNewCache == controller.acquisition_goal())) {
+          acquisition_goal_type::kNewCache == controller.acquisition_goal() &&
+          transport_goal_type::kNewCache == controller.block_transport_goal())) {
       return filter_status_type(true, kStatusControllerNotReady);
     }
     int cache_id = loop_utils::new_cache_cache_proximity(controller,

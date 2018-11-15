@@ -146,10 +146,14 @@ ds::block_list dynamic_cache_creator::cache_blocks_calc(
                           src_blocks.end(),
                           candidates[i]) == src_blocks.end(),
                 "Block%d already on src list", candidates[i]->id());
-        ER_TRACE("Add block %d:@%s to src list",
+      if (std::find(used_blocks.begin(),
+                    used_blocks.end(),
+                    candidates[i]) == used_blocks.end()) {
+        ER_TRACE("Add block %d@%s to src list",
                  candidates[i]->id(),
                  candidates[i]->real_loc().to_str().c_str());
         src_blocks.push_back(candidates[i]);
+      }
     }
   } /* for(i..) */
   return src_blocks;
@@ -193,8 +197,8 @@ rmath::vector2i dynamic_cache_creator::calc_center(
   while (i++ < kOVERLAP_SEARCH_MAX_TRIES) {
     bool conflict = false;
     for (size_t j = 0; j < existing_caches.size(); ++j) {
-      auto pair = deconflict_existing_cache(*existing_caches[j], center);
       center = deconflict_arena_boundaries(cache_dim, center);
+      auto pair = deconflict_existing_cache(*existing_caches[j], center);
       if (pair.first) {
         conflict = true;
         center = pair.second;

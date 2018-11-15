@@ -47,6 +47,7 @@ block_proximity::block_proximity(
  * Depth2 Foraging
  ******************************************************************************/
 void block_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
+  c.ndc_push();
   events::block_found found(m_block);
   c.perception()->map()->accept(found);
   auto* task = dynamic_cast<tasks::depth2::cache_starter*>(c.current_task());
@@ -54,6 +55,7 @@ void block_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
             "Non cache starter task %s received block proximity event",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
   task->accept(*this);
+  c.ndc_pop();
 } /* visit() */
 
 void block_proximity::visit(tasks::depth2::cache_starter& task) {
