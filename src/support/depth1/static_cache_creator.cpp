@@ -47,7 +47,8 @@ static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
  ******************************************************************************/
 ds::cache_vector static_cache_creator::create_all(
     const ds::cache_vector& existing_caches,
-    ds::block_vector& blocks) {
+    ds::block_vector& blocks,
+    double) {
   ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
   std::vector<std::shared_ptr<representation::arena_cache>> caches;
 
@@ -57,7 +58,7 @@ ds::cache_vector static_cache_creator::create_all(
   ER_INFO("Creating static cache@%s from %zu free blocks",
           m_center.to_str().c_str(),
           blocks.size());
-  block_list starter_blocks;
+  ds::block_list starter_blocks;
   for (auto b : blocks) {
     starter_blocks.push_back(b);
   } /* for(i..) */

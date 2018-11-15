@@ -50,7 +50,8 @@ class static_cache_creator : public base_cache_creator,
                        double cache_dim);
 
   ds::cache_vector create_all(const ds::cache_vector& existing_caches,
-                              ds::block_vector& blocks) override;
+                              ds::block_vector& blocks,
+                              double) override;
 
  private:
   // clang-format off

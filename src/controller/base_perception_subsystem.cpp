@@ -44,7 +44,7 @@ using ds::occupancy_grid;
 base_perception_subsystem::base_perception_subsystem(
     const params::perception_params* const params,
     const std::string& id)
-    : ER_CLIENT_INIT("fordyca.controller.perception"),
+    : ER_CLIENT_INIT("fordyca.controller.base_perception"),
       m_cell_stats(fsm::cell2D_fsm::ST_MAX_STATES),
       m_map(rcppsw::make_unique<ds::perceived_arena_map>(params, id)) {}
 
@@ -78,7 +78,7 @@ void base_perception_subsystem::process_los(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  representation::line_of_sight::const_block_list blocks = c_los->blocks();
+  ds::const_block_list blocks = c_los->blocks();
   std::string accum;
   std::for_each(blocks.begin(), blocks.end(), [&](const auto& b) {
     accum += "b" + std::to_string(b->id()) + "->(" +
@@ -116,7 +116,9 @@ void base_perception_subsystem::process_los(
   }   /* for(i..) */
 
   for (auto& block : c_los->blocks()) {
-    ER_ASSERT(!block->is_out_of_sight(), "Block out of sight in LOS?");
+    ER_ASSERT(!block->is_out_of_sight(),
+              "Block%d out of sight in LOS?",
+              block->id());
     auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
     if (!cell.state_has_block()) {
       ER_INFO("Discovered block%d@(%u, %u)",

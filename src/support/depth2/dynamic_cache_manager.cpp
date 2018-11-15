@@ -69,7 +69,9 @@ std::pair<bool, ds::cache_vector> dynamic_cache_manager::create(
   if (!pair.first) {
     return std::make_pair(false, ds::cache_vector());
   }
-  auto created = creator.create_all(existing_caches, pair.second);
+  auto created = creator.create_all(existing_caches,
+                                    pair.second,
+                                    mc_cache_params.dimension);
 
   /*
    * Must be after fixing hidden blocks, otherwise the cache host cell will

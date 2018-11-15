@@ -36,6 +36,7 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
+#include "fordyca/dbg/dbg.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,20 +73,23 @@ void cache_block_drop::visit(ds::cell2D& cell) {
 } /* visit() */
 
 void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
-  ER_ASSERT(fsm.state_has_cache(), "cell does not contain a cache");
+  ER_ASSERT(fsm.state_has_cache(), "Cell does not contain a cache");
   fsm.event_block_drop();
 } /* visit() */
 
 void cache_block_drop::visit(ds::arena_map& map) {
-  ER_ASSERT(-1 != m_block->robot_id(), "undefined robot index");
+  ER_ASSERT(-1 != m_block->robot_id(),
+            "Undefined robot index for block%d",
+            m_block->id());
   __rcsw_unused int index = m_block->robot_id();
   m_block->accept(*this);
   m_cache->accept(*this);
   map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
-  ER_INFO("arena_map: fb%d dropped block%d in cache%d [%zu blocks total]",
+  ER_INFO("arena_map: fb%d dropped block%d in cache%d,total=[%s] (%zu)",
           index,
           m_block->id(),
           m_cache->id(),
+          dbg::blocks_list(m_cache->blocks()).c_str(),
           m_cache->n_blocks());
 } /* visit() */
 
@@ -113,12 +117,17 @@ void cache_block_drop::visit(
 
   auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task());
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+
   ER_ASSERT(nullptr != task,
             "Non existing cache interactor task %s causing cached block drop",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            task_name.c_str());
   task->accept(*this);
 
-  ER_INFO("Dropped block%d in cache%d", m_block->id(), m_cache->id());
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          task_name.c_str());
   controller.ndc_pop();
 } /* visit() */
 
@@ -136,12 +145,21 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
  ******************************************************************************/
 void cache_block_drop::visit(
     controller::depth2::greedy_recpart_controller& controller) {
+  controller.ndc_push();
   auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task());
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
   ER_ASSERT(nullptr != task,
             "Non existing cache interactor task %s causing cached block drop",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            task_name.c_str());
+
+  controller.block(nullptr);
   task->accept(*this);
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          task_name.c_str());
+  controller.ndc_pop();
 } /* visit() */
 
 void cache_block_drop::visit(tasks::depth2::cache_transferer& task) {

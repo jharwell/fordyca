@@ -31,6 +31,8 @@
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -67,11 +69,6 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
                             public decorator::decorator<occupancy_grid>,
                             public visitor::visitable_any<perceived_arena_map> {
  public:
-  using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
-  using block_list = std::list<std::shared_ptr<representation::base_block>>;
-  using perceived_cache_list = std::list<representation::perceived_cache>;
-  using perceived_block_list = std::list<representation::perceived_block>;
-
   perceived_arena_map(
       const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
@@ -198,7 +195,7 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  cache_list m_caches;
+  ds::cache_list m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -206,7 +203,7 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  block_list m_blocks;
+  ds::block_list m_blocks;
   // clang-format on
 };
 

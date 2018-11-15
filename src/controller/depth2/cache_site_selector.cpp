@@ -47,8 +47,8 @@ cache_site_selector::cache_site_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rmath::vector2d cache_site_selector::calc_best(const cache_list& known_caches,
-                                               const block_list& known_blocks,
+rmath::vector2d cache_site_selector::calc_best(const ds::cache_list& known_caches,
+                                               const ds::block_list& known_blocks,
                                                rmath::vector2d position) {
   double max_utility;
   std::vector<double> point;
@@ -87,8 +87,8 @@ rmath::vector2d cache_site_selector::calc_best(const cache_list& known_caches,
 } /* calc_best() */
 
 void cache_site_selector::opt_initialize(
-    const cache_list& known_caches,
-    const block_list& known_blocks,
+    const ds::cache_list& known_caches,
+    const ds::block_list& known_blocks,
     rmath::vector2d position,
     constraint_set* const constraints,
     struct site_utility_data* const utility_data,
@@ -153,8 +153,8 @@ void cache_site_selector::opt_initialize(
           yrange.to_str().c_str());
 } /* opt_initialize() */
 
-void cache_site_selector::constraints_create(const cache_list& known_caches,
-                                             const block_list& known_blocks,
+void cache_site_selector::constraints_create(const ds::cache_list& known_caches,
+                                             const ds::block_list& known_blocks,
                                              const rmath::vector2d& nest_loc,
                                              constraint_set* const constraints) {
   for (auto& c : known_caches) {

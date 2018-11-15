@@ -30,6 +30,7 @@
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/ds/block_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,8 +50,6 @@ namespace rmath = rcppsw::math;
  */
 class block_selector: public rcppsw::er::client<block_selector> {
  public:
-  using perceived_block_list = std::list<representation::perceived_block>;
-
   explicit block_selector(const block_sel_matrix* sel_matrix);
 
   ~block_selector(void) override = default;
@@ -65,7 +64,7 @@ class block_selector: public rcppsw::er::client<block_selector> {
    * @return A pointer to the "best" block, along with its utility value.
    */
   representation::perceived_block calc_best(
-      const perceived_block_list& blocks,
+      const ds::perceived_block_list& blocks,
       const rmath::vector2d& position);
 
  private:

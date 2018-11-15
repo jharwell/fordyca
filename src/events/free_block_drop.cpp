@@ -146,17 +146,18 @@ void free_block_drop::visit(
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
   if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
       !polled->task_aborted()) {
-    ER_INFO("Added block%d@%s to exception list",
+    ER_INFO("Added block%d@%s to exception list,task='%s'",
             m_block->id(),
-            m_block->real_loc().to_str().c_str());
+            m_block->real_loc().to_str().c_str(),
+            polled->name().c_str());
     controller.block_sel_matrix()->sel_exception_add(m_block->id());
     controller.bsel_exception_added(true);
   }
   task->accept(*this);
-  controller.perception()->map()->accept(*this);
-  ER_INFO("Dropped block%d@%s",
+  ER_INFO("Dropped block%d@%s,task='%s'",
           m_block->id(),
-          m_block->real_loc().to_str().c_str());
+          m_block->real_loc().to_str().c_str(),
+          polled->name().c_str());
 
   controller.block(nullptr);
   controller.ndc_pop();

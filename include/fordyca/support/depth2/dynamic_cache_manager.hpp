@@ -75,7 +75,7 @@ class dynamic_cache_manager : public base_cache_manager,
    * currently being carried by robots.
    */
   std::pair<bool, ds::cache_vector> create(ds::cache_vector& existing_caches,
-                                       ds::block_vector& blocks);
+                                           ds::block_vector& blocks);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches

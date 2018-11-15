@@ -30,6 +30,8 @@
 #include "rcppsw/ds/base_grid2D.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/dcoord.hpp"
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -63,10 +65,6 @@ class base_cache;
  */
 class line_of_sight : public rcppsw::er::client<line_of_sight> {
  public:
-  using block_list = std::list<std::shared_ptr<base_block>>;
-  using const_block_list = std::list<std::shared_ptr<const base_block>>;
-  using cache_list = std::list<std::shared_ptr<base_cache>>;
-  using const_cache_list = std::list<std::shared_ptr<const base_cache>>;
   using grid_view = rcppsw::ds::grid_view<ds::cell2D>;
 
   line_of_sight(const grid_view& c_view, rcppsw::math::dcoord2 center)
@@ -75,8 +73,8 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
         m_view(c_view),
         m_caches() {}
 
-  const_block_list blocks(void) const;
-  const_cache_list caches(void) const;
+  ds::const_block_list blocks(void) const;
+  ds::const_cache_list caches(void) const;
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -128,7 +126,7 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
   // clang-format off
   rcppsw::math::dcoord2             m_center;
   grid_view                         m_view;
-  const_cache_list                  m_caches;
+  ds::const_cache_list              m_caches;
   // clang-format on
 };
 

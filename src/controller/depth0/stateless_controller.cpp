@@ -28,6 +28,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,6 +67,11 @@ void stateless_controller::Reset(void) {
 
 void stateless_controller::ControlStep(void) {
   ndc_pusht();
+  if (nullptr != block()) {
+    ER_ASSERT(-1 != block()->robot_id(), "Carried block%d has robot id=%d",
+              block()->id(), block()->robot_id());
+  }
+
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());

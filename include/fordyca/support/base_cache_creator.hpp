@@ -26,15 +26,15 @@
  ******************************************************************************/
 #include <list>
 #include <vector>
+#include <random>
+#include <utility>
 
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
+#include "fordyca/ds/block_list.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-
-#include "fordyca/support/block_vector.hpp"
-#include "fordyca/support/cache_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,8 +59,6 @@ namespace rmath = rcppsw::math;
  */
 class base_cache_creator : public er::client<base_cache_creator> {
  public:
-  using cache_list = std::list<std::shared_ptr<representation::arena_cache>>;
-  using block_list = std::list<std::shared_ptr<representation::base_block>>;
 
   /**
    * @brief Initialize a new cache creator.
@@ -81,11 +79,16 @@ class base_cache_creator : public er::client<base_cache_creator> {
    *                        avoiding overlaps during new cache creation.
    * @param candidate_blocks The vector of free blocks that may be used in cache
    *                         creation.
+   * @param cache_dim The dimensions of the caches to create. Possibly needed
+   *                  for deconflicting the new cache's location with arena
+   *                  boundaries in the cache where there are no existing
+   *                  caches that can be used to obtain cache dimensions
    *
    * @return A vector of created caches.
    */
   virtual ds::cache_vector create_all(const ds::cache_vector& existing_caches,
-                                      ds::block_vector& candidate_blocks) = 0;
+                                      ds::block_vector& candidate_blocks,
+                                      double cache_dim) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact
@@ -96,16 +99,54 @@ class base_cache_creator : public er::client<base_cache_creator> {
   void update_host_cells(ds::cache_vector& caches);
 
  protected:
+  using deconflict_result_type = std::pair<bool, rmath::vector2i>;
+
   const ds::arena_grid* grid(void) const { return m_grid; }
   ds::arena_grid* grid(void) { return m_grid; }
   std::unique_ptr<representation::arena_cache> create_single_cache(
-      block_list blocks,
+      ds::block_list blocks,
       const rmath::vector2d& center);
+
+  /**
+   * @brief Basic sanity checks on newly created caches:
+   *
+   * - No block contained in one cache is contained in another.
+   * - No two newly created caches overlap.
+   *
+   * This function is provided for derived classes to use when they implement
+   * \ref create_all().
+   *
+   * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
+   * otherwise.
+   */
+  bool creation_sanity_checks(const ds::cache_vector& new_caches) const;
+
+  /**
+   * @brief Given the size of the cache-to-be and its tentative location in the
+   * arena, return a new location that guarantees that the cache will not
+   * overlap arena boundaries.
+   *
+   * This function is provided for derived classes to use when they implement
+   * \ref create_all().
+   */
+  rmath::vector2i deconflict_arena_boundaries(double cache_dim,
+                                              const rmath::vector2i& center) const;
+  /**
+   * @brief Deconflict new cache cache from overlapping with any existing caches
+   * (including taking the span of the new cache into account).
+   *
+   * This function is provided for derived classes to use when they implement
+   * \ref create_all().
+   */
+  deconflict_result_type deconflict_existing_cache(
+      const representation::base_cache& cache,
+      const rmath::vector2i& center) const;
 
  private:
   // clang-format off
-  double          m_cache_dim;
-  ds::arena_grid* m_grid;
+  double                             m_cache_dim;
+  ds::arena_grid*                    m_grid;
+  mutable std::default_random_engine m_rng{};
   // clang-format on
 };
 NS_END(fordyca, depth1);

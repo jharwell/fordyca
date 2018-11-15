@@ -39,6 +39,7 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
+#include "fordyca/dbg/dbg.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -78,7 +79,7 @@ void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 void cached_block_pickup::visit(ds::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
             "Cell does not have coordinates");
-  ER_ASSERT(cell.state_has_cache(), "cell does not have cache");
+  ER_ASSERT(cell.state_has_cache(), "Cell does not have cache");
   if (nullptr != m_orphan_block) {
     cell.entity(m_orphan_block);
     ER_DEBUG("Cell (%u, %u) gets orphan block%d",
@@ -127,18 +128,20 @@ void cached_block_pickup::visit(ds::arena_map& map) {
     m_real_cache->accept(*this);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
-              "cell@(%u, %u) with >= %zu blocks does not have cache",
+              "Cell@(%u, %u) with >= %zu blocks does not have cache",
               cell_op::x(),
               cell_op::y(),
               base_cache::kMinBlocks);
-    ER_INFO(
-        "arena_map: fb%u: block%d from cache%d@(%u, %u) [%zu blocks remain]",
-        m_robot_index,
-        m_pickup_block->id(),
-        cache_id,
-        cell_op::x(),
-        cell_op::y(),
-        m_real_cache->n_blocks());
+
+    ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u),remaining=[%s] (%zu)",
+            m_robot_index,
+            m_pickup_block->id(),
+            cache_id,
+            cell_op::x(),
+            cell_op::y(),
+            dbg::blocks_list(m_real_cache->blocks()).c_str(),
+            m_real_cache->n_blocks());
+
 
   } else {
     m_real_cache->accept(*this);
@@ -183,15 +186,15 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
               "cell@(%u, %u) with >= 2 blocks does not have cache",
               cell_op::x(),
               cell_op::y());
-    ER_INFO(
-        "perceived_arena_map: fb%u: block%d from cache%d@(%u, %u) [%zu "
-        "blocks remain]",
-        m_robot_index,
-        m_pickup_block->id(),
-        cell.cache()->id(),
-        cell_op::x(),
-        cell_op::y(),
-        cell.cache()->n_blocks());
+
+    ER_INFO("PAM: fb%u: block%d from cache%d@(%u, %u),remaining=[%s] (%zu)",
+            m_robot_index,
+            m_pickup_block->id(),
+            cell.cache()->id(),
+            cell_op::x(),
+            cell_op::y(),
+            dbg::blocks_list(cell.cache()->blocks()).c_str(),
+            cell.cache()->n_blocks());
 
   } else {
     __rcsw_unused int id = cell.cache()->id();
@@ -224,12 +227,17 @@ void cached_block_pickup::visit(
 
   auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task());
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+
   ER_ASSERT(nullptr != task,
             "Non existing cache interactor task %s causing cached block pickup",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            task_name.c_str());
   task->accept(*this);
 
-  ER_INFO("Picked up block%d", m_pickup_block->id());
+  ER_INFO("Picked up block%d from cache%d,task='%s'",
+          m_pickup_block->id(),
+          m_real_cache->id(),
+          task_name.c_str());
   controller.ndc_pop();
 } /* visit() */
 
@@ -258,10 +266,16 @@ void cached_block_pickup::visit(
   controller.block(m_pickup_block);
   auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task());
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+
   ER_ASSERT(nullptr != task,
             "Non existing cache interactor task %s causing cached block pickup",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            task_name.c_str());
   task->accept(*this);
+  ER_INFO("Picked up block%d from cache%d,task='%s'",
+          m_pickup_block->id(),
+          m_real_cache->id(),
+          task_name.c_str());
   controller.ndc_pop();
 } /* visit() */
 

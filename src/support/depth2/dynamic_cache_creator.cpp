@@ -26,6 +26,8 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
+#include "fordyca/dbg/dbg.hpp"
+#include "fordyca/ds/block_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,66 +56,25 @@ dynamic_cache_creator::dynamic_cache_creator(ds::arena_grid* const grid,
  ******************************************************************************/
 ds::cache_vector dynamic_cache_creator::create_all(
     const ds::cache_vector& existing_caches,
-    ds::block_vector& candidate_blocks) {
+    ds::block_vector& candidate_blocks,
+    double cache_dim) {
   ds::cache_vector caches;
-
-  std::string s =
-      std::accumulate(candidate_blocks.begin(),
-                      candidate_blocks.end(),
-                      std::string(),
-                      [&](const std::string& a, const auto& b) {
-                        return a + "b" + std::to_string(b->id()) + ",";
-                      });
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free blocks=[%s] (%zu)",
            m_min_dist,
            m_min_blocks,
-           s.c_str(),
+           dbg::blocks_list(candidate_blocks).c_str(),
            candidate_blocks.size());
 
-  block_list used_blocks;
+  ds::block_list used_blocks;
   for (size_t i = 0; i < candidate_blocks.size() - 1; ++i) {
-    block_list cache_i_blocks;
-
-    /*
-     * Block already in a new cache
-     */
-    if (std::find(used_blocks.begin(), used_blocks.end(), candidate_blocks[i]) !=
-        used_blocks.end()) {
-      continue;
-    }
-    for (size_t j = i + 1; j < candidate_blocks.size(); ++j) {
-      /*
-       * First, we have to first a block j that is close enough to block i to be
-       * able to create a cache.
-       */
-      if ((candidate_blocks[i]->real_loc() - candidate_blocks[j]->real_loc())
-              .length() <= m_min_dist) {
-        /*
-         * We don't want to double add any blocks.
-         */
-        if (std::find(cache_i_blocks.begin(),
-                      cache_i_blocks.end(),
-                      candidate_blocks[i]) == cache_i_blocks.end()) {
-          ER_TRACE("Add block %zu@%s",
-                   i,
-                   candidate_blocks[i]->real_loc().to_str().c_str());
-          cache_i_blocks.push_back(candidate_blocks[i]);
-        }
-        if (std::find(cache_i_blocks.begin(),
-                      cache_i_blocks.end(),
-                      candidate_blocks[j]) == cache_i_blocks.end()) {
-          ER_TRACE("Add block %zu:@%s",
-                   j,
-                   candidate_blocks[j]->real_loc().to_str().c_str());
-          cache_i_blocks.push_back(candidate_blocks[j]);
-        }
-      }
-    } /* for(j..) */
+    ds::block_list cache_i_blocks = cache_blocks_calc(used_blocks,
+                                                      candidate_blocks,
+                                                      i);
 
     /*
      * We now have all the blocks that are close enough to block i to be
-     * included in a new cache, so create the cache, if we have enough.
+     * included in a new cache, so create the cache if we have enough.
      */
     if (cache_i_blocks.size() >= m_min_blocks) {
       /*
@@ -123,7 +84,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
        */
       ds::cache_vector avoid = existing_caches;
       avoid.insert(avoid.end(), caches.begin(), caches.end());
-      rmath::vector2i center = calc_center(cache_i_blocks, avoid);
+      rmath::vector2i center = calc_center(cache_i_blocks, avoid, cache_dim);
 
       /*
        * We convert to discrete and then back to real coordinates so that our
@@ -141,17 +102,64 @@ ds::cache_vector dynamic_cache_creator::create_all(
       used_blocks.insert(used_blocks.end(),
                          cache_i_blocks.begin(),
                          cache_i_blocks.end());
+      ER_DEBUG("Used blocks=[%s]", dbg::blocks_list(used_blocks).c_str());
     }
   } /* for(i..) */
 
   ER_ASSERT(creation_sanity_checks(caches),
             "One or more bad caches on creation");
   return caches;
-} /* create() */
+} /* create_all() */
+
+ds::block_list dynamic_cache_creator::cache_blocks_calc(
+    const ds::block_list& used_blocks,
+    const ds::block_vector& candidates,
+    uint anchor_index) const {
+  ds::block_list src_blocks;
+
+  /*
+   * Block already in a new cache, so bail out.
+   */
+  if (std::find(used_blocks.begin(),
+                used_blocks.end(),
+                candidates[anchor_index]) != used_blocks.end()) {
+          return src_blocks;
+  }
+  /*
+   * Add our anchor/target block to the list of blocks for the new cache. This
+   * is OK to do even if there are no other blocks close enough to create a new
+   * cache, because we have a minimum # blocks threshold that has to be met
+   * anyway.
+   */
+  ER_TRACE("Add anchor block %d@%s to src list",
+           candidates[anchor_index]->id(),
+           candidates[anchor_index]->real_loc().to_str().c_str());
+  src_blocks.push_back(candidates[anchor_index]);
+  for (size_t i = anchor_index + 1; i < candidates.size(); ++i) {
+    /*
+     * If we find a block that is close enough to our anchor/target block, then
+     * add to the src list.
+     */
+    if ((candidates[anchor_index]->real_loc() - candidates[i]->real_loc())
+        .length() <= m_min_dist) {
+      ER_ASSERT(std::find(src_blocks.begin(),
+                          src_blocks.end(),
+                          candidates[i]) == src_blocks.end(),
+                "Block%d already on src list", candidates[i]->id());
+        ER_TRACE("Add block %d:@%s to src list",
+                 candidates[i]->id(),
+                 candidates[i]->real_loc().to_str().c_str());
+        src_blocks.push_back(candidates[i]);
+    }
+  } /* for(i..) */
+  return src_blocks;
+} /* cache_blocks_calc() */
+
 
 rmath::vector2i dynamic_cache_creator::calc_center(
-    const block_list& blocks,
-    const ds::cache_vector& existing_caches) const {
+    const ds::block_list& blocks,
+    const ds::cache_vector& existing_caches,
+    double cache_dim) const {
   double sumx = std::accumulate(
       std::begin(blocks), std::end(blocks), 0.0, [](double sum, const auto& b) {
         return sum + b->real_loc().x();
@@ -164,19 +172,17 @@ rmath::vector2i dynamic_cache_creator::calc_center(
   rmath::vector2i center(sumx / blocks.size(), sumy / blocks.size());
   ER_DEBUG("Guess center=%s", center.to_str().c_str());
 
+  /*
+   * This needs to be done even if there are no other known caches, because the
+   * guessed center might still be too close to the arena boundaries.
+   */
+  center = deconflict_arena_boundaries(cache_dim, center);
+
   /* If no existing caches, no possibility for conflict */
   if (existing_caches.empty()) {
     return center;
   }
-  std::string ec_str =
-      std::accumulate(existing_caches.begin(),
-                      existing_caches.end(),
-                      std::string(),
-                      [&](const std::string& a, const auto& b) {
-                        return a + "c" + std::to_string(b->id()) + ",";
-                      });
-
-  ER_DEBUG("Deconflict caches=[%s]", ec_str.c_str());
+  ER_DEBUG("Deconflict caches=[%s]", dbg::caches_list(existing_caches).c_str());
 
   /*
    * Every time we find an overlap we have to re-test all of the caches we've
@@ -187,8 +193,11 @@ rmath::vector2i dynamic_cache_creator::calc_center(
   while (i++ < kOVERLAP_SEARCH_MAX_TRIES) {
     bool conflict = false;
     for (size_t j = 0; j < existing_caches.size(); ++j) {
-      if (!deconflict_cache_center(*existing_caches[j], center)) {
+      auto pair = deconflict_existing_cache(*existing_caches[j], center);
+      center = deconflict_arena_boundaries(cache_dim, center);
+      if (pair.first) {
         conflict = true;
+        center = pair.second;
       }
     } /* for(j..) */
     if (!conflict) {
@@ -201,100 +210,14 @@ rmath::vector2i dynamic_cache_creator::calc_center(
    * can't find anything conflict free in that many, bail out.
    */
   if (i >= kOVERLAP_SEARCH_MAX_TRIES) {
-    std::string b_str =
-        std::accumulate(blocks.begin(),
-                        blocks.end(),
-                        std::string(),
-                        [&](const std::string& a, const auto& b) {
-                          return a + "b" + std::to_string(b->id()) + ",";
-                        });
-
     ER_WARN("No conflict-free center found in %u tries: caches=[%s],blocks=[%s]",
             kOVERLAP_SEARCH_MAX_TRIES,
-            ec_str.c_str(),
-            b_str.c_str());
+            dbg::caches_list(existing_caches).c_str(),
+            dbg::blocks_list(blocks).c_str());
     return kInvalidCacheCenter;
   }
 
   return center;
 } /* calc_center() */
-
-bool dynamic_cache_creator::deconflict_cache_center(
-    const representation::base_cache& cache,
-    rmath::vector2i& center) const {
-  std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
-  std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
-
-  auto exc_xspan = cache.xspan(cache.real_loc());
-  auto exc_yspan = cache.yspan(cache.real_loc());
-  auto newc_xspan = cache.xspan(rmath::ivec2dvec(center, grid()->resolution()));
-  auto newc_yspan = cache.yspan(rmath::ivec2dvec(center, grid()->resolution()));
-
-  /*
-   * All caches are the same size, so we can just grab an [x,y] span from the
-   * first of our known caches, and use that to ensure that caches are not
-   * placed too close to the arena boundaries.
-   */
-  double x_max = grid()->xrsize() - exc_xspan.span() * 1.5;
-  double x_min = exc_xspan.span() * 1.5;
-  double y_max = grid()->yrsize() - exc_yspan.span() * 1.5;
-  double y_min = exc_yspan.span() * 1.5;
-
-  double delta = xrnd(m_rng) * newc_xspan.span();
-
-  if (newc_xspan.overlaps_with(exc_xspan)) {
-    ER_TRACE("xspan=%s overlap cache%d@%s xspan=%s center=%s",
-             newc_xspan.to_str().c_str(),
-             cache.id(),
-             cache.real_loc().to_str().c_str(),
-             exc_xspan.to_str().c_str(),
-             center.to_str().c_str());
-    center.x(std::max(x_min, std::min(x_max, center.x() + delta)));
-    return false;
-  } else if (newc_yspan.overlaps_with(exc_yspan)) {
-    ER_TRACE("yspan=%s overlap cache%d@%s yspan=%s center=%s",
-             newc_yspan.to_str().c_str(),
-             cache.id(),
-             cache.real_loc().to_str().c_str(),
-             exc_yspan.to_str().c_str(),
-             center.to_str().c_str());
-    center.y(std::max(y_min, std::min(y_max, center.y() + delta)));
-    return false;
-  }
-  return true;
-} /* deconflict_cache_center() */
-
-bool dynamic_cache_creator::creation_sanity_checks(
-    const ds::cache_vector& caches) const {
-  for (auto& c1 : caches) {
-    for (auto& c2 : caches) {
-      if (c1->id() == c2->id()) {
-        continue;
-      }
-      for (auto& b : c1->blocks()) {
-        ER_ASSERT(!c2->contains_block(b),
-                  "Block%d contained in both cache%d and cache%d",
-                  b->id(),
-                  c1->id(),
-                  c2->id());
-        auto c1_xspan = c1->xspan(c1->real_loc());
-        auto c2_xspan = c2->xspan(c2->real_loc());
-        auto c1_yspan = c1->yspan(c1->real_loc());
-        auto c2_yspan = c2->yspan(c2->real_loc());
-        ER_ASSERT(!(c1_xspan.overlaps_with(c2_xspan) &&
-                    c1_yspan.overlaps_with(c2_yspan)),
-                  "Cache%d xspan=%s, yspan=%s overlaps cache%d "
-                  "xspan=%s,yspan=%s",
-                  c1->id(),
-                  c1_xspan.to_str().c_str(),
-                  c1_yspan.to_str().c_str(),
-                  c2->id(),
-                  c2_xspan.to_str().c_str(),
-                  c2_yspan.to_str().c_str());
-      } /* for(&b..) */
-    }   /* for(&c2..) */
-  }     /* for(&c1..) */
-  return true;
-} /* creation_sanity_checks() */
 
 NS_END(depth2, support, fordyca);

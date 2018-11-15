@@ -32,6 +32,8 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,9 +81,7 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
     rmath::vector2d nest_loc{};
   };
 
-  using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
   using cache_constraint_vector = std::vector<cache_constraint_data>;
-  using block_list = std::list<std::shared_ptr<representation::base_block>>;
   using block_constraint_vector = std::vector<block_constraint_data>;
   using nest_constraint_vector = std::vector<nest_constraint_data>;
 
@@ -98,8 +98,8 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    *
    * @return The local of the best cache site.
    */
-  rmath::vector2d calc_best(const cache_list& known_caches,
-                            const block_list& known_blocks,
+  rmath::vector2d calc_best(const ds::cache_list& known_caches,
+                            const ds::block_list& known_blocks,
                             rmath::vector2d position);
 
   void cc_violated(uint id) { m_cc_violations[id] = true; }
@@ -150,14 +150,14 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * @brief Create constraints for known caches, known blocks, and relating to
    * the nest.
    */
-  void constraints_create(const cache_list& known_caches,
-                          const block_list& known_blocks,
+  void constraints_create(const ds::cache_list& known_caches,
+                          const ds::block_list& known_blocks,
                           const rmath::vector2d& nest_loc,
                           constraint_set* constraints);
 
 
-  void opt_initialize(const cache_list& known_caches,
-                      const block_list& known_blocks,
+  void opt_initialize(const ds::cache_list& known_caches,
+                      const ds::block_list& known_blocks,
                       rmath::vector2d position,
                       constraint_set* constraints,
                       struct site_utility_data* utility_data,
@@ -165,7 +165,7 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
 
   // clang-format off
   const controller::cache_sel_matrix* const mc_matrix;
-  nlopt::opt                                      m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
+  nlopt::opt        m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
   std::vector<bool> m_cc_violations{};
   std::vector<bool> m_bc_violations{};
   bool              m_nc_violations{0};

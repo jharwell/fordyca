@@ -54,7 +54,7 @@ void perception_subsystem::process_los(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  representation::line_of_sight::const_cache_list caches = c_los->caches();
+  ds::const_cache_list caches = c_los->caches();
   std::string accum;
   std::for_each(caches.begin(), caches.end(), [&](const auto& c) {
     accum += "c" + std::to_string(c->id()) + "->(" +

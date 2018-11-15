@@ -159,7 +159,9 @@ std::pair<bool, ds::cache_vector> static_cache_manager::create(
     return std::make_pair(false, created);
   }
   /* no existing caches, so empty vector */
-  created = creator.create_all(ds::cache_vector(), pair.second);
+  created = creator.create_all(ds::cache_vector(),
+                               pair.second,
+                               -1);
   ER_ASSERT(1 == created.size(),
             "Wrong # caches after static create: %zu",
             created.size());

@@ -1,5 +1,5 @@
 /**
- * @file block_vector.hpp
+ * @file dbg.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,32 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_VECTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BLOCK_VECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_DBG_DBG_HPP_
+#define INCLUDE_FORDYCA_DBG_DBG_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
+#include <numeric>
+#include <string>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/representation/base_cell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace representation {
-class base_block;
-}
-NS_START(support);
-
-using block_vector_type = std::shared_ptr<representation::base_block>;
+NS_START(fordyca, dbg);
 
 /*******************************************************************************
- * Type Definitions
+ * Free Functions
  ******************************************************************************/
-using block_vector = std::vector<block_vector_type>;
+template<typename T>
+std::string blocks_list(const T& blocks) {
+  std::string ret = std::accumulate(
+      blocks.begin(),
+      blocks.end(),
+      std::string(),
+      [&](const std::string& a, const auto& b) {
+        return a + "b" + std::to_string(b->id()) + ",";
+      });
+  return ret;
+}
 
-NS_END(support, fordyca);
+template<typename T>
+std::string caches_list(const T& caches) {
+  std::string ret = std::accumulate(
+      caches.begin(),
+      caches.end(),
+      std::string(),
+      [&](const std::string& a, const auto& b) {
+        return a + "c" + std::to_string(b->id()) + ",";
+      });
+  return ret;
+}
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_VECTOR_HPP_ */
+NS_END(dbg, fordyca);
+
+
+#endif /* INCLUDE_FORDYCA_DBG_DBG_HPP_ */

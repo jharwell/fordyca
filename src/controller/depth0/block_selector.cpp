@@ -43,7 +43,7 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
  * Member Functions
  ******************************************************************************/
 representation::perceived_block block_selector::calc_best(
-    const perceived_block_list& blocks,
+    const ds::perceived_block_list& blocks,
     const rmath::vector2d& position) {
   double max_utility = 0.0;
   representation::perceived_block best{nullptr, {}};

@@ -33,6 +33,7 @@
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -90,6 +91,11 @@ __rcsw_pure depth0::sensing_subsystem* stateful_controller::stateful_sensors(
 
 void stateful_controller::ControlStep(void) {
   ndc_pusht();
+  if (nullptr != block()) {
+    ER_ASSERT(-1 != block()->robot_id(), "Carried block%d has robot id=%d",
+              block()->id(), block()->robot_id());
+  }
+
   /*
    * Update the robot's model of the world with the current line-of-sight, and
    * update the relevance of information within it. Then, you can run the main

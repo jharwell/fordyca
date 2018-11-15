@@ -35,6 +35,7 @@
 #include "fordyca/params/cache_sel_matrix_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -60,6 +61,10 @@ greedy_partitioning_controller::~greedy_partitioning_controller(void) = default;
  ******************************************************************************/
 void greedy_partitioning_controller::ControlStep(void) {
   ndc_pusht();
+  if (nullptr != block()) {
+    ER_ASSERT(-1 != block()->robot_id(), "Carried block%d has robot id=%d",
+              block()->id(), block()->robot_id());
+  }
   perception()->update(depth0::stateful_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());

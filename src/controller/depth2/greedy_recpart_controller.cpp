@@ -34,6 +34,7 @@
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,6 +55,10 @@ greedy_recpart_controller::~greedy_recpart_controller(void) = default;
  ******************************************************************************/
 void greedy_recpart_controller::ControlStep(void) {
   ndc_pusht();
+  if (nullptr != block()) {
+    ER_ASSERT(-1 != block()->robot_id(), "Carried block%d has robot id=%d",
+              block()->id(), block()->robot_id());
+  }
   perception()->update(depth1::greedy_partitioning_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());

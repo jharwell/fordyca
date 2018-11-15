@@ -96,7 +96,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
         auto cache_pair = loop_utils::new_cache_cache_proximity(controller,
                                                                 *m_map,
                                                                 m_cache_manager->cache_proximity_dist());
-        ER_ASSERT(-1 != cache_pair.first,"Error in block op handler");
+        ER_ASSERT(-1 != cache_pair.first,
+                  "No cache too close with CacheProximity return status");
         cache_proximity_notify(controller, cache_pair);
       }
     }
@@ -155,7 +156,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
      * said cache, then abort the drop and tell the robot about the undiscovered
      * cache so that it will update its state and pick a different new cache.
      */
-      ER_WARN("%s cannot drop block in cache site %s: Cache%d too close (%f <= %f)",
+      ER_WARN("%s cannot drop block in new cache %s: Cache%d too close (%f <= %f)",
               controller.GetId().c_str(),
               controller.position().to_str().c_str(),
               cache_pair.first,
@@ -169,7 +170,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
        */
       auto it = std::find_if(m_map->caches().begin(),
                              m_map->caches().end(),
-                             [&](const auto& c) { return c->id() == p.id(); });
+                             [&](const auto& c) {
+                               return c->id() == cache_pair.first; });
       ER_ASSERT(m_map->caches().end() != it,
                 "FATAL: Cache%d does not exist?",
                 cache_pair.first);

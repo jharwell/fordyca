@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <random>
 #include "fordyca/support/base_cache_creator.hpp"
 
 /*******************************************************************************
@@ -56,7 +55,8 @@ class dynamic_cache_creator : public base_cache_creator,
    * together.
    */
   ds::cache_vector create_all(const ds::cache_vector& existing_caches,
-                          ds::block_vector& candidate_blocks) override;
+                              ds::block_vector& candidate_blocks,
+                              double cache_dim) override;
 
  private:
   static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 10;
@@ -81,26 +81,17 @@ class dynamic_cache_creator : public base_cache_creator,
    *
    * @return Coordinates of the new cache.
    */
-  rmath::vector2i calc_center(const block_list& blocks,
-                              const ds::cache_vector& existing_caches) const;
+  rmath::vector2i calc_center(const ds::block_list& blocks,
+                              const ds::cache_vector& existing_caches,
+                              double cache_dim) const;
 
-  /**
-   * @brief Basic sanity checks on newly created caches.
-   */
-  bool creation_sanity_checks(const ds::cache_vector& new_caches) const;
+  ds::block_list cache_blocks_calc(const ds::block_list& used_blocks,
+                                   const ds::block_vector& candidates,
+                                   uint anchor_index) const;
 
-  /**
-   * @brief Deconflict new cache cache from overlapping with any existing caches
-   * (including taking the span of the new cache into account)
-   *
-   * @return \c TRUE if there were no conflicts, \c FALSE otherwise.
-   */
-  bool deconflict_cache_center(const representation::base_cache& cache,
-                               rmath::vector2i& center) const;
   // clang-format off
   double                             m_min_dist;
   uint                               m_min_blocks;
-  mutable std::default_random_engine m_rng{};
   // clang-format on
 };
 
