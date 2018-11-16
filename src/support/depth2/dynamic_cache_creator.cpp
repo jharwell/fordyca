@@ -131,7 +131,7 @@ ds::block_list dynamic_cache_creator::cache_blocks_calc(
    * cache, because we have a minimum # blocks threshold that has to be met
    * anyway.
    */
-  ER_TRACE("Add anchor block %d@%s to src list",
+  ER_TRACE("Add anchor block%d@%s to src list",
            candidates[anchor_index]->id(),
            candidates[anchor_index]->real_loc().to_str().c_str());
   src_blocks.push_back(candidates[anchor_index]);

@@ -156,7 +156,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
     map.cache_extent_clear(m_real_cache);
     map.cache_remove(m_real_cache);
     map.caches_removed(1);
-    ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [cache depleted]",
+    ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [depleted]",
             m_robot_index,
             m_pickup_block->id(),
             cache_id,
@@ -177,7 +177,12 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
             cell.block_count());
 
   ER_ASSERT(cell.cache()->contains_block(m_pickup_block),
-            "Perceived cache does not contain ref to block to be picked up");
+            "Perceived cache%d@%s [%u,%u] does not contain pickup block%d",
+            cell.cache()->id(),
+            cell.cache()->real_loc().to_str().c_str(),
+            cell.cache()->discrete_loc().first,
+            cell.cache()->discrete_loc().second,
+            m_pickup_block->id());
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
     cell.cache()->block_remove(m_pickup_block);
@@ -201,7 +206,7 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
     cell.cache()->block_remove(m_pickup_block);
 
     map.cache_remove(cell.cache());
-    ER_INFO("PAM: fb%u: block%d from cache%d@(%u, %u) [cache depleted]",
+    ER_INFO("PAM: fb%u: block%d from cache%d@(%u, %u) [depleted]",
             m_robot_index,
             m_pickup_block->id(),
             id,
@@ -230,7 +235,7 @@ void cached_block_pickup::visit(
   std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
 
   ER_ASSERT(nullptr != task,
-            "Non existing cache interactor task %s causing cached block pickup",
+            "Non existing cache interactor task '%s' causing cached block pickup",
             task_name.c_str());
   task->accept(*this);
 

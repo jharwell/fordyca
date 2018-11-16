@@ -37,18 +37,21 @@
   <category name="fordyca.ds.occupancy_grid" >
     <priority value ="info" />
   </category>
-    <category name="fordyca.support.depth2.dynamic_cache_creator" >
+  <category name="fordyca.support.depth2.dynamic_cache_creator" >
+    <priority value ="trace" />
+  </category>
+  <category name="fordyca.support.base_cache_creator" >
     <priority value ="trace" />
   </category>
   <category name="fordyca.controller.perception" >
-    <priority value ="all" />
+    <priority value ="info" />
   </category>
   
   <category name="fordyca.ds.arena_map" >
     <priority value ="info" />
   </category>
   <category name="fordyca.ds.perceived_arena_map" >
-    <priority value ="all" />
+    <priority value ="info" />
   </category>
 
  </log4j:configuration>

@@ -40,7 +40,7 @@ using ds::arena_grid;
  ******************************************************************************/
 base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
                                        double cache_dim)
-    : ER_CLIENT_INIT("fordyca.support.depth1.base_cache_creator"),
+    : ER_CLIENT_INIT("fordyca.support.base_cache_creator"),
       m_cache_dim(cache_dim),
       m_grid(grid) {}
 
@@ -149,6 +149,19 @@ base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existi
 
   bool x_conflict = false;
   bool y_conflict = false;
+  ER_TRACE("xspan=%s cache%d@%s [xspan=%s center=%s]",
+           newc_xspan.to_str().c_str(),
+           cache.id(),
+           cache.real_loc().to_str().c_str(),
+           exc_xspan.to_str().c_str(),
+           center.to_str().c_str());
+  ER_TRACE("yspan=%s cache%d@%s [yspan=%s center=%s]",
+           newc_yspan.to_str().c_str(),
+           cache.id(),
+           cache.real_loc().to_str().c_str(),
+           exc_yspan.to_str().c_str(),
+           center.to_str().c_str());
+
   if (newc_xspan.overlaps_with(exc_xspan)) {
     ER_TRACE("xspan=%s overlap cache%d@%s [xspan=%s center=%s], x_delta=%f",
              newc_xspan.to_str().c_str(),
@@ -188,7 +201,11 @@ rmath::vector2i base_cache_creator::deconflict_arena_boundaries(
 
   int x = std::max(x_min, std::min(x_max, static_cast<double>(center.x())));
   int y = std::max(y_min, std::min(y_max, static_cast<double>(center.y())));
-  return rmath::vector2i(x, y);
+  rmath::vector2i res(x, y);
+  ER_TRACE("Adjust center=%s -> %s for arena boundaries",
+           center.to_str().c_str(),
+           res.to_str().c_str());
+  return res;
 } /* deconflict_arena_boundaries() */
 
 void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
@@ -210,7 +227,7 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
 
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {
-        rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
+        rmath::dcoord2 c = rmath::dcoord2(i, j);
         if (c != cache->discrete_loc()) {
           ER_ASSERT(cache->contains_point(
                         math::dcoord_to_rcoord(c, m_grid->resolution())),
@@ -220,7 +237,7 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
                     j);
           auto& cell = m_grid->access<arena_grid::kCell>(i, j);
           ER_ASSERT(!cell.state_in_cache_extent(),
-                    "cell(%u, %u) already in CACHE_EXTENT",
+                    "Cell@(%u, %u) already in CACHE_EXTENT",
                     i,
                     j);
           events::cell_cache_extent e(c, cache);

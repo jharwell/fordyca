@@ -90,10 +90,10 @@
               generalist="2000:4000"
               collector="1000:2000"
               harvester="1000:2000"
-              cache_starter="1000:2000"
-              cache_finisher="1000:2000"
-              cache_collector="1000:2000"
-              cache_transferer="1000:2000">
+              cache_starter="100:200"
+              cache_finisher="100:200"
+              cache_collector="100:200"
+              cache_transferer="100:200">
             <ema alpha="0.8"/>
           </task_exec_estimates>
           <tab_sel>
@@ -317,28 +317,28 @@
   <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d0">
-     <boundaries>
-	<top height="1" />
-	<bottom height="0" />
-	<sides>
-	  <vertex point="0,0" />
-	  <vertex point="6,0" />
-	  <vertex point="6,6" />
-	  <vertex point="0,6" />
-	</sides>
-     </boundaries>
-    </dynamics2d>
-    <dynamics2d id="dyn2d1">
-     <boundaries>
-	<top height="1" />
-	<bottom height="0" />
-	<sides>
-	  <vertex point="6,0" />
-	  <vertex point="12,0" />
-	  <vertex point="12,6" />
-	  <vertex point="6,6" />
-	</sides>
-     </boundaries>
+    <!--  <boundaries> -->
+    <!--     <top height="1" /> -->
+    <!--     <bottom height="0" /> -->
+    <!--     <sides> -->
+    <!--       <vertex point="0,0" /> -->
+    <!--       <vertex point="6,0" /> -->
+    <!--       <vertex point="6,6" /> -->
+    <!--       <vertex point="0,6" /> -->
+    <!--     </sides> -->
+    <!--  </boundaries> -->
+    <!-- </dynamics2d> -->
+    <!-- <dynamics2d id="dyn2d1"> -->
+    <!--  <boundaries> -->
+    <!--     <top height="1" /> -->
+    <!--     <bottom height="0" /> -->
+    <!--     <sides> -->
+    <!--       <vertex point="6,0" /> -->
+    <!--       <vertex point="12,0" /> -->
+    <!--       <vertex point="12,6" /> -->
+    <!--       <vertex point="6,6" /> -->
+    <!--     </sides> -->
+    <!--  </boundaries> -->
      </dynamics2d>
   </physics_engines>
 

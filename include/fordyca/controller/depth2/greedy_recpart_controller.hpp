@@ -72,11 +72,28 @@ class greedy_recpart_controller : public depth1::greedy_partitioning_controller,
   tasks::base_foraging_task* current_task(void) override;
   const tasks::base_foraging_task* current_task(void) const override;
 
+  /**
+   * @brief Get whether or not a task has been aborted this timestep.
+   */
+  bool task_aborted(void) const { return m_task_aborted; }
+
  private:
   void task_alloc_cb(const ta::polled_task* const,
                      const ta::bi_tab* const);
 
+  /**
+   * @brief Callback for task abort. We cannot use the parent class version,
+   * because you can't directly bind a protected member in a derived class using
+   * std::bind(). We could wrap the protected member function in a public
+   * function in THIS class, but that is more cumbersome that just defining our
+   * own. Plus, I've run into issues with controllers sharing state between
+   * derived and parent classes before, so this seems the best approach (for
+   * now).
+   */
+  void task_abort_cb(const ta::polled_task*);
+
   // clang-format off
+  bool m_task_aborted{false};
   bool m_bsel_exception_added{false};
   // clang-format on
 };

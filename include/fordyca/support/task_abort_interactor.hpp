@@ -83,7 +83,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
      * of the simulation, (2) update its own internal state.
      */
     if (controller.is_carrying_block()) {
-      ER_INFO("%s aborted task %s while carrying block%d",
+      ER_INFO("%s aborted task '%s' while carrying block%d",
               controller.GetId().c_str(),
               dynamic_cast<ta::logical_task*>(controller.current_task())
                   ->name()
@@ -91,7 +91,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
               controller.block()->id());
       task_abort_with_block(controller);
     } else {
-      ER_INFO("%s aborted task %s (no block)",
+      ER_INFO("%s aborted task '%s' (no block)",
               controller.GetId().c_str(),
               dynamic_cast<ta::logical_task*>(controller.current_task())
                   ->name()
@@ -104,7 +104,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
                   "Controller serving penalties from more than one source");
         h->penalty_abort(controller);
         aborted = true;
-        ER_INFO("%s aborted task %s while serving '%s' penalty",
+        ER_INFO("%s aborted task '%s' while serving '%s' penalty",
                 controller.GetId().c_str(),
                 dynamic_cast<ta::logical_task*>(controller.current_task())
                     ->name()

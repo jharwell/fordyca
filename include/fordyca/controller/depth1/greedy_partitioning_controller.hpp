@@ -114,6 +114,14 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
+  const ta::bi_tab* active_tab(void) const;
+
+  /*
+   * Public to setup metric collection from tasks.
+   */
+  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+
   /**
    * @brief Get whether or not a task has been aborted this timestep.
    *
@@ -124,16 +132,6 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    * false, and lead to inconsistent simulation state.
    */
   bool task_aborted(void) const { return m_task_aborted; }
-  void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
-
-  const ta::bi_tab* active_tab(void) const;
-
-  /*
-   * Public to setup metric collection from tasks.
-   */
-  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
-
 
  protected:
   const class cache_sel_matrix* cache_sel_matrix(void) const {
@@ -158,7 +156,6 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    * Strategy pattern!
    */
   void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
-
 
  private:
   /**

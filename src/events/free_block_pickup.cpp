@@ -46,6 +46,7 @@
 NS_START(fordyca, events);
 
 using ds::occupancy_grid;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -118,7 +119,7 @@ void free_block_pickup::visit(
 
 void free_block_pickup::visit(fsm::depth0::stateless_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -148,7 +149,7 @@ void free_block_pickup::visit(ds::perceived_arena_map& map) {
 
 void free_block_pickup::visit(fsm::depth0::stateful_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(
@@ -194,12 +195,12 @@ void free_block_pickup::visit(tasks::depth1::harvester& task) {
 
 void free_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 /*******************************************************************************

@@ -110,10 +110,7 @@ HFSM_STATE_DEFINE(block_to_goal_fsm, wait_for_block_pickup, rfsm::event_data) {
    *
    * In both cases, treat the block as vanished and try again.
    */
-  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-    m_block_fsm->task_reset();
-    internal_event(ST_TRANSPORT_TO_GOAL);
-  } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
+  if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
     m_block_fsm->task_reset();
     internal_event(ST_ACQUIRE_BLOCK);
   }

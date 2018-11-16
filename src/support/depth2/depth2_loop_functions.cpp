@@ -161,6 +161,12 @@ void depth2_loop_functions::cache_handling_init(
   m_cache_manager =
       rcppsw::make_unique<dynamic_cache_manager>(cachep,
                                                  &arena_map()->decoratee());
+  auto pair =
+      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
+  if (pair.first) {
+    arena_map()->caches_add(pair.second);
+    floor()->SetChanged();
+  }
 } /* cache_handlng_init() */
 
 argos::CColor depth2_loop_functions::GetFloorColor(

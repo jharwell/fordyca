@@ -28,7 +28,7 @@
 
 #include "fordyca/support/block_op_penalty_handler.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/events/cache_found.hpp"
+#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 
@@ -107,7 +107,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
   using penalty_status = typename block_op_penalty_handler<T>::penalty_status;
 
-    void cache_proximity_notify(T& controller, std::pair<int, rmath::vector2d> cache_pair) {
+  void cache_proximity_notify(T& controller, std::pair<int, rmath::vector2d> cache_pair) {
     ER_WARN("%s cannot drop block in new cache@%s: Cache%d too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position().to_str().c_str(),
@@ -127,7 +127,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     ER_ASSERT(m_map->caches().end() != it,
               "FATAL: Cache%d does not exist?",
               cache_pair.first);
-    events::cache_found prox(*it);
+    events::cache_proximity prox((*it)->id());
     controller.visitor::template visitable_any<T>::accept(prox);
   }
 
@@ -164,9 +164,9 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
               m_cache_manager->cache_proximity_dist());
 
       /*
-       * Because caches can be dynamically created/destroyed, we cannot rely on
-       * the index position of cache i to be the same as its ID, so we need to
-       * search for the correct cache.
+       * We need to perform the proxmity check again after serving our block
+       * drop penalty, because a cache might have been created nearby while we
+       * were waiting, rendering our chosen location invalid.
        */
       auto it = std::find_if(m_map->caches().begin(),
                              m_map->caches().end(),
@@ -175,7 +175,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
       ER_ASSERT(m_map->caches().end() != it,
                 "FATAL: Cache%d does not exist?",
                 cache_pair.first);
-      events::cache_found prox(*it);
+      events::cache_proximity prox((*it)->id());
       controller.visitor::template visitable_any<T>::accept(prox);
     } else {
       perform_new_cache_block_drop(controller, p);
