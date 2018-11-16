@@ -51,8 +51,8 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
                     this,
                     std::placeholders::_1),
           std::bind([](void) noexcept {
-              return false;
-            })), /* new caches never acquired via exploration */
+            return false;
+          })), /* new caches never acquired via exploration */
       mc_matrix(matrix),
       mc_map(map) {}
 

@@ -111,14 +111,13 @@ powerlaw_distributor::arena_view_vector powerlaw_distributor::
 
     auto view = grid.layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
     rmath::vector2u loc = (*view.origin()).loc();
-    ER_TRACE(
-        "Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
-        i,
-        loc.x() + view.index_bases()[0],
-        loc.x() + view.index_bases()[0] + view.shape()[0],
-        loc.y() + view.index_bases()[1],
-        loc.y() + view.index_bases()[1] + view.shape()[1],
-        clust_sizes[i]);
+    ER_TRACE("Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
+             i,
+             loc.x() + view.index_bases()[0],
+             loc.x() + view.index_bases()[0] + view.shape()[0],
+             loc.y() + view.index_bases()[1],
+             loc.y() + view.index_bases()[1] + view.shape()[1],
+             clust_sizes[i]);
     views.push_back(std::make_pair(view, clust_sizes[i]));
   } /* for(i..) */
   return views;
@@ -128,33 +127,33 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
     const arena_view_vector& list) {
   for (const std::pair<ds::arena_grid::view, uint>& v : list) {
     bool overlap = std::any_of(list.begin(), list.end(), [&](const auto& other) {
-        /*
+      /*
          * Can't compare directly (boost multi_array makes a COPY of each
          * element during iteration for some reason, and because the cells
          * have a unique_ptr, that doesn't work), so compare using addresses
          * of elements of the vector, which WILL work.
          */
-        if (&other == &v) { /* self */
-          return false;
-        }
-        rmath::vector2u v_loc = (*v.first.origin()).loc();
-        rmath::vector2u other_loc = (*other.first.origin()).loc();
-        rmath::rangeu v_xrange(v_loc.x() + v.first.index_bases()[0],
-                               v_loc.x() + v.first.index_bases()[0] +
-                               v.first.shape()[0]);
-        rmath::rangeu v_yrange(v_loc.y() + v.first.index_bases()[1],
-                               v_loc.y() + v.first.index_bases()[1] +
-                               v.first.shape()[1]);
-        rmath::rangeu other_xrange(other_loc.x() + other.first.index_bases()[0],
-                                   other_loc.x() + other.first.index_bases()[0] +
-                                   other.first.shape()[0]);
-        rmath::rangeu other_yrange(other_loc.y() + other.first.index_bases()[1],
-                                   other_loc.y() + other.first.index_bases()[1] +
-                                   other.first.shape()[1]);
+      if (&other == &v) { /* self */
+        return false;
+      }
+      rmath::vector2u v_loc = (*v.first.origin()).loc();
+      rmath::vector2u other_loc = (*other.first.origin()).loc();
+      rmath::rangeu v_xrange(v_loc.x() + v.first.index_bases()[0],
+                             v_loc.x() + v.first.index_bases()[0] +
+                                 v.first.shape()[0]);
+      rmath::rangeu v_yrange(v_loc.y() + v.first.index_bases()[1],
+                             v_loc.y() + v.first.index_bases()[1] +
+                                 v.first.shape()[1]);
+      rmath::rangeu other_xrange(other_loc.x() + other.first.index_bases()[0],
+                                 other_loc.x() + other.first.index_bases()[0] +
+                                     other.first.shape()[0]);
+      rmath::rangeu other_yrange(other_loc.y() + other.first.index_bases()[1],
+                                 other_loc.y() + other.first.index_bases()[1] +
+                                     other.first.shape()[1]);
 
-        return v_xrange.overlaps_with(other_xrange) &&
-        v_yrange.overlaps_with(other_yrange);
-      });
+      return v_xrange.overlaps_with(other_xrange) &&
+             v_yrange.overlaps_with(other_yrange);
+    });
     if (overlap) {
       return false;
     }

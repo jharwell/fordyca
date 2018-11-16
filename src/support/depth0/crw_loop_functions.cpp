@@ -1,5 +1,5 @@
 /**
- * @file stateless_loop_functions.cpp
+ * @file crw_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,15 +21,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_loop_functions.hpp"
+#include "fordyca/support/depth0/crw_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 
-#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
-#include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
+#include "fordyca/support/depth0/crw_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,17 +40,17 @@ using ds::arena_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateless_loop_functions::stateless_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.stateless"),
+crw_loop_functions::crw_loop_functions(void)
+    : ER_CLIENT_INIT("fordyca.loop.crw"),
       m_arena_map(nullptr),
       m_interactor(nullptr) {}
 
-stateless_loop_functions::~stateless_loop_functions(void) = default;
+crw_loop_functions::~crw_loop_functions(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_loop_functions::Init(ticpp::Element& node) {
+void crw_loop_functions::Init(ticpp::Element& node) {
   base_loop_functions::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
@@ -61,9 +61,8 @@ void stateless_loop_functions::Init(ticpp::Element& node) {
       *params().parse_results<params::output_params>();
   output.metrics.arena_grid = arena->grid;
 
-  m_metrics_agg =
-      rcppsw::make_unique<stateless_metrics_aggregator>(&output.metrics,
-                                                        output_root());
+  m_metrics_agg = rcppsw::make_unique<crw_metrics_aggregator>(&output.metrics,
+                                                              output_root());
 
   /* initialize arena map and distribute blocks */
   arena_map_init(params());
@@ -95,14 +94,14 @@ void stateless_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 }
 
-void stateless_loop_functions::Reset() {
+void crw_loop_functions::Reset() {
   m_metrics_agg->reset_all();
   m_arena_map->distribute_all_blocks();
 }
 
-void stateless_loop_functions::Destroy() { m_metrics_agg->finalize_all(); }
+void crw_loop_functions::Destroy() { m_metrics_agg->finalize_all(); }
 
-__rcsw_pure argos::CColor stateless_loop_functions::GetFloorColor(
+__rcsw_pure argos::CColor crw_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
   if (m_arena_map->nest().contains_point(tmp)) {
@@ -127,8 +126,8 @@ __rcsw_pure argos::CColor stateless_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void stateless_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller = static_cast<controller::depth0::stateless_controller&>(
+void crw_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+  auto& controller = static_cast<controller::depth0::crw_controller&>(
       robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
@@ -137,8 +136,8 @@ void stateless_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   controller.free_drop_event(false);
 
   /* Send the robot its current position */
-  set_robot_tick<controller::depth0::stateless_controller>(robot);
-  loop_utils::set_robot_pos<controller::depth0::stateless_controller>(robot);
+  set_robot_tick<controller::depth0::crw_controller>(robot);
+  loop_utils::set_robot_pos<controller::depth0::crw_controller>(robot);
 
   /* update arena map metrics with robot position */
   auto coord = math::rcoord_to_dcoord(controller.position(),
@@ -149,14 +148,14 @@ void stateless_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
-void stateless_loop_functions::pre_step_final(void) {
+void crw_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 } /* pre_step_final() */
 
-void stateless_loop_functions::PreStep() {
+void crw_loop_functions::PreStep() {
   ndc_push();
   base_loop_functions::PreStep();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -170,8 +169,7 @@ void stateless_loop_functions::PreStep() {
   ndc_pop();
 } /* PreStep() */
 
-void stateless_loop_functions::arena_map_init(
-    params::loop_function_repository& repo) {
+void crw_loop_functions::arena_map_init(params::loop_function_repository& repo) {
   auto* aparams = repo.parse_results<struct params::arena::arena_map_params>();
   auto* vparams = repo.parse_results<struct params::visualization_params>();
 
@@ -197,7 +195,7 @@ using namespace argos;
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_LOOP_FUNCTIONS(stateless_loop_functions,
-                        "stateless_loop_functions"); // NOLINT
+REGISTER_LOOP_FUNCTIONS(crw_loop_functions,
+                        "crw_loop_functions"); // NOLINT
 #pragma clang diagnostic pop
 NS_END(depth0, support, fordyca);

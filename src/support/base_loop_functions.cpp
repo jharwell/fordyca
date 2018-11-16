@@ -118,8 +118,7 @@ std::vector<double> base_loop_functions::nearest_neighbors(void) const {
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
-    auto pts =
-        alg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
+    auto pts = alg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
     size_t old = v.size();
     v.erase(std::remove_if(v.begin(),
                            v.end(),

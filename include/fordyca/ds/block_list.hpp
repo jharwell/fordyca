@@ -34,7 +34,7 @@ NS_START(fordyca);
 namespace representation {
 class base_block;
 struct perceived_block;
-}
+} // namespace representation
 NS_START(ds);
 
 using block_list_type = std::shared_ptr<representation::base_block>;

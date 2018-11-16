@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_loop_functions.hpp"
+#include "fordyca/support/depth0/crw_loop_functions.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 
 /*******************************************************************************
@@ -48,7 +48,7 @@ class stateful_metrics_aggregator;
  * - Sending robots their position each timestep.
  * - Sending robot the current simulation tick each timestep.
  */
-class stateful_loop_functions : public stateless_loop_functions,
+class stateful_loop_functions : public crw_loop_functions,
                                 public er::client<stateful_loop_functions> {
  public:
   stateful_loop_functions(void);

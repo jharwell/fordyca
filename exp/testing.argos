@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_recpart_controller id="ffc"
+    <crw_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -155,7 +155,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_recpart_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -163,7 +163,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="crw_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"

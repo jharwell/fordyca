@@ -37,7 +37,7 @@ namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
 namespace depth0 {
-class stateless_fsm;
+class crw_fsm;
 class stateful_fsm;
 class free_block_to_nest_fsm;
 } // namespace depth0
@@ -45,7 +45,7 @@ class block_to_goal_fsm;
 } // namespace fsm
 namespace controller {
 namespace depth0 {
-class stateless_controller;
+class crw_controller;
 class stateful_controller;
 } // namespace depth0
 namespace depth1 {
@@ -85,11 +85,11 @@ class free_block_pickup
     : public cell_op,
       public rcppsw::er::client<free_block_pickup>,
       public block_pickup_event,
-      public visitor::visit_set<controller::depth0::stateless_controller,
+      public visitor::visit_set<controller::depth0::crw_controller,
                                 controller::depth0::stateful_controller,
                                 controller::depth1::greedy_partitioning_controller,
                                 controller::depth2::greedy_recpart_controller,
-                                fsm::depth0::stateless_fsm,
+                                fsm::depth0::crw_fsm,
                                 fsm::depth0::stateful_fsm,
                                 fsm::depth0::free_block_to_nest_fsm,
                                 fsm::block_to_goal_fsm,
@@ -111,8 +111,8 @@ class free_block_pickup
   void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::base_block& block) override;
-  void visit(controller::depth0::stateless_controller& controller) override;
-  void visit(fsm::depth0::stateless_fsm& fsm) override;
+  void visit(controller::depth0::crw_controller& controller) override;
+  void visit(fsm::depth0::crw_fsm& fsm) override;
 
   /* stateful foraging */
   void visit(ds::perceived_arena_map& map) override;

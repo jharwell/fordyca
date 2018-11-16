@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
+#include "fordyca/support/depth0/crw_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +50,7 @@ namespace ta = rcppsw::task_allocation;
  * - FSM distance/block acquisition metrics
  */
 
-class stateful_metrics_aggregator : public stateless_metrics_aggregator,
+class stateful_metrics_aggregator : public crw_metrics_aggregator,
                                     public er::client<stateful_metrics_aggregator> {
  public:
   stateful_metrics_aggregator(const struct params::metrics_params* params,

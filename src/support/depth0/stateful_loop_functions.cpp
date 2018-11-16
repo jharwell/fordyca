@@ -55,7 +55,7 @@ stateful_loop_functions::~stateful_loop_functions(void) = default;
  * Member Functions
  ******************************************************************************/
 void stateful_loop_functions::Init(ticpp::Element& node) {
-  stateless_loop_functions::Init(node);
+  crw_loop_functions::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -163,7 +163,7 @@ void stateful_loop_functions::PreStep() {
 } /* PreStep() */
 
 void stateful_loop_functions::Reset(void) {
-  stateless_loop_functions::Reset();
+  crw_loop_functions::Reset();
   m_metrics_agg->reset_all();
 } /* Reset() */
 

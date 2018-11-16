@@ -240,9 +240,9 @@ void depth1_loop_functions::PreStep() {
 
 void depth1_loop_functions::Reset() {
   m_metrics_agg->reset_all();
-  /* return value ignored (for now...) */
-  auto pair = m_cache_manager->create(arena_map()->blocks());
-  arena_map()->caches_add(pair.second);
+  /* status ignored (for now...) */
+  auto ret = m_cache_manager->create(arena_map()->blocks());
+  arena_map()->caches_add(ret.caches);
 }
 
 void depth1_loop_functions::pre_step_final(void) {
@@ -260,12 +260,12 @@ void depth1_loop_functions::pre_step_final(void) {
             *(*m_metrics_agg)["tasks::tab::generalist"]);
     uint n_harvesters = collector.int_subtask1_count();
     uint n_collectors = collector.int_subtask2_count();
-    auto pair = m_cache_manager->create_conditional(arena_map()->blocks(),
-                                                    n_harvesters,
-                                                    n_collectors);
+    auto ret = m_cache_manager->create_conditional(arena_map()->blocks(),
+                                                   n_harvesters,
+                                                   n_collectors);
 
-    if (pair.first) {
-      arena_map()->caches_add(pair.second);
+    if (ret.status) {
+      arena_map()->caches_add(ret.caches);
       __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
           arena_map()->caches()[0]->discrete_loc());
       ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
@@ -306,8 +306,8 @@ void depth1_loop_functions::cache_handling_init(
         cachep, &arena_map()->decoratee(), cache_loc);
 
     /* return value ignored at this level (for now...) */
-    auto pair = m_cache_manager->create(arena_map()->blocks());
-    arena_map()->caches_add(pair.second);
+    auto ret = m_cache_manager->create(arena_map()->blocks());
+    arena_map()->caches_add(ret.caches);
   }
 } /* cache_handling_init() */
 

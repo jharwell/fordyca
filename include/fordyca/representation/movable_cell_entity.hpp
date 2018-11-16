@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include "fordyca/math/utils.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,9 +69,7 @@ class movable_cell_entity {
    * can be used to index into an arena_map.
    *
    */
-  const rmath::vector2u& discrete_loc(void) const {
-    return m_discrete_loc;
-  }
+  const rmath::vector2u& discrete_loc(void) const { return m_discrete_loc; }
   void real_loc(const rmath::vector2d& loc) { m_real_loc = loc; }
   void discrete_loc(const rmath::vector2u& loc) { m_discrete_loc = loc; }
 

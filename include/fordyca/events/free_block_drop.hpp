@@ -36,7 +36,9 @@ NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
 namespace rmath = rcppsw::math;
-namespace ds { class perceived_arena_map; }
+namespace ds {
+class perceived_arena_map;
+}
 namespace fsm {
 class block_to_goal_fsm;
 } // namespace fsm

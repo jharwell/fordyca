@@ -22,13 +22,13 @@ n * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_vanished.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
-#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -50,7 +50,7 @@ block_vanished::block_vanished(uint block_id)
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void block_vanished::visit(controller::depth0::stateless_controller& controller) {
+void block_vanished::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
   controller.fsm()->accept(*this);
@@ -64,7 +64,7 @@ void block_vanished::visit(controller::depth0::stateful_controller& controller) 
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(fsm::depth0::stateless_fsm& fsm) {
+void block_vanished::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
                    state_machine::event_type::NORMAL);
 } /* visit() */

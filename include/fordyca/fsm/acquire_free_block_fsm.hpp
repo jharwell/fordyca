@@ -64,6 +64,8 @@ class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
                          controller::saa_subsystem* saa,
                          ds::perceived_arena_map* map);
 
+  ~acquire_free_block_fsm(void) override = default;
+
   acquire_free_block_fsm(const acquire_free_block_fsm& fsm) = delete;
   acquire_free_block_fsm& operator=(const acquire_free_block_fsm& fsm) = delete;
 

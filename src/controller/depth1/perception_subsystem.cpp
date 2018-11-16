@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
+#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/dbg/dbg.hpp"
 
 /*******************************************************************************
  * Namespaces

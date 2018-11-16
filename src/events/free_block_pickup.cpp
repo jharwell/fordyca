@@ -23,16 +23,16 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
-#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -104,8 +104,7 @@ void free_block_pickup::visit(representation::base_block& block) {
   ER_INFO("Block%d is now carried by fb%u", m_block->id(), m_robot_index);
 } /* visit() */
 
-void free_block_pickup::visit(
-    controller::depth0::stateless_controller& controller) {
+void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
   controller.fsm()->accept(*this);
   controller.block(m_block);
@@ -115,7 +114,7 @@ void free_block_pickup::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::stateless_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    rfsm::event_type::NORMAL);
 } /* visit() */

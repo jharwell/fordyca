@@ -1,7 +1,7 @@
 /**
- * @file block_priority_map.hpp
+ * @file crw_controller_repository.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,27 +18,26 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BLOCK_PRIORITY_MAP_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BLOCK_PRIORITY_MAP_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <map>
-#include <string>
-
-#include "rcppsw/common/common.hpp"
+#include "fordyca/params/depth0/crw_controller_repository.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+namespace ct = rcppsw::control;
+
+NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Class Definitions
+ * Constructors/Destructor
  ******************************************************************************/
-using block_priority_map = std::map<std::string, double>;
+crw_controller_repository::crw_controller_repository(void) {
+  register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
+                                               ct::waveform_xml_parser::kXMLRoot,
+                                           ct::waveform_xml_parser::kHeader1);
+}
 
-NS_END(controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BLOCK_PRIORITY_MAP_HPP_ */
+NS_END(depth0, params, fordyca);

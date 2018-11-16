@@ -78,14 +78,12 @@ class cached_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      penalty_type::kSrcExistingCachePickup,
+                                      cache_op_src::kSrcExistingCachePickup,
                                       timestep);
     }
   }
 
  private:
-  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
-
   /**
    * @brief Called after a robot has satisfied the cache usage penalty, and
    * actually performs the handshaking between the cache, the arena, and the

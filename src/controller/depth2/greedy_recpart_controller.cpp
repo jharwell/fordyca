@@ -33,8 +33,8 @@
 
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "fordyca/representation/base_block.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,8 +56,10 @@ greedy_recpart_controller::~greedy_recpart_controller(void) = default;
 void greedy_recpart_controller::ControlStep(void) {
   ndc_pusht();
   if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(), "Carried block%d has robot id=%d",
-              block()->id(), block()->robot_id());
+    ER_ASSERT(-1 != block()->robot_id(),
+              "Carried block%d has robot id=%d",
+              block()->id(),
+              block()->robot_id());
   }
   perception()->update(depth1::greedy_partitioning_controller::los());
 
@@ -88,10 +90,8 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2));
-  executive()->task_abort_notify(
-      std::bind(&greedy_recpart_controller::task_abort_cb,
-                this,
-                std::placeholders::_1));
+  executive()->task_abort_notify(std::bind(
+      &greedy_recpart_controller::task_abort_cb, this, std::placeholders::_1));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */

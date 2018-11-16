@@ -34,7 +34,7 @@ NS_START(fordyca);
 namespace representation {
 class base_cache;
 struct perceived_cache;
-}
+} // namespace representation
 NS_START(ds);
 
 using cache_list_type = std::shared_ptr<representation::base_cache>;

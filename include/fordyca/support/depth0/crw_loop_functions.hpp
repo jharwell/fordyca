@@ -1,5 +1,5 @@
 /**
- * @file stateless_loop_functions.hpp
+ * @file crw_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -39,7 +39,7 @@ namespace params {
 class loop_function_repository;
 }
 NS_START(support, depth0);
-class stateless_metrics_aggregator;
+class crw_metrics_aggregator;
 /*******************************************************************************
  * Classes
  ******************************************************************************/
@@ -47,17 +47,17 @@ class stateless_metrics_aggregator;
  * @class statless_loop_functions
  * @ingroup support depth0
  *
- * @brief Contains the simulation support functions for stateless foraging:
+ * @brief Contains the simulation support functions for crw foraging:
  *
  * - Sending robots block pickup/block drop signals if they are waiting for
  *   them.
  * - Handling block distribution.
  */
-class stateless_loop_functions : public base_loop_functions,
-                                 public er::client<stateless_loop_functions>  {
+class crw_loop_functions : public base_loop_functions,
+                                 public er::client<crw_loop_functions>  {
  public:
-  stateless_loop_functions(void);
-  ~stateless_loop_functions(void) override;
+  crw_loop_functions(void);
+  ~crw_loop_functions(void) override;
 
   void Init(ticpp::Element& node) override;
   void Reset() override;
@@ -78,14 +78,14 @@ class stateless_loop_functions : public base_loop_functions,
 
  private:
   using interactor =
-      robot_arena_interactor<controller::depth0::stateless_controller>;
+      robot_arena_interactor<controller::depth0::crw_controller>;
 
   void arena_map_init(params::loop_function_repository& repo);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   // clang-format off
-  std::unique_ptr<stateless_metrics_aggregator> m_metrics_agg{nullptr};
+  std::unique_ptr<crw_metrics_aggregator> m_metrics_agg{nullptr};
   std::unique_ptr<ds::arena_map>                m_arena_map;
   std::unique_ptr<interactor>                   m_interactor;
   // clang-format on
@@ -93,4 +93,4 @@ class stateless_loop_functions : public base_loop_functions,
 
 NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_LOOP_FUNCTIONS_HPP_ */

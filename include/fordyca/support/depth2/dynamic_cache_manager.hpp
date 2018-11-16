@@ -74,8 +74,8 @@ class dynamic_cache_manager : public base_cache_manager,
    * failures to create dynamic caches can occur if, for example, all blocks are
    * currently being carried by robots.
    */
-  std::pair<bool, ds::cache_vector> create(ds::cache_vector& existing_caches,
-                                           ds::block_vector& blocks);
+  creation_result create(ds::cache_vector& existing_caches,
+                         ds::block_vector& blocks);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches
@@ -98,9 +98,8 @@ class dynamic_cache_manager : public base_cache_manager,
   }
 
  private:
-  std::pair<bool, ds::block_vector> calc_blocks_for_creation(
-      const ds::cache_vector& existing_caches,
-      ds::block_vector& blocks);
+  block_calc_result calc_blocks_for_creation(const ds::cache_vector& existing_caches,
+                                             ds::block_vector& blocks);
 
   // clang-format off
   const params::caches::caches_params mc_cache_params;

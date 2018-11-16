@@ -22,14 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
+#include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
-#include "fordyca/fsm/depth0/stateless_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -67,7 +67,7 @@ void nest_block_drop::visit(representation::base_block& block) {
   block.distribution_time(m_timestep);
 } /* visit() */
 
-void nest_block_drop::visit(controller::depth0::stateless_controller& controller) {
+void nest_block_drop::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
   controller.fsm()->accept(*this);
   controller.block(nullptr);
@@ -77,7 +77,7 @@ void nest_block_drop::visit(controller::depth0::stateless_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void nest_block_drop::visit(fsm::depth0::stateless_fsm& fsm) {
+void nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

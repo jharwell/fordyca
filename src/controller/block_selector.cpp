@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth0/block_selector.hpp"
+#include "fordyca/controller/block_selector.hpp"
 #include "fordyca/math/block_utility.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cube_block.hpp"
@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth0);
+NS_START(fordyca, controller);
 using bselm = block_sel_matrix;
 
 /*******************************************************************************
@@ -119,4 +119,4 @@ bool block_selector::block_is_excluded(
   return false;
 } /* block_is_excluded() */
 
-NS_END(depth0, controller, fordyca);
+NS_END(controller, fordyca);

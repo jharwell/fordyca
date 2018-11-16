@@ -83,7 +83,7 @@ class free_block_pickup_interactor
       }
     } else {
       m_penalty_handler.penalty_init(controller,
-                                     penalty_type::kSrcFreePickup,
+                                     block_op_src::kSrcFreePickup,
                                      timestep);
     }
   }
@@ -93,8 +93,6 @@ class free_block_pickup_interactor
   }
 
  private:
-  typedef typename block_op_penalty_handler<T>::penalty_src penalty_type;
-
   /**
    * @brief Determine if a robot is waiting to pick up a free block, and if it
    * is actually on a free block, send it the \ref free_block_pickup event.

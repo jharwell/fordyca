@@ -27,12 +27,12 @@
 #include <list>
 #include <string>
 
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

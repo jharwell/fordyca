@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
+#include "fordyca/dbg/dbg.hpp"
+#include "fordyca/ds/block_list.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/dbg/dbg.hpp"
-#include "fordyca/ds/block_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,9 +68,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
 
   ds::block_list used_blocks;
   for (size_t i = 0; i < candidate_blocks.size() - 1; ++i) {
-    ds::block_list cache_i_blocks = cache_blocks_calc(used_blocks,
-                                                      candidate_blocks,
-                                                      i);
+    ds::block_list cache_i_blocks =
+        cache_blocks_calc(used_blocks, candidate_blocks, i);
 
     /*
      * We now have all the blocks that are close enough to block i to be
@@ -123,7 +122,7 @@ ds::block_list dynamic_cache_creator::cache_blocks_calc(
   if (std::find(used_blocks.begin(),
                 used_blocks.end(),
                 candidates[anchor_index]) != used_blocks.end()) {
-          return src_blocks;
+    return src_blocks;
   }
   /*
    * Add our anchor/target block to the list of blocks for the new cache. This
@@ -141,14 +140,13 @@ ds::block_list dynamic_cache_creator::cache_blocks_calc(
      * add to the src list.
      */
     if ((candidates[anchor_index]->real_loc() - candidates[i]->real_loc())
-        .length() <= m_min_dist) {
-      ER_ASSERT(std::find(src_blocks.begin(),
-                          src_blocks.end(),
-                          candidates[i]) == src_blocks.end(),
-                "Block%d already on src list", candidates[i]->id());
-      if (std::find(used_blocks.begin(),
-                    used_blocks.end(),
-                    candidates[i]) == used_blocks.end()) {
+            .length() <= m_min_dist) {
+      ER_ASSERT(std::find(src_blocks.begin(), src_blocks.end(), candidates[i]) ==
+                    src_blocks.end(),
+                "Block%d already on src list",
+                candidates[i]->id());
+      if (std::find(used_blocks.begin(), used_blocks.end(), candidates[i]) ==
+          used_blocks.end()) {
         ER_TRACE("Add block %d@%s to src list",
                  candidates[i]->id(),
                  candidates[i]->real_loc().to_str().c_str());
@@ -158,7 +156,6 @@ ds::block_list dynamic_cache_creator::cache_blocks_calc(
   } /* for(i..) */
   return src_blocks;
 } /* cache_blocks_calc() */
-
 
 rmath::vector2i dynamic_cache_creator::calc_center(
     const ds::block_list& blocks,
@@ -199,9 +196,9 @@ rmath::vector2i dynamic_cache_creator::calc_center(
     for (size_t j = 0; j < existing_caches.size(); ++j) {
       center = deconflict_arena_boundaries(cache_dim, center);
       auto pair = deconflict_existing_cache(*existing_caches[j], center);
-      if (pair.first) {
+      if (pair.status) {
         conflict = true;
-        center = pair.second;
+        center = pair.loc;
       }
     } /* for(j..) */
     if (!conflict) {
@@ -214,10 +211,11 @@ rmath::vector2i dynamic_cache_creator::calc_center(
    * can't find anything conflict free in that many, bail out.
    */
   if (i >= kOVERLAP_SEARCH_MAX_TRIES) {
-    ER_WARN("No conflict-free center found in %u tries: caches=[%s],blocks=[%s]",
-            kOVERLAP_SEARCH_MAX_TRIES,
-            dbg::caches_list(existing_caches).c_str(),
-            dbg::blocks_list(blocks).c_str());
+    ER_WARN(
+        "No conflict-free center found in %u tries: caches=[%s],blocks=[%s]",
+        kOVERLAP_SEARCH_MAX_TRIES,
+        dbg::caches_list(existing_caches).c_str(),
+        dbg::blocks_list(blocks).c_str());
     return kInvalidCacheCenter;
   }
 

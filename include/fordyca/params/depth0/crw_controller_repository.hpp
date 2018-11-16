@@ -1,5 +1,5 @@
 /**
- * @file stateless_controller_repository.cpp
+ * @file crw_controller_repository.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,26 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_CRW_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_PARAMS_DEPTH0_CRW_CONTROLLER_REPOSITORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_controller_repository.hpp"
-#include "rcppsw/control/waveform_xml_parser.hpp"
+#include "fordyca/params/base_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ct = rcppsw::control;
-
 NS_START(fordyca, params, depth0);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-stateless_controller_repository::stateless_controller_repository(void) {
-  register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
-                                               ct::waveform_xml_parser::kXMLRoot,
-                                           ct::waveform_xml_parser::kHeader1);
-}
+/**
+ * @class crw_controller_repository
+ * @ingroup params depth0
+ *
+ * @brief Collection of all parameter parsers and parse results needed by
+ * \ref crw_controller.
+ */
+class crw_controller_repository: public base_controller_repository {
+ public:
+  crw_controller_repository();
+};
 
-NS_END(depth0, params, fordyca);
+NS_END(params, fordyca, depth0);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_CRW_CONTROLLER_REPOSITORY_HPP_ */

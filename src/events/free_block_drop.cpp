@@ -23,13 +23,13 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_drop.hpp"
 
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"

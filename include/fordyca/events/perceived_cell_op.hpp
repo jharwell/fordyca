@@ -59,8 +59,7 @@ class perceived_cell_op
       public visitor::visit_set<controller::depth2::greedy_recpart_controller,
                                 ds::perceived_arena_map> {
  public:
-  explicit perceived_cell_op(const rmath::vector2u& coord)
-      : cell_op(coord) {}
+  explicit perceived_cell_op(const rmath::vector2u& coord) : cell_op(coord) {}
   ~perceived_cell_op(void) override = default;
 };
 

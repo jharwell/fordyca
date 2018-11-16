@@ -49,7 +49,10 @@ namespace rmath = rcppsw::math;
 /*******************************************************************************
  * Types
  ******************************************************************************/
-using proximity_status_type = std::pair<int, rmath::vector2d>;
+struct proximity_status {
+  int entity_id;
+  rmath::vector2d distance;
+};
 
 /*******************************************************************************
  * Functions
@@ -128,7 +131,7 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
  * @return (block id of cache that is too close (-1 if none), distance to said
  *         block).
  */
-proximity_status_type cache_site_block_proximity(
+proximity_status cache_site_block_proximity(
     const controller::base_controller& controller,
     const ds::arena_map& map,
     double block_prox_dist);
@@ -144,7 +147,7 @@ proximity_status_type cache_site_block_proximity(
  * @return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).
  */
-proximity_status_type new_cache_cache_proximity(
+proximity_status new_cache_cache_proximity(
     const controller::base_controller& controller,
     const ds::arena_map& map,
     double proximity_dist);

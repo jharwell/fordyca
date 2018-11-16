@@ -44,7 +44,7 @@ using task0 = tasks::depth0::foraging_task;
 stateful_metrics_aggregator::stateful_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : stateless_metrics_aggregator(params, output_root),
+    : crw_metrics_aggregator(params, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.stateful_aggregator") {
   register_collector<metrics::world_model_metrics_collector>(
       "perception::world_model",

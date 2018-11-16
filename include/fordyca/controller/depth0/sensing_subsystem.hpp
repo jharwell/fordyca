@@ -39,7 +39,7 @@ NS_START(fordyca, controller, depth0);
  * @class sensing_subsystem
  * @ingroup controller
  *
- * @brief The sensors used by depth0 (\ref stateless_foraging_controller,
+ * @brief The sensors used by depth0 (\ref crw_controller,
  * \ref stateful_foraging_controller) controllers.
  */
 class sensing_subsystem : public base_sensing_subsystem {
@@ -54,7 +54,7 @@ class sensing_subsystem : public base_sensing_subsystem {
   /**
    * @brief Get the robot's current line-of-sight (LOS)
    *
-   * Not used by \ref stateless_foraging_controller.
+   * Not used by \ref crw_controller.
    */
   const representation::line_of_sight* los(void) const { return m_los.get(); }
 

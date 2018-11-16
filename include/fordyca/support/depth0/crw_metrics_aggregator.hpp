@@ -1,5 +1,5 @@
 /**
- * @file stateless_metrics_aggregator.hpp
+ * @file crw_metrics_aggregator.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace controller { namespace depth0 { class stateless_controller; }}
+namespace controller { namespace depth0 { class crw_controller; }}
 namespace representation {
 class base_block;
 } /* namespace representation */
@@ -49,10 +49,10 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 
 /**
- * @class stateless_metrics_aggregator
+ * @class crw_metrics_aggregator
  * @ingroup support depth0
  *
- * @brief Aggregates and metrics metric collection for stateless foraging. That
+ * @brief Aggregates and metrics metric collection for crw foraging. That
  * includes:
  *
  * - FSM distance metrics
@@ -63,18 +63,18 @@ namespace er = rcppsw::er;
  *
  * Metrics are *NOT* reset after collection--that is the caller's responsibility.
  */
-class stateless_metrics_aggregator : public metrics::base_metrics_aggregator,
-                                     public er::client<stateless_metrics_aggregator> {
+class crw_metrics_aggregator : public metrics::base_metrics_aggregator,
+                                     public er::client<crw_metrics_aggregator> {
  public:
-  stateless_metrics_aggregator(const struct params::metrics_params* params,
+  crw_metrics_aggregator(const struct params::metrics_params* params,
                                const std::string& output_root);
 
   /**
-   * @brief Collect metrics from the stateless controller synchronously (i.e. at
+   * @brief Collect metrics from the crw controller synchronously (i.e. at
    * the end of each timestep).
    */
   void collect_from_controller(
-      const controller::depth0::stateless_controller* controller);
+      const controller::depth0::crw_controller* controller);
 
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.
@@ -89,4 +89,4 @@ class stateless_metrics_aggregator : public metrics::base_metrics_aggregator,
 
 NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_STATELESS_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_METRICS_AGGREGATOR_HPP_ */

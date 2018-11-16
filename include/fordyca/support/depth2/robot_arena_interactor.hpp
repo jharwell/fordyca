@@ -58,7 +58,7 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
                                public er::client<robot_arena_interactor<T>> {
  public:
   robot_arena_interactor(ds::arena_map* const map_in,
-                         depth0::stateless_metrics_aggregator *const metrics_agg,
+                         depth0::crw_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor_in,
                          const ct::waveform_params* const block_manip_penalty,
                          const ct::waveform_params* const cache_usage_penalty,
@@ -109,16 +109,15 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
     }
   }
 
- protected:
+
+ private:
   using depth1::robot_arena_interactor<T>::nest_drop_interactor;
   using depth1::robot_arena_interactor<T>::free_pickup_interactor;
   using depth1::robot_arena_interactor<T>::task_abort_interactor;
   using depth1::robot_arena_interactor<T>::cached_pickup_interactor;
   using depth1::robot_arena_interactor<T>::existing_cache_drop_interactor;
   using depth1::robot_arena_interactor<T>::cache_penalty_handler;
-  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
 
- private:
   // clang-format off
   cache_site_block_drop_interactor<T> m_cache_site_drop_interactor;
   new_cache_block_drop_interactor<T>  m_new_cache_drop_interactor;

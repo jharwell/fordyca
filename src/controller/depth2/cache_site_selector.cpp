@@ -25,11 +25,11 @@
 #include <random>
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
-#include "fordyca/dbg/dbg.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,9 +48,10 @@ cache_site_selector::cache_site_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rmath::vector2d cache_site_selector::calc_best(const ds::cache_list& known_caches,
-                                               const ds::block_list& known_blocks,
-                                               rmath::vector2d position) {
+rmath::vector2d cache_site_selector::calc_best(
+    const ds::cache_list& known_caches,
+    const ds::block_list& known_blocks,
+    rmath::vector2d position) {
   double max_utility;
   std::vector<double> point;
   constraint_set constraints;
@@ -131,7 +132,7 @@ void cache_site_selector::opt_initialize(
   uint x = std::max(std::min((std::rand() % xrange.ub()) + 1, xrange.ub()),
                     xrange.lb());
   uint y = std::max(std::min((std::rand() % yrange.ub()) + 1, yrange.ub()),
-                             yrange.lb());
+                    yrange.lb());
   *initial_guess = {static_cast<double>(x), static_cast<double>(y)};
   ER_INFO("Initial guess: (%u,%u), xrange=%s, yrange=%s",
           x,

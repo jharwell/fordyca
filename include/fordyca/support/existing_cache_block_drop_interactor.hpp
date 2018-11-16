@@ -79,14 +79,12 @@ class existing_cache_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      penalty_type::kSrcExistingCacheDrop,
+                                      cache_op_src::kSrcExistingCacheDrop,
                                       timestep);
     }
   }
 
  private:
-  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
-
   /**
    * @brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache and is looking to drop an object in it.

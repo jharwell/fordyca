@@ -92,28 +92,28 @@ __rcsw_pure bool block_drop_overlap_with_nest(
          nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
 } /* block_drop_overlap_with_nest() */
 
-proximity_status_type cache_site_block_proximity(
+proximity_status cache_site_block_proximity(
     const controller::base_controller& c,
     const ds::arena_map& map,
     double block_prox_dist) {
   for (const auto& b : map.blocks()) {
     if ((b->real_loc() - c.position()).length() <= block_prox_dist) {
-      return std::make_pair(b->id(), b->real_loc() - c.position());
+      return {b->id(), b->real_loc() - c.position()};
     }
   } /* for(&b..) */
-  return std::make_pair(-1, rmath::vector2d());
+  return {-1, rmath::vector2d()};
 } /* cache_site_block_proximity() */
 
-proximity_status_type new_cache_cache_proximity(
+proximity_status new_cache_cache_proximity(
     const controller::base_controller& c,
     const ds::arena_map& map,
     double proximity_dist) {
   for (const auto& cache : map.caches()) {
     if ((cache->real_loc() - c.position()).length() <= proximity_dist) {
-      return std::make_pair(cache->id(), cache->real_loc() - c.position());
+      return {cache->id(), cache->real_loc() - c.position()};
     }
   } /* for(&b..) */
-  return std::make_pair(-1, rmath::vector2d());
+  return {-1, rmath::vector2d()};
 } /* new_cache_cache_proximity() */
 
 NS_END(loop_utils, support, fordyca);

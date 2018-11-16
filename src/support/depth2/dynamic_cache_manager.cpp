@@ -48,7 +48,7 @@ dynamic_cache_manager::dynamic_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::pair<bool, ds::cache_vector> dynamic_cache_manager::create(
+base_cache_manager::creation_result dynamic_cache_manager::create(
     ds::cache_vector& existing_caches,
     ds::block_vector& blocks) {
   support::depth2::dynamic_cache_creator creator(
@@ -66,11 +66,11 @@ std::pair<bool, ds::cache_vector> dynamic_cache_manager::create(
    * are eligible for being part of a dynamically created cache.
    */
   auto pair = calc_blocks_for_creation(existing_caches, blocks);
-  if (!pair.first) {
-    return std::make_pair(false, ds::cache_vector());
+  if (!pair.status) {
+    return creation_result(false, ds::cache_vector());
   }
   auto created = creator.create_all(existing_caches,
-                                    pair.second,
+                                    pair.blocks,
                                     mc_cache_params.dimension);
 
   /*
@@ -78,10 +78,10 @@ std::pair<bool, ds::cache_vector> dynamic_cache_manager::create(
    * have a block as its entity!
    */
   creator.update_host_cells(created);
-  return std::make_pair(!created.empty(), created);
+  return creation_result(!created.empty(), created);
 } /* create() */
 
-std::pair<bool, ds::block_vector> dynamic_cache_manager::calc_blocks_for_creation(
+base_cache_manager::block_calc_result dynamic_cache_manager::calc_blocks_for_creation(
     const ds::cache_vector& existing_caches,
     ds::block_vector& blocks) {
   /*
@@ -149,7 +149,7 @@ std::pair<bool, ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
             mc_cache_params.dynamic.min_blocks);
     ret = false;
   }
-  return std::make_pair(ret, to_use);
+  return block_calc_result(ret, to_use);
 } /* calc_blocks_for_creation() */
 
 NS_END(depth2, support, fordyca);

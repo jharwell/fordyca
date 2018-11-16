@@ -1,5 +1,5 @@
 /**
- * @file stateless_metrics_aggregator.cpp
+ * @file crw_metrics_aggregator.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,10 +21,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_metrics_aggregator.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/support/depth0/crw_metrics_aggregator.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/fsm/depth0/stateless_fsm.hpp"
+#include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
@@ -35,17 +35,17 @@ NS_START(fordyca, support, depth0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-stateless_metrics_aggregator::stateless_metrics_aggregator(
+crw_metrics_aggregator::crw_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
     : base_metrics_aggregator(params, output_root),
-      ER_CLIENT_INIT("fordyca.support.depth0.stateless_aggregator") {}
+      ER_CLIENT_INIT("fordyca.support.depth0.crw_aggregator") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateless_metrics_aggregator::collect_from_controller(
-    const controller::depth0::stateless_controller* controller) {
+void crw_metrics_aggregator::collect_from_controller(
+    const controller::depth0::crw_controller* controller) {
   auto collision_m =
       dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
   auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
@@ -66,13 +66,12 @@ void stateless_metrics_aggregator::collect_from_controller(
   collect("blocks::manipulation", *manip_m);
 } /* collect_from_controller() */
 
-void stateless_metrics_aggregator::collect_from_block(
+void crw_metrics_aggregator::collect_from_block(
     const representation::base_block* const block) {
   collect("blocks::transport", *block);
 } /* collect_from_block() */
 
-void stateless_metrics_aggregator::collect_from_arena(
-    const ds::arena_map* const arena) {
+void crw_metrics_aggregator::collect_from_arena(const ds::arena_map* const arena) {
   collect("arena::robot_occupancy", *arena);
 } /* collect_from_arena() */
 

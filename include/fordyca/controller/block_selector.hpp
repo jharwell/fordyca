@@ -18,24 +18,24 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH0_BLOCK_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH0_BLOCK_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_BLOCK_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_BLOCK_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <list>
 
-#include "rcppsw/er/client.hpp"
-#include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/block_list.hpp"
+#include "fordyca/representation/perceived_block.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth0);
+NS_START(fordyca, controller);
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
@@ -48,7 +48,7 @@ namespace rmath = rcppsw::math;
  * @brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.
  */
-class block_selector: public rcppsw::er::client<block_selector> {
+class block_selector : public rcppsw::er::client<block_selector> {
  public:
   explicit block_selector(const block_sel_matrix* sel_matrix);
 
@@ -63,14 +63,12 @@ class block_selector: public rcppsw::er::client<block_selector> {
    *
    * @return A pointer to the "best" block, along with its utility value.
    */
-  representation::perceived_block calc_best(
-      const ds::perceived_block_list& blocks,
-      const rmath::vector2d& position);
+  representation::perceived_block calc_best(const ds::perceived_block_list& blocks,
+                                            const rmath::vector2d& position);
 
  private:
-  bool block_is_excluded(
-      const rmath::vector2d& position,
-      const representation::base_block* block) const;
+  bool block_is_excluded(const rmath::vector2d& position,
+                         const representation::base_block* block) const;
 
   /**
    * @brief The minimum distance a robot has to be from a block for it to have a
@@ -86,6 +84,6 @@ class block_selector: public rcppsw::er::client<block_selector> {
   // clang-format on
 };
 
-NS_END(depth0, fordyca, controller);
+NS_END(fordyca, controller);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH0_BLOCK_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_BLOCK_SELECTOR_HPP_ */

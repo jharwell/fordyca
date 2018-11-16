@@ -23,7 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateless_qt_user_functions.hpp"
+#include "fordyca/support/depth0/crw_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +39,7 @@ NS_START(fordyca, support, depth0);
  *
  * @brief Contains hooks for Qt to draw the robot's LOS if so configured.
  */
-class stateful_qt_user_functions : public stateless_qt_user_functions {
+class stateful_qt_user_functions : public crw_qt_user_functions {
  public:
   stateful_qt_user_functions(void);
 

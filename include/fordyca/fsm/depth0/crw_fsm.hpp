@@ -1,5 +1,5 @@
 /**
- * @file stateless_fsm.hpp
+ * @file crw_fsm.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_STATELESS_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH0_STATELESS_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -49,23 +49,23 @@ using transport_goal_type = block_transporter::goal_type;
  ******************************************************************************/
 
 /**
- * @class stateless_fsm
+ * @class crw_fsm
  * @ingroup fsm depth0
  *
  * @brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest, and drops it.
  */
-class stateless_fsm : public base_foraging_fsm,
-                               public er::client<stateless_fsm>,
+class crw_fsm : public base_foraging_fsm,
+                               public er::client<crw_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
-                               public visitor::visitable_any<stateless_fsm> {
+                               public visitor::visitable_any<crw_fsm> {
  public:
-  explicit stateless_fsm(controller::saa_subsystem* saa);
+  explicit crw_fsm(controller::saa_subsystem* saa);
 
-  stateless_fsm(const stateless_fsm& fsm) = delete;
-  stateless_fsm& operator=(const stateless_fsm& fsm) = delete;
+  crw_fsm(const crw_fsm& fsm) = delete;
+  crw_fsm& operator=(const crw_fsm& fsm) = delete;
 
   /* collision metrics */
   FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
@@ -115,12 +115,12 @@ class stateless_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* stateless fsm states */
-  HFSM_STATE_DECLARE(stateless_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(stateless_fsm, acquire_block);
-  HFSM_STATE_DECLARE(stateless_fsm, wait_for_block_pickup,
+  /* crw fsm states */
+  HFSM_STATE_DECLARE(crw_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(crw_fsm, acquire_block);
+  HFSM_STATE_DECLARE(crw_fsm, wait_for_block_pickup,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(stateless_fsm, wait_for_block_drop,
+  HFSM_STATE_DECLARE(crw_fsm, wait_for_block_drop,
                      state_machine::event_data);
 
   /**
@@ -142,4 +142,4 @@ class stateless_fsm : public base_foraging_fsm,
 
 NS_END(depth0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_STATELESS_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_ */

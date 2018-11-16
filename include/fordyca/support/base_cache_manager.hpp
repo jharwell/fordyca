@@ -27,6 +27,8 @@
 #include <vector>
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 #include "rcppsw/common/common.hpp"
+#include "fordyca/ds/cache_vector.hpp"
+#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,6 +56,24 @@ NS_START(support);
  */
 class base_cache_manager : public metrics::caches::lifecycle_metrics {
  public:
+  struct creation_result {
+    creation_result(bool b, const ds::cache_vector& c) :
+        status(b),
+        caches(c) {}
+
+    bool status;
+    ds::cache_vector caches;
+  };
+
+  struct block_calc_result {
+    block_calc_result(bool b, const ds::block_vector& c) :
+        status(b),
+        blocks(c) {}
+
+    bool status;
+    ds::block_vector blocks;
+  };
+
   explicit base_cache_manager(ds::arena_grid* const arena_grid)
       : m_grid(arena_grid) {}
   virtual ~base_cache_manager(void) = default;

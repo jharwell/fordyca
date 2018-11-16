@@ -51,7 +51,7 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::pair<bool, ds::block_vector> static_cache_manager::calc_blocks_for_creation(
+base_cache_manager::block_calc_result static_cache_manager::calc_blocks_for_creation(
     ds::block_vector& blocks) {
   /*
    * Only blocks that are not:
@@ -111,17 +111,18 @@ std::pair<bool, ds::block_vector> static_cache_manager::calc_blocks_for_creation
   }
   if (to_use.size() < mc_cache_params.static_.size) {
     ER_WARN(
-        "Not enough free blocks to meet min size for new cache@%s/%s (%zu < %u)",
+        "Not enough free blocks to meet min size for new cache@%s/%s (%zu < "
+        "%u)",
         mc_cache_loc.to_str().c_str(),
         dcenter.to_str().c_str(),
         to_use.size(),
         mc_cache_params.static_.size);
     ret = false;
   }
-  return std::make_pair(ret, to_use);
+  return block_calc_result(ret, to_use);
 } /* calc_blocks_for_creation() */
 
-std::pair<bool, ds::cache_vector> static_cache_manager::create_conditional(
+base_cache_manager::creation_result static_cache_manager::create_conditional(
     ds::block_vector& blocks,
     uint n_harvesters,
     uint n_collectors) {
@@ -131,11 +132,11 @@ std::pair<bool, ds::cache_vector> static_cache_manager::create_conditional(
       static_cast<double>(std::rand()) / RAND_MAX) {
     return create(blocks);
   } else {
-    return std::make_pair(false, ds::cache_vector());
+    return creation_result(false, ds::cache_vector());
   }
 } /* create_conditional() */
 
-std::pair<bool, ds::cache_vector> static_cache_manager::create(
+base_cache_manager::creation_result static_cache_manager::create(
     ds::block_vector& blocks) {
   ER_DEBUG("(Re)-Creating static cache");
   ER_ASSERT(mc_cache_params.static_.size >=
@@ -147,17 +148,15 @@ std::pair<bool, ds::cache_vector> static_cache_manager::create(
   support::depth1::static_cache_creator creator(arena_grid(),
                                                 mc_cache_loc,
                                                 mc_cache_params.dimension);
-  auto pair = calc_blocks_for_creation(blocks);
-  ds::cache_vector created;
-  if (!pair.first) {
+  auto ret = calc_blocks_for_creation(blocks);
+  if (!ret.status) {
     ER_WARN("Unable to create static cache @%s: Not enough free blocks",
             mc_cache_loc.to_str().c_str());
-    return std::make_pair(false, created);
+    return creation_result(true, ds::cache_vector());
   }
+  ds::cache_vector created;
   /* no existing caches, so empty vector */
-  created = creator.create_all(ds::cache_vector(),
-                               pair.second,
-                               -1);
+  created = creator.create_all(ds::cache_vector(), ret.blocks, -1);
   ER_ASSERT(1 == created.size(),
             "Wrong # caches after static create: %zu",
             created.size());
@@ -192,7 +191,7 @@ std::pair<bool, ds::cache_vector> static_cache_manager::create(
    * have a block as its entity!
    */
   creator.update_host_cells(created);
-  return std::make_pair(true, created);
+  return creation_result(true, created);
 } /* create() */
 
 NS_END(depth1, support, fordyca);

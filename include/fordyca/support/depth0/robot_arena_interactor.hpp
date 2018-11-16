@@ -49,7 +49,7 @@ template <typename T>
 class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
  public:
   robot_arena_interactor(ds::arena_map* const map,
-                   stateless_metrics_aggregator *const metrics_agg,
+                   crw_metrics_aggregator *const metrics_agg,
                    argos::CFloorEntity* const floor,
                    const ct::waveform_params* const block_penalty)
       : ER_CLIENT_INIT("fordyca.support.depth0.robot_arena_interactor"),

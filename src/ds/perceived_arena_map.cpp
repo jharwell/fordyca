@@ -48,8 +48,7 @@ perceived_arena_map::perceived_arena_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::perceived_block_list perceived_arena_map::perceived_blocks(
-    void) const {
+ds::perceived_block_list perceived_arena_map::perceived_blocks(void) const {
   ds::perceived_block_list pblocks;
 
   for (auto& b : m_blocks) {
@@ -59,8 +58,7 @@ ds::perceived_block_list perceived_arena_map::perceived_blocks(
   return pblocks;
 } /* blocks() */
 
-ds::perceived_cache_list perceived_arena_map::perceived_caches(
-    void) const {
+ds::perceived_cache_list perceived_arena_map::perceived_caches(void) const {
   ds::perceived_cache_list pcaches;
 
   for (auto& c : m_caches) {

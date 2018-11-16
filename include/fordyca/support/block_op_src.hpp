@@ -1,5 +1,5 @@
 /**
- * @file block_priority_map.hpp
+ * @file block_op_src.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,27 +18,30 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BLOCK_PRIORITY_MAP_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BLOCK_PRIORITY_MAP_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_SRC_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_SRC_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <map>
-#include <string>
-
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, support);
+
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
-using block_priority_map = std::map<std::string, double>;
+enum block_op_src {
+  kSrcFreePickup,
+  kSrcNestDrop,
+  kSrcCacheSiteDrop,
+  kSrcNewCacheDrop,
+};
 
-NS_END(controller, fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BLOCK_PRIORITY_MAP_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_SRC_HPP_ */

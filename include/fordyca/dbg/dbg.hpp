@@ -37,31 +37,30 @@ NS_START(fordyca, dbg);
 /*******************************************************************************
  * Free Functions
  ******************************************************************************/
-template<typename T>
+template <typename T>
 std::string blocks_list(const T& blocks) {
-  std::string ret = std::accumulate(
-      blocks.begin(),
-      blocks.end(),
-      std::string(),
-      [&](const std::string& a, const auto& b) {
-        return a + "b" + std::to_string(b->id()) + ",";
-      });
+  std::string ret =
+      std::accumulate(blocks.begin(),
+                      blocks.end(),
+                      std::string(),
+                      [&](const std::string& a, const auto& b) {
+                        return a + "b" + std::to_string(b->id()) + ",";
+                      });
   return ret;
 }
 
-template<typename T>
+template <typename T>
 std::string caches_list(const T& caches) {
-  std::string ret = std::accumulate(
-      caches.begin(),
-      caches.end(),
-      std::string(),
-      [&](const std::string& a, const auto& b) {
-        return a + "c" + std::to_string(b->id()) + ",";
-      });
+  std::string ret =
+      std::accumulate(caches.begin(),
+                      caches.end(),
+                      std::string(),
+                      [&](const std::string& a, const auto& b) {
+                        return a + "c" + std::to_string(b->id()) + ",";
+                      });
   return ret;
 }
 
 NS_END(dbg, fordyca);
-
 
 #endif /* INCLUDE_FORDYCA_DBG_DBG_HPP_ */

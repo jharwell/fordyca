@@ -45,7 +45,7 @@ namespace ta = rcppsw::task_allocation;
  * Constructors/Destructor
  ******************************************************************************/
 stateful_controller::stateful_controller(void)
-    : stateless_controller(),
+    : crw_controller(),
       ER_CLIENT_INIT("fordyca.controller.depth0.stateful"),
       m_light_loc(),
       m_block_sel_matrix(),
@@ -92,8 +92,10 @@ __rcsw_pure depth0::sensing_subsystem* stateful_controller::stateful_sensors(
 void stateful_controller::ControlStep(void) {
   ndc_pusht();
   if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(), "Carried block%d has robot id=%d",
-              block()->id(), block()->robot_id());
+    ER_ASSERT(-1 != block()->robot_id(),
+              "Carried block%d has robot id=%d",
+              block()->id(),
+              block()->robot_id());
   }
 
   /*
@@ -111,7 +113,7 @@ void stateful_controller::ControlStep(void) {
 
 void stateful_controller::Init(ticpp::Element& node) {
   /*
-   * Note that we do not call \ref stateless_controller::Init()--there
+   * Note that we do not call \ref crw_controller::Init()--there
    * is nothing in there that we need.
    */
   base_controller::Init(node);
@@ -149,7 +151,7 @@ void stateful_controller::Init(ticpp::Element& node) {
 } /* Init() */
 
 void stateful_controller::Reset(void) {
-  stateless_controller::Reset();
+  crw_controller::Reset();
   m_perception->reset();
 } /* Reset() */
 

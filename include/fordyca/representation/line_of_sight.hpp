@@ -27,11 +27,11 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 #include "rcppsw/ds/base_grid2D.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

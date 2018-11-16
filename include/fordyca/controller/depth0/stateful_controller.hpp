@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 
@@ -51,12 +51,8 @@ NS_START(depth0);
  * @brief A foraging controller that remembers what it has seen for a period of
  * time (knowledge decays according to an exponential model,
  * @see pheromone_density).
- *
- * Robots using this controller execute the \ref generalist task, in which a
- * block is acquired (either via randomized exploring or by vectoring to a known
- * block) and then bring the block to the nest.
  */
-class stateful_controller : public stateless_controller,
+class stateful_controller : public crw_controller,
                             public er::client<stateful_controller>,
                             public metrics::world_model_metrics,
                             public visitor::visitable_any<stateful_controller> {

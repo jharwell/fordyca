@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,8 +59,7 @@ NS_START(events);
 class cell_op : public visitor::visitor,
                 public visitor::visit_set<ds::cell2D, fsm::cell2D_fsm> {
  public:
-  explicit cell_op(const rmath::vector2u& coord)
-      : m_coord(coord) {}
+  explicit cell_op(const rmath::vector2u& coord) : m_coord(coord) {}
 
   ~cell_op(void) override = default;
 

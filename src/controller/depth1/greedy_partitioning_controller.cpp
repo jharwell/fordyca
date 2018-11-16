@@ -62,8 +62,10 @@ greedy_partitioning_controller::~greedy_partitioning_controller(void) = default;
 void greedy_partitioning_controller::ControlStep(void) {
   ndc_pusht();
   if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(), "Carried block%d has robot id=%d",
-              block()->id(), block()->robot_id());
+    ER_ASSERT(-1 != block()->robot_id(),
+              "Carried block%d has robot id=%d",
+              block()->id(),
+              block()->robot_id());
   }
   perception()->update(depth0::stateful_controller::los());
 

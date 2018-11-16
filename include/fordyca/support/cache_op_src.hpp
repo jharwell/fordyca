@@ -1,7 +1,7 @@
 /**
- * @file stateless_controller_repository.hpp
+ * @file cache_op_src.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,28 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_CACHE_OP_SRC_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_CACHE_OP_SRC_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/base_controller_repository.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, support);
+
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
-/**
- * @class stateless_controller_repository
- * @ingroup params depth0
- *
- * @brief Collection of all parameter parsers and parse results needed by
- * \ref stateless_foraging_controller.
- */
-class stateless_controller_repository: public base_controller_repository {
- public:
-  stateless_controller_repository();
+enum cache_op_src {
+  kSrcExistingCacheDrop,
+  kSrcExistingCachePickup,
 };
 
-NS_END(params, fordyca, depth0);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_DEPTH0_STATELESS_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_CACHE_OP_SRC_HPP_ */

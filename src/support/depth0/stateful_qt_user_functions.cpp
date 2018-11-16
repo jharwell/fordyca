@@ -51,7 +51,7 @@ stateful_qt_user_functions::stateful_qt_user_functions() {
  * Member Functions
  ******************************************************************************/
 void stateful_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  stateless_qt_user_functions::Draw(c_entity);
+  crw_qt_user_functions::Draw(c_entity);
 
   auto& controller = dynamic_cast<controller::depth0::stateful_controller&>(
       c_entity.GetControllableEntity().GetController());

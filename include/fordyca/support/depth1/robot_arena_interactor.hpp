@@ -59,7 +59,7 @@ class robot_arena_interactor : public depth0::robot_arena_interactor<T>,
                          public er::client<robot_arena_interactor<T>> {
  public:
   robot_arena_interactor(ds::arena_map* const map_in,
-                         depth0::stateless_metrics_aggregator *const metrics_agg,
+                         depth0::crw_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor_in,
                          const ct::waveform_params* const block_manip_penalty,
                          const ct::waveform_params* const cache_usage_penalty)
@@ -107,7 +107,6 @@ class robot_arena_interactor : public depth0::robot_arena_interactor<T>,
  protected:
   using depth0::robot_arena_interactor<T>::nest_drop_interactor;
   using depth0::robot_arena_interactor<T>::free_pickup_interactor;
-  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
 
   const cached_block_pickup_interactor<T>& cached_pickup_interactor(void) const {
     return m_cached_pickup_interactor;

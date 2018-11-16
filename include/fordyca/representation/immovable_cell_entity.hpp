@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include "fordyca/math/utils.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,9 +65,7 @@ class immovable_cell_entity {
    * can be used to index into an arena_map.
    *
    */
-  const rmath::vector2u& discrete_loc(void) const {
-    return m_discrete_loc;
-  }
+  const rmath::vector2u& discrete_loc(void) const { return m_discrete_loc; }
 
  private:
   // clang-format off

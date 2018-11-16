@@ -88,31 +88,31 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
        * robot is too close to a block/cache.
        */
       penalty_status status = m_penalty_handler.penalty_init(controller,
-                                                             penalty_type::kSrcNewCacheDrop,
+                                                             block_op_src::kSrcNewCacheDrop,
                                                              timestep,
                                                              m_cache_manager->cache_proximity_dist(),
                                                              m_cache_manager->block_proximity_dist());
       if (penalty_status::kStatusCacheProximity == status) {
-        auto cache_pair = loop_utils::new_cache_cache_proximity(controller,
-                                                                *m_map,
-                                                                m_cache_manager->cache_proximity_dist());
-        ER_ASSERT(-1 != cache_pair.first,
+        auto prox_status = loop_utils::new_cache_cache_proximity(controller,
+                                                                 *m_map,
+                                                                 m_cache_manager->cache_proximity_dist());
+        ER_ASSERT(-1 != prox_status.entity_id,
                   "No cache too close with CacheProximity return status");
-        cache_proximity_notify(controller, cache_pair);
+        cache_proximity_notify(controller, prox_status);
       }
     }
   }
 
  private:
-  using penalty_type = typename block_op_penalty_handler<T>::penalty_src;
-  using penalty_status = typename block_op_penalty_handler<T>::penalty_status;
+  using penalty_status = typename block_op_penalty_handler<T>::filter_status;
 
-  void cache_proximity_notify(T& controller, std::pair<int, rmath::vector2d> cache_pair) {
+  void cache_proximity_notify(T& controller,
+                              const loop_utils::proximity_status& status) {
     ER_WARN("%s cannot drop block in new cache@%s: Cache%d too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position().to_str().c_str(),
-            cache_pair.first,
-            cache_pair.second.length(),
+            status.entity_id,
+            status.distance.length(),
             m_cache_manager->cache_proximity_dist());
     /*
      * Because caches can be dynamically created/destroyed, we cannot rely on
@@ -122,11 +122,11 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     auto it = std::find_if(m_map->caches().begin(),
                            m_map->caches().end(),
                            [&](const auto& c) {
-                             return c->id() == cache_pair.first;
+                             return c->id() == status.entity_id;
                            });
     ER_ASSERT(m_map->caches().end() != it,
               "FATAL: Cache%d does not exist?",
-              cache_pair.first);
+              status.entity_id);
     events::cache_proximity prox((*it)->id());
     controller.visitor::template visitable_any<T>::accept(prox);
   }
@@ -144,11 +144,11 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     ER_ASSERT(controller.current_task()->goal_acquired() &&
               acquisition_goal_type::kNewCache == controller.current_task()->acquisition_goal(),
               "Controller not waiting for new cache block drop");
-    auto cache_pair = loop_utils::new_cache_cache_proximity(controller,
+    auto status = loop_utils::new_cache_cache_proximity(controller,
                                                        *m_map,
                                                        m_cache_manager->cache_proximity_dist());
 
-    if (-1 != cache_pair.first) {
+    if (-1 != status.entity_id) {
       /*
      * If there is another cache nearby that the robot is unaware of, and if
      * that cache is close enough to the robot's current location that a block
@@ -159,8 +159,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
       ER_WARN("%s cannot drop block in new cache %s: Cache%d too close (%f <= %f)",
               controller.GetId().c_str(),
               controller.position().to_str().c_str(),
-              cache_pair.first,
-              cache_pair.second.length(),
+              status.entity_id,
+              status.distance.length(),
               m_cache_manager->cache_proximity_dist());
 
       /*
@@ -171,10 +171,10 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
       auto it = std::find_if(m_map->caches().begin(),
                              m_map->caches().end(),
                              [&](const auto& c) {
-                               return c->id() == cache_pair.first; });
+                               return c->id() == status.entity_id; });
       ER_ASSERT(m_map->caches().end() != it,
                 "FATAL: Cache%d does not exist?",
-                cache_pair.first);
+                status.entity_id);
       events::cache_proximity prox((*it)->id());
       controller.visitor::template visitable_any<T>::accept(prox);
     } else {

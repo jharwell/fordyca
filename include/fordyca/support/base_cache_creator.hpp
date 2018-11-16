@@ -25,14 +25,14 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <vector>
 #include <random>
 #include <utility>
+#include <vector>
 
 #include "fordyca/ds/arena_grid.hpp"
+#include "fordyca/ds/block_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/ds/block_list.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -59,7 +59,6 @@ namespace rmath = rcppsw::math;
  */
 class base_cache_creator : public er::client<base_cache_creator> {
  public:
-
   /**
    * @brief Initialize a new cache creator.
    *
@@ -99,7 +98,14 @@ class base_cache_creator : public er::client<base_cache_creator> {
   void update_host_cells(ds::cache_vector& caches);
 
  protected:
-  using deconflict_result_type = std::pair<bool, rmath::vector2u>;
+  struct deconflict_result {
+    deconflict_result(bool b, const rmath::vector2u& l) :
+        status(b),
+        loc(l) {}
+
+    bool status;
+    rmath::vector2u loc;
+  };
 
   const ds::arena_grid* grid(void) const { return m_grid; }
   ds::arena_grid* grid(void) { return m_grid; }
@@ -138,7 +144,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * This function is provided for derived classes to use when they implement
    * \ref create_all().
    */
-  deconflict_result_type deconflict_existing_cache(
+  deconflict_result deconflict_existing_cache(
       const representation::base_cache& cache,
       const rmath::vector2u& center) const;
 

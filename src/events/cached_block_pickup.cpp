@@ -26,6 +26,7 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -39,7 +40,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-#include "fordyca/dbg/dbg.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -130,15 +130,15 @@ void cached_block_pickup::visit(ds::arena_map& map) {
               cell_op::y(),
               base_cache::kMinBlocks);
 
-    ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u),remaining=[%s] (%zu)",
-            m_robot_index,
-            m_pickup_block->id(),
-            cache_id,
-            cell_op::x(),
-            cell_op::y(),
-            dbg::blocks_list(m_real_cache->blocks()).c_str(),
-            m_real_cache->n_blocks());
-
+    ER_INFO(
+        "arena_map: fb%u: block%d from cache%d@(%u, %u),remaining=[%s] (%zu)",
+        m_robot_index,
+        m_pickup_block->id(),
+        cache_id,
+        cell_op::x(),
+        cell_op::y(),
+        dbg::blocks_list(m_real_cache->blocks()).c_str(),
+        m_real_cache->n_blocks());
 
   } else {
     m_real_cache->accept(*this);
@@ -226,9 +226,10 @@ void cached_block_pickup::visit(
       controller.current_task());
   std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
 
-  ER_ASSERT(nullptr != task,
-            "Non existing cache interactor task '%s' causing cached block pickup",
-            task_name.c_str());
+  ER_ASSERT(
+      nullptr != task,
+      "Non existing cache interactor task '%s' causing cached block pickup",
+      task_name.c_str());
   task->accept(*this);
 
   ER_INFO("Picked up block%d from cache%d,task='%s'",

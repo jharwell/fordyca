@@ -73,9 +73,7 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
      * creation). However, it may also NOT be in the list of blocks to use for
      * the new cache, in which case we need to add in (static cache creation).
      */
-    if (blocks.end() == std::find(blocks.begin(),
-                                  blocks.end(),
-                                  cell.block())) {
+    if (blocks.end() == std::find(blocks.begin(), blocks.end(), cell.block())) {
       /*
        * We use insert() instead of push_back() here so that it there was a
        * leftover block on the cell where a cache used to be that is also where
@@ -123,9 +121,9 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
   return ret;
 } /* create_single_cache() */
 
-base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existing_cache(
-    const representation::base_cache& cache,
-    const rmath::vector2u& center) const {
+base_cache_creator::deconflict_result base_cache_creator::
+    deconflict_existing_cache(const representation::base_cache& cache,
+                              const rmath::vector2u& center) const {
   std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
   std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
 
@@ -182,13 +180,12 @@ base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existi
     new_center.y(new_center.y() + y_delta);
     y_conflict = true;
   }
-  return std::make_pair(x_conflict && y_conflict, new_center);
+  return deconflict_result(x_conflict && y_conflict, new_center);
 } /* deconflict_existing_cache() */
 
 rmath::vector2u base_cache_creator::deconflict_arena_boundaries(
     double cache_dim,
     const rmath::vector2u& center) const {
-
   /*
    * We need to be sure the center of the new cache is not near the arena
    * boundaries, in order to avoid all sorts of weird corner cases.
@@ -269,14 +266,15 @@ bool base_cache_creator::creation_sanity_checks(
         auto c2_yspan = c2->yspan(c2->real_loc());
         if (c1_xspan.overlaps_with(c2_xspan) &&
             c1_yspan.overlaps_with(c2_yspan)) {
-          ER_FATAL_SENTINEL("Cache%d xspan=%s, yspan=%s overlaps cache%d "
-                            "xspan=%s,yspan=%s",
-                            c1->id(),
-                            c1_xspan.to_str().c_str(),
-                            c1_yspan.to_str().c_str(),
-                            c2->id(),
-                            c2_xspan.to_str().c_str(),
-                            c2_yspan.to_str().c_str());
+          ER_FATAL_SENTINEL(
+              "Cache%d xspan=%s, yspan=%s overlaps cache%d "
+              "xspan=%s,yspan=%s",
+              c1->id(),
+              c1_xspan.to_str().c_str(),
+              c1_yspan.to_str().c_str(),
+              c2->id(),
+              c2_xspan.to_str().c_str(),
+              c2_yspan.to_str().c_str());
           ret = false;
         }
       } /* for(&b..) */

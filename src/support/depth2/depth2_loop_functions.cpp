@@ -161,10 +161,10 @@ void depth2_loop_functions::cache_handling_init(
   m_cache_manager =
       rcppsw::make_unique<dynamic_cache_manager>(cachep,
                                                  &arena_map()->decoratee());
-  auto pair =
+  auto ret =
       m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
-  if (pair.first) {
-    arena_map()->caches_add(pair.second);
+  if (ret.status) {
+    arena_map()->caches_add(ret.caches);
     floor()->SetChanged();
   }
 } /* cache_handlng_init() */
@@ -216,10 +216,10 @@ void depth2_loop_functions::PreStep() {
   } /* for(&entity..) */
 
   /* create new caches */
-  auto pair =
+  auto ret =
       m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
-  if (pair.first) {
-    arena_map()->caches_add(pair.second);
+  if (ret.status) {
+    arena_map()->caches_add(ret.caches);
     floor()->SetChanged();
   }
 
@@ -236,10 +236,10 @@ void depth2_loop_functions::PreStep() {
 
 void depth2_loop_functions::Reset(void) {
   m_metrics_agg->reset_all();
-  auto pair =
+  auto ret =
       m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
-  if (pair.first) {
-    arena_map()->caches_add(pair.second);
+  if (ret.status) {
+    arena_map()->caches_add(ret.caches);
     floor()->SetChanged();
   }
 }

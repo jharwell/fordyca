@@ -27,7 +27,6 @@
  ******************************************************************************/
 #include <utility>
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * namespaces
@@ -57,8 +56,7 @@ __rcsw_pure static inline rmath::vector2u rcoord_to_dcoord(
 __rcsw_pure static inline rmath::vector2d dcoord_to_rcoord(
     const rmath::vector2u& d_coord,
     double resolution) {
-  return rmath::vector2d(d_coord.x() * resolution,
-                         d_coord.y() * resolution);
+  return rmath::vector2d(d_coord.x() * resolution, d_coord.y() * resolution);
 }
 
 NS_END(math, fordyca);
