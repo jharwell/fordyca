@@ -66,7 +66,7 @@ class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
       : stacked_grid(resolution, x_max, y_max) {
     for (uint i = 0; i < xdsize(); ++i) {
       for (uint j = 0; j < ydsize(); ++j) {
-        access<kCell>(i, j).loc(rcppsw::math::dcoord2(i, j));
+        access<kCell>(i, j).loc(rmath::vector2u(i, j));
       } /* for(j..) */
     }   /* for(i..) */
   }

@@ -49,14 +49,14 @@ block_manifest_processor::block_vector block_manifest_processor::create_blocks(
   uint i;
   for (i = 0; i < mc_manifest.n_cube; ++i) {
     v.push_back(create("cube",
-                       rcppsw::math::vector2d(mc_manifest.unit_dim,
+                       rmath::vector2d(mc_manifest.unit_dim,
                                               mc_manifest.unit_dim),
                        i));
   } /* for(i..) */
   for (i = mc_manifest.n_cube; i < mc_manifest.n_cube + mc_manifest.n_ramp;
        ++i) {
     v.push_back(create("ramp",
-                       rcppsw::math::vector2d(mc_manifest.unit_dim * 2,
+                       rmath::vector2d(mc_manifest.unit_dim * 2,
                                               mc_manifest.unit_dim),
                        i));
   } /* for(i..) */

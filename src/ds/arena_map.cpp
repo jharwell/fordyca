@@ -127,7 +127,7 @@ void arena_map::distribute_all_blocks(void) {
     for (size_t j = 0; j < ydsize(); ++j) {
       cell2D& cell = decoratee().access<arena_grid::kCell>(i, j);
       if (!cell.state_has_block() && !cell.state_has_cache()) {
-        events::cell_empty op(i, j);
+        events::cell_empty op(cell.loc());
         cell.accept(op);
       }
     } /* for(j..) */
@@ -160,7 +160,7 @@ void arena_map::cache_extent_clear(
 
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {
-      rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
+      rmath::vector2u c = rmath::vector2u(i, j);
       if (c != victim->discrete_loc()) {
         ER_ASSERT(victim->contains_point(
                       math::dcoord_to_rcoord(c, grid_resolution())),

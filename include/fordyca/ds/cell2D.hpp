@@ -27,7 +27,7 @@
 #include <string>
 
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -45,6 +45,7 @@ NS_START(ds);
 
 namespace visitor = rcppsw::patterns::visitor;
 namespace decorator = rcppsw::patterns::decorator;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -98,8 +99,8 @@ class cell2D : public visitor::visitable_any<cell2D>,
     return m_entity;
   }
 
-  void loc(rcppsw::math::dcoord2 loc) { m_loc = loc; }
-  rcppsw::math::dcoord2 loc(void) const { return m_loc; }
+  void loc(rmath::vector2u loc) { m_loc = loc; }
+  rmath::vector2u loc(void) const { return m_loc; }
 
   /**
    * @brief Get the block entity associated with this cell.
@@ -123,7 +124,7 @@ class cell2D : public visitor::visitable_any<cell2D>,
   // clang-format off
   std::string                                       m_robot_id{""};
   std::shared_ptr<representation::base_cell_entity> m_entity{nullptr};
-  rcppsw::math::dcoord2                             m_loc;
+  rmath::vector2u                             m_loc;
   // clang-format on
 };
 

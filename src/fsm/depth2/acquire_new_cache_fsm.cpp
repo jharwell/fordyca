@@ -52,7 +52,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
                     std::placeholders::_1),
           std::bind([](void) noexcept {
               return false;
-            })), /* new caches never acquire via exploration */
+            })), /* new caches never acquired via exploration */
       mc_matrix(matrix),
       mc_map(map) {}
 
@@ -77,11 +77,10 @@ acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const
   if (nullptr == best.ent) {
     return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
   } else {
-    ER_INFO("Select new cache%d@%s [%u, %u], utility=%f for acquisition",
+    ER_INFO("Select new cache%d@%s/%s, utility=%f for acquisition",
             best.ent->id(),
             best.ent->real_loc().to_str().c_str(),
-            best.ent->discrete_loc().first,
-            best.ent->discrete_loc().second,
+            best.ent->discrete_loc().to_str().c_str(),
             best.density.last_result());
     return acquire_goal_fsm::candidate_type(true,
                                             best.ent->real_loc(),

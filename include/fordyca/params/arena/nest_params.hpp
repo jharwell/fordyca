@@ -42,7 +42,7 @@ namespace rmath = rcppsw::math;
  */
 struct nest_params : public rcppsw::params::base_params {
   rmath::vector2d center{};
-  rcppsw::math::vector2d dims{};
+  rmath::vector2d dims{};
 };
 
 NS_END(params, fordyca);

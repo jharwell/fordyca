@@ -160,12 +160,12 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
   }
   template <int Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) {
+      const rmath::vector2u& d) {
     return decoratee().access<Index>(d);
   }
   template <int Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) const {
+      const rmath::vector2u& d) const {
     return decoratee().access<Index>(d);
   }
 

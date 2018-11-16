@@ -38,7 +38,7 @@ NS_START(fordyca, support, block_dist);
 using fordyca::ds::arena_grid;
 
 namespace er = rcppsw::er;
-namespace math = rcppsw::math;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -110,13 +110,14 @@ powerlaw_distributor::arena_view_vector powerlaw_distributor::
     uint y_max = y + clust_sizes[i] / (x_max - x);
 
     auto view = grid.layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
+    rmath::vector2u loc = (*view.origin()).loc();
     ER_TRACE(
-        "Guess cluster%zu placement: x=[%lu-%lu], y=[%lu-%lu], size=%u",
+        "Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
         i,
-        (*view.origin()).loc().first + view.index_bases()[0],
-        (*view.origin()).loc().first + view.index_bases()[0] + view.shape()[0],
-        (*view.origin()).loc().second + view.index_bases()[1],
-        (*view.origin()).loc().second + view.index_bases()[1] + view.shape()[1],
+        loc.x() + view.index_bases()[0],
+        loc.x() + view.index_bases()[0] + view.shape()[0],
+        loc.y() + view.index_bases()[1],
+        loc.y() + view.index_bases()[1] + view.shape()[1],
         clust_sizes[i]);
     views.push_back(std::make_pair(view, clust_sizes[i]));
   } /* for(i..) */
@@ -127,35 +128,33 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
     const arena_view_vector& list) {
   for (const std::pair<ds::arena_grid::view, uint>& v : list) {
     bool overlap = std::any_of(list.begin(), list.end(), [&](const auto& other) {
-      /*
-           * Can't compare directly (boost multi_array makes a COPY of each
-           * element during iteration for some reason, and because the cells
-           * have a unique_ptr, that doesn't work), so compare using addresses
-           * of elements of the vector, which WILL work.
-           */
-      if (&other == &v) { /* self */
-        return false;
-      }
-      uint v_xbase = (*v.first.origin()).loc().first;
-      uint v_ybase = (*v.first.origin()).loc().second;
-      uint other_xbase = (*other.first.origin()).loc().first;
-      uint other_ybase = (*other.first.origin()).loc().second;
-      math::rangeu v_xrange(v_xbase + v.first.index_bases()[0],
-                            v_xbase + v.first.index_bases()[0] +
-                                v.first.shape()[0]);
-      math::rangeu v_yrange(v_ybase + v.first.index_bases()[1],
-                            v_ybase + v.first.index_bases()[1] +
-                                v.first.shape()[1]);
-      math::rangeu other_xrange(other_xbase + other.first.index_bases()[0],
-                                other_xbase + other.first.index_bases()[0] +
-                                    other.first.shape()[0]);
-      math::rangeu other_yrange(other_ybase + other.first.index_bases()[1],
-                                other_ybase + other.first.index_bases()[1] +
-                                    other.first.shape()[1]);
+        /*
+         * Can't compare directly (boost multi_array makes a COPY of each
+         * element during iteration for some reason, and because the cells
+         * have a unique_ptr, that doesn't work), so compare using addresses
+         * of elements of the vector, which WILL work.
+         */
+        if (&other == &v) { /* self */
+          return false;
+        }
+        rmath::vector2u v_loc = (*v.first.origin()).loc();
+        rmath::vector2u other_loc = (*other.first.origin()).loc();
+        rmath::rangeu v_xrange(v_loc.x() + v.first.index_bases()[0],
+                               v_loc.x() + v.first.index_bases()[0] +
+                               v.first.shape()[0]);
+        rmath::rangeu v_yrange(v_loc.y() + v.first.index_bases()[1],
+                               v_loc.y() + v.first.index_bases()[1] +
+                               v.first.shape()[1]);
+        rmath::rangeu other_xrange(other_loc.x() + other.first.index_bases()[0],
+                                   other_loc.x() + other.first.index_bases()[0] +
+                                   other.first.shape()[0]);
+        rmath::rangeu other_yrange(other_loc.y() + other.first.index_bases()[1],
+                                   other_loc.y() + other.first.index_bases()[1] +
+                                   other.first.shape()[1]);
 
-      return v_xrange.overlaps_with(other_xrange) &&
-             v_yrange.overlaps_with(other_yrange);
-    });
+        return v_xrange.overlaps_with(other_xrange) &&
+        v_yrange.overlaps_with(other_yrange);
+      });
     if (overlap) {
       return false;
     }
@@ -201,9 +200,8 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid& grid) {
   for (auto it = m_dist_map.begin(); it != m_dist_map.end(); ++it) {
     ER_INFO("Mapped %zu clusters of capacity %u", it->second.size(), it->first);
     for (auto& dist : it->second) {
-      ER_DEBUG("Cluster with origin@(%u, %u): capacity=%u",
-               (*dist.cluster().view().origin()).loc().first,
-               (*dist.cluster().view().origin()).loc().second,
+      ER_DEBUG("Cluster with origin@%s: capacity=%u",
+               (*dist.cluster().view().origin()).loc().to_str().c_str(),
                dist.cluster().capacity());
     } /* for(dist..) */
   }   /* for(&l..) */

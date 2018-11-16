@@ -29,7 +29,7 @@
 #include <random>
 
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 

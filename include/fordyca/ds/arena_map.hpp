@@ -144,13 +144,13 @@ class arena_map : public er::client<arena_map>,
 
   template <int Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) {
-    return decoratee().access<Index>(d.first, d.second);
+      const rmath::vector2u& d) {
+    return decoratee().access<Index>(d);
   }
   template <int Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) const {
-    return decoratee().access<Index>(d.first, d.second);
+      const rmath::vector2u& d) const {
+    return decoratee().access<Index>(d);
   }
   template <int Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(size_t i,

@@ -55,7 +55,7 @@ free_block_pickup::free_block_pickup(
     std::shared_ptr<representation::base_block> block,
     uint robot_index,
     uint timestep)
-    : cell_op(block->discrete_loc().first, block->discrete_loc().second),
+    : cell_op(block->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
       m_timestep(timestep),
       m_robot_index(robot_index),
@@ -71,27 +71,25 @@ void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 void free_block_pickup::visit(ds::cell2D& cell) {
   cell.fsm().accept(*this);
   cell.entity(nullptr);
-  ER_INFO("cell2D: fb%u block%d from (%u, %u)",
+  ER_INFO("cell2D: fb%u block%d from %s",
           m_robot_index,
           m_block->id(),
-          m_block->discrete_loc().first,
-          m_block->discrete_loc().second);
+          m_block->discrete_loc().to_str().c_str());
 } /* visit() */
 
 void free_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
-                rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
+                rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
   rmath::vector2d old_r = m_block->real_loc();
-  events::cell_empty op(cell_op::x(), cell_op::y());
+  events::cell_empty op(cell_op::coord());
   map.accept(op);
   m_block->accept(*this);
-  ER_INFO("arena_map: fb%u: block%d from %s -> (%u, %u)",
+  ER_INFO("arena_map: fb%u: block%d@%s/%s",
           m_robot_index,
           m_block->id(),
           old_r.to_str().c_str(),
-          cell_op::x(),
-          cell_op::y());
+          cell_op::coord().to_str().c_str());
 } /* visit() */
 
 /*******************************************************************************
@@ -127,7 +125,7 @@ void free_block_pickup::visit(fsm::depth0::stateless_fsm& fsm) {
  ******************************************************************************/
 void free_block_pickup::visit(ds::perceived_arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
-                rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
+                rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
   ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());

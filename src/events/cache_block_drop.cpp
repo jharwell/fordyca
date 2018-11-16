@@ -52,7 +52,7 @@ cache_block_drop::cache_block_drop(
     const std::shared_ptr<representation::base_block>& block,
     const std::shared_ptr<representation::arena_cache>& cache,
     double resolution)
-    : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
+    : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
       m_resolution(resolution),
       m_block(block),
@@ -62,7 +62,7 @@ cache_block_drop::cache_block_drop(
  * Depth1 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(ds::cell2D& cell) {
-  ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
+  ER_ASSERT(0 != cell.loc().x() && 0 != cell.loc().y(),
             "Cell does not have coordinates");
 
   cell.fsm().accept(*this);
@@ -99,7 +99,7 @@ void cache_block_drop::visit(ds::perceived_arena_map& map) {
 
 void cache_block_drop::visit(representation::base_block& block) {
   events::free_block_drop e(m_block, /* OK because we only have 1 block */
-                            rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
+                            rmath::vector2u(cell_op::x(), cell_op::y()),
                             m_resolution);
   block.accept(e);
 } /* visit() */

@@ -130,9 +130,8 @@ std::pair<bool, ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
 
     accum = "";
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      accum += "b" + std::to_string(b->id()) + "->(" +
-               std::to_string(b->discrete_loc().first) + "," +
-               std::to_string(b->discrete_loc().second) + "),";
+      accum += "b" + std::to_string(b->id()) + "->" +
+               b->discrete_loc().to_str() + ",";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 

@@ -99,7 +99,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
   void update_host_cells(ds::cache_vector& caches);
 
  protected:
-  using deconflict_result_type = std::pair<bool, rmath::vector2i>;
+  using deconflict_result_type = std::pair<bool, rmath::vector2u>;
 
   const ds::arena_grid* grid(void) const { return m_grid; }
   ds::arena_grid* grid(void) { return m_grid; }
@@ -129,8 +129,8 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * This function is provided for derived classes to use when they implement
    * \ref create_all().
    */
-  rmath::vector2i deconflict_arena_boundaries(double cache_dim,
-                                              const rmath::vector2i& center) const;
+  rmath::vector2u deconflict_arena_boundaries(double cache_dim,
+                                              const rmath::vector2u& center) const;
   /**
    * @brief Deconflict new cache cache from overlapping with any existing caches
    * (including taking the span of the new cache into account).
@@ -140,7 +140,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    */
   deconflict_result_type deconflict_existing_cache(
       const representation::base_cache& cache,
-      const rmath::vector2i& center) const;
+      const rmath::vector2u& center) const;
 
  private:
   // clang-format off

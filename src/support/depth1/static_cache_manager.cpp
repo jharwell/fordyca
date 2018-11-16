@@ -61,7 +61,7 @@ std::pair<bool, ds::block_vector> static_cache_manager::calc_blocks_for_creation
    *
    * are eligible for being used to re-create the static cache.
    */
-  rcppsw::math::dcoord2 dcenter =
+  rmath::vector2u dcenter =
       math::rcoord_to_dcoord(mc_cache_loc, arena_grid()->resolution());
   ds::block_vector to_use;
   for (auto& b : blocks) {
@@ -94,18 +94,16 @@ std::pair<bool, ds::block_vector> static_cache_manager::calc_blocks_for_creation
 
     accum = "";
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      accum += "b" + std::to_string(b->id()) + "->(" +
-               std::to_string(b->discrete_loc().first) + "," +
-               std::to_string(b->discrete_loc().second) + "),";
+      accum += "b" + std::to_string(b->id()) + "->" +
+               b->discrete_loc().to_str() + ",";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
     ER_ASSERT(to_use.size() - count < representation::base_cache::kMinBlocks,
-              "For new cache @%s [%u, %u]: %zu blocks SHOULD be "
+              "For new cache @%s/%s: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
               mc_cache_loc.to_str().c_str(),
-              dcenter.first,
-              dcenter.second,
+              dcenter.to_str().c_str(),
               to_use.size() - count,
               to_use.size(),
               representation::base_cache::kMinBlocks);
@@ -113,11 +111,9 @@ std::pair<bool, ds::block_vector> static_cache_manager::calc_blocks_for_creation
   }
   if (to_use.size() < mc_cache_params.static_.size) {
     ER_WARN(
-        "Not enough free blocks to meet min size for new cache@%s [%u, "
-        "%u] (%zu < %u)",
+        "Not enough free blocks to meet min size for new cache@%s/%s (%zu < %u)",
         mc_cache_loc.to_str().c_str(),
-        dcenter.first,
-        dcenter.second,
+        dcenter.to_str().c_str(),
         to_use.size(),
         mc_cache_params.static_.size);
     ret = false;

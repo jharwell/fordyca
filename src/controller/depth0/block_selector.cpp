@@ -68,10 +68,10 @@ representation::perceived_block block_selector::calc_best(
     double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
         position, b.density.last_result(), priority);
 
-    ER_DEBUG("Utility for block%d loc=(%u, %u), density=%f: %f",
+    ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
              b.ent->id(),
-             b.ent->discrete_loc().first,
-             b.ent->discrete_loc().second,
+             b.ent->real_loc().to_str().c_str(),
+             b.ent->discrete_loc().to_str().c_str(),
              b.density.last_result(),
              utility);
     if (utility > max_utility) {
@@ -81,11 +81,10 @@ representation::perceived_block block_selector::calc_best(
   } /* for(block..) */
 
   if (nullptr != best.ent) {
-    ER_INFO("Best utility: block%d@%s [%u, %u]: %f",
+    ER_INFO("Best utility: block%d@%s/%s: %f",
             best.ent->id(),
             best.ent->real_loc().to_str().c_str(),
-            best.ent->discrete_loc().first,
-            best.ent->discrete_loc().second,
+            best.ent->real_loc().to_str().c_str(),
             max_utility);
   } else {
     ER_WARN(
@@ -98,11 +97,10 @@ bool block_selector::block_is_excluded(
     const rmath::vector2d& position,
     const representation::base_block* const block) const {
   if ((position - block->real_loc()).length() <= kMinDist) {
-    ER_INFO("Ignoring block%d@%s [%u, %u]: Too close (%f < %f)",
+    ER_INFO("Ignoring block%d@%s/%s: Too close (%f < %f)",
             block->id(),
             block->real_loc().to_str().c_str(),
-            block->discrete_loc().first,
-            block->discrete_loc().second,
+            block->discrete_loc().to_str().c_str(),
             (position - block->real_loc()).length(),
             kMinDist);
     return true;
@@ -112,9 +110,10 @@ bool block_selector::block_is_excluded(
   if (std::any_of(exceptions.begin(), exceptions.end(), [&](int id) {
         return id == block->id();
       })) {
-    ER_INFO("Ignoring block%d@%s: On exception list",
+    ER_INFO("Ignoring block%d@%s/%s: On exception list",
             block->id(),
-            block->real_loc().to_str().c_str());
+            block->real_loc().to_str().c_str(),
+            block->discrete_loc().to_str().c_str());
     return true;
   }
   return false;

@@ -27,7 +27,7 @@
 #include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,6 +35,7 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+namespace rmath = rcppsw::math;
 namespace ds { class perceived_arena_map; }
 namespace fsm {
 class block_to_goal_fsm;
@@ -85,7 +86,7 @@ class free_block_drop
    * @param resolution The resolution of the arena map.
    */
   free_block_drop(const std::shared_ptr<representation::base_block>& block,
-                  rcppsw::math::dcoord2 coord,
+                  const rmath::vector2u& coord,
                   double resolution);
   ~free_block_drop(void) override = default;
 

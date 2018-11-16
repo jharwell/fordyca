@@ -57,12 +57,12 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
-  rcppsw::math::dcoord2 d = math::rcoord_to_dcoord(center, grid()->resolution());
+  rmath::vector2u d = math::rcoord_to_dcoord(center, grid()->resolution());
   ds::cell2D& cell = m_grid->access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
     ER_ASSERT(nullptr != cell.block(),
-              "Cell@(%u,%u) does not have block",
-              cell.loc().first, cell.loc().second);
+              "Cell@%s does not have block",
+              cell.loc().to_str().c_str());
 
     /*
      * If the host cell for the cache already contains a block, we don't want to
@@ -112,11 +112,10 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
   ds::block_vector block_vec(blocks.begin(), blocks.end());
   auto ret = rcppsw::make_unique<representation::arena_cache>(
       m_cache_dim, m_grid->resolution(), center, block_vec, -1);
-  ER_INFO("Create cache%d@%s [%u,%u], xspan=%s,yspan=%s with %zu blocks [%s]",
+  ER_INFO("Create cache%d@%s/%s, xspan=%s,yspan=%s with %zu blocks [%s]",
           ret->id(),
           ret->real_loc().to_str().c_str(),
-          ret->discrete_loc().first,
-          ret->discrete_loc().second,
+          ret->discrete_loc().to_str().c_str(),
           ret->xspan(ret->real_loc()).to_str().c_str(),
           ret->yspan(ret->real_loc()).to_str().c_str(),
           ret->n_blocks(),
@@ -126,16 +125,16 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
 
 base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existing_cache(
     const representation::base_cache& cache,
-    const rmath::vector2i& center) const {
+    const rmath::vector2u& center) const {
   std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
   std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
 
   auto exc_xspan = cache.xspan(cache.real_loc());
   auto exc_yspan = cache.yspan(cache.real_loc());
-  auto newc_xspan = cache.xspan(rmath::ivec2dvec(center));
-  auto newc_yspan = cache.yspan(rmath::ivec2dvec(center));
+  auto newc_xspan = cache.xspan(rmath::uvec2dvec(center));
+  auto newc_yspan = cache.yspan(rmath::uvec2dvec(center));
 
-  rmath::vector2i new_center = center;
+  rmath::vector2u new_center = center;
 
   /*
    * Now that our center is comfortably in the middle of the arena, we need to
@@ -186,9 +185,9 @@ base_cache_creator::deconflict_result_type base_cache_creator::deconflict_existi
   return std::make_pair(x_conflict && y_conflict, new_center);
 } /* deconflict_existing_cache() */
 
-rmath::vector2i base_cache_creator::deconflict_arena_boundaries(
+rmath::vector2u base_cache_creator::deconflict_arena_boundaries(
     double cache_dim,
-    const rmath::vector2i& center) const {
+    const rmath::vector2u& center) const {
 
   /*
    * We need to be sure the center of the new cache is not near the arena
@@ -201,7 +200,7 @@ rmath::vector2i base_cache_creator::deconflict_arena_boundaries(
 
   int x = std::max(x_min, std::min(x_max, static_cast<double>(center.x())));
   int y = std::max(y_min, std::min(y_max, static_cast<double>(center.y())));
-  rmath::vector2i res(x, y);
+  rmath::vector2u res(x, y);
   ER_TRACE("Adjust center=%s -> %s for arena boundaries",
            center.to_str().c_str(),
            res.to_str().c_str());
@@ -227,7 +226,7 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
 
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {
-        rmath::dcoord2 c = rmath::dcoord2(i, j);
+        rmath::vector2u c = rmath::vector2u(i, j);
         if (c != cache->discrete_loc()) {
           ER_ASSERT(cache->contains_point(
                         math::dcoord_to_rcoord(c, m_grid->resolution())),

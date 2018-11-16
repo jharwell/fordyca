@@ -27,7 +27,6 @@
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
 #include "fordyca/representation/movable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -62,7 +61,7 @@ class base_block : public multicell_entity,
    * @brief Out of sight location base_blocks are moved to when a robot picks
    * them up, for visualization/rending purposes.
    */
-  static const rcppsw::math::dcoord2 kOutOfSightDLoc;
+  static const rmath::vector2u kOutOfSightDLoc;
   static const rmath::vector2d kOutOfSightRLoc;
 
   /**
@@ -72,7 +71,7 @@ class base_block : public multicell_entity,
    * Using this constructor, blocks are assigned the next available id, starting
    * from 0.
    */
-  base_block(const rcppsw::math::vector2d& dim, const ut::color& color)
+  base_block(const rmath::vector2d& dim, const ut::color& color)
       : multicell_entity(dim, color, -1), movable_cell_entity() {}
 
   /**
@@ -80,7 +79,7 @@ class base_block : public multicell_entity,
    * @param color The color of the block.
    * @param id The id of the block.
    */
-  base_block(const rcppsw::math::vector2d& dim, const ut::color& color, int id)
+  base_block(const rmath::vector2d& dim, const ut::color& color, int id)
       : multicell_entity(dim, color, id), movable_cell_entity() {}
 
   __rcsw_pure bool operator==(const base_block& other) const {

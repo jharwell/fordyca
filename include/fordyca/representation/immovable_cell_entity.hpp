@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/math/utils.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
@@ -66,14 +66,14 @@ class immovable_cell_entity {
    * can be used to index into an arena_map.
    *
    */
-  const rcppsw::math::dcoord2& discrete_loc(void) const {
+  const rmath::vector2u& discrete_loc(void) const {
     return m_discrete_loc;
   }
 
  private:
   // clang-format off
   rmath::vector2d       m_real_loc;
-  rcppsw::math::dcoord2 m_discrete_loc;
+  rmath::vector2u m_discrete_loc;
   // clang-format on
 };
 

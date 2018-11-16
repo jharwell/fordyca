@@ -44,7 +44,7 @@ NS_START(fordyca, representation);
  */
 class nest : public multicell_entity, public immovable_cell_entity {
  public:
-  nest(const rcppsw::math::vector2d& dim,
+  nest(const rmath::vector2d& dim,
        const rmath::vector2d& loc,
        double resolution)
       : multicell_entity(dim, rcppsw::utils::color::kGRAY70),

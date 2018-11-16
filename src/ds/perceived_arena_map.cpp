@@ -80,8 +80,7 @@ void perceived_arena_map::cache_remove(
     const std::shared_ptr<representation::base_cache>& victim) {
   for (auto it = m_caches.begin(); it != m_caches.end(); ++it) {
     if (*(*it) == *victim) {
-      events::cell_empty op(victim->discrete_loc().first,
-                            victim->discrete_loc().second);
+      events::cell_empty op(victim->discrete_loc());
       decoratee().access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
       m_caches.erase(it);
       return;
@@ -114,47 +113,41 @@ bool perceived_arena_map::block_add(
    * processing.
    */
   if (it2 != m_blocks.end()) {
-    ER_TRACE("Remove old block%d@(%u, %u): new block%d found there",
+    ER_TRACE("Remove old block%d@%s: new block%d found there",
              (*it2)->id(),
-             block_in->discrete_loc().first,
-             block_in->discrete_loc().second,
+             block_in->discrete_loc().to_str().c_str(),
              block_in->id());
     block_remove(*it2);
   }
 
   if (m_blocks.end() != it1) { /* block is known */
-    ER_TRACE("Known incoming block%d@(%u,%u)",
+    ER_TRACE("Known incoming block%d@%s",
              block_in->id(),
-             block_in->discrete_loc().first,
-             block_in->discrete_loc().second);
+             block_in->discrete_loc().to_str().c_str());
     /*
      * Unless a given block's location has changed, there is no need to update
      * the state of the world.
      */
     if (block_in->discrete_loc() != (*it1)->discrete_loc()) {
-      ER_TRACE("Block%d has moved: (%u,%u) -> (%u,%u)",
+      ER_TRACE("Block%d has moved: %s - %s",
                block_in->id(),
-               (*it1)->discrete_loc().first,
-               (*it1)->discrete_loc().second,
-               block_in->discrete_loc().first,
-               block_in->discrete_loc().second);
+               (*it1)->discrete_loc().to_str().c_str(),
+               block_in->discrete_loc().to_str().c_str());
       block_remove(*it1);
       m_blocks.push_back(block_in);
       __rcsw_unused int id = block_in->id();
-      ER_TRACE("Add block%d@(%u,%u) (n_blocks=%zu)",
+      ER_TRACE("Add block%d@%s (n_blocks=%zu)",
                id,
-               block_in->discrete_loc().first,
-               block_in->discrete_loc().second,
+               block_in->discrete_loc().to_str().c_str(),
                m_blocks.size());
       return true;
     }
   } else { /* block is not known */
     ER_TRACE("Unknown incoming block%d", block_in->id());
     m_blocks.push_back(block_in);
-    ER_TRACE("Add block%d@(%u,%u) (n_blocks=%zu)",
+    ER_TRACE("Add block%d@%s (n_blocks=%zu)",
              block_in->id(),
-             block_in->discrete_loc().first,
-             block_in->discrete_loc().second,
+             block_in->discrete_loc().to_str().c_str(),
              m_blocks.size());
     return true;
   }
@@ -165,10 +158,9 @@ bool perceived_arena_map::block_remove(
     const std::shared_ptr<representation::base_block>& victim) {
   for (auto it = m_blocks.begin(); it != m_blocks.end(); ++it) {
     if (*(*it) == *victim) {
-      ER_TRACE("Removing block%d@(%u,%u)",
+      ER_TRACE("Removing block%d@%s",
                victim->id(),
-               victim->discrete_loc().first,
-               victim->discrete_loc().second);
+               victim->discrete_loc().to_str().c_str());
       events::cell_empty op(victim->discrete_loc());
       access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
       m_blocks.erase(it);

@@ -34,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace rmath = rcppsw::math;
 namespace representation {
 class base_block;
 }
@@ -45,7 +46,7 @@ namespace factory = rcppsw::patterns::factory;
  ******************************************************************************/
 class block_manifest_processor
     : private factory::sharing_factory<representation::base_block,
-                                       const rcppsw::math::vector2d&,
+                                       const rmath::vector2d&,
                                        int> {
  public:
   using block_vector = std::vector<std::shared_ptr<representation::base_block>>;

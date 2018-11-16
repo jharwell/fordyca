@@ -26,7 +26,7 @@
  * Includes
  ******************************************************************************/
 #include <utility>
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
@@ -42,10 +42,10 @@ namespace rmath = rcppsw::math;
  * @brief Translate real (continuous) coordinates to discrete ones using the
  * specified resolution.
  */
-__rcsw_pure static inline rcppsw::math::dcoord2 rcoord_to_dcoord(
+__rcsw_pure static inline rmath::vector2u rcoord_to_dcoord(
     const rmath::vector2d& r_coord,
     double resolution) {
-  return rcppsw::math::dcoord2(
+  return rmath::vector2u(
       static_cast<uint>(std::round(r_coord.x() / resolution)),
       static_cast<uint>(std::round(r_coord.y() / resolution)));
 }
@@ -55,10 +55,10 @@ __rcsw_pure static inline rcppsw::math::dcoord2 rcoord_to_dcoord(
  * specified resolution.
  */
 __rcsw_pure static inline rmath::vector2d dcoord_to_rcoord(
-    const rcppsw::math::dcoord2& d_coord,
+    const rmath::vector2u& d_coord,
     double resolution) {
-  return rmath::vector2d(d_coord.first * resolution,
-                         d_coord.second * resolution);
+  return rmath::vector2d(d_coord.x() * resolution,
+                         d_coord.y() * resolution);
 }
 
 NS_END(math, fordyca);

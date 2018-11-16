@@ -29,6 +29,7 @@
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
+#include "fordyca/dbg/dbg.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -96,22 +97,8 @@ void cache_site_selector::opt_initialize(
   rmath::vector2d nest_loc =
       boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
 
-  std::string baccum;
-  std::for_each(known_blocks.begin(), known_blocks.end(), [&](const auto& b) {
-    baccum += "b" + std::to_string(b->id()) + "->(" +
-              std::to_string(b->discrete_loc().first) + "," +
-              std::to_string(b->discrete_loc().second) + "),";
-  });
-
-  std::string caccum;
-  std::for_each(known_caches.begin(), known_caches.end(), [&](const auto& c) {
-    caccum += "c" + std::to_string(c->id()) + "->(" +
-              std::to_string(c->discrete_loc().first) + "," +
-              std::to_string(c->discrete_loc().second) + "),";
-  });
-
-  ER_INFO("Known blocks: [%s]", baccum.c_str());
-  ER_INFO("Known caches: [%s]", caccum.c_str());
+  ER_INFO("Known blocks: [%s]", dbg::blocks_list(known_blocks).c_str());
+  ER_INFO("Known caches: [%s]", dbg::caches_list(known_caches).c_str());
 
   /*
    * If there are no constraints on the problem, the COBYLA method hangs, BUT

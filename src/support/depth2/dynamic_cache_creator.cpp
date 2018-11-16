@@ -173,7 +173,7 @@ rmath::vector2i dynamic_cache_creator::calc_center(
         return sum + b->real_loc().y();
       });
 
-  rmath::vector2i center(sumx / blocks.size(), sumy / blocks.size());
+  rmath::vector2u center(sumx / blocks.size(), sumy / blocks.size());
   ER_DEBUG("Guess center=%s", center.to_str().c_str());
 
   /*
@@ -184,7 +184,7 @@ rmath::vector2i dynamic_cache_creator::calc_center(
 
   /* If no existing caches, no possibility for conflict */
   if (existing_caches.empty()) {
-    return center;
+    return rmath::vector2i(center.x(), center.y());
   }
   ER_DEBUG("Deconflict caches=[%s]", dbg::caches_list(existing_caches).c_str());
 
@@ -221,7 +221,7 @@ rmath::vector2i dynamic_cache_creator::calc_center(
     return kInvalidCacheCenter;
   }
 
-  return center;
+  return rmath::vector2i(center.x(), center.y());
 } /* calc_center() */
 
 NS_END(depth2, support, fordyca);

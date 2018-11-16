@@ -52,9 +52,9 @@ namespace rfsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 free_block_drop::free_block_drop(
     const std::shared_ptr<representation::base_block>& block,
-    rcppsw::math::dcoord2 coord,
+    const rmath::vector2u& coord,
     double resolution)
-    : cell_op(coord.first, coord.second),
+    : cell_op(coord),
       ER_CLIENT_INIT("fordyca.events.free_block_drop"),
       m_resolution(resolution),
       m_block(block) {}
@@ -75,13 +75,12 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 void free_block_drop::visit(representation::base_block& block) {
   block.reset_robot_id();
 
-  rcppsw::math::dcoord2 d(cell_op::x(), cell_op::y());
-  block.real_loc(math::dcoord_to_rcoord(d, m_resolution));
-  block.discrete_loc(d);
+  block.real_loc(math::dcoord_to_rcoord(cell_op::coord(), m_resolution));
+  block.discrete_loc(cell_op::coord());
 } /* visit() */
 
 void free_block_drop::visit(ds::arena_map& map) {
-  ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
+  ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::coord());
 
   if (cell.state_has_cache()) {
     cache_block_drop op(m_block,
@@ -164,7 +163,7 @@ void free_block_drop::visit(
 } /* visit() */
 
 void free_block_drop::visit(ds::perceived_arena_map& map) {
-  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(cell_op::coord());
   cell.accept(*this);
 } /* visit() */
 

@@ -29,7 +29,7 @@
 
 #include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************

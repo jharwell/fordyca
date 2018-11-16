@@ -88,7 +88,7 @@ void base_loop_functions::Init(ticpp::Element& node) {
 void base_loop_functions::PreStep(void) { nearest_neighbors(); } /* PreStep() */
 
 std::vector<double> base_loop_functions::nearest_neighbors(void) const {
-  std::vector<rcppsw::math::vector2d> v;
+  std::vector<rmath::vector2d> v;
   auto& robots =
       const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
           "foot-bot");
@@ -115,11 +115,11 @@ std::vector<double> base_loop_functions::nearest_neighbors(void) const {
    */
   std::vector<double> res;
   for (size_t i = 0; i < robots.size() / 2; ++i) {
-    auto dist_func = std::bind(&rcppsw::math::vector2d::distance,
+    auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
     auto pts =
-        alg::closest_pair<rcppsw::math::vector2d>()("recursive", v, dist_func);
+        alg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
     size_t old = v.size();
     v.erase(std::remove_if(v.begin(),
                            v.end(),

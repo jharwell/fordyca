@@ -57,7 +57,7 @@ cached_block_pickup::cached_block_pickup(
     const std::shared_ptr<representation::arena_cache>& cache,
     uint robot_index,
     uint timestep)
-    : cell_op(cache->discrete_loc().first, cache->discrete_loc().second),
+    : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
       m_robot_index(robot_index),
       m_timestep(timestep),
@@ -77,7 +77,7 @@ void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cached_block_pickup::visit(ds::cell2D& cell) {
-  ER_ASSERT(0 != cell.loc().first && 0 != cell.loc().second,
+  ER_ASSERT(0 != cell.loc().x() && 0 != cell.loc().y(),
             "Cell does not have coordinates");
   ER_ASSERT(cell.state_has_cache(), "Cell does not have cache");
   if (nullptr != m_orphan_block) {
@@ -102,15 +102,12 @@ void cached_block_pickup::visit(ds::arena_map& map) {
   int cache_id = m_real_cache->id();
   ER_ASSERT(-1 != cache_id, "Cache ID undefined on block pickup");
 
-  rcppsw::math::dcoord2 coord = m_real_cache->discrete_loc();
-  ER_ASSERT(coord == rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
-            "Coordinates for cache%d (%u, %u)/cell(%u, %u) do not "
-            "agree",
+  rmath::vector2u cache_coord = m_real_cache->discrete_loc();
+  ER_ASSERT(cache_coord == cell_op::coord(),
+            "Coordinates for cache%d%s/cell@%s do not agree",
             cache_id,
-            coord.first,
-            coord.second,
-            cell_op::y(),
-            cell_op::y());
+            cache_coord.to_str().c_str(),
+            cell_op::coord().to_str().c_str());
 
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
@@ -167,8 +164,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 } /* visit() */
 
 void cached_block_pickup::visit(ds::perceived_arena_map& map) {
-  ds::cell2D& cell =
-      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(cell_op::coord());
   ER_ASSERT(cell.state_has_cache(), "Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
             "Perceived cache/cell disagree on # of blocks: "
@@ -177,27 +173,24 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
             cell.block_count());
 
   ER_ASSERT(cell.cache()->contains_block(m_pickup_block),
-            "Perceived cache%d@%s [%u,%u] does not contain pickup block%d",
+            "Perceived cache%d@%s/%s does not contain pickup block%d",
             cell.cache()->id(),
             cell.cache()->real_loc().to_str().c_str(),
-            cell.cache()->discrete_loc().first,
-            cell.cache()->discrete_loc().second,
+            cell.cache()->discrete_loc().to_str().c_str(),
             m_pickup_block->id());
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
     cell.cache()->block_remove(m_pickup_block);
     cell.accept(*this);
     ER_ASSERT(cell.state_has_cache(),
-              "cell@(%u, %u) with >= 2 blocks does not have cache",
-              cell_op::x(),
-              cell_op::y());
+              "cell@%s with >= 2 blocks does not have cache",
+              cell_op::coord().to_str().c_str());
 
-    ER_INFO("PAM: fb%u: block%d from cache%d@(%u, %u),remaining=[%s] (%zu)",
+    ER_INFO("PAM: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
             m_robot_index,
             m_pickup_block->id(),
             cell.cache()->id(),
-            cell_op::x(),
-            cell_op::y(),
+            cell_op::coord().to_str().c_str(),
             dbg::blocks_list(cell.cache()->blocks()).c_str(),
             cell.cache()->n_blocks());
 
@@ -206,12 +199,11 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
     cell.cache()->block_remove(m_pickup_block);
 
     map.cache_remove(cell.cache());
-    ER_INFO("PAM: fb%u: block%d from cache%d@(%u, %u) [depleted]",
+    ER_INFO("PAM: fb%u: block%d from cache%d@%s [depleted]",
             m_robot_index,
             m_pickup_block->id(),
             id,
-            cell_op::x(),
-            cell_op::y());
+            cell_op::coord().to_str().c_str());
   }
 } /* visit() */
 

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces

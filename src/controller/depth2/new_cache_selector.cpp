@@ -57,11 +57,10 @@ representation::perceived_block new_cache_selector::calc_best(
 
     double utility = u.calc(position, c.density.last_result());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
-    ER_DEBUG("Utility for block%d@%s [%u,%u], density=%f: %f",
+    ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
              c.ent->id(),
              best.ent->real_loc().to_str().c_str(),
-             c.ent->discrete_loc().first,
-             c.ent->discrete_loc().second,
+             best.ent->discrete_loc().to_str().c_str(),
              c.density.last_result(),
              utility);
 
@@ -73,11 +72,10 @@ representation::perceived_block new_cache_selector::calc_best(
 
   ER_ASSERT(nullptr != best.ent, "No best new cache found?");
 
-  ER_INFO("Best utility: block%d@%s [%u,%u]: %f",
+  ER_INFO("Best utility: block%d@%s/%s: %f",
           best.ent->id(),
           best.ent->real_loc().to_str().c_str(),
-          best.ent->discrete_loc().first,
-          best.ent->discrete_loc().second,
+          best.ent->discrete_loc().to_str().c_str(),
           max_utility);
   return best;
 } /* calc_best() */

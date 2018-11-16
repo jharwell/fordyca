@@ -71,11 +71,10 @@ bool acquire_existing_cache_fsm::calc_acquisition_location(
   if (nullptr == best.ent) {
     return false;
   }
-  ER_INFO("Selected existing cache%d@%s [%u,%u], utility=%f for acquisition",
+  ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
           best.ent->id(),
           best.ent->real_loc().to_str().c_str(),
-          best.ent->discrete_loc().first,
-          best.ent->discrete_loc().second,
+          best.ent->discrete_loc().to_str().c_str(),
           best.density.last_result());
 
   /*

@@ -54,12 +54,13 @@ random_distributor::random_distributor(ds::arena_grid::view& grid,
  ******************************************************************************/
 bool random_distributor::distribute_blocks(block_vector& blocks,
                                            entity_list& entities) {
+  rmath::vector2u loc = (*m_grid.origin()).loc();
   ER_INFO("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
           blocks.size(),
-          (*m_grid.origin()).loc().first,
-          (*m_grid.origin()).loc().first + m_grid.shape()[0],
-          (*m_grid.origin()).loc().second,
-          (*m_grid.origin()).loc().second + m_grid.shape()[1]);
+          loc.x(),
+          loc.x() + m_grid.shape()[0],
+          loc.y(),
+          loc.y() + m_grid.shape()[1]);
   for (auto& b : blocks) {
     if (!distribute_block(b, entities)) {
       return false;
@@ -95,7 +96,7 @@ bool random_distributor::distribute_block(
             "Destination cell part of cache extent");
 
   events::free_block_drop op(block,
-                             rcppsw::math::dcoord2(coord[2], coord[3]),
+                             rmath::vector2u(coord[2], coord[3]),
                              m_resolution);
   cell->accept(op);
   if (verify_block_dist(*block, cell)) {
@@ -122,11 +123,10 @@ __rcsw_pure bool random_distributor::verify_block_dist(
            "Block%d real coordinates still out of sight after distribution",
            block.id());
 
-  ER_DEBUG("Block%d@%s [%u, %u] ptr=%p",
+  ER_DEBUG("Block%d@%s/%s ptr=%p",
            block.id(),
            block.real_loc().to_str().c_str(),
-           block.discrete_loc().first,
-           block.discrete_loc().second,
+           block.discrete_loc().to_str().c_str(),
            reinterpret_cast<const void*>(cell->block().get()));
   return true;
 
@@ -148,10 +148,11 @@ bool random_distributor::find_avail_coord(const entity_list& entities,
   uint count = 0;
 
   do {
+    rmath::vector2u loc = (*m_grid.origin()).loc();
     rel_x = area_xrange.span() > 0 ? xdist(m_rng) : m_grid.index_bases()[0];
     rel_y = area_xrange.span() > 0 ? ydist(m_rng) : m_grid.index_bases()[1];
-    abs_x = rel_x + (*m_grid.origin()).loc().first;
-    abs_y = rel_y + (*m_grid.origin()).loc().second;
+    abs_x = rel_x + loc.x();
+    abs_y = rel_y + loc.y();
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
     return entity_contains_coord(ent, abs_x, abs_y) &&
            count++ <= kMAX_DIST_TRIES;
@@ -170,7 +171,7 @@ bool random_distributor::entity_contains_coord(
   auto movable =
       dynamic_cast<const representation::movable_cell_entity*>(entity);
   rmath::vector2d coord =
-      math::dcoord_to_rcoord(rcppsw::math::dcoord2(abs_x, abs_y), m_resolution);
+      math::dcoord_to_rcoord(rmath::vector2u(abs_x, abs_y), m_resolution);
   if (nullptr != movable) {
     auto ent_xspan = entity->xspan(movable->real_loc());
     auto ent_yspan = entity->yspan(movable->real_loc());

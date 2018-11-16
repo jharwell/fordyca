@@ -90,7 +90,7 @@ void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {
   access<kPheromone>(i, j).rho(pheromone_rho);
   cell2D& cell = access<kCell>(i, j);
   cell.robot_id(m_robot_id);
-  cell.loc(rcppsw::math::dcoord2(i, j));
+  cell.loc(rmath::vector2u(i, j));
 } /* cell_init() */
 
 void occupancy_grid::cell_state_update(uint i, uint j) {
@@ -120,7 +120,7 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
              j,
              kEPSILON,
              m_robot_id.c_str());
-    events::cell_unknown op(cell.loc().first, cell.loc().second);
+    events::cell_unknown op(cell.loc());
     this->accept(op);
     density.reset();
   }
