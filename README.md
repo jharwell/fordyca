@@ -78,14 +78,14 @@ For parameter configuration see [parameters](https://github.com/swarm-robotics/f
 
 ## Controller Configuration
 
-| Controller Name        | Required loop/QT user functions | Notes                                                                                              |
-|------------------------|---------------------------------|----------------------------------------------------------------------------------------------------|
-| crw                    | crw                             | CRW = Correlated Random Walk                                                                       |
-| stateful               | stateful                        |                                                                                                    |
-| greedy\_partitioning   | depth1                          | Requires static caches to also be enabled. Only really valid for single source foraging scenarios. |
-| oracular\_partitioning | depth1                          | Requires static caches and the oracle to be enabled.                                               |
-| greedy\_recpart        | depth2                          | Requires dynamic caches to also be enabled.                                                        |
-| oracular\_recpart      | depth2                          | Requires dynamic caches and the oracle to be enabled.                                              |
+| Controller Name        | Status   | Required loop/QT user functions | Notes                                                                                              |
+|------------------------|----------|---------------------------------|----------------------------------------------------------------------------------------------------|
+| crw                    | Usable   | crw                             | CRW = Correlated Random Walk                                                                       |
+| stateful               | Usable   | stateful                        |                                                                                                    |
+| greedy\_partitioning   | Usable   | depth1                          | Requires static caches to also be enabled. Only really valid for single source foraging scenarios. |
+| oracular\_partitioning | Usable   | depth1                          | Requires static caches and the oracle to be enabled.                                               |
+| greedy\_recpart        | Unstable | depth2                          | Requires dynamic caches to also be enabled.                                                        |
+| oracular\_recpart      | Unstable | depth2                          | Requires dynamic caches and the oracle to be enabled.                                              |
 
 # Running On Your Laptop
 
@@ -101,14 +101,13 @@ After successful compilation, follow these steps to run a foraging scenario:
 
         export LOG4CXX_CONFIGURATION=/path/to/fordyca/log4cxx.xml
 
-3. cd to the ROOT of the fordyca repo, and run the experiment:
+3. cd to the ROOT of the fordyca repo, and run the demo experiment:
 
-        argos3 -c exp/testing.argos
+        argos3 -c exp/demo.argos
 
-   This should pop up a nice GUI from which you can start the experiment. If it
-   doesn't, verify that the `<visualization>` subtree of the file is not
-   commented out (that happens during development and I sometimes forget to
-   change it back before committing).
+   This should pop up a nice GUI from which you can start the experiment (it
+   runs depth0 stateful foraging by default). If no GUI appears, verify that the
+   `<visualization>` subtree of the file is not commented out.
 
 # Running on MSI
 
