@@ -38,19 +38,51 @@ constexpr char cache_sel_matrix::kBlockProxDist[];
 constexpr char cache_sel_matrix::kNestProxDist[];
 constexpr char cache_sel_matrix::kSiteXRange[];
 constexpr char cache_sel_matrix::kSiteYRange[];
+constexpr char cache_sel_matrix::kPickupExceptions[];
+constexpr char cache_sel_matrix::kDropExceptions[];
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 cache_sel_matrix::cache_sel_matrix(
     const struct params::cache_sel_matrix_params* const params,
-    const rmath::vector2d& nest_loc) {
+    const rmath::vector2d& nest_loc)
+    : ER_CLIENT_INIT("fordyca.controller.cache_sel_matrix") {
   this->insert(std::make_pair(kNestLoc, nest_loc));
   this->insert(std::make_pair(kCacheProxDist, params->cache_prox_dist));
   this->insert(std::make_pair(kBlockProxDist, params->block_prox_dist));
   this->insert(std::make_pair(kNestProxDist, params->nest_prox_dist));
   this->insert(std::make_pair(kSiteXRange, params->site_xrange));
   this->insert(std::make_pair(kSiteYRange, params->site_yrange));
+  this->insert(std::make_pair(kPickupExceptions, std::vector<int>()));
+  this->insert(std::make_pair(kDropExceptions, std::vector<int>()));
 }
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
+  switch (ex.type) {
+    case cache_sel_exception::kPickup:
+      {
+        auto vec = boost::get<std::vector<int>>(this->find(kPickupExceptions)->second);
+        vec.push_back(ex.id);
+      }
+      break;
+    case cache_sel_exception::kDrop:
+      {
+        auto vec = boost::get<std::vector<int>>(this->find(kDropExceptions)->second);
+        vec.push_back(ex.id);
+      }
+      break;
+    default:
+      ER_FATAL_SENTINEL("Bad exception type %d", ex.type);
+  } /* switch() */
+} /* sel_exception_add() */
+
+void cache_sel_matrix::sel_exceptions_clear(void) {
+  boost::get<std::vector<int>>(this->operator[](kPickupExceptions)).clear();
+  boost::get<std::vector<int>>(this->operator[](kDropExceptions)).clear();
+} /* sel_exceptions_clear() */
 
 NS_END(controller, fordyca);

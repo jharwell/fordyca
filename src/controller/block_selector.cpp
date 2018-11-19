@@ -88,7 +88,7 @@ representation::perceived_block block_selector::calc_best(
             max_utility);
   } else {
     ER_WARN(
-        "No best block found: all known blocks too close/on exception list!");
+        "No best block found: all known blocks excluded!");
   }
   return best;
 } /* calc_best() */
@@ -96,13 +96,15 @@ representation::perceived_block block_selector::calc_best(
 bool block_selector::block_is_excluded(
     const rmath::vector2d& position,
     const representation::base_block* const block) const {
-  if ((position - block->real_loc()).length() <= kMinDist) {
-    ER_INFO("Ignoring block%d@%s/%s: Too close (%f < %f)",
+  double block_dim = std::min(block->xspan(block->real_loc()).span(),
+                              block->yspan(block->real_loc()).span());
+  if ((position - block->real_loc()).length() <= block_dim) {
+    ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f < %f)",
             block->id(),
             block->real_loc().to_str().c_str(),
             block->discrete_loc().to_str().c_str(),
             (position - block->real_loc()).length(),
-            kMinDist);
+            block_dim);
     return true;
   }
   std::vector<int> exceptions = boost::get<std::vector<int>>(
@@ -110,7 +112,7 @@ bool block_selector::block_is_excluded(
   if (std::any_of(exceptions.begin(), exceptions.end(), [&](int id) {
         return id == block->id();
       })) {
-    ER_INFO("Ignoring block%d@%s/%s: On exception list",
+    ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
             block->id(),
             block->real_loc().to_str().c_str(),
             block->discrete_loc().to_str().c_str());

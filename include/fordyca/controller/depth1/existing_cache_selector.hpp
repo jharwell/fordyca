@@ -51,7 +51,8 @@ namespace rmath = rcppsw::math;
  */
 class existing_cache_selector: public rcppsw::er::client<existing_cache_selector> {
  public:
-  explicit existing_cache_selector(const cache_sel_matrix* matrix);
+  explicit existing_cache_selector(bool is_pickup,
+                                   const cache_sel_matrix* matrix);
 
   ~existing_cache_selector(void) override = default;
   existing_cache_selector& operator=(const existing_cache_selector& other) = delete;
@@ -69,7 +70,21 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
       const rmath::vector2d& position);
 
  private:
+  /**
+   * @brief Determine if the specified cache is excluded from being considered
+   * for selection because:
+   *
+   * - The robot is currently inside it.
+   * - It is on the exception list.
+   *
+   * @return \c TRUE if the cache should be excluded, \c FALSE otherwise.
+   */
+  bool cache_is_excluded(const rmath::vector2d& position,
+                         const representation::base_cache* const cache) const;
+  // clang-format off
+  bool                          m_is_pickup;
   const cache_sel_matrix* const mc_matrix;
+  // clang-format on
 };
 
 NS_END(depth1, controller, fordyca);

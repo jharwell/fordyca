@@ -133,10 +133,14 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    */
   bool task_aborted(void) const { return m_task_aborted; }
 
- protected:
   const class cache_sel_matrix* cache_sel_matrix(void) const {
     return m_cache_sel_matrix.get();
   }
+  class cache_sel_matrix* cache_sel_matrix(void) {
+    return m_cache_sel_matrix.get();
+  }
+
+ protected:
   /**
    * @brief Perform initialization that derived classes will also need to do.
    *

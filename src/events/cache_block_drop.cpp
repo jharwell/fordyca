@@ -37,6 +37,7 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -146,19 +147,28 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
 void cache_block_drop::visit(
     controller::depth2::greedy_recpart_controller& controller) {
   controller.ndc_push();
-  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
+  auto* interactor = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
       controller.current_task());
-  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
-  ER_ASSERT(nullptr != task,
+  ER_ASSERT(nullptr != interactor,
             "Non existing cache interactor task %s causing cached block drop",
-            task_name.c_str());
+            polled->name().c_str());
 
+  if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
+    ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
+            m_block->id(),
+            m_block->real_loc().to_str().c_str(),
+            polled->name().c_str());
+    controller.cache_sel_matrix()->sel_exception_add(
+        {m_cache->id(), controller::cache_sel_exception::kPickup});
+    controller.csel_exception_added(true);
+  }
   controller.block(nullptr);
-  task->accept(*this);
+  interactor->accept(*this);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_block->id(),
           m_cache->id(),
-          task_name.c_str());
+          polled->name().c_str());
   controller.ndc_pop();
 } /* visit() */
 
