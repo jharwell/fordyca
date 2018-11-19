@@ -59,6 +59,7 @@ class acquire_existing_cache_fsm
       public acquire_goal_fsm {
  public:
   acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
+                             bool is_pickup,
                              controller::saa_subsystem* saa,
                              ds::perceived_arena_map* map);
   ~acquire_existing_cache_fsm(void) override = default;
@@ -80,6 +81,7 @@ class acquire_existing_cache_fsm
   bool cache_exploration_term_cb(void) const;
 
   // clang-format off
+  const bool                                mc_is_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::perceived_arena_map*      const mc_map;
   std::default_random_engine                m_rd{};

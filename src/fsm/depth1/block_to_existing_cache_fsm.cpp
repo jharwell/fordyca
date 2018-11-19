@@ -38,7 +38,7 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
-      m_cache_fsm(csel_matrix, saa, map),
+      m_cache_fsm(csel_matrix, false, saa, map),
       m_block_fsm(bsel_matrix, saa, map) {}
 
 /*******************************************************************************

@@ -69,7 +69,22 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
 
   explicit block_sel_matrix(const struct params::block_sel_matrix_params* params);
 
+  /**
+   * @brief Add a block to the exception list, disqualifying it from being
+   * selected as a block to pick up, regardless of its utility value, the next
+   * time the robot runs the block selection algorithm.
+   *
+   * @param id The ID of the block to add.
+   */
   void sel_exception_add(int id);
+
+  /**
+   * @brief Clear the exceptions list. This happens after a robot has executed
+   * the task AFTER the task that dropped a free block somewhere in the arena
+   * (i.e. there is a 1 task buffer between when a robot drops block X via a
+   * free block drop event as part of a task, and when it is allowed to pick
+   * that block up again as part of a task).
+   */
   void sel_exceptions_clear(void);
 };
 

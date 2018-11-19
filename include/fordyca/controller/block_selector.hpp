@@ -67,17 +67,22 @@ class block_selector : public rcppsw::er::client<block_selector> {
                                             const rmath::vector2d& position);
 
  private:
+  /**
+   * @brief Determine if the specified block is excluded from being considered
+   * for selection because:
+   *
+   * - The robot is too close to it (within block_dim meters of it). Allowing
+   * robots to consider ANY block, regardless of how close it is to the robot,
+   * can potentially get the robot stuck in an infinite loop of trying to
+   * acquire a block that is REALLY close to it and failing, due to kinematic
+   * parameters making its turning radius too large.
+   *
+   * - It is on the exception list.
+   *
+   * @return \c TRUE if the cache should be excluded, \c FALSE otherwise.
+   */
   bool block_is_excluded(const rmath::vector2d& position,
                          const representation::base_block* block) const;
-
-  /**
-   * @brief The minimum distance a robot has to be from a block for it to have a
-   * non-zero utility. Allowing robots to consider ANY block, regardless of how
-   * close it is to the robot, can potentially get the robot stuck in an
-   * infinite loop of trying to acquire a block that is REALLY close to it and
-   * failing, due to kinematic parameters making its turning radius too large.
-   */
-  static constexpr double kMinDist = 0.2;
 
   // clang-format off
   const block_sel_matrix* const mc_matrix;

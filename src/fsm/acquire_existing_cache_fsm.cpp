@@ -38,6 +38,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const controller::cache_sel_matrix* matrix,
+    bool is_pickup,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
@@ -52,21 +53,22 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                     std::placeholders::_1),
           std::bind(&acquire_existing_cache_fsm::cache_exploration_term_cb,
                     this)),
+      mc_is_pickup(is_pickup),
       mc_matrix(matrix),
-      mc_map(map) {}
+  mc_map(map) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool acquire_existing_cache_fsm::calc_acquisition_location(
     rmath::vector2d* const loc) {
-  controller::depth1::existing_cache_selector selector(mc_matrix);
+  controller::depth1::existing_cache_selector selector(mc_is_pickup, mc_matrix);
   representation::perceived_cache best =
       selector.calc_best(mc_map->perceived_caches(),
                          saa_subsystem()->sensing()->position());
   /*
-   * If this happens, all the cachess we know of are too close for us to vector
-   * to.
+   * If this happens, all the caches we know of are too close for us to vector
+   * to, or otherwise unsuitable.
    */
   if (nullptr == best.ent) {
     return false;

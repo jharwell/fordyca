@@ -36,8 +36,8 @@ cache_transferer_fsm::cache_transferer_fsm(
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa),
-      m_src_cache_fsm(matrix, saa, map),
-      m_dest_cache_fsm(matrix, saa, map) {}
+      m_src_cache_fsm(matrix, true, saa, map),
+      m_dest_cache_fsm(matrix, false, saa, map) {}
 
 /*******************************************************************************
  * FSM Metrics
