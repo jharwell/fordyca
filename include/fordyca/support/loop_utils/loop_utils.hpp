@@ -172,8 +172,7 @@ void set_robot_los(argos::CFootBotEntity& robot, ds::arena_map& map) {
               .GetOriginAnchor()
               .Position.GetY());
 
-  rmath::vector2u position =
-      math::rcoord_to_dcoord(pos, map.grid_resolution());
+  rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution());
   auto& controller =
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =

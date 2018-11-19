@@ -163,7 +163,7 @@ void arena_map::cache_extent_clear(
       rmath::vector2u c = rmath::vector2u(i, j);
       if (c != victim->discrete_loc()) {
         ER_ASSERT(victim->contains_point(
-                      math::dcoord_to_rcoord(c, grid_resolution())),
+                      rmath::uvec2dvec(c, grid_resolution())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   victim->id(),
                   i,

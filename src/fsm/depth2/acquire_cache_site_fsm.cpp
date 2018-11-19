@@ -75,7 +75,7 @@ __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
   return true;
 } /* site_acquired_cb() */
 
-bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
+__rcsw_dead bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   ER_FATAL_SENTINEL("Cache site acquired through exploration");
 } /* site_exploration_term_cb() */
 

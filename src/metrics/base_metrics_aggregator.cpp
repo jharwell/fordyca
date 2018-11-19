@@ -89,8 +89,8 @@ base_metrics_aggregator::base_metrics_aggregator(
       "arena::robot_occupancy",
       metrics_path() + "/" + params->arena_robot_occupancy_fname,
       params->collect_interval,
-      math::rcoord_to_dcoord(params->arena_grid.upper,
-                             params->arena_grid.resolution));
+      rmath::dvec2uvec(params->arena_grid.upper,
+                       params->arena_grid.resolution));
   register_collector<metrics::robot_interaction_metrics_collector>(
       "loop::robot_interaction",
       metrics_path() + "/" + params->loop_robot_interaction_fname,

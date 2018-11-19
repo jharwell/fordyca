@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/math/utils.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
@@ -51,7 +50,7 @@ class immovable_cell_entity {
    */
   immovable_cell_entity(const rmath::vector2d& loc, double resolution)
       : m_real_loc(loc),
-        m_discrete_loc(math::rcoord_to_dcoord(loc, resolution)) {}
+        m_discrete_loc(rmath::dvec2uvec(loc, resolution)) {}
 
   virtual ~immovable_cell_entity(void) = default;
 

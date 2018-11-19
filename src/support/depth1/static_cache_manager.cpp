@@ -25,7 +25,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/math/utils.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
@@ -61,8 +60,8 @@ base_cache_manager::block_calc_result static_cache_manager::calc_blocks_for_crea
    *
    * are eligible for being used to re-create the static cache.
    */
-  rmath::vector2u dcenter =
-      math::rcoord_to_dcoord(mc_cache_loc, arena_grid()->resolution());
+  rmath::vector2u dcenter = rmath::dvec2uvec(mc_cache_loc,
+                                             arena_grid()->resolution());
   ds::block_vector to_use;
   for (auto& b : blocks) {
     if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
@@ -177,7 +176,7 @@ base_cache_manager::creation_result static_cache_manager::create(
         arena_grid()->access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
         events::free_block_drop op(
             b,
-            math::rcoord_to_dcoord(c->real_loc(), arena_grid()->resolution()),
+            rmath::dvec2uvec(c->real_loc(), arena_grid()->resolution()),
             arena_grid()->resolution());
         arena_grid()->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
         c->block_add(b);

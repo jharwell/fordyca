@@ -192,8 +192,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   void perform_new_cache_block_drop(T& controller,
                                     const temporal_penalty<T>& penalty) {
     events::free_block_drop drop_op(m_map->blocks()[penalty.id()],
-                                    math::rcoord_to_dcoord(controller.position(),
-                                                           m_map->grid_resolution()),
+                                    rmath::dvec2uvec(controller.position(),
+                                                     m_map->grid_resolution()),
                                     m_map->grid_resolution());
 
     m_map->accept(drop_op);

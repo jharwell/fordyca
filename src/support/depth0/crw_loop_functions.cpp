@@ -140,8 +140,8 @@ void crw_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   loop_utils::set_robot_pos<controller::depth0::crw_controller>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = math::rcoord_to_dcoord(controller.position(),
-                                      m_arena_map->grid_resolution());
+  auto coord = rmath::dvec2uvec(controller.position(),
+                                m_arena_map->grid_resolution());
   m_arena_map->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */

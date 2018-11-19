@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/math/utils.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
@@ -50,7 +49,7 @@ class movable_cell_entity {
    */
   movable_cell_entity(const rmath::vector2d& initial_loc, double resolution)
       : m_real_loc(initial_loc),
-        m_discrete_loc(math::rcoord_to_dcoord(initial_loc, resolution)) {}
+        m_discrete_loc(rmath::dvec2uvec(initial_loc, resolution)) {}
 
   /**
    * @brief Initialize a movable entity with an initial location in the arena.

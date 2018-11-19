@@ -109,8 +109,8 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = math::rcoord_to_dcoord(controller.position(),
-                                      arena_map()->grid_resolution());
+  auto coord = rmath::dvec2uvec(controller.position(),
+                                arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */

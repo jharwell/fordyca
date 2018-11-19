@@ -27,7 +27,6 @@
 #include <boost/uuid/uuid_io.hpp>
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/math/utils.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
@@ -170,8 +169,8 @@ bool random_distributor::entity_contains_coord(
     double abs_y) {
   auto movable =
       dynamic_cast<const representation::movable_cell_entity*>(entity);
-  rmath::vector2d coord =
-      math::dcoord_to_rcoord(rmath::vector2u(abs_x, abs_y), m_resolution);
+  rmath::vector2d coord = rmath::uvec2dvec(rmath::vector2u(abs_x, abs_y),
+                                           m_resolution);
   if (nullptr != movable) {
     auto ent_xspan = entity->xspan(movable->real_loc());
     auto ent_yspan = entity->yspan(movable->real_loc());
