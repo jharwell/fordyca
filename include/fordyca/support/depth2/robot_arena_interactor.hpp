@@ -87,25 +87,29 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
    *
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
+   *
+   * @return \c TRUE if a block was dropped to create a new cache, \c FALSE
+   * otherwise.
    */
-  void operator()(T& controller, uint timestep) {
+  bool operator()(T& controller, uint timestep) {
     std::list<temporal_penalty_handler<T>*> penalty_handlers =  {
       nest_drop_interactor().penalty_handler(),
       free_pickup_interactor().penalty_handler(),
       &cache_penalty_handler()
     };
     if (task_abort_interactor()(controller, penalty_handlers)) {
-      return;
+      return false;
     }
 
     if (controller.is_carrying_block()) {
       nest_drop_interactor()(controller, timestep);
       existing_cache_drop_interactor()(controller, timestep);
       m_cache_site_drop_interactor(controller, timestep);
-      m_new_cache_drop_interactor(controller, timestep);
+      return m_new_cache_drop_interactor(controller, timestep);
     } else { /* The foot-bot has no block item */
       free_pickup_interactor()(controller, timestep);
       cached_pickup_interactor()(controller, timestep);
+      return false;
     }
   }
 

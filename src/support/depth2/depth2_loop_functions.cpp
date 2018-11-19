@@ -113,8 +113,21 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
                                 arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
-  /* Now watch it react to the environment */
-  (*m_interactor)(controller, GetSpace().GetSimulationClock());
+  /*
+   * Now watch it react to the environment. If said reaction results in a block
+   * being dropped in a new cache, then we need to re-run dynamic cache
+   * creation.
+   */
+  if ((*m_interactor)(controller, GetSpace().GetSimulationClock())) {
+    auto ret =
+        m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
+    if (ret.status) {
+      arena_map()->caches_add(ret.caches);
+      floor()->SetChanged();
+    } else {
+      ER_WARN("Unable to create cache after block drop in new cache");
+    }
+  }
 } /* pre_step_iter() */
 
 void depth2_loop_functions::controller_configure(controller::base_controller& c) {
@@ -214,14 +227,6 @@ void depth2_loop_functions::PreStep() {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
-
-  /* create new caches */
-  auto ret =
-      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
-  if (ret.status) {
-    arena_map()->caches_add(ret.caches);
-    floor()->SetChanged();
-  }
 
   /* handle cache removal */
   if (arena_map()->caches_removed() > 0) {

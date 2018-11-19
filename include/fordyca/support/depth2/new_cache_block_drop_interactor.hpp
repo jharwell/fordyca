@@ -71,12 +71,14 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
    *
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
+   *
+   * @return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
-  void operator()(T& controller, uint timestep) {
+  bool operator()(T& controller, uint timestep) {
     if (m_penalty_handler.is_serving_penalty(controller)) {
       if (m_penalty_handler.penalty_satisfied(controller,
                                               timestep)) {
-        finish_new_cache_block_drop(controller);
+        return finish_new_cache_block_drop(controller);
       }
     } else {
       /*
@@ -101,6 +103,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
         cache_proximity_notify(controller, prox_status);
       }
     }
+    return false;
   }
 
  private:
@@ -135,7 +138,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
    * @brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache site and is looking to drop an object on it.
    */
-  void finish_new_cache_block_drop(T& controller) {
+  bool finish_new_cache_block_drop(T& controller) {
     const temporal_penalty<T>& p = m_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
@@ -177,11 +180,13 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
                 status.entity_id);
       events::cache_proximity prox((*it)->id());
       controller.visitor::template visitable_any<T>::accept(prox);
+      return false;
     } else {
       perform_new_cache_block_drop(controller, p);
       m_penalty_handler.remove(p);
       ER_ASSERT(!m_penalty_handler.is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
+      return true;
     }
   }
 
