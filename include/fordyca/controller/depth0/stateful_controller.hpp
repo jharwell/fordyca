@@ -77,7 +77,6 @@ class stateful_controller : public crw_controller,
   /* block transportation */
   FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
-
   /**
    * @brief Set the robot's current line of sight (LOS).
    */

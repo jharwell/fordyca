@@ -58,7 +58,7 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
                                public er::client<robot_arena_interactor<T>> {
  public:
   robot_arena_interactor(ds::arena_map* const map_in,
-                         depth0::crw_metrics_aggregator *const metrics_agg,
+                         depth0::depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor_in,
                          const ct::waveform_params* const block_manip_penalty,
                          const ct::waveform_params* const cache_usage_penalty,

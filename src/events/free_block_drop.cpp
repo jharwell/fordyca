@@ -129,7 +129,7 @@ void free_block_drop::visit(
     controller::depth2::greedy_recpart_controller& controller) {
   controller.ndc_push();
   auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non free block interactor task %s causing free block drop",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());

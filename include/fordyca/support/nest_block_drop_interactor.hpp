@@ -31,7 +31,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/block_op_penalty_handler.hpp"
-#include "fordyca/support/depth0/crw_metrics_aggregator.hpp"
+#include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +58,7 @@ class nest_block_drop_interactor
     : public er::client<nest_block_drop_interactor<T>> {
  public:
   nest_block_drop_interactor(ds::arena_map* const map,
-                             depth0::crw_metrics_aggregator* const metrics_agg,
+                             depth0::depth0_metrics_aggregator* const metrics_agg,
                              argos::CFloorEntity* const floor,
                              const ct::waveform_params* const block_penalty)
       : ER_CLIENT_INIT("fordyca.support.depth0.nest_block_drop_interactor"),
@@ -150,10 +150,10 @@ class nest_block_drop_interactor
   }
 
   // clang-format off
-  argos::CFloorEntity*             const m_floor;
-  depth0::crw_metrics_aggregator* const  m_metrics_agg;
-  ds::arena_map* const                   m_map;
-  block_op_penalty_handler<T>            m_penalty_handler;
+  argos::CFloorEntity*             const   m_floor;
+  depth0::depth0_metrics_aggregator* const m_metrics_agg;
+  ds::arena_map* const                     m_map;
+  block_op_penalty_handler<T>              m_penalty_handler;
   // clang-format on
 };
 

@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
+#include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
@@ -67,7 +67,7 @@ namespace er = rcppsw::er;
  * - Task execution metrics (per task)
  * - TAB metrics (rooted at generalist)
  */
-class depth1_metrics_aggregator : public depth0::stateful_metrics_aggregator,
+class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public er::client<depth1_metrics_aggregator> {
  public:
   using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;

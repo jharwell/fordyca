@@ -28,7 +28,6 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +38,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 crw_controller::crw_controller(void)
-    : base_controller(),
+    : depth0_controller(),
       ER_CLIENT_INIT("fordyca.controller.depth0.crw"),
       m_fsm() {}
 

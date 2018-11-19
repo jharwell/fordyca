@@ -47,7 +47,7 @@ depth1_qt_user_functions::depth1_qt_user_functions(void) {
  * Member Functions
  ******************************************************************************/
 void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  stateful_qt_user_functions::Draw(c_entity);
+  depth0_qt_user_functions::Draw(c_entity);
 
   auto& controller = dynamic_cast<controller::greedy_partitioning_controller&>(
       c_entity.GetControllableEntity().GetController());

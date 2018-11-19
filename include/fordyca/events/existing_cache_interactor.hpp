@@ -1,5 +1,5 @@
 /**
- * @file free_block_interactor.hpp
+ * @file existing_cache_interactor.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_FREE_BLOCK_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_FREE_BLOCK_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,33 +29,29 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, events);
 
-namespace events {
-class free_block_pickup;
-class free_block_drop;
-class block_vanished;
-} // namespace events
+class cached_block_pickup;
+class cache_block_drop;
+class cache_vanished;
 
 namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class free_block_interactor
- * @ingroup tasks
+ * @class existing_cache_interactor
+ * @ingroup tasks depth1
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
- * interact with free blocks in FORDYCA.
+ * interact with existing caches in FORDYCA.
  */
-class free_block_interactor
-    : public visitor::polymorphic_accept_set<events::free_block_drop,
-                                             events::free_block_pickup,
-                                             events::block_vanished> {};
+class existing_cache_interactor
+    : public visitor::polymorphic_accept_set<cache_block_drop,
+                                             cached_block_pickup,
+                                             cache_vanished> {};
 
-NS_END(tasks, fordyca);
+NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_FREE_BLOCK_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_EXISTING_CACHE_INTERACTOR_HPP_ */

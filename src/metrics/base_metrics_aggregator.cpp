@@ -106,4 +106,13 @@ void base_metrics_aggregator::collect_from_loop(
   collect("loop::robot_interaction", *loop);
 } /* collect_from_loop() */
 
+void base_metrics_aggregator::collect_from_block(
+    const representation::base_block* const block) {
+  collect("blocks::transport", *block);
+} /* collect_from_block() */
+
+void base_metrics_aggregator::collect_from_arena(const ds::arena_map* const arena) {
+  collect("arena::robot_occupancy", *arena);
+} /* collect_from_arena() */
+
 NS_END(metrics, fordyca);

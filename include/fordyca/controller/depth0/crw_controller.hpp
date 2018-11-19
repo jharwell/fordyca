@@ -25,11 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/base_controller.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "fordyca/controller/depth0/depth0_controller.hpp"
 #include "rcppsw/patterns/state_machine/base_fsm.hpp"
 
 /*******************************************************************************
@@ -55,13 +51,9 @@ NS_START(depth0);
  * @brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.
  */
-class crw_controller : public base_controller,
-                                      public er::client<crw_controller>,
-                                      public metrics::fsm::movement_metrics,
-                                      public metrics::fsm::goal_acquisition_metrics,
-                                      public metrics::blocks::manipulation_metrics,
-                                      public fsm::block_transporter,
-                                      public visitor::visitable_any<crw_controller> {
+class crw_controller : public depth0_controller,
+                       public er::client<crw_controller>,
+                       public visitor::visitable_any<crw_controller> {
  public:
   crw_controller(void);
   ~crw_controller(void) override;
@@ -71,22 +63,15 @@ class crw_controller : public base_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
-  /* distance metrics */
+  /* movement metrics */
   double distance(void) const override;
   rmath::vector2d velocity(void) const override;
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override{ return false; }
-  bool is_vectoring_to_goal(void) const override{ return false; }
+  bool is_exploring_for_goal(void) const override { return false; }
+  bool is_vectoring_to_goal(void) const override { return false; }
   FSM_WRAPPER_DECLAREC(bool, goal_acquired);
   FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
-
-  /* block manipulation metrics */
-  bool free_pickup_event(void) const override { return m_free_pickup_event; }
-  bool free_drop_event(void) const override { return m_free_drop_event; }
-  bool cache_pickup_event(void) const override { return false; }
-  bool cache_drop_event(void) const override { return false; }
-  uint penalty_served(void) const override { return m_penalty; }
 
   /* block transportation */
   FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
@@ -94,15 +79,8 @@ class crw_controller : public base_controller,
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }
 
-  void free_pickup_event(bool free_pickup_event) { m_free_pickup_event = free_pickup_event; }
-  void free_drop_event(bool free_drop_event) { m_free_drop_event = free_drop_event; }
-  void penalty_served(uint penalty) { m_penalty = penalty; }
-
  private:
   // clang-format off
-  bool                                  m_free_pickup_event{false};
-  bool                                  m_free_drop_event{false};
-  uint                                  m_penalty{false};
   std::unique_ptr<fsm::depth0::crw_fsm> m_fsm;
   // clang-format on
 };

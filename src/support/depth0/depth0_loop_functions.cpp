@@ -1,5 +1,5 @@
 /**
- * @file stateful_loop_functions.cpp
+ * @file depth0_loop_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateful_loop_functions.hpp"
+#include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
@@ -33,9 +33,7 @@
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
-#include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,35 +44,41 @@ using ds::arena_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-stateful_loop_functions::stateful_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.stateful"), m_metrics_agg(nullptr) {}
+depth0_loop_functions::depth0_loop_functions(void)
+    : ER_CLIENT_INIT("fordyca.loop.depth0"),
+      m_metrics_agg(nullptr) {}
 
-stateful_loop_functions::~stateful_loop_functions(void) = default;
+depth0_loop_functions::~depth0_loop_functions(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void stateful_loop_functions::Init(ticpp::Element& node) {
-  crw_loop_functions::Init(node);
+void depth0_loop_functions::Init(ticpp::Element& node) {
+  base_loop_functions::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
 
-  /* initialize stat collecting */
-  auto* arenap = params().parse_results<params::arena::arena_map_params>();
+    /* initialize output and metrics collection */
+  auto* arena = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
-      *params().parse_results<const struct params::output_params>();
-  output.metrics.arena_grid = arenap->grid;
+      *params()->parse_results<params::output_params>();
+  output.metrics.arena_grid = arena->grid;
 
-  m_metrics_agg =
-      rcppsw::make_unique<stateful_metrics_aggregator>(&output.metrics,
-                                                       output_root());
+  m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,
+                                                                  output_root());
 
   /* intitialize robot interactions with environment */
-  m_interactor =
-      rcppsw::make_unique<interactor>(arena_map(),
-                                      m_metrics_agg.get(),
-                                      floor(),
-                                      &arenap->blocks.manipulation_penalty);
+  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
+  m_crw_interactor =
+      rcppsw::make_unique<crw_interactor_type>(arena_map(),
+                                               m_metrics_agg.get(),
+                                               floor(),
+                                               &arenap->blocks.manipulation_penalty);
+  m_stateful_interactor =
+      rcppsw::make_unique<stateful_interactor_type>(arena_map(),
+                                                    m_metrics_agg.get(),
+                                                    floor(),
+                                                    &arenap->blocks.manipulation_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -82,48 +86,72 @@ void stateful_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot.GetControllableEntity().GetController());
-    controller_configure(controller);
+    controller_configure<controller::base_controller*>(&controller);
   } /* for(entity..) */
   ER_INFO("Initialization finished");
   ndc_pop();
 }
 
-void stateful_loop_functions::controller_configure(
-    controller::base_controller& c) {
-  auto& stateful = dynamic_cast<controller::depth0::stateful_controller&>(c);
+template<class T>
+void depth0_loop_functions::controller_configure(
+    controller::base_controller* const c) {
+  auto* stateful = dynamic_cast<controller::depth0::stateful_controller*>(c);
   /*
    * If NULL, then visualization has been disabled.
    */
-  auto* vparams = params().parse_results<struct params::visualization_params>();
+  auto* vparams = params()->parse_results<struct params::visualization_params>();
+  if (nullptr != stateful && nullptr != vparams) {
+    stateful->display_los(vparams->robot_los);
+  }
   if (nullptr != vparams) {
-    stateful.display_los(vparams->robot_los);
+    c->display_id(vparams->robot_id);
   }
 } /* controller_configure() */
 
-void stateful_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller = static_cast<controller::depth0::stateful_controller&>(
+void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
+  auto& controller = static_cast<controller::depth0::depth0_controller&>(
       robot.GetControllableEntity().GetController());
 
+  /*
+   * This is the one place in the depth0 event handling code where we need to
+   * know *ALL* of the controllers that are in the depth, and we can't/don't use
+   * templates and/or inheritance to get what we need.
+   */
+  auto* stateful = dynamic_cast<controller::depth0::stateful_controller*>(
+      &controller);
+  auto* crw = dynamic_cast<controller::depth0::crw_controller*>(&controller);
+
   /* collect metrics from robot before its state changes */
-  m_metrics_agg->collect_from_controller(&controller);
+  if (nullptr != stateful) {
+    m_metrics_agg->collect_from_controller(stateful);
+  } else if (nullptr != crw) {
+    m_metrics_agg->collect_from_controller(crw);
+  }
+
   controller.free_pickup_event(false);
   controller.free_drop_event(false);
 
   /* Send the robot its new line of sight */
   loop_utils::set_robot_pos<decltype(controller)>(robot);
-  loop_utils::set_robot_los<decltype(controller)>(robot, *arena_map());
   set_robot_tick<decltype(controller)>(robot);
+
+
+  if (nullptr != stateful) {
+    loop_utils::set_robot_los<decltype(*stateful)>(robot, *arena_map());
+    (*m_stateful_interactor)(*stateful, GetSpace().GetSimulationClock());
+  } else if (nullptr != crw) {
+    (*m_crw_interactor)(*crw, GetSpace().GetSimulationClock());
+  } else {
+    ER_FATAL_SENTINEL("Bad depth0 controller");
+  }
 
   /* update arena map metrics with robot position */
   auto coord = rmath::dvec2uvec(controller.position(),
                                 arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
-
-  /* Now watch it react to the environment */
-  (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
-__rcsw_pure argos::CColor stateful_loop_functions::GetFloorColor(
+__rcsw_pure argos::CColor depth0_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
   if (arena_map()->nest().contains_point(tmp)) {
@@ -148,7 +176,7 @@ __rcsw_pure argos::CColor stateful_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void stateful_loop_functions::PreStep() {
+void depth0_loop_functions::PreStep() {
   ndc_push();
   base_loop_functions::PreStep();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -162,12 +190,13 @@ void stateful_loop_functions::PreStep() {
   ndc_pop();
 } /* PreStep() */
 
-void stateful_loop_functions::Reset(void) {
-  crw_loop_functions::Reset();
+void depth0_loop_functions::Destroy(void) { m_metrics_agg->finalize_all(); }
+void depth0_loop_functions::Reset(void) {
+  base_loop_functions::Reset();
   m_metrics_agg->reset_all();
 } /* Reset() */
 
-void stateful_loop_functions::pre_step_final(void) {
+void depth0_loop_functions::pre_step_final(void) {
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
@@ -179,6 +208,6 @@ using namespace argos; // NOLINT
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_LOOP_FUNCTIONS(stateful_loop_functions, "stateful_loop_functions");
+REGISTER_LOOP_FUNCTIONS(depth0_loop_functions, "depth0_loop_functions");
 #pragma clang diagnostic pop;
 NS_END(depth0, support, fordyca);

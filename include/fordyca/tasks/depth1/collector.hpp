@@ -30,8 +30,8 @@
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "fordyca/tasks/nest_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/nest_interactor.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -50,8 +50,8 @@ NS_START(fordyca, tasks, depth1);
  * nest. It is abortable, and has one task interface.
  */
 class collector : public foraging_task,
-                  public existing_cache_interactor,
-                  public nest_interactor,
+                  public events::existing_cache_interactor,
+                  public events::nest_interactor,
                   public rcppsw::er::client<collector> {
  public:
   collector(const struct ta::task_allocation_params* params,

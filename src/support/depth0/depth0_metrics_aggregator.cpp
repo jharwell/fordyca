@@ -1,5 +1,5 @@
 /**
- * @file crw_metrics_aggregator.cpp
+ * @file depth0_metrics_aggregator.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,11 +21,18 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/crw_metrics_aggregator.hpp"
+#include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/world_model_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
+
+#include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
+#include "fordyca/fsm/depth0/stateful_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,46 +40,61 @@
 NS_START(fordyca, support, depth0);
 
 /*******************************************************************************
+ * Template Instantiations
+ ******************************************************************************/
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::crw_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::stateful_controller* const c);
+
+/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_metrics_aggregator::crw_metrics_aggregator(
+depth0_metrics_aggregator::depth0_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
     : base_metrics_aggregator(params, output_root),
-      ER_CLIENT_INIT("fordyca.support.depth0.crw_aggregator") {}
+      ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
+  register_collector<metrics::world_model_metrics_collector>(
+      "perception::world_model",
+      metrics_path() + "/" + params->perception_world_model_fname,
+      params->collect_interval);
+  reset_all();
+}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void crw_metrics_aggregator::collect_from_controller(
-    const controller::depth0::crw_controller* controller) {
+template<class T>
+void depth0_metrics_aggregator::collect_from_controller(const T* const controller) {
+  /*
+   * Both CRW and stateful controllers provide these.
+   */
   auto collision_m =
       dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
   auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
   auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-      controller->fsm());
-  auto manip_m =
-      dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+      controller);
+  auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
 
-  ER_ASSERT(mov_m, "Controller does not provide FSM movement metrics");
+  ER_ASSERT(mov_m, "FSM does not provide movement metrics");
   ER_ASSERT(block_acq_m,
-            "Controller does not provide FSM block acquisition metrics");
-  ER_ASSERT(collision_m, "Controller does not provide FSM collision metrics");
-  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
+            "FSM does not provide block acquisition metrics");
+  ER_ASSERT(collision_m, "FSM does not provide collision metrics");
+  ER_ASSERT(manip_m, "FSM does not provide block manipulation metrics");
 
   collect("fsm::movement", *mov_m);
   collect("fsm::collision", *collision_m);
   collect("blocks::acquisition", *block_acq_m);
   collect("blocks::manipulation", *manip_m);
+
+/*
+ * Only stateful provides these.
+ */
+  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
+  if (nullptr != worldm_m) {
+    collect("perception::world_model", *worldm_m);
+  }
 } /* collect_from_controller() */
-
-void crw_metrics_aggregator::collect_from_block(
-    const representation::base_block* const block) {
-  collect("blocks::transport", *block);
-} /* collect_from_block() */
-
-void crw_metrics_aggregator::collect_from_arena(const ds::arena_map* const arena) {
-  collect("arena::robot_occupancy", *arena);
-} /* collect_from_arena() */
 
 NS_END(depth0, support, fordyca);

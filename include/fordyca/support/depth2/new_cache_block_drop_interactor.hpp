@@ -29,7 +29,7 @@
 #include "fordyca/support/block_op_penalty_handler.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
+#include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 
 /*******************************************************************************
@@ -142,7 +142,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     const temporal_penalty<T>& p = m_penalty_handler.next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
-    ER_ASSERT(nullptr != dynamic_cast<tasks::depth2::dynamic_cache_interactor*>(
+    ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
               acquisition_goal_type::kNewCache == controller.current_task()->acquisition_goal(),

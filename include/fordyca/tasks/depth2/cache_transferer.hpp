@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -47,7 +47,7 @@ NS_START(fordyca, tasks, depth2);
  * one at each cache it interacts with.
  */
 class cache_transferer : public foraging_task,
-                         public depth1::existing_cache_interactor,
+                         public events::existing_cache_interactor,
                          rcppsw::er::client<cache_transferer> {
  public:
   cache_transferer(const struct ta::task_allocation_params* params,

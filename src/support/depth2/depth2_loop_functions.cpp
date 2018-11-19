@@ -59,16 +59,16 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   /* initialize stat collecting */
-  auto* arenap = params().parse_results<params::arena::arena_map_params>();
+  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
 
   params::output_params output =
-      *params().parse_results<const struct params::output_params>();
+      *params()->parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
                                                                  output_root());
 
   /* initialize cache handling */
-  auto* cachep = params().parse_results<params::caches::caches_params>();
+  auto* cachep = params()->parse_results<params::caches::caches_params>();
   cache_handling_init(cachep);
 
   /* intitialize robot interactions with environment */
@@ -135,12 +135,12 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
    * If NULL, then visualization has been disabled.
    */
   auto& greedy = dynamic_cast<controller::depth2::greedy_recpart_controller&>(c);
-  auto* vparams = params().parse_results<struct params::visualization_params>();
+  auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
   }
 
-  auto* oraclep = params().parse_results<params::oracle_params>();
+  auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     auto& oracular =
         dynamic_cast<controller::depth2::oracular_recpart_controller&>(c);

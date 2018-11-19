@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "fordyca/tasks/free_block_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
 
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
@@ -49,8 +49,8 @@ NS_START(fordyca, tasks, depth1);
  * cache. It is abortable, and has one task interface.
  */
 class harvester : public foraging_task,
-                  public existing_cache_interactor,
-                  public free_block_interactor,
+                  public events::existing_cache_interactor,
+                  public events::free_block_interactor,
                   public rcppsw::er::client<harvester> {
  public:
   harvester(const struct ta::task_allocation_params* params,

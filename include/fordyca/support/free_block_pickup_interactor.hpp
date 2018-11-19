@@ -76,7 +76,8 @@ class free_block_pickup_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep The current timestep.
    */
-  void operator()(T& controller, uint timestep) {
+  template<typename C = T>
+  void operator()(C& controller, uint timestep) {
     if (m_penalty_handler.is_serving_penalty(controller)) {
       if (m_penalty_handler.penalty_satisfied(controller, timestep)) {
         finish_free_block_pickup(controller, timestep);
@@ -159,18 +160,17 @@ class free_block_pickup_interactor
     ER_ASSERT((*it)->real_loc() != representation::base_block::kOutOfSightRLoc,
               "Attempt to pick up out of sight block%d",
               (*it)->id());
-    events::free_block_pickup pickup_op(*it,
-                                        loop_utils::robot_id(controller),
-                                        timestep);
-
     /*
      * Penalty served needs to be set here rather than in the free block pickup
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
     controller.penalty_served(penalty.penalty());
-    controller.visitor::template visitable_any<T>::accept(pickup_op);
+    events::free_block_pickup pickup_op(*it,
+                                        loop_utils::robot_id(controller),
+                                        timestep);
 
+    controller.visitor::template visitable_any<T>::accept(pickup_op);
     m_map->accept(pickup_op);
 
     /* The floor texture must be updated */

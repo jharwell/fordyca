@@ -85,7 +85,7 @@ void block_vanished::visit(
       dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
       m_block_id);
   auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non-free block interactor task %s triggered block vanished event",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
@@ -120,7 +120,7 @@ void block_vanished::visit(
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in block: block%d vanished", m_block_id);
   auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non-free block interactor task %s triggered block vanished event",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());

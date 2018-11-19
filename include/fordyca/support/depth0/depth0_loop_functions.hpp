@@ -1,5 +1,5 @@
 /**
- * @file crw_loop_functions.hpp
+ * @file depth0_loop_functions.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,58 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_LOOP_FUNCTIONS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_LOOP_FUNCTIONS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_LOOP_FUNCTIONS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_LOOP_FUNCTIONS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/common/common.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace rmath = rcppsw::math;
-namespace params {
-class loop_function_repository;
-}
+namespace controller { namespace depth0 { class depth0_controller; }}
 NS_START(support, depth0);
-class crw_metrics_aggregator;
+
+class depth0_metrics_aggregator;
+
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class statless_loop_functions
+ * @class depth0_loop_functions
  * @ingroup support depth0
  *
- * @brief Contains the simulation support functions for crw foraging:
+ * @brief Contains the simulation support functions for depth0 foraging, such
+ * as:
  *
- * - Sending robots block pickup/block drop signals if they are waiting for
- *   them.
- * - Handling block distribution.
+ * - Sending robots their LOS each timestep
+ * - Sending robots their position each timestep.
+ * - Sending robot the current simulation tick each timestep.
  */
-class crw_loop_functions : public base_loop_functions,
-                                 public er::client<crw_loop_functions>  {
+class depth0_loop_functions : public base_loop_functions,
+                                public er::client<depth0_loop_functions> {
  public:
-  crw_loop_functions(void);
-  ~crw_loop_functions(void) override;
+  depth0_loop_functions(void);
+  ~depth0_loop_functions(void) override;
 
   void Init(ticpp::Element& node) override;
-  void Reset() override;
-  void Destroy() override;
-  void PreStep() override;
+  void PreStep(void) override;
+  void Reset(void) override;
+  void Destroy(void) override;
 
  protected:
-  const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
-  ds::arena_map* arena_map(void) { return m_arena_map.get(); }
-
   virtual void pre_step_final(void);
-
   template<typename T>
   void set_robot_tick(argos::CFootBotEntity& robot) {
     auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
@@ -77,20 +70,27 @@ class crw_loop_functions : public base_loop_functions,
   }
 
  private:
-  using interactor =
-      robot_arena_interactor<controller::depth0::crw_controller>;
+  /*
+   * We use a unique interactor type for each controller in this depth, rather
+   * than trying to get everything to fit together with a single abstract base
+   * class controller (i.e. \ref depth0_controller). Waaaayyyyy cleaner.
+   */
+  using crw_interactor_type = robot_arena_interactor<controller::depth0::crw_controller>;
+  using stateful_interactor_type = robot_arena_interactor<controller::depth0::stateful_controller>;
 
-  void arena_map_init(params::loop_function_repository& repo);
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+  template<class T>
+  void controller_configure(controller::base_controller* c);
+  void arena_map_init(params::loop_function_repository& repo);
 
   // clang-format off
-  std::unique_ptr<crw_metrics_aggregator> m_metrics_agg{nullptr};
-  std::unique_ptr<ds::arena_map>                m_arena_map;
-  std::unique_ptr<interactor>                   m_interactor;
+  std::unique_ptr<depth0_metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<crw_interactor_type>       m_crw_interactor{nullptr};
+  std::unique_ptr<stateful_interactor_type>  m_stateful_interactor{nullptr};
   // clang-format on
 };
 
 NS_END(depth0, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_CRW_LOOP_FUNCTIONS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_LOOP_FUNCTIONS_HPP_ */

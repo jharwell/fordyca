@@ -34,7 +34,7 @@
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -60,21 +60,21 @@ depth1_loop_functions::~depth1_loop_functions(void) = default;
  * Member Functions
  ******************************************************************************/
 void depth1_loop_functions::Init(ticpp::Element& node) {
-  depth0::stateful_loop_functions::Init(node);
+  depth0::depth0_loop_functions::Init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
 
   /* initialize stat collecting */
-  auto* arenap = params().parse_results<params::arena::arena_map_params>();
+  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
-      *params().parse_results<const struct params::output_params>();
+      *params()->parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(&output.metrics,
                                                                  output_root());
 
   /* initialize cache handling and create initial cache */
-  auto* cachep = params().parse_results<params::caches::caches_params>();
+  auto* cachep = params()->parse_results<params::caches::caches_params>();
   cache_handling_init(cachep);
 
   /* intitialize robot interactions with environment */
@@ -102,7 +102,7 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
 }
 
 void depth1_loop_functions::oracle_init(void) {
-  auto* oraclep = params().parse_results<params::oracle_params>();
+  auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     ER_INFO("Creating oracle");
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
@@ -146,12 +146,12 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
    */
   auto& greedy =
       dynamic_cast<controller::depth1::greedy_partitioning_controller&>(c);
-  auto* vparams = params().parse_results<struct params::visualization_params>();
+  auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
   }
 
-  auto* oraclep = params().parse_results<params::oracle_params>();
+  auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     auto& oracular =
         dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);

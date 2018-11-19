@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/tasks/free_block_interactor.hpp"
-#include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
+#include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -49,8 +49,8 @@ namespace task_allocation = rcppsw::task_allocation;
  * abortable, and has one task interface.
  */
 class cache_finisher : public foraging_task,
-                       public free_block_interactor,
-                       public dynamic_cache_interactor,
+                       public events::free_block_interactor,
+                       public events::dynamic_cache_interactor,
                        public rcppsw::er::client<cache_finisher> {
  public:
   cache_finisher(const struct ta::task_allocation_params* params,

@@ -1,5 +1,5 @@
 /**
- * @file crw_qt_user_functions.cpp
+ * @file depth0_qt_user_functions.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -26,11 +26,13 @@
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
-#include "fordyca/support/depth0/crw_qt_user_functions.hpp"
+#include "fordyca/support/depth0/depth0_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
+
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "fordyca/support/los_visualizer.hpp"
 #include "fordyca/support/block_carry_visualizer.hpp"
 
 /*******************************************************************************
@@ -41,25 +43,31 @@ NS_START(fordyca, support, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-crw_qt_user_functions::crw_qt_user_functions() {
-  RegisterUserFunction<crw_qt_user_functions, argos::CFootBotEntity>(
-      &crw_qt_user_functions::Draw);
+depth0_qt_user_functions::depth0_qt_user_functions(void) {
+  RegisterUserFunction<depth0_qt_user_functions, argos::CFootBotEntity>(
+      &depth0_qt_user_functions::Draw);
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void crw_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  auto& controller = dynamic_cast<controller::depth0::crw_controller&>(
-      c_entity.GetControllableEntity().GetController());
+void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
+  auto* stateful = dynamic_cast<const controller::depth0::stateful_controller*>(
+      &c_entity.GetControllableEntity().GetController());
+  auto* crw = dynamic_cast<const controller::depth0::crw_controller*>(
+      &c_entity.GetControllableEntity().GetController());
 
-  if (controller.display_id()) {
+  if (crw->display_id()) {
     DrawText(argos::CVector3(0.0, 0.0, 0.5), c_entity.GetId());
   }
 
-  if (controller.is_carrying_block()) {
+  if (crw->is_carrying_block()) {
     block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
-        .draw(controller.block().get(), controller.GetId().size());
+        .draw(crw->block().get(), crw->GetId().size());
+  }
+  if (nullptr != stateful && stateful->display_los()) {
+    los_visualizer(this).draw(stateful->los(),
+                              stateful->perception()->map()->grid_resolution());
   }
 }
 
@@ -68,7 +76,8 @@ using namespace argos;
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-REGISTER_QTOPENGL_USER_FUNCTIONS(crw_qt_user_functions,
-                                 "crw_qt_user_functions"); // NOLINT
+REGISTER_QTOPENGL_USER_FUNCTIONS(depth0_qt_user_functions,
+                                 "depth0_qt_user_functions"); // NOLINT
 #pragma clang diagnostic pop
+
 NS_END(depth0, support, fordyca);

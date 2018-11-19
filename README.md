@@ -80,8 +80,8 @@ For parameter configuration see [parameters](https://github.com/swarm-robotics/f
 
 | Controller Name        | Status   | Required loop/QT user functions | Notes                                                                                              |
 |------------------------|----------|---------------------------------|----------------------------------------------------------------------------------------------------|
-| crw                    | Usable   | crw                             | CRW = Correlated Random Walk                                                                       |
-| stateful               | Usable   | stateful                        |                                                                                                    |
+| crw                    | Usable   | depth0                          | CRW = Correlated Random Walk                                                                       |
+| stateful               | Usable   | depth0                          | Stateful = memory based controller with information relevance via pheromones                       |
 | greedy\_partitioning   | Usable   | depth1                          | Requires static caches to also be enabled. Only really valid for single source foraging scenarios. |
 | oracular\_partitioning | Usable   | depth1                          | Requires static caches and the oracle to be enabled.                                               |
 | greedy\_recpart        | Unstable | depth2                          | Requires dynamic caches to also be enabled.                                                        |

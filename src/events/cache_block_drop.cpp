@@ -116,7 +116,7 @@ void cache_block_drop::visit(
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
 
-  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
   std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
 
@@ -148,7 +148,7 @@ void cache_block_drop::visit(
     controller::depth2::greedy_recpart_controller& controller) {
   controller.ndc_push();
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
-  auto* interactor = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
   ER_ASSERT(nullptr != interactor,
             "Non existing cache interactor task %s causing cached block drop",

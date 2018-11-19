@@ -223,7 +223,7 @@ void cached_block_pickup::visit(
   controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
 
-  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
   std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
 
@@ -265,7 +265,7 @@ void cached_block_pickup::visit(
   controller.block(m_pickup_block);
 
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
-  auto* interactor = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
 
   ER_ASSERT(nullptr != interactor,

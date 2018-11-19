@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_TASKS_NEST_INTERACTOR_HPP_
-#define INCLUDE_FORDYCA_TASKS_NEST_INTERACTOR_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_NEST_INTERACTOR_HPP_
+#define INCLUDE_FORDYCA_EVENTS_NEST_INTERACTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,29 +29,24 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+NS_START(fordyca, events);
 
-namespace events {
 class nest_block_drop;
-} // namespace events
-
 namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
  * @class nest_interactor
- * @ingroup tasks
+ * @ingroup events
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with the nest in FORDYCA.
  */
 class nest_interactor
-    : public visitor::polymorphic_accept_set<events::nest_block_drop> {};
+    : public visitor::polymorphic_accept_set<nest_block_drop> {};
 
 NS_END(tasks, fordyca);
 
-#endif /* INCLUDE_FORDYCA_TASKS_NEST_INTERACTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_NEST_INTERACTOR_HPP_ */

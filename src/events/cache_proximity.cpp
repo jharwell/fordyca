@@ -26,7 +26,7 @@
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
-#include "fordyca/tasks/depth2/dynamic_cache_interactor.hpp"
+#include "fordyca/events/dynamic_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces

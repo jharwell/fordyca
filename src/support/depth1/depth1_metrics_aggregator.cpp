@@ -58,7 +58,7 @@ using task1 = tasks::depth1::foraging_task;
 depth1_metrics_aggregator::depth1_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : stateful_metrics_aggregator(params, output_root),
+    : depth0_metrics_aggregator(params, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acquisition",

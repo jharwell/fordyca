@@ -50,7 +50,7 @@ void cache_vanished::visit(
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
 
-  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
   ER_ASSERT(
       nullptr != task,
@@ -88,7 +88,7 @@ void cache_vanished::visit(
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
 
-  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
   ER_ASSERT(
       nullptr != task,

@@ -171,7 +171,7 @@ void free_block_pickup::visit(
   controller.block(m_block);
 
   auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non free block interactor task %s causing free block pickup",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
@@ -211,7 +211,7 @@ void free_block_pickup::visit(
   controller.block(m_block);
 
   auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non free block interactor task %s causing free block pickup",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());

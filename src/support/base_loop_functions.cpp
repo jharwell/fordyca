@@ -28,7 +28,11 @@
 
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
+#include "fordyca/params/visualization_params.hpp"
+
 #include "rcppsw/algorithm/closest_pair2D.hpp"
+#include "fordyca/ds/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +45,8 @@ namespace rmath = rcppsw::math;
  * Constructors/Destructors
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.base") {}
+    : ER_CLIENT_INIT("fordyca.loop.base"),
+      m_arena_map(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
@@ -75,17 +80,47 @@ void base_loop_functions::output_init(
 } /* output_init() */
 
 void base_loop_functions::Init(ticpp::Element& node) {
+  ndc_push();
   /* parse all environment parameters and capture in logfile */
   m_params.parse_all(node);
 
   /* initialize output and metrics collection */
   output_init(m_params.parse_results<params::output_params>());
 
+  /* initialize arena map and distribute blocks */
+  arena_map_init(params());
+
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
+  ndc_pop();
 } /* Init() */
 
+void base_loop_functions::arena_map_init(
+    const params::loop_function_repository* const repo) {
+  auto* aparams = repo->parse_results<params::arena::arena_map_params>();
+  auto* vparams = repo->parse_results<params::visualization_params>();
+
+  m_arena_map.reset(new ds::arena_map(aparams));
+  if (!m_arena_map->initialize()) {
+    ER_ERR("Could not initialize arena map");
+    std::exit(EXIT_FAILURE);
+  }
+  m_arena_map->distribute_all_blocks();
+
+  /*
+   * If null, visualization has been disabled.
+   */
+  if (nullptr != vparams) {
+    for (auto& block : m_arena_map->blocks()) {
+      block->display_id(vparams->block_id);
+    } /* for(&block..) */
+  }
+} /* arena_map_init() */
+
 void base_loop_functions::PreStep(void) { nearest_neighbors(); } /* PreStep() */
+void base_loop_functions::Reset(void) {
+  m_arena_map->distribute_all_blocks();
+} /* Reset() */
 
 std::vector<double> base_loop_functions::nearest_neighbors(void) const {
   std::vector<rmath::vector2d> v;

@@ -41,7 +41,8 @@ struct metrics_params;
 namespace support {
 class base_loop_functions;
 }
-
+namespace representation { class base_block; }
+namespace ds { class arena_map; }
 NS_START(metrics);
 
 /*******************************************************************************
@@ -64,6 +65,16 @@ class base_metrics_aggregator
   virtual ~base_metrics_aggregator(void) = default;
 
   void collect_from_loop(const support::base_loop_functions* const loop);
+
+  /**
+   * @brief Collect metrics from a block right before it is dropped in the nest.
+   */
+  void collect_from_block(const representation::base_block* block);
+
+  /**
+   * @brief Collect metrics from the arena each timestep.
+   */
+  void collect_from_arena(const ds::arena_map* arena);
 
  protected:
   const std::string& metrics_path(void) const { return m_metrics_path; }
