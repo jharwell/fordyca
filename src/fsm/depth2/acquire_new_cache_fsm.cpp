@@ -64,11 +64,12 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
 } /* candidates_exsti() */
 
 acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const {
-  controller::depth2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
   representation::perceived_block best =
-      selector.calc_best(mc_map->perceived_blocks(), base_sensors()->position());
+      controller::depth2::new_cache_selector(mc_matrix)(mc_map->perceived_blocks(),
+                                                        mc_map->caches(),
+                                                        base_sensors()->position());
 
   /*
    * If this happens, all the blocks we know of are ineligible for us to

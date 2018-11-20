@@ -192,8 +192,10 @@ void depth0_loop_functions::PreStep() {
 
 void depth0_loop_functions::Destroy(void) { m_metrics_agg->finalize_all(); }
 void depth0_loop_functions::Reset(void) {
+  ndc_push();
   base_loop_functions::Reset();
   m_metrics_agg->reset_all();
+  ndc_pop();
 } /* Reset() */
 
 void depth0_loop_functions::pre_step_final(void) {

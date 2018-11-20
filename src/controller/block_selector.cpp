@@ -99,7 +99,7 @@ bool block_selector::block_is_excluded(
   double block_dim = std::min(block->xspan(block->real_loc()).span(),
                               block->yspan(block->real_loc()).span());
   if ((position - block->real_loc()).length() <= block_dim) {
-    ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f < %f)",
+    ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
             block->id(),
             block->real_loc().to_str().c_str(),
             block->discrete_loc().to_str().c_str(),

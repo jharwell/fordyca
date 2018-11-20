@@ -190,7 +190,10 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 - `cache_prox_dist` - When executing the Cache Finisher task, the constraint
                       applied to new cache selection for how close the chosen
-                      new cache can be to known existing caches.
+                      new cache can be to known existing caches. Should be at
+                      least twice the size of a cache for Cache Finisher robots
+                      to behave properly and not get stuck in infinite loops
+                      attempting to drop a block too close to a known cache.
 
 - `block_prox_dist` - When executing the Cache Starter task, the constraint
                       applied to cache site selection for how close the chosen

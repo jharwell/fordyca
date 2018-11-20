@@ -101,8 +101,7 @@ bool existing_cache_selector::cache_is_excluded(
    * This threshold prevents that behavior, forcing robots to at least LEAVE
    * the cache, even if they will then immediately return to it.
    */
-  if ((position - cache->real_loc()).length() <=
-      std::max(cache->xsize(), cache->ysize())) {
+  if (cache->contains_point(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s in search: robot@%s inside it",
             cache->id(),
             cache->real_loc().to_str().c_str(),

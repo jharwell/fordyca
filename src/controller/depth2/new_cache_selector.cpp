@@ -25,6 +25,7 @@
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/perceived_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,21 +44,25 @@ new_cache_selector::new_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::perceived_block new_cache_selector::calc_best(
-    const std::list<representation::perceived_block>& new_caches,
-    const rmath::vector2d& position) {
+representation::perceived_block new_cache_selector::operator()(
+    const ds::perceived_block_list& new_caches,
+    const ds::cache_list& existing_caches,
+    const rmath::vector2d& position) const {
   representation::perceived_block best;
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
   for (auto& c : new_caches) {
+    if (new_cache_is_excluded(existing_caches, c.ent.get())) {
+      continue;
+    }
     math::new_cache_utility u(c.ent->real_loc(),
                               boost::get<rmath::vector2d>(
                                   mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility = u.calc(position, c.density.last_result());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
-    ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
+    ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
              c.ent->id(),
              best.ent->real_loc().to_str().c_str(),
              best.ent->discrete_loc().to_str().c_str(),
@@ -70,14 +75,42 @@ representation::perceived_block new_cache_selector::calc_best(
     }
   } /* for(new_cache..) */
 
-  ER_ASSERT(nullptr != best.ent, "No best new cache found?");
+  if (nullptr != best.ent) {
+    ER_INFO("Best utility: new cache%d@%s/%s: %f",
+            best.ent->id(),
+            best.ent->real_loc().to_str().c_str(),
+            best.ent->discrete_loc().to_str().c_str(),
+            max_utility);
+  } else {
+    ER_WARN("No best new cache found: all known new caches excluded!");
+  }
 
-  ER_INFO("Best utility: block%d@%s/%s: %f",
-          best.ent->id(),
-          best.ent->real_loc().to_str().c_str(),
-          best.ent->discrete_loc().to_str().c_str(),
-          max_utility);
   return best;
-} /* calc_best() */
+} /* operator() */
+
+bool new_cache_selector::new_cache_is_excluded(
+    const ds::cache_list& existing_caches,
+    const representation::base_block* const new_cache) const {
+  double threshold =
+      boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second);
+  for (auto &ec : existing_caches) {
+    double prox = (ec->real_loc() - new_cache->real_loc()).length();
+    if (prox <= threshold) {
+      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
+               new_cache->id(),
+               new_cache->real_loc().to_str().c_str(),
+               new_cache->discrete_loc().to_str().c_str(),
+               ec->id(),
+               ec->real_loc().to_str().c_str(),
+               ec->discrete_loc().to_str().c_str(),
+               prox,
+               threshold);
+      return true;
+    }
+  } /* for(&ec..) */
+
+
+  return false;
+} /* new_cache_is_excluded() */
 
 NS_END(depth2, controller, fordyca);

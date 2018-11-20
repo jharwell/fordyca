@@ -32,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
+namespace representation { class base_cache; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller { namespace depth2 {
 class greedy_recpart_controller;
@@ -63,20 +63,20 @@ class cache_proximity
                                 tasks::depth2::cache_finisher,
                                 fsm::block_to_goal_fsm> {
  public:
-  explicit cache_proximity(uint cache_id);
+  explicit cache_proximity(std::shared_ptr<representation::base_cache> cache);
   ~cache_proximity(void) override = default;
 
   cache_proximity(const cache_proximity& op) = delete;
   cache_proximity& operator=(const cache_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::greedy_recpart_controller& c) override;
   void visit(tasks::depth2::cache_finisher& task) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
 
  private:
   // clang-format off
-  uint m_cache_id;
+  std::shared_ptr<representation::base_cache> m_cache;
   // clang-format on
 };
 

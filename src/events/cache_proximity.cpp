@@ -27,6 +27,9 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
+#include "fordyca/events/cache_found.hpp"
+#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,25 +39,26 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_proximity::cache_proximity(uint cache_id)
-    : ER_CLIENT_INIT("fordyca.events.cache_proximity"), m_cache_id(cache_id) {}
+cache_proximity::cache_proximity(std::shared_ptr<representation::base_cache> cache)
+    : ER_CLIENT_INIT("fordyca.events.cache_proximity"), m_cache(cache) {}
 
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_proximity::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
-  controller.ndc_push();
-  ER_INFO("Abort block drop: cache%d proximity", m_cache_id);
+void cache_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
+  c.ndc_push();
+  ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
 
-  auto* task =
-      dynamic_cast<tasks::depth2::cache_finisher*>(controller.current_task());
+  events::cache_found found(m_cache);
+  c.perception()->map()->accept(found);
+
+  auto* task = dynamic_cast<tasks::depth2::cache_finisher*>(c.current_task());
   ER_ASSERT(nullptr != task,
-            "Non cache finisher task %s received cache proximity event",
+            "Non cache finisher task '%s' received cache proximity event",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
 
   task->accept(*this);
-  controller.ndc_pop();
+  c.ndc_pop();
 } /* visit() */
 
 void cache_proximity::visit(tasks::depth2::cache_finisher& task) {

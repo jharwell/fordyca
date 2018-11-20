@@ -240,6 +240,7 @@ void depth2_loop_functions::PreStep() {
 } /* PreStep() */
 
 void depth2_loop_functions::Reset(void) {
+  ndc_push();
   m_metrics_agg->reset_all();
   auto ret =
       m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
@@ -247,6 +248,7 @@ void depth2_loop_functions::Reset(void) {
     arena_map()->caches_add(ret.caches);
     floor()->SetChanged();
   }
+  ndc_pop();
 }
 
 void depth2_loop_functions::pre_step_final(void) {

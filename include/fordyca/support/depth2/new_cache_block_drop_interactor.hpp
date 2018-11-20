@@ -130,7 +130,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     ER_ASSERT(m_map->caches().end() != it,
               "FATAL: Cache%d does not exist?",
               status.entity_id);
-    events::cache_proximity prox((*it)->id());
+    events::cache_proximity prox(*it);
     controller.visitor::template visitable_any<T>::accept(prox);
   }
 
@@ -178,7 +178,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
       ER_ASSERT(m_map->caches().end() != it,
                 "FATAL: Cache%d does not exist?",
                 status.entity_id);
-      events::cache_proximity prox((*it)->id());
+      events::cache_proximity prox(*it);
       controller.visitor::template visitable_any<T>::accept(prox);
       return false;
     } else {

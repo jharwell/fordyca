@@ -239,10 +239,16 @@ void depth1_loop_functions::PreStep() {
 } /* PreStep() */
 
 void depth1_loop_functions::Reset() {
+  ndc_push();
+  base_loop_functions::Reset();
   m_metrics_agg->reset_all();
-  /* status ignored (for now...) */
+
   auto ret = m_cache_manager->create(arena_map()->blocks());
-  arena_map()->caches_add(ret.caches);
+  if (ret.status) {
+    arena_map()->caches_add(ret.caches);
+    floor()->SetChanged();
+  }
+  ndc_pop();
 }
 
 void depth1_loop_functions::pre_step_final(void) {

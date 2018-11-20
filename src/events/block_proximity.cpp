@@ -48,8 +48,10 @@ block_proximity::block_proximity(
  ******************************************************************************/
 void block_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
   c.ndc_push();
+  ER_INFO("Abort block drop: block%d proximity", m_block->id());
   events::block_found found(m_block);
   c.perception()->map()->accept(found);
+
   auto* task = dynamic_cast<tasks::depth2::cache_starter*>(c.current_task());
   ER_ASSERT(nullptr != task,
             "Non cache starter task %s received block proximity event",
