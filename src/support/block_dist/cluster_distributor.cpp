@@ -36,36 +36,42 @@ namespace er = rcppsw::er;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cluster_distributor::cluster_distributor(ds::arena_grid::view& grid,
+cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
                                          double arena_resolution,
-                                         uint maxsize)
+                                         uint capacity)
     : base_distributor(),
       ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
-      m_clust(grid, maxsize),
-      m_dist(grid, arena_resolution) {}
+      m_clust(view, capacity),
+      m_dist(view, arena_resolution) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool cluster_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
-    entity_list& entities) {
+    ds::const_entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
-    ER_DEBUG("Could not distribute block: Cluster capacity (%u) reached",
+    ER_DEBUG("Could not distribute block%d: Cluster capacity (%u) reached",
+             block->id(),
              m_clust.capacity());
     return false;
   }
   return m_dist.distribute_block(block, entities);
 } /* distribute_block() */
 
-bool cluster_distributor::distribute_blocks(block_vector& blocks,
-                                            entity_list& entities) {
+bool cluster_distributor::distribute_blocks(ds::block_vector& blocks,
+                                            ds::const_entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
-    ER_DEBUG("Could not distribute block: Cluster capacity (%u) reached",
+    ER_DEBUG("Could not distribute any of %zu blocks: Cluster capacity (%u) reached",
+             blocks.size(),
              m_clust.capacity());
     return false;
   }
   return m_dist.distribute_blocks(blocks, entities);
 } /* distribute_blocks() */
+
+ds::const_block_cluster_list cluster_distributor::block_clusters(void) const {
+  return ds::const_block_cluster_list{&m_clust};
+} /* block_clusters() */
 
 NS_END(block_dist, support, fordyca);

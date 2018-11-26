@@ -1,5 +1,5 @@
 /**
- * @file dist_params.hpp
+ * @file block_cluster_list.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,39 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_LIST_HPP_
+#define INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_LIST_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/params/arena/powerlaw_dist_params.hpp"
-#include "fordyca/params/arena/block_manifest.hpp"
+#include <list>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, arena);
+NS_START(fordyca);
+namespace representation {
+class block_cluster;
+} // namespace representation
+NS_START(ds);
+
+using block_cluster_list_type = representation::block_cluster*;
+using const_block_cluster_list_type = const representation::block_cluster*;
 
 /*******************************************************************************
- * Structure Definitions
+ * Type Definitions
  ******************************************************************************/
-/**
- * @struct block_dist_params
- * @ingroup params arena
- */
-struct block_dist_params : public rcppsw::params::base_params {
-  block_manifest manifest{};
+using block_cluster_list = std::list<block_cluster_list_type>;
+using const_block_cluster_list = std::list<const_block_cluster_list_type>;
 
-  /**
-   * @brief Resolution of the arena the blocks are being distributed into.
-   */
-  double arena_resolution{0.0};
-  std::string dist_type{""};
-  struct powerlaw_dist_params powerlaw{};
-};
+NS_END(ds, fordyca);
 
-NS_END(arena, params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_LIST_HPP_ */

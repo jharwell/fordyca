@@ -45,6 +45,7 @@ struct cache_sel_matrix_params : public rcppsw::params::base_params {
   double cache_prox_dist{0.0};
   double block_prox_dist{0.0};
   double nest_prox_dist{0.0};
+  double cluster_prox_dist{0.0};
   rcppsw::math::rangeu site_xrange{0, 0};
   rcppsw::math::rangeu site_yrange{0, 0};
 };

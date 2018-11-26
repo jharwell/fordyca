@@ -27,6 +27,7 @@
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
+#include "fordyca/representation/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +49,8 @@ dynamic_cache_manager::dynamic_cache_manager(
  * Member Functions
  ******************************************************************************/
 base_cache_manager::creation_result dynamic_cache_manager::create(
-    ds::cache_vector& existing_caches,
+    const ds::cache_vector& existing_caches,
+    const ds::const_block_cluster_list& clusters,
     ds::block_vector& blocks) {
   support::depth2::dynamic_cache_creator creator(
       arena_grid(),
@@ -56,15 +58,7 @@ base_cache_manager::creation_result dynamic_cache_manager::create(
       mc_cache_params.dynamic.min_dist,
       mc_cache_params.dynamic.min_blocks);
 
-  /*
-   * Only blocks that are not:
-   *
-   * - Currently carried by a robot
-   * - Currently part of a cache
-   *
-   * are eligible for being part of a dynamically created cache.
-   */
-  auto pair = calc_blocks_for_creation(existing_caches, blocks);
+  auto pair = calc_blocks_for_creation(existing_caches, clusters, blocks);
   if (!pair.status) {
     return creation_result(false, ds::cache_vector());
   }
@@ -82,26 +76,32 @@ base_cache_manager::creation_result dynamic_cache_manager::create(
 
 base_cache_manager::block_calc_result dynamic_cache_manager::calc_blocks_for_creation(
     const ds::cache_vector& existing_caches,
-    ds::block_vector& blocks) {
-  /*
-   * Only blocks that are not:
-   *
-   * - Currently carried by a robot
-   * - Currently part of a cache
-   *
-   * are eligible for being part of a dynamically created cache.
-   */
+    const ds::const_block_cluster_list& clusters,
+    const ds::block_vector& blocks) {
   ds::block_vector to_use;
   std::copy_if(blocks.begin(),
                blocks.end(),
                std::back_inserter(to_use),
                [&](const auto& b) {
+                 /* Blocks cannot be in existing caches */
                  return std::all_of(existing_caches.begin(),
                                     existing_caches.end(),
                                     [&](const auto& c) {
                                       return !c->contains_block(b);
                                     }) &&
-                        -1 == b->robot_id();
+
+                     /* blocks cannot be in clusters */
+                     std::all_of(clusters.begin(),
+                                 clusters.end(),
+                                 [&](const auto& clust) {
+                                   /* constructed, so must assign before search */
+                                   auto cblocks = clust->blocks();
+                                   return cblocks.end() == std::find(cblocks.begin(),
+                                                                     cblocks.end(),
+                                                                     b);
+                                 }) &&
+                     /* blocks cannot be carried by a robot */
+                     -1 == b->robot_id();
                });
 
   bool ret = true;

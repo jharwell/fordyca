@@ -120,6 +120,7 @@
             cache_prox_dist="1.6"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
+            cluster_prox_dist="1.0"
             site_xrange="2:10"
             site_yrange="2.5:3"
             />
@@ -217,7 +218,7 @@
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
-            dist_type="random">
+            dist_type="single_source">
           <powerlaw
               pwr_min="0"
               pwr_max="3"
@@ -248,7 +249,8 @@
       </usage_penalty>
       <dynamic enable="true"
                min_dist="0.8"
-               min_blocks="2"/>
+               min_blocks="2"
+               robot_drop_only="true"/>
 
     </caches>
 

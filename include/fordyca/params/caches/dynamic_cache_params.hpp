@@ -42,18 +42,32 @@ namespace ct = rcppsw::control;
  * @ingroup params cache
  */
 struct dynamic_cache_params : public rcppsw::params::base_params {
-  bool                enable{false};
+  bool   enable{false};
 
   /**
-   * @brief How close do blocks have to be to each other to be considered "in"
-   * the cache?
+   * @brief How close do blocks have to be to each other to be considered for
+   * dynamic cache creation (should be >= whatever the threshold value for the
+   * \ref cache_sel_matrix is, or weird behavior will likely result).
    */
-  double              min_dist{0.0};
+  double min_dist{0.0};
 
- /**
-   * @brief How many blocks does it take to create a dynamic cache?
+  /**
+   * @brief How many blocks within min_dist does it take to trigger dynamic
+   * cache creation?
    */
-  uint                min_blocks{0};
+  uint   min_blocks{0};
+
+  /**
+   * @brief If \c TRUE, then dynamic cache creation will only occur when a robot
+   * drops a block (if the other conditions for dynamic cache creation are also
+   * met of course). If \c FALSE, then it will occur ANYTIME the conditions for
+   * dynamic cache creation are met (viz, min # blocks and block
+   * proximity). This would allow cache creation from blocks clustered together
+   * in single or dual source scenarios at the start of simulation, or as a
+   * result of a block distribution after a robot drops a block in the nest,
+   * which may not be desirable.
+   */
+  bool   robot_drop_only{false};
 };
 
 NS_END(caches, params, fordyca);

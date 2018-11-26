@@ -35,6 +35,7 @@ NS_START(fordyca, controller);
 constexpr char cache_sel_matrix::kNestLoc[];
 constexpr char cache_sel_matrix::kCacheProxDist[];
 constexpr char cache_sel_matrix::kBlockProxDist[];
+constexpr char cache_sel_matrix::kClusterProxDist[];
 constexpr char cache_sel_matrix::kNestProxDist[];
 constexpr char cache_sel_matrix::kSiteXRange[];
 constexpr char cache_sel_matrix::kSiteYRange[];
@@ -52,6 +53,7 @@ cache_sel_matrix::cache_sel_matrix(
   this->insert(std::make_pair(kCacheProxDist, params->cache_prox_dist));
   this->insert(std::make_pair(kBlockProxDist, params->block_prox_dist));
   this->insert(std::make_pair(kNestProxDist, params->nest_prox_dist));
+  this->insert(std::make_pair(kClusterProxDist, params->nest_prox_dist));
   this->insert(std::make_pair(kSiteXRange, params->site_xrange));
   this->insert(std::make_pair(kSiteYRange, params->site_yrange));
   this->insert(std::make_pair(kPickupExceptions, std::vector<int>()));

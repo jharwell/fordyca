@@ -101,11 +101,12 @@ bool dispatcher::initialize(void) {
 
 bool dispatcher::distribute_block(
     std::shared_ptr<representation::base_block>& block,
-    entity_list& entities) {
+    ds::const_entity_list& entities) {
   return m_dist->distribute_block(block, entities);
 } /* distribute_block() */
 
-bool dispatcher::distribute_blocks(block_vector& blocks, entity_list& entities) {
+bool dispatcher::distribute_blocks(ds::block_vector& blocks,
+                                   ds::const_entity_list& entities) {
   return m_dist->distribute_blocks(blocks, entities);
 } /* distribute_block() */
 

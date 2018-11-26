@@ -73,6 +73,7 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
 
  private:
   bool new_cache_is_excluded(const ds::cache_list& existing_caches,
+                             const ds::perceived_block_list& blocks,
                              const representation::base_block* const new_cache) const;
 
   // clang-format off

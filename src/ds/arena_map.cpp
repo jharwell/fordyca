@@ -92,7 +92,7 @@ __rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
 
 bool arena_map::distribute_single_block(
     std::shared_ptr<representation::base_block>& block) {
-  support::block_dist::dispatcher::entity_list entities;
+  ds::const_entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
@@ -110,7 +110,7 @@ void arena_map::distribute_all_blocks(void) {
   decoratee().reset();
 
   /* distribute blocks */
-  support::block_dist::dispatcher::entity_list entities;
+  ds::const_entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */

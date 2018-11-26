@@ -41,7 +41,7 @@ namespace rmath = rcppsw::math;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-random_distributor::random_distributor(ds::arena_grid::view& grid,
+random_distributor::random_distributor(const ds::arena_grid::view& grid,
                                        double resolution)
     : base_distributor(),
       ER_CLIENT_INIT("fordyca.support.block_dist.random"),
@@ -51,8 +51,8 @@ random_distributor::random_distributor(ds::arena_grid::view& grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool random_distributor::distribute_blocks(block_vector& blocks,
-                                           entity_list& entities) {
+bool random_distributor::distribute_blocks(ds::block_vector& blocks,
+                                           ds::const_entity_list& entities) {
   rmath::vector2u loc = (*m_grid.origin()).loc();
   ER_INFO("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
           blocks.size(),
@@ -60,17 +60,17 @@ bool random_distributor::distribute_blocks(block_vector& blocks,
           loc.x() + m_grid.shape()[0],
           loc.y(),
           loc.y() + m_grid.shape()[1]);
-  for (auto& b : blocks) {
-    if (!distribute_block(b, entities)) {
-      return false;
-    }
-  } /* for(&b..) */
-  return true;
+
+  return std::all_of(blocks.begin(),
+                     blocks.end(),
+                     [&](std::shared_ptr<representation::base_block>& b) {
+                       return distribute_block(b, entities);
+                     });
 } /* distribute_blocks() */
 
 bool random_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
-    entity_list& entities) {
+    ds::const_entity_list& entities) {
   ds::cell2D* cell = nullptr;
   std::vector<uint> coord;
   if (!find_avail_coord(entities, coord)) {
@@ -100,9 +100,9 @@ bool random_distributor::distribute_block(
   cell->accept(op);
   if (verify_block_dist(*block, cell)) {
     /*
-       * Now that the block has been distributed, it is another entity that
-       * needs to be distributed around.
-       */
+     * Now that the block has been distributed, it is another entity that
+     * needs to be distributed around.
+     */
     entities.push_back(block.get());
     return true;
   } else {
@@ -133,7 +133,7 @@ error:
   return false;
 } /* verify_block_dist() */
 
-bool random_distributor::find_avail_coord(const entity_list& entities,
+bool random_distributor::find_avail_coord(const ds::const_entity_list& entities,
                                           std::vector<uint>& coordv) {
   uint abs_x, abs_y, rel_x, rel_y;
   rcppsw::math::rangeu area_xrange(m_grid.index_bases()[0], m_grid.shape()[0]);

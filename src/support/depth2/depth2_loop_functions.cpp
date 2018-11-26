@@ -34,6 +34,7 @@
 #include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/support/block_dist/base_distributor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -119,11 +120,7 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
    * creation.
    */
   if ((*m_interactor)(controller, GetSpace().GetSimulationClock())) {
-    auto ret =
-        m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
-    if (ret.status) {
-      arena_map()->caches_add(ret.caches);
-      floor()->SetChanged();
+    if (cache_creation_handle(true)) {
     } else {
       ER_WARN("Unable to create cache after block drop in new cache");
     }
@@ -174,12 +171,8 @@ void depth2_loop_functions::cache_handling_init(
   m_cache_manager =
       rcppsw::make_unique<dynamic_cache_manager>(cachep,
                                                  &arena_map()->decoratee());
-  auto ret =
-      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
-  if (ret.status) {
-    arena_map()->caches_add(ret.caches);
-    floor()->SetChanged();
-  }
+
+  cache_creation_handle(false);
 } /* cache_handlng_init() */
 
 argos::CColor depth2_loop_functions::GetFloorColor(
@@ -242,14 +235,30 @@ void depth2_loop_functions::PreStep() {
 void depth2_loop_functions::Reset(void) {
   ndc_push();
   m_metrics_agg->reset_all();
+  cache_creation_handle(false);
+  ndc_pop();
+}
+
+bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
+  auto* cachep = params()->parse_results<params::caches::caches_params>();
+  /*
+   * If dynamic cache creation is configured to occur only upon a robot dropping
+   * a block, then we do not perform cache creation unless that event occurred.
+   */
+  if (cachep->dynamic.robot_drop_only && !on_drop) {
+    ER_INFO("Not performing dynamic cache creation: no robot block drop");
+    return false;
+  }
   auto ret =
-      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
+      m_cache_manager->create(arena_map()->caches(),
+                              arena_map()->block_distributor()->block_clusters(),
+                              arena_map()->blocks());
   if (ret.status) {
     arena_map()->caches_add(ret.caches);
     floor()->SetChanged();
   }
-  ndc_pop();
-}
+  return ret.status;
+} /* cache_creation_handle() */
 
 void depth2_loop_functions::pre_step_final(void) {
   /* collect metrics from/about caches */

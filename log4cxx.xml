@@ -46,7 +46,7 @@
   <category name="fordyca.controller.perception" >
     <priority value ="info" />
   </category>
-  
+
   <category name="fordyca.ds.arena_map" >
     <priority value ="info" />
   </category>

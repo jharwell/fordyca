@@ -234,6 +234,9 @@ class arena_map : public er::client<arena_map>,
   }
   double grid_resolution(void) const { return decoratee().resolution(); }
   const representation::nest& nest(void) const { return m_nest; }
+  const support::block_dist::base_distributor* block_distributor(void) const {
+    return m_block_dispatcher.distributor();
+  }
 
   /**
    * @brief Perform deferred initialization. This is not part the constructor so

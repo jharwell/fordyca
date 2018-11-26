@@ -53,7 +53,9 @@ representation::perceived_block new_cache_selector::operator()(
 
   double max_utility = 0.0;
   for (auto& c : new_caches) {
-    if (new_cache_is_excluded(existing_caches, c.ent.get())) {
+    if (new_cache_is_excluded(existing_caches,
+                              new_caches,
+                              c.ent.get())) {
       continue;
     }
     math::new_cache_utility u(c.ent->real_loc(),
@@ -90,12 +92,16 @@ representation::perceived_block new_cache_selector::operator()(
 
 bool new_cache_selector::new_cache_is_excluded(
     const ds::cache_list& existing_caches,
+    const ds::perceived_block_list& blocks,
     const representation::base_block* const new_cache) const {
-  double threshold =
+  double cache_prox =
       boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second);
+  double cluster_prox =
+      boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
+
   for (auto &ec : existing_caches) {
-    double prox = (ec->real_loc() - new_cache->real_loc()).length();
-    if (prox <= threshold) {
+    double dist = (ec->real_loc() - new_cache->real_loc()).length();
+    if (dist <= cache_prox) {
       ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
                new_cache->id(),
                new_cache->real_loc().to_str().c_str(),
@@ -103,11 +109,40 @@ bool new_cache_selector::new_cache_is_excluded(
                ec->id(),
                ec->real_loc().to_str().c_str(),
                ec->discrete_loc().to_str().c_str(),
-               prox,
-               threshold);
+               dist,
+               cache_prox);
       return true;
     }
   } /* for(&ec..) */
+
+  /*
+   * Because robots have imperfect knowledge of the environment, AND that
+   * environment is constantly changing (whether by the actions of other robots
+   * or in and of itself), any block that they know about MIGHT be part of a
+   * larger block cluster (i.e. part of a single source/dual source block
+   * distribution).
+   *
+   * So, we approximate a block distribution as a single block, and only choose
+   * new caches that are sufficiently far from any potential clusters.
+   */
+  for (auto &b : blocks) {
+    if (b.ent.get == new_cache) {
+      continue;
+    }
+    double dist = (b.ent->real_loc() - new_cache->real_loc()).length();
+
+    if (dist <= cluster_prox) {
+      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to potential block cluster@%s/%s (%f <= %f)",
+               new_cache->id(),
+               new_cache->real_loc().to_str().c_str(),
+               new_cache->discrete_loc().to_str().c_str(),
+               b.ent->real_loc().to_str().c_str(),
+               b.ent->discrete_loc().to_str().c_str(),
+               dist,
+               cluster_prox);
+      return true;
+    }
+  } /* for(&b..) */
 
 
   return false;

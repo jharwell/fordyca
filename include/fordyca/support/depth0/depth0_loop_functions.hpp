@@ -82,7 +82,6 @@ class depth0_loop_functions : public base_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   template<class T>
   void controller_configure(controller::base_controller* c);
-  void arena_map_init(params::loop_function_repository& repo);
 
   // clang-format off
   std::unique_ptr<depth0_metrics_aggregator> m_metrics_agg;

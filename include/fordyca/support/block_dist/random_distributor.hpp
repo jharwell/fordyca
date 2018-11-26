@@ -65,15 +65,19 @@ namespace er = rcppsw::er;
 class random_distributor : public base_distributor,
                            public er::client<random_distributor> {
  public:
-  random_distributor(ds::arena_grid::view& grid,
+  random_distributor(const ds::arena_grid::view& grid,
                      double resolution);
 
   random_distributor& operator=(const random_distributor& s) = delete;
 
-  bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
+  bool distribute_blocks(ds::block_vector& blocks,
+                         ds::const_entity_list& entities) override;
 
   bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                        entity_list& entities) override;
+                        ds::const_entity_list& entities) override;
+  ds::const_block_cluster_list block_clusters(void) const override {
+    return ds::const_block_cluster_list();
+  }
 
  private:
   /**
@@ -90,7 +94,8 @@ class random_distributor : public base_distributor,
    * @param coordv A (to be filled) vector of absolute and relative coordinates
    *               within the arena view if an available location can be found.
    */
-  bool find_avail_coord(const entity_list& entity, std::vector<uint>& coordv);
+  bool find_avail_coord(const ds::const_entity_list& entities,
+                        std::vector<uint>& coordv);
   bool verify_block_dist(const representation::base_block& block,
                          const ds::cell2D* cell);
 
@@ -99,7 +104,7 @@ class random_distributor : public base_distributor,
                              double abs_y);
   // clang-format off
   double                     m_resolution;
-  std::default_random_engine m_rng{std::random_device{}()};
+  std::default_random_engine m_rng{std::random_device {}()};
   ds::arena_grid::view       m_grid;
   // clang-format on
 };

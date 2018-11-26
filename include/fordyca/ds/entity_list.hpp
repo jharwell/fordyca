@@ -1,5 +1,5 @@
 /**
- * @file dist_params.hpp
+ * @file entity_list.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,39 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_DS_ENTITY_LIST_HPP_
+#define INCLUDE_FORDYCA_DS_ENTITY_LIST_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/params/arena/powerlaw_dist_params.hpp"
-#include "fordyca/params/arena/block_manifest.hpp"
+#include <list>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, arena);
+NS_START(fordyca);
+namespace representation {
+class multicell_entity;
+} // namespace representation
+NS_START(ds);
+
+using entity_list_type = representation::multicell_entity*;
+using const_entity_list_type = const representation::multicell_entity*;
 
 /*******************************************************************************
- * Structure Definitions
+ * Type Definitions
  ******************************************************************************/
-/**
- * @struct block_dist_params
- * @ingroup params arena
- */
-struct block_dist_params : public rcppsw::params::base_params {
-  block_manifest manifest{};
+using entity_list = std::list<entity_list_type>;
+using const_entity_list = std::list<const_entity_list_type>;
 
-  /**
-   * @brief Resolution of the arena the blocks are being distributed into.
-   */
-  double arena_resolution{0.0};
-  std::string dist_type{""};
-  struct powerlaw_dist_params powerlaw{};
-};
+NS_END(ds, fordyca);
 
-NS_END(arena, params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_ENTITY_LIST_HPP_ */
