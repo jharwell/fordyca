@@ -61,13 +61,33 @@ class multicell_entity : public base_cell_entity {
   ~multicell_entity(void) override = default;
 
   /**
+   * @brief Calculate the span in X of an entity given its location and
+   * dimension in X.
+   *
+   * @return The span in X of the entity.
+   */
+  static rmath::ranged xspan(const rmath::vector2d& loc, double xdim) {
+    return rmath::ranged(loc.x() - 0.5 * xdim, loc.x() + 0.5 * xdim);
+  }
+
+  /**
+   * @brief Calculate the span in Y of an entity given its location and
+   * dimension in Y.
+   *
+   * @return The span in Y of the entity.
+   */
+  static rmath::ranged yspan(const rmath::vector2d& loc, double ydim) {
+    return rmath::ranged(loc.y() - 0.5 * ydim, loc.y() + 0.5 * ydim);
+  }
+
+  /**
    * @brief Get the 2D space spanned by the multicell entity in absolute
    * coordinates in the arena in Y. This is NOT the size of the entity in X.
    *
    * @param loc The entities current location.
    */
   rmath::ranged xspan(const rmath::vector2d& loc) const {
-    return rmath::ranged(loc.x() - 0.5 * m_dim.x(), loc.x() + 0.5 * m_dim.x());
+    return xspan(loc, m_dim.x());
   }
 
   /**
@@ -78,7 +98,7 @@ class multicell_entity : public base_cell_entity {
    */
 
   rmath::ranged yspan(const rmath::vector2d& loc) const {
-    return rmath::ranged(loc.y() - 0.5 * m_dim.y(), loc.y() + 0.5 * m_dim.y());
+    return yspan(loc, m_dim.y());
   }
 
   /**

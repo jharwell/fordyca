@@ -45,6 +45,7 @@ class cell2D;
 
 NS_START(support, block_dist);
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -80,6 +81,11 @@ class random_distributor : public base_distributor,
   }
 
  private:
+  struct coord_search_result {
+    bool            status;
+    rmath::vector2u rel;
+    rmath::vector2u abs;
+  };
   /**
    * @brief The maxmimum # of times the distribution will be attempted before
    * giving up.
@@ -91,17 +97,33 @@ class random_distributor : public base_distributor,
    * all specified entities, while also accounting for block size.
    *
    * @param entities The entities to avoid.
-   * @param coordv A (to be filled) vector of absolute and relative coordinates
-   *               within the arena view if an available location can be found.
    */
-  bool find_avail_coord(const ds::const_entity_list& entities,
-                        std::vector<uint>& coordv);
-  bool verify_block_dist(const representation::base_block& block,
+  coord_search_result avail_coord_search(const ds::const_entity_list& entities,
+                                         const rmath::vector2d& block_dim);
+  bool verify_block_dist(const representation::base_block* block,
+                         const ds::const_entity_list& entities,
                          const ds::cell2D* cell);
 
-  bool entity_contains_coord(const representation::multicell_entity* entity,
-                             double abs_x,
-                             double abs_y);
+  /**
+   * @brief Determine if the specified distribution location will cause an
+   * overlap with the specified entity, given the dimensions of the block to be
+   * distributed.
+   *
+   * @return \c TRUE if an overlap will occur, \c FALSE otherwise
+   */
+  bool dist_loc_will_overlap_entity(const rmath::vector2u& loc,
+                                    const rmath::vector2d& block_dim,
+                                    const representation::multicell_entity* entity);
+
+  /**
+   * @brief Determine if a block overlaps with the specified entity after it has
+   * been distributed, for verification purposes.
+   *
+   * @return \c TRUE if it overlaps in X or in Y, \c FALSE otherwise.
+   */
+  bool block_overlaps_entity(const representation::base_block* block,
+                             const representation::multicell_entity* entity);
+
   // clang-format off
   double                     m_resolution;
   std::default_random_engine m_rng{std::random_device {}()};

@@ -126,7 +126,7 @@ bool new_cache_selector::new_cache_is_excluded(
    * new caches that are sufficiently far from any potential clusters.
    */
   for (auto &b : blocks) {
-    if (b.ent.get == new_cache) {
+    if (b.ent.get() == new_cache) {
       continue;
     }
     double dist = (b.ent->real_loc() - new_cache->real_loc()).length();

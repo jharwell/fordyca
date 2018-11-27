@@ -61,6 +61,7 @@ class cache_sel_matrix_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<cache_sel_matrix_params> parse_results(void) const {
     return m_params;
   }
+  bool validate(void) const override;
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(

@@ -218,15 +218,15 @@
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
-            dist_type="single_source">
+            dist_type="random">
           <powerlaw
               pwr_min="0"
               pwr_max="3"
               n_clusters="15"
               />
           <manifest
-              n_cube="10"
-              n_ramp="10"
+              n_cube="50"
+              n_ramp="50"
               unit_dim="0.2"
               />
         </distribution>

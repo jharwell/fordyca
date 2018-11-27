@@ -61,4 +61,15 @@ void cache_sel_matrix_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
+bool cache_sel_matrix_parser::validate(void) const {
+  CHECK(m_params->cache_prox_dist > 0.0);
+  CHECK(m_params->block_prox_dist > 0.0);
+  CHECK(m_params->nest_prox_dist > 0.0);
+  CHECK(m_params->cluster_prox_dist > 0.0);
+  return true;
+
+error:
+  return false;
+} /* validate() */
+
 NS_END(params, fordyca);
