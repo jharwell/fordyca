@@ -108,9 +108,11 @@ HFSM_STATE_DEFINE(block_to_goal_fsm, wait_for_block_pickup, rfsm::event_data) {
    * serving a penalty for a block pickup will have the block taken by a
    * different robot.
    *
-   * In both cases, treat the block as vanished and try again.
+   * Similar things can happen for a cache to vanish while a robot is waiting to
+   * pick up a block from it.
    */
-  if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
+  if (controller::foraging_signal::BLOCK_VANISHED == data->signal() ||
+      controller::foraging_signal::CACHE_VANISHED == data->signal()) {
     m_block_fsm->task_reset();
     internal_event(ST_ACQUIRE_BLOCK);
   }

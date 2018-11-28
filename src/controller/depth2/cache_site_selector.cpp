@@ -55,6 +55,7 @@ rmath::vector2d cache_site_selector::calc_best(
   double max_utility;
   std::vector<double> point;
   struct site_utility_data u;
+  rmath::vector2d site(-1, -1);
   opt_initialize(known_caches, known_blocks, position, &u, &point);
 
   /*
@@ -68,8 +69,9 @@ rmath::vector2d cache_site_selector::calc_best(
     ER_INFO("NLopt return code: %d", res);
   } catch (std::runtime_error) {
     ER_WARN("NLopt failed");
+    return site;
   }
-  rmath::vector2d site(point[0], point[1]);
+  site.set(point[0], point[1]);
 
   for (auto &c : known_caches) {
     ER_ASSERT((c->real_loc() - site).length() >=
@@ -198,38 +200,6 @@ void cache_site_selector::constraints_create(const ds::cache_list& known_caches,
                                   &std::get<2>(m_constraints)[0],
                                   kNEST_CONSTRAINT_TOL);
 } /* constraints_create() */
-
-
-bool cache_site_selector::verify_site(const rmath::vector2d& site,
-                                      const ds::cache_list& known_caches,
-                                      const ds::block_list& known_blocks) {
-  for (auto &c : known_caches) {
-    ER_ASSERT((c->real_loc() - site).length() >=
-        std::get<0>(m_constraints)[0].cache_prox_dist,
-        "Cache site@%s too close to cache%d (%f <= %f)",
-              site.to_str().c_str(),
-              c->id(),
-              (c->real_loc() - site).length(),
-              std::get<0>(m_constraints)[0].cache_prox_dist);
-  } /* for(&c..) */
-
-  for (auto &b : known_blocks) {
-    ER_ASSERT((b->real_loc() - site).length() >=
-              std::get<1>(m_constraints)[0].block_prox_dist,
-              "Cache site@%s too close to block%d (%f <= %f)",
-              site.to_str().c_str(),
-              b->id(),
-              (b->real_loc() - site).length(),
-              std::get<1>(m_constraints)[0].block_prox_dist);
-  } /* for(&b..) */
-  struct nest_constraint_data* ndata = &std::get<2>(m_constraints)[0];
-  ER_ASSERT((ndata->nest_loc - site).length() >= ndata->nest_prox_dist,
-            "Cache site@%s too close to nest (%f <= %f)",
-            site.to_str().c_str(),
-            (ndata->nest_loc - site).length(),
-            ndata->nest_prox_dist);
-  return true;
-} /* verify_site() */
 
 /*******************************************************************************
  * Non-Member Functions

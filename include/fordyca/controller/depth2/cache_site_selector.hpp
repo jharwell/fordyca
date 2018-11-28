@@ -96,7 +96,8 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * (i.e. have not faded into an unknown state), compute the best site to start
    * a new cache.
    *
-   * @return The local of the best cache site.
+   * @return The location of the best cache site, or (-1, -1) if no best cache
+   * site could be found (can happen if NLopt mysteriously fails).
    */
   rmath::vector2d calc_best(const ds::cache_list& known_caches,
                             const ds::block_list& known_blocks,

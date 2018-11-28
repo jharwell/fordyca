@@ -108,10 +108,10 @@ void nest_block_drop::visit(
   controller.ndc_push();
   controller.block(nullptr);
   auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
-  ER_ASSERT(
-      nullptr != task,
-      "Non nest-interactor task %s causing nest block drop",
-      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str());
+  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non nest-interactor task %s causing nest block drop",
+            polled->name().c_str());
   task->accept(*this);
   controller.free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
@@ -145,10 +145,11 @@ void nest_block_drop::visit(
     controller::depth2::greedy_recpart_controller& controller) {
   controller.ndc_push();
   controller.block(nullptr);
+  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
   auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non nest-interactor task %s causing nest block drop",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            polled->name().c_str());
   task->accept(*this);
   controller.free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
