@@ -218,7 +218,7 @@
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
-            dist_type="random">
+            dist_type="single_source">
           <powerlaw
               pwr_min="0"
               pwr_max="3"
