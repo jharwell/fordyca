@@ -154,6 +154,10 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
                       struct site_utility_data* utility_data,
                       std::vector<double>* initial_guess);
 
+  bool verify_site(const rmath::vector2d& site,
+                   const ds::cache_list& known_caches,
+                   const ds::block_list& known_blocks);
+
   // clang-format off
   const controller::cache_sel_matrix* const mc_matrix;
   nlopt::opt     m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
