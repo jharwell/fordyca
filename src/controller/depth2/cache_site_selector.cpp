@@ -55,6 +55,7 @@ rmath::vector2d cache_site_selector::calc_best(
   double max_utility;
   std::vector<double> point;
   struct site_utility_data u;
+  rmath::vector2d site(-1, -1);
   opt_initialize(known_caches, known_blocks, position, &u, &point);
 
   /*
@@ -68,8 +69,9 @@ rmath::vector2d cache_site_selector::calc_best(
     ER_INFO("NLopt return code: %d", res);
   } catch (std::runtime_error) {
     ER_WARN("NLopt failed");
+    return site;
   }
-  rmath::vector2d site(point[0], point[1]);
+  site.set(point[0], point[1]);
 
   for (auto &c : known_caches) {
     ER_ASSERT((c->real_loc() - site).length() >=
@@ -97,7 +99,7 @@ rmath::vector2d cache_site_selector::calc_best(
             (ndata->nest_loc - site).length(),
             ndata->nest_prox_dist);
 
-  ER_INFO("Selected cache site @(%f, %f), utility=%f",
+  ER_INFO("Found site@(%f, %f), utility=%f",
           point[0],
           point[1],
           max_utility);

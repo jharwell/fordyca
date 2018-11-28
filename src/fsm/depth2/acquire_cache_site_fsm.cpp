@@ -84,6 +84,12 @@ acquire_goal_fsm::candidate_type acquire_cache_site_fsm::site_select(void) const
   auto best = s.calc_best(mc_map->caches(),
                           mc_map->blocks(),
                           saa_subsystem()->sensing()->position());
+  if (best.x() < 0 || best.y() < 0) {
+    ER_WARN("No cache could acquired for acquisition--internal error?")
+    return acquire_goal_fsm::candidate_type(false,
+                                            rmath::vector2d(),
+                                            -1);
+  }
   ER_INFO("Select cache site@%s for acquisition", best.to_str().c_str());
 
   return acquire_goal_fsm::candidate_type(true,
