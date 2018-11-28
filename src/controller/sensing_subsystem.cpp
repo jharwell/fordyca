@@ -1,5 +1,5 @@
 /**
- * @file base_sensing_subsystem.cpp
+ * @file sensing_subsystem.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include <limits>
 
 #include "fordyca/params/sensing_params.hpp"
@@ -34,21 +34,21 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_sensing_subsystem::base_sensing_subsystem(
+sensing_subsystem::sensing_subsystem(
     const struct params::sensing_params* const params,
     const struct sensor_list* const list)
     : m_tick(0),
       mc_obstacle_delta(params->proximity.delta),
       m_position(),
       m_prev_position(),
-      m_sensors(*list) {}
+      m_sensors(*list),
+      m_fov(rmath::radians(-5 * M_PI / 6),
+            rmath::radians(5 * M_PI / 6)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool base_sensing_subsystem::in_nest(void) const {
-  std::vector<hal::sensors::ground_sensor::reading> readings =
-      m_sensors.ground.readings();
+bool sensing_subsystem::in_nest(void) const {
   /*
    * The nest is a relatively light gray, so the sensors will return something
    * in the range specified below.
@@ -56,47 +56,22 @@ bool base_sensing_subsystem::in_nest(void) const {
    * They return 1.0 when the robot is on a white area, it is 0.0 when the robot
    * is on a black area.
    */
-  int sum = 0;
-  sum += static_cast<int>(readings[0].value > 0.60 && readings[0].value < 0.80);
-  sum += static_cast<int>(readings[1].value > 0.60 && readings[1].value < 0.80);
-  sum += static_cast<int>(readings[2].value > 0.60 && readings[2].value < 0.80);
-  sum += static_cast<int>(readings[3].value > 0.60 && readings[3].value < 0.80);
-
-  return sum >= 3;
+  return m_sensors.ground.detect(0.7, 0.1, 3);
 } /* in_nest() */
 
-__rcsw_pure bool base_sensing_subsystem::obstacle_is_threatening(
-    const rmath::vector2d& obstacle) const {
-  rmath::range<rmath::radians> range(rmath::radians(-5 * M_PI / 6),
-                                     rmath::radians(5 * M_PI / 6));
-  return obstacle.length() >= mc_obstacle_delta &&
-         range.contains(obstacle.angle());
-} /* obstacle_is_threatening() */
-
-rmath::vector2d base_sensing_subsystem::find_closest_obstacle(void) const {
-  rmath::vector2d closest(0, 0);
-
-  for (auto& r : m_sensors.proximity.readings()) {
-    rmath::vector2d obstacle(r.value, rmath::radians(r.angle));
-    if (obstacle_is_threatening(obstacle)) {
-      if ((position() - obstacle).length() < closest.length() ||
-          closest.length() <= std::numeric_limits<double>::epsilon()) {
-        closest = obstacle;
-      }
-    }
-  } /* for(r..) */
-  return closest;
+rmath::vector2d sensing_subsystem::find_closest_obstacle(void) const {
+  return m_sensors.proximity.closest_prox_obj(position(),
+                                              mc_obstacle_delta,
+                                              m_fov);
 } /* find_closest_obstacle() */
 
-bool base_sensing_subsystem::threatening_obstacle_exists(void) const {
-  return find_closest_obstacle().length() > 0;
+bool sensing_subsystem::threatening_obstacle_exists(void) const {
+  return m_sensors.proximity.prox_obj_exists(position(),
+                                                 mc_obstacle_delta,
+                                                 m_fov);
 } /* threatening_obstacle_exists() */
 
-bool base_sensing_subsystem::block_detected(void) const {
-  std::vector<hal::sensors::ground_sensor::reading> readings =
-      m_sensors.ground.readings();
-  int sum = 0;
-
+bool sensing_subsystem::block_detected(void) const {
   /*
    * We are on a block fif ALL 4 ground sensors say we are. We can usually get
    * by with 3/4, but sometimes there are corner cases where a robot thinks that
@@ -107,12 +82,16 @@ bool base_sensing_subsystem::block_detected(void) const {
    *
    * Blocks are black, so sensors should return 0 when the robot is on a block.
    */
-  sum += static_cast<int>(readings[0].value < 0.05);
-  sum += static_cast<int>(readings[1].value < 0.05);
-  sum += static_cast<int>(readings[2].value < 0.05);
-  sum += static_cast<int>(readings[3].value < 0.05);
+    return m_sensors.ground.detect(0.0, 0.05, 4);
+} /* block_detected() */
 
-  return 4 == sum;
+bool sensing_subsystem::cache_detected(void) const {
+  /*
+   * We are on a cache if at least 3 of the 4 ground sensors say we are. Caches
+   * are a relatively dark gray, so the sensor should return something in the
+   * range specified below.
+   */
+  return m_sensors.ground.detect(0.4, 0.1, 3);
 } /* block_detected() */
 
 NS_END(controller, fordyca);

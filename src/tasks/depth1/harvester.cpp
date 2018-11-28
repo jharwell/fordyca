@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/harvester.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cache_block_drop.hpp"

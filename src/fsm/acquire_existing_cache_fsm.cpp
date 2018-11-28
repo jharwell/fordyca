@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
@@ -101,10 +101,7 @@ bool acquire_existing_cache_fsm::calc_acquisition_location(
 } /* calc_acquisition_location() */
 
 bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
-  auto sensors =
-      std::static_pointer_cast<const controller::depth1::sensing_subsystem>(
-          saa_subsystem()->sensing());
-  return sensors->cache_detected();
+  return saa_subsystem()->sensing()->cache_detected();
 } /* cache_exploration_term_cb() */
 
 acquire_goal_fsm::candidate_type acquire_existing_cache_fsm::existing_cache_select(
@@ -124,15 +121,12 @@ bool acquire_existing_cache_fsm::candidates_exist(void) const {
 } /* candidates() */
 
 bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
-  auto sensors =
-      std::static_pointer_cast<const controller::depth1::sensing_subsystem>(
-          saa_subsystem()->sensing());
   if (explore_result) {
-    ER_ASSERT(sensors->cache_detected(),
+    ER_ASSERT(saa_subsystem()->sensing()->cache_detected(),
               "No cache detected after successful exploration?");
     return true;
   } else {
-    if (sensors->cache_detected()) {
+    if (saa_subsystem()->sensing()->cache_detected()) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no cache was detected.");

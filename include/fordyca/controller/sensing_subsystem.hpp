@@ -1,5 +1,5 @@
 /**
- * @file base_sensing_subsystem.hpp
+ * @file sensing_subsystem.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_SENSING_SUBSYSTEM_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BASE_SENSING_SUBSYSTEM_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_SENSING_SUBSYSTEM_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_SENSING_SUBSYSTEM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -52,14 +52,14 @@ namespace rmath = rcppsw::math;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_sensing_subsystem
+ * @class sensing_subsystem
  * @ingroup controller
  *
  * @brief The base sensing subsystem for all sensors used by the different
  * foraging controllers.  Contains common sensor functionality for all
  * controllers.
  */
-class base_sensing_subsystem {
+class sensing_subsystem {
  public:
   struct sensor_list {
     hal::sensors::rab_wifi_sensor rabs;
@@ -75,7 +75,7 @@ class base_sensing_subsystem {
    * @param params Subsystem parameters.
    * @param list List of handles to sensing devices.
    */
-  base_sensing_subsystem(const struct params::sensing_params* params,
+  sensing_subsystem(const struct params::sensing_params* params,
                          const struct sensor_list* list);
 
   /**
@@ -109,6 +109,8 @@ class base_sensing_subsystem {
    * of its ground sensors.
    */
   bool in_nest(void) const;
+
+  bool cache_detected(void) const;
 
   /**
    * @brief Get the robot's current location.
@@ -175,21 +177,16 @@ class base_sensing_subsystem {
   rmath::vector2d find_closest_obstacle(void) const;
 
  private:
-  /**
-   * @brief Determine if the obstacle represented by its closest point to the
-   * robot is threatening.
-   */
-  bool obstacle_is_threatening(const rmath::vector2d& obstacle) const;
-
   // clang-format off
-  uint               m_tick;
-  const double       mc_obstacle_delta;
-  rmath::vector2d    m_position;
-  rmath::vector2d    m_prev_position;
-  struct sensor_list m_sensors;
+  uint                                           m_tick;
+  const double                                   mc_obstacle_delta;
+  rmath::vector2d                                m_position;
+  rmath::vector2d                                m_prev_position;
+  struct sensor_list                             m_sensors;
+  rmath::range<rmath::radians>                   m_fov;
   // clang-format off
 };
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_SENSING_SUBSYSTEM_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_SENSING_SUBSYSTEM_HPP_ */

@@ -83,18 +83,18 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     return controller::foraging_signal::HANDLED;
   }
 
-  if (base_sensors()->threatening_obstacle_exists()) {
+  if (sensors()->threatening_obstacle_exists()) {
     collision_avoidance_tracking_begin();
-    if (base_sensors()->tick() - m_state.last_collision_time <
+    if (sensors()->tick() - m_state.last_collision_time <
         kFREQ_COLLISION_THRESH) {
       ER_DEBUG("Frequent collision: last=%u curr=%u",
                m_state.last_collision_time,
-               base_sensors()->tick());
+               sensors()->tick());
       rmath::vector2d new_dir = randomize_vector_angle(rmath::vector2d::X);
       internal_event(ST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.angle()));
     } else {
-      rmath::vector2d obs = base_sensors()->find_closest_obstacle();
+      rmath::vector2d obs = sensors()->find_closest_obstacle();
       ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
                obs.to_str().c_str(),
                obs.angle().value(),
@@ -111,7 +111,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   } else {
-    m_state.last_collision_time = base_sensors()->tick();
+    m_state.last_collision_time = sensors()->tick();
     /*
      * Go in whatever direction you are currently facing for collision recovery.
      */
@@ -148,7 +148,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data) {
             saa_subsystem()->sensing()->position().to_str().c_str());
   }
 
-  if ((m_goal_data.loc - base_sensors()->position()).length() <=
+  if ((m_goal_data.loc - sensors()->position()).length() <=
       m_goal_data.tolerance) {
     internal_event(ST_ARRIVED,
                    rcppsw::make_unique<struct goal_data>(m_goal_data));
@@ -162,7 +162,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data) {
    * Not doing this results in robots getting stuck when they all are trying to
    * pick up the same block in close quarters.
    */
-  if (base_sensors()->threatening_obstacle_exists() &&
+  if (sensors()->threatening_obstacle_exists() &&
       !saa_subsystem()->steering_force().within_slowing_radius()) {
     internal_event(ST_COLLISION_AVOIDANCE);
   } else {
@@ -241,7 +241,7 @@ void vector_fsm::init(void) {
 
 __rcsw_pure rmath::vector2d vector_fsm::calc_vector_to_goal(
     const rmath::vector2d& goal) {
-  return goal - base_sensors()->position();
+  return goal - sensors()->position();
 } /* calc_vector_to_goal() */
 
 NS_END(fsm, fordyca);

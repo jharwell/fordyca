@@ -27,7 +27,7 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/depth0/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
@@ -70,23 +70,11 @@ void stateful_controller::perception(
 
 __rcsw_pure const representation::line_of_sight* stateful_controller::los(
     void) const {
-  return stateful_sensors()->los();
+  return m_perception->los();
 }
 void stateful_controller::los(
     std::unique_ptr<representation::line_of_sight>& new_los) {
-  stateful_sensors()->los(new_los);
-}
-
-__rcsw_pure const depth0::sensing_subsystem* stateful_controller::stateful_sensors(
-    void) const {
-  return static_cast<const depth0::sensing_subsystem*>(
-      saa_subsystem()->sensing().get());
-}
-
-__rcsw_pure depth0::sensing_subsystem* stateful_controller::stateful_sensors(
-    void) {
-  return static_cast<depth0::sensing_subsystem*>(
-      saa_subsystem()->sensing().get());
+  m_perception->los(new_los);
 }
 
 void stateful_controller::ControlStep(void) {
@@ -103,10 +91,10 @@ void stateful_controller::ControlStep(void) {
    * update the relevance of information within it. Then, you can run the main
    * FSM loop.
    */
-  m_perception->update(stateful_sensors()->los());
+  m_perception->update(m_perception->los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
+  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
   m_fsm->run();
   ndc_pop();
 } /* ControlStep() */
@@ -133,10 +121,6 @@ void stateful_controller::Init(ticpp::Element& node) {
   /* initialize subsystems and perception */
   m_perception = rcppsw::make_unique<base_perception_subsystem>(
       param_repo.parse_results<params::perception_params>(), GetId());
-
-  saa_subsystem()->sensing(std::make_shared<depth0::sensing_subsystem>(
-      param_repo.parse_results<struct params::sensing_params>(),
-      &saa_subsystem()->sensing()->sensor_list()));
 
   auto* block_mat = param_repo.parse_results<params::block_sel_matrix_params>();
   m_block_sel_matrix = rcppsw::make_unique<class block_sel_matrix>(block_mat);

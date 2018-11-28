@@ -36,7 +36,7 @@ namespace rmath = rcppsw::math;
 steering_force2D::steering_force2D(
     steering::boid& entity,
     const params::steering_force2D_params* const params,
-    const std::shared_ptr<base_sensing_subsystem>& sensors)
+    const std::shared_ptr<sensing_subsystem>& sensors)
     : steering::force_calculator(entity, params),
       ER_CLIENT_INIT("fordyca.controller.steering_force2D"),
       m_phototaxis_force(&params->phototaxis, sensors) {}

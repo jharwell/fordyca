@@ -28,7 +28,7 @@
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
@@ -113,11 +113,7 @@ void greedy_partitioning_controller::non_unique_init(
     std::exit(EXIT_FAILURE);
   }
 
-  /* Put in new depth1 sensors and perception, ala strategy pattern */
-  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
-      param_repo->parse_results<struct params::sensing_params>(),
-      &saa_subsystem()->sensing()->sensor_list()));
-
+  /* Put in new depth1 perception, ala strategy pattern */
   perception(rcppsw::make_unique<perception_subsystem>(
       param_repo->parse_results<params::perception_params>(), GetId()));
 

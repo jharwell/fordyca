@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/phototaxis_force.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/params/phototaxis_force_params.hpp"
 
 /*******************************************************************************
@@ -35,7 +35,7 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 phototaxis_force::phototaxis_force(
     const struct params::phototaxis_force_params* params,
-    const std::shared_ptr<base_sensing_subsystem>& sensors)
+    const std::shared_ptr<sensing_subsystem>& sensors)
     : m_max(params->max), m_sensors(sensors) {}
 
 /*******************************************************************************

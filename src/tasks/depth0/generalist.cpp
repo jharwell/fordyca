@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth0/generalist.hpp"
 
-#include "fordyca/controller/depth0/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -51,7 +51,7 @@ __rcsw_pure double generalist::abort_prob_calc(void) {
 __rcsw_pure double generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::free_block_to_nest_fsm*>(
              polled_task::mechanism())
-      ->base_sensors()
+      ->sensors()
       ->tick();
 } /* current_time() */
 

@@ -36,7 +36,7 @@ struct phototaxis_force_params;
 }
 
 NS_START(controller);
-class base_sensing_subsystem;
+class sensing_subsystem;
 namespace steering = rcppsw::robotics::steering2D;
 namespace rmath = rcppsw::math;
 
@@ -53,13 +53,13 @@ namespace rmath = rcppsw::math;
 class phototaxis_force {
  public:
   phototaxis_force(const struct params::phototaxis_force_params* params,
-                   const std::shared_ptr<base_sensing_subsystem>& sensors);
+                   const std::shared_ptr<sensing_subsystem>& sensors);
 
   rmath::vector2d operator()() const;
 
   // clang-format off
   double                                   m_max;
-  std::shared_ptr<base_sensing_subsystem>  m_sensors;
+  std::shared_ptr<sensing_subsystem>  m_sensors;
   // clang-format on
 };
 

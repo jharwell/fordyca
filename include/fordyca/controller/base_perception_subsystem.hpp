@@ -32,15 +32,12 @@
 #include "fordyca/params/perception_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace representation {
-class line_of_sight;
-} // namespace representation
 
 namespace ds {
 class perceived_arena_map;
@@ -90,6 +87,25 @@ class base_perception_subsystem
   const ds::perceived_arena_map* map(void) const { return m_map.get(); }
   ds::perceived_arena_map* map(void) { return m_map.get(); }
 
+  /**
+   * @brief Get the robot's current line-of-sight (LOS)
+   *
+   * Not used by \ref crw_controller.
+   */
+  const representation::line_of_sight* los(void) const { return m_los.get(); }
+
+  /**
+   * @brief Set the robots LOS for the next timestep.
+   *
+   * This is a hack to make it easy for me to run simulations, as I can computer
+   * the line of sight for a robot within the loop functions, and just pass it
+   * in here. In real robots this routine would be MUCH messier and harder to
+   * work with.
+   *
+   * @param los The new los
+   */
+  void los(std::unique_ptr<representation::line_of_sight>& los);
+
  protected:
   /*
    * @brief Update the perceived arena map with the current line-of-sight,
@@ -119,8 +135,9 @@ class base_perception_subsystem
   void update_cell_stats(const representation::line_of_sight* const los);
 
   // clang-format off
-  std::vector<uint>                        m_cell_stats;
-  std::unique_ptr<ds::perceived_arena_map> m_map;
+  std::vector<uint>                              m_cell_stats;
+  std::unique_ptr<representation::line_of_sight> m_los;
+  std::unique_ptr<ds::perceived_arena_map>       m_map;
   // clang-format on
 };
 

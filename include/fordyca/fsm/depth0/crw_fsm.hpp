@@ -38,7 +38,7 @@ NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller { class base_sensing_subsystem; class actuation_subsystem;}
+namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;

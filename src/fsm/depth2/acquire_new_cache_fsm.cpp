@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -69,7 +69,7 @@ acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const
   representation::perceived_block best =
       controller::depth2::new_cache_selector(mc_matrix)(mc_map->perceived_blocks(),
                                                         mc_map->caches(),
-                                                        base_sensors()->position());
+                                                        sensors()->position());
 
   /*
    * If this happens, all the blocks we know of are ineligible for us to

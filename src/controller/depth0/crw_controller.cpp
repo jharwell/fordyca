@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include <fstream>
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"

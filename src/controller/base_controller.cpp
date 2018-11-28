@@ -95,7 +95,7 @@ void base_controller::Init(ticpp::Element& node) {
   auto* params = param_repo.parse_results<struct params::output_params>();
   output_init(params);
 
-  /* initialize sensing and actuation subsystem */
+  /* initialize sensing and actuation (SAA) subsystem */
   struct actuation_subsystem::actuator_list alist = {
       .wheels = hal::actuators::differential_drive_actuator(
           GetActuator<argos::CCI_DifferentialSteeringActuator>(
@@ -105,7 +105,7 @@ void base_controller::Init(ticpp::Element& node) {
       .wifi = hal::actuators::wifi_actuator(
           GetActuator<argos::CCI_RangeAndBearingActuator>(
               "range_and_bearing"))};
-  struct base_sensing_subsystem::sensor_list slist = {
+  struct sensing_subsystem::sensor_list slist = {
       .rabs = hal::sensors::rab_wifi_sensor(
           GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
       .proximity = hal::sensors::proximity_sensor(

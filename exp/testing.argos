@@ -225,8 +225,8 @@
               n_clusters="15"
               />
           <manifest
-              n_cube="50"
-              n_ramp="50"
+              n_cube="20"
+              n_ramp="0"
               unit_dim="0.2"
               />
         </distribution>

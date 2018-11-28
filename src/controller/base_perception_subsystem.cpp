@@ -30,7 +30,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,6 +45,7 @@ base_perception_subsystem::base_perception_subsystem(
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.base_perception"),
       m_cell_stats(fsm::cell2D_fsm::ST_MAX_STATES),
+      m_los(),
       m_map(rcppsw::make_unique<ds::perceived_arena_map>(params, id)) {}
 
 /*******************************************************************************
@@ -207,6 +207,10 @@ void base_perception_subsystem::update_cell_stats(
     } /* for(j..) */
   }   /* for(i..) */
 } /* update_cell_stats() */
+
+void base_perception_subsystem::los(std::unique_ptr<representation::line_of_sight>& los) {
+  m_los = std::move(los);
+} /* los() */
 
 /*******************************************************************************
  * World Model Metrics

@@ -26,7 +26,7 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"

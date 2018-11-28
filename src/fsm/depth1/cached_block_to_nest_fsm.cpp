@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************

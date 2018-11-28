@@ -38,7 +38,7 @@ NS_START(fordyca);
 
 namespace controller {
 class saa_subsystem;
-class base_sensing_subsystem;
+class sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
@@ -77,7 +77,7 @@ class base_foraging_fsm : public state_machine::hfsm,
   void init(void) override;
 
   /**
-   * @brief Get a reference to the \ref base_sensing_subsystem.
+   * @brief Get a reference to the \ref sensing_subsystem.
    *
    * Derived classes needing to reference these sensors should use this function
    * rather than maintaining their own std::shared_ptr copy of things, as that
@@ -85,9 +85,8 @@ class base_foraging_fsm : public state_machine::hfsm,
    * as tick, location, etc., and that do not get propagated down the
    * composition/inheritance hierarchy of robot controllers properly.
    */
-  const std::shared_ptr<const controller::base_sensing_subsystem> base_sensors(
-      void) const;
-  const std::shared_ptr<controller::base_sensing_subsystem> base_sensors(void);
+  const std::shared_ptr<const controller::sensing_subsystem> sensors(void) const;
+  const std::shared_ptr<controller::sensing_subsystem> sensors(void);
 
   const std::shared_ptr<const controller::actuation_subsystem> actuators(
       void) const;
