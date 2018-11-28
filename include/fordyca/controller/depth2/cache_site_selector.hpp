@@ -96,7 +96,8 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * (i.e. have not faded into an unknown state), compute the best site to start
    * a new cache.
    *
-   * @return The local of the best cache site.
+   * @return The location of the best cache site, or (-1, -1) if no best cache
+   * site could be found (can happen if NLopt mysteriously fails).
    */
   rmath::vector2d calc_best(const ds::cache_list& known_caches,
                             const ds::block_list& known_blocks,
@@ -133,7 +134,7 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * chugs. We *should* be able to get something good enough in this many
    * iterations.
    */
-  static constexpr uint kMAX_ITERATIONS = 10000;
+  static constexpr uint kMAX_ITERATIONS = 100000;
 
   using constraint_set = std::tuple<cache_constraint_vector,
                                     block_constraint_vector,
@@ -156,7 +157,7 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
 
   bool verify_site(const rmath::vector2d& site,
                    const ds::cache_list& known_caches,
-                   const ds::block_list& known_blocks);
+                   const ds::block_list& known_blocks) const;
 
   // clang-format off
   const controller::cache_sel_matrix* const mc_matrix;
