@@ -102,13 +102,6 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
                             const ds::block_list& known_blocks,
                             rmath::vector2d position);
 
-  void cc_violated(uint id) { m_cc_violations[id] = true; }
-  void cc_satisfied(uint id) { m_cc_violations[id] = false; }
-  void bc_violated(uint id) { m_bc_violations[id] = true; }
-  void bc_satisfied(uint id) { m_bc_violations[id] = false; }
-  void nc_violated(void) { m_nc_violations = true; }
-  void nc_satisfied(void) { m_nc_violations = false; }
-
  private:
   /*
    * @brief The amount of violation of cache constraints that is considered
@@ -152,23 +145,23 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    */
   void constraints_create(const ds::cache_list& known_caches,
                           const ds::block_list& known_blocks,
-                          const rmath::vector2d& nest_loc,
-                          constraint_set* constraints);
+                          const rmath::vector2d& nest_loc);
 
 
   void opt_initialize(const ds::cache_list& known_caches,
                       const ds::block_list& known_blocks,
                       rmath::vector2d position,
-                      constraint_set* constraints,
                       struct site_utility_data* utility_data,
                       std::vector<double>* initial_guess);
 
+  bool verify_site(const rmath::vector2d& site,
+                   const ds::cache_list& known_caches,
+                   const ds::block_list& known_blocks);
+
   // clang-format off
   const controller::cache_sel_matrix* const mc_matrix;
-  nlopt::opt        m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
-  std::vector<bool> m_cc_violations{};
-  std::vector<bool> m_bc_violations{};
-  bool              m_nc_violations{0};
+  nlopt::opt     m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
+  constraint_set m_constraints{};
   // clang-format on
 };
 

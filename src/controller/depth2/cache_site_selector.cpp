@@ -54,9 +54,8 @@ rmath::vector2d cache_site_selector::calc_best(
     rmath::vector2d position) {
   double max_utility;
   std::vector<double> point;
-  constraint_set constraints;
   struct site_utility_data u;
-  opt_initialize(known_caches, known_blocks, position, &constraints, &u, &point);
+  opt_initialize(known_caches, known_blocks, position, &u, &point);
 
   /*
    * @bug Sometimes NLopt just fails with a generic error code and I don't
@@ -70,29 +69,49 @@ rmath::vector2d cache_site_selector::calc_best(
   } catch (std::runtime_error) {
     ER_WARN("NLopt failed");
   }
+  rmath::vector2d site(point[0], point[1]);
+
+  for (auto &c : known_caches) {
+    ER_ASSERT((c->real_loc() - site).length() >=
+        std::get<0>(m_constraints)[0].cache_prox_dist,
+        "Cache site@%s too close to cache%d (%f <= %f)",
+              site.to_str().c_str(),
+              c->id(),
+              (c->real_loc() - site).length(),
+              std::get<0>(m_constraints)[0].cache_prox_dist);
+  } /* for(&c..) */
+
+  for (auto &b : known_blocks) {
+    ER_ASSERT((b->real_loc() - site).length() >=
+              std::get<1>(m_constraints)[0].block_prox_dist,
+              "Cache site@%s too close to block%d (%f <= %f)",
+              site.to_str().c_str(),
+              b->id(),
+              (b->real_loc() - site).length(),
+              std::get<1>(m_constraints)[0].block_prox_dist);
+  } /* for(&b..) */
+  struct nest_constraint_data* ndata = &std::get<2>(m_constraints)[0];
+  ER_ASSERT((ndata->nest_loc - site).length() >= ndata->nest_prox_dist,
+            "Cache site@%s too close to nest (%f <= %f)",
+            site.to_str().c_str(),
+            (ndata->nest_loc - site).length(),
+            ndata->nest_prox_dist);
+
+  ER_ASSERT(verify_site(site, known_caches, known_blocks),
+            "Selected cache violates constraints");
 
   ER_INFO("Selected cache site @(%f, %f), utility=%f",
           point[0],
           point[1],
           max_utility);
-  uint cc_count =
-      std::accumulate(std::begin(m_cc_violations), std::end(m_cc_violations), 0);
-  uint bc_count =
-      std::accumulate(std::begin(m_bc_violations), std::end(m_bc_violations), 0);
 
-  ER_INFO("%u cache, %u block, %u nest constraint violations on cache site",
-          cc_count,
-          bc_count,
-          m_nc_violations);
-
-  return rmath::vector2d(point[0], point[1]);
+return site;
 } /* calc_best() */
 
 void cache_site_selector::opt_initialize(
     const ds::cache_list& known_caches,
     const ds::block_list& known_blocks,
     rmath::vector2d position,
-    constraint_set* const constraints,
     struct site_utility_data* const utility_data,
     std::vector<double>* const initial_guess) {
   rmath::vector2d nest_loc =
@@ -105,13 +124,11 @@ void cache_site_selector::opt_initialize(
    * If there are no constraints on the problem, the COBYLA method hangs, BUT
    * that is OK because we always have at least the nest proximity constraint.
    */
-  constraints_create(known_caches, known_blocks, nest_loc, constraints);
+  constraints_create(known_caches, known_blocks, nest_loc);
   ER_INFO("Calculated %zu cache, %zu block, %zu nest constraints",
-          std::get<0>(*constraints).size(),
-          std::get<1>(*constraints).size(),
-          std::get<2>(*constraints).size());
-  m_cc_violations.reserve(std::get<0>(*constraints).size());
-  m_bc_violations.reserve(std::get<1>(*constraints).size());
+          std::get<0>(m_constraints).size(),
+          std::get<1>(m_constraints).size(),
+          std::get<2>(m_constraints).size());
 
   auto xrange =
       boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteXRange)->second);
@@ -143,10 +160,9 @@ void cache_site_selector::opt_initialize(
 
 void cache_site_selector::constraints_create(const ds::cache_list& known_caches,
                                              const ds::block_list& known_blocks,
-                                             const rmath::vector2d& nest_loc,
-                                             constraint_set* const constraints) {
+                                             const rmath::vector2d& nest_loc) {
   for (auto& c : known_caches) {
-    std::get<0>(*constraints)
+    std::get<0>(m_constraints)
         .push_back({c.get(),
                     this,
                     boost::get<double>(
@@ -154,34 +170,66 @@ void cache_site_selector::constraints_create(const ds::cache_list& known_caches,
   } /* for(&c..) */
 
   for (auto& b : known_blocks) {
-    std::get<1>(*constraints)
+    std::get<1>(m_constraints)
         .push_back({b.get(),
                     this,
                     boost::get<double>(
                         mc_matrix->find(cselm::kBlockProxDist)->second)});
   } /* for(&c..) */
 
-  std::get<2>(*constraints)
+  std::get<2>(m_constraints)
       .push_back(
           {nest_loc,
            this,
            boost::get<double>(mc_matrix->find(cselm::kNestProxDist)->second)});
 
-  for (size_t i = 0; i < std::get<0>(*constraints).size(); ++i) {
+  for (size_t i = 0; i < std::get<0>(m_constraints).size(); ++i) {
     m_alg.add_inequality_constraint(__cache_constraint_func,
-                                    &std::get<0>(*constraints)[i],
+                                    &std::get<0>(m_constraints)[i],
                                     kCACHE_CONSTRAINT_TOL);
   } /* for(i..) */
-  for (size_t i = 0; i < std::get<1>(*constraints).size(); ++i) {
+  for (size_t i = 0; i < std::get<1>(m_constraints).size(); ++i) {
     m_alg.add_inequality_constraint(__block_constraint_func,
-                                    &std::get<1>(*constraints)[i],
+                                    &std::get<1>(m_constraints)[i],
                                     kBLOCK_CONSTRAINT_TOL);
   } /* for(i..) */
 
   m_alg.add_inequality_constraint(__nest_constraint_func,
-                                  &std::get<2>(*constraints)[0],
+                                  &std::get<2>(m_constraints)[0],
                                   kNEST_CONSTRAINT_TOL);
 } /* constraints_create() */
+
+
+bool cache_site_selector::verify_site(const rmath::vector2d& site,
+                                      const ds::cache_list& known_caches,
+                                      const ds::block_list& known_blocks) {
+  for (auto &c : known_caches) {
+    ER_ASSERT((c->real_loc() - site).length() >=
+        std::get<0>(m_constraints)[0].cache_prox_dist,
+        "Cache site@%s too close to cache%d (%f <= %f)",
+              site.to_str().c_str(),
+              c->id(),
+              (c->real_loc() - site).length(),
+              std::get<0>(m_constraints)[0].cache_prox_dist);
+  } /* for(&c..) */
+
+  for (auto &b : known_blocks) {
+    ER_ASSERT((b->real_loc() - site).length() >=
+              std::get<1>(m_constraints)[0].block_prox_dist,
+              "Cache site@%s too close to block%d (%f <= %f)",
+              site.to_str().c_str(),
+              b->id(),
+              (b->real_loc() - site).length(),
+              std::get<1>(m_constraints)[0].block_prox_dist);
+  } /* for(&b..) */
+  struct nest_constraint_data* ndata = &std::get<2>(m_constraints)[0];
+  ER_ASSERT((ndata->nest_loc - site).length() >= ndata->nest_prox_dist,
+            "Cache site@%s too close to nest (%f <= %f)",
+            site.to_str().c_str(),
+            (ndata->nest_loc - site).length(),
+            ndata->nest_prox_dist);
+  return true;
+} /* verify_site() */
 
 /*******************************************************************************
  * Non-Member Functions
@@ -196,12 +244,6 @@ __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
       reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
   double val = c->cache_prox_dist -
                (rmath::vector2d(x[0], x[1]) - c->cache->real_loc()).length();
-
-  if (val > 0) {
-    c->selector->cc_violated(c->cache->id());
-  } else {
-    c->selector->cc_satisfied(c->cache->id());
-  }
   return val;
 } /* __cache_constraint_func() */
 
@@ -215,12 +257,6 @@ __rcsw_pure double __nest_constraint_func(const std::vector<double>& x,
       reinterpret_cast<cache_site_selector::nest_constraint_data*>(data);
   double val =
       c->nest_prox_dist - (rmath::vector2d(x[0], x[1]) - c->nest_loc).length();
-  if (val > 0) {
-    c->selector->nc_violated();
-  } else {
-    c->selector->nc_satisfied();
-  }
-
   return val;
 } /* __nest_constraint_func() */
 
@@ -234,11 +270,6 @@ __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
       reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
   double val = c->block_prox_dist -
                (rmath::vector2d(x[0], x[1]) - c->block->real_loc()).length();
-  if (val > 0) {
-    c->selector->bc_violated(c->block->id());
-  } else {
-    c->selector->bc_satisfied(c->block->id());
-  }
   return val;
 } /* __block_constraint_func() */
 
