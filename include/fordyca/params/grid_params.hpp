@@ -24,13 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Structure Definitions
@@ -41,8 +42,8 @@ NS_START(fordyca, params);
  */
 struct grid_params : public rcppsw::params::base_params {
   double resolution{0.0};
-  argos::CVector2 upper{};
-  argos::CVector2 lower{};
+  rmath::vector2d upper{};
+  rmath::vector2d lower{};
 };
 
 NS_END(params, fordyca);

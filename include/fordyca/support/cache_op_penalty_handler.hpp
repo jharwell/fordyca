@@ -29,6 +29,8 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/support/temporal_penalty_handler.hpp"
+#include "fordyca/support/cache_op_src.hpp"
+#include "fordyca/support/cache_op_filter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +38,7 @@
 NS_START(fordyca);
 namespace controller { namespace depth0 {
 class stateful_foraging_controller;
-class stateless_foraging_controller;
+class crw_controller;
 }} // namespace controller::depth0
 
 NS_START(support);
@@ -60,10 +62,6 @@ class cache_op_penalty_handler
     : public temporal_penalty_handler<T>,
       public er::client<cache_op_penalty_handler<T>> {
  public:
-  enum penalty_src {
-    kSrcExistingCacheDrop,
-    kSrcExistingCachePickup,
-  };
   using temporal_penalty_handler<T>::is_serving_penalty;
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
@@ -80,6 +78,8 @@ class cache_op_penalty_handler
       delete;
   cache_op_penalty_handler(const cache_op_penalty_handler& other) = delete;
 
+  using filter_status = typename cache_op_filter<T>::filter_status;
+
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
    * trying to drop/pickup a block. If so, create a \ref cache_op_penalty object
@@ -91,16 +91,17 @@ class cache_op_penalty_handler
    * @param timestep The current timestep.
    *
    * @return \c TRUE if a penalty has been initialized for a robot, and they
-   * should begin waiting, and \c FALSE otherwise.
+   * should begin waiting, and \c FALSE otherwise, along with the reason why.
    */
-  bool penalty_init(T& controller, penalty_src src, uint timestep) {
+  filter_status penalty_init(T& controller, cache_op_src src, uint timestep) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
      */
-    if ((kSrcExistingCacheDrop == src || kSrcExistingCachePickup == src) &&
-        !existing_cache_op_filter(controller)) {
-      return false;
+    auto filter = cache_op_filter<T>(m_map)(controller,
+                                            src);
+    if (filter.status) {
+      return filter.reason;
     }
 
     ER_ASSERT(!is_serving_penalty(controller),
@@ -119,27 +120,7 @@ class cache_op_penalty_handler
 
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));
-    return true;
-  }
-
-  /**
-   * @brief Filter out spurious penalty initializations for existing cache
-   * operations (e.g. pickup/drop)
-   * (i.e. controller not ready/not intending to use an existing cache).
-   *
-   * @return \c TRUE if the controller has met preconditions, \c FALSE
-   * otherwise.
-   */
-  bool existing_cache_op_filter(const T& controller) const {
-    if (nullptr == controller.current_task()) {
-      return false;
-    }
-
-    int cache_id = loop_utils::robot_on_cache(controller, *m_map);
-    return (controller.current_task()->goal_acquired() &&
-            acquisition_goal_type::kExistingCache ==
-                controller.current_task()->acquisition_goal() &&
-            -1 != cache_id);
+    return filter_status::kStatusOK;
   }
 
  protected:

@@ -40,14 +40,12 @@ namespace swarm = rcppsw::swarm;
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
-    : perceived_cell_op(cache->discrete_loc().first,
-                        cache->discrete_loc().second),
+    : perceived_cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
 
 cache_found::cache_found(const std::shared_ptr<representation::base_cache>& cache)
-    : perceived_cell_op(cache->discrete_loc().first,
-                        cache->discrete_loc().second),
+    : perceived_cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
 
@@ -126,8 +124,7 @@ void cache_found::visit(ds::perceived_arena_map& map) {
                (*it)->id(),
                m_cache->id());
 
-      events::cell_empty op((*it)->discrete_loc().first,
-                            (*it)->discrete_loc().second);
+      events::cell_empty op((*it)->discrete_loc());
       map.access<occupancy_grid::kCell>((*it)->discrete_loc()).accept(op);
       it = map.blocks().erase(it);
     } else {

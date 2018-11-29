@@ -58,7 +58,7 @@ using task1 = tasks::depth1::foraging_task;
 depth1_metrics_aggregator::depth1_metrics_aggregator(
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : stateful_metrics_aggregator(params, output_root),
+    : depth0_metrics_aggregator(params, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acquisition",
@@ -80,7 +80,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
 
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::generalist",
-      metrics_path() + "/" + params->task_generalist_tab_fname,
+      metrics_path() + "/" + params->task_tab_generalist_fname,
       params->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
@@ -121,16 +121,14 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
    * as well, which should be ignored.
    */
   if (!(task1::task_in_depth1(task) || task0::task_in_depth0(task))) {
-      return;
+    return;
   }
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-
-void depth1_metrics_aggregator::task_alloc_cb(
-    const ta::polled_task* const,
-    const ta::bi_tab* const tab) {
+void depth1_metrics_aggregator::task_alloc_cb(const ta::polled_task* const,
+                                              const ta::bi_tab* const tab) {
   /*
    * Depth [0,1,2] metrics aggregators are registered on the same executive,
    * so this function will be called for the task allocations for any depth,

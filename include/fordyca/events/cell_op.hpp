@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
@@ -32,6 +33,7 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+namespace rmath = rcppsw::math;
 namespace ds {
 class cell2D;
 }
@@ -57,15 +59,16 @@ NS_START(events);
 class cell_op : public visitor::visitor,
                 public visitor::visit_set<ds::cell2D, fsm::cell2D_fsm> {
  public:
-  cell_op(uint x, uint y) : m_x(x), m_y(y) {}
+  explicit cell_op(const rmath::vector2u& coord) : m_coord(coord) {}
+
   ~cell_op(void) override = default;
 
-  uint x(void) const { return m_x; }
-  uint y(void) const { return m_y; }
+  uint x(void) const { return m_coord.x(); }
+  uint y(void) const { return m_coord.y(); }
+  const rmath::vector2u& coord(void) const { return m_coord; }
 
  private:
-  uint m_x;
-  uint m_y;
+  rmath::vector2u m_coord;
 };
 
 NS_END(events, fordyca);

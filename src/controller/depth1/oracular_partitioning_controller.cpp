@@ -24,10 +24,10 @@
 #include "fordyca/controller/depth1/oracular_partitioning_controller.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
+#include "fordyca/params/oracle_params.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/params/oracle_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -87,14 +87,16 @@ void oracular_partitioning_controller::task_finish_cb(ta::polled_task* task) {
           task->task_exec_estimate().last_result());
 
   oracle_est = boost::get<ta::time_estimate>(
-      mc_tasking_oracle->ask("interface_est." + task->name())).last_result();
+                   mc_tasking_oracle->ask("interface_est." + task->name()))
+                   .last_result();
   old = task->task_interface_estimate(0).last_result();
   task->exec_estimate_update(oracle_est);
-  ER_INFO("Update 'interface_est.%s' with oracular estimate %f on finish: %f -> %f",
-          task->name().c_str(),
-          oracle_est,
-          old,
-          task->task_interface_estimate(0).last_result());
+  ER_INFO(
+      "Update 'interface_est.%s' with oracular estimate %f on finish: %f -> %f",
+      task->name().c_str(),
+      oracle_est,
+      old,
+      task->task_interface_estimate(0).last_result());
 } /* task_finish_cb() */
 
 using namespace argos; // NOLINT

@@ -34,7 +34,7 @@
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -60,21 +60,21 @@ depth1_loop_functions::~depth1_loop_functions(void) = default;
  * Member Functions
  ******************************************************************************/
 void depth1_loop_functions::Init(ticpp::Element& node) {
-  depth0::stateful_loop_functions::Init(node);
+  depth0::depth0_loop_functions::Init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
 
   /* initialize stat collecting */
-  auto* arenap = params().parse_results<params::arena::arena_map_params>();
+  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
-      *params().parse_results<const struct params::output_params>();
+      *params()->parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(&output.metrics,
                                                                  output_root());
 
   /* initialize cache handling and create initial cache */
-  auto* cachep = params().parse_results<params::caches::caches_params>();
+  auto* cachep = params()->parse_results<params::caches::caches_params>();
   cache_handling_init(cachep);
 
   /* intitialize robot interactions with environment */
@@ -102,7 +102,7 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
 }
 
 void depth1_loop_functions::oracle_init(void) {
-  auto* oraclep = params().parse_results<params::oracle_params>();
+  auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     ER_INFO("Creating oracle");
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
@@ -110,8 +110,8 @@ void depth1_loop_functions::oracle_init(void) {
     const auto& controller0 =
         dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
             robot0.GetControllableEntity().GetController());
-    auto* bigraph = dynamic_cast<const ta::bi_tdgraph*>(
-        controller0.executive()->graph());
+    auto* bigraph =
+        dynamic_cast<const ta::bi_tdgraph*>(controller0.executive()->graph());
     m_tasking_oracle = std::make_unique<support::tasking_oracle>(bigraph);
   }
 } /* oracle_init() */
@@ -132,8 +132,8 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
-                                      arena_map()->grid_resolution());
+  auto coord = rmath::dvec2uvec(controller.position(),
+                                arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */
@@ -146,12 +146,12 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
    */
   auto& greedy =
       dynamic_cast<controller::depth1::greedy_partitioning_controller&>(c);
-  auto* vparams = params().parse_results<struct params::visualization_params>();
+  auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
   }
 
-  auto* oraclep = params().parse_results<params::oracle_params>();
+  auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     auto& oracular =
         dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
@@ -182,7 +182,8 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
 
 argos::CColor depth1_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  if (arena_map()->nest().contains_point(plane_pos)) {
+  rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
+  if (arena_map()->nest().contains_point(tmp)) {
     return argos::CColor(arena_map()->nest().color().red(),
                          arena_map()->nest().color().green(),
                          arena_map()->nest().color().blue());
@@ -192,7 +193,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
    * so that you don't have blocks renderin inside of caches.
    */
   for (auto& cache : arena_map()->caches()) {
-    if (cache->contains_point(plane_pos)) {
+    if (cache->contains_point(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
                            cache->color().blue());
@@ -207,7 +208,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
      * when they are not actually (when blocks are picked up their correct color
      * is shown through visualization).
      */
-    if (block->contains_point(plane_pos)) {
+    if (block->contains_point(tmp)) {
       return argos::CColor::BLACK;
     }
   } /* for(&block..) */
@@ -238,10 +239,16 @@ void depth1_loop_functions::PreStep() {
 } /* PreStep() */
 
 void depth1_loop_functions::Reset() {
+  ndc_push();
+  base_loop_functions::Reset();
   m_metrics_agg->reset_all();
-  /* return value ignored (for now...) */
-  auto pair = m_cache_manager->create(arena_map()->blocks());
-  arena_map()->caches_add(pair.second);
+
+  auto ret = m_cache_manager->create(arena_map()->blocks());
+  if (ret.status) {
+    arena_map()->caches_add(ret.caches);
+    floor()->SetChanged();
+  }
+  ndc_pop();
 }
 
 void depth1_loop_functions::pre_step_final(void) {
@@ -259,24 +266,24 @@ void depth1_loop_functions::pre_step_final(void) {
             *(*m_metrics_agg)["tasks::tab::generalist"]);
     uint n_harvesters = collector.int_subtask1_count();
     uint n_collectors = collector.int_subtask2_count();
-    auto pair = m_cache_manager->create_conditional(arena_map()->blocks(),
-                                                    n_harvesters,
-                                                    n_collectors);
+    auto ret = m_cache_manager->create_conditional(arena_map()->blocks(),
+                                                   n_harvesters,
+                                                   n_collectors);
 
-    if (pair.first) {
-        arena_map()->caches_add(pair.second);
-        __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
-            arena_map()->caches()[0]->discrete_loc());
-        ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-                  "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
-                  arena_map()->caches()[0]->n_blocks(),
-                  cell.block_count());
-        m_cache_manager->cache_created();
-        floor()->SetChanged();
-      } else {
-        ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
-      }
+    if (ret.status) {
+      arena_map()->caches_add(ret.caches);
+      __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
+          arena_map()->caches()[0]->discrete_loc());
+      ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
+                "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+                arena_map()->caches()[0]->n_blocks(),
+                cell.block_count());
+      m_cache_manager->cache_created();
+      floor()->SetChanged();
+    } else {
+      ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
     }
+  }
 
   if (arena_map()->caches_removed() > 0) {
     m_cache_manager->cache_depleted();
@@ -297,16 +304,16 @@ void depth1_loop_functions::cache_handling_init(
      * Regardless of how many foragers/etc there are, always create an
      * initial cache.
      */
-    argos::CVector2 cache_loc = argos::CVector2((arena_map()->xrsize() +
-                                                 arena_map()->nest().real_loc().GetX()) / 2.0,
-                                                arena_map()->nest().real_loc().GetY());
+    rmath::vector2d cache_loc = rmath::vector2d(
+        (arena_map()->xrsize() + arena_map()->nest().real_loc().x()) / 2.0,
+        arena_map()->nest().real_loc().y());
 
     m_cache_manager = rcppsw::make_unique<static_cache_manager>(
         cachep, &arena_map()->decoratee(), cache_loc);
 
     /* return value ignored at this level (for now...) */
-    auto pair = m_cache_manager->create(arena_map()->blocks());
-    arena_map()->caches_add(pair.second);
+    auto ret = m_cache_manager->create(arena_map()->blocks());
+    arena_map()->caches_add(ret.caches);
   }
 } /* cache_handling_init() */
 

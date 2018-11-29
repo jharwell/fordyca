@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "rcppsw/task_allocation/task_allocation_params.hpp"
 
@@ -55,15 +55,15 @@ foraging_task::foraging_task(const std::string& name,
  ******************************************************************************/
 __rcsw_pure double foraging_task::current_time(void) const {
   return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
-      ->base_sensors()
+      ->sensors()
       ->tick();
 } /* current_time() */
 
 bool foraging_task::task_in_depth2(const polled_task* const task) {
   return task->name() == kCacheStarterName ||
-      task->name() == kCacheFinisherName ||
-      task->name() == kCacheTransfererName ||
-      task->name() == kCacheCollectorName;
+         task->name() == kCacheFinisherName ||
+         task->name() == kCacheTransfererName ||
+         task->name() == kCacheCollectorName;
 } /* task_in_depth2() */
 
 NS_END(depth2, tasks, fordyca);

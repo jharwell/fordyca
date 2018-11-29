@@ -23,7 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/stateful_qt_user_functions.hpp"
+#include "fordyca/support/depth0/depth0_qt_user_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,14 +37,17 @@ NS_START(fordyca, support, depth1);
  * @class depth1_qt_user_functions
  * @ingroup support depth1
  *
- * @brief Contains hooks for Qt to draw the robot's LOS if so configured.
+ * @brief Contains hooks for Qt to draw the visualizations related to depth 1
+ * task decomposition:
+ *
+ * - Task name
  */
-class depth1_qt_user_functions : public depth0::stateful_qt_user_functions {
+class depth1_qt_user_functions : public depth0::depth0_qt_user_functions {
  public:
   depth1_qt_user_functions(void);
   ~depth1_qt_user_functions(void) override = default;
 
-  void Draw(argos::CFootBotEntity& c_entity) override;
+  void Draw(argos::CFootBotEntity& c_entity);
 };
 
 NS_END(depth1, support, fordyca);

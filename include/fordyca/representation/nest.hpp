@@ -44,9 +44,7 @@ NS_START(fordyca, representation);
  */
 class nest : public multicell_entity, public immovable_cell_entity {
  public:
-  nest(const rcppsw::math::vector2d& dim,
-       const argos::CVector2& loc,
-       double resolution)
+  nest(const rmath::vector2d& dim, const rmath::vector2d& loc, double resolution)
       : multicell_entity(dim, rcppsw::utils::color::kGRAY70),
         immovable_cell_entity(loc, resolution) {}
 
@@ -61,9 +59,9 @@ class nest : public multicell_entity, public immovable_cell_entity {
    *
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
-  bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).value_within(point.GetX()) &&
-           yspan(real_loc()).value_within(point.GetY());
+  bool contains_point(const rmath::vector2d& point) const {
+    return xspan(real_loc()).contains(point.x()) &&
+           yspan(real_loc()).contains(point.y());
   }
 };
 

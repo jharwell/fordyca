@@ -64,11 +64,11 @@ bool base_controller::block_detected(void) const {
   return m_saa->sensing()->block_detected();
 } /* block_detected() */
 
-void base_controller::robot_loc(argos::CVector2 loc) {
+void base_controller::position(const rmath::vector2d& loc) {
   m_saa->sensing()->position(loc);
 }
 
-__rcsw_pure argos::CVector2 base_controller::robot_loc(void) const {
+__rcsw_pure rmath::vector2d base_controller::position(void) const {
   return m_saa->sensing()->position();
 }
 
@@ -95,7 +95,7 @@ void base_controller::Init(ticpp::Element& node) {
   auto* params = param_repo.parse_results<struct params::output_params>();
   output_init(params);
 
-  /* initialize sensing and actuation subsystem */
+  /* initialize sensing and actuation (SAA) subsystem */
   struct actuation_subsystem::actuator_list alist = {
       .wheels = hal::actuators::differential_drive_actuator(
           GetActuator<argos::CCI_DifferentialSteeringActuator>(
@@ -105,7 +105,7 @@ void base_controller::Init(ticpp::Element& node) {
       .wifi = hal::actuators::wifi_actuator(
           GetActuator<argos::CCI_RangeAndBearingActuator>(
               "range_and_bearing"))};
-  struct base_sensing_subsystem::sensor_list slist = {
+  struct sensing_subsystem::sensor_list slist = {
       .rabs = hal::sensors::rab_wifi_sensor(
           GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
       .proximity = hal::sensors::proximity_sensor(
@@ -166,9 +166,11 @@ void base_controller::output_init(
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.fsm"),
                       output_root + "/fsm.log");
 
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.saa_subsystem"),
+  client::set_logfile(log4cxx::Logger::getLogger(
+                          "fordyca.controller.saa_subsystem"),
                       output_root + "/saa.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+  client::set_logfile(log4cxx::Logger::getLogger(
+                          "fordyca.controller.explore_behavior"),
                       output_root + "/saa.log");
 #endif
 } /* output_init() */

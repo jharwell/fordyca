@@ -24,23 +24,29 @@
 #include "fordyca/support/base_loop_functions.hpp"
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/arena/arena_map_params.hpp"
+#include "fordyca/params/visualization_params.hpp"
+
 #include "rcppsw/algorithm/closest_pair2D.hpp"
-#include "rcppsw/math/vector2.hpp"
+#include "fordyca/ds/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
 namespace alg = rcppsw::algorithm;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.base") {}
+    : ER_CLIENT_INIT("fordyca.loop.base"),
+      m_arena_map(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
@@ -74,28 +80,58 @@ void base_loop_functions::output_init(
 } /* output_init() */
 
 void base_loop_functions::Init(ticpp::Element& node) {
+  ndc_push();
   /* parse all environment parameters and capture in logfile */
   m_params.parse_all(node);
 
   /* initialize output and metrics collection */
   output_init(m_params.parse_results<params::output_params>());
 
+  /* initialize arena map and distribute blocks */
+  arena_map_init(params());
+
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
+  ndc_pop();
 } /* Init() */
 
+void base_loop_functions::arena_map_init(
+    const params::loop_function_repository* const repo) {
+  auto* aparams = repo->parse_results<params::arena::arena_map_params>();
+  auto* vparams = repo->parse_results<params::visualization_params>();
+
+  m_arena_map.reset(new ds::arena_map(aparams));
+  if (!m_arena_map->initialize()) {
+    ER_ERR("Could not initialize arena map");
+    std::exit(EXIT_FAILURE);
+  }
+  m_arena_map->distribute_all_blocks();
+
+  /*
+   * If null, visualization has been disabled.
+   */
+  if (nullptr != vparams) {
+    for (auto& block : m_arena_map->blocks()) {
+      block->display_id(vparams->block_id);
+    } /* for(&block..) */
+  }
+} /* arena_map_init() */
+
 void base_loop_functions::PreStep(void) { nearest_neighbors(); } /* PreStep() */
+void base_loop_functions::Reset(void) {
+  m_arena_map->distribute_all_blocks();
+} /* Reset() */
 
 std::vector<double> base_loop_functions::nearest_neighbors(void) const {
-  std::vector<rcppsw::math::vector2d> v;
+  std::vector<rmath::vector2d> v;
   auto& robots =
       const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
           "foot-bot");
 
   for (auto& entity_pair : robots) {
     auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    argos::CVector2 pos;
-    pos.Set(const_cast<argos::CFootBotEntity&>(robot)
+    rmath::vector2d pos;
+    pos.set(const_cast<argos::CFootBotEntity&>(robot)
                 .GetEmbodiedEntity()
                 .GetOriginAnchor()
                 .Position.GetX(),
@@ -103,7 +139,7 @@ std::vector<double> base_loop_functions::nearest_neighbors(void) const {
                 .GetEmbodiedEntity()
                 .GetOriginAnchor()
                 .Position.GetY());
-    v.push_back(rcppsw::math::vector2d(pos.GetX(), pos.GetY()));
+    v.push_back(pos);
   } /* for(&entity..) */
 
   /*
@@ -114,11 +150,10 @@ std::vector<double> base_loop_functions::nearest_neighbors(void) const {
    */
   std::vector<double> res;
   for (size_t i = 0; i < robots.size() / 2; ++i) {
-    auto dist_func = std::bind(&rcppsw::math::vector2d::distance,
+    auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
-    auto pts =
-        alg::closest_pair<rcppsw::math::vector2d>()("recursive", v, dist_func);
+    auto pts = alg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
     size_t old = v.size();
     v.erase(std::remove_if(v.begin(),
                            v.end(),

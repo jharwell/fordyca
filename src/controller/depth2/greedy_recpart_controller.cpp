@@ -26,13 +26,17 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
+#include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,12 +57,19 @@ greedy_recpart_controller::~greedy_recpart_controller(void) = default;
  ******************************************************************************/
 void greedy_recpart_controller::ControlStep(void) {
   ndc_pusht();
+  if (nullptr != block()) {
+    ER_ASSERT(-1 != block()->robot_id(),
+              "Carried block%d has robot id=%d",
+              block()->id(),
+              block()->robot_id());
+  }
   perception()->update(depth1::greedy_partitioning_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
 
+  m_task_aborted = false;
   executive()->run();
   ndc_pop();
 } /* ControlStep() */
@@ -76,6 +87,13 @@ void greedy_recpart_controller::Init(ticpp::Element& node) {
                                 saa_subsystem(),
                                 perception())(&param_repo));
 
+  executive()->task_alloc_notify(
+      std::bind(&greedy_recpart_controller::task_alloc_cb,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2));
+  executive()->task_abort_notify(std::bind(
+      &greedy_recpart_controller::task_abort_cb, this, std::placeholders::_1));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -89,6 +107,31 @@ __rcsw_pure const tasks::base_foraging_task* greedy_recpart_controller::current_
     void) const {
   return const_cast<greedy_recpart_controller*>(this)->current_task();
 } /* current_task() */
+
+void greedy_recpart_controller::task_alloc_cb(const ta::polled_task* const task,
+                                              const ta::bi_tab* const) {
+  if (!m_bsel_exception_added) {
+    block_sel_matrix()->sel_exceptions_clear();
+  }
+  m_bsel_exception_added = false;
+
+  /*
+   * We only care about the cache selection exceptions for the cache transferer
+   * task. If that is not the task we just allocated ourself, then even if we
+   * just finished the cache transferer task and added a cache to one of the
+   * exception lists, remove it.
+   */
+  if (!m_csel_exception_added ||
+      task->name() != tasks::depth2::foraging_task::kCacheTransfererName) {
+    cache_sel_matrix()->sel_exceptions_clear();
+  }
+  m_bsel_exception_added = false;
+  m_csel_exception_added = false;
+} /* task_alloc_cb() */
+
+void greedy_recpart_controller::task_abort_cb(const ta::polled_task*) {
+  m_task_aborted = true;
+} /* task_abort_cb() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

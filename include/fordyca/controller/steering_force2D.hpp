@@ -41,7 +41,7 @@ struct steering_force2D_params;
 NS_START(controller);
 namespace steering = rcppsw::robotics::steering2D;
 namespace er = rcppsw::er;
-class base_sensing_subsystem;
+class sensing_subsystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -62,7 +62,7 @@ class steering_force2D : public steering::force_calculator,
  public:
   steering_force2D(steering::boid& entity,
                    const params::steering_force2D_params* params,
-                   const std::shared_ptr<base_sensing_subsystem>& sensors);
+                   const std::shared_ptr<sensing_subsystem>& sensors);
 
   /**
    * @brief Add the \ref kPhototaxis force to the sum forces for this timestep.

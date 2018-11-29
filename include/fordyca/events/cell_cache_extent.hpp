@@ -25,13 +25,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
+namespace rmath = rcppsw::math;
 namespace representation {
 class arena_map;
 class base_cache;
@@ -59,7 +59,7 @@ NS_START(events);
 class cell_cache_extent : public cell_op,
                           public visitor::can_visit<ds::arena_map> {
  public:
-  cell_cache_extent(const rcppsw::math::dcoord2& coord,
+  cell_cache_extent(const rmath::vector2u& coord,
                     const std::shared_ptr<representation::base_cache> cache);
 
   /* depth1 foraging */

@@ -36,7 +36,7 @@ using representation::base_cache;
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
-                                           const argos::CVector2& center,
+                                           const rmath::vector2d& center,
                                            double cache_size)
     : base_cache_creator(grid, cache_size),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
@@ -45,21 +45,21 @@ static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-base_cache_creator::cache_vector static_cache_creator::create_all(
-    const cache_vector& existing_caches,
-    block_vector& blocks) {
+ds::cache_vector static_cache_creator::create_all(
+    const ds::cache_vector& existing_caches,
+    ds::block_vector& blocks,
+    double) {
   ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
   std::vector<std::shared_ptr<representation::arena_cache>> caches;
 
   ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
             "Cannot create static cache from < %zu blocks",
             base_cache::kMinBlocks);
-  ER_INFO("Creating static cache @(%f, %f) from %zu free blocks",
-          m_center.GetX(),
-          m_center.GetY(),
+  ER_INFO("Creating static cache@%s from %zu free blocks",
+          m_center.to_str().c_str(),
           blocks.size());
-  block_list starter_blocks;
-  for (auto b : blocks) {
+  ds::block_list starter_blocks;
+  for (auto& b : blocks) {
     starter_blocks.push_back(b);
   } /* for(i..) */
 

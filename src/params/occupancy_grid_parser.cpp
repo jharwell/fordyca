@@ -56,8 +56,7 @@ void occupancy_grid_parser::show(std::ostream& stream) const {
            << build_footer();
     return;
   }
-  stream << build_header() << m_grid << m_pheromone
-          << build_footer();
+  stream << build_header() << m_grid << m_pheromone << build_footer();
 } /* show() */
 
 __rcsw_pure bool occupancy_grid_parser::validate(void) const {

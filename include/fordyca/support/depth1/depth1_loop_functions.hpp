@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include "fordyca/support/depth0/stateful_loop_functions.hpp"
+#include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
 
@@ -54,8 +54,8 @@ class static_cache_manager;
  * Handles all operations robots perform relating to static caches: pickup,
  * drop, etc.
  */
-class depth1_loop_functions : public depth0::stateful_loop_functions,
-                                public er::client<depth1_loop_functions> {
+class depth1_loop_functions : public depth0::depth0_loop_functions,
+                              public er::client<depth1_loop_functions> {
  public:
   depth1_loop_functions(void);
   ~depth1_loop_functions(void) override;

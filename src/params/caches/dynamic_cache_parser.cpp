@@ -42,11 +42,11 @@ void dynamic_cache_parser::parse(const ticpp::Element& node) {
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-
   XML_PARSE_ATTR(cnode, m_params, enable);
   if (m_params->enable) {
     XML_PARSE_ATTR(cnode, m_params, min_dist);
     XML_PARSE_ATTR(cnode, m_params, min_blocks);
+    XML_PARSE_ATTR(cnode, m_params, robot_drop_only);
   }
 } /* parse() */
 
@@ -55,6 +55,7 @@ void dynamic_cache_parser::show(std::ostream& stream) const {
          << XML_ATTR_STR(m_params, enable) << std::endl
          << XML_ATTR_STR(m_params, min_dist) << std::endl
          << XML_ATTR_STR(m_params, min_blocks) << std::endl
+         << XML_ATTR_STR(m_params, robot_drop_only) << std::endl
          << build_footer();
 } /* show() */
 

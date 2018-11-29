@@ -22,10 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
+#include "fordyca/events/block_proximity.hpp"
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/cache_appeared.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
+
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -88,34 +89,34 @@ void cache_starter::active_interface_update(int) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_starter,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_starter,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         cache_starter,
+                         is_exploring_for_goal,
+                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         cache_starter,
+                         is_vectoring_to_goal,
+                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        cache_starter,
-                        goal_acquired,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         cache_starter,
+                         goal_acquired,
+                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        cache_starter,
-                        acquisition_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         cache_starter,
+                         acquisition_goal,
+                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        cache_starter,
-                        block_transport_goal,
-                        static_cast<fsm::depth2::block_to_cache_site_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         cache_starter,
+                         block_transport_goal,
+                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()));
 
 /*******************************************************************************
  * Event Handling
@@ -129,7 +130,7 @@ void cache_starter::accept(events::free_block_pickup& visitor) {
 void cache_starter::accept(events::block_vanished& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::cache_appeared& visitor) {
+void cache_starter::accept(events::block_proximity& visitor) {
   visitor.visit(*this);
 }
 

@@ -23,16 +23,16 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
-#include "fordyca/fsm/depth0/stateless_fsm.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -46,6 +46,7 @@
 NS_START(fordyca, events);
 
 using ds::occupancy_grid;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -54,7 +55,7 @@ free_block_pickup::free_block_pickup(
     std::shared_ptr<representation::base_block> block,
     uint robot_index,
     uint timestep)
-    : cell_op(block->discrete_loc().first, block->discrete_loc().second),
+    : cell_op(block->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
       m_timestep(timestep),
       m_robot_index(robot_index),
@@ -70,28 +71,25 @@ void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
 void free_block_pickup::visit(ds::cell2D& cell) {
   cell.fsm().accept(*this);
   cell.entity(nullptr);
-  ER_INFO("cell2D: fb%u block%d from (%u, %u)",
+  ER_INFO("cell2D: fb%u block%d from %s",
           m_robot_index,
           m_block->id(),
-          m_block->discrete_loc().first,
-          m_block->discrete_loc().second);
+          m_block->discrete_loc().to_str().c_str());
 } /* visit() */
 
 void free_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
-                rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
+                rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
-  argos::CVector2 old_r(m_block->real_loc().GetX(), m_block->real_loc().GetY());
-  events::cell_empty op(cell_op::x(), cell_op::y());
+  rmath::vector2d old_r = m_block->real_loc();
+  events::cell_empty op(cell_op::coord());
   map.accept(op);
   m_block->accept(*this);
-  ER_INFO("arena_map: fb%u: block%d from (%f, %f) -> (%u, %u)",
+  ER_INFO("arena_map: fb%u: block%d@%s/%s",
           m_robot_index,
           m_block->id(),
-          old_r.GetX(),
-          old_r.GetY(),
-          cell_op::x(),
-          cell_op::y());
+          old_r.to_str().c_str(),
+          cell_op::coord().to_str().c_str());
 } /* visit() */
 
 /*******************************************************************************
@@ -106,8 +104,7 @@ void free_block_pickup::visit(representation::base_block& block) {
   ER_INFO("Block%d is now carried by fb%u", m_block->id(), m_robot_index);
 } /* visit() */
 
-void free_block_pickup::visit(
-    controller::depth0::stateless_controller& controller) {
+void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
   controller.fsm()->accept(*this);
   controller.block(m_block);
@@ -117,9 +114,9 @@ void free_block_pickup::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::stateless_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -127,7 +124,7 @@ void free_block_pickup::visit(fsm::depth0::stateless_fsm& fsm) {
  ******************************************************************************/
 void free_block_pickup::visit(ds::perceived_arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
-                rcppsw::math::dcoord2(cell_op::x(), cell_op::y()),
+                rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
   ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
@@ -138,7 +135,7 @@ void free_block_pickup::visit(ds::perceived_arena_map& map) {
    * true (and the fact that it isn't is not an indication of inconsistent
    * simulation state :-( ). This can happen if, for example, a robot is
    * exploring for a block very near the edge of the arena, and happens to drive
-   * over a block. In that case the block is not in its LOS (BUG!), or it its
+   * over a block. In that case the block is not in its LOS (BUG!), or in its
    * occupancy grid, and hence the assertion failure here.
    */
   /* ER_ASSERT(cell.state_has_block(), "cell does not contain block"); */
@@ -149,7 +146,7 @@ void free_block_pickup::visit(ds::perceived_arena_map& map) {
 
 void free_block_pickup::visit(fsm::depth0::stateful_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(
@@ -173,11 +170,12 @@ void free_block_pickup::visit(
   controller.free_pickup_event(true);
   controller.block(m_block);
 
+  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
   auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non free block interactor task %s causing free block pickup",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            polled->name().c_str());
 
   task->accept(*this);
   ER_INFO("Picked up block%d", m_block->id());
@@ -185,21 +183,22 @@ void free_block_pickup::visit(
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())
+      ->accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth1::harvester& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+void free_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -212,11 +211,12 @@ void free_block_pickup::visit(
   controller.free_pickup_event(true);
   controller.block(m_block);
 
+  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
   auto* task =
-      dynamic_cast<tasks::free_block_interactor*>(controller.current_task());
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non free block interactor task %s causing free block pickup",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            polled->name().c_str());
 
   task->accept(*this);
   ER_INFO("Picked up block%d", m_block->id());
@@ -224,11 +224,11 @@ void free_block_pickup::visit(
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth2::cache_starter& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void free_block_pickup::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

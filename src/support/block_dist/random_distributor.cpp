@@ -27,7 +27,6 @@
 #include <boost/uuid/uuid_io.hpp>
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/math/utils.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
@@ -37,11 +36,12 @@
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-random_distributor::random_distributor(ds::arena_grid::view& grid,
+random_distributor::random_distributor(const ds::arena_grid::view& grid,
                                        double resolution)
     : base_distributor(),
       ER_CLIENT_INIT("fordyca.support.block_dist.random"),
@@ -51,37 +51,36 @@ random_distributor::random_distributor(ds::arena_grid::view& grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool random_distributor::distribute_blocks(block_vector& blocks,
-                                           entity_list& entities) {
+bool random_distributor::distribute_blocks(ds::block_vector& blocks,
+                                           ds::const_entity_list& entities) {
+  rmath::vector2u loc = (*m_grid.origin()).loc();
   ER_INFO("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
           blocks.size(),
-          (*m_grid.origin()).loc().first,
-          (*m_grid.origin()).loc().first + m_grid.shape()[0],
-          (*m_grid.origin()).loc().second,
-          (*m_grid.origin()).loc().second + m_grid.shape()[1]);
-  for (auto& b : blocks) {
-    if (!distribute_block(b, entities)) {
-      return false;
-    }
-  } /* for(&b..) */
-  return true;
+          loc.x(),
+          loc.x() + m_grid.shape()[0],
+          loc.y(),
+          loc.y() + m_grid.shape()[1]);
+
+  return std::all_of(blocks.begin(),
+                     blocks.end(),
+                     [&](auto& b) {
+                       return distribute_block(b, entities);
+                     });
 } /* distribute_blocks() */
 
 bool random_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
-    entity_list& entities) {
+    ds::const_entity_list& entities) {
   ds::cell2D* cell = nullptr;
-  std::vector<uint> coord;
-  if (!find_avail_coord(entities, coord)) {
+  coord_search_result res = avail_coord_search(entities, block->dims());
+  if (!res.status) {
     return false;
   }
-  ER_INFO("Found coordinates for distribution: rel=(%u, %u), abs=(%u, %u)",
-           coord[0],
-           coord[1],
-           coord[2],
-           coord[3]);
+  ER_INFO("Found coordinates for distribution: rel=%s, abs=%s",
+          res.rel.to_str().c_str(),
+          res.abs.to_str().c_str());
 
-  cell = &m_grid[coord[0]][coord[1]];
+  cell = &m_grid[res.rel.x()][res.rel.y()];
 
   /*
    * You can only distribute blocks to cells that do not currently have
@@ -93,117 +92,170 @@ bool random_distributor::distribute_block(
   ER_ASSERT(!cell->state_in_cache_extent(),
             "Destination cell part of cache extent");
 
-  events::free_block_drop op(block,
-                             rcppsw::math::dcoord2(coord[2], coord[3]),
-                             m_resolution);
+  events::free_block_drop op(block, res.abs, m_resolution);
   cell->accept(op);
-  if (verify_block_dist(*block, cell)) {
+  if (verify_block_dist(block.get(), entities, cell)) {
+    ER_DEBUG("Block%d,ptr=%p distributed@%s/%s",
+             block->id(),
+             block.get(),
+             block->real_loc().to_str().c_str(),
+             block->discrete_loc().to_str().c_str());
     /*
-       * Now that the block has been distributed, it is another entity that
-       * needs to be distributed around.
-       */
+     * Now that the block has been distributed, it is another entity that
+     * needs to be avoided during subsequent distributions.
+     */
     entities.push_back(block.get());
     return true;
   } else {
+    ER_WARN("Failed to distribute block%d after finding distribution coord",
+            block->id());
     return false;
   }
 } /* distribute_block() */
 
 __rcsw_pure bool random_distributor::verify_block_dist(
-    const representation::base_block& block,
+    const representation::base_block* const block,
+    const ds::const_entity_list& entities,
     __rcsw_unused const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
-  ER_CHECK(representation::base_block::kOutOfSightDLoc != block.discrete_loc(),
+  ER_CHECK(representation::base_block::kOutOfSightDLoc != block->discrete_loc(),
            "Block%d discrete coordinates still out of sight after "
            "distribution",
-           block.id());
-  ER_CHECK(representation::base_block::kOutOfSightRLoc != block.real_loc(),
+           block->id());
+  ER_CHECK(representation::base_block::kOutOfSightRLoc != block->real_loc(),
            "Block%d real coordinates still out of sight after distribution",
-           block.id());
+           block->id());
 
-  ER_DEBUG("Block%d: real_loc=(%f, %f) discrete_loc=(%u, %u) ptr=%p",
-           block.id(),
-           block.real_loc().GetX(),
-           block.real_loc().GetY(),
-           block.discrete_loc().first,
-           block.discrete_loc().second,
-           reinterpret_cast<const void*>(cell->block().get()));
+  /* The cell it was distributed to should refer to it */
+  ER_CHECK(block == cell->block().get(),
+           "Block%d@%s not referenced by containing cell@%s",
+           block->id(),
+           block->real_loc().to_str().c_str(),
+           cell->loc().to_str().c_str());
+
+  /* no entity should overlap with the block after distribution */
+  for (auto &e : entities) {
+    if (e == block) {
+      continue;
+    }
+    ER_ASSERT(!block_overlaps_entity(block, e),
+            "Entity contains block%d@%s/%s after distribution",
+            block->id(),
+            block->real_loc().to_str().c_str(),
+            block->real_loc().to_str().c_str());
+  } /* for(&e..) */
   return true;
 
 error:
   return false;
 } /* verify_block_dist() */
 
-bool random_distributor::find_avail_coord(const entity_list& entities,
-                                          std::vector<uint>& coordv) {
-  uint abs_x, abs_y, rel_x, rel_y;
-  rcppsw::math::range<uint> area_xrange(m_grid.index_bases()[0],
-                                        m_grid.shape()[0]);
-  rcppsw::math::range<uint> area_yrange(m_grid.index_bases()[1],
-                                        m_grid.shape()[1]);
+random_distributor::coord_search_result
+random_distributor::avail_coord_search(const ds::const_entity_list& entities,
+                                       const rmath::vector2d& block_dim) {
+  rmath::vector2u rel;
+  rmath::vector2u abs;
+  rcppsw::math::rangeu area_xrange(m_grid.index_bases()[0], m_grid.shape()[0]);
+  rcppsw::math::rangeu area_yrange(m_grid.index_bases()[1], m_grid.shape()[1]);
 
   /* -1 because we are working with array indices */
-  std::uniform_int_distribution<uint> xdist(area_xrange.get_min(),
-                                            area_xrange.get_max() - 1);
-  std::uniform_int_distribution<uint> ydist(area_yrange.get_min(),
-                                            area_yrange.get_max() - 1);
+  std::uniform_int_distribution<uint> xdist(area_xrange.lb(),
+                                            area_xrange.ub() - 1);
+  std::uniform_int_distribution<uint> ydist(area_yrange.lb(),
+                                            area_yrange.ub() - 1);
   uint count = 0;
 
+  /*
+   * Try to find an available set of relative+absolute coordinates such that if
+   * the entity is placed there it will not overlap any other entities in the
+   * arena. You only have a finite number of tries, for obvious reasons.
+   */
   do {
-    rel_x = area_xrange.span() > 0 ? xdist(m_rng) : m_grid.index_bases()[0];
-    rel_y = area_xrange.span() > 0 ? ydist(m_rng) : m_grid.index_bases()[1];
-    abs_x = rel_x + (*m_grid.origin()).loc().first;
-    abs_y = rel_y + (*m_grid.origin()).loc().second;
-  } while (
-      std::any_of(
-          entities.begin(),
-          entities.end(),
-          [&](const representation::multicell_entity* ent) {
-            auto movable =
-                dynamic_cast<const representation::movable_cell_entity*>(ent);
-            argos::CVector2 coord =
-                math::dcoord_to_rcoord(rcppsw::math::dcoord2(abs_x, abs_y),
-                                       m_resolution);
-            if (nullptr != movable) {
-              auto ent_xspan = ent->xspan(movable->real_loc());
-              auto ent_yspan = ent->yspan(movable->real_loc());
-              ER_TRACE(
-                  "(movable entity) rcoord=(%f, %f), xspan=[%f-%f], "
-                  "yspan=[%f-%f]",
-                  coord.GetX(),
-                  coord.GetY(),
-                  ent_xspan.get_min(),
-                  ent_xspan.get_max(),
-                  ent_yspan.get_min(),
-                  ent_yspan.get_max());
-              return ent_xspan.value_within(coord.GetX()) &&
-                     ent_yspan.value_within(coord.GetY());
-            }
-            auto immovable =
-                dynamic_cast<const representation::immovable_cell_entity*>(ent);
-            ER_ASSERT(nullptr != immovable,
-                      "Cell entity is neither movable nor immovable");
-            auto ent_xspan = ent->xspan(immovable->real_loc());
-            auto ent_yspan = ent->yspan(immovable->real_loc());
-
-            ER_TRACE(
-                "(immovable entity) rcoord=(%f, %f), xspan=[%f-%f], "
-                "yspan=[%f-%f]",
-                coord.GetX(),
-                coord.GetY(),
-                ent_xspan.get_min(),
-                ent_xspan.get_max(),
-                ent_yspan.get_min(),
-                ent_yspan.get_max());
-            return ent_xspan.value_within(coord.GetX()) &&
-                   ent_yspan.value_within(coord.GetY());
-          }) &&
-      count++ <= kMAX_DIST_TRIES);
+    rmath::vector2u loc = (*m_grid.origin()).loc();
+    uint x = area_xrange.span() > 0 ? xdist(m_rng) : m_grid.index_bases()[0];
+    uint y = area_xrange.span() > 0 ? ydist(m_rng) : m_grid.index_bases()[1];
+    rel = {x, y};
+    abs = {rel.x() + loc.x(), rel.y() + loc.y()};
+  } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
+        return  dist_loc_will_overlap_entity(abs, block_dim, ent) &&
+           count++ <= kMAX_DIST_TRIES;
+  }));
   if (count <= kMAX_DIST_TRIES) {
-    coordv = std::vector<uint>({rel_x, rel_y, abs_x, abs_y});
-    return true;
+    return {true, rel, abs};
   }
-  return false;
-} /* find_avail_coord() */
+  return {false, {}, {}};
+} /* avail_coord_search() */
+
+bool random_distributor::dist_loc_will_overlap_entity(
+    const rmath::vector2u& loc,
+    const rmath::vector2d& block_dim,
+    const representation::multicell_entity* const entity) {
+  auto movable =
+      dynamic_cast<const representation::movable_cell_entity*>(entity);
+  auto immovable =
+      dynamic_cast<const representation::immovable_cell_entity*>(entity);
+  ER_ASSERT(!(nullptr == movable && nullptr == immovable),
+            "Entity is neither movable nor immovable");
+
+  rmath::vector2d rloc = rmath::uvec2dvec(loc, m_resolution);
+  auto loc_xspan = representation::multicell_entity::xspan(rloc,
+                                                           block_dim.x());
+  auto loc_yspan = representation::multicell_entity::yspan(rloc,
+                                                           block_dim.y());
+  if (nullptr != movable) {
+    auto ent_xspan = entity->xspan(movable->real_loc());
+    auto ent_yspan = entity->yspan(movable->real_loc());
+    ER_TRACE("(movable) rloc=%s loc_xspan=%s,loc_yspan=%s, ent_xspan=%s,ent_yspan=%s",
+             rloc.to_str().c_str(),
+             loc_xspan.to_str().c_str(),
+             loc_yspan.to_str().c_str(),
+             ent_xspan.to_str().c_str(),
+             ent_yspan.to_str().c_str());
+
+    return ent_xspan.overlaps_with(loc_xspan) &&
+        ent_yspan.overlaps_with(loc_yspan);
+  }
+
+  auto ent_xspan = entity->xspan(immovable->real_loc());
+  auto ent_yspan = entity->yspan(immovable->real_loc());
+
+  ER_TRACE("(immovable) rloc=%s loc_xspan=%s,loc_yspan=%s, ent_xspan=%s,ent_yspan=%s",
+           rloc.to_str().c_str(),
+           loc_xspan.to_str().c_str(),
+           loc_yspan.to_str().c_str(),
+           ent_xspan.to_str().c_str(),
+           ent_yspan.to_str().c_str());
+
+  return ent_xspan.overlaps_with(loc_xspan) &&
+          ent_yspan.overlaps_with(loc_yspan);
+} /* dist_loc_will_overlap_entity() */
+
+bool random_distributor::block_overlaps_entity(
+    const representation::base_block* const block,
+    const representation::multicell_entity* const entity) {
+
+  auto movable =
+      dynamic_cast<const representation::movable_cell_entity*>(entity);
+  auto immovable =
+      dynamic_cast<const representation::immovable_cell_entity*>(entity);
+  ER_ASSERT(!(nullptr == movable && nullptr == immovable),
+            "Entity is neither movable nor immovable");
+  auto block_xspan = block->xspan(block->real_loc());
+  auto block_yspan = block->yspan(block->real_loc());
+
+  if (nullptr != movable) {
+    auto ent_xspan = entity->xspan(movable->real_loc());
+    auto ent_yspan = entity->yspan(movable->real_loc());
+
+    return ent_xspan.overlaps_with(block_xspan) &&
+        ent_yspan.overlaps_with(block_yspan);
+  }
+
+  auto ent_xspan = entity->xspan(immovable->real_loc());
+  auto ent_yspan = entity->yspan(immovable->real_loc());
+
+  return ent_xspan.overlaps_with(block_xspan) &&
+      ent_yspan.overlaps_with(block_yspan);
+} /* block_overlaps_entity() */
 
 NS_END(block_dist, support, fordyca);

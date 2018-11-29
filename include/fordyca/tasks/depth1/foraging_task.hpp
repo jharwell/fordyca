@@ -27,7 +27,6 @@
 #include <string>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************

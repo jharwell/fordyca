@@ -35,7 +35,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 free_block_to_nest_fsm::free_block_to_nest_fsm(
-    const controller::block_selection_matrix* sel_matrix,
+    const controller::block_sel_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
     ds::perceived_arena_map* const map)
     : base_foraging_fsm(saa, ST_MAX_STATES),
@@ -65,7 +65,7 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
                                                nullptr,
                                                &entry_transport_to_nest,
                                                nullptr),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, state_machine::event_data) {
   /* first time running FSM */
@@ -132,17 +132,19 @@ __rcsw_const FSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
  ******************************************************************************/
 __rcsw_pure bool free_block_to_nest_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
-      base_foraging_fsm::in_collision_avoidance();
+         base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool free_block_to_nest_fsm::entered_collision_avoidance(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.entered_collision_avoidance()) ||
-      base_foraging_fsm::entered_collision_avoidance();
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.entered_collision_avoidance()) ||
+         base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool free_block_to_nest_fsm::exited_collision_avoidance(void) const {
-  return (m_block_fsm.task_running() && m_block_fsm.exited_collision_avoidance()) ||
-      base_foraging_fsm::exited_collision_avoidance();
+  return (m_block_fsm.task_running() &&
+          m_block_fsm.exited_collision_avoidance()) ||
+         base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 __rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) const {
@@ -156,8 +158,14 @@ __rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) cons
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINE(bool, free_block_to_nest_fsm, is_exploring_for_goal, m_block_fsm);
-FSM_WRAPPER_DEFINE(bool, free_block_to_nest_fsm, is_vectoring_to_goal, m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool,
+                    free_block_to_nest_fsm,
+                    is_exploring_for_goal,
+                    m_block_fsm);
+FSM_WRAPPER_DEFINEC(bool,
+                    free_block_to_nest_fsm,
+                    is_vectoring_to_goal,
+                    m_block_fsm);
 
 acquisition_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||

@@ -44,10 +44,10 @@ NS_START(fordyca, representation);
  */
 class cube_block : public base_block {
  public:
-  explicit cube_block(const rcppsw::math::vector2d& dim)
+  explicit cube_block(const rmath::vector2d& dim)
       : base_block(dim, ut::color::kBLACK, -1) {}
 
-  cube_block(const rcppsw::math::vector2d& dim, int id)
+  cube_block(const rmath::vector2d& dim, int id)
       : base_block(dim, ut::color::kBLACK, id) {}
 
   transport_metrics::block_type type(void) const override {

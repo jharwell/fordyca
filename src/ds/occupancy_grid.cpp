@@ -38,8 +38,8 @@ occupancy_grid::occupancy_grid(
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
       stacked_grid(c_params->grid.resolution,
-                   static_cast<size_t>(c_params->grid.upper.GetX()),
-                   static_cast<size_t>(c_params->grid.upper.GetY())),
+                   c_params->grid.upper.x(),
+                   c_params->grid.upper.y()),
       m_pheromone_repeat_deposit(c_params->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
   ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
@@ -49,8 +49,8 @@ occupancy_grid::occupancy_grid(
           ydsize(),
           resolution());
 
-  for (size_t i = 0; i < xdsize(); ++i) {
-    for (size_t j = 0; j < ydsize(); ++j) {
+  for (uint i = 0; i < xdsize(); ++i) {
+    for (uint j = 0; j < ydsize(); ++j) {
       cell_init(i, j, c_params->pheromone.rho);
     } /* for(j..) */
   }   /* for(i..) */
@@ -90,7 +90,7 @@ void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {
   access<kPheromone>(i, j).rho(pheromone_rho);
   cell2D& cell = access<kCell>(i, j);
   cell.robot_id(m_robot_id);
-  cell.loc(rcppsw::math::dcoord2(i, j));
+  cell.loc(rmath::vector2u(i, j));
 } /* cell_init() */
 
 void occupancy_grid::cell_state_update(uint i, uint j) {
@@ -120,7 +120,7 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
              j,
              kEPSILON,
              m_robot_id.c_str());
-    events::cell_unknown op(cell.loc().first, cell.loc().second);
+    events::cell_unknown op(cell.loc());
     this->accept(op);
     density.reset();
   }

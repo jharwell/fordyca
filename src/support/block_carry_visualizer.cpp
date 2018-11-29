@@ -50,11 +50,11 @@ void block_carry_visualizer::draw(const representation::base_block* const block,
                                 block->color().blue()));
   } else if (nullptr != dynamic_cast<const representation::ramp_block*>(block)) {
     /*
-   * Ramp blocks are 2X as long in X as in Y. Z height is the same as X (not */
-    /* currently used/handled in the simulation; only for visualization
-   * purposes). But, drawing ramp blocks in ARGos is a pain in the ass, so use
-   * the spherical cow approach.
-   */
+     * Ramp blocks are 2X as long in X as in Y. Z height is the same as X (not
+     * currently used/handled in the simulation; only for visualization
+     * purposes). But, drawing ramp blocks in ARGos is a pain in the ass, so use
+     * the spherical cow approach.
+     */
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
                   argos::CVector3(block->xsize(), block->ysize(), block->ysize()),

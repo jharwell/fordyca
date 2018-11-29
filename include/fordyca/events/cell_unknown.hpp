@@ -26,12 +26,14 @@
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace rmath = rcppsw::math;
 namespace ds {
 class cell2D;
 class occupancy_grid;
@@ -61,8 +63,8 @@ class cell_unknown : public cell_op,
                      public visitor::can_visit<ds::occupancy_grid>,
                      public rcppsw::er::client<cell_unknown> {
  public:
-  cell_unknown(uint x, uint y)
-      : cell_op(x, y), ER_CLIENT_INIT("fordyca.ds.events.cell_unknown") {}
+  explicit cell_unknown(const rmath::vector2u& coord)
+      : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_unknown") {}
 
   /* stateful foraging */
   void visit(ds::cell2D& cell) override;

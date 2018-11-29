@@ -51,20 +51,30 @@ multi_cluster_distributor::multi_cluster_distributor(
  ******************************************************************************/
 bool multi_cluster_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
-    entity_list& entities) {
-  for (size_t i = 0; i < kMAX_DIST_TRIES; ++i) {
+    ds::const_entity_list& entities) {
+  for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
     uint idx = std::rand() % m_dists.size();
-    cluster_distributor& d = m_dists[idx];
-    if (d.cluster().capacity() == d.cluster().block_count()) {
+    cluster_distributor& dist = m_dists[idx];
+    const auto* clust = dist.block_clusters().front(); /* only 1 */
+    if (clust->capacity() == clust->block_count()) {
       ER_DEBUG("block%d to cluster%u failed: Cluster capacity (%u) reached",
                block->id(),
                idx,
-               d.cluster().capacity());
+               clust->capacity());
     } else {
-      return d.distribute_block(block, entities);
+      return dist.distribute_block(block, entities);
     }
   } /* for(i..) */
   return false;
 } /* distribute_block() */
+
+ds::const_block_cluster_list multi_cluster_distributor::block_clusters(void) const {
+  ds::const_block_cluster_list ret;
+  for (auto &dist : m_dists) {
+    auto bclusts = dist.block_clusters();
+    ret.insert(ret.end(), bclusts.begin(), bclusts.end());
+  } /* for(&dist..) */
+  return ret;
+} /* block_clusters() */
 
 NS_END(block_dist, support, fordyca);

@@ -33,8 +33,8 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-line_of_sight::const_block_list line_of_sight::blocks(void) const {
-  const_block_list blocks;
+ds::const_block_list line_of_sight::blocks(void) const {
+  ds::const_block_list blocks;
   for (uint i = 0; i < m_view.shape()[0]; ++i) {
     for (uint j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];
@@ -50,8 +50,8 @@ line_of_sight::const_block_list line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-line_of_sight::const_cache_list line_of_sight::caches(void) const {
-  const_cache_list caches = m_caches;
+ds::const_cache_list line_of_sight::caches(void) const {
+  ds::const_cache_list caches = m_caches;
 
   for (uint i = 0; i < m_view.shape()[0]; ++i) {
     for (uint j = 0; j < m_view.shape()[1]; ++j) {
@@ -100,19 +100,19 @@ __rcsw_pure ds::cell2D& line_of_sight::cell(uint i, uint j) {
   return m_view[i][j];
 }
 
-rcppsw::math::dcoord2 line_of_sight::abs_ll(void) const {
+rmath::vector2u line_of_sight::abs_ll(void) const {
   return cell(0, 0).loc();
 } /* abs_ll() */
 
-rcppsw::math::dcoord2 line_of_sight::abs_ul(void) const {
+rmath::vector2u line_of_sight::abs_ul(void) const {
   return cell(0, ysize() - 1).loc();
 } /* abs_ul() */
 
-rcppsw::math::dcoord2 line_of_sight::abs_lr(void) const {
+rmath::vector2u line_of_sight::abs_lr(void) const {
   return cell(xsize() - 1, 0).loc();
 } /* abs_lr() */
 
-rcppsw::math::dcoord2 line_of_sight::abs_ur(void) const {
+rmath::vector2u line_of_sight::abs_ur(void) const {
   return cell(xsize() - 1, ysize() - 1).loc();
 } /* abs_ur() */
 

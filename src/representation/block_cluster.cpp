@@ -31,18 +31,26 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure uint block_cluster::block_count(void) const {
-  uint count = 0;
+__rcsw_pure ds::const_block_list block_cluster::blocks(void) const {
+  ds::const_block_list ret;
   for (size_t i = 0; i < m_view.shape()[0]; ++i) {
     for (size_t j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];
-      ER_ASSERT(!cell.state_has_cache(), "Cell@(%u,%u) in HAS_CACHE state",
-                cell.loc().first,
-                cell.loc().second);
-      count += cell.state_has_block();
+      ER_ASSERT(!cell.state_has_cache(),
+                "Cell@%s in HAS_CACHE state",
+                cell.loc().to_str().c_str());
+      ER_ASSERT(!cell.state_in_cache_extent(),
+                "Cell@%s in CACHE_EXTENT state",
+                cell.loc().to_str().c_str());
+      if (cell.state_has_block()) {
+        auto block = cell.block();
+        ER_ASSERT(nullptr != block, "Cell@%s null block",
+                  cell.loc().to_str().c_str());
+        ret.push_back(block);
+      }
     } /* for(j..) */
   }   /* for(i..) */
-  return count;
-} /* block_count() */
+  return ret;
+} /* blocks() */
 
 NS_END(representation, fordyca);

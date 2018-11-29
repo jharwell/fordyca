@@ -35,13 +35,17 @@ namespace ta = rcppsw::task_allocation;
  ******************************************************************************/
 controller_repository::controller_repository(void) {
   get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_starter");
+      ta::task_allocation_xml_parser::kXMLRoot)
+      ->exec_est_task_add("cache_starter");
   get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_finisher");
+      ta::task_allocation_xml_parser::kXMLRoot)
+      ->exec_est_task_add("cache_finisher");
   get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_transferer");
+      ta::task_allocation_xml_parser::kXMLRoot)
+      ->exec_est_task_add("cache_transferer");
   get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)->exec_est_task_add("cache_collector");
+      ta::task_allocation_xml_parser::kXMLRoot)
+      ->exec_est_task_add("cache_collector");
 }
 
 NS_END(depth2, params, fordyca);

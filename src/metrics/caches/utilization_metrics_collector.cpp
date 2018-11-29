@@ -77,7 +77,7 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
 
   line += (!m_cum_cache_ids.empty())
               ? std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                               (m_cum_cache_ids.size() *(timestep() + 1)))
+                               (m_cum_cache_ids.size() * (timestep() + 1)))
               : "0";
   line += separator();
 

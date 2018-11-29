@@ -51,9 +51,9 @@ class arena_cache;
 namespace ds {
 class perceived_arena_map;
 } // namespace ds
-namespace fsm { namespace depth1 {
+namespace fsm {
 class block_to_goal_fsm;
-}} // namespace fsm::depth1
+} // namespace fsm
 namespace tasks {
 namespace depth1 {
 class harvester;
@@ -85,7 +85,7 @@ class cache_block_drop
                                 controller::depth2::greedy_recpart_controller,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_transferer,
-                                fsm::depth1::block_to_goal_fsm,
+                                fsm::block_to_goal_fsm,
                                 ds::perceived_arena_map,
                                 representation::arena_cache> {
  public:
@@ -106,7 +106,7 @@ class cache_block_drop
   void visit(representation::arena_cache& cache) override;
   void visit(
       controller::depth1::greedy_partitioning_controller& controller) override;
-  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
+  void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
 
   /* depth2 foraging */

@@ -24,10 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 
@@ -38,7 +36,7 @@ NS_START(fordyca);
 namespace fsm { namespace depth0 { class stateful_fsm; }}
 NS_START(controller);
 class base_perception_subsystem;
-class block_selection_matrix;
+class block_sel_matrix;
 namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
@@ -53,12 +51,8 @@ NS_START(depth0);
  * @brief A foraging controller that remembers what it has seen for a period of
  * time (knowledge decays according to an exponential model,
  * @see pheromone_density).
- *
- * Robots using this controller execute the \ref generalist task, in which a
- * block is acquired (either via randomized exploring or by vectoring to a known
- * block) and then bring the block to the nest.
  */
-class stateful_controller : public stateless_controller,
+class stateful_controller : public crw_controller,
                             public er::client<stateful_controller>,
                             public metrics::world_model_metrics,
                             public visitor::visitable_any<stateful_controller> {
@@ -72,8 +66,8 @@ class stateful_controller : public stateless_controller,
   void Reset(void) override;
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
+  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* world model metrics */
   uint cell_state_inaccuracies(uint state) const override;
@@ -81,8 +75,7 @@ class stateful_controller : public stateless_controller,
   double unknown_percentage(void) const override;
 
   /* block transportation */
-  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
-
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Set the robot's current line of sight (LOS).
@@ -115,16 +108,25 @@ class stateful_controller : public stateless_controller,
   const fsm::depth0::stateful_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::stateful_fsm* fsm(void) { return m_fsm.get(); }
 
+  const class block_sel_matrix* block_sel_matrix(void) const {
+    return m_block_sel_matrix.get();
+  }
+  /*
+   * Needed to update block selections exceptions list in depth2.
+   */
+  class block_sel_matrix* block_sel_matrix(void) {
+    return m_block_sel_matrix.get();
+  }
+
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
-  const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
-  void block_sel_matrix(std::unique_ptr<block_selection_matrix> m);
+  void block_sel_matrix(std::unique_ptr<class block_sel_matrix> m);
 
  private:
   // clang-format off
   bool                                       m_display_los{false};
-  argos::CVector2                            m_light_loc;
-  std::unique_ptr<block_selection_matrix>    m_block_sel_matrix;
+  rmath::vector2d                            m_light_loc;
+  std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
   std::unique_ptr<fsm::depth0::stateful_fsm> m_fsm;
   // clang-format on

@@ -24,14 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "fordyca/math/utils.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -48,9 +47,9 @@ class movable_cell_entity {
   /**
    * @brief Initialize a movable entity with an initial location in the arena.
    */
-  movable_cell_entity(const argos::CVector2& initial_loc, double resolution)
+  movable_cell_entity(const rmath::vector2d& initial_loc, double resolution)
       : m_real_loc(initial_loc),
-        m_discrete_loc(math::rcoord_to_dcoord(initial_loc, resolution)) {}
+        m_discrete_loc(rmath::dvec2uvec(initial_loc, resolution)) {}
 
   /**
    * @brief Initialize a movable entity with an initial location in the arena.
@@ -62,23 +61,21 @@ class movable_cell_entity {
   /**
    * @brief Get the real location (center) of the object.
    */
-  const argos::CVector2& real_loc(void) const { return m_real_loc; }
+  const rmath::vector2d& real_loc(void) const { return m_real_loc; }
 
   /**
    * @brief Get the discretized coordinates of the center of the object, which
    * can be used to index into an arena_map.
    *
    */
-  const rcppsw::math::dcoord2& discrete_loc(void) const {
-    return m_discrete_loc;
-  }
-  void real_loc(const argos::CVector2& loc) { m_real_loc = loc; }
-  void discrete_loc(const rcppsw::math::dcoord2& loc) { m_discrete_loc = loc; }
+  const rmath::vector2u& discrete_loc(void) const { return m_discrete_loc; }
+  void real_loc(const rmath::vector2d& loc) { m_real_loc = loc; }
+  void discrete_loc(const rmath::vector2u& loc) { m_discrete_loc = loc; }
 
  private:
   // clang-format off
-  argos::CVector2       m_real_loc;
-  rcppsw::math::dcoord2 m_discrete_loc;
+  rmath::vector2d       m_real_loc;
+  rmath::vector2u m_discrete_loc;
   // clang-format on
 };
 

@@ -78,8 +78,8 @@ void movement_metrics_collector::collect(
   ++m_stats.cum_robot_count;
   m_stats.cum_distance += m.distance();
   m_stats.int_distance += m.distance();
-  m_stats.cum_velocity += m.velocity().Length();
-  m_stats.int_velocity += m.velocity().Length();
+  m_stats.cum_velocity += m.velocity().length();
+  m_stats.int_velocity += m.velocity().length();
 } /* collect() */
 
 void movement_metrics_collector::reset_after_interval(void) {
