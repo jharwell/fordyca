@@ -29,6 +29,7 @@
 #include "fordyca/params/arena/block_manifest.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/factory/sharing_factory.hpp"
+#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,10 +50,9 @@ class block_manifest_processor
                                        const rmath::vector2d&,
                                        int> {
  public:
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   explicit block_manifest_processor(const params::arena::block_manifest* const m);
 
-  block_vector create_blocks(void);
+  ds::block_vector create_blocks(void);
 
  private:
   // clang-format off

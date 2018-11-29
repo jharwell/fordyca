@@ -56,20 +56,12 @@ NS_START(support);
  */
 class base_cache_manager : public metrics::caches::lifecycle_metrics {
  public:
-  struct creation_result {
-    creation_result(bool b, const ds::cache_vector& c) :
-        status(b),
-        caches(c) {}
-
+  struct creation_res_t {
     bool status;
     ds::cache_vector caches;
   };
 
-  struct block_calc_result {
-    block_calc_result(bool b, const ds::block_vector& c) :
-        status(b),
-        blocks(c) {}
-
+  struct block_calc_res_t {
     bool status;
     ds::block_vector blocks;
   };

@@ -81,7 +81,7 @@ class random_distributor : public base_distributor,
   }
 
  private:
-  struct coord_search_result {
+  struct coord_search_res_t {
     bool            status;
     rmath::vector2u rel;
     rmath::vector2u abs;
@@ -98,31 +98,11 @@ class random_distributor : public base_distributor,
    *
    * @param entities The entities to avoid.
    */
-  coord_search_result avail_coord_search(const ds::const_entity_list& entities,
+  coord_search_res_t avail_coord_search(const ds::const_entity_list& entities,
                                          const rmath::vector2d& block_dim);
   bool verify_block_dist(const representation::base_block* block,
                          const ds::const_entity_list& entities,
                          const ds::cell2D* cell);
-
-  /**
-   * @brief Determine if the specified distribution location will cause an
-   * overlap with the specified entity, given the dimensions of the block to be
-   * distributed.
-   *
-   * @return \c TRUE if an overlap will occur, \c FALSE otherwise
-   */
-  bool dist_loc_will_overlap_entity(const rmath::vector2u& loc,
-                                    const rmath::vector2d& block_dim,
-                                    const representation::multicell_entity* entity);
-
-  /**
-   * @brief Determine if a block overlaps with the specified entity after it has
-   * been distributed, for verification purposes.
-   *
-   * @return \c TRUE if it overlaps in X or in Y, \c FALSE otherwise.
-   */
-  bool block_overlaps_entity(const representation::base_block* block,
-                             const representation::multicell_entity* entity);
 
   // clang-format off
   double                     m_resolution;

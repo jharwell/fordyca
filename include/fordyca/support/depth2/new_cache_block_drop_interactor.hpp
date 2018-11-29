@@ -110,7 +110,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   using penalty_status = typename block_op_penalty_handler<T>::filter_status;
 
   void cache_proximity_notify(T& controller,
-                              const loop_utils::proximity_status& status) {
+                              const loop_utils::proximity_status_t& status) {
     ER_WARN("%s cannot drop block in new cache@%s: Cache%d too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position().to_str().c_str(),

@@ -69,7 +69,7 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
    * If \c FALSE, then the controller should NOT be filtered out, and has
    * satisfied the preconditions. reason is undefined in this case.
    */
-  struct filter_result {
+  struct filter_res_t {
     bool status;
     filter_status reason;
   };
@@ -90,7 +90,7 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
    * @return (\c TRUE, status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_result operator()(T& controller,
+  filter_res_t operator()(T& controller,
                            cache_op_src src) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
@@ -105,7 +105,7 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
         ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
     } /* switch() */
     ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
-    return filter_result{};
+    return filter_res_t{};
   }
 
  private:
@@ -115,16 +115,16 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
    * use an existing cache).
    *
    */
-  filter_result do_filter(const T& controller) const {
+  filter_res_t do_filter(const T& controller) const {
     int cache_id = loop_utils::robot_on_cache(controller, *m_map);
     bool ready =  (controller.goal_acquired() &&
                    acquisition_goal_type::kExistingCache ==
                    controller.acquisition_goal() &&
                    -1 != cache_id);
     if (ready) {
-      return filter_result{false, kStatusOK};
+      return filter_res_t{false, kStatusOK};
     }
-    return filter_result{true, kStatusControllerNotReady};
+    return filter_res_t{true, kStatusControllerNotReady};
   }
 
   // clang-format off

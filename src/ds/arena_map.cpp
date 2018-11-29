@@ -126,7 +126,8 @@ void arena_map::distribute_all_blocks(void) {
   for (size_t i = 0; i < xdsize(); ++i) {
     for (size_t j = 0; j < ydsize(); ++j) {
       cell2D& cell = decoratee().access<arena_grid::kCell>(i, j);
-      if (!cell.state_has_block() && !cell.state_has_cache()) {
+      if (!cell.state_has_block() && !cell.state_has_cache() &&
+          !cell.state_in_cache_extent()) {
         events::cell_empty op(cell.loc());
         cell.accept(op);
       }

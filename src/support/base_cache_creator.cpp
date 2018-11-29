@@ -28,6 +28,7 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -121,69 +122,7 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
   return ret;
 } /* create_single_cache() */
 
-base_cache_creator::deconflict_result base_cache_creator::
-    deconflict_existing_cache(const representation::base_cache& cache,
-                              const rmath::vector2u& center) const {
-  std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
-  std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
-
-  auto exc_xspan = cache.xspan(cache.real_loc());
-  auto exc_yspan = cache.yspan(cache.real_loc());
-  auto newc_xspan = cache.xspan(rmath::uvec2dvec(center));
-  auto newc_yspan = cache.yspan(rmath::uvec2dvec(center));
-
-  rmath::vector2u new_center = center;
-
-  /*
-   * Now that our center is comfortably in the middle of the arena, we need to
-   * deconflict it with all known caches. We move the cache by unings of the
-   * cache size (all caches are the same size), in order to preserve having the
-   * cache location be on an even multiple of the grid size, making sure it
-   * still stays in the arena boundaries.
-   */
-  double x_delta = std::copysign(newc_xspan.span(), xrnd(m_rng));
-  double y_delta = std::copysign(newc_yspan.span(), yrnd(m_rng));
-
-  bool x_conflict = false;
-  bool y_conflict = false;
-  ER_TRACE("xspan=%s cache%d@%s [xspan=%s center=%s]",
-           newc_xspan.to_str().c_str(),
-           cache.id(),
-           cache.real_loc().to_str().c_str(),
-           exc_xspan.to_str().c_str(),
-           center.to_str().c_str());
-  ER_TRACE("yspan=%s cache%d@%s [yspan=%s center=%s]",
-           newc_yspan.to_str().c_str(),
-           cache.id(),
-           cache.real_loc().to_str().c_str(),
-           exc_yspan.to_str().c_str(),
-           center.to_str().c_str());
-
-  if (newc_xspan.overlaps_with(exc_xspan)) {
-    ER_TRACE("xspan=%s overlap cache%d@%s [xspan=%s center=%s], x_delta=%f",
-             newc_xspan.to_str().c_str(),
-             cache.id(),
-             cache.real_loc().to_str().c_str(),
-             exc_xspan.to_str().c_str(),
-             center.to_str().c_str(),
-             x_delta);
-    new_center.x(new_center.x() + x_delta);
-    x_conflict = true;
-  } else if (newc_yspan.overlaps_with(exc_yspan)) {
-    ER_TRACE("yspan=%s overlap cache%d@%s [yspan=%s center=%s], y_delta=%f",
-             newc_yspan.to_str().c_str(),
-             cache.id(),
-             cache.real_loc().to_str().c_str(),
-             exc_yspan.to_str().c_str(),
-             center.to_str().c_str(),
-             y_delta);
-    new_center.y(new_center.y() + y_delta);
-    y_conflict = true;
-  }
-  return deconflict_result(x_conflict && y_conflict, new_center);
-} /* deconflict_existing_cache() */
-
-rmath::vector2u base_cache_creator::deconflict_arena_boundaries(
+base_cache_creator::deconflict_res_t base_cache_creator::deconflict_loc_boundaries(
     double cache_dim,
     const rmath::vector2u& center) const {
   /*
@@ -195,14 +134,90 @@ rmath::vector2u base_cache_creator::deconflict_arena_boundaries(
   double y_max = grid()->yrsize() - cache_dim * 2;
   double y_min = cache_dim * 2;
 
-  int x = std::max(x_min, std::min(x_max, static_cast<double>(center.x())));
-  int y = std::max(y_min, std::min(y_max, static_cast<double>(center.y())));
-  rmath::vector2u res(x, y);
-  ER_TRACE("Adjust center=%s -> %s for arena boundaries",
-           center.to_str().c_str(),
-           res.to_str().c_str());
-  return res;
-} /* deconflict_arena_boundaries() */
+  bool conflict = false;
+  rmath::vector2u new_center = center;
+  if (center.x() > x_max || center.x() < x_min) {
+    new_center.x(std::max(x_min, std::min(x_max, static_cast<double>(center.x()))));
+    conflict = true;
+    ER_TRACE("Adjust center=%s -> %s for arena boundaries X",
+             center.to_str().c_str(),
+             new_center.to_str().c_str());
+  }
+
+  if (center.y() > y_max || center.y() < y_min) {
+    new_center.y(std::max(y_min, std::min(y_max, static_cast<double>(center.y()))));
+    conflict = true;
+    ER_TRACE("Adjust center=%s -> %s for arena boundaries Y",
+             center.to_str().c_str(),
+             new_center.to_str().c_str());
+  }
+  return deconflict_res_t{conflict, new_center};
+} /* deconflict_loc_boundaries() */
+
+
+base_cache_creator::deconflict_res_t base_cache_creator::
+    deconflict_loc_entity(const representation::multicell_entity* ent,
+                          const rmath::vector2d& ent_loc,
+                          const rmath::vector2u& center) const {
+  std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
+  std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
+  rmath::vector2d center_r = rmath::uvec2dvec(center, m_grid->resolution());
+
+  auto exc_xspan = ent->xspan(ent_loc);
+  auto exc_yspan = ent->yspan(ent_loc);
+  auto newc_xspan = ent->xspan(center_r);
+  auto newc_yspan = ent->yspan(center_r);
+
+
+  auto status = loop_utils::placement_conflict(center_r,
+                                               ent->dims(),
+                                               ent);
+  rmath::vector2u new_center = center;
+
+  ER_TRACE("xspan=%s ent%d@%s [xspan=%s center=%s]",
+           newc_xspan.to_str().c_str(),
+           ent->id(),
+           ent_loc.to_str().c_str(),
+           exc_xspan.to_str().c_str(),
+           center.to_str().c_str());
+  ER_TRACE("yspan=%s ent%d@%s [yspan=%s center=%s]",
+           newc_yspan.to_str().c_str(),
+           ent->id(),
+           ent_loc.to_str().c_str(),
+           exc_yspan.to_str().c_str(),
+           center.to_str().c_str());
+
+  /*
+   * We move the cache by units of the grid size when we discover a conflict in
+   * X or Y, in order to preserve having the block location be on an even
+   * multiple of the grid size, which makes handling creation much easier.
+   */
+  double x_delta = std::copysign(m_grid->resolution(), xrnd(m_rng));
+  double y_delta = std::copysign(m_grid->resolution(), yrnd(m_rng));
+
+
+  if (status.x_conflict) {
+    ER_TRACE("xspan=%s overlap ent%d@%s [xspan=%s center=%s], x_delta=%f",
+             newc_xspan.to_str().c_str(),
+             ent->id(),
+             ent_loc.to_str().c_str(),
+             exc_xspan.to_str().c_str(),
+             center.to_str().c_str(),
+             x_delta);
+    new_center.x(new_center.x() + x_delta);
+  }
+  if (status.y_conflict) {
+    ER_TRACE("yspan=%s overlap ent%d@%s [yspan=%s center=%s], y_delta=%f",
+             newc_yspan.to_str().c_str(),
+             ent->id(),
+             ent_loc.to_str().c_str(),
+             exc_yspan.to_str().c_str(),
+             center.to_str().c_str(),
+             y_delta);
+    new_center.y(new_center.y() + y_delta);
+  }
+  return deconflict_res_t{status.x_conflict && status.y_conflict, new_center};
+} /* deconflict_ent() */
 
 void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
   /*
@@ -245,9 +260,14 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
 } /* update_host_cells() */
 
 bool base_cache_creator::creation_sanity_checks(
-    const ds::cache_vector& caches) const {
+    const ds::cache_vector& caches,
+    const ds::block_list& free_blocks) const {
   bool ret = true;
+
   for (auto& c1 : caches) {
+    auto c1_xspan = c1->xspan(c1->real_loc());
+    auto c1_yspan = c1->yspan(c1->real_loc());
+
     for (auto& c2 : caches) {
       if (c1->id() == c2->id()) {
         continue;
@@ -260,9 +280,7 @@ bool base_cache_creator::creation_sanity_checks(
                             c2->id());
           ret = false;
         }
-        auto c1_xspan = c1->xspan(c1->real_loc());
         auto c2_xspan = c2->xspan(c2->real_loc());
-        auto c1_yspan = c1->yspan(c1->real_loc());
         auto c2_yspan = c2->yspan(c2->real_loc());
         if (c1_xspan.overlaps_with(c2_xspan) &&
             c1_yspan.overlaps_with(c2_yspan)) {
@@ -279,7 +297,26 @@ bool base_cache_creator::creation_sanity_checks(
         }
       } /* for(&b..) */
     }   /* for(&c2..) */
+
+    for (auto &b : free_blocks) {
+      auto b_xspan = b->xspan(b->real_loc());
+      auto b_yspan = b->yspan(b->real_loc());
+      if (c1_xspan.overlaps_with(b_xspan) &&
+          c1_yspan.overlaps_with(b_yspan)) {
+        ER_FATAL_SENTINEL(
+            "Cache%d xspan=%s, yspan=%s overlaps block%d "
+            "xspan=%s,yspan=%s",
+            c1->id(),
+            c1_xspan.to_str().c_str(),
+            c1_yspan.to_str().c_str(),
+            b->id(),
+            b_xspan.to_str().c_str(),
+            b_yspan.to_str().c_str());
+        ret = false;
+      }
+    } /* for(&b..) */
   }     /* for(&c1..) */
+
   return ret;
 } /* creation_sanity_checks() */
 

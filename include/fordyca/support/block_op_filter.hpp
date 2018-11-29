@@ -73,7 +73,7 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * If \c FALSE, then the controller should NOT be filtered out, and has
    * satisfied the preconditions. reason is undefined in this case.
    */
-  struct filter_result {
+  struct filter_res_t {
     bool status;
     filter_status reason;
   };
@@ -94,7 +94,7 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * @return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_result operator()(T& controller,
+  filter_res_t operator()(T& controller,
                            block_op_src src,
                            double cache_prox_dist,
                            double block_prox_dist) {
@@ -116,7 +116,7 @@ class block_op_filter : public er::client<block_op_filter<T>> {
         ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
     } /* switch() */
     ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
-    return filter_result{};
+    return filter_res_t{};
   }
 
  private:
@@ -127,15 +127,15 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * @return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_result free_pickup_filter(const T& controller) const {
+  filter_res_t free_pickup_filter(const T& controller) const {
     int block_id = loop_utils::robot_on_block(controller, *m_map);
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kBlock == controller.acquisition_goal())) {
-      return filter_result{true, kStatusControllerNotReady};
+      return filter_res_t{true, kStatusControllerNotReady};
     } else if (-1 == block_id) {
-      return filter_result{true, kStatusControllerNotOnBlock};
+      return filter_res_t{true, kStatusControllerNotOnBlock};
     }
-    return filter_result{false, kStatusOK};
+    return filter_res_t{false, kStatusOK};
   }
 
   /**
@@ -145,12 +145,12 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * @return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_result nest_drop_filter(const T& controller) const {
+  filter_res_t nest_drop_filter(const T& controller) const {
     if (!(controller.in_nest() && controller.goal_acquired() &&
           transport_goal_type::kNest == controller.block_transport_goal())) {
-      return filter_result{true, kStatusControllerNotReady};
+      return filter_res_t{true, kStatusControllerNotReady};
     }
-    return filter_result{false, kStatusOK};
+    return filter_res_t{false, kStatusOK};
   }
 
   /**
@@ -161,21 +161,21 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * @return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_result cache_site_drop_filter(const T& controller,
+  filter_res_t cache_site_drop_filter(const T& controller,
                                             double block_prox_dist) const {
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kCacheSite == controller.acquisition_goal() &&
           transport_goal_type::kCacheSite == controller.block_transport_goal())) {
-      return filter_result{true, kStatusControllerNotReady};
+      return filter_res_t{true, kStatusControllerNotReady};
     }
     int block_id = loop_utils::cache_site_block_proximity(controller,
                                                           *m_map,
                                                           block_prox_dist)
                        .entity_id;
     if (-1 != block_id) {
-      return filter_result{true, kStatusBlockProximity};
+      return filter_res_t{true, kStatusBlockProximity};
     }
-    return filter_result{false, kStatusOK};
+    return filter_res_t{false, kStatusOK};
   }
 
   /**
@@ -186,21 +186,21 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * @return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_result new_cache_drop_filter(const T& controller,
+  filter_res_t new_cache_drop_filter(const T& controller,
                                            double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kNewCache == controller.acquisition_goal() &&
           transport_goal_type::kNewCache == controller.block_transport_goal())) {
-      return filter_result{true, kStatusControllerNotReady};
+      return filter_res_t{true, kStatusControllerNotReady};
     }
     int cache_id = loop_utils::new_cache_cache_proximity(controller,
                                                          *m_map,
                                                          cache_prox_dist)
                        .entity_id;
     if (-1 != cache_id) {
-      return filter_result{true, kStatusCacheProximity};
+      return filter_res_t{true, kStatusCacheProximity};
     }
-    return filter_result{false, kStatusOK};
+    return filter_res_t{false, kStatusOK};
   }
 
   // clang-format off

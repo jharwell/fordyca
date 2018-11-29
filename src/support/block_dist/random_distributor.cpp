@@ -24,12 +24,12 @@
 #include "fordyca/support/block_dist/random_distributor.hpp"
 #include <algorithm>
 
-#include <boost/uuid/uuid_io.hpp>
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,7 +72,7 @@ bool random_distributor::distribute_block(
     std::shared_ptr<representation::base_block>& block,
     ds::const_entity_list& entities) {
   ds::cell2D* cell = nullptr;
-  coord_search_result res = avail_coord_search(entities, block->dims());
+  coord_search_res_t res = avail_coord_search(entities, block->dims());
   if (!res.status) {
     return false;
   }
@@ -138,7 +138,10 @@ __rcsw_pure bool random_distributor::verify_block_dist(
     if (e == block) {
       continue;
     }
-    ER_ASSERT(!block_overlaps_entity(block, e),
+    auto status = loop_utils::placement_conflict(block->real_loc(),
+                                                 block->dims(),
+                                                 e);
+    ER_ASSERT(!(status.x_conflict && status.y_conflict),
             "Entity contains block%d@%s/%s after distribution",
             block->id(),
             block->real_loc().to_str().c_str(),
@@ -150,7 +153,7 @@ error:
   return false;
 } /* verify_block_dist() */
 
-random_distributor::coord_search_result
+random_distributor::coord_search_res_t
 random_distributor::avail_coord_search(const ds::const_entity_list& entities,
                                        const rmath::vector2d& block_dim) {
   rmath::vector2u rel;
@@ -177,85 +180,16 @@ random_distributor::avail_coord_search(const ds::const_entity_list& entities,
     rel = {x, y};
     abs = {rel.x() + loc.x(), rel.y() + loc.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
-        return  dist_loc_will_overlap_entity(abs, block_dim, ent) &&
-           count++ <= kMAX_DIST_TRIES;
+        rmath::vector2d abs_r = rmath::uvec2dvec(abs, m_resolution);
+        auto status = loop_utils::placement_conflict(abs_r,
+                                                     block_dim, ent);
+        return status.x_conflict && status.y_conflict &&
+            count++ <= kMAX_DIST_TRIES;
   }));
   if (count <= kMAX_DIST_TRIES) {
     return {true, rel, abs};
   }
   return {false, {}, {}};
 } /* avail_coord_search() */
-
-bool random_distributor::dist_loc_will_overlap_entity(
-    const rmath::vector2u& loc,
-    const rmath::vector2d& block_dim,
-    const representation::multicell_entity* const entity) {
-  auto movable =
-      dynamic_cast<const representation::movable_cell_entity*>(entity);
-  auto immovable =
-      dynamic_cast<const representation::immovable_cell_entity*>(entity);
-  ER_ASSERT(!(nullptr == movable && nullptr == immovable),
-            "Entity is neither movable nor immovable");
-
-  rmath::vector2d rloc = rmath::uvec2dvec(loc, m_resolution);
-  auto loc_xspan = representation::multicell_entity::xspan(rloc,
-                                                           block_dim.x());
-  auto loc_yspan = representation::multicell_entity::yspan(rloc,
-                                                           block_dim.y());
-  if (nullptr != movable) {
-    auto ent_xspan = entity->xspan(movable->real_loc());
-    auto ent_yspan = entity->yspan(movable->real_loc());
-    ER_TRACE("(movable) rloc=%s loc_xspan=%s,loc_yspan=%s, ent_xspan=%s,ent_yspan=%s",
-             rloc.to_str().c_str(),
-             loc_xspan.to_str().c_str(),
-             loc_yspan.to_str().c_str(),
-             ent_xspan.to_str().c_str(),
-             ent_yspan.to_str().c_str());
-
-    return ent_xspan.overlaps_with(loc_xspan) &&
-        ent_yspan.overlaps_with(loc_yspan);
-  }
-
-  auto ent_xspan = entity->xspan(immovable->real_loc());
-  auto ent_yspan = entity->yspan(immovable->real_loc());
-
-  ER_TRACE("(immovable) rloc=%s loc_xspan=%s,loc_yspan=%s, ent_xspan=%s,ent_yspan=%s",
-           rloc.to_str().c_str(),
-           loc_xspan.to_str().c_str(),
-           loc_yspan.to_str().c_str(),
-           ent_xspan.to_str().c_str(),
-           ent_yspan.to_str().c_str());
-
-  return ent_xspan.overlaps_with(loc_xspan) &&
-          ent_yspan.overlaps_with(loc_yspan);
-} /* dist_loc_will_overlap_entity() */
-
-bool random_distributor::block_overlaps_entity(
-    const representation::base_block* const block,
-    const representation::multicell_entity* const entity) {
-
-  auto movable =
-      dynamic_cast<const representation::movable_cell_entity*>(entity);
-  auto immovable =
-      dynamic_cast<const representation::immovable_cell_entity*>(entity);
-  ER_ASSERT(!(nullptr == movable && nullptr == immovable),
-            "Entity is neither movable nor immovable");
-  auto block_xspan = block->xspan(block->real_loc());
-  auto block_yspan = block->yspan(block->real_loc());
-
-  if (nullptr != movable) {
-    auto ent_xspan = entity->xspan(movable->real_loc());
-    auto ent_yspan = entity->yspan(movable->real_loc());
-
-    return ent_xspan.overlaps_with(block_xspan) &&
-        ent_yspan.overlaps_with(block_yspan);
-  }
-
-  auto ent_xspan = entity->xspan(immovable->real_loc());
-  auto ent_yspan = entity->yspan(immovable->real_loc());
-
-  return ent_xspan.overlaps_with(block_xspan) &&
-      ent_yspan.overlaps_with(block_yspan);
-} /* block_overlaps_entity() */
 
 NS_END(block_dist, support, fordyca);
