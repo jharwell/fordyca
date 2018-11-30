@@ -34,6 +34,7 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -137,7 +138,16 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
 
   if (nullptr != stateful) {
-    loop_utils::set_robot_los<decltype(*stateful)>(robot, *arena_map());
+    ER_ASSERT(std::fmod(stateful->los_dim(),
+                        arena_map()->grid_resolution())
+                        <= std::numeric_limits<double>::epsilon(),
+              "LOS dimension (%f) not an even multiple of grid resolution (%f)",
+              stateful->los_dim(),
+              arena_map()->grid_resolution());
+    uint los_grid_size = stateful->los_dim() / arena_map()->grid_resolution();
+    loop_utils::set_robot_los<decltype(*stateful)>(robot,
+                                                   los_grid_size,
+                                                   *arena_map());
     (*m_stateful_interactor)(*stateful, GetSpace().GetSimulationClock());
   } else if (nullptr != crw) {
     (*m_crw_interactor)(*crw, GetSpace().GetSimulationClock());

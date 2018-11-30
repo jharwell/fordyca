@@ -81,9 +81,8 @@ class stateful_controller : public crw_controller,
    * @brief Set the robot's current line of sight (LOS).
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
+  double los_dim(void) const;
 
-  const depth0::sensing_subsystem* stateful_sensors(void) const;
-  depth0::sensing_subsystem* stateful_sensors(void);
 
   /**
    * @brief Get the current LOS for the robot.

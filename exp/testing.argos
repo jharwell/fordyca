@@ -124,10 +124,11 @@
             site_xrange="2:10"
             site_yrange="2.5:3"
             />
-        <sensing>
+        <sensing
+            los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
                             delta="0.0001" />
-        </sensing>
+          </sensing>
         <actuation>
           <block_carry_throttle>
             <waveform
@@ -183,6 +184,7 @@
           cache_acquisition_fname="cache-acquisition.csv"
           cache_utilization_fname="cache-utilization.csv"
           cache_lifecycle_fname="cache-lifecycle.csv"
+          cache_locations_fname="cache-locations.csv"
           task_execution_generalist_fname="task-execution-generalist.csv"
           task_execution_collector_fname="task-execution-collector.csv"
           task_execution_harvester_fname="task-execution-harvester.csv"
@@ -255,7 +257,7 @@
     </caches>
 
     <visualization robot_id="true"
-                   robot_los="false"
+                   robot_los="true"
                    robot_task="true"
                    block_id="false"
                    />

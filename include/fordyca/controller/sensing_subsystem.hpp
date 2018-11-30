@@ -76,7 +76,9 @@ class sensing_subsystem {
    * @param list List of handles to sensing devices.
    */
   sensing_subsystem(const struct params::sensing_params* params,
-                         const struct sensor_list* list);
+                    const struct sensor_list* list);
+
+  double los_dim(void) const { return mc_los_dim; }
 
   /**
    * @brief Get the list of sensors that the subsystem is managing.
@@ -178,8 +180,10 @@ class sensing_subsystem {
 
  private:
   // clang-format off
-  uint                                           m_tick;
   const double                                   mc_obstacle_delta;
+  const double                                   mc_los_dim;
+
+  uint                                           m_tick;
   rmath::vector2d                                m_position;
   rmath::vector2d                                m_prev_position;
   struct sensor_list                             m_sensors;

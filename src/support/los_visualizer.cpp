@@ -39,6 +39,10 @@ NS_START(fordyca, support);
  ******************************************************************************/
 void los_visualizer::draw(const representation::line_of_sight* const los,
                           double grid_resolution) {
+  /* has not been populated yet on first timestep */
+  if (nullptr == los) {
+    return;
+  }
   std::vector<argos::CVector2> points;
   points.emplace_back(-grid_resolution * los->xsize() / 2,
                       -grid_resolution * los->ysize() / 2);

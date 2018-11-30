@@ -57,7 +57,6 @@ stateful_controller::~stateful_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-
 void stateful_controller::block_sel_matrix(
     std::unique_ptr<class block_sel_matrix> m) {
   m_block_sel_matrix = std::move(m);
@@ -76,6 +75,11 @@ void stateful_controller::los(
     std::unique_ptr<representation::line_of_sight>& new_los) {
   m_perception->los(new_los);
 }
+
+double stateful_controller::los_dim(void) const {
+  return saa_subsystem()->sensing()->los_dim();
+} /* los_dim() */
+
 
 void stateful_controller::ControlStep(void) {
   ndc_pusht();

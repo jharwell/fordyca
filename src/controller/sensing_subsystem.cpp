@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include <limits>
-
 #include "fordyca/params/sensing_params.hpp"
 
 /*******************************************************************************
@@ -37,8 +35,9 @@ NS_START(fordyca, controller);
 sensing_subsystem::sensing_subsystem(
     const struct params::sensing_params* const params,
     const struct sensor_list* const list)
-    : m_tick(0),
-      mc_obstacle_delta(params->proximity.delta),
+    : mc_obstacle_delta(params->proximity.delta),
+      mc_los_dim(params->los_dim),
+      m_tick(0),
       m_position(),
       m_prev_position(),
       m_sensors(*list),

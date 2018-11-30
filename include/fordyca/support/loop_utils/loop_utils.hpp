@@ -166,7 +166,9 @@ proximity_status_t new_cache_cache_proximity(
  * the robot, probably using on-board cameras.
  */
 template <typename T>
-void set_robot_los(argos::CFootBotEntity& robot, ds::arena_map& map) {
+void set_robot_los(argos::CFootBotEntity& robot,
+                   uint los_grid_size,
+                   ds::arena_map& map) {
   rmath::vector2d pos;
   pos.set(const_cast<argos::CFootBotEntity&>(robot)
               .GetEmbodiedEntity()
@@ -182,7 +184,7 @@ void set_robot_los(argos::CFootBotEntity& robot, ds::arena_map& map) {
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
-          map.subgrid(position.x(), position.y(), 2), position);
+          map.subgrid(position.x(), position.y(), los_grid_size), position);
   controller.los(new_los);
 }
 

@@ -168,11 +168,12 @@ class base_controller : public argos::CCI_Controller,
    */
   void ndc_pop(void) { ER_NDC_POP(); }
 
+
  protected:
-  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
   class saa_subsystem* saa_subsystem(void) {
     return m_saa.get();
   }
+  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
 
  private:
   void output_init(const struct params::output_params* params);

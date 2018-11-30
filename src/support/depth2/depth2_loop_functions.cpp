@@ -106,7 +106,17 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* send the robot its view of the world: what it sees and where it is */
   loop_utils::set_robot_pos<decltype(controller)>(robot);
-  loop_utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  ER_ASSERT(std::fmod(controller.los_dim(),
+                      arena_map()->grid_resolution())<=
+                      std::numeric_limits<double>::epsilon(),
+            "LOS dimension (%f) not an even multiple of grid resolution (%f)",
+            controller.los_dim(),
+            arena_map()->grid_resolution());
+  uint los_grid_size = controller.los_dim() / arena_map()->grid_resolution();
+
+  loop_utils::set_robot_los<decltype(controller)>(robot,
+                                                  los_grid_size,
+                                                  *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
