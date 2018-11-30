@@ -114,6 +114,8 @@ class multicell_entity : public base_cell_entity {
   double ysize(void) const { return m_dim.y(); }
 
   const rmath::vector2d& dims(void) const { return m_dim; }
+  double xdim(void) const { return m_dim.x(); }
+  double ydim(void) const { return m_dim.y(); }
 
  private:
   // clang-format off

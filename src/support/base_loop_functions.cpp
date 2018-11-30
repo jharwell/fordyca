@@ -101,7 +101,7 @@ void base_loop_functions::arena_map_init(
   auto* vparams = repo->parse_results<params::visualization_params>();
 
   m_arena_map = rcppsw::make_unique<ds::arena_map>(aparams);
-  if (!m_arena_map->initialize()) {
+  if (!m_arena_map->initialize(this)) {
     ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
   }

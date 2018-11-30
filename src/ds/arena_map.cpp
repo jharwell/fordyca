@@ -21,6 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -60,7 +61,11 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool arena_map::initialize(void) {
+bool arena_map::initialize(support::base_loop_functions* loop) {
+  for (auto &l : m_nest.lights()) {
+    loop->AddEntity(l);
+  } /* for(&l..) */
+
   return m_block_dispatcher.initialize();
 } /* initialize() */
 

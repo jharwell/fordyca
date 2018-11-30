@@ -50,6 +50,9 @@ struct arena_map_params;
 namespace representation {
 class arena_cache;
 }
+namespace support {
+class base_loop_functions;
+}
 NS_START(ds);
 
 class cell2D;
@@ -243,8 +246,9 @@ class arena_map : public er::client<arena_map>,
    * that it can be verified via return code. Currently it initializes:
    *
    * - The block distributor
+   * - Nest lights
    */
-  bool initialize(void);
+  bool initialize(support::base_loop_functions* loop);
 
  private:
   // clang-format off
