@@ -1,5 +1,5 @@
 /**
- * @file robot_interaction_metrics_collector.hpp
+ * @file location_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,50 +27,59 @@
 #include <string>
 #include <vector>
 
+#include "rcppsw/ds/grid2D.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/swarm/interactivity.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, caches);
+namespace rmath = rcppsw::math;
 namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class robot_interaction_metrics_collector
- * @ingroup metrics
+ * @class location_metrics_collector
+ * @ingroup metrics caches
  *
- * @brief Collector for \ref robot_interaction_metrics.
+ * @brief Collector for \ref location_metrics.
  *
- * Metrics are written out each timestep.
+ * Location metrics are somewhat unusual, because they output a large 2D array
+ * into a .csv each time they are written out. As such, at the specified
+ * collection interval they are written out, capturing the state of the
+ * arena in terms of an accumulated desired quantity (i.e. metrics are always
+ * written out as cumulative averages) representing proportions of which cells
+ * in the arena contain/have contained a cache in the past.
  */
-class robot_interaction_metrics_collector
+class location_metrics_collector
     : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<robot_interaction_metrics_collector> {
+      public visitor::visitable_any<location_metrics_collector> {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
+   * @param dims Dimensions of the arena.
    */
-  robot_interaction_metrics_collector(const std::string& ofname, uint interval);
+  location_metrics_collector(const std::string& ofname,
+                             uint interval,
+                             const rmath::vector2u& dims);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
-  std::string csv_header_build(const std::string& header) override;
+  std::string csv_header_build(const std::string&) override;
   bool csv_line_build(std::string& line) override;
 
   // clang-format off
-  rcppsw::swarm::interactivity m_cum{};
-  std::vector<double>          m_cum_stats{};
+  rcppsw::ds::grid2D<uint> m_stats;
+  uint                     m_total{0};  // Total count of all caches across all timesteps
   // clang-format on
 };
 
-NS_END(metrics, fordyca);
+NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_ */

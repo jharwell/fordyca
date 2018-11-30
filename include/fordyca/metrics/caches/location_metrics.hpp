@@ -1,7 +1,7 @@
 /**
- * @file movement_metrics.hpp
+ * @file location_metrics.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_MOVEMENT_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_MOVEMENT_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,38 +30,31 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, fsm);
-namespace rmath = rcppsw::math;
+NS_START(fordyca, metrics, caches);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
- * @class movement_metrics
- * @ingroup metrics fsm
+ * @class location_metrics
+ * @ingroup metrics caches
  *
- * @brief Interface defining what metrics regarding movement traveled should be
- * collected from all robots.
+ * @brief Defines the metrics to be collected from a cache regarding its
+ * location in the arena.
+ *
+ * Metrics are collected every timestep.
  */
-class movement_metrics : virtual public rcppsw::metrics::base_metrics {
+class location_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
-  movement_metrics(void) = default;
-  ~movement_metrics(void) override = default;
+  location_metrics(void) = default;
 
   /**
-   * @brief Get the movement that a robot has traveled in a single timestep.
-   *
-   * This will be called every timestep by the \ref movement_metrics_collector
-   * on all robots.
+   * @brief Should return the discrete location of the cache.
    */
-  virtual double distance(void) const = 0;
-
-  /**
-   * @brief Get the velocity that a robot has on a single timestep.
-   */
-  virtual rmath::vector2d velocity(void) const = 0;
+  virtual rcppsw::math::vector2u location(void) const = 0;
 };
 
-NS_END(fsm, metrics, fordyca);
+NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_MOVEMENT_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_ */

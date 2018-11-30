@@ -111,7 +111,7 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
 
 void utilization_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const utilization_metrics&>(metrics);
+  auto& m = dynamic_cast<const utilization_metrics&>(metrics);
   m_stats.int_blocks += m.n_blocks();
   m_int_cache_ids.insert(m.cache_id());
   m_stats.int_pickups += m.total_block_pickups();

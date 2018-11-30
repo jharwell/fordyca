@@ -191,7 +191,7 @@ void arena_map::cache_extent_clear(
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-bool arena_map::has_robot(size_t i, size_t j) const {
+bool arena_map::has_robot(uint i, uint j) const {
   return decoratee().access<arena_grid::kRobotOccupancy>(i, j);
 } /* has_robot() */
 

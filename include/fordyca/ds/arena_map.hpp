@@ -81,8 +81,8 @@ class arena_map : public er::client<arena_map>,
  public:
   explicit arena_map(const struct params::arena::arena_map_params* params);
 
-  /* arena metrics */
-  bool has_robot(size_t i, size_t j) const override;
+  /* robot occupancy metrics */
+  bool has_robot(uint i, uint j) const override;
 
   /**
    * @brief Reset the # of caches that have been removed on a single timestep

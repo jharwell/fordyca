@@ -52,6 +52,7 @@ struct metrics_params : public rcppsw::params::base_params {
   std::string cache_acquisition_fname{""};
   std::string cache_utilization_fname{""};
   std::string cache_lifecycle_fname{""};
+  std::string cache_locations_fname{""};
 
   std::string task_execution_generalist_fname{""};
   std::string task_execution_collector_fname{""};

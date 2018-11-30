@@ -31,6 +31,9 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/params/metrics_params.hpp"
+#include "fordyca/metrics/caches/location_metrics.hpp"
+#include "fordyca/metrics/caches/location_metrics_collector.hpp"
+
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
@@ -51,6 +54,7 @@
 NS_START(fordyca, support, depth1);
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -97,6 +101,13 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       "caches::lifecycle",
       metrics_path() + "/" + params->cache_lifecycle_fname,
       params->collect_interval);
+
+  register_collector<metrics::caches::location_metrics_collector>(
+      "caches::locations",
+      metrics_path() + "/" + params->cache_locations_fname,
+      params->collect_interval,
+      rmath::dvec2uvec(params->arena_grid.upper,
+                       params->arena_grid.resolution));
   reset_all();
 }
 
@@ -105,7 +116,10 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
  ******************************************************************************/
 void depth1_metrics_aggregator::collect_from_cache(
     const representation::arena_cache* const cache) {
-  collect("caches::utilization", *cache);
+  auto util_m = dynamic_cast<const metrics::caches::utilization_metrics*>(cache);
+  auto loc_m = dynamic_cast<const metrics::caches::location_metrics*>(cache);
+  collect("caches::utilization", *util_m);
+  collect("caches::locations", *loc_m);
 } /* collect_from_cache() */
 
 void depth1_metrics_aggregator::collect_from_cache_manager(
