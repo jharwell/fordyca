@@ -23,13 +23,11 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth0/generalist.hpp"
 
-#include "fordyca/controller/depth0/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
-#include "fordyca/events/block_vanished.hpp"
-#include "fordyca/fsm/depth0/stateful_foraging_fsm.hpp"
-#include "rcppsw/er/server.hpp"
-#include "rcppsw/task_allocation/partitionable_task_params.hpp"
+#include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,34 +37,23 @@ NS_START(fordyca, tasks, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-generalist::generalist(const struct ta::partitionable_task_params* const params,
-                       std::unique_ptr<ta::taskable>& mechanism)
-    : partitionable_polled_task(rcppsw::er::g_server,
-                                kGeneralistName,
-                                params,
-                                std::move(mechanism)),
-      foraging_task(params) {}
+generalist::generalist(const ta::task_allocation_params* const params,
+                       std::unique_ptr<ta::taskable> mechanism)
+    : foraging_task(kGeneralistName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+__rcsw_pure double generalist::abort_prob_calc(void) {
+  return executable_task::abort_prob();
+} /* abort_prob_calc() */
+
 __rcsw_pure double generalist::current_time(void) const {
-  return dynamic_cast<fsm::depth0::stateful_foraging_fsm*>(
+  return dynamic_cast<fsm::depth0::free_block_to_nest_fsm*>(
              polled_task::mechanism())
-      ->base_sensors()
+      ->sensors()
       ->tick();
 } /* current_time() */
-
-double generalist::calc_abort_prob(void) {
-  /*
-   * Generalists always have a small chance of aborting their task when not at a
-   * task interface. Not strictly necessary at least for now, but it IS
-   * necessary for foragers and so it seems like a good idea to add this to all
-   * tasks.
-   */
-  return abort_prob().calc(executable_task::exec_time(),
-                           executable_task::exec_estimate());
-} /* calc_abort_prob() */
 
 /*******************************************************************************
  * Event Handling
@@ -84,33 +71,33 @@ void generalist::accept(events::block_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    generalist,
-    is_exploring_for_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    generalist,
-    is_vectoring_to_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         generalist,
+                         is_exploring_for_goal,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         generalist,
+                         is_vectoring_to_goal,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    generalist,
-    goal_acquired,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         generalist,
+                         goal_acquired,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
-    acquisition_goal_type,
-    generalist,
-    acquisition_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         generalist,
+                         acquisition_goal,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
-    transport_goal_type,
-    generalist,
-    block_transport_goal,
-    static_cast<fsm::depth0::stateful_foraging_fsm*>(polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         generalist,
+                         block_transport_goal,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
 NS_END(depth0, tasks, fordyca);

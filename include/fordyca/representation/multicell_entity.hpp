@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/representation/base_cell_entity.hpp"
@@ -35,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -51,14 +51,34 @@ NS_START(fordyca, representation);
  */
 class multicell_entity : public base_cell_entity {
  public:
-  multicell_entity(const rcppsw::math::vector2d& dim,
-                   const rcppsw::utils::color& color)
+  multicell_entity(const rmath::vector2d& dim, const rcppsw::utils::color& color)
       : multicell_entity{dim, color, -1} {}
 
-  multicell_entity(const rcppsw::math::vector2d& dim,
+  multicell_entity(const rmath::vector2d& dim,
                    const rcppsw::utils::color& color,
                    int id)
       : base_cell_entity(color, id), m_dim(dim) {}
+  ~multicell_entity(void) override = default;
+
+  /**
+   * @brief Calculate the span in X of an entity given its location and
+   * dimension in X.
+   *
+   * @return The span in X of the entity.
+   */
+  static rmath::ranged xspan(const rmath::vector2d& loc, double xdim) {
+    return rmath::ranged(loc.x() - 0.5 * xdim, loc.x() + 0.5 * xdim);
+  }
+
+  /**
+   * @brief Calculate the span in Y of an entity given its location and
+   * dimension in Y.
+   *
+   * @return The span in Y of the entity.
+   */
+  static rmath::ranged yspan(const rmath::vector2d& loc, double ydim) {
+    return rmath::ranged(loc.y() - 0.5 * ydim, loc.y() + 0.5 * ydim);
+  }
 
   /**
    * @brief Get the 2D space spanned by the multicell entity in absolute
@@ -66,9 +86,8 @@ class multicell_entity : public base_cell_entity {
    *
    * @param loc The entities current location.
    */
-  rcppsw::math::range<double> xspan(const argos::CVector2& loc) const {
-    return rcppsw::math::range<double>(loc.GetX() - 0.5 * m_dim.x(),
-                                       loc.GetX() + 0.5 * m_dim.x());
+  rmath::ranged xspan(const rmath::vector2d& loc) const {
+    return xspan(loc, m_dim.x());
   }
 
   /**
@@ -78,9 +97,8 @@ class multicell_entity : public base_cell_entity {
    * @param loc The entities current location.
    */
 
-  rcppsw::math::range<double> yspan(const argos::CVector2& loc) const {
-    return rcppsw::math::range<double>(loc.GetY() - 0.5 * m_dim.y(),
-                                       loc.GetY() + 0.5 * m_dim.y());
+  rmath::ranged yspan(const rmath::vector2d& loc) const {
+    return yspan(loc, m_dim.y());
   }
 
   /**
@@ -95,11 +113,13 @@ class multicell_entity : public base_cell_entity {
    */
   double ysize(void) const { return m_dim.y(); }
 
-  const rcppsw::math::vector2d& dims(void) const { return m_dim; }
+  const rmath::vector2d& dims(void) const { return m_dim; }
+  double xdim(void) const { return m_dim.x(); }
+  double ydim(void) const { return m_dim.y(); }
 
  private:
   // clang-format off
-  rcppsw::math::vector2d m_dim;
+  rmath::vector2d m_dim;
   // clang-format on
 };
 

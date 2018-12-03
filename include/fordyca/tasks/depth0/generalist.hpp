@@ -25,8 +25,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/task_allocation/partitionable_polled_task.hpp"
-#include "fordyca/tasks/free_block_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,12 +47,10 @@ NS_START(fordyca, tasks, depth0);
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */
-class generalist : public ta::partitionable_polled_task,
-                   public foraging_task,
-                   public free_block_interactor {
+class generalist : public foraging_task {
  public:
-  generalist(const struct ta::partitionable_task_params* params,
-             std::unique_ptr<ta::taskable>& mechanism);
+  generalist(const ta::task_allocation_params* params,
+             std::unique_ptr<ta::taskable> mechanism);
 
   /* event handling */
   void accept(events::free_block_pickup& visitor) override;
@@ -63,26 +59,24 @@ class generalist : public ta::partitionable_polled_task,
   void accept(events::block_vanished& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired);
-  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
+  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /* task metrics */
   bool task_at_interface(void) const override { return false; }
-  double task_last_exec_time(void) const override { return last_exec_time(); }
-  double task_last_interface_time(void) const override { return last_interface_time(); }
   bool task_completed(void) const override { return task_finished(); }
-  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const ta::taskable_argument* const) override {}
 
   double current_time(void) const override;
-  double calc_abort_prob(void) override;
-  double calc_interface_time(double) override { return 0.0; }
+  double interface_time_calc(uint, double) override { return 0.0; }
+  void active_interface_update(int) override {}
+  double abort_prob_calc(void) override;
 };
 
 NS_END(depth0, tasks, fordyca);

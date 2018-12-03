@@ -46,18 +46,17 @@ NS_START(fordyca, representation);
  */
 class ramp_block : public base_block {
  public:
-  explicit ramp_block(const rcppsw::math::vector2d& dim)
+  explicit ramp_block(const rmath::vector2d& dim)
       : base_block(dim, ut::color::kBLUE, -1) {}
 
-  ramp_block(const rcppsw::math::vector2d& dim, int id)
+  ramp_block(const rmath::vector2d& dim, int id)
       : base_block(dim, ut::color::kBLUE, id) {}
 
   transport_metrics::block_type type(void) const override {
     return transport_metrics::kRamp;
   }
   std::unique_ptr<base_block> clone(void) const override {
-    std::unique_ptr<base_block> tmp =
-        rcppsw::make_unique<ramp_block>(dims(), id());
+    auto tmp = rcppsw::make_unique<ramp_block>(dims(), id());
     tmp->discrete_loc(this->discrete_loc());
     tmp->real_loc(this->real_loc());
     tmp->reset_robot_id();

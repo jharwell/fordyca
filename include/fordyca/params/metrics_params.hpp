@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <string>
+
+#include "fordyca/params/grid_params.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -40,7 +42,8 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct metrics_params : public rcppsw::params::base_params {
-  std::string collision_fname{""};
+  std::string fsm_movement_fname{""};
+  std::string fsm_collision_fname{""};
 
   std::string block_acquisition_fname{""};
   std::string block_transport_fname{""};
@@ -49,17 +52,29 @@ struct metrics_params : public rcppsw::params::base_params {
   std::string cache_acquisition_fname{""};
   std::string cache_utilization_fname{""};
   std::string cache_lifecycle_fname{""};
+  std::string cache_locations_fname{""};
 
   std::string task_execution_generalist_fname{""};
   std::string task_execution_collector_fname{""};
   std::string task_execution_harvester_fname{""};
-  std::string task_generalist_tab_fname{""};
+  std::string task_execution_cache_starter_fname{""};
+  std::string task_execution_cache_finisher_fname{""};
+  std::string task_execution_cache_transferer_fname{""};
+  std::string task_execution_cache_collector_fname{""};
 
-  std::string distance_fname{""};
+  std::string task_tab_generalist_fname{""};
+  std::string task_tab_harvester_fname{""};
+  std::string task_tab_collector_fname{""};
+
+  std::string task_distribution_fname{""};
+
   std::string output_dir{""};
 
-  std::string perception_world_model_fname{""};
+  std::string arena_robot_occupancy_fname{""};
+  std::string loop_robot_interaction_fname{""};
 
+  std::string perception_world_model_fname{""};
+  grid_params arena_grid{};
   uint collect_interval{0};
 };
 

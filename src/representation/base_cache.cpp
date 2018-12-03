@@ -32,17 +32,17 @@ NS_START(fordyca, representation);
  * Static Members
  ******************************************************************************/
 int base_cache::m_next_id = 0;
-constexpr uint base_cache::kMinBlocks;
+constexpr size_t base_cache::kMinBlocks;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 base_cache::base_cache(double dimension,
                        double resolution,
-                       argos::CVector2 center,
+                       const rmath::vector2d& center,
                        const std::vector<std::shared_ptr<base_block>>& blocks,
                        int id)
-    : multicell_entity(rcppsw::math::vector2d(dimension, dimension),
+    : multicell_entity(rmath::vector2d(dimension, dimension),
                        rcppsw::utils::color::kGRAY40),
       immovable_cell_entity(center, resolution),
       m_resolution(resolution),

@@ -43,20 +43,22 @@ NS_START(fordyca, support, block_dist);
  * @brief Distributes a block or set of blocks within the specified cluster
  * bounds randomly, using \ref random_block_distributor.
  */
-class cluster_distributor : public base_distributor {
+class cluster_distributor : public base_distributor,
+                            public er::client<cluster_distributor> {
  public:
-  cluster_distributor(std::shared_ptr<rcppsw::er::server> server,
-                            representation::arena_grid::view& grid,
-                            double arena_resolution,
-                            uint maxsize);
+  cluster_distributor(const ds::arena_grid::view& view,
+                      double arena_resolution,
+                      uint capacity);
+  ~cluster_distributor(void) override = default;
 
   cluster_distributor& operator=(const cluster_distributor& s) = delete;
 
   bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                        entity_list& entities) override;
-  bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
+                        ds::const_entity_list& entities) override;
+  bool distribute_blocks(ds::block_vector& blocks,
+                         ds::const_entity_list& entities) override;
 
-  const representation:: block_cluster& cluster(void) const { return m_clust; }
+  ds::const_block_cluster_list block_clusters(void) const override;
 
  private:
   // clang-format off
@@ -66,4 +68,5 @@ class cluster_distributor : public base_distributor {
 };
 
 NS_END(block_dist, support, fordyca);
+
 #endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_DIST_CLUSTER_DISTRIBUTOR_HPP_ */

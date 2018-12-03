@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
+#include "rcppsw/task_allocation/task_allocation_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,23 +37,33 @@ NS_START(fordyca, tasks, depth2);
 constexpr char foraging_task::kCacheStarterName[];
 constexpr char foraging_task::kCacheFinisherName[];
 constexpr char foraging_task::kCacheTransfererName[];
+constexpr char foraging_task::kCacheCollectorName[];
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const struct ta::task_params* params,
-                             std::unique_ptr<ta::taskable>& mechanism)
-    : base_foraging_task(&params->abort),
-      polled_task(name, params, std::move(mechanism)) {}
+                             const ta::task_allocation_params* params,
+                             std::unique_ptr<ta::taskable> mechanism)
+    : polled_task(name,
+                  &params->abort,
+                  &params->exec_est.ema,
+                  std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 __rcsw_pure double foraging_task::current_time(void) const {
   return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
-      ->base_sensors()
+      ->sensors()
       ->tick();
 } /* current_time() */
+
+bool foraging_task::task_in_depth2(const polled_task* const task) {
+  return task->name() == kCacheStarterName ||
+         task->name() == kCacheFinisherName ||
+         task->name() == kCacheTransfererName ||
+         task->name() == kCacheCollectorName;
+} /* task_in_depth2() */
 
 NS_END(depth2, tasks, fordyca);

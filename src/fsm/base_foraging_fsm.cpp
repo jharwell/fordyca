@@ -22,11 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
@@ -42,11 +39,10 @@ using controller::steering_force_type;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-base_foraging_fsm::base_foraging_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
-    controller::saa_subsystem* const saa,
-    uint8_t max_states)
-    : state_machine::hfsm(server, max_states),
+base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
+                                     uint8_t max_states)
+    : state_machine::hfsm(max_states),
+      ER_CLIENT_INIT("fordyca.fsm.base_foraging"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
@@ -63,14 +59,14 @@ base_foraging_fsm::base_foraging_fsm(
  ******************************************************************************/
 HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
-            "FATAL: ST_LEAVING_NEST cannot handle child events");
+            "ST_LEAVING_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
-            "FATAL: ST_LEAVING_NEST should never pickup blocks...");
+            "ST_LEAVING_NEST should never pickup blocks...");
   ER_ASSERT(controller::foraging_signal::BLOCK_DROP != data->signal(),
-            "FATAL: ST_LEAVING_NEST should never drop blocks...");
+            "ST_LEAVING_NEST should never drop blocks...");
 
   if (current_state() != last_state()) {
-    ER_DIAG("Executing ST_LEAVING_NEST");
+    ER_DEBUG("Executing ST_LEAVING_NEST");
   }
   /*
    * We don't want to just apply anti-phototaxis force, because that will make
@@ -81,7 +77,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
    */
   if (m_saa->sensing()->threatening_obstacle_exists()) {
     collision_avoidance_tracking_begin();
-    argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
+    rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
     saa_subsystem()->steering_force().avoidance(obs);
   } else {
     collision_avoidance_tracking_end();
@@ -98,13 +94,13 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
                   transport_to_nest,
                   state_machine::event_data) {
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
-            "FATAL: ST_TRANSPORT_TO_NEST cannot handle child events");
+            "ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
-            "FATAL: ST_TRANSPORT_TO_NEST should never pickup blocks...");
+            "ST_TRANSPORT_TO_NEST should never pickup blocks...");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
-            "FATAL: ST_TRANSPORT_TO_NEST should never drop blocks");
+            "ST_TRANSPORT_TO_NEST should never drop blocks");
   if (current_state() != last_state()) {
-    ER_DIAG("Executing ST_TRANSPORT_TO_NEST");
+    ER_DEBUG("Executing ST_TRANSPORT_TO_NEST");
   }
 
   /*
@@ -123,7 +119,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   }
 
   m_saa->steering_force().phototaxis();
-  argos::CVector2 obs = m_saa->sensing()->find_closest_obstacle();
+  rmath::vector2d obs = m_saa->sensing()->find_closest_obstacle();
   if (m_saa->sensing()->threatening_obstacle_exists()) {
     collision_avoidance_tracking_begin();
     m_saa->steering_force().avoidance(obs);
@@ -133,7 +129,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
      * velocity, and that does not play well with the arrival force
      * calculations. To fix this, and a bit of wander force.
      */
-    if (m_saa->linear_velocity().Length() <= 0.1) {
+    if (m_saa->linear_velocity().length() <= 0.1) {
       m_saa->steering_force().wander();
     }
     collision_avoidance_tracking_end();
@@ -144,7 +140,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
 }
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
-  argos::CRadians current_dir = m_saa->sensing()->heading_angle();
+  rmath::radians current_dir = m_saa->sensing()->heading_angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so
@@ -154,9 +150,9 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
   if (nullptr != dir_data) {
     m_new_dir = dir_data->dir;
     m_new_dir_count = 0;
-    ER_DIAG("Change direction: %f -> %f",
-            current_dir.GetValue(),
-            m_new_dir.GetValue());
+    ER_DEBUG("Change direction: %f -> %f",
+             current_dir.value(),
+             m_new_dir.value());
   }
 
   /*
@@ -173,7 +169,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * We limit the maximum # of steps that we spin, and have an arrival tolerance
    * to also help limit excessive spinning. See #191.
    */
-  if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL ||
+  if (std::fabs((current_dir - m_new_dir).value()) < kDIR_CHANGE_TOL ||
       m_new_dir_count >= kDIR_CHANGE_MAX_STEPS) {
     internal_event(previous_state());
   }
@@ -198,7 +194,7 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-bool base_foraging_fsm::in_collision_avoidance(void) const {
+__rcsw_pure bool base_foraging_fsm::in_collision_avoidance(void) const {
   return m_in_avoidance;
 } /* in_collision_avoidance() */
 
@@ -249,20 +245,21 @@ void base_foraging_fsm::init(void) {
   hfsm::init();
 } /* init() */
 
-argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
+rmath::vector2d base_foraging_fsm::randomize_vector_angle(
+    const rmath::vector2d& vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
-  vector.Rotate(m_rng->Uniform(range));
-  return vector;
+  argos::CVector2 tmp(vector.x(), vector.y());
+  tmp.Rotate(m_rng->Uniform(range));
+  return rmath::vector2d(tmp.GetX(), tmp.GetY());
 } /* randomize_vector_angle() */
 
-const std::shared_ptr<const controller::base_sensing_subsystem> base_foraging_fsm::
-    base_sensors(void) const {
+const std::shared_ptr<const controller::sensing_subsystem> base_foraging_fsm::
+    sensors(void) const {
   return m_saa->sensing();
 } /* base_sensors() */
 
-const std::shared_ptr<controller::base_sensing_subsystem> base_foraging_fsm::
-    base_sensors(void) {
+const std::shared_ptr<controller::sensing_subsystem> base_foraging_fsm::sensors(void) {
   return m_saa->sensing();
 } /* base_actuation() */
 

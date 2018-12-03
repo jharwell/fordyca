@@ -35,38 +35,35 @@ using representation::base_cache;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-static_cache_creator::static_cache_creator(
-    const std::shared_ptr<rcppsw::er::server>& server,
-    representation::arena_grid& grid,
-    const argos::CVector2& center,
-    double cache_size,
-    double resolution)
-    : cache_creator(server, grid, cache_size, resolution), m_center(center) {
-  client::insmod("static_cache_creator",
-                 rcppsw::er::er_lvl::DIAG,
-                 rcppsw::er::er_lvl::NOM);
-}
+static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
+                                           const rmath::vector2d& center,
+                                           double cache_size)
+    : base_cache_creator(grid, cache_size),
+      ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
+      m_center(center) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cache_creator::cache_vector static_cache_creator::create_all(
-    block_vector& blocks) {
+ds::cache_vector static_cache_creator::create_all(
+    const ds::cache_vector& existing_caches,
+    ds::block_vector& blocks,
+    double) {
+  ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
   std::vector<std::shared_ptr<representation::arena_cache>> caches;
 
   ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
-            "FATAL: Cannot create static cache from <= %u blocks",
+            "Cannot create static cache from < %zu blocks",
             base_cache::kMinBlocks);
-  ER_NOM("Creating static cache @(%f, %f) from %zu free blocks",
-         m_center.GetX(),
-         m_center.GetY(),
-         blocks.size());
-  block_list starter_blocks;
-  for (auto b : blocks) {
+  ER_INFO("Creating static cache@%s from %zu free blocks",
+          m_center.to_str().c_str(),
+          blocks.size());
+  ds::block_list starter_blocks;
+  for (auto& b : blocks) {
     starter_blocks.push_back(b);
   } /* for(i..) */
 
-  auto cache = cache_creator::create_single(starter_blocks, m_center);
+  auto cache = create_single_cache(starter_blocks, m_center);
   auto cache_p = std::shared_ptr<representation::arena_cache>(std::move(cache));
   caches.push_back(cache_p);
   return caches;

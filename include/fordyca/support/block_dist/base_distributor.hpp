@@ -25,19 +25,18 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <algorithm>
+#include <vector>
+
 #include "rcppsw/er/client.hpp"
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/entity_list.hpp"
+#include "fordyca/ds/block_cluster_list.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace representation {
-class base_block;
-class multicell_entity;
-} // namespace representation
-
-NS_START(support, block_dist);
+NS_START(fordyca, support, block_dist);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,24 +47,33 @@ NS_START(support, block_dist);
  *
  * @brief Base class for block distributors to enable use of strategy pattern.
  */
-class base_distributor : public rcppsw::er::client {
+class base_distributor {
  public:
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
-  using entity_list = std::list<const representation::multicell_entity*>;
+  /**
+   * @brief How many times to attempt to distribute all blocks before giving up,
+   * causing an assertion failure on distribution.
+   */
+  static constexpr uint kMAX_DIST_TRIES = 100;
 
-  explicit base_distributor(std::shared_ptr<rcppsw::er::server> server)
-      : client(server) {}
+  base_distributor(void) = default;
   virtual ~base_distributor(void) = default;
 
   /**
    * @brief Distribute a block in the specified area by trying each random
    * distributor in turn.
    *
+   * @param block The block to distribute.
+   * @param entities The list of entities that the block should be distributed
+   * around. If block distribution is successful, then the distributed block is
+   * added to the entity list.
+   *
    * @return \c TRUE if the block distribution was successful, \c FALSE
    * otherwise.
    */
   virtual bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                                entity_list& entities) = 0;
+                                ds::const_entity_list& entities) = 0;
+
+  virtual ds::const_block_cluster_list block_clusters(void) const = 0;
 
   /**
    * @brief Calls \ref distribute_block on each block.
@@ -73,7 +81,14 @@ class base_distributor : public rcppsw::er::client {
    * @return \c TRUE iff all block distributions were successful, \c FALSE
    * otherwise.
    */
-  virtual bool distribute_blocks(block_vector& blocks, entity_list& entities) = 0;
+  virtual bool distribute_blocks(ds::block_vector& blocks,
+                                 ds::const_entity_list& entities) {
+    return std::all_of(blocks.begin(),
+                       blocks.end(),
+                       [&](std::shared_ptr<representation::base_block>& b) {
+                         return distribute_block(b, entities);
+                       });
+  }
 };
 
 NS_END(block_dist, support, fordyca);

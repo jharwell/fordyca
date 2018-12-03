@@ -22,9 +22,24 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
-#include "fordyca/params/metrics_params.hpp"
-
 #include <experimental/filesystem>
+
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
+#include "fordyca/metrics/robot_interaction_metrics.hpp"
+#include "fordyca/metrics/robot_interaction_metrics_collector.hpp"
+#include "fordyca/metrics/robot_occupancy_metrics.hpp"
+#include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
+#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,21 +51,68 @@ NS_START(fordyca, metrics);
  * Constructors/Destructors
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
-    std::shared_ptr<rcppsw::er::server> server,
     const struct params::metrics_params* params,
     const std::string& output_root)
-    : client(server), collector_group() {
-  m_metrics_path = output_root + "/" + params->output_dir;
-
+    : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
+      collector_group(),
+      m_metrics_path(output_root + "/" + params->output_dir) {
   if (!fs::exists(m_metrics_path)) {
     fs::create_directories(m_metrics_path);
   } else {
-    ER_WARN("WARNING: Output metrics path '%s' already exists",
-            m_metrics_path.c_str());
+    ER_WARN("Output metrics path '%s' already exists", m_metrics_path.c_str());
   }
+  register_collector<metrics::fsm::movement_metrics_collector>(
+      "fsm::movement",
+      metrics_path() + "/" + params->fsm_movement_fname,
+      params->collect_interval);
+
+  register_collector<metrics::fsm::collision_metrics_collector>(
+      "fsm::collision",
+      metrics_path() + "/" + params->fsm_collision_fname,
+      params->collect_interval);
+
+  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
+      "blocks::acquisition",
+      metrics_path() + "/" + params->block_acquisition_fname,
+      params->collect_interval);
+
+  register_collector<metrics::blocks::transport_metrics_collector>(
+      "blocks::transport",
+      metrics_path() + "/" + params->block_transport_fname,
+      params->collect_interval);
+
+  register_collector<metrics::blocks::manipulation_metrics_collector>(
+      "blocks::manipulation",
+      metrics_path() + "/" + params->block_manipulation_fname,
+      params->collect_interval);
+  register_collector<metrics::robot_occupancy_metrics_collector>(
+      "arena::robot_occupancy",
+      metrics_path() + "/" + params->arena_robot_occupancy_fname,
+      params->collect_interval,
+      rmath::dvec2uvec(params->arena_grid.upper,
+                       params->arena_grid.resolution));
+  register_collector<metrics::robot_interaction_metrics_collector>(
+      "loop::robot_interaction",
+      metrics_path() + "/" + params->loop_robot_interaction_fname,
+      params->collect_interval);
+  reset_all();
 }
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
+void base_metrics_aggregator::collect_from_loop(
+    const support::base_loop_functions* const loop) {
+  collect("loop::robot_interaction", *loop);
+} /* collect_from_loop() */
+
+void base_metrics_aggregator::collect_from_block(
+    const representation::base_block* const block) {
+  collect("blocks::transport", *block);
+} /* collect_from_block() */
+
+void base_metrics_aggregator::collect_from_arena(const ds::arena_map* const arena) {
+  collect("arena::robot_occupancy", *arena);
+} /* collect_from_arena() */
 
 NS_END(metrics, fordyca);

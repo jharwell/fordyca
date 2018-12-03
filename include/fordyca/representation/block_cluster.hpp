@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/arena_grid.hpp"
+#include "fordyca/ds/arena_grid.hpp"
 #include "rcppsw/common/common.hpp"
+#include "fordyca/ds/block_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,22 +41,30 @@ NS_START(fordyca, representation);
  * @ingroup representation
  *
  * @brief Represents a cluster of blocks in the arena as an entity for use
- * during block distribution.
+ * during block distribution and dynamic cache creation. A cluster is defined
+ * as:
+ *
+ * - The 2D area in which the blocks reside
+ * - The blocks distributed in that area.
+ * - The maximum capacity of the cluster.
  */
-class block_cluster {
+class block_cluster : public rcppsw::er::client<block_cluster> {
  public:
-  block_cluster(const arena_grid::view& view, uint capacity)
-      : m_view(view), m_capacity(capacity) {}
+  block_cluster(const ds::arena_grid::const_view& view,
+                uint capacity)
+      : ER_CLIENT_INIT("fordyca.representation.block_cluster"),
+        m_view(view),
+        m_capacity(capacity) {}
 
   uint capacity(void) const { return m_capacity; }
-  uint block_count(void) const;
-  const arena_grid::view& view(void) const { return m_view; }
-  arena_grid::view& view(void) { return m_view; }
+  size_t block_count(void) const { return blocks().size(); }
+  ds::const_block_list blocks(void) const;
+  const ds::arena_grid::const_view& view(void) const { return m_view; }
 
  private:
   // clang-format off
-  arena_grid::view m_view;
-  uint             m_capacity;
+  ds::arena_grid::const_view m_view;
+  uint                       m_capacity;
   // clang-format on
 };
 

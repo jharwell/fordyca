@@ -22,20 +22,22 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/cell2D.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
+#include "fordyca/ds/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::occupancy_grid;
+using ds::arena_grid;
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_empty::visit(representation::cell2D& cell) {
+void cell_empty::visit(ds::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);
 } /* visit() */
@@ -44,13 +46,26 @@ void cell_empty::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_empty();
 } /* visit() */
 
-void cell_empty::visit(representation::arena_map& map) {
-  map.access(cell_op::x(), cell_op::y()).accept(*this);
+void cell_empty::visit(ds::arena_map& map) {
+  map.access<arena_grid::kCell>(x(), y()).accept(*this);
 } /* visit() */
 
-void cell_empty::visit(representation::perceived_arena_map& map) {
-  map.access<occupancy_grid::kPheromoneLayer>(x(), y()).reset();
-  map.access<occupancy_grid::kCellLayer>(x(), y()).accept(*this);
+void cell_empty::visit(ds::occupancy_grid& grid) {
+  ds::cell2D& cell = grid.access<occupancy_grid::kCell>(x(), y());
+  if (!cell.state_is_known()) {
+    grid.known_cells_inc();
+  }
+  ER_ASSERT(grid.known_cell_count() <= grid.xdsize() * grid.ydsize(),
+            "Known cell count (%u) >= arena dimensions (%ux%u)",
+            grid.known_cell_count(),
+            grid.xdsize(),
+            grid.ydsize());
+  grid.access<occupancy_grid::kPheromone>(x(), y()).reset();
+  cell.accept(*this);
+} /* visit() */
+
+void cell_empty::visit(ds::perceived_arena_map& map) {
+  map.decoratee().accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -25,19 +25,21 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <string>
 
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/temporal_penalty.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/control/waveform_generator.hpp"
 #include "rcppsw/control/periodic_waveform.hpp"
+#include "rcppsw/control/waveform_generator.hpp"
 #include "rcppsw/control/waveform_params.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ct = rcppsw::control;
 NS_START(fordyca, support);
+namespace ct = rcppsw::control;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -45,7 +47,7 @@ NS_START(fordyca, support);
 
 /**
  * @class temporal_penalty_handler
- * @ingroup support depth1
+ * @ingroup support
  *
  * @brief The penalty handler for penalties for robots (e.g. how long they have
  * to wait when they pickup/drop a block).
@@ -54,25 +56,24 @@ NS_START(fordyca, support);
  * manipulating it to derived classes.
  */
 template <typename T>
-class temporal_penalty_handler : public rcppsw::er::client {
+class temporal_penalty_handler
+    : public er::client<temporal_penalty_handler<T>> {
  public:
   /**
-   * @Brief Initialize the penalty handler.
+   * @brief Initialize the penalty handler.
    *
-   * @param server Server for debugging.
    * @param params Parameters for penalty waveform generation.
    */
-  temporal_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
-                       const ct::waveform_params* const params)
-      : client(server),
+  explicit temporal_penalty_handler(const ct::waveform_params* const params,
+                                    const std::string& name)
+      : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
+        mc_name(name),
         m_penalty_list(),
-        m_penalty(ct::waveform_generator()(params->type, params)) {
-    insmod("temporal_penalty_handler",
-           rcppsw::er::er_lvl::DIAG,
-           rcppsw::er::er_lvl::NOM);
-  }
+        m_penalty(ct::waveform_generator()(params->type, params)) {}
 
-  ~temporal_penalty_handler(void) override { client::rmmod(); }
+  ~temporal_penalty_handler(void) override = default;
+
+  const std::string& name(void) const { return mc_name; }
 
   /**
    * @brief Determine if a robot has satisfied the \ref temporal_penalty
@@ -86,7 +87,8 @@ class temporal_penalty_handler : public rcppsw::er::client {
    * penalty.
    */
   __rcsw_pure bool penalty_satisfied(const T& controller, uint timestep) const {
-    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+    auto it = std::find_if(m_penalty_list.begin(),
+                           m_penalty_list.end(),
                            [&](const temporal_penalty<T>& p) {
                              return p.controller() == &controller;
                            });
@@ -123,9 +125,9 @@ class temporal_penalty_handler : public rcppsw::er::client {
     if (it != m_penalty_list.end()) {
       m_penalty_list.remove(*it);
     }
-    ER_NOM("fb%d", utils::robot_id(controller));
+    ER_INFO("fb%d", loop_utils::robot_id(controller));
     ER_ASSERT(!is_serving_penalty(controller),
-              "FATAL: Robot still serving penalty after abort?!");
+              "Robot still serving penalty after abort?!");
   }
 
   typename std::list<temporal_penalty<T>>::iterator find(const T& controller) {
@@ -140,35 +142,42 @@ class temporal_penalty_handler : public rcppsw::er::client {
    * penalty.
    */
   __rcsw_pure bool is_serving_penalty(const T& controller) const {
-    auto it = std::find_if(m_penalty_list.begin(), m_penalty_list.end(),
+    auto it = std::find_if(m_penalty_list.begin(),
+                           m_penalty_list.end(),
                            [&](const temporal_penalty<T>& p) {
-                             return p.controller() == &controller; });
+                             return p.controller() == &controller;
+                           });
     return it != m_penalty_list.end();
   }
 
   size_t list_size(void) const { return m_penalty_list.size(); }
 
  protected:
-  std::list<temporal_penalty<T>>& penalty_list(void) {
-    return m_penalty_list;
-  }
+  std::list<temporal_penalty<T>>& penalty_list(void) { return m_penalty_list; }
   const std::list<temporal_penalty<T>>& penalty_list(void) const {
     return m_penalty_list;
   }
 
   /*
-   * @brief Deconflict cache penalties such that at most 1 robot finishes
-   * serving their penalty in the cache per timestep. This ensures consistency
-   * and proper processing of \ref cached_block_pickup events.
-
-   * When handling \ref cache_block_pickup events, if two robots enter the cache
-   * at the EXACT same timestep, whichever one is processed second for that
-   * timestep will trigger an assert due to the cache having a different amount
-   * of blocks than it should (i.e. only one block pickup is allowed per
-   * timestep, otherwise the world is inconsistent).
+   * @brief Deconflict penalties such that at most 1 robot finishes
+   * serving their penalty per block/cache operation.
+   *
+   * If the penalty for the robot was zero, should we still need to make the
+   * robot serve a 1 timestep penalty. Not needed for block ops (but doesn't
+   * really hurt), but IS needed for cache ops, so that if two robots that enter
+   * a cache on the same timestep and will serve 0 duration penalties things are
+   * still handled properly. You can't rely on just checking the list in that
+   * case, because 0 duration penalties are marked as served and removed from
+   * the list the SAME timestep they are added, so the handler incorrectly
+   * thinks that there is no conflict.
+   *
+   * @param timestep The current timestep.
    */
   uint deconflict_penalty_finish(uint timestep) const {
-    uint penalty = m_penalty->value(timestep);
+    uint penalty = static_cast<uint>(m_penalty->value(timestep));
+    if (0 == penalty) {
+      ++penalty;
+    }
     m_orig_penalty = penalty;
     for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
       if (it->start_time() + it->penalty() == timestep + penalty) {
@@ -183,6 +192,7 @@ class temporal_penalty_handler : public rcppsw::er::client {
 
   // clang-format off
   mutable uint                   m_orig_penalty{0};
+  const std::string              mc_name;
   std::list<temporal_penalty<T>> m_penalty_list;
   std::unique_ptr<ct::waveform>  m_penalty;
   // clang-format on

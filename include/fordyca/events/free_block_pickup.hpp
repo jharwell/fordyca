@@ -37,23 +37,22 @@ namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
 namespace depth0 {
-class stateless_foraging_fsm;
-class stateful_foraging_fsm;
+class crw_fsm;
+class stateful_fsm;
+class free_block_to_nest_fsm;
 } // namespace depth0
-namespace depth1 {
 class block_to_goal_fsm;
-}
 } // namespace fsm
 namespace controller {
 namespace depth0 {
-class stateless_foraging_controller;
-class stateful_foraging_controller;
+class crw_controller;
+class stateful_controller;
 } // namespace depth0
 namespace depth1 {
-class foraging_controller;
+class greedy_partitioning_controller;
 }
 namespace depth2 {
-class foraging_controller;
+class greedy_recpart_controller;
 }
 } // namespace controller
 
@@ -84,52 +83,52 @@ NS_START(events);
  */
 class free_block_pickup
     : public cell_op,
-      public rcppsw::er::client,
+      public rcppsw::er::client<free_block_pickup>,
       public block_pickup_event,
-      public visitor::visit_set<controller::depth0::stateless_foraging_controller,
-                                controller::depth0::stateful_foraging_controller,
-                                controller::depth1::foraging_controller,
-                                controller::depth2::foraging_controller,
-                                fsm::depth0::stateless_foraging_fsm,
-                                fsm::depth0::stateful_foraging_fsm,
-                                fsm::depth1::block_to_goal_fsm,
+      public visitor::visit_set<controller::depth0::crw_controller,
+                                controller::depth0::stateful_controller,
+                                controller::depth1::greedy_partitioning_controller,
+                                controller::depth2::greedy_recpart_controller,
+                                fsm::depth0::crw_fsm,
+                                fsm::depth0::stateful_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
+                                fsm::block_to_goal_fsm,
                                 tasks::depth0::generalist,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher> {
  public:
-  free_block_pickup(std::shared_ptr<rcppsw::er::server> server,
-                    std::shared_ptr<representation::base_block> block,
+  free_block_pickup(std::shared_ptr<representation::base_block> block,
                     uint robot_index,
                     uint timestep);
-  ~free_block_pickup(void) override { client::rmmod(); }
+  ~free_block_pickup(void) override = default;
 
   free_block_pickup(const free_block_pickup& op) = delete;
   free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
   /* stateless foraging */
-  void visit(representation::arena_map& map) override;
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::arena_map& map) override;
+  void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(representation::base_block& block) override;
-  void visit(
-      controller::depth0::stateless_foraging_controller& controller) override;
-  void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
+  void visit(controller::depth0::crw_controller& controller) override;
+  void visit(fsm::depth0::crw_fsm& fsm) override;
 
   /* stateful foraging */
-  void visit(representation::perceived_arena_map& map) override;
-  void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
-  void visit(
-      controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(ds::perceived_arena_map& map) override;
+  void visit(fsm::depth0::stateful_fsm& fsm) override;
+  void visit(controller::depth0::stateful_controller& controller) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::foraging_controller& controller) override;
-  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(tasks::depth1::harvester& task) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::foraging_controller& controller) override;
+  void visit(controller::depth2::greedy_recpart_controller& controller) override;
   void visit(tasks::depth2::cache_starter& task) override;
   void visit(tasks::depth2::cache_finisher& task) override;
 
@@ -138,7 +137,6 @@ class free_block_pickup
   uint                                        m_timestep;
   uint                                        m_robot_index;
   std::shared_ptr<representation::base_block> m_block;
-  std::shared_ptr<rcppsw::er::server>         m_server;
   // clang-format on
 };
 

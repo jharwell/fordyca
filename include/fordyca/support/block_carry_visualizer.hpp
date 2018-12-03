@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,14 +49,19 @@ NS_START(support);
  * @brief Renders a block in 3D that the robot is carrying for
  * visualization/debugging purposes.
  */
-class block_carry_visualizer {
+class block_carry_visualizer
+    : public rcppsw::er::client<block_carry_visualizer> {
  public:
   block_carry_visualizer(argos::CQTOpenGLUserFunctions* qt,
                          double block_vis_offset,
                          double text_vis_offset)
-      : m_block_vis_offset(block_vis_offset),
+      : ER_CLIENT_INIT("fordyca.support.block_carry_visualizer"),
+        m_block_vis_offset(block_vis_offset),
         m_text_vis_offset(text_vis_offset),
         m_qt(qt) {}
+
+  block_carry_visualizer(const block_carry_visualizer& op) = delete;
+  block_carry_visualizer& operator=(const block_carry_visualizer& op) = delete;
 
   /**
    * @brief Draw visualizations related to block carries:

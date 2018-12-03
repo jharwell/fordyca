@@ -47,8 +47,7 @@ NS_START(fordyca, params);
  */
 class block_priorities_parser : public rcppsw::params::xml_param_parser {
  public:
-  block_priorities_parser(std::shared_ptr<rcppsw::er::server> server, uint level)
-      : xml_param_parser(server, level) {}
+  explicit block_priorities_parser(uint level) : xml_param_parser(level) {}
 
   /**
    * @brief The root tag that all block parameters should lie under in the

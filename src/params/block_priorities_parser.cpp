@@ -42,17 +42,17 @@ void block_priorities_parser::parse(const ticpp::Element& node) {
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-  XML_PARSE_PARAM(bnode, m_params, cube);
-  XML_PARSE_PARAM(bnode, m_params, ramp);
+  XML_PARSE_ATTR(bnode, m_params, cube);
+  XML_PARSE_ATTR(bnode, m_params, ramp);
 } /* parse() */
 
 void block_priorities_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, cube) << std::endl
-         << XML_PARAM_STR(m_params, ramp) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, cube) << std::endl
+         << XML_ATTR_STR(m_params, ramp) << std::endl
          << build_footer();
 } /* show() */
 
-bool block_priorities_parser::validate(void) const {
+__rcsw_pure bool block_priorities_parser::validate(void) const {
   CHECK(m_params->cube >= 1.0);
   CHECK(m_params->ramp >= 1.0);
   return true;

@@ -52,7 +52,7 @@ class foraging_signal : public state_machine::event_signal {
     BLOCK_PICKUP,       /// A robot has picked up a block
     BLOCK_DROP,         /// A robot has dropped a block in {cache, nest, arena}
     LEFT_NEST,          /// A robot has left the nest
-    ENTERED_NEST,          /// A robot has entered the nest
+    ENTERED_NEST,       /// A robot has entered the nest
     ACQUIRE_FREE_BLOCK, /// Direct a robot to acquire a free block in the arena
     ACQUIRE_CACHED_BLOCK, /// Direct a robot to acquire a block from a cache.
     /**
@@ -60,6 +60,13 @@ class foraging_signal : public state_machine::event_signal {
      * #411).
      */
     BLOCK_VANISHED,
+
+    /**
+     * @brief The proximity of a block unknown to the robot is blocnking it from
+     * completing its current task. Used by the Cache Starter task.
+     */
+    BLOCK_PROXIMITY,
+
     /**
      * @brief The cache the robot was waiting to pickup from has vanished (see
      * #247).
@@ -69,7 +76,7 @@ class foraging_signal : public state_machine::event_signal {
      * @brief The place the robot wait waiting to drop a block into has suddenly
      * become a cache.
     */
-    CACHE_APPEARED
+    CACHE_PROXIMITY
   };
 };
 

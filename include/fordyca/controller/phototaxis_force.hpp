@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/steering2D/boid.hpp"
 
@@ -37,8 +36,9 @@ struct phototaxis_force_params;
 }
 
 NS_START(controller);
-class base_sensing_subsystem;
+class sensing_subsystem;
 namespace steering = rcppsw::robotics::steering2D;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -52,15 +52,14 @@ namespace steering = rcppsw::robotics::steering2D;
  */
 class phototaxis_force {
  public:
-  explicit phototaxis_force(
-      const struct params::phototaxis_force_params* params,
-      const std::shared_ptr<base_sensing_subsystem>& sensors);
+  phototaxis_force(const struct params::phototaxis_force_params* params,
+                   const std::shared_ptr<sensing_subsystem>& sensors);
 
-  argos::CVector2 operator()() const;
+  rmath::vector2d operator()() const;
 
   // clang-format off
   double                                   m_max;
-  std::shared_ptr<base_sensing_subsystem>  m_sensors;
+  std::shared_ptr<sensing_subsystem>  m_sensors;
   // clang-format on
 };
 

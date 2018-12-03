@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
@@ -32,7 +33,8 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
+namespace rmath = rcppsw::math;
+namespace ds {
 class cell2D;
 }
 namespace fsm {
@@ -54,19 +56,19 @@ NS_START(events);
  * Also provided are the (x, y) coordinates of the cell to which the event is
  * directed. Not all derived events may need them, but they are there.
  */
-class cell_op
-    : public visitor::visitor,
-      public visitor::visit_set<representation::cell2D, fsm::cell2D_fsm> {
+class cell_op : public visitor::visitor,
+                public visitor::visit_set<ds::cell2D, fsm::cell2D_fsm> {
  public:
-  cell_op(size_t x, size_t y) : m_x(x), m_y(y) {}
+  explicit cell_op(const rmath::vector2u& coord) : m_coord(coord) {}
+
   ~cell_op(void) override = default;
 
-  size_t x(void) const { return m_x; }
-  size_t y(void) const { return m_y; }
+  uint x(void) const { return m_coord.x(); }
+  uint y(void) const { return m_coord.y(); }
+  const rmath::vector2u& coord(void) const { return m_coord; }
 
  private:
-  size_t m_x;
-  size_t m_y;
+  rmath::vector2u m_coord;
 };
 
 NS_END(events, fordyca);

@@ -43,16 +43,16 @@ void block_dist_parser::parse(const ticpp::Element& node) {
   m_manifest.parse(bnode);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_PARAM(bnode, m_params, arena_resolution);
-  XML_PARSE_PARAM(bnode, m_params, dist_type);
+  XML_PARSE_ATTR(bnode, m_params, arena_resolution);
+  XML_PARSE_ATTR(bnode, m_params, dist_type);
   m_params->powerlaw = *m_powerlaw.parse_results();
   m_params->manifest = *m_manifest.parse_results();
 } /* parse() */
 
 void block_dist_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, dist_type) << std::endl
-         << XML_PARAM_STR(m_params, arena_resolution) << std::endl
-         << XML_PARAM_STR(m_params, dist_type) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, dist_type) << std::endl
+         << XML_ATTR_STR(m_params, arena_resolution) << std::endl
+         << XML_ATTR_STR(m_params, dist_type) << std::endl
          << m_powerlaw << build_footer();
 } /* show() */
 

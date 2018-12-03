@@ -24,9 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
+#include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -44,9 +43,12 @@ class sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
 namespace representation {
-class perceived_arena_map;
 class block;
 } // namespace representation
+
+namespace ds {
+class perceived_arena_map;
+} // namespace ds
 
 namespace task_allocation = rcppsw::task_allocation;
 namespace visitor = rcppsw::patterns::visitor;
@@ -70,16 +72,16 @@ using transport_goal_type = block_transporter::goal_type;
  * one.
  */
 class cached_block_to_nest_fsm : public base_foraging_fsm,
+                                 er::client<cached_block_to_nest_fsm>,
                                  public metrics::fsm::goal_acquisition_metrics,
                                  public block_transporter,
                                  public task_allocation::taskable,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
-  cached_block_to_nest_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
-      const controller::cache_selection_matrix* sel_matrix,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
+                           controller::saa_subsystem* saa,
+                           ds::perceived_arena_map* map);
+  ~cached_block_to_nest_fsm(void) override = default;
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
   cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;
@@ -107,13 +109,13 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  bool goal_acquired(void) const override;
+  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   acquisition_goal_type acquisition_goal(void) const override;
 
   /* block transportation */
-  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Reset the FSM
@@ -177,7 +179,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* stateful foraging states */
+  /* foraging states */
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
@@ -199,7 +201,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  depth1::acquire_existing_cache_fsm m_cache_fsm;
+  acquire_existing_cache_fsm m_cache_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

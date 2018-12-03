@@ -24,10 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/temporal_penalty_handler.hpp"
-#include "fordyca/support/loop_functions_utils.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include <string>
+
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/temporal_penalty_handler.hpp"
+#include "fordyca/support/block_op_filter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,6 +39,7 @@ NS_START(fordyca, support);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -49,68 +53,117 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
-class block_op_penalty_handler : public temporal_penalty_handler<T> {
+class block_op_penalty_handler
+    : public temporal_penalty_handler<T>,
+      public er::client<block_op_penalty_handler<T>> {
  public:
-  block_op_penalty_handler(std::shared_ptr<rcppsw::er::server> server,
-                                 representation::arena_map* const map,
-                                 const ct::waveform_params* const params)
-      : temporal_penalty_handler<T>(server, params), m_map(map) {}
+  using temporal_penalty_handler<T>::is_serving_penalty;
+  using temporal_penalty_handler<T>::deconflict_penalty_finish;
+  using temporal_penalty_handler<T>::original_penalty;
+
+  block_op_penalty_handler(ds::arena_map* const map,
+                           const ct::waveform_params* const params,
+                           const std::string& name)
+      : temporal_penalty_handler<T>(params, name),
+        ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
+        m_map(map) {}
 
   ~block_op_penalty_handler(void) override = default;
-  block_op_penalty_handler& operator=(
-      const block_op_penalty_handler& other) = delete;
-  block_op_penalty_handler(
-      const block_op_penalty_handler& other) = delete;
+  block_op_penalty_handler& operator=(const block_op_penalty_handler& other) =
+      delete;
+  block_op_penalty_handler(const block_op_penalty_handler& other) = delete;
+
+  using filter_status = typename block_op_filter<T>::filter_status;
+
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
    * trying to drop/pickup a block. If so, create a \ref block_op_penalty object
    * and associate it with the robot.
    *
    * @param robot The robot to check.
+   * @param src The penalty source (i.e. what event caused this penalty to be
+   *            applied).
    * @param timestep The current timestep.
+   * @param cache_prox_dist The minimum distance that the cache site needs to
+   *                        be from all caches in the arena.n
    *
-   * @return \c TRUE if a penalty has been initialized for a robot, and they
-   * should begin waiting, and \c FALSE otherwise.
+   * @return \ref kStatusOK if a penalty has been initialized for a robot, a
+   * non-zero code if it has not indicating why.
    */
-  bool penalty_init(T& controller, uint timestep) {
-    /* For nest block drops, this will always be unused and -1 */
-    int block_id = utils::robot_on_block(controller, *m_map);
-
-    /*
-     * If the robot has not acquired a block, or thinks it has but actually has
-     * not, nothing to do. If a robot is carrying a block but is still
-     * transporting it (even if it IS currently in the nest), nothing to do.3
-     */
-    bool precond = false;
-    if (controller.goal_acquired() &&
-          acquisition_goal_type::kBlock == controller.acquisition_goal() &&
-          -1 != block_id) {
-      precond = true;
+  filter_status penalty_init(T& controller,
+                             block_op_src src,
+                             uint timestep,
+                             double cache_prox_dist = -1,
+                             double block_prox_dist = -1) {
+    auto filter = block_op_filter<T>(m_map)(controller,
+                                                    src,
+                                                    cache_prox_dist,
+                                                    block_prox_dist);
+    if (filter.status) {
+      return filter.reason;
     }
-    if (controller.in_nest() && controller.goal_acquired()) {
-      precond = true;
-    }
-    if (!precond) {
-      return precond;
-    }
+    ER_ASSERT(!is_serving_penalty(controller),
+              "Robot already serving block penalty?");
 
-    ER_ASSERT(!temporal_penalty_handler<T>::is_serving_penalty(controller),
-              "FATAL: Robot already serving block penalty?");
+    int id = penalty_id_calc(controller, src, cache_prox_dist, block_prox_dist);
+    uint penalty = deconflict_penalty_finish(timestep);
+    ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
+            loop_utils::robot_id(controller),
+            id,
+            timestep,
+            original_penalty(),
+            penalty,
+            src);
 
-    uint penalty = temporal_penalty_handler<T>::deconflict_penalty_finish(timestep);
-    ER_NOM("fb%d: start=%u, penalty=%u, adjusted penalty=%d",
-           utils::robot_id(controller),
-           timestep,
-           temporal_penalty_handler<T>::original_penalty(),
-           penalty);
-
-    temporal_penalty_handler<T>::penalty_list().push_back(
-        temporal_penalty<T>(&controller, block_id, penalty, timestep));
-    return true;
+    penalty_list().push_back(
+        temporal_penalty<T>(&controller, id, penalty, timestep));
+    return filter_status::kStatusOK;
   }
 
+ protected:
+  using temporal_penalty_handler<T>::penalty_list;
+
+ private:
+  int penalty_id_calc(const T& controller,
+                      block_op_src src,
+                      double cache_prox_dist,
+                      double block_prox_dist) const {
+    int id = -1;
+    switch (src) {
+      case kSrcFreePickup:
+        id = loop_utils::robot_on_block(controller, *m_map);
+        ER_ASSERT(-1 != id, "Robot not on block?");
+        break;
+      case kSrcNestDrop:
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
+                  "Robot not carrying block?");
+        id = controller.block()->id();
+        break;
+      case kSrcCacheSiteDrop:
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
+                  "Robot not carrying block?");
+        ER_ASSERT(block_prox_dist > 0.0,
+                  "Block proximity distance not specified for cache site drop");
+        id = controller.block()->id();
+        break;
+      case kSrcNewCacheDrop:
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
+                  "Robot not carrying block?");
+        ER_ASSERT(cache_prox_dist > 0.0,
+                  "Cache proximity distance not specified for new cache drop");
+        id = controller.block()->id();
+        break;
+      default:
+        id = -1;
+    }
+    return id;
+  } /* penalty_id_calc() */
+
   // clang-format off
-  representation::arena_map* const m_map;
+  ds::arena_map* const m_map;
   // clang-format on
 };
 NS_END(support, fordyca);
