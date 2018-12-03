@@ -44,7 +44,7 @@ NS_START(fordyca, metrics);
  *
  * Metrics are collected every timestep.
  */
-class world_model_metrics : virtual public rcppsw::metrics::base_metrics {
+class world_model_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
   world_model_metrics(void) = default;
 
@@ -60,6 +60,18 @@ class world_model_metrics : virtual public rcppsw::metrics::base_metrics {
    * @param state The state type for which inaccuracies should be reported.
    */
   virtual uint cell_state_inaccuracies(uint state) const = 0;
+
+  /**
+   * @brief Return the percentage of the arena that is currently in a known
+   * state as a fraction of 1.0.
+   */
+  virtual double known_percentage(void) const = 0;
+
+  /**
+   * @brief Return the percentage of the arena that is currently in an unknown
+   * state, as a fraction of 1.0
+   */
+  virtual double unknown_percentage(void) const = 0;
 };
 
 NS_END(metrics, fordyca);

@@ -23,6 +23,9 @@
  ******************************************************************************/
 #include "fordyca/params/loop_function_repository.hpp"
 #include "fordyca/params/arena/arena_map_parser.hpp"
+#include "fordyca/params/battery_parser.hpp"
+#include "fordyca/params/caches/caches_parser.hpp"
+#include "fordyca/params/oracle_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
@@ -36,9 +39,7 @@ namespace ct = rcppsw::control;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-loop_function_repository::loop_function_repository(
-    const std::shared_ptr<rcppsw::er::server>& server)
-    : xml_param_repository(server) {
+loop_function_repository::loop_function_repository(void) {
   register_parser<output_parser, output_params>(
       output_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
   register_parser<arena::arena_map_parser, arena::arena_map_params>(
@@ -47,9 +48,13 @@ loop_function_repository::loop_function_repository(
   register_parser<visualization_parser, visualization_params>(
       visualization_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<ct::waveform_xml_parser>(
-      std::string("static_cache_penalty_") + ct::waveform_xml_parser::kXMLRoot,
-      ct::waveform_xml_parser::kHeader1);
+  register_parser<battery_parser, battery_params>(
+      battery_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<oracle_parser, oracle_params>(
+      oracle_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<caches::caches_parser, caches::caches_params>(
+      caches::caches_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
 }
 
 NS_END(params, fordyca);

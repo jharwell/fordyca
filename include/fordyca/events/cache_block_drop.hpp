@@ -37,20 +37,23 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth1 {
-class foraging_controller;
+class greedy_partitioning_controller;
 }
 namespace depth2 {
-class foraging_controller;
+class greedy_recpart_controller;
 }
 } // namespace controller
 
 namespace representation {
-class perceived_arena_map;
 class arena_cache;
 } // namespace representation
-namespace fsm { namespace depth1 {
+
+namespace ds {
+class perceived_arena_map;
+} // namespace ds
+namespace fsm {
 class block_to_goal_fsm;
-}} // namespace fsm::depth1
+} // namespace fsm
 namespace tasks {
 namespace depth1 {
 class harvester;
@@ -76,38 +79,38 @@ NS_START(events);
  */
 class cache_block_drop
     : public cell_op,
-      public rcppsw::er::client,
+      public rcppsw::er::client<cache_block_drop>,
       public block_drop_event,
-      public visitor::visit_set<controller::depth1::foraging_controller,
-                                controller::depth2::foraging_controller,
+      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
+                                controller::depth2::greedy_recpart_controller,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_transferer,
-                                fsm::depth1::block_to_goal_fsm,
-                                representation::perceived_arena_map,
+                                fsm::block_to_goal_fsm,
+                                ds::perceived_arena_map,
                                 representation::arena_cache> {
  public:
-  cache_block_drop(const std::shared_ptr<rcppsw::er::server>& server,
-                   const std::shared_ptr<representation::base_block>& block,
+  cache_block_drop(const std::shared_ptr<representation::base_block>& block,
                    const std::shared_ptr<representation::arena_cache>& cache,
                    double resolution);
-  ~cache_block_drop(void) override { client::rmmod(); }
+  ~cache_block_drop(void) override = default;
 
   cache_block_drop(const cache_block_drop& op) = delete;
   cache_block_drop& operator=(const cache_block_drop& op) = delete;
 
   /* depth1 foraging */
-  void visit(class representation::cell2D& cell) override;
+  void visit(class ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::arena_map& map) override;
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(controller::depth1::foraging_controller& controller) override;
-  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::foraging_controller&) override;
+  void visit(controller::depth2::greedy_recpart_controller&) override;
   void visit(tasks::depth2::cache_transferer& task) override;
 
  private:
@@ -115,7 +118,6 @@ class cache_block_drop
   double                                       m_resolution;
   std::shared_ptr<representation::base_block>  m_block;
   std::shared_ptr<representation::arena_cache> m_cache;
-  std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };
 

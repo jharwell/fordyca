@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
+#include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,19 +48,16 @@ NS_START(fordyca, fsm, depth2);
  * and then drop the block there. Once it has done that it will signal that its
  * task is complete.
  */
-class block_to_cache_site_fsm : public depth1::block_to_goal_fsm {
+class block_to_cache_site_fsm : public block_to_goal_fsm {
  public:
-  block_to_cache_site_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
-      const controller::block_selection_matrix* bsel_matrix,
-      const controller::cache_selection_matrix* csel_matrix,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  block_to_cache_site_fsm(const controller::block_sel_matrix* bsel_matrix,
+                          const controller::cache_sel_matrix* csel_matrix,
+                          controller::saa_subsystem* saa,
+                          ds::perceived_arena_map* map);
+  ~block_to_cache_site_fsm(void) override = default;
 
   block_to_cache_site_fsm(const block_to_cache_site_fsm& fsm) = delete;
   block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm& fsm) = delete;
-
-  acquire_cache_site_fsm& goal_fsm(void) override { return m_cache_fsm; }
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;
@@ -70,6 +68,7 @@ class block_to_cache_site_fsm : public depth1::block_to_goal_fsm {
  private:
   // clang-format off
   acquire_cache_site_fsm m_cache_fsm;
+  acquire_free_block_fsm m_block_fsm;
   // clang-format on
 };
 

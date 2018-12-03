@@ -24,11 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/nest_interactor.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,10 +50,15 @@ NS_START(fordyca, tasks, depth1);
  * nest. It is abortable, and has one task interface.
  */
 class collector : public foraging_task,
-                  public existing_cache_interactor {
+                  public events::existing_cache_interactor,
+                  public events::nest_interactor,
+                  public rcppsw::er::client<collector> {
  public:
-  collector(const struct ta::task_params* params,
-            std::unique_ptr<ta::taskable>& mechanism);
+  collector(const struct ta::task_allocation_params* params,
+            const std::string& name,
+            std::unique_ptr<ta::taskable> mechanism);
+  collector(const struct ta::task_allocation_params* params,
+            std::unique_ptr<ta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -64,24 +73,23 @@ class collector : public foraging_task,
   void accept(events::cache_block_drop&) override {}
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired);
-  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
+  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /* task metrics */
   bool task_at_interface(void) const override;
-  double task_last_exec_time(void) const override { return last_exec_time(); }
-  double task_last_interface_time(void) const override { return last_interface_time(); }
   bool task_completed(void) const override { return task_finished(); }
-  bool task_aborted(void) const override { return executable_task::task_aborted(); }
 
   void task_start(const ta::taskable_argument*) override;
-  double calc_abort_prob(void) override;
-  double calc_interface_time(double start_time) override;
+  double abort_prob_calc(void) override;
+  double interface_time_calc(uint interface,
+                             double start_time) override;
+  void active_interface_update(int) override;
 };
 
 NS_END(depth1, tasks, fordyca);

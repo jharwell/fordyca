@@ -27,17 +27,13 @@
 #include <string>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
 NS_START(fordyca);
-
-namespace events {
-class nest_block_drop;
-} // namespace events
 
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -59,25 +55,20 @@ NS_START(tasks, depth1);
  */
 class foraging_task
     : public base_foraging_task,
-      public ta::polled_task,
-      public visitor::polymorphic_accept_set<events::nest_block_drop> {
+      public ta::polled_task {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kHarvesterName[] = "Harvester";
 
   foraging_task(const std::string& name,
-                const struct ta::task_params *params,
-                std::unique_ptr<ta::taskable>& mechanism);
+                const struct ta::task_allocation_params *params,
+                std::unique_ptr<ta::taskable> mechanism);
+  ~foraging_task(void) override = default;
+
+  static bool task_in_depth1(const polled_task* const task);
 
     /* task overrides */
   double current_time(void) const override;
-
- protected:
-  void interface_complete(bool interface_complete) { m_interface_complete = interface_complete; }
-  bool interface_complete(void) const { return m_interface_complete; }
-
- private:
-  bool m_interface_complete{false};
 };
 
 NS_END(depth1, tasks, fordyca);

@@ -24,23 +24,34 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <map>
 #include <string>
 
 #include "rcppsw/common/common.hpp"
-#include "fordyca/controller/depth0/stateful_tasking_initializer.hpp"
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ta = rcppsw::task_allocation;
+namespace rcppsw { namespace task_allocation {
+class polled_task;
+class bi_tdgraph_executive;
+class bi_tdgraph;
+}}
 NS_START(fordyca);
 namespace params {
-namespace depth1 { class param_repository; }
+struct oracle_params;
+namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
-class cache_selection_matrix;
+class cache_sel_matrix;
+class block_sel_matrix;
+class saa_subsystem;
+class base_perception_subsystem;
 NS_START(depth1);
+namespace ta = rcppsw::task_allocation;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -52,27 +63,45 @@ NS_START(depth1);
  * @brief A helper class to offload initialization of the task tree for depth1
  * foraging.
  */
-class tasking_initializer : public depth0::stateful_tasking_initializer {
+class tasking_initializer : public er::client<tasking_initializer> {
  public:
-  tasking_initializer(std::shared_ptr<rcppsw::er::server>& server,
-                      const controller::block_selection_matrix* bsel_matrix,
-                      const controller::cache_selection_matrix* csel_matrix,
+  tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
+                      const controller::cache_sel_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
                       base_perception_subsystem* perception);
-  ~tasking_initializer(void);
+
+  ~tasking_initializer(void) override;
   tasking_initializer& operator=(const tasking_initializer& other) = delete;
   tasking_initializer(const tasking_initializer& other) = delete;
 
-  std::unique_ptr<ta::bifurcating_tdgraph_executive>
-  operator()(params::depth1::param_repository *const param_repo);
+  std::unique_ptr<ta::bi_tdgraph_executive>
+  operator()(params::depth1::controller_repository *const controller_repo);
+
+  using tasking_map = std::map<std::string, ta::polled_task*>;
 
  protected:
-  void depth1_tasking_init(params::depth1::param_repository* task_repo);
-  const cache_selection_matrix* cache_sel_matrix(void) const { return mc_sel_matrix; }
+  const base_perception_subsystem* perception(void) const { return m_perception; }
+  base_perception_subsystem* perception(void) { return m_perception; }
+
+  controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
+  ta::bi_tdgraph* graph(void) { return m_graph; }
+  const ta::bi_tdgraph* graph(void) const { return m_graph; }
+  const class block_sel_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
+
+  tasking_map depth1_tasks_create(
+      params::depth1::controller_repository* task_repo);
+  void depth1_exec_est_init(params::depth1::controller_repository* task_repo,
+                            const tasking_map& map);
+  const class cache_sel_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }
 
  private:
   // clang-format off
-  const controller::cache_selection_matrix* const mc_sel_matrix;
+  controller::saa_subsystem* const                m_saa;
+  base_perception_subsystem* const                m_perception;
+  const controller::cache_sel_matrix* const mc_csel_matrix;
+  const controller::block_sel_matrix* const mc_bsel_matrix;
+
+  ta::bi_tdgraph*                                 m_graph;
   // clang-format on
 };
 

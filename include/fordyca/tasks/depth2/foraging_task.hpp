@@ -33,6 +33,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
 NS_START(fordyca, tasks, depth2);
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -55,22 +56,19 @@ class foraging_task
       public ta::polled_task {
  public:
   foraging_task(const std::string& name,
-                const struct ta::task_params *params,
-                std::unique_ptr<ta::taskable>& mechanism);
+                const ta::task_allocation_params *params,
+                std::unique_ptr<ta::taskable> mechanism);
+  ~foraging_task(void) override = default;
 
   static constexpr char kCacheStarterName[] = "Cache Starter";
   static constexpr char kCacheFinisherName[] = "Cache Finisher";
   static constexpr char kCacheTransfererName[] = "Cache Transferer";
+  static constexpr char kCacheCollectorName[] = "Cache Collector";
+
+  static bool task_in_depth2(const polled_task* const task);
 
   /* task overrides */
   double current_time(void) const override;
-
- protected:
-  void interface_complete(bool interface_complete) { m_interface_complete = interface_complete; }
-  bool interface_complete(void) const { return m_interface_complete; }
-
- private:
-  bool m_interface_complete{false};
 };
 
 NS_END(depth2, tasks, fordyca);

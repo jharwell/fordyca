@@ -50,11 +50,10 @@ NS_START(fordyca, params, arena);
  */
 class block_dist_parser : public rcppsw::params::xml_param_parser {
  public:
-  block_dist_parser(std::shared_ptr<rcppsw::er::server> server,
-              uint level)
-      : xml_param_parser(server, level),
-        m_manifest(server, level + 1),
-        m_powerlaw(server, level + 1) {}
+  explicit block_dist_parser(uint level)
+      : xml_param_parser(level),
+        m_manifest(level + 1),
+        m_powerlaw(level + 1) {}
 
   /**
    * @brief The root tag that all block distribution parameters should lie under in the

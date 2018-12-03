@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "fordyca/metrics/caches/utilization_metrics.hpp"
+#include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -50,20 +51,22 @@ NS_START(fordyca, representation);
 class arena_cache
     : public base_cache,
       public metrics::caches::utilization_metrics,
+      public metrics::caches::location_metrics,
       public rcppsw::patterns::visitor::visitable_any<arena_cache> {
  public:
   arena_cache(double dimension,
               double resolution,
-              argos::CVector2 center,
+              rmath::vector2d center,
               const block_vector& blocks,
               int id);
 
   /* metrics */
-  uint n_blocks(void) const override { return base_cache::n_blocks(); }
+  size_t n_blocks(void) const override { return base_cache::n_blocks(); }
   uint total_block_pickups(void) const override { return m_block_pickups; }
   uint total_block_drops(void) const override { return m_block_drops; }
   void reset_metrics(void) override;
-  uint cache_id(void) const override { return id(); }
+  int cache_id(void) const override { return id(); }
+  rmath::vector2u location(void) const override { return discrete_loc(); }
 
   void has_block_pickup(void) { m_block_pickups = 1; }
   void has_block_drop(void) { m_block_drops = 1; }

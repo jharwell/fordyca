@@ -48,7 +48,6 @@ struct block_dist_params : public rcppsw::params::base_params {
    */
   double arena_resolution{0.0};
   std::string dist_type{""};
-
   struct powerlaw_dist_params powerlaw{};
 };
 

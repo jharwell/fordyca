@@ -21,8 +21,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/configuration/argos_configuration.h>
-
 #include "fordyca/params/phototaxis_force_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
@@ -41,11 +39,10 @@ constexpr char phototaxis_force_parser::kXMLRoot[];
  ******************************************************************************/
 void phototaxis_force_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element pnode =
-        argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element pnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-    XML_PARSE_PARAM(pnode, m_params, max);
+    XML_PARSE_ATTR(pnode, m_params, max);
     m_parsed = true;
   }
 } /* parse() */
@@ -56,7 +53,7 @@ void phototaxis_force_parser::show(std::ostream& stream) const {
            << build_footer();
     return;
   }
-  stream << build_header() << XML_PARAM_STR(m_params, max) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, max) << std::endl
          << build_footer();
 } /* show() */
 

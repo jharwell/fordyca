@@ -4,13 +4,12 @@
 ((c++-mode
   (flycheck-gcc-language-standard . "c++14")
   (eval progn
-        (require 'rtags-init)
-        (require 'irony-mode-init)
         (let
             ((includes-list
               (list
                (substitute-in-file-name "$rcsw/include")
                (substitute-in-file-name "$rcppsw/include")
+               (substitute-in-file-name "$fordyca/include")
                (concat
                 (projectile-project-root)
                 "include")
@@ -27,6 +26,7 @@
                                                                  "$rcppsw")))
           (add-to-list 'flycheck-clang-args (concat "-isystem" (substitute-in-file-name
                                                                 "$localroot/include")))
+          (add-to-list 'flycheck-clang-args (concat "-isystem" "/usr/include/eigen3"))
           (add-to-list 'flycheck-clang-definitions "HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT")
 
           (add-to-list 'flycheck-gcc-args "-fPIC")
@@ -36,33 +36,8 @@
                                                               "$rcppsw")))
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
                                                               "$localroot/include")))
-          (setq compile-command
-                (concat "make -C"
-                        (concat
-                         (projectile-project-root)
-                         "build")))
-          (add-hook 'c++-mode-hook 'google-style-hook)
-          (setq helm-locate-project-list (list "fordyca" "rcppsw"))
+          (add-to-list 'flycheck-gcc-args (concat "-isystem" "/usr/include/eigen3"))
           )
-        (let
-            ((cc-search-dirs
-              (list
-               (concat
-                (projectile-project-root)
-                "src/*/*/*")
-               (concat
-                (projectile-project-root)
-                "include/fordyca/*/*/*")
-               (concat
-                (projectile-project-root)
-                "include/fordyca")
-               (concat
-                (projectile-project-root)
-                "include")
-               (concat
-                (projectile-project-root)
-                "../rcppsw/include"))))
-          (setq cc-search-directories cc-search-dirs))
         (c++-mode))))
 
 

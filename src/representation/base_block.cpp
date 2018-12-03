@@ -27,12 +27,14 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
-namespace math = rcppsw::math;
+namespace rmath = rcppsw::math;
+
 /*******************************************************************************
  *  Static Variables
  ******************************************************************************/
-math::dcoord2 base_block::kOutOfSightDLoc = math::dcoord2(100, 100);
-argos::CVector2 base_block::kOutOfSightRLoc = argos::CVector2(100.0, 100.0);
+const rmath::vector2u base_block::kOutOfSightDLoc = rmath::vector2u(1000, 1000);
+const rmath::vector2d base_block::kOutOfSightRLoc =
+    rmath::vector2d(1000.0, 1000.0);
 
 /******************************************************************************
  * Member Functions

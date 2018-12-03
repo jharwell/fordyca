@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/pheromone_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -38,17 +37,16 @@ constexpr char pheromone_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void pheromone_parser::parse(const ticpp::Element& node) {
-  ticpp::Element pnode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element pnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_PARAM(pnode, m_params, rho);
-  XML_PARSE_PARAM(pnode, m_params, repeat_deposit);
+  XML_PARSE_ATTR(pnode, m_params, rho);
+  XML_PARSE_ATTR(pnode, m_params, repeat_deposit);
 } /* parse() */
 
 void pheromone_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, rho) << std::endl
-         << XML_PARAM_STR(m_params, repeat_deposit) << std::endl
+  stream << build_header() << XML_ATTR_STR(m_params, rho) << std::endl
+         << XML_ATTR_STR(m_params, repeat_deposit) << std::endl
          << build_footer();
 } /* show() */
 

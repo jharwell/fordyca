@@ -96,11 +96,6 @@ class base_cell_entity {
   // clang-format on
 };
 
-/*******************************************************************************
- * Type Definitions
- ******************************************************************************/
-using perceived_entity = std::pair<const base_cell_entity*, double>;
-
 NS_END(representation, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_BASE_CELL_ENTITY_HPP_ */

@@ -35,11 +35,9 @@ namespace utils = rcppsw::utils;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-base_explore_fsm::base_explore_fsm(
-    std::shared_ptr<rcppsw::er::server> server,
-    controller::saa_subsystem* const saa,
-    uint8_t max_states)
-    : base_foraging_fsm(server, saa, max_states), entry_explore() {}
+base_explore_fsm::base_explore_fsm(controller::saa_subsystem* const saa,
+                                   uint8_t max_states)
+    : base_foraging_fsm(saa, max_states), entry_explore() {}
 
 /*******************************************************************************
  * States

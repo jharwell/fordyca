@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include "fordyca/controller/explore_behavior.hpp"
 
 /*******************************************************************************
@@ -41,10 +42,10 @@ NS_START(fordyca, controller);
  *
  * @brief Perform random walk exploration: wander force + avoidance force.
  */
-class random_explore_behavior : public explore_behavior {
+class random_explore_behavior : public explore_behavior,
+                                er::client<random_explore_behavior> {
  public:
-  random_explore_behavior(std::shared_ptr<rcppsw::er::server> server,
-                          controller::saa_subsystem* saa);
+  explicit random_explore_behavior(controller::saa_subsystem* saa);
 
   ~random_explore_behavior(void) override = default;
   random_explore_behavior(const random_explore_behavior& fsm) = delete;

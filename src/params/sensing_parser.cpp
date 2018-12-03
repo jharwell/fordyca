@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/sensing_parser.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
 
 /*******************************************************************************
  * Namespaces
@@ -38,21 +37,28 @@ constexpr char sensing_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void sensing_parser::parse(const ticpp::Element& node) {
-  ticpp::Element snode =
-      argos::GetNode(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element snode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  XML_PARSE_ATTR(snode, m_params, los_dim);
   m_proximity_parser.parse(snode);
   m_params->proximity = *m_proximity_parser.parse_results();
 } /* parse() */
 
 void sensing_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_proximity_parser << build_footer();
+  stream << build_header() <<
+      XML_ATTR_STR(m_params, los_dim) << std::endl
+         << m_proximity_parser << build_footer();
 } /* show() */
 
 __rcsw_pure bool sensing_parser::validate(void) const {
-  return m_proximity_parser.validate();
+  CHECK(m_params->los_dim > 0.0);
+  CHECK(m_proximity_parser.validate());
+  return true;
+
+error:
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -25,9 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
-#include <argos3/core/utility/math/vector2.h>
+#include <string>
 #include "fordyca/fsm/new_direction_data.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/state_machine/hfsm.hpp"
 
 /*******************************************************************************
@@ -37,10 +38,13 @@ NS_START(fordyca);
 
 namespace controller {
 class saa_subsystem;
-class base_sensing_subsystem;
+class sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
+
 NS_START(fsm);
 
 /*******************************************************************************
@@ -57,11 +61,10 @@ NS_START(fsm);
  * per-se.
  */
 class base_foraging_fsm : public state_machine::hfsm,
+                          public er::client<base_foraging_fsm>,
                           public metrics::fsm::collision_metrics {
  public:
-  base_foraging_fsm(std::shared_ptr<rcppsw::er::server>& server,
-                    controller::saa_subsystem* saa,
-                    uint8_t max_states);
+  base_foraging_fsm(controller::saa_subsystem* saa, uint8_t max_states);
 
   ~base_foraging_fsm(void) override = default;
 
@@ -74,7 +77,7 @@ class base_foraging_fsm : public state_machine::hfsm,
   void init(void) override;
 
   /**
-   * @brief Get a reference to the \ref base_sensing_subsystem.
+   * @brief Get a reference to the \ref sensing_subsystem.
    *
    * Derived classes needing to reference these sensors should use this function
    * rather than maintaining their own std::shared_ptr copy of things, as that
@@ -82,9 +85,8 @@ class base_foraging_fsm : public state_machine::hfsm,
    * as tick, location, etc., and that do not get propagated down the
    * composition/inheritance hierarchy of robot controllers properly.
    */
-  const std::shared_ptr<const controller::base_sensing_subsystem> base_sensors(
-      void) const;
-  const std::shared_ptr<controller::base_sensing_subsystem> base_sensors(void);
+  const std::shared_ptr<const controller::sensing_subsystem> sensors(void) const;
+  const std::shared_ptr<controller::sensing_subsystem> sensors(void);
 
   const std::shared_ptr<const controller::actuation_subsystem> actuators(
       void) const;
@@ -104,7 +106,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    *
    * @return The same vector, but with a new angle.
    */
-  argos::CVector2 randomize_vector_angle(argos::CVector2 vector);
+  rmath::vector2d randomize_vector_angle(const rmath::vector2d& vector);
 
   const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
@@ -180,7 +182,6 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
 
-
  private:
   /**
    * @brief When changing direction, a robot is spinning at such a speed that it
@@ -218,7 +219,7 @@ class base_foraging_fsm : public state_machine::hfsm,
   uint                             m_avoidance_start{0};
   uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
-  argos::CRadians                  m_new_dir;
+  rmath::radians                   m_new_dir;
   argos::CRandom::CRNG*            m_rng;
   controller::saa_subsystem* const m_saa;
   // clang-format on

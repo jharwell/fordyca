@@ -22,17 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/depth1/existing_cache_selector.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
+#include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,23 +39,26 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_goal_fsm::acquire_goal_fsm(
-    std::shared_ptr<rcppsw::er::server>& server,
     controller::saa_subsystem* saa,
-    const representation::perceived_arena_map* const map,
-    std::function<bool(void)> goal_detect)
-    : base_foraging_fsm(server, saa, ST_MAX_STATES),
+    const acquisition_goal_ftype& acquisition_goal,
+    const goal_candidates_ftype& candidates_exist_cb,
+    const goal_select_ftype& goal_select,
+    const std::function<bool(bool)>& goal_acquired_cb,
+    const std::function<bool(void)>& explore_term_cb)
+    : base_foraging_fsm(saa, ST_MAX_STATES),
+      ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(fsm_acquire_goal, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       exit_fsm_acquire_goal(),
-      mc_map(map),
-      m_vector_fsm(server, saa),
-      m_explore_fsm(
-          server,
-          saa,
-          std::make_unique<controller::random_explore_behavior>(server, saa),
-          goal_detect),
-      m_goal_acquired_cb(nullptr),
+      m_vector_fsm(saa),
+      m_explore_fsm(saa,
+                    std::make_unique<controller::random_explore_behavior>(saa),
+                    explore_term_cb),
+      m_acquisition_goal(acquisition_goal),
+      m_candidates_exist(candidates_exist_cb),
+      m_goal_select(goal_select),
+      m_goal_acquired_cb(goal_acquired_cb),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
                                                nullptr,
@@ -71,14 +70,14 @@ acquire_goal_fsm::acquire_goal_fsm(
 }
 
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, start) {
-  ER_DIAG("Executing ST_START");
+  ER_DEBUG("Executing ST_START");
   internal_event(ST_ACQUIRE_GOAL);
   return controller::foraging_signal::HANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, fsm_acquire_goal) {
   if (ST_ACQUIRE_GOAL != last_state()) {
-    ER_DIAG("Executing ST_ACQUIRE_GOAL");
+    ER_DEBUG("Executing ST_ACQUIRE_GOAL");
   }
 
   if (acquire_goal()) {
@@ -93,7 +92,7 @@ HFSM_EXIT_DEFINE(acquire_goal_fsm, exit_fsm_acquire_goal) {
 }
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
   if (ST_FINISHED != last_state()) {
-    ER_DIAG("Executing ST_FINISHED");
+    ER_DEBUG("Executing ST_FINISHED");
   }
 
   return state_machine::event_signal::HANDLED;
@@ -104,17 +103,17 @@ HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
  ******************************************************************************/
 __rcsw_pure bool acquire_goal_fsm::in_collision_avoidance(void) const {
   return m_explore_fsm.in_collision_avoidance() ||
-      m_vector_fsm.in_collision_avoidance();
+         m_vector_fsm.in_collision_avoidance();
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool acquire_goal_fsm::entered_collision_avoidance(void) const {
   return m_explore_fsm.entered_collision_avoidance() ||
-      m_vector_fsm.entered_collision_avoidance();
+         m_vector_fsm.entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool acquire_goal_fsm::exited_collision_avoidance(void) const {
   return m_explore_fsm.exited_collision_avoidance() ||
-      m_vector_fsm.exited_collision_avoidance();
+         m_vector_fsm.exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 __rcsw_pure uint acquire_goal_fsm::collision_avoidance_duration(void) const {
@@ -134,6 +133,13 @@ bool acquire_goal_fsm::is_vectoring_to_goal(void) const {
   return current_state() == ST_ACQUIRE_GOAL && m_vector_fsm.task_running();
 } /* is_vectoring_to_goal() */
 
+acquisition_goal_type acquire_goal_fsm::acquisition_goal(void) const {
+  if (ST_ACQUIRE_GOAL == current_state()) {
+    return m_acquisition_goal();
+  }
+  return acquisition_goal_type::kNone;
+} /* acquisition_goal() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
@@ -143,27 +149,11 @@ void acquire_goal_fsm::init(void) {
   m_explore_fsm.task_reset();
 } /* init() */
 
-bool acquire_goal_fsm::acquire_unknown_goal(void) {
-  if (!m_explore_fsm.task_running()) {
-    m_explore_fsm.task_reset();
-    m_explore_fsm.task_start(nullptr);
-  }
-  m_explore_fsm.task_execute();
-  if (m_explore_fsm.task_finished()) {
-    if (m_goal_acquired_cb) {
-      return m_goal_acquired_cb(true);
-    }
-    return true;
-  }
-  return false;
-} /* acquire_unknown_goal() */
-
 bool acquire_goal_fsm::acquire_goal(void) {
   /*
-   * If we know of ANY caches in the arena, go to the location of the best one
-   * and pick it up. Otherwise, explore until you find one. If during
-   * exploration we find one through our LOS, then stop exploring and go vector
-   * to it.
+   * If we know of goal caches in the arena, go to the location of the best
+   * one. Otherwise, explore until you find one. If during exploration we find
+   * one through our LOS, then stop exploring and go vector to it.
    */
   if (!acquire_known_goal()) {
     if (m_vector_fsm.task_running()) {
@@ -179,6 +169,64 @@ bool acquire_goal_fsm::acquire_goal(void) {
   }
   return true;
 } /* acquire_goal() */
+
+bool acquire_goal_fsm::acquire_unknown_goal(void) {
+  if (!m_explore_fsm.task_running()) {
+    m_explore_fsm.task_reset();
+    m_explore_fsm.task_start(nullptr);
+  }
+  m_explore_fsm.task_execute();
+  if (m_explore_fsm.task_finished()) {
+    return m_goal_acquired_cb(true);
+  }
+  return false;
+} /* acquire_unknown_goal() */
+
+bool acquire_goal_fsm::acquire_known_goal(void) {
+  /*
+   * If we don't know of any blocks and we are not current vectoring towards
+   * one, then there is no way we can acquire a known block, so bail out.
+   */
+  if (!m_candidates_exist() && !m_vector_fsm.task_running()) {
+    return false;
+  }
+
+  if (m_candidates_exist() && !m_vector_fsm.task_running()) {
+    /*
+     * If we get here, we must know of some candidates/perceived entities of
+     * interest, but not be currently vectoring toward any of them.
+     */
+    auto selection = m_goal_select();
+
+    /*
+     * If this happens, all the entities we know of are too close for us to
+     * vector to, or there was some other issue with selecting one.
+     */
+    if (false == std::get<0>(selection)) {
+      return false;
+    }
+
+    m_explore_fsm.task_reset();
+    m_vector_fsm.task_reset();
+
+    ER_INFO("Start acquiring goal@%s tol=%f",
+            std::get<1>(selection).to_str().c_str(),
+            std::get<2>(selection));
+    tasks::vector_argument v(std::get<2>(selection), std::get<1>(selection));
+    m_vector_fsm.task_start(&v);
+  }
+
+  /* we are vectoring */
+  if (!m_vector_fsm.task_finished()) {
+    m_vector_fsm.task_execute();
+  }
+
+  if (m_vector_fsm.task_finished()) {
+    m_vector_fsm.task_reset();
+    return m_goal_acquired_cb(false);
+  }
+  return false;
+} /* acquire_known_block() */
 
 void acquire_goal_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,

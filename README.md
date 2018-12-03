@@ -2,7 +2,9 @@
 
 This is the main entry point for getting started on the project.
 
-## Papers
+To see what's new, take a look at the [release notes](docs/release-notes.md).
+
+# Papers
 
 1. J. Harwell and M. Gini, "Broadening applicability of swarm-robotic foraging
    through constraint relaxation," 2018 IEEE International Conference on
@@ -10,25 +12,12 @@ This is the main entry point for getting started on the project.
    Australia, 2018, pp. 116-122.
    [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8376280&isnumber=8376259)
 
-## Pre-cloning Setup
+# Pre-cloning Setup
 
 1. Install development packages for the project:
 
-   - catch (A unit testing framework that some unit tests use).
-
-        sudo apt install catch
-
-   - boost 1.58.
-
-        sudo apt install libboost-all-dev
-
-   - Qt5.
-
-        sudo apt install qtbase5-dev
-
-   - graphviz (For building the documentation include/dependency graphs)
-
-        sudo apt install graphviz
+   - Qt5 (`qtbase5-dev` on ubuntu)
+   - NLopt (`libnlopt-dev` on ubuntu)
 
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.
@@ -43,7 +32,7 @@ This is the main entry point for getting started on the project.
 
         sudo apt install -f
 
-   To fix installation issues.
+   After installing the .deb with dpkg to fix installation issues.
 
    If you are compiling ARGoS from source you can use whatever compiler/compiler
    version you like, so long as it supports C++14.
@@ -56,15 +45,15 @@ This is the main entry point for getting started on the project.
    look at the platform requirements for that project and install any
    needed packages/libraries.
 
-
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
    C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
 
-        `ln -s /path/to/rcppsw ext/rcppsw`
+        mkdir ext
+        ln -s /path/to/rcppsw ext/rcppsw
 
    Follow all pre/post-cloning instructions found in README for the rcppsw repo.
 
-## Post-cloning setup
+# Post-cloning setup
 
 1. Check out the development branch, as that has not only the latest semi-stable
    release, but also the most up-to-date documentation, including this README.
@@ -85,7 +74,22 @@ This is the main entry point for getting started on the project.
 
         make documentation
 
-## Running On Your Laptop
+# Configuring Simulations
+
+For parameter configuration see [parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
+
+## Controller Configuration
+
+| Controller Name        | Status   | Required loop/QT user functions | Notes                                                                                              |
+|------------------------|----------|---------------------------------|----------------------------------------------------------------------------------------------------|
+| crw                    | Usable   | depth0                          | CRW = Correlated Random Walk                                                                       |
+| stateful               | Usable   | depth0                          | Stateful = memory based controller with information relevance via pheromones                       |
+| greedy\_partitioning   | Usable   | depth1                          | Requires static caches to also be enabled. Only really valid for single source foraging scenarios. |
+| oracular\_partitioning | Usable   | depth1                          | Requires static caches and the oracle to be enabled.                                               |
+| greedy\_recpart        | Unstable | depth2                          | Requires dynamic caches to also be enabled.                                                        |
+| oracular\_recpart      | Unstable | depth2                          | Requires dynamic caches and the oracle to be enabled.                                              |
+
+# Running On Your Laptop
 
 After successful compilation, follow these steps to run a foraging scenario:
 
@@ -94,14 +98,20 @@ After successful compilation, follow these steps to run a foraging scenario:
 
         export ARGOS_PLUGIN_PATH=/path/to/fordyca/build/lib
 
+2. Unless you disable event reporting, you will need to set the path to the
+   log4cxx configuration file. On bash that is:
 
-2. cd to the ROOT of the fordyca repo, and run the experiment:
+        export LOG4CXX_CONFIGURATION=/path/to/fordyca/log4cxx.xml
 
-        argos3 -c exp/single-source.argos
+3. cd to the ROOT of the fordyca repo, and run the demo experiment:
 
-   This should pop up a nice GUI from which you can start the experiment.
+        argos3 -c exp/demo.argos
 
-## Running on MSI
+   This should pop up a nice GUI from which you can start the experiment (it
+   runs depth0 stateful foraging by default). If no GUI appears, verify that the
+   `<visualization>` subtree of the file is not commented out.
+
+# Running on MSI
 
 ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
 access to that directory as part of the gini group.
@@ -124,9 +134,6 @@ access to that directory as part of the gini group.
 
    If you need to checkout a particular branch in the repo you can do that after
    running the script and then re-running make.
-
-3. Once the script finishes, set `ARGOS_PLUGIN_PATH` as before and you should be
-   able to run experiments.
 
 # Troubleshooting
 
@@ -154,7 +161,14 @@ access to that directory as part of the gini group.
      version, anaconda loads a DIFFERENT version of the Qt than fordyca uses,
      resulting in a dynamic linking error.
 
-## Contributing
+  3. Make sure you have the necessary environment variables set correctly.
+
+  4. If you get a `std::bad_cast` exception (or something similar), then verify
+     that the name of [controller, loop functions, qt user functions], are
+     correct, per the table above.
+
+
+# Contributing
 
 For contributing to `fordyca`, see
 [CONTRIBUTING](https://github.com/swarm-robotics/rcppsw/blob/master/docs/CONTRIBUTING.md).

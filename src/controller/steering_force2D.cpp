@@ -28,38 +28,39 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 steering_force2D::steering_force2D(
-    const std::shared_ptr<rcppsw::er::server>& server,
     steering::boid& entity,
     const params::steering_force2D_params* const params,
-    const std::shared_ptr<base_sensing_subsystem>& sensors)
-    : steering::force_calculator(server, entity, params),
+    const std::shared_ptr<sensing_subsystem>& sensors)
+    : steering::force_calculator(entity, params),
+      ER_CLIENT_INIT("fordyca.controller.steering_force2D"),
       m_phototaxis_force(&params->phototaxis, sensors) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void steering_force2D::phototaxis(void) {
-  argos::CVector2 force = m_phototaxis_force();
-  ER_DIAG("Phototaxis force: (%f, %f)@%f [%f]",
-          force.GetX(),
-          force.GetY(),
-          force.Angle().GetValue(),
-          force.Length());
+  rmath::vector2d force = m_phototaxis_force();
+  ER_DEBUG("Phototaxis force: (%f, %f)@%f [%f]",
+           force.x(),
+           force.y(),
+           force.angle().value(),
+           force.length());
   accum_force(force);
 } /* phototaxis() */
 
 void steering_force2D::anti_phototaxis(void) {
-  argos::CVector2 force = -m_phototaxis_force();
-  ER_DIAG("Anti-phototaxis force: (%f, %f)@%f [%f]",
-          force.GetX(),
-          force.GetY(),
-          force.Angle().GetValue(),
-          force.Length());
+  rmath::vector2d force = -m_phototaxis_force();
+  ER_DEBUG("Anti-phototaxis force: (%f, %f)@%f [%f]",
+           force.x(),
+           force.y(),
+           force.angle().value(),
+           force.length());
   accum_force(force);
 } /* anti_phototaxis() */
 

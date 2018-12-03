@@ -32,18 +32,14 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 random_explore_behavior::random_explore_behavior(
-    std::shared_ptr<rcppsw::er::server> server,
     controller::saa_subsystem* const saa)
-    : explore_behavior(server, saa) {
-  insmod("random_explore_behavior",
-         rcppsw::er::er_lvl::DIAG,
-         rcppsw::er::er_lvl::NOM);
-}
+    : explore_behavior(saa),
+      ER_CLIENT_INIT("fordyca.controller.explore_behavior.random") {}
 
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-bool random_explore_behavior::in_collision_avoidance(void) const {
+__rcsw_pure bool random_explore_behavior::in_collision_avoidance(void) const {
   return m_in_avoidance;
 } /* in_collision_avoidance() */
 
@@ -66,7 +62,7 @@ uint random_explore_behavior::collision_avoidance_duration(void) const {
  * General Member Functions
  ******************************************************************************/
 void random_explore_behavior::execute(void) {
-  argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
+  rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
   saa_subsystem()->steering_force().avoidance(obs);
   saa_subsystem()->steering_force().wander();
 
@@ -81,11 +77,11 @@ void random_explore_behavior::execute(void) {
     }
     m_in_avoidance = true;
 
-    ER_DIAG("Found threatening obstacle: (%f, %f)@%f [%f]",
-            obs.GetX(),
-            obs.GetY(),
-            obs.Angle().GetValue(),
-            obs.Length());
+    ER_DEBUG("Found threatening obstacle: (%f, %f)@%f [%f]",
+             obs.x(),
+             obs.y(),
+             obs.angle().value(),
+             obs.length());
     saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     saa_subsystem()->actuation()->leds_set_color(utils::color::kRED);
   } else {
@@ -99,13 +95,13 @@ void random_explore_behavior::execute(void) {
     m_in_avoidance = false;
     m_entered_avoidance = false; /* catches 1 timestep avoidances correctly */
 
-    ER_DIAG("No threatening obstacle found");
+    ER_DEBUG("No threatening obstacle found");
     saa_subsystem()->actuation()->leds_set_color(utils::color::kMAGENTA);
-    argos::CVector2 force = saa_subsystem()->steering_force().value();
+    rmath::vector2d force = saa_subsystem()->steering_force().value();
     /*
      * This can be 0 if the wander force is not active this timestep.
      */
-    if (force.Length() >= std::numeric_limits<double>::epsilon()) {
+    if (force.length() >= std::numeric_limits<double>::epsilon()) {
       saa_subsystem()->steering_force().value(
           saa_subsystem()->steering_force().value() * 0.7);
       saa_subsystem()->apply_steering_force(std::make_pair(false, false));

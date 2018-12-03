@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -65,9 +65,13 @@ class world_model_metrics_collector
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  std::vector<uint> m_stats;
+  // clang-format off
+  std::vector<uint>   m_stats;
+  std::vector<double> m_known{};
+  std::vector<double> m_unknown{};
+  // clang-format on
 };
 
 NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */

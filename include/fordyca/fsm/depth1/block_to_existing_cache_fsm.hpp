@@ -24,13 +24,16 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
-#include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
+#include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, depth1);
+NS_START(fordyca);
+namespace controller { class block_sel_matrix; }
+NS_START(fsm, depth1);
 
 /*******************************************************************************
  * Class Definitions
@@ -48,20 +51,18 @@ NS_START(fordyca, fsm, depth1);
  */
 class block_to_existing_cache_fsm : public block_to_goal_fsm {
  public:
-  block_to_existing_cache_fsm(
-      std::shared_ptr<rcppsw::er::server>& server,
-      const controller::block_selection_matrix* bsel_matrix,
-      const controller::cache_selection_matrix* csel_matrix,
-      controller::saa_subsystem* saa,
-      representation::perceived_arena_map* map);
+  block_to_existing_cache_fsm(const controller::block_sel_matrix* bsel_matrix,
+                              const controller::cache_sel_matrix* csel_matrix,
+                              controller::saa_subsystem* saa,
+                              ds::perceived_arena_map* map);
+  ~block_to_existing_cache_fsm(void) override = default;
 
   block_to_existing_cache_fsm(const block_to_existing_cache_fsm& fsm) = delete;
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm& fsm) = delete;
 
-  acquire_existing_cache_fsm& goal_fsm(void) override { return m_cache_fsm; }
-
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;
+  bool goal_acquired(void) const override;
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;
@@ -69,6 +70,7 @@ class block_to_existing_cache_fsm : public block_to_goal_fsm {
  private:
   // clang-format off
   acquire_existing_cache_fsm m_cache_fsm;
+  acquire_free_block_fsm     m_block_fsm;
   // clang-format on
 };
 

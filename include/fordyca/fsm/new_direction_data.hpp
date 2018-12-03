@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/state_machine/event.hpp"
 
 /*******************************************************************************
@@ -32,6 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -44,9 +45,9 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * them change their direction.
  */
 struct new_direction_data : public state_machine::event_data {
-  explicit new_direction_data(argos::CRadians dir_) : dir(dir_) {}
+  explicit new_direction_data(const rmath::radians& dir_) : dir(dir_) {}
 
-  argos::CRadians dir;
+  rmath::radians dir;
 };
 
 NS_END(fsm, fordyca);

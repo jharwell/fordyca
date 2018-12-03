@@ -40,6 +40,10 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct sensing_params : public rcppsw::params::base_params {
+  /**
+   * @brief The dimension of a robot's line of sight, specified in meters.
+   */
+  double los_dim{0.0};
   struct proximity_sensor_params proximity {};
 };
 

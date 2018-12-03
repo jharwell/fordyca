@@ -34,16 +34,18 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace fsm { namespace depth1 {
+namespace fsm {
 class block_to_goal_fsm;
+namespace depth1 {
 class cached_block_to_nest_fsm;
-}} // namespace fsm::depth1
+}
+} // namespace fsm
 namespace controller {
 namespace depth1 {
-class foraging_controller;
+class greedy_partitioning_controller;
 }
 namespace depth2 {
-class foraging_controller;
+class greedy_recpart_controller;
 }
 } // namespace controller
 namespace representation {
@@ -55,7 +57,8 @@ class collector;
 }
 namespace depth2 {
 class cache_transferer;
-}
+class cache_collector;
+} // namespace depth2
 } // namespace tasks
 
 NS_START(events);
@@ -74,43 +77,47 @@ NS_START(events);
  */
 class cached_block_pickup
     : public cell_op,
-      public rcppsw::er::client,
+      public rcppsw::er::client<cached_block_pickup>,
       public block_pickup_event,
-      public visitor::visit_set<controller::depth1::foraging_controller,
-                                controller::depth2::foraging_controller,
-                                fsm::depth1::block_to_goal_fsm,
+      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
+                                controller::depth2::greedy_recpart_controller,
+                                fsm::block_to_goal_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm,
                                 tasks::depth1::collector,
                                 tasks::depth2::cache_transferer,
+                                tasks::depth2::cache_collector,
                                 representation::arena_cache> {
  public:
-  cached_block_pickup(std::shared_ptr<rcppsw::er::server> server,
-                      const std::shared_ptr<representation::arena_cache>& cache,
-                      size_t robot_index);
-  ~cached_block_pickup(void) override { client::rmmod(); }
+  cached_block_pickup(const std::shared_ptr<representation::arena_cache>& cache,
+                      uint robot_index,
+                      uint timestep);
+  ~cached_block_pickup(void) override = default;
 
   cached_block_pickup(const cached_block_pickup& op) = delete;
   cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
 
   /* depth1 foraging */
-  void visit(representation::arena_map& map) override;
-  void visit(representation::cell2D& cell) override;
+  void visit(ds::arena_map& map) override;
+  void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::perceived_arena_map& map) override;
+  void visit(ds::perceived_arena_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
-  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(tasks::depth1::collector& task) override;
+  void visit(fsm::block_to_goal_fsm& fsm) override;
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::foraging_controller& controller) override;
+  void visit(controller::depth2::greedy_recpart_controller& controller) override;
   void visit(tasks::depth2::cache_transferer& task) override;
+  void visit(tasks::depth2::cache_collector& task) override;
 
  private:
   // clang-format off
   uint                                         m_robot_index;
+  uint                                         m_timestep;
   std::shared_ptr<representation::arena_cache> m_real_cache;
 
   /**
@@ -123,7 +130,6 @@ class cached_block_pickup
    * block, that needs to be sent to the cell that the cache used to live on.
    */
   std::shared_ptr<representation::base_block>  m_orphan_block{nullptr};
-  std::shared_ptr<rcppsw::er::server>          m_server;
   // clang-format on
 };
 

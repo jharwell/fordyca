@@ -22,30 +22,38 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_unknown.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_unknown::visit(representation::cell2D& cell) {
+void cell_unknown::visit(ds::cell2D& cell) {
   cell.entity(nullptr);
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cell_unknown::visit(fsm::cell2D_fsm& fsm) {
-  /*
-   * Much faster to check this than to send a redundant event to the
-   * FSM. Doesn't matter for just a few robots, but it does when you have
-   * dozens/hundreds.
-   */
-  if (fsm.state_is_known()) {
-    fsm.event_unknown();
+void cell_unknown::visit(ds::occupancy_grid& grid) {
+  ds::cell2D& cell = grid.access<occupancy_grid::kCell>(x(), y());
+
+  if (cell.state_is_known()) {
+    ER_ASSERT(grid.known_cell_count() >= 1,
+              "Known cell count (%u) < 1 before event",
+              grid.known_cell_count());
+
+    grid.known_cells_dec();
   }
+  cell.accept(*this);
+} /* visit() */
+
+void cell_unknown::visit(fsm::cell2D_fsm& fsm) {
+  fsm.event_unknown();
 } /* visit() */
 
 NS_END(events, fordyca);
