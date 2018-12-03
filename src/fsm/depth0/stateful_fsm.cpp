@@ -88,13 +88,22 @@ HFSM_STATE_DEFINE(stateful_fsm, block_to_nest, state_machine::event_data) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINEC(bool, stateful_fsm, in_collision_avoidance, m_block_fsm);
-FSM_WRAPPER_DEFINEC(bool, stateful_fsm, entered_collision_avoidance, m_block_fsm);
-FSM_WRAPPER_DEFINEC(bool, stateful_fsm, exited_collision_avoidance, m_block_fsm);
-FSM_WRAPPER_DEFINEC(uint,
-                    stateful_fsm,
-                    collision_avoidance_duration,
-                    m_block_fsm);
+__rcsw_pure FSM_WRAPPER_DEFINEC(bool,
+                                stateful_fsm,
+                                in_collision_avoidance,
+                                m_block_fsm);
+__rcsw_pure FSM_WRAPPER_DEFINEC(bool,
+                                stateful_fsm,
+                                entered_collision_avoidance,
+                                m_block_fsm);
+__rcsw_pure FSM_WRAPPER_DEFINEC(bool,
+                                stateful_fsm,
+                                exited_collision_avoidance,
+                                m_block_fsm);
+__rcsw_pure FSM_WRAPPER_DEFINEC(uint,
+                                stateful_fsm,
+                                collision_avoidance_duration,
+                                m_block_fsm);
 
 /*******************************************************************************
  * Goal Acquisition Metrics

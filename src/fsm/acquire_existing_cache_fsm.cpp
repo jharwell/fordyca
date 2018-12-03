@@ -134,7 +134,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   }
 } /* cache_acquired_cb() */
 
-acquisition_goal_type acquire_existing_cache_fsm::acquisition_goal_internal(
+__rcsw_const acquisition_goal_type acquire_existing_cache_fsm::acquisition_goal_internal(
     void) const {
   return acquisition_goal_type::kExistingCache;
 } /* acquisition_goal() */

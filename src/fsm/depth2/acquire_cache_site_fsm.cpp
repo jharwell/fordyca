@@ -75,8 +75,9 @@ __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
   return true;
 } /* site_acquired_cb() */
 
-__rcsw_dead bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
+bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   ER_FATAL_SENTINEL("Cache site acquired through exploration");
+  return false;
 } /* site_exploration_term_cb() */
 
 acquire_goal_fsm::candidate_type acquire_cache_site_fsm::site_select(void) const {
@@ -97,7 +98,7 @@ acquire_goal_fsm::candidate_type acquire_cache_site_fsm::site_select(void) const
                                           vector_fsm::kCACHE_SITE_ARRIVAL_TOL);
 } /* site_select() */
 
-acquisition_goal_type acquire_cache_site_fsm::acquisition_goal_internal(
+__rcsw_const acquisition_goal_type acquire_cache_site_fsm::acquisition_goal_internal(
     void) const {
   return acquisition_goal_type::kCacheSite;
 } /* acquisition_goal_internal() */

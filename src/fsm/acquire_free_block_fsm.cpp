@@ -94,7 +94,7 @@ bool acquire_free_block_fsm::candidates_exist(void) const {
   return !mc_map->perceived_blocks().empty();
 } /* candidates_exsti() */
 
-acquisition_goal_type acquire_free_block_fsm::acquisition_goal_internal(
+__rcsw_const acquisition_goal_type acquire_free_block_fsm::acquisition_goal_internal(
     void) const {
   return acquisition_goal_type::kBlock;
 } /* acquisition_goal() */

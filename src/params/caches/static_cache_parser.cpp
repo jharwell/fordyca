@@ -57,7 +57,7 @@ void static_cache_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__rcsw_pure bool static_cache_parser::validate(void) const {
+__rcsw_const bool static_cache_parser::validate(void) const {
   CHECK(m_params->size > 0);
   CHECK(m_params->respawn_scale_factor > 0);
 

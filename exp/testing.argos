@@ -6,8 +6,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" />
-    <experiment length="10000"
+    <system threads="2" />
+    <experiment length="1000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_recpart_controller id="ffc"
+    <crw_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -157,7 +157,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_recpart_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -165,7 +165,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth0_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -287,7 +287,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="128" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->
@@ -302,28 +302,28 @@
   <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d0">
-    <!--  <boundaries> -->
-    <!--     <top height="1" /> -->
-    <!--     <bottom height="0" /> -->
-    <!--     <sides> -->
-    <!--       <vertex point="0,0" /> -->
-    <!--       <vertex point="6,0" /> -->
-    <!--       <vertex point="6,6" /> -->
-    <!--       <vertex point="0,6" /> -->
-    <!--     </sides> -->
-    <!--  </boundaries> -->
-    <!-- </dynamics2d> -->
-    <!-- <dynamics2d id="dyn2d1"> -->
-    <!--  <boundaries> -->
-    <!--     <top height="1" /> -->
-    <!--     <bottom height="0" /> -->
-    <!--     <sides> -->
-    <!--       <vertex point="6,0" /> -->
-    <!--       <vertex point="12,0" /> -->
-    <!--       <vertex point="12,6" /> -->
-    <!--       <vertex point="6,6" /> -->
-    <!--     </sides> -->
-    <!--  </boundaries> -->
+     <boundaries>
+        <top height="1" />
+        <bottom height="0" />
+        <sides>
+          <vertex point="0,0" />
+          <vertex point="6,0" />
+          <vertex point="6,6" />
+          <vertex point="0,6" />
+        </sides>
+     </boundaries>
+    </dynamics2d>
+    <dynamics2d id="dyn2d1">
+     <boundaries>
+        <top height="1" />
+        <bottom height="0" />
+        <sides>
+          <vertex point="6,0" />
+          <vertex point="12,0" />
+          <vertex point="12,6" />
+          <vertex point="6,6" />
+        </sides>
+     </boundaries>
      </dynamics2d>
   </physics_engines>
 
@@ -338,28 +338,28 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
-       <frame_grabbing directory="frames"
-                       base_name="frame_"
-                       format="png"
-                       quality="100" />
-      <camera>
-        <placement idx="0"
-                   position="6,3,6"
-                   look_at="6,3,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-        <placement idx="1"
-                   position="6,0,5"
-                   look_at="6,3,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="depth2_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl> -->
+  <!--      <frame_grabbing directory="frames" -->
+  <!--                      base_name="frame_" -->
+  <!--                      format="png" -->
+  <!--                      quality="100" /> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="6,3,6" -->
+  <!--                  look_at="6,3,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--       <placement idx="1" -->
+  <!--                  position="6,0,5" -->
+  <!--                  look_at="6,3,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="depth2_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

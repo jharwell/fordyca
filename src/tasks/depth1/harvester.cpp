@@ -57,7 +57,7 @@ void harvester::task_start(const task_allocation::taskable_argument* const) {
   task_allocation::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-double harvester::abort_prob_calc(void) {
+__rcsw_pure double harvester::abort_prob_calc(void) {
   /*
    * Harvesters always have a small chance of aborting their task when not at a
    * task interface. Having the harvester task un-abortable until AFTER it

@@ -54,7 +54,7 @@ nest::light_list nest::init_square(void) const {
   argos::CVector3 loc(real_loc().x(),
                       real_loc().y(),
                       1.0);
-  return light_list{{"nest_light0", loc, argos::CColor::YELLOW, 10.0}};
+  return light_list{new argos::CLightEntity("nest_light0", loc, argos::CColor::YELLOW, 10.0)};
 } /* init_square() */
 
 nest::light_list nest::init_rect(void) const {
@@ -83,9 +83,9 @@ nest::light_list nest::init_rect(void) const {
              1.0);
   }
   return {
-    {"nest_light0", loc1, argos::CColor::YELLOW, 10.0},
-    {"nest_light1", loc2, argos::CColor::YELLOW, 10.0},
-    {"nest_light2", loc3, argos::CColor::YELLOW, 10.0}
+    new argos::CLightEntity("nest_light0", loc1, argos::CColor::YELLOW, 10.0),
+        new argos::CLightEntity("nest_light1", loc2, argos::CColor::YELLOW, 10.0),
+        new argos::CLightEntity("nest_light2", loc3, argos::CColor::YELLOW, 10.0)
   };
 } /* init_rect() */
 

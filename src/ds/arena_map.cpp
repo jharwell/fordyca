@@ -63,7 +63,7 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
  ******************************************************************************/
 bool arena_map::initialize(support::base_loop_functions* loop) {
   for (auto &l : m_nest.lights()) {
-    loop->AddEntity(l);
+    loop->AddEntity(*l);
   } /* for(&l..) */
 
   return m_block_dispatcher.initialize();

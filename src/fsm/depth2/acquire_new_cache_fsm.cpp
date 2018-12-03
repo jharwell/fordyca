@@ -105,7 +105,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acquisition_goal_type acquire_new_cache_fsm::acquisition_goal_internal(
+__rcsw_const acquisition_goal_type acquire_new_cache_fsm::acquisition_goal_internal(
     void) const {
   return acquisition_goal_type::kNewCache;
 } /* acquisition_goal() */

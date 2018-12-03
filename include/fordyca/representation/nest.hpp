@@ -47,7 +47,13 @@ NS_START(fordyca, representation);
  */
 class nest : public multicell_entity, public immovable_cell_entity {
  public:
-  using light_list = std::list<argos::CLightEntity>;
+  /**
+   * @brief We use raw pointers to indicate that ARGoS owns the constructed
+   * lights. If we own them, then when ARGoS goes to delete them after the
+   * experiment has ended the arena has already been deconstructed and the
+   * nest lights along with them, and an exception is thrown.
+   */
+  using light_list = std::list<argos::CLightEntity*>;
 
   nest(const rmath::vector2d& dim,
        const rmath::vector2d& loc,
