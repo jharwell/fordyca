@@ -30,7 +30,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,8 +43,9 @@ using ds::occupancy_grid;
 base_perception_subsystem::base_perception_subsystem(
     const params::perception_params* const params,
     const std::string& id)
-    : ER_CLIENT_INIT("fordyca.controller.perception"),
+    : ER_CLIENT_INIT("fordyca.controller.base_perception"),
       m_cell_stats(fsm::cell2D_fsm::ST_MAX_STATES),
+      m_los(),
       m_map(rcppsw::make_unique<ds::perceived_arena_map>(params, id)) {}
 
 /*******************************************************************************
@@ -63,30 +63,23 @@ void base_perception_subsystem::reset(void) { m_map->reset(); }
 
 void base_perception_subsystem::process_los(
     const representation::line_of_sight* const c_los) {
-  ER_TRACE("LOS LL=(%u, %u), LR=(%u, %u), UL=(%u, %u) UR=(%u, %u)",
-      c_los->abs_ll().first,
-      c_los->abs_ll().second,
-      c_los->abs_lr().first,
-      c_los->abs_lr().second,
-      c_los->abs_ul().first,
-      c_los->abs_ul().second,
-      c_los->abs_ur().first,
-      c_los->abs_ur().second);
+  ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
+           c_los->abs_ll().to_str().c_str(),
+           c_los->abs_lr().to_str().c_str(),
+           c_los->abs_ul().to_str().c_str(),
+           c_los->abs_ur().to_str().c_str());
 
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  representation::line_of_sight::const_block_list blocks = c_los->blocks();
+  ds::const_block_list blocks = c_los->blocks();
   std::string accum;
-  std::for_each(blocks.begin(),
-                blocks.end(),
-                [&](const auto& b) {
-                  accum += "b" + std::to_string(b->id()) + "->(" +
-                           std::to_string(b->discrete_loc().first) + "," +
-                           std::to_string(b->discrete_loc().second) +  "),";
-                });
+  std::for_each(blocks.begin(), blocks.end(), [&](const auto& b) {
+    accum += "b" + std::to_string(b->id()) + "->" +
+             b->discrete_loc().to_str().c_str() + ",";
+  });
   if (!blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", accum.c_str());
   }
@@ -100,17 +93,18 @@ void base_perception_subsystem::process_los(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
+      rmath::vector2u d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_block() &&
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        ER_DEBUG("Correct block%d discrepency at (%u, %u)",
-                 m_map->access<occupancy_grid::kCell>(d).block()->id(),
-                 d.first,
-                 d.second);
-        m_map->block_remove(m_map->access<occupancy_grid::kCell>(d).block());
+        auto block = m_map->access<occupancy_grid::kCell>(d).block();
+        ER_DEBUG("Correct block%d %s/%s discrepency",
+                 block->id(),
+                 block->real_loc().to_str().c_str(),
+                 block->discrete_loc().to_str().c_str());
+        m_map->block_remove(block);
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
-        ER_TRACE("Cell (%u, %u) now known to be empty", d.first, d.second);
+        ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
         events::cell_empty e(d);
         m_map->accept(e);
       }
@@ -118,18 +112,20 @@ void base_perception_subsystem::process_los(
   }   /* for(i..) */
 
   for (auto& block : c_los->blocks()) {
-    ER_ASSERT(!block->is_out_of_sight(), "Block out of sight in LOS?");
+    ER_ASSERT(!block->is_out_of_sight(),
+              "Block%d out of sight in LOS?",
+              block->id());
     auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
     if (!cell.state_has_block()) {
-      ER_INFO("Discovered block%d@(%u, %u)",
+      ER_INFO("Discovered block%d@%s/%s",
               block->id(),
-              block->discrete_loc().first,
-              block->discrete_loc().second);
+              block->real_loc().to_str().c_str(),
+              block->discrete_loc().to_str().c_str());
     } else if (cell.state_has_block()) {
-      ER_DEBUG("Block%d@(%u,%u) already known",
-              block->id(),
-              block->discrete_loc().first,
-              block->discrete_loc().second);
+      ER_DEBUG("Block%d@%s/%s already known",
+               block->id(),
+               block->real_loc().to_str().c_str(),
+               block->discrete_loc().to_str().c_str());
       auto it = std::find_if(m_map->blocks().begin(),
                              m_map->blocks().end(),
                              [&](const auto& b) {
@@ -150,15 +146,14 @@ void base_perception_subsystem::processed_los_verify(
    * Verify that for each cell that contained a block in the LOS, the
    * corresponding cell in the PAM also contains the same block.
    */
-  for (auto &block : c_los->blocks()) {
+  for (auto& block : c_los->blocks()) {
     auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
-    ER_ASSERT(cell.state_has_block(), "Cell at (%u,%u) not in HAS_BLOCK state",
-              block->discrete_loc().first,
-              block->discrete_loc().second);
+    ER_ASSERT(cell.state_has_block(),
+              "Cell@%s not in HAS_BLOCK state",
+              block->discrete_loc().to_str().c_str());
     ER_ASSERT(cell.block()->id() == block->id(),
-              "Cell at (%u,%u) has wrong block ID (%u vs %u)",
-              block->discrete_loc().first,
-              block->discrete_loc().second,
+              "Cell@%s has wrong block ID (%u vs %u)",
+              block->discrete_loc().to_str().c_str(),
               block->id(),
               cell.block()->id());
   } /* for(&block..) */
@@ -169,22 +164,20 @@ void base_perception_subsystem::processed_los_verify(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
+      rmath::vector2u d = c_los->cell(i, j).loc();
       auto& cell1 = c_los->cell(i, j);
       auto& cell2 = m_map->access<occupancy_grid::kCell>(d);
 
       if (cell1.state_has_block() || cell1.state_is_empty()) {
         ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
-                  "LOS/PAM disagree on state of cell at (%u, %u): %d/%d",
-                  d.first,
-                  d.second,
+                  "LOS/PAM disagree on state of cell@%s: %d/%d",
+                  d.to_str().c_str(),
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
         if (cell1.state_has_block()) {
           ER_ASSERT(cell1.block()->id() == cell2.block()->id(),
-                    "LOS/PAM disagree on block id in cell at (%u, %u): %d/%d",
-                    d.first,
-                    d.second,
+                    "LOS/PAM disagree on block id in cell@%s: %d/%d",
+                    d.to_str().c_str(),
                     cell1.block()->id(),
                     cell2.block()->id());
         }
@@ -197,7 +190,7 @@ void base_perception_subsystem::update_cell_stats(
     const representation::line_of_sight* const los) {
   for (uint i = 0; i < los->xsize(); ++i) {
     for (uint j = 0; j < los->ysize(); ++j) {
-      rcppsw::math::dcoord2 d = los->cell(i, j).loc();
+      rmath::vector2u d = los->cell(i, j).loc();
       if (los->cell(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
           !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
@@ -214,6 +207,10 @@ void base_perception_subsystem::update_cell_stats(
     } /* for(j..) */
   }   /* for(i..) */
 } /* update_cell_stats() */
+
+void base_perception_subsystem::los(std::unique_ptr<representation::line_of_sight>& los) {
+  m_los = std::move(los);
+} /* los() */
 
 /*******************************************************************************
  * World Model Metrics

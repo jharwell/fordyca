@@ -32,19 +32,19 @@ NS_START(fordyca, math);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-existing_cache_utility::existing_cache_utility(const argos::CVector2& cache_loc,
-                                               const argos::CVector2& nest_loc)
+existing_cache_utility::existing_cache_utility(const rmath::vector2d& cache_loc,
+                                               const rmath::vector2d& nest_loc)
     : mc_cache_loc(cache_loc), mc_nest_loc(nest_loc) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double existing_cache_utility::calc(const argos::CVector2& rloc,
+double existing_cache_utility::calc(const rmath::vector2d& rloc,
                                     double density,
                                     size_t n_blocks) {
   return set_result(
       (std::exp(density) * n_blocks) /
-      ((mc_cache_loc - rloc).Length() * (mc_cache_loc - mc_nest_loc).Length()));
+      ((mc_cache_loc - rloc).length() * (mc_cache_loc - mc_nest_loc).length()));
 } /* calc() */
 
 NS_END(expressions, fordyca);

@@ -24,10 +24,10 @@
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/math/utils.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
+#include "fordyca/representation/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,20 +48,110 @@ dynamic_cache_manager::dynamic_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::pair<bool, dynamic_cache_manager::cache_vector> dynamic_cache_manager::create(
-    cache_vector& existing_caches,
-    block_vector& blocks) {
-  support::depth2::dynamic_cache_creator creator(arena_grid(),
-                                                 mc_cache_params.dimension,
-                                                 mc_cache_params.dynamic.min_dist);
+base_cache_manager::creation_res_t dynamic_cache_manager::create(
+    const ds::cache_vector& existing_caches,
+    const ds::const_block_cluster_list& clusters,
+    ds::block_vector& blocks) {
+  support::depth2::dynamic_cache_creator creator(
+      arena_grid(),
+      mc_cache_params.dimension,
+      mc_cache_params.dynamic.min_dist,
+      mc_cache_params.dynamic.min_blocks);
 
-  auto created = creator.create_all(existing_caches, blocks);
+  block_calc_res_t r = calc_blocks_for_creation(existing_caches,
+                                                clusters,
+                                                blocks);
+  if (!r.status) {
+    return creation_res_t{false, ds::cache_vector()};
+  }
+
+  ds::cache_vector created = creator.create_all(existing_caches,
+                                                r.blocks,
+                                                mc_cache_params.dimension);
+
   /*
    * Must be after fixing hidden blocks, otherwise the cache host cell will
    * have a block as its entity!
    */
   creator.update_host_cells(created);
-  return std::make_pair(true, created);
-} /* dynamic_cache_create() */
+  return creation_res_t{!created.empty(), created};
+} /* create() */
+
+base_cache_manager::block_calc_res_t dynamic_cache_manager::calc_blocks_for_creation(
+    const ds::cache_vector& existing_caches,
+    const ds::const_block_cluster_list& clusters,
+    const ds::block_vector& blocks) {
+  ds::block_vector to_use;
+  std::copy_if(blocks.begin(),
+               blocks.end(),
+               std::back_inserter(to_use),
+               [&](const auto& b) {
+                 /* Blocks cannot be in existing caches */
+                 return std::all_of(existing_caches.begin(),
+                                    existing_caches.end(),
+                                    [&](const auto& c) {
+                                      return !c->contains_block(b);
+                                    }) &&
+
+                     /* blocks cannot be in clusters */
+                     std::all_of(clusters.begin(),
+                                 clusters.end(),
+                                 [&](const auto& clust) {
+                                   /* constructed, so must assign before search */
+                                   auto cblocks = clust->blocks();
+                                   return cblocks.end() == std::find(cblocks.begin(),
+                                                                     cblocks.end(),
+                                                                     b);
+                                 }) &&
+                     /* blocks cannot be carried by a robot */
+                     -1 == b->robot_id();
+               });
+
+  bool ret = true;
+  if (to_use.size() < mc_cache_params.dynamic.min_blocks) {
+    /*
+     * Cannot use std::accumulate for these, because that doesn't work with
+     * C++14/gcc7 when you are accumulating into a different type (e.g. from a
+     * set of blocks into an int).
+     */
+    uint count = 0;
+    std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
+      count +=
+          (b->is_out_of_sight() ||
+           std::any_of(existing_caches.begin(),
+                       existing_caches.end(),
+                       [&](const auto& c) { return !c->contains_block(b); }));
+    });
+
+    std::string accum;
+    std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
+      accum += "b" + std::to_string(b->id()) + "->fb" +
+               std::to_string(b->robot_id()) + ",";
+    });
+    ER_DEBUG("Block carry statuses: [%s]", accum.c_str());
+
+    accum = "";
+    std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
+      accum += "b" + std::to_string(b->id()) + "->" +
+               b->discrete_loc().to_str() + ",";
+    });
+    ER_DEBUG("Block locations: [%s]", accum.c_str());
+
+    ER_ASSERT(to_use.size() - count < mc_cache_params.dynamic.min_blocks,
+              "For new caches, %zu blocks SHOULD be available, but only %zu "
+              "are (min=%u)",
+              to_use.size() - count,
+              to_use.size(),
+              mc_cache_params.dynamic.min_blocks);
+    ret = false;
+  }
+  if (to_use.size() < mc_cache_params.static_.size) {
+    ER_WARN("Free block count < min blocks for new caches (%zu < %u)",
+            to_use.size(),
+            mc_cache_params.dynamic.min_blocks);
+    ret = false;
+  }
+  return block_calc_res_t{ret, to_use};
+} /* calc_blocks_for_creation() */
 
 NS_END(depth2, support, fordyca);

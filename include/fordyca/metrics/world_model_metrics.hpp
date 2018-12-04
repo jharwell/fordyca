@@ -44,7 +44,7 @@ NS_START(fordyca, metrics);
  *
  * Metrics are collected every timestep.
  */
-class world_model_metrics : virtual public rcppsw::metrics::base_metrics {
+class world_model_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
   world_model_metrics(void) = default;
 

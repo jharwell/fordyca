@@ -21,6 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -42,8 +43,8 @@ NS_START(fordyca, ds);
 arena_map::arena_map(const struct params::arena::arena_map_params* params)
     : ER_CLIENT_INIT("fordyca.ds.arena_map"),
       decorator(params->grid.resolution,
-                static_cast<size_t>(params->grid.upper.GetX()),
-                static_cast<size_t>(params->grid.upper.GetY())),
+                static_cast<uint>(params->grid.upper.x()),
+                static_cast<uint>(params->grid.upper.y())),
       m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
                    .create_blocks()),
       m_caches(),
@@ -60,11 +61,15 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool arena_map::initialize(void) {
+bool arena_map::initialize(support::base_loop_functions* loop) {
+  for (auto &l : m_nest.lights()) {
+    loop->AddEntity(*l);
+  } /* for(&l..) */
+
   return m_block_dispatcher.initialize();
 } /* initialize() */
 
-__rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
+__rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   /*
    * Caches hide blocks, add even though a robot may technically be standing on
    * a block, if it is also standing in a cache, that takes priority.
@@ -73,26 +78,26 @@ __rcsw_pure int arena_map::robot_on_block(const argos::CVector2& pos) const {
     ER_TRACE("Block hidden by cache%d", robot_on_cache(pos));
     return -1;
   }
-  for (size_t i = 0; i < m_blocks.size(); ++i) {
-    if (m_blocks[i]->contains_point(pos)) {
-      return m_blocks[i]->id();
+  for (auto& b : m_blocks) {
+    if (b->contains_point(pos)) {
+      return b->id();
     }
-  } /* for(i..) */
+  } /* for(&b..) */
   return -1;
 } /* robot_on_block() */
 
-__rcsw_pure int arena_map::robot_on_cache(const argos::CVector2& pos) const {
-  for (size_t i = 0; i < m_caches.size(); ++i) {
-    if (m_caches[i]->contains_point(pos)) {
-      return m_caches[i]->id();
+__rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
+  for (auto& c : m_caches) {
+    if (c->contains_point(pos)) {
+      return c->id();
     }
-  } /* for(i..) */
+  } /* for(&c..) */
   return -1;
 } /* robot_on_cache() */
 
 bool arena_map::distribute_single_block(
     std::shared_ptr<representation::base_block>& block) {
-  support::block_dist::dispatcher::entity_list entities;
+  ds::const_entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
@@ -110,7 +115,7 @@ void arena_map::distribute_all_blocks(void) {
   decoratee().reset();
 
   /* distribute blocks */
-  support::block_dist::dispatcher::entity_list entities;
+  ds::const_entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
@@ -126,8 +131,9 @@ void arena_map::distribute_all_blocks(void) {
   for (size_t i = 0; i < xdsize(); ++i) {
     for (size_t j = 0; j < ydsize(); ++j) {
       cell2D& cell = decoratee().access<arena_grid::kCell>(i, j);
-      if (!cell.state_has_block() && !cell.state_has_cache()) {
-        events::cell_empty op(i, j);
+      if (!cell.state_has_block() && !cell.state_has_cache() &&
+          !cell.state_in_cache_extent()) {
+        events::cell_empty op(cell.loc());
         cell.accept(op);
       }
     } /* for(j..) */
@@ -139,7 +145,7 @@ void arena_map::cache_remove(
   size_t before = caches().size();
   __rcsw_unused int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
-  ER_ASSERT(caches().size() == before - 1, "cache%d not removed", id);
+  ER_ASSERT(caches().size() == before - 1, "Cache%d not removed", id);
 } /* cache_remove() */
 
 void arena_map::cache_extent_clear(
@@ -153,17 +159,17 @@ void arena_map::cache_extent_clear(
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  uint xmin = static_cast<uint>(std::ceil(xspan.get_min() / grid_resolution()));
-  uint xmax = static_cast<uint>(std::ceil(xspan.get_max() / grid_resolution()));
-  uint ymin = static_cast<uint>(std::ceil(yspan.get_min() / grid_resolution()));
-  uint ymax = static_cast<uint>(std::ceil(yspan.get_max() / grid_resolution()));
+  uint xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
+  uint xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
+  uint ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
+  uint ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
 
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {
-      rcppsw::math::dcoord2 c = rcppsw::math::dcoord2(i, j);
+      rmath::vector2u c = rmath::vector2u(i, j);
       if (c != victim->discrete_loc()) {
         ER_ASSERT(victim->contains_point(
-                      math::dcoord_to_rcoord(c, grid_resolution())),
+                      rmath::uvec2dvec(c, grid_resolution())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   victim->id(),
                   i,
@@ -185,7 +191,7 @@ void arena_map::cache_extent_clear(
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-bool arena_map::has_robot(size_t i, size_t j) const {
+bool arena_map::has_robot(uint i, uint j) const {
   return decoratee().access<arena_grid::kRobotOccupancy>(i, j);
 } /* has_robot() */
 

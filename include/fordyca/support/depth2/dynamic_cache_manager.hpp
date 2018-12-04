@@ -27,10 +27,12 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
+#include "fordyca/ds/block_cluster_list.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -68,13 +70,17 @@ class dynamic_cache_manager : public base_cache_manager,
    *
    * @param existing_caches The list of current caches in the arena.
    * @param blocks The total block vector for the arena.
+   * @param clusters The total block clusters in the arena, for use in
+   * (possibly) disallowing cache creation within their boundaries, depending on
+   * configuration.
    *
-   * @return \c TRUE iff at least 1dynamic cache was actually created. Non-fatal
-   * failures to create dynamic caches can occur if, for example, all blocks are
-   * currently being carried by robots.
+   * @return \c TRUE iff at least 1 dynamic cache was actually
+   * created. Non-fatal failures to create dynamic caches can occur if, for
+   * example, all blocks are currently being carried by robots.
    */
-  std::pair<bool, cache_vector> create(cache_vector& existing_caches,
-                                       block_vector& blocks);
+  creation_res_t create(const ds::cache_vector& existing_caches,
+                         const ds::const_block_cluster_list& clusters,
+                         ds::block_vector& blocks);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches
@@ -97,6 +103,20 @@ class dynamic_cache_manager : public base_cache_manager,
   }
 
  private:
+  /*
+   * @brief Calculate the blocks eligible to be considered for dynamic cache
+   * creation. Only blocks that are not:
+   *
+   * - Currently carried by a robot
+   * - Currently part of a cache
+   *
+   * are eligible.
+   */
+  block_calc_res_t calc_blocks_for_creation(
+      const ds::cache_vector& existing_caches,
+      const ds::const_block_cluster_list& clusters,
+      const ds::block_vector& blocks);
+
   // clang-format off
   const params::caches::caches_params mc_cache_params;
   // clang-format on

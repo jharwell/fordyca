@@ -35,9 +35,9 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cell_cache_extent::cell_cache_extent(
-    const rcppsw::math::dcoord2& coord,
+    const rmath::vector2u& coord,
     std::shared_ptr<representation::base_cache> cache)
-    : cell_op(coord.first, coord.second), m_cache(cache) {}
+    : cell_op(coord), m_cache(cache) {}
 
 /*******************************************************************************
  * Member Functions
@@ -52,7 +52,7 @@ void cell_cache_extent::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cell_cache_extent::visit(ds::arena_map& map) {
-  map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
+  map.access<arena_grid::kCell>(cell_op::coord()).accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

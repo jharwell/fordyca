@@ -31,18 +31,18 @@ NS_START(fordyca, math);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_utility::block_utility(const argos::CVector2& block_loc,
-                             const argos::CVector2& nest_loc)
+block_utility::block_utility(const rmath::vector2d& block_loc,
+                             const rmath::vector2d& nest_loc)
     : mc_block_loc(block_loc), mc_nest_loc(nest_loc) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double block_utility::calc(const argos::CVector2& rloc,
+double block_utility::calc(const rmath::vector2d& rloc,
                            double density,
                            double priority) {
   return set_result(
-      ((mc_block_loc - mc_nest_loc).Length() / (mc_block_loc - rloc).Length()) *
+      ((mc_block_loc - mc_nest_loc).length() / (mc_block_loc - rloc).length()) *
       std::exp(density * priority));
 } /* calc() */
 

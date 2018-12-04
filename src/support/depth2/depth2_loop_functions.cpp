@@ -34,6 +34,7 @@
 #include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/support/block_dist/base_distributor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,16 +60,16 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   /* initialize stat collecting */
-  auto* arenap = params().parse_results<params::arena::arena_map_params>();
+  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
 
   params::output_params output =
-      *params().parse_results<const struct params::output_params>();
+      *params()->parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
                                                                  output_root());
 
   /* initialize cache handling */
-  auto* cachep = params().parse_results<params::caches::caches_params>();
+  auto* cachep = params()->parse_results<params::caches::caches_params>();
   cache_handling_init(cachep);
 
   /* intitialize robot interactions with environment */
@@ -105,16 +106,35 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* send the robot its view of the world: what it sees and where it is */
   loop_utils::set_robot_pos<decltype(controller)>(robot);
-  loop_utils::set_robot_los<decltype(controller)>(robot, *arena_map());
+  ER_ASSERT(std::fmod(controller.los_dim(),
+                      arena_map()->grid_resolution())<=
+                      std::numeric_limits<double>::epsilon(),
+            "LOS dimension (%f) not an even multiple of grid resolution (%f)",
+            controller.los_dim(),
+            arena_map()->grid_resolution());
+  uint los_grid_size = controller.los_dim() / arena_map()->grid_resolution();
+
+  loop_utils::set_robot_los<decltype(controller)>(robot,
+                                                  los_grid_size,
+                                                  *arena_map());
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = math::rcoord_to_dcoord(controller.robot_loc(),
-                                      arena_map()->grid_resolution());
+  auto coord = rmath::dvec2uvec(controller.position(),
+                                arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
-  /* Now watch it react to the environment */
-  (*m_interactor)(controller, GetSpace().GetSimulationClock());
+  /*
+   * Now watch it react to the environment. If said reaction results in a block
+   * being dropped in a new cache, then we need to re-run dynamic cache
+   * creation.
+   */
+  if ((*m_interactor)(controller, GetSpace().GetSimulationClock())) {
+    if (cache_creation_handle(true)) {
+    } else {
+      ER_WARN("Unable to create cache after block drop in new cache");
+    }
+  }
 } /* pre_step_iter() */
 
 void depth2_loop_functions::controller_configure(controller::base_controller& c) {
@@ -122,12 +142,12 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
    * If NULL, then visualization has been disabled.
    */
   auto& greedy = dynamic_cast<controller::depth2::greedy_recpart_controller&>(c);
-  auto* vparams = params().parse_results<struct params::visualization_params>();
+  auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
   }
 
-  auto* oraclep = params().parse_results<params::oracle_params>();
+  auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     auto& oracular =
         dynamic_cast<controller::depth2::oracular_recpart_controller&>(c);
@@ -158,15 +178,17 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
 
 void depth2_loop_functions::cache_handling_init(
     const struct params::caches::caches_params* const cachep) {
-  m_cache_manager = rcppsw::make_unique<dynamic_cache_manager>(
-      cachep,
-      &arena_map()->decoratee());
-} /* cache_handlng_init() */
+  m_cache_manager =
+      rcppsw::make_unique<dynamic_cache_manager>(cachep,
+                                                 &arena_map()->decoratee());
 
+  cache_creation_handle(false);
+} /* cache_handlng_init() */
 
 argos::CColor depth2_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
-  if (arena_map()->nest().contains_point(plane_pos)) {
+  rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
+  if (arena_map()->nest().contains_point(tmp)) {
     return argos::CColor(arena_map()->nest().color().red(),
                          arena_map()->nest().color().green(),
                          arena_map()->nest().color().blue());
@@ -176,7 +198,7 @@ argos::CColor depth2_loop_functions::GetFloorColor(
    * so that you don't have blocks rendering inside of caches.
    */
   for (auto& cache : arena_map()->caches()) {
-    if (cache->contains_point(plane_pos)) {
+    if (cache->contains_point(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
                            cache->color().blue());
@@ -191,7 +213,7 @@ argos::CColor depth2_loop_functions::GetFloorColor(
      * when they are not actually (when blocks are picked up their correct color
      * is shown through visualization).
      */
-    if (block->contains_point(plane_pos)) {
+    if (block->contains_point(tmp)) {
       return argos::CColor::BLACK;
     }
   } /* for(&block..) */
@@ -202,40 +224,65 @@ argos::CColor depth2_loop_functions::GetFloorColor(
 void depth2_loop_functions::PreStep() {
   ndc_push();
   base_loop_functions::PreStep();
-  /* Get metrics from caches */
-  for (auto& c : arena_map()->caches()) {
-    m_metrics_agg->collect_from_cache(c.get());
-    c->reset_metrics();
-  } /* for(&c..) */
-  m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
-  m_cache_manager->reset_metrics();
 
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     pre_step_iter(robot);
   } /* for(&entity..) */
-  m_metrics_agg->collect_from_arena(arena_map());
-  m_metrics_agg->collect_from_loop(this);
-  pre_step_final();
-  ndc_pop();
-} /* PreStep() */
 
-void depth2_loop_functions::Reset() {
-  m_metrics_agg->reset_all();
-  auto pair =
-      m_cache_manager->create(arena_map()->caches(), arena_map()->blocks());
-  if (pair.first) {
-    arena_map()->caches_add(pair.second);
-  }
-}
-
-void depth2_loop_functions::pre_step_final(void) {
+  /* handle cache removal */
   if (arena_map()->caches_removed() > 0) {
     m_cache_manager->cache_depleted();
     floor()->SetChanged();
     arena_map()->caches_removed_reset();
   }
+
+  pre_step_final();
+  ndc_pop();
+} /* PreStep() */
+
+void depth2_loop_functions::Reset(void) {
+  ndc_push();
+  m_metrics_agg->reset_all();
+  cache_creation_handle(false);
+  ndc_pop();
+}
+
+bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
+  auto* cachep = params()->parse_results<params::caches::caches_params>();
+  /*
+   * If dynamic cache creation is configured to occur only upon a robot dropping
+   * a block, then we do not perform cache creation unless that event occurred.
+   */
+  if (cachep->dynamic.robot_drop_only && !on_drop) {
+    ER_INFO("Not performing dynamic cache creation: no robot block drop");
+    return false;
+  }
+  auto ret =
+      m_cache_manager->create(arena_map()->caches(),
+                              arena_map()->block_distributor()->block_clusters(),
+                              arena_map()->blocks());
+  if (ret.status) {
+    arena_map()->caches_add(ret.caches);
+    floor()->SetChanged();
+  }
+  return ret.status;
+} /* cache_creation_handle() */
+
+void depth2_loop_functions::pre_step_final(void) {
+  /* collect metrics from/about caches */
+  for (auto& c : arena_map()->caches()) {
+    m_metrics_agg->collect_from_cache(c.get());
+    c->reset_metrics();
+  } /* for(&c..) */
+
+  m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
+  m_cache_manager->reset_metrics();
+
+  /* collect metrics about the arena  */
+  m_metrics_agg->collect_from_arena(arena_map());
+  m_metrics_agg->collect_from_loop(this);
 
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
   m_metrics_agg->timestep_inc_all();

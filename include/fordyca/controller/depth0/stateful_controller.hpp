@@ -24,10 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/depth0/stateless_controller.hpp"
+#include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/communication_params.hpp"
@@ -36,22 +34,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
-class bi_tdgraph_executive;
-class bi_tab;
-class executable_task;
-}}
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
-
 NS_START(fordyca);
-
-namespace tasks { namespace depth0 { class foraging_task; }}
-
+namespace fsm { namespace depth0 { class stateful_fsm; }}
 NS_START(controller);
-
 class base_perception_subsystem;
-class block_selection_matrix;
+class block_sel_matrix;
 namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
@@ -66,12 +53,8 @@ NS_START(depth0);
  * @brief A foraging controller that remembers what it has seen for a period of
  * time (knowledge decays according to an exponential model,
  * @see pheromone_density).
- *
- * Robots using this controller execute the \ref generalist task, in which a
- * block is acquired (either via randomized exploring or by vectoring to a known
- * block) and then bring the block to the nest.
  */
-class stateful_controller : public stateless_controller,
+class stateful_controller : public crw_controller,
                             public er::client<stateful_controller>,
                             public metrics::world_model_metrics,
                             public visitor::visitable_any<stateful_controller> {
@@ -89,32 +72,23 @@ class stateful_controller : public stateless_controller,
   argos::CVector2 get_most_valuable_cell(void);
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, goal_acquired);
-  FSM_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
+  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* world model metrics */
   uint cell_state_inaccuracies(uint state) const override;
   double known_percentage(void) const override;
   double unknown_percentage(void) const override;
 
-    /* block transportation */
-  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
-
-
-  /**
-   * @brief Get the current task the controller is executing. For this
-   * controller, that is always the \ref generalist task.
-   */
-  virtual tasks::base_foraging_task* current_task(void);
-  virtual const tasks::base_foraging_task* current_task(void) const;
+  /* block transportation */
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Set the robot's current line of sight (LOS).
    */
   void los(std::unique_ptr<representation::line_of_sight>& new_los);
+  double los_dim(void) const;
 
-  const depth0::sensing_subsystem* stateful_sensors(void) const;
-  depth0::sensing_subsystem* stateful_sensors(void);
 
   /**
    * @brief Get the current LOS for the robot.
@@ -136,40 +110,37 @@ class stateful_controller : public stateless_controller,
   const base_perception_subsystem* perception(void) const { return m_perception.get(); }
   base_perception_subsystem* perception(void) { return m_perception.get(); }
 
-  const ta::bi_tab* active_tab(void) const;
+  const fsm::depth0::stateful_fsm* fsm(void) const { return m_fsm.get(); }
+  fsm::depth0::stateful_fsm* fsm(void) { return m_fsm.get(); }
 
+  const class block_sel_matrix* block_sel_matrix(void) const {
+    return m_block_sel_matrix.get();
+  }
   /*
-   * Public to setup metric collection from tasks.
+   * Needed to update block selections exceptions list in depth2.
    */
-  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+  class block_sel_matrix* block_sel_matrix(void) {
+    return m_block_sel_matrix.get();
+  }
 
  protected:
   void perception(std::unique_ptr<base_perception_subsystem> perception);
-  const block_selection_matrix* block_sel_matrix(void) const { return m_block_sel_matrix.get(); }
-  void block_sel_matrix(std::unique_ptr<block_selection_matrix> m);
-
-  /*
-   * The stateful foraging controller owns the executive, but derived classes
-   * can access it and set it to whatever they want. This is done to reduce the
-   * amount of function overriding that would have to be performed otherwise if
-   * derived controllers each had private executives--slightly cleaner to do it
-   * this way I think.
-   *
-   * Strategy pattern!
-   */
-  void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
+  void block_sel_matrix(std::unique_ptr<class block_sel_matrix> m);
 
  private:
   // clang-format off
   bool                                       m_display_los{false};
-  argos::CVector2                            m_light_loc;
-  std::unique_ptr<block_selection_matrix>    m_block_sel_matrix;
+  rmath::vector2d                            m_light_loc;
+  std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
+<<<<<<< HEAD
   std::unique_ptr<ta::bi_tdgraph_executive>  m_executive;
   struct params::communication_params        m_communication_params;
   uint                                       m_arena_x;
   uint                                       m_arena_y;
+=======
+  std::unique_ptr<fsm::depth0::stateful_fsm> m_fsm;
+>>>>>>> devel
   // clang-format on
 };
 

@@ -45,7 +45,7 @@ NS_START(fordyca, metrics);
  *
  * Metrics are collected every timestep.
  */
-class robot_interaction_metrics : virtual public rcppsw::metrics::base_metrics {
+class robot_interaction_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
   robot_interaction_metrics(void) = default;
 

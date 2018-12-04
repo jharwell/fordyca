@@ -24,14 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
-#include "fordyca/math/utils.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, representation);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -49,30 +48,28 @@ class immovable_cell_entity {
   /**
    * @brief Initialize a immovable entity with an initial location in the arena.
    */
-  immovable_cell_entity(const argos::CVector2& loc, double resolution)
+  immovable_cell_entity(const rmath::vector2d& loc, double resolution)
       : m_real_loc(loc),
-        m_discrete_loc(math::rcoord_to_dcoord(loc, resolution)) {}
+        m_discrete_loc(rmath::dvec2uvec(loc, resolution)) {}
 
   virtual ~immovable_cell_entity(void) = default;
 
   /**
    * @brief Get the real location (center) of the object.
    */
-  const argos::CVector2& real_loc(void) const { return m_real_loc; }
+  const rmath::vector2d& real_loc(void) const { return m_real_loc; }
 
   /**
    * @brief Get the discretized coordinates of the center of the object, which
    * can be used to index into an arena_map.
    *
    */
-  const rcppsw::math::dcoord2& discrete_loc(void) const {
-    return m_discrete_loc;
-  }
+  const rmath::vector2u& discrete_loc(void) const { return m_discrete_loc; }
 
  private:
   // clang-format off
-  argos::CVector2       m_real_loc;
-  rcppsw::math::dcoord2 m_discrete_loc;
+  rmath::vector2d       m_real_loc;
+  rmath::vector2u m_discrete_loc;
   // clang-format on
 };
 

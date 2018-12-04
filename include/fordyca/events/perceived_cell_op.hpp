@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_op.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,7 +33,7 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-
+namespace rmath = rcppsw::math;
 namespace controller { namespace depth2 {
 class greedy_recpart_controller;
 }} // namespace controller::depth2
@@ -58,7 +59,7 @@ class perceived_cell_op
       public visitor::visit_set<controller::depth2::greedy_recpart_controller,
                                 ds::perceived_arena_map> {
  public:
-  perceived_cell_op(size_t x, size_t y) : cell_op(x, y) {}
+  explicit perceived_cell_op(const rmath::vector2u& coord) : cell_op(coord) {}
   ~perceived_cell_op(void) override = default;
 };
 

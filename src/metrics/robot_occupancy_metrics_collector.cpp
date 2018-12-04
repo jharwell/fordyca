@@ -36,9 +36,9 @@ NS_START(fordyca, metrics);
 robot_occupancy_metrics_collector::robot_occupancy_metrics_collector(
     const std::string& ofname,
     uint interval,
-    const rcppsw::math::dcoord2& dims)
+    const rmath::vector2u& dims)
     : base_metrics_collector(ofname, interval, true),
-      m_stats(dims.first, dims.second) {}
+      m_stats(dims.x(), dims.y()) {}
 
 /*******************************************************************************
  * Member Functions

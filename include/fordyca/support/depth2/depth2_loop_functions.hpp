@@ -61,6 +61,18 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
  private:
   using interactor = robot_arena_interactor<controller::depth2::greedy_recpart_controller>;
 
+  /**
+   * @brief Handle creation of dynamic caches during initialization, reset, or
+   * when triggered by events during simulation.
+   *
+   * @param on_drop \c TRUE if caches are to be (potentially) created as a
+   * result of a robot block drop. If \c FALSE, then consider dynamic cache
+   * creation in other situations.
+   *
+   * @return \c TRUE if one or more caches were creation, \c FALSE otherwise.
+   */
+  bool cache_creation_handle(bool on_drop);
+
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;

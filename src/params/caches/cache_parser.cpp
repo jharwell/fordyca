@@ -65,10 +65,7 @@ void caches_parser::show(std::ostream& stream) const {
 
   stream << build_header() << std::endl
          << XML_ATTR_STR(m_params, dimension) << std::endl
-         << m_static
-         << m_dynamic
-         << m_waveform
-         << m_waveform << build_footer();
+         << m_static << m_dynamic << m_waveform << m_waveform << build_footer();
 } /* show() */
 
 __rcsw_pure bool caches_parser::validate(void) const {

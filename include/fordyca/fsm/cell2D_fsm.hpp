@@ -37,6 +37,7 @@ NS_START(fordyca, fsm);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -50,7 +51,8 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  */
 class cell2D_fsm : public state_machine::simple_fsm,
-                   public visitor::visitable_any<cell2D_fsm> {
+                   public visitor::visitable_any<cell2D_fsm>,
+                   public er::client<cell2D_fsm> {
  public:
   enum state {
     ST_UNKNOWN,

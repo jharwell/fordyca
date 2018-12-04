@@ -56,7 +56,7 @@ void cache_transferer::task_start(
   task_allocation::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-double cache_transferer::abort_prob_calc(void) {
+__rcsw_pure double cache_transferer::abort_prob_calc(void) {
   if (-1 == active_interface()) {
     return ta::abort_probability::kMIN_ABORT_PROB;
   } else {
@@ -64,8 +64,7 @@ double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-double cache_transferer::interface_time_calc(uint interface,
-                                             double start_time) {
+double cache_transferer::interface_time_calc(uint interface, double start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
@@ -111,30 +110,30 @@ void cache_transferer::accept(events::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     bool,
     cache_transferer,
     is_exploring_for_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     bool,
     cache_transferer,
     is_vectoring_to_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     bool,
     cache_transferer,
     goal_acquired,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     acquisition_goal_type,
     cache_transferer,
     acquisition_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(
+TASK_WRAPPER_DEFINEC_PTR(
     transport_goal_type,
     cache_transferer,
     block_transport_goal,

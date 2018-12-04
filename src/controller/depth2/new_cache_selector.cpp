@@ -22,44 +22,52 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/perceived_block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth2);
+using cselm = cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 new_cache_selector::new_cache_selector(
-    const controller::cache_selection_matrix* const csel_matrix)
+    const controller::cache_sel_matrix* const csel_matrix)
     : ER_CLIENT_INIT("fordyca.controller.depth2.new_cache_selector"),
       mc_matrix(csel_matrix) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::perceived_block new_cache_selector::calc_best(
-    const std::list<representation::perceived_block>& new_caches,
-    argos::CVector2 robot_loc) {
+representation::perceived_block new_cache_selector::operator()(
+    const ds::perceived_block_list& new_caches,
+    const ds::cache_list& existing_caches,
+    const rmath::vector2d& position) const {
   representation::perceived_block best;
-  ER_ASSERT(!new_caches.empty(), "no known new caches");
+  ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
   for (auto& c : new_caches) {
+    if (new_cache_is_excluded(existing_caches,
+                              new_caches,
+                              c.ent.get())) {
+      continue;
+    }
     math::new_cache_utility u(c.ent->real_loc(),
-                              boost::get<argos::CVector2>(
-                                  mc_matrix->find("nest_center")->second));
+                              boost::get<rmath::vector2d>(
+                                  mc_matrix->find(cselm::kNestLoc)->second));
 
-    double utility = u.calc(robot_loc, c.density.last_result());
+    double utility = u.calc(position, c.density.last_result());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
-    ER_DEBUG("Utility for new_cache%d loc=(%u, %u), density=%f: %f",
+    ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
              c.ent->id(),
-             c.ent->discrete_loc().first,
-             c.ent->discrete_loc().second,
+             best.ent->real_loc().to_str().c_str(),
+             best.ent->discrete_loc().to_str().c_str(),
              c.density.last_result(),
              utility);
 
@@ -69,14 +77,75 @@ representation::perceived_block new_cache_selector::calc_best(
     }
   } /* for(new_cache..) */
 
-  ER_ASSERT(nullptr != best.ent, "No best new cache found?");
+  if (nullptr != best.ent) {
+    ER_INFO("Best utility: new cache%d@%s/%s: %f",
+            best.ent->id(),
+            best.ent->real_loc().to_str().c_str(),
+            best.ent->discrete_loc().to_str().c_str(),
+            max_utility);
+  } else {
+    ER_WARN("No best new cache found: all known new caches excluded!");
+  }
 
-  ER_INFO("Best utility: new_cache%d at (%u, %u): %f",
-          best.ent->id(),
-          best.ent->discrete_loc().first,
-          best.ent->discrete_loc().second,
-          max_utility);
   return best;
-} /* calc_best() */
+} /* operator() */
+
+bool new_cache_selector::new_cache_is_excluded(
+    const ds::cache_list& existing_caches,
+    const ds::perceived_block_list& blocks,
+    const representation::base_block* const new_cache) const {
+  double cache_prox =
+      boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second);
+  double cluster_prox =
+      boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
+
+  for (auto &ec : existing_caches) {
+    double dist = (ec->real_loc() - new_cache->real_loc()).length();
+    if (dist <= cache_prox) {
+      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
+               new_cache->id(),
+               new_cache->real_loc().to_str().c_str(),
+               new_cache->discrete_loc().to_str().c_str(),
+               ec->id(),
+               ec->real_loc().to_str().c_str(),
+               ec->discrete_loc().to_str().c_str(),
+               dist,
+               cache_prox);
+      return true;
+    }
+  } /* for(&ec..) */
+
+  /*
+   * Because robots have imperfect knowledge of the environment, AND that
+   * environment is constantly changing (whether by the actions of other robots
+   * or in and of itself), any block that they know about MIGHT be part of a
+   * larger block cluster (i.e. part of a single source/dual source block
+   * distribution).
+   *
+   * So, we approximate a block distribution as a single block, and only choose
+   * new caches that are sufficiently far from any potential clusters.
+   */
+  for (auto &b : blocks) {
+    if (b.ent.get() == new_cache) {
+      continue;
+    }
+    double dist = (b.ent->real_loc() - new_cache->real_loc()).length();
+
+    if (dist <= cluster_prox) {
+      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to potential block cluster@%s/%s (%f <= %f)",
+               new_cache->id(),
+               new_cache->real_loc().to_str().c_str(),
+               new_cache->discrete_loc().to_str().c_str(),
+               b.ent->real_loc().to_str().c_str(),
+               b.ent->discrete_loc().to_str().c_str(),
+               dist,
+               cluster_prox);
+      return true;
+    }
+  } /* for(&b..) */
+
+
+  return false;
+} /* new_cache_is_excluded() */
 
 NS_END(depth2, controller, fordyca);

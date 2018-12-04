@@ -25,10 +25,13 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
+#include "fordyca/ds/entity_list.hpp"
+#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,9 +71,6 @@ class dispatcher {
   static constexpr char kDIST_QUAD_SRC[] = "quad_source";
   static constexpr char kDIST_POWERLAW[] = "powerlaw";
 
-  using entity_list = std::list<const representation::multicell_entity*>;
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
-
   dispatcher(ds::arena_grid& grid,
              const struct params::arena::block_dist_params* params);
   ~dispatcher(void);
@@ -97,14 +97,17 @@ class dispatcher {
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
   bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                        entity_list& entities);
+                        ds::const_entity_list& entities);
 
   /**
    * @brief Distribute all blocks in the arena.
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_blocks(block_vector& blocks, entity_list& entities);
+  bool distribute_blocks(ds::block_vector& blocks,
+                         ds::const_entity_list& entities);
+
+  const base_distributor* distributor(void) const { return m_dist.get(); }
 
  private:
   // clang-format off

@@ -25,16 +25,19 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <argos3/core/utility/math/vector2.h>
 
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/perceived_block.hpp"
+#include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-class cache_selection_matrix;
+class cache_sel_matrix;
+namespace rmath = rcppsw::math;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -50,27 +53,31 @@ NS_START(depth2);
  */
 class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
  public:
-  explicit new_cache_selector(const controller::cache_selection_matrix* csel_matrix);
+  explicit new_cache_selector(const controller::cache_sel_matrix* csel_matrix);
 
   ~new_cache_selector(void) override = default;
   new_cache_selector& operator=(const new_cache_selector& other) = delete;
   new_cache_selector(const new_cache_selector& other) = delete;
 
   /**
-   * @brief Given a list of new caches that a robot knows about (i.e. have not
-   * faded into an unknown state), compute which is the "best", for use in
-   * deciding which cache to go to and drop the block they are currently
-   * carrying.
+   * @brief Given a list of new caches that a robot knows about, compute which
+   * is the "best", taking into account proximity to known caches alread in
+   * existence.
    *
    * @return The "best" new cache.
    */
-  representation::perceived_block calc_best(
-      const std::list<representation::perceived_block>& new_caches,
-      argos::CVector2 robot_loc);
+  representation::perceived_block operator()(
+      const ds::perceived_block_list& new_caches,
+      const ds::cache_list& existing_caches,
+      const rmath::vector2d& position) const;
 
  private:
+  bool new_cache_is_excluded(const ds::cache_list& existing_caches,
+                             const ds::perceived_block_list& blocks,
+                             const representation::base_block* const new_cache) const;
+
   // clang-format off
-  const controller::cache_selection_matrix* const mc_matrix;
+  const controller::cache_sel_matrix* const mc_matrix;
   // clang-format on
 };
 

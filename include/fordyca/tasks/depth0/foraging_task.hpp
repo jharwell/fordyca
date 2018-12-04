@@ -28,8 +28,8 @@
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "fordyca/tasks/nest_interactor.hpp"
-#include "fordyca/tasks/free_block_interactor.hpp"
+#include "fordyca/events/nest_interactor.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
@@ -58,8 +58,8 @@ NS_START(tasks, depth0);
  */
 class foraging_task
     : public base_foraging_task,
-      public nest_interactor,
-      public free_block_interactor,
+      public events::nest_interactor,
+      public events::free_block_interactor,
       public ta::polled_task {
  public:
   static constexpr char kGeneralistName[] = "Generalist";

@@ -46,10 +46,10 @@ NS_START(fordyca, representation);
  */
 class ramp_block : public base_block {
  public:
-  explicit ramp_block(const rcppsw::math::vector2d& dim)
+  explicit ramp_block(const rmath::vector2d& dim)
       : base_block(dim, ut::color::kBLUE, -1) {}
 
-  ramp_block(const rcppsw::math::vector2d& dim, int id)
+  ramp_block(const rmath::vector2d& dim, int id)
       : base_block(dim, ut::color::kBLUE, id) {}
 
   transport_metrics::block_type type(void) const override {
