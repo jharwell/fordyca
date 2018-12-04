@@ -130,7 +130,7 @@ void stateful_controller::ControlStep(void) {
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
 
-  if(m_communication_params.mode > 0) {
+  if(m_communication_params.on) {
     perform_communication();
   }
 
@@ -189,17 +189,19 @@ void stateful_controller::Reset(void) {
 } /* Reset() */
 
 void stateful_controller::perform_communication(void) {
-  std::vector<uint8_t> recieved_packet_data = saa_subsystem()->sensing()->recieve_message();
+  std::vector<uint8_t> recieved_packet_data =
+    saa_subsystem()->sensing()->recieve_message();
   float probability = static_cast <float> (rand()) /
       static_cast <float> (RAND_MAX);
 
   hal::wifi_packet packet = hal::wifi_packet();
   if (!recieved_packet_data.empty() && probability >=
-      (1 - m_communication_params.chance_to_pass_on)) {
+      (1 - m_communication_params.chance_to_continue_communication)) {
     packet.data = recieved_packet_data;
     integrate_recieved_packet(packet);
     saa_subsystem()->actuation()->start_sending_message(packet);
-  } else if (probability >= (1 - m_communication_params.chance_to_start)) {
+  } else if (probability >= (1 -
+      m_communication_params.chance_to_start_communication)) {
     int x_coord;
     int y_coord;
 
@@ -253,8 +255,12 @@ void stateful_controller::perform_communication(void) {
         } /* if block type */
       } /* if state */
     } /* if entity */
-    packet.data.push_back(static_cast<uint8_t>(id)); // Entity ID (will be 0 if the cell is unknown)
-    packet.data.push_back(static_cast<uint8_t>(type)); // Type of block
+
+    // Entity ID (will be 0 if the cell is unknown)
+    packet.data.push_back(static_cast<uint8_t>(id));
+
+    // Type of block
+    packet.data.push_back(static_cast<uint8_t>(type));
 
     rcppsw::swarm::pheromone_density& density = perception()->map()->
       access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
@@ -302,7 +308,8 @@ void stateful_controller::integrate_recieved_packet(hal::wifi_packet packet) {
         block_ptr->real_loc(rcoord_vector);
         block_ptr->discrete_loc(disc_loc);
 
-        perception()->map()->accept(*(new fordyca::events::block_found(block_ptr)));
+        perception()->map()->accept(*(
+          new fordyca::events::block_found(block_ptr)));
       // cube block
     } else if (type == 3) {
         std::shared_ptr<representation::cube_block> block_ptr (new
@@ -310,7 +317,8 @@ void stateful_controller::integrate_recieved_packet(hal::wifi_packet packet) {
         block_ptr->real_loc(rcoord_vector);
         block_ptr->discrete_loc(disc_loc);
 
-        perception()->map()->accept(*(new fordyca::events::block_found(block_ptr)));
+        perception()->map()->accept(*(
+          new fordyca::events::block_found(block_ptr)));
       } /* if type */
 
       density.pheromone_set(pheromone_density);
@@ -325,8 +333,11 @@ void stateful_controller::integrate_recieved_packet(hal::wifi_packet packet) {
 argos::CVector2 stateful_controller::get_most_valuable_cell(void) {
   argos::CVector2 cell_coords;
 
-  int nest_x_coord = boost::get<argos::CVector2>(m_block_sel_matrix->find("nest_loc")->second).GetX();
-  int nest_y_coord = boost::get<argos::CVector2>(m_block_sel_matrix->find("nest_loc")->second).GetY();
+  int nest_x_coord = boost::get<argos::CVector2>(
+    m_block_sel_matrix->find("nest_loc")->second).GetX();
+
+  int nest_y_coord = boost::get<argos::CVector2>(
+    m_block_sel_matrix->find("nest_loc")->second).GetY();
 
   int communicated_cell_value = 0;
   int current_cell_value = 0;
@@ -342,21 +353,22 @@ argos::CVector2 stateful_controller::get_most_valuable_cell(void) {
       ds::cell2D current_cell = perception()->map()->
         access<ds::occupancy_grid::kCell>(i, j);
 
-      // Current cell density
-      rcppsw::swarm::pheromone_density& density = perception()->map()->
-        access<ds::occupancy_grid::kPheromone>(i, j);
-
       if (current_cell.state_has_block()) {
+        // Current cell density
+        rcppsw::swarm::pheromone_density& density = perception()->map()->
+          access<ds::occupancy_grid::kPheromone>(i, j);
+
         // Distance from the nest * number of blocks * pheromone density
         current_cell_value = ((((i - nest_x_coord)^2) +
           ((j - nest_y_coord)^2))^(1/2)) * current_cell.block_count() *
            density.last_result();
-        // current_cell_value = current_cell.block_count();
+
+        // Update variables
         if (current_cell_value > communicated_cell_value) {
           communicated_cell_value = current_cell_value;
           cell_x = i;
           cell_y = j;
-        } /* if value */
+        } /* update value and cell location */
       } /* if cell has block */
     } /* for(j..) */
   } /* for(i..) */

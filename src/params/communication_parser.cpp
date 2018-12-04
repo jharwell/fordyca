@@ -41,30 +41,34 @@ void communication_parser::parse(const ticpp::Element& node) {
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_ATTR(anode, m_params, chance_to_pass_on);
-  XML_PARSE_ATTR(anode, m_params, chance_to_start);
-  XML_PARSE_ATTR(anode, m_params, max_message);
+  XML_PARSE_ATTR(anode, m_params, on);
   XML_PARSE_ATTR(anode, m_params, mode);
+  XML_PARSE_ATTR(anode, m_params, max_message_length);
+  XML_PARSE_ATTR(anode, m_params, chance_to_continue_communication);
+  XML_PARSE_ATTR(anode, m_params, chance_to_start_communication);
 } /* parse() */
 
 void communication_parser::show(std::ostream& stream) const {
   stream << build_header();
 
-  stream << XML_ATTR_STR(m_params, chance_to_pass_on)
-         << XML_ATTR_STR(m_params, chance_to_start)
-         << XML_ATTR_STR(m_params, max_message)
+  stream << XML_ATTR_STR(m_params, on)
+         << XML_ATTR_STR(m_params, mode)
+         << XML_ATTR_STR(m_params, max_message_length)
+         << XML_ATTR_STR(m_params, chance_to_continue_communication)
+         << XML_ATTR_STR(m_params, chance_to_start_communication)
          << std::endl
          << build_footer();
 } /* show() */
 
 __rcsw_pure bool communication_parser::validate(void) const {
-    return m_params->chance_to_pass_on >= 0.0 &&
-        m_params->chance_to_pass_on <= 1.0 &&
-        m_params->chance_to_start >= 0.0 &&
-        m_params->chance_to_start <= 1.0 &&
-        m_params->max_message >= 0 &&
-        m_params->max_message <= 10 &&
-        m_params->mode <= 2;
+    return (m_params->mode == 2 ||
+            m_params->mode == 1) &&
+           m_params->max_message_length >= 0 &&
+           m_params->max_message_length <= 20 &&
+           m_params->chance_to_continue_communication >= 0.0 &&
+           m_params->chance_to_continue_communication <= 1.0 &&
+           m_params->chance_to_start_communication >= 0.0 &&
+           m_params->chance_to_start_communication <= 1.0;
 } /* validate() */
 
 

@@ -40,10 +40,11 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct communication_params : public rcppsw::params::base_params {
-  double chance_to_pass_on{0.0};
-  double chance_to_start{0.0};
-  int max_message{0};
+  double chance_to_continue_communication{0.0};
+  double chance_to_start_communication{0.0};
+  int max_message_length{0};
   int mode{0};
+  bool on{false};
 };
 
 NS_END(params, fordyca);

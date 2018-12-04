@@ -27,7 +27,7 @@
         <footbot_proximity implementation="default" show_rays="true" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
-        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
+        <range_and_bearing implementation="medium" medium="rab"/>
         <battery implementation="default" />
       </sensors>
       <params>
@@ -150,10 +150,11 @@
           <differential_drive soft_turn_max="15"
                               max_speed="10.0" />
         </actuation>
-        <communication chance_to_pass_on="0.5"
-                       chance_to_start="0.75"
-                       max_message="10"
-                       mode="2"/>
+        <communication on="true"
+                       mode="2"
+                       max_message_length="10"
+                       chance_to_continue_communication="0.5"
+                       chance_to_start_communication="0.75"/>
       </params>
     </stateful_controller>
 
@@ -302,8 +303,8 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="4" max_trials="1000">
-        <foot-bot id="fb" rab_range="5" rab_data_size="20">
+      <entity quantity="6" max_trials="1000">
+        <foot-bot id="fb" rab_range="3" rab_data_size="15">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->
         </foot-bot>
