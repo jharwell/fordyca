@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/vector_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
 
@@ -32,8 +29,14 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace state_machine = rcppsw::patterns::state_machine;
 namespace utils = rcppsw::utils;
+
+/*******************************************************************************
+ * Class Constants
+ ******************************************************************************/
+constexpr double vector_fsm::kCACHE_ARRIVAL_TOL;
+constexpr double vector_fsm::kBLOCK_ARRIVAL_TOL;
+constexpr double vector_fsm::kCACHE_SITE_ARRIVAL_TOL;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -80,36 +83,35 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     return controller::foraging_signal::HANDLED;
   }
 
-  if (base_sensors()->threatening_obstacle_exists()) {
+  if (sensors()->threatening_obstacle_exists()) {
     collision_avoidance_tracking_begin();
-    if (base_sensors()->tick() - m_state.last_collision_time <
+    if (sensors()->tick() - m_state.last_collision_time <
         kFREQ_COLLISION_THRESH) {
       ER_DEBUG("Frequent collision: last=%u curr=%u",
                m_state.last_collision_time,
-               base_sensors()->tick());
-      argos::CVector2 new_dir = randomize_vector_angle(argos::CVector2::X);
+               sensors()->tick());
+      rmath::vector2d new_dir = randomize_vector_angle(rmath::vector2d::X);
       internal_event(ST_NEW_DIRECTION,
-                     rcppsw::make_unique<new_direction_data>(new_dir.Angle()));
+                     rcppsw::make_unique<new_direction_data>(new_dir.angle()));
     } else {
-      argos::CVector2 obs = base_sensors()->find_closest_obstacle();
-      ER_DEBUG("Found threatening obstacle: (%f, %f)@%f [%f]",
-               obs.GetX(),
-               obs.GetY(),
-               obs.Angle().GetValue(),
-               obs.Length());
+      rmath::vector2d obs = sensors()->find_closest_obstacle();
+      ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
+               obs.to_str().c_str(),
+               obs.angle().value(),
+               obs.length());
       saa_subsystem()->steering_force().avoidance(obs);
       /*
        * If we are currently spinning in place (hard turn), we have 0 linear
        * velocity, and that does not play well with the arrival force
        * calculations. To fix this, and a bit of wander force.
        */
-      if (saa_subsystem()->linear_velocity().Length() <= 0.1) {
+      if (saa_subsystem()->linear_velocity().length() <= 0.1) {
         saa_subsystem()->steering_force().wander();
       }
       saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     }
   } else {
-    m_state.last_collision_time = base_sensors()->tick();
+    m_state.last_collision_time = sensors()->tick();
     /*
      * Go in whatever direction you are currently facing for collision recovery.
      */
@@ -133,7 +135,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
   }
   return controller::foraging_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
+FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data) {
   if (ST_VECTOR != last_state()) {
     ER_DEBUG("Executing ST_VECTOR");
   }
@@ -141,10 +143,12 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
   auto* goal = dynamic_cast<const struct goal_data*>(data);
   if (nullptr != goal) {
     m_goal_data = *goal;
-    ER_INFO("Target: (%f, %f)", m_goal_data.loc.GetX(), m_goal_data.loc.GetY());
+    ER_INFO("Target=%s, robot=%s",
+            m_goal_data.loc.to_str().c_str(),
+            saa_subsystem()->sensing()->position().to_str().c_str());
   }
 
-  if ((m_goal_data.loc - base_sensors()->position()).Length() <=
+  if ((m_goal_data.loc - sensors()->position()).length() <=
       m_goal_data.tolerance) {
     internal_event(ST_ARRIVED,
                    rcppsw::make_unique<struct goal_data>(m_goal_data));
@@ -158,7 +162,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
    * Not doing this results in robots getting stuck when they all are trying to
    * pick up the same block in close quarters.
    */
-  if (base_sensors()->threatening_obstacle_exists() &&
+  if (sensors()->threatening_obstacle_exists() &&
       !saa_subsystem()->steering_force().within_slowing_radius()) {
     internal_event(ST_COLLISION_AVOIDANCE);
   } else {
@@ -171,9 +175,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, state_machine::event_data) {
 
 FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
   if (ST_ARRIVED != last_state()) {
-    ER_DEBUG("Executing ST_ARRIVED: target (%f, %f) within %f tolerance",
-             data->loc.GetX(),
-             data->loc.GetY(),
+    ER_DEBUG("Executing ST_ARRIVED: target=%s, tol=%f",
+             data->loc.to_str().c_str(),
              data->tolerance);
   }
   return controller::foraging_signal::HANDLED;
@@ -228,18 +231,17 @@ void vector_fsm::task_start(
 } /* task_start() */
 
 void vector_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 void vector_fsm::init(void) {
   actuators()->reset();
-  state_machine::simple_fsm::init();
+  rfsm::simple_fsm::init();
 } /* init() */
 
-__rcsw_pure argos::CVector2 vector_fsm::calc_vector_to_goal(
-    const argos::CVector2& goal) {
-  return goal - base_sensors()->position();
+__rcsw_pure rmath::vector2d vector_fsm::calc_vector_to_goal(
+    const rmath::vector2d& goal) {
+  return goal - sensors()->position();
 } /* calc_vector_to_goal() */
 
 NS_END(fsm, fordyca);

@@ -27,7 +27,7 @@
 #include <list>
 #include <string>
 
-#include "fordyca/support/loop_functions_utils.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/temporal_penalty.hpp"
 #include "rcppsw/control/periodic_waveform.hpp"
 #include "rcppsw/control/waveform_generator.hpp"
@@ -60,17 +60,20 @@ class temporal_penalty_handler
     : public er::client<temporal_penalty_handler<T>> {
  public:
   /**
-   * @Brief Initialize the penalty handler.
+   * @brief Initialize the penalty handler.
    *
-   * @param server Server for debugging.
    * @param params Parameters for penalty waveform generation.
    */
-  temporal_penalty_handler(const ct::waveform_params* const params)
+  explicit temporal_penalty_handler(const ct::waveform_params* const params,
+                                    const std::string& name)
       : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
+        mc_name(name),
         m_penalty_list(),
         m_penalty(ct::waveform_generator()(params->type, params)) {}
 
   ~temporal_penalty_handler(void) override = default;
+
+  const std::string& name(void) const { return mc_name; }
 
   /**
    * @brief Determine if a robot has satisfied the \ref temporal_penalty
@@ -122,7 +125,7 @@ class temporal_penalty_handler
     if (it != m_penalty_list.end()) {
       m_penalty_list.remove(*it);
     }
-    ER_INFO("fb%d", utils::robot_id(controller));
+    ER_INFO("fb%d", loop_utils::robot_id(controller));
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot still serving penalty after abort?!");
   }
@@ -171,7 +174,7 @@ class temporal_penalty_handler
    * @param timestep The current timestep.
    */
   uint deconflict_penalty_finish(uint timestep) const {
-    uint penalty = m_penalty->value(timestep);
+    uint penalty = static_cast<uint>(m_penalty->value(timestep));
     if (0 == penalty) {
       ++penalty;
     }
@@ -189,6 +192,7 @@ class temporal_penalty_handler
 
   // clang-format off
   mutable uint                   m_orig_penalty{0};
+  const std::string              mc_name;
   std::list<temporal_penalty<T>> m_penalty_list;
   std::unique_ptr<ct::waveform>  m_penalty;
   // clang-format on

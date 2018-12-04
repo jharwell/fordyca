@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
 #include <random>
 #include <vector>
 #include <map>
+#include <utility>
+#include <list>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
@@ -41,7 +42,6 @@ NS_START(fordyca);
 
 namespace representation {
 class block;
-class arena_grid;
 } // namespace representation
 
 namespace params { namespace arena { struct block_dist_params; }}
@@ -67,8 +67,6 @@ class powerlaw_distributor : public base_distributor,
  public:
   /**
    * @brief Initialize the distributor.
-   *
-   * @param server Debugging/logging server.
    */
   explicit powerlaw_distributor(const struct params::arena::block_dist_params* params);
 
@@ -76,8 +74,9 @@ class powerlaw_distributor : public base_distributor,
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
 
   bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                        entity_list& entities) override;
-  bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
+                        ds::const_entity_list& entities) override;
+
+  ds::const_block_cluster_list block_clusters(void) const override;
 
   /**
    * @brief Computer cluster locations such that no two clusters overlap, and
@@ -88,15 +87,15 @@ class powerlaw_distributor : public base_distributor,
    *
    * @return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
    */
-  bool map_clusters(representation::arena_grid& grid);
+  bool map_clusters(ds::arena_grid& grid);
 
  private:
-  using arena_view_list = std::list<std::pair<representation::arena_grid::view, uint>>;
-  /**
-   * @brief How many times to attempt to distribute all blocks before giving up,
-   * causing an assertion failure on distribution.
-   */
-  static constexpr uint kMAX_DIST_TRIES = 100;
+  struct cluster_params {
+    ds::arena_grid::view view;
+    uint                 capacity;
+  };
+
+  using cluster_paramvec = std::vector<cluster_params>;
 
   /**
    * @brief Assign cluster centers randomly, with the only restriction that the
@@ -105,8 +104,9 @@ class powerlaw_distributor : public base_distributor,
    * @param grid Arena grid.
    * @param clust_sizes Vector of powers of 2 for the cluster sizes.
    */
-  arena_view_list guess_cluster_placements(representation::arena_grid& grid,
-                                             const std::vector<uint>& clust_sizes);
+  cluster_paramvec guess_cluster_placements(
+      ds::arena_grid& grid,
+      const std::vector<uint>& clust_sizes);
 
   /**
    * @brief Verify that no cluster placements cause overlap, after guessing
@@ -116,7 +116,7 @@ class powerlaw_distributor : public base_distributor,
    *
    * @return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
    */
-  bool check_cluster_placements(const arena_view_list& list);
+  bool check_cluster_placements(const cluster_paramvec& pvec);
 
   /**
    * @brief Perform a "guess and check" cluster placement until you get a
@@ -125,13 +125,13 @@ class powerlaw_distributor : public base_distributor,
    *
    * Cluster sizes are drawn from the internally stored power law distribution.
    */
-  arena_view_list compute_cluster_placements(representation::arena_grid& grid,
+  cluster_paramvec compute_cluster_placements(ds::arena_grid& grid,
                                              uint n_clusters);
 
   // clang-format off
   double                                         m_arena_resolution{0.0};
   uint                                           m_n_clusters{0};
-  std::map<uint, std::list<cluster_distributor>> m_dist_map;
+  std::map<uint, std::list<cluster_distributor>> m_dist_map{};
   std::default_random_engine                     m_rng {std::random_device {}()};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;
   // clang-format on

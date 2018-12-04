@@ -27,16 +27,25 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 #include "rcppsw/ds/base_grid2D.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca);
+
+namespace ds {
+class cell2D;
+}
+namespace rmath = rcppsw::math;
+
+NS_START(representation);
 class base_block;
 class base_cache;
-class cell2D;
 
 /*******************************************************************************
  * Class Definitions
@@ -56,19 +65,18 @@ class cell2D;
  * All coordinates within a LOS are relative to the LOS itself (not its location
  * within the arena). The origin is in the lower left corner of the LOS.
  */
-class line_of_sight {
+class line_of_sight : public rcppsw::er::client<line_of_sight> {
  public:
-  using block_list = std::list<std::shared_ptr<base_block>>;
-  using const_block_list = std::list<std::shared_ptr<const base_block>>;
-  using cache_list = std::list<std::shared_ptr<base_cache>>;
-  using const_cache_list = std::list<std::shared_ptr<const base_cache>>;
+  using grid_view = rcppsw::ds::grid_view<ds::cell2D>;
 
-  line_of_sight(const rcppsw::ds::grid_view<cell2D>& c_view,
-                rcppsw::math::dcoord2 center)
-      : m_center(std::move(center)), m_view(c_view), m_caches() {}
+  line_of_sight(const grid_view& c_view, rmath::vector2u center)
+      : ER_CLIENT_INIT("fordyca.representation.line_of_sight"),
+        m_center(std::move(center)),
+        m_view(c_view),
+        m_caches() {}
 
-  const_block_list blocks(void) const;
-  const_cache_list caches(void) const;
+  ds::const_block_list blocks(void) const;
+  ds::const_cache_list caches(void) const;
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -77,24 +85,24 @@ class line_of_sight {
    */
   size_t xsize(void) const { return m_view.shape()[0]; }
 
-  rcppsw::math::dcoord2 abs_ll(void) const;
-  rcppsw::math::dcoord2 abs_lr(void) const;
-  rcppsw::math::dcoord2 abs_ul(void) const;
-  rcppsw::math::dcoord2 abs_ur(void) const;
+  rmath::vector2u abs_ll(void) const;
+  rmath::vector2u abs_lr(void) const;
+  rmath::vector2u abs_ul(void) const;
+  rmath::vector2u abs_ur(void) const;
 
   /**
    * @brief Get the size of the Y dimension for a LOS.
    *
    * @return The Y dimension.
    */
-  size_t ysize(void) const { return m_view.shape()[1]; }
+  grid_view::size_type ysize(void) const { return m_view.shape()[1]; }
 
   /**
    * @brief Get the # elements in a LOS.
    *
    * @return # elements.
    */
-  size_t size(void) const { return m_view.num_elements(); }
+  grid_view::size_type size(void) const { return m_view.num_elements(); }
 
   /**
    * @brief Get the cell associated with a particular grid location within the
@@ -106,21 +114,21 @@ class line_of_sight {
    *
    * @return A reference to the cell.
    */
-  const cell2D& cell(size_t i, size_t j) const;
-  cell2D& cell(size_t i, size_t j);
+  const ds::cell2D& cell(uint i, uint j) const;
+  ds::cell2D& cell(uint i, uint j);
 
   /**
    * @brief Get the coordinates for the center of the LOS.
    *
    * @return The center coordinates (discrete version).
    */
-  const rcppsw::math::dcoord2& center(void) const { return m_center; }
+  const rmath::vector2u& center(void) const { return m_center; }
 
  private:
   // clang-format off
-  rcppsw::math::dcoord2         m_center;
-  rcppsw::ds::grid_view<cell2D> m_view;
-  const_cache_list              m_caches;
+  rmath::vector2u             m_center;
+  grid_view                         m_view;
+  ds::const_cache_list              m_caches;
   // clang-format on
 };
 

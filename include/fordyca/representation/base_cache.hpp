@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <algorithm>
-#include <cassert>
 #include <utility>
 #include <vector>
 
@@ -37,9 +36,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace prototype = rcppsw::patterns::prototype;
-
 NS_START(fordyca, representation);
+namespace prototype = rcppsw::patterns::prototype;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -63,7 +62,7 @@ class base_cache : public multicell_entity,
    * @brief The minimum # of blocks required for a cache to exist (less than
    * this and you just have a bunch of blocks)
    */
-  static constexpr uint kMinBlocks = 2;
+  static constexpr size_t kMinBlocks = 2;
 
   /**
    * @param dimension The size of the cache. Does not have to be a multiple of
@@ -77,7 +76,7 @@ class base_cache : public multicell_entity,
    */
   base_cache(double dimension,
              double resolution,
-             argos::CVector2 center,
+             const rmath::vector2d& center,
              const std::vector<std::shared_ptr<base_block>>& blocks,
              int id);
 
@@ -93,7 +92,7 @@ class base_cache : public multicell_entity,
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }
-  uint n_blocks(void) const { return blocks().size(); }
+  virtual size_t n_blocks(void) const { return blocks().size(); }
 
   /**
    * @brief Get a list of the blocks currently in the cache.
@@ -121,9 +120,9 @@ class base_cache : public multicell_entity,
    *
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
-  bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).value_within(point.GetX()) &&
-           yspan(real_loc()).value_within(point.GetY());
+  bool contains_point(const rmath::vector2d& point) const {
+    return xspan(real_loc()).contains(point.x()) &&
+           yspan(real_loc()).contains(point.y());
   }
 
   /**
@@ -137,7 +136,7 @@ class base_cache : public multicell_entity,
    * @brief Get the oldest block in the cache (the one that has been in the
    * cache the longest).
    */
-  std::shared_ptr<base_block> block_get(void) { return m_blocks.front(); }
+  std::shared_ptr<base_block> oldest_block(void) { return m_blocks.front(); }
 
   std::unique_ptr<base_cache> clone(void) const override;
 

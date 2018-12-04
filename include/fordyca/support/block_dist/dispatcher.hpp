@@ -25,10 +25,13 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
+#include "fordyca/ds/entity_list.hpp"
+#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,9 +40,12 @@ NS_START(fordyca);
 
 namespace representation {
 class base_block;
-class arena_grid;
 class multicell_entity;
 } // namespace representation
+
+namespace ds {
+class arena_grid;
+} // namespace ds
 
 NS_START(support, block_dist);
 class base_distributor;
@@ -51,19 +57,21 @@ class base_distributor;
  * @class dispatcher
  * @ingroup block_dist support
  *
- * @brief Dispatches call to distribute blocks (or a single block a specific
- * distributer, as configured in simulation input file.
+ * @brief Dispatches call to distribute blocks (or a single block), as
+ * configured in simulation input file.
+ *
+ * - Single and dual source distribution assumes left-right rectangular arena.
+ * - Power law, quad source, random distribution assume square arena.
  */
 class dispatcher {
  public:
   static constexpr char kDIST_SINGLE_SRC[] = "single_source";
   static constexpr char kDIST_RANDOM[] = "random";
+  static constexpr char kDIST_DUAL_SRC[] = "dual_source";
+  static constexpr char kDIST_QUAD_SRC[] = "quad_source";
   static constexpr char kDIST_POWERLAW[] = "powerlaw";
 
-  using entity_list = std::list<const representation::multicell_entity*>;
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
-
-  dispatcher(representation::arena_grid& grid,
+  dispatcher(ds::arena_grid& grid,
              const struct params::arena::block_dist_params* params);
   ~dispatcher(void);
 
@@ -89,21 +97,24 @@ class dispatcher {
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
   bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                        entity_list& entities);
+                        ds::const_entity_list& entities);
 
   /**
    * @brief Distribute all blocks in the arena.
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_blocks(block_vector& blocks, entity_list& entities);
+  bool distribute_blocks(ds::block_vector& blocks,
+                         ds::const_entity_list& entities);
+
+  const base_distributor* distributor(void) const { return m_dist.get(); }
 
  private:
   // clang-format off
-  const struct params::arena::block_dist_params  mc_params;
-  std::string                                    m_dist_type;
-  representation::arena_grid&                    m_grid;
-  std::unique_ptr<base_distributor>              m_dist;
+  const struct params::arena::block_dist_params mc_params;
+  std::string                                   m_dist_type;
+  ds::arena_grid&                               m_grid;
+  std::unique_ptr<base_distributor>             m_dist;
 
   // clang-format on
 };

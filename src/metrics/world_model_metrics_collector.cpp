@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/world_model_metrics_collector.hpp"
+#include <numeric>
+
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 
@@ -48,7 +50,10 @@ std::string world_model_metrics_collector::csv_header_build(
   return base_metrics_collector::csv_header_build(header) +
       "ST_EMPTY_inaccuracies" + separator() +
       "ST_HAS_BLOCK_inaccuracies" + separator() +
-      "ST_HAS_CACHE_inaccuracies" + separator();
+      "ST_HAS_CACHE_inaccuracies" + separator() +
+      "known_percentage" + separator() +
+      "unknown_percentage" + separator() +
+      "knowledge_ratio" + separator();
   // clang-format on
 } /* csv_header_build() */
 
@@ -70,6 +75,11 @@ bool world_model_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] /
                          static_cast<double>(timestep() + 1)) +
           separator();
+  double known = std::accumulate(m_known.begin(), m_known.end(), 0.0);
+  double unknown = std::accumulate(m_unknown.begin(), m_unknown.end(), 0.0);
+  line += std::to_string(known / m_known.size()) + separator();
+  line += std::to_string(unknown / m_unknown.size()) + separator();
+  line += std::to_string(known / unknown) + separator();
   return true;
 } /* csv_line_build() */
 
@@ -82,10 +92,15 @@ void world_model_metrics_collector::collect(
       m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_BLOCK);
   m_stats[fsm::cell2D_fsm::ST_HAS_CACHE] +=
       m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_HAS_CACHE);
+
+  m_known.push_back(m.known_percentage());
+  m_unknown.push_back(m.unknown_percentage());
 } /* collect() */
 
 void world_model_metrics_collector::reset_after_interval(void) {
   m_stats.assign(m_stats.size(), 0);
+  m_known.clear();
+  m_unknown.clear();
 } /* reset_after_interval() */
 
 NS_END(metrics, fordyca);

@@ -85,9 +85,9 @@ class utilization_metrics_collector
    * IDs of the caches that had events in the current interval, for use in
    * averaging statistics.
    */
-  std::set<uint> m_int_cache_ids{};
+  std::set<int>  m_int_cache_ids{};
 
-  std::set<uint> m_cum_cache_ids{};
+  std::set<int>  m_cum_cache_ids{};
   // clang-format on
 };
 

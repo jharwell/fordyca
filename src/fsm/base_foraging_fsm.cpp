@@ -22,11 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include <argos3/core/simulator/simulator.h>
-#include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/core/utility/datatypes/color.h>
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
@@ -84,7 +81,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
    */
   if (m_saa->sensing()->threatening_obstacle_exists()) {
     collision_avoidance_tracking_begin();
-    argos::CVector2 obs = saa_subsystem()->sensing()->find_closest_obstacle();
+    rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
     saa_subsystem()->steering_force().avoidance(obs);
   } else {
     collision_avoidance_tracking_end();
@@ -126,7 +123,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   }
 
   m_saa->steering_force().phototaxis();
-  argos::CVector2 obs = m_saa->sensing()->find_closest_obstacle();
+  rmath::vector2d obs = m_saa->sensing()->find_closest_obstacle();
   if (m_saa->sensing()->threatening_obstacle_exists()) {
     collision_avoidance_tracking_begin();
     m_saa->steering_force().avoidance(obs);
@@ -136,7 +133,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
      * velocity, and that does not play well with the arrival force
      * calculations. To fix this, and a bit of wander force.
      */
-    if (m_saa->linear_velocity().Length() <= 0.1) {
+    if (m_saa->linear_velocity().length() <= 0.1) {
       m_saa->steering_force().wander();
     }
     collision_avoidance_tracking_end();
@@ -147,7 +144,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
 }
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
-  argos::CRadians current_dir = m_saa->sensing()->heading_angle();
+  rmath::radians current_dir = m_saa->sensing()->heading_angle();
 
   /*
    * The new direction is only passed the first time this state is entered, so
@@ -158,8 +155,8 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
     m_new_dir = dir_data->dir;
     m_new_dir_count = 0;
     ER_DEBUG("Change direction: %f -> %f",
-             current_dir.GetValue(),
-             m_new_dir.GetValue());
+             current_dir.value(),
+             m_new_dir.value());
   }
 
   /*
@@ -176,7 +173,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
    * We limit the maximum # of steps that we spin, and have an arrival tolerance
    * to also help limit excessive spinning. See #191.
    */
-  if (std::fabs((current_dir - m_new_dir).GetValue()) < kDIR_CHANGE_TOL ||
+  if (std::fabs((current_dir - m_new_dir).value()) < kDIR_CHANGE_TOL ||
       m_new_dir_count >= kDIR_CHANGE_MAX_STEPS) {
     internal_event(previous_state());
   }
@@ -223,7 +220,7 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_charge_at_nest) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-bool base_foraging_fsm::in_collision_avoidance(void) const {
+__rcsw_pure bool base_foraging_fsm::in_collision_avoidance(void) const {
   return m_in_avoidance;
 } /* in_collision_avoidance() */
 
@@ -274,20 +271,21 @@ void base_foraging_fsm::init(void) {
   hfsm::init();
 } /* init() */
 
-argos::CVector2 base_foraging_fsm::randomize_vector_angle(argos::CVector2 vector) {
+rmath::vector2d base_foraging_fsm::randomize_vector_angle(
+    const rmath::vector2d& vector) {
   argos::CRange<argos::CRadians> range(argos::CRadians(0.0),
                                        argos::CRadians(1.0));
-  vector.Rotate(m_rng->Uniform(range));
-  return vector;
+  argos::CVector2 tmp(vector.x(), vector.y());
+  tmp.Rotate(m_rng->Uniform(range));
+  return rmath::vector2d(tmp.GetX(), tmp.GetY());
 } /* randomize_vector_angle() */
 
-const std::shared_ptr<const controller::base_sensing_subsystem> base_foraging_fsm::
-    base_sensors(void) const {
+const std::shared_ptr<const controller::sensing_subsystem> base_foraging_fsm::
+    sensors(void) const {
   return m_saa->sensing();
 } /* base_sensors() */
 
-const std::shared_ptr<controller::base_sensing_subsystem> base_foraging_fsm::
-    base_sensors(void) {
+const std::shared_ptr<controller::sensing_subsystem> base_foraging_fsm::sensors(void) {
   return m_saa->sensing();
 } /* base_actuation() */
 

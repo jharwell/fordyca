@@ -27,7 +27,6 @@
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
 #include "fordyca/representation/movable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
-#include "rcppsw/math/dcoord.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -59,21 +58,34 @@ class base_block : public multicell_entity,
                    public prototype::clonable<base_block> {
  public:
   /**
-   * @brief Out of sight location base_blocks are moved to when a robot picks them
-   * up, for visualization/rending purposes.
+   * @brief Out of sight location base_blocks are moved to when a robot picks
+   * them up, for visualization/rending purposes.
    */
-  static rcppsw::math::dcoord2 kOutOfSightDLoc;
-  static argos::CVector2 kOutOfSightRLoc;
+  static const rmath::vector2u kOutOfSightDLoc;
+  static const rmath::vector2d kOutOfSightRLoc;
 
-  base_block(const rcppsw::math::vector2d& dim, const ut::color& color)
+  /**
+   * @param dim 2 element vector of the dimensions of the block.
+   * @param color The color of the block.
+   *
+   * Using this constructor, blocks are assigned the next available id, starting
+   * from 0.
+   */
+  base_block(const rmath::vector2d& dim, const ut::color& color)
       : multicell_entity(dim, color, -1), movable_cell_entity() {}
 
-  base_block(const rcppsw::math::vector2d& dim, const ut::color& color, int id)
+  /**
+   * @param dim 2 element vector of the dimensions of the block.
+   * @param color The color of the block.
+   * @param id The id of the block.
+   */
+  base_block(const rmath::vector2d& dim, const ut::color& color, int id)
       : multicell_entity(dim, color, id), movable_cell_entity() {}
 
   __rcsw_pure bool operator==(const base_block& other) const {
-    return (this->id() == other.id());
+    return this->id() == other.id();
   }
+  ~base_block(void) override = default;
 
   /* transport metrics */
   void reset_metrics(void) override;
@@ -85,7 +97,7 @@ class base_block : public multicell_entity,
    * @brief Increment the # of carries this block has undergone on its way back
    * to the nest.
    */
-  void add_transporter(uint robot_id) {
+  void add_transporter(int robot_id) {
     ++m_transporters;
     m_robot_id = robot_id;
   }
@@ -94,14 +106,14 @@ class base_block : public multicell_entity,
    * @brief Set the time that the base_block is picked up for the first time after
    * being distributed in the arena.
    *
-   * @param current_time The current simulation time.
+   * @param time The current simulation time.
    */
   void first_pickup_time(double time);
 
   /**
    * @brief Set the time that the base_block dropped in the nest.
    *
-   * @param current_time The current simulation time.
+   * @param time The current simulation time.
    */
   void nest_drop_time(double time) { m_nest_drop_time = time; }
 
@@ -118,8 +130,8 @@ class base_block : public multicell_entity,
   void reset_robot_id(void) { m_robot_id = -1; }
 
   /**
-   * @brief change the base_block's location to something outside the visitable space
-   * in the arena when it is being carried by robot.
+   * @brief change the base_block's location to something outside the visitable
+   * space in the arena when it is being carried by robot.
    */
   void move_out_of_sight(void);
 
@@ -132,10 +144,11 @@ class base_block : public multicell_entity,
     return kOutOfSightDLoc == discrete_loc() || kOutOfSightRLoc == real_loc();
   }
   /**
-   * @brief Get the ID/index of the robot that is currently carrying this base_block
+   * @brief Get the ID/index of the robot that is currently carrying this
+   * block
    *
    * @return The robot index, or -1 if no robot is currently carrying this
-   * base_block.
+   * block.
    */
   int robot_id(void) const { return m_robot_id; }
 
@@ -150,9 +163,9 @@ class base_block : public multicell_entity,
    *
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
-  bool contains_point(const argos::CVector2& point) const {
-    return xspan(real_loc()).value_within(point.GetX()) &&
-           yspan(real_loc()).value_within(point.GetY());
+  bool contains_point(const rmath::vector2d& point) const {
+    return xspan(real_loc()).contains(point.x()) &&
+           yspan(real_loc()).contains(point.y());
   }
 
  private:

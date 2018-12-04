@@ -22,8 +22,8 @@
  * Includes
  *****************************************************************************/
 #include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -33,13 +33,16 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-line_of_sight::const_block_list line_of_sight::blocks(void) const {
-  const_block_list blocks;
-  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
-    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      const cell2D& cell = m_view[i][j];
+ds::const_block_list line_of_sight::blocks(void) const {
+  ds::const_block_list blocks;
+  for (uint i = 0; i < m_view.shape()[0]; ++i) {
+    for (uint j = 0; j < m_view.shape()[1]; ++j) {
+      const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_block()) {
-        assert(cell.block());
+        ER_ASSERT(nullptr != cell.block(),
+                  "Cell at(%u,%u) in HAS_BLOCK state, but does not have block",
+                  i,
+                  j);
         blocks.push_back(cell.block());
       }
     } /* for(j..) */
@@ -47,16 +50,24 @@ line_of_sight::const_block_list line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-line_of_sight::const_cache_list line_of_sight::caches(void) const {
-  const_cache_list caches = m_caches;
+ds::const_cache_list line_of_sight::caches(void) const {
+  ds::const_cache_list caches = m_caches;
 
-  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
-    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      const cell2D& cell = m_view[i][j];
+  for (uint i = 0; i < m_view.shape()[0]; ++i) {
+    for (uint j = 0; j < m_view.shape()[1]; ++j) {
+      const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = std::dynamic_pointer_cast<base_cache>(cell.entity());
-        assert(nullptr != cache);
-        assert(cache->n_blocks() >= base_cache::kMinBlocks);
+        ER_ASSERT(nullptr != cell.cache(),
+                  "Cell at(%u,%u) in HAS_CACHE state, but does not have cache",
+                  i,
+                  j);
+        ER_ASSERT(nullptr != cell.cache(),
+                  "Cache at(%u,%u) has too few blocks (%zu < %zu)",
+                  i,
+                  j,
+                  cache->n_blocks(),
+                  base_cache::kMinBlocks);
         /*
          * We can't add the cache unconditionally, because cache host cells and
          * extent cells both refer to the same cache, and doing so will give you
@@ -73,29 +84,35 @@ line_of_sight::const_cache_list line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-__rcsw_pure const cell2D& line_of_sight::cell(size_t i, size_t j) const {
+__rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
   return const_cast<line_of_sight*>(this)->cell(i, j);
 }
 
-__rcsw_pure cell2D& line_of_sight::cell(size_t i, size_t j) {
-  assert(i < m_view.shape()[0]);
-  assert(j < m_view.shape()[1]);
+__rcsw_pure ds::cell2D& line_of_sight::cell(uint i, uint j) {
+  ER_ASSERT(i < m_view.shape()[0],
+            "Out of bounds X access: %u >= %lu",
+            i,
+            m_view.shape()[0]);
+  ER_ASSERT(j < m_view.shape()[1],
+            "Out of bounds Y access: %u >= %lu",
+            j,
+            m_view.shape()[1]);
   return m_view[i][j];
 }
 
-rcppsw::math::dcoord2 line_of_sight::abs_ll(void) const {
+rmath::vector2u line_of_sight::abs_ll(void) const {
   return cell(0, 0).loc();
 } /* abs_ll() */
 
-rcppsw::math::dcoord2 line_of_sight::abs_ul(void) const {
+rmath::vector2u line_of_sight::abs_ul(void) const {
   return cell(0, ysize() - 1).loc();
 } /* abs_ul() */
 
-rcppsw::math::dcoord2 line_of_sight::abs_lr(void) const {
+rmath::vector2u line_of_sight::abs_lr(void) const {
   return cell(xsize() - 1, 0).loc();
 } /* abs_lr() */
 
-rcppsw::math::dcoord2 line_of_sight::abs_ur(void) const {
+rmath::vector2u line_of_sight::abs_ur(void) const {
   return cell(xsize() - 1, ysize() - 1).loc();
 } /* abs_ur() */
 

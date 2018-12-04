@@ -28,7 +28,7 @@
 #include <utility>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/base_sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/kinematics/twist.hpp"
@@ -44,6 +44,7 @@ struct sensing_params;
 } // namespace params
 
 NS_START(controller);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -62,12 +63,12 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
   saa_subsystem(const struct params::actuation_params* aparams,
                 const struct params::sensing_params* sparams,
                 struct actuation_subsystem::actuator_list* actuator_list,
-                struct base_sensing_subsystem::sensor_list* sensor_list);
+                struct sensing_subsystem::sensor_list* sensor_list);
 
   /* BOID interface */
-  argos::CVector2 linear_velocity(void) const override {
-    return argos::CVector2(m_actuation->differential_drive().current_speed(),
-                           m_sensing->heading().Angle());
+  rmath::vector2d linear_velocity(void) const override {
+    return rmath::vector2d(m_actuation->differential_drive().current_speed(),
+                           m_sensing->heading().angle());
   }
   double angular_velocity(void) const override {
     return (m_actuation->differential_drive().right_linspeed() -
@@ -77,11 +78,11 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
   double max_speed(void) const override {
     return m_actuation->differential_drive().max_speed();
   }
-  argos::CVector2 position(void) const override {
+  rmath::vector2d position(void) const override {
     return m_sensing->position();
   }
 
-  void sensing(const std::shared_ptr<base_sensing_subsystem>& sensing) {
+  void sensing(const std::shared_ptr<sensing_subsystem>& sensing) {
     m_sensing = sensing;
   }
 
@@ -94,8 +95,8 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
   steering_force2D& steering_force(void) { return m_steering; }
   const steering_force2D& steering_force(void) const { return m_steering; }
 
-  std::shared_ptr<base_sensing_subsystem> sensing(void) { return m_sensing; }
-  const std::shared_ptr<const base_sensing_subsystem> sensing(void) const {
+  std::shared_ptr<sensing_subsystem> sensing(void) { return m_sensing; }
+  const std::shared_ptr<const sensing_subsystem> sensing(void) const {
     return m_sensing;
   }
 
@@ -109,7 +110,7 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
  private:
   // clang-format off
   std::shared_ptr<controller::actuation_subsystem> m_actuation;
-  std::shared_ptr<base_sensing_subsystem>          m_sensing;
+  std::shared_ptr<sensing_subsystem>               m_sensing;
   steering_force2D                                 m_steering;
   // clang-format on
 };

@@ -36,25 +36,24 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth0 {
-class stateless_foraging_controller;
-class stateful_foraging_controller;
+class crw_controller;
+class stateful_controller;
 } // namespace depth0
 namespace depth1 {
-class foraging_controller;
+class greedy_partitioning_controller;
 }
 namespace depth2 {
-class foraging_controller;
+class greedy_recpart_controller;
 }
 } // namespace controller
 
 namespace fsm {
 namespace depth0 {
-class stateless_foraging_fsm;
-class stateful_foraging_fsm;
+class crw_fsm;
+class stateful_fsm;
+class free_block_to_nest_fsm;
 } // namespace depth0
-namespace depth1 {
 class block_to_goal_fsm;
-}
 } // namespace fsm
 namespace tasks {
 namespace depth0 {
@@ -84,17 +83,18 @@ NS_START(events);
  */
 class block_vanished
     : public rcppsw::er::client<block_vanished>,
-      public visitor::visit_set<controller::depth0::stateless_foraging_controller,
-                                controller::depth0::stateful_foraging_controller,
-                                controller::depth1::foraging_controller,
-                                controller::depth2::foraging_controller,
+      public visitor::visit_set<controller::depth0::crw_controller,
+                                controller::depth0::stateful_controller,
+                                controller::depth1::greedy_partitioning_controller,
+                                controller::depth2::greedy_recpart_controller,
                                 tasks::depth0::generalist,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher,
-                                fsm::depth0::stateless_foraging_fsm,
-                                fsm::depth0::stateful_foraging_fsm,
-                                fsm::depth1::block_to_goal_fsm> {
+                                fsm::depth0::crw_fsm,
+                                fsm::depth0::stateful_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
+                                fsm::block_to_goal_fsm> {
  public:
   explicit block_vanished(uint block_id);
   ~block_vanished(void) override = default;
@@ -103,21 +103,21 @@ class block_vanished
   block_vanished& operator=(const block_vanished& op) = delete;
 
   /* depth0 foraging */
-  void visit(
-      controller::depth0::stateless_foraging_controller& controller) override;
-  void visit(
-      controller::depth0::stateful_foraging_controller& controller) override;
+  void visit(controller::depth0::crw_controller& controller) override;
+  void visit(controller::depth0::stateful_controller& controller) override;
   void visit(tasks::depth0::generalist& task) override;
-  void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
-  void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
+  void visit(fsm::depth0::crw_fsm& fsm) override;
+  void visit(fsm::depth0::stateful_fsm& fsm) override;
 
   /* depth1 foraging */
-  void visit(fsm::depth1::block_to_goal_fsm& fsm) override;
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
+  void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
-  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::foraging_controller& controller) override;
+  void visit(controller::depth2::greedy_recpart_controller& controller) override;
   void visit(tasks::depth2::cache_starter& task) override;
   void visit(tasks::depth2::cache_finisher& task) override;
 

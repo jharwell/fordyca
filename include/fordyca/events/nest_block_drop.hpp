@@ -37,8 +37,9 @@ namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
 namespace depth0 {
-class stateless_foraging_fsm;
-class stateful_foraging_fsm;
+class crw_fsm;
+class stateful_fsm;
+class free_block_to_nest_fsm;
 } // namespace depth0
 namespace depth1 {
 class block_to_cache_fsm;
@@ -47,14 +48,14 @@ class cached_block_to_nest_fsm;
 } // namespace fsm
 namespace controller {
 namespace depth0 {
-class stateless_foraging_controller;
-class stateful_foraging_controller;
+class crw_controller;
+class stateful_controller;
 } // namespace depth0
 namespace depth1 {
-class foraging_controller;
+class greedy_partitioning_controller;
 }
 namespace depth2 {
-class foraging_controller;
+class greedy_recpart_controller;
 }
 } // namespace controller
 
@@ -82,12 +83,13 @@ class nest_block_drop
     : public visitor::visitor,
       public block_drop_event,
       public rcppsw::er::client<nest_block_drop>,
-      public visitor::visit_set<controller::depth0::stateful_foraging_controller,
-                                controller::depth0::stateless_foraging_controller,
-                                controller::depth1::foraging_controller,
-                                controller::depth2::foraging_controller,
-                                fsm::depth0::stateless_foraging_fsm,
-                                fsm::depth0::stateful_foraging_fsm,
+      public visitor::visit_set<controller::depth0::stateful_controller,
+                                controller::depth0::crw_controller,
+                                controller::depth1::greedy_partitioning_controller,
+                                controller::depth2::greedy_recpart_controller,
+                                fsm::depth0::crw_fsm,
+                                fsm::depth0::stateful_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm,
                                 tasks::depth0::generalist,
                                 tasks::depth1::collector> {
@@ -100,25 +102,25 @@ class nest_block_drop
   nest_block_drop& operator=(const nest_block_drop& op) = delete;
 
   /* stateless foraging */
-  void visit(representation::arena_map& map) override;
+  void visit(ds::arena_map& map) override;
   void visit(representation::base_block& block) override;
-  void visit(fsm::depth0::stateless_foraging_fsm& fsm) override;
-  void visit(
-      controller::depth0::stateless_foraging_controller& controller) override;
+  void visit(fsm::depth0::crw_fsm& fsm) override;
+  void visit(controller::depth0::crw_controller& controller) override;
 
   /* stateful foraging */
-  void visit(
-      controller::depth0::stateful_foraging_controller& controller) override;
-  void visit(fsm::depth0::stateful_foraging_fsm& fsm) override;
+  void visit(controller::depth0::stateful_controller& controller) override;
+  void visit(fsm::depth0::stateful_fsm& fsm) override;
   void visit(tasks::depth0::generalist& task) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::foraging_controller& controller) override;
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
+  void visit(
+      controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::foraging_controller&) override {}
+  void visit(controller::depth2::greedy_recpart_controller&) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.
@@ -131,7 +133,7 @@ class nest_block_drop
   // clang-format off
   uint                                        m_timestep;
   std::shared_ptr<representation::base_block> m_block;
-  //clang-format on
+  // clang-format on
 };
 
 NS_END(events, fordyca);

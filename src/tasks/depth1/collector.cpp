@@ -22,9 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/collector.hpp"
-#include "rcppsw/task_allocation/task_params.hpp"
 
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -41,9 +40,15 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-collector::collector(const struct ta::task_params* const params,
+collector::collector(const struct ta::task_allocation_params* const params,
                      std::unique_ptr<ta::taskable> mechanism)
-    : foraging_task(kCollectorName, params, std::move(mechanism)) {}
+    : collector{params, kCollectorName, std::move(mechanism)} {}
+
+collector::collector(const struct ta::task_allocation_params* const params,
+                     const std::string& name,
+                     std::unique_ptr<ta::taskable> mechanism)
+    : foraging_task(name, params, std::move(mechanism)),
+      ER_CLIENT_INIT("fordyca.tasks.depth1.collector") {}
 
 /*******************************************************************************
  * Member Functions
@@ -51,37 +56,48 @@ collector::collector(const struct ta::task_params* const params,
 void collector::task_start(const ta::taskable_argument* const) {
   foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
   ta::polled_task::mechanism()->task_start(&a);
-  interface_complete(false);
 } /* task_start() */
 
-double collector::calc_abort_prob(void) {
+__rcsw_pure double collector::abort_prob_calc(void) {
   /*
    * Collectors always have a small chance of aborting their task when not at a
    * task interface. Not strictly necessary at least for now, but it IS
    * necessary for foragers and so it seems like a good idea to add this to all
    * tasks.
    */
-  auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (transport_goal_type::kNest == fsm->block_transport_goal()) {
-    return 0.0;
+  if (-1 == active_interface()) {
+    return ta::abort_probability::kMIN_ABORT_PROB;
+  } else {
+    return executable_task::abort_prob();
   }
-  return abort_prob().calc(executable_task::interface_time(),
-                           executable_task::interface_estimate());
-} /* calc_abort_prob() */
+} /* abort_prob_calc() */
 
-double collector::calc_interface_time(double start_time) {
+double collector::interface_time_calc(uint interface, double start_time) {
+  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
+  return current_time() - start_time;
+} /* interface_time_calc() */
+
+void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (transport_goal_type::kNest == fsm->block_transport_goal() &&
-      !interface_complete()) {
-    interface_complete(true);
-    reset_interface_time();
+  if (acquisition_goal_type::kExistingCache != fsm->acquisition_goal()) {
+    return;
   }
 
-  if (!(transport_goal_type::kNest == fsm->block_transport_goal())) {
-    return current_time() - start_time;
+  if (!fsm->goal_acquired()) {
+    if (!interface_in_prog(0)) {
+      interface_enter(0);
+      interface_time_mark_start(0);
+      ER_TRACE("Interface start at timestep %f", current_time());
+    }
+  } else if (fsm->goal_acquired()) {
+    if (interface_in_prog(0)) {
+      interface_exit(0);
+      interface_time_mark_finish(0);
+      ER_TRACE("Interface finished at timestep %f", current_time());
+      ER_DEBUG("Interface time: %f", interface_time(0));
+    }
   }
-  return 0.0;
-} /* calc_interface_time() */
+} /* active_interface_update() */
 
 /*******************************************************************************
  * Event Handling
@@ -99,34 +115,34 @@ void collector::accept(events::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        collector,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        collector,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         collector,
+                         is_exploring_for_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         collector,
+                         is_vectoring_to_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        collector,
-                        goal_acquired,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         collector,
+                         goal_acquired,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        collector,
-                        acquisition_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         collector,
+                         acquisition_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        collector,
-                        block_transport_goal,
-                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         collector,
+                         block_transport_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

@@ -22,27 +22,27 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_cache_extent.hpp"
-#include "fordyca/representation/arena_map.hpp"
-#include "fordyca/representation/cell2D.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-using representation::arena_grid;
+using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cell_cache_extent::cell_cache_extent(
-    const rcppsw::math::dcoord2& coord,
+    const rmath::vector2u& coord,
     std::shared_ptr<representation::base_cache> cache)
-    : cell_op(coord.first, coord.second), m_cache(cache) {}
+    : cell_op(coord), m_cache(cache) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell_cache_extent::visit(representation::cell2D& cell) {
+void cell_cache_extent::visit(ds::cell2D& cell) {
   cell.entity(m_cache);
   cell.fsm().accept(*this);
 } /* visit() */
@@ -51,8 +51,8 @@ void cell_cache_extent::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_cache_extent();
 } /* visit() */
 
-void cell_cache_extent::visit(representation::arena_map& map) {
-  map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
+void cell_cache_extent::visit(ds::arena_map& map) {
+  map.access<arena_grid::kCell>(cell_op::coord()).accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

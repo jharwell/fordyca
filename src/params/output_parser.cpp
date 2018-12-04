@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/output_parser.hpp"
-
-#include <argos3/core/utility/configuration/argos_configuration.h>
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -53,14 +51,14 @@ void output_parser::parse(const ticpp::Element& node) {
   }
 
   ticpp::Element snode = get_node(onode, "sim");
-  XML_PARSE_PARAM(snode, m_params, output_root);
-  XML_PARSE_PARAM(snode, m_params, output_dir);
+  XML_PARSE_ATTR(snode, m_params, output_root);
+  XML_PARSE_ATTR(snode, m_params, output_dir);
 } /* parse() */
 
 void output_parser::show(std::ostream& stream) const {
   stream << build_header() << m_metrics_parser
-         << XML_PARAM_STR(m_params, output_root) << std::endl
-         << XML_PARAM_STR(m_params, output_dir) << std::endl
+         << XML_ATTR_STR(m_params, output_root) << std::endl
+         << XML_ATTR_STR(m_params, output_dir) << std::endl
          << build_footer();
 } /* show() */
 

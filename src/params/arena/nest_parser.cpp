@@ -48,7 +48,7 @@ void nest_parser::parse(const ticpp::Element& node) {
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_params->center =
-      argos::CVector2(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
+      rmath::vector2d(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
   res = parser.parse(nnode.GetAttribute("size"));
   m_params->dims.x(std::atof(res[0].c_str()));
   m_params->dims.y(std::atof(res[1].c_str()));
@@ -61,8 +61,8 @@ void nest_parser::show(std::ostream& stream) const {
 } /* show() */
 
 __rcsw_pure bool nest_parser::validate(void) const {
-  CHECK(m_params->center.GetX() > 0);
-  CHECK(m_params->center.GetY() > 0);
+  CHECK(m_params->center.x() > 0);
+  CHECK(m_params->center.y() > 0);
   CHECK(m_params->dims.x() > 0);
   CHECK(m_params->dims.y() > 0);
   return true;

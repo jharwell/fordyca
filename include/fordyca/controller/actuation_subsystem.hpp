@@ -68,7 +68,6 @@ class actuation_subsystem {
    *
    * @param c_params Subsystem parameters.
    * @param list List of handles to actuator devices.
-   * @param steering Handle for steering force calculator.
    */
   actuation_subsystem(const struct params::actuation_params* c_params,
                       struct actuator_list* list);

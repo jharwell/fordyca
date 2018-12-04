@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,21 +32,24 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_cache_site_fsm::block_to_cache_site_fsm(
-    const controller::block_selection_matrix* bsel_matrix,
-    const controller::cache_selection_matrix* csel_matrix,
+    const controller::block_sel_matrix* bsel_matrix,
+    const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
-    representation::perceived_arena_map* const map)
-    : block_to_goal_fsm(bsel_matrix, saa, map),
-      m_cache_fsm(csel_matrix, saa, map) {}
+    ds::perceived_arena_map* const map)
+    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
+      m_cache_fsm(csel_matrix, saa, map),
+      m_block_fsm(bsel_matrix, saa, map) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
 acquisition_goal_type block_to_cache_site_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_FREE_BLOCK == current_state()) {
-    return block_fsm().acquisition_goal();
-  } else if (ST_TRANSPORT_TO_GOAL == current_state()) {
-    return m_cache_fsm.acquisition_goal();
+  if (ST_ACQUIRE_BLOCK == current_state() ||
+      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+    return acquisition_goal_type::kBlock;
+  } else if (ST_TRANSPORT_TO_GOAL == current_state() ||
+             ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return acquisition_goal_type::kCacheSite;
   }
   return acquisition_goal_type::kNone;
 } /* acquisition_goal() */
