@@ -28,8 +28,8 @@
 
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/cache_op_src.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,12 +75,10 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
   };
 
   explicit cache_op_filter(ds::arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.cache_op_filter"),
-        m_map(map) {}
+      : ER_CLIENT_INIT("fordyca.support.cache_op_filter"), m_map(map) {}
 
   ~cache_op_filter(void) override = default;
-  cache_op_filter& operator=(const cache_op_filter& other) =
-      delete;
+  cache_op_filter& operator=(const cache_op_filter& other) = delete;
   cache_op_filter(const cache_op_filter& other) = delete;
 
   /**
@@ -90,8 +88,7 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
    * @return (\c TRUE, status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_res_t operator()(T& controller,
-                           cache_op_src src) {
+  filter_res_t operator()(T& controller, cache_op_src src) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a cache but is still
@@ -100,7 +97,7 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
     switch (src) {
       case kSrcExistingCacheDrop:
       case kSrcExistingCachePickup:
-      return do_filter(controller);
+        return do_filter(controller);
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
     } /* switch() */
@@ -117,10 +114,10 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
    */
   filter_res_t do_filter(const T& controller) const {
     int cache_id = loop_utils::robot_on_cache(controller, *m_map);
-    bool ready =  (controller.goal_acquired() &&
-                   acquisition_goal_type::kExistingCache ==
-                   controller.acquisition_goal() &&
-                   -1 != cache_id);
+    bool ready = (controller.goal_acquired() &&
+                  acquisition_goal_type::kExistingCache ==
+                      controller.acquisition_goal() &&
+                  -1 != cache_id);
     if (ready) {
       return filter_res_t{false, kStatusOK};
     }

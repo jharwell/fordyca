@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 #include "rcppsw/common/common.hpp"
-#include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces

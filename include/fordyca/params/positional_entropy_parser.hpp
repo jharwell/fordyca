@@ -1,7 +1,7 @@
 /**
- * @file sensing_parser.hpp
+ * @file positional_entropy_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,16 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_SENSING_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_SENSING_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/proximity_sensor_parser.hpp"
-#include "fordyca/params/sensing_params.hpp"
+#include "fordyca/params/positional_entropy_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
@@ -40,31 +39,28 @@ NS_START(fordyca, params);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class sensing_parser
+ * @class positional_entropy_parser
  * @ingroup params
  *
- * @brief Parses XML parameters relating to sensings into \ref sensing_params.
+ * @brief Parses XML parameters related the calculation of swarm positional
+ * entropy into \ref positional_entropy_params.
  */
-class sensing_parser : public rcppsw::params::xml_param_parser {
+class positional_entropy_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit sensing_parser(uint level)
-      : xml_param_parser(level), m_proximity_parser(level + 1) {}
-
-  ~sensing_parser(void) override = default;
+  explicit positional_entropy_parser(uint level) : xml_param_parser(level) {}
 
   /**
-   * @brief The root tag that all robot sensing parameters should lie under in
-   * the XML tree.
+   * @brief The root tag that all loop functions relating to positional_entropy
+   * parameters should lie under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "sensing";
+  static constexpr char kXMLRoot[] = "positional_entropy";
 
   void show(std::ostream& stream) const override;
-  bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
 
-  std::shared_ptr<sensing_params> parse_results(void) const { return m_params; }
+  std::shared_ptr<positional_entropy_params> parse_results(void) const { return m_params; }
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
@@ -73,11 +69,10 @@ class sensing_parser : public rcppsw::params::xml_param_parser {
   }
 
   // clang-format off
-  std::shared_ptr<sensing_params> m_params{nullptr};
-  proximity_sensor_parser         m_proximity_parser;
+  std::shared_ptr<positional_entropy_params> m_params{nullptr};
   // clang-format on
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_SENSING_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARSER_HPP_ */

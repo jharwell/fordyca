@@ -43,8 +43,7 @@ location_metrics_collector::location_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string location_metrics_collector::csv_header_build(
-    const std::string&) {
+std::string location_metrics_collector::csv_header_build(const std::string&) {
   std::string line;
   for (size_t j = 0; j < m_stats.ysize(); ++j) {
     line += "y" + std::to_string(j) + separator();
@@ -79,8 +78,7 @@ void location_metrics_collector::collect(
   auto& m = dynamic_cast<const location_metrics&>(metrics);
 
   ++m_total;
-  ++m_stats.access(m.location().x(),
-                   m.location().y());
+  ++m_stats.access(m.location().x(), m.location().y());
 } /* collect() */
 
 NS_END(caches, metrics, fordyca);

@@ -61,11 +61,9 @@ bool random_distributor::distribute_blocks(ds::block_vector& blocks,
           loc.y(),
           loc.y() + m_grid.shape()[1]);
 
-  return std::all_of(blocks.begin(),
-                     blocks.end(),
-                     [&](auto& b) {
-                       return distribute_block(b, entities);
-                     });
+  return std::all_of(blocks.begin(), blocks.end(), [&](auto& b) {
+    return distribute_block(b, entities);
+  });
 } /* distribute_blocks() */
 
 bool random_distributor::distribute_block(
@@ -134,18 +132,17 @@ __rcsw_pure bool random_distributor::verify_block_dist(
            cell->loc().to_str().c_str());
 
   /* no entity should overlap with the block after distribution */
-  for (auto &e : entities) {
+  for (auto& e : entities) {
     if (e == block) {
       continue;
     }
-    auto status = loop_utils::placement_conflict(block->real_loc(),
-                                                 block->dims(),
-                                                 e);
+    auto status =
+        loop_utils::placement_conflict(block->real_loc(), block->dims(), e);
     ER_ASSERT(!(status.x_conflict && status.y_conflict),
-            "Entity contains block%d@%s/%s after distribution",
-            block->id(),
-            block->real_loc().to_str().c_str(),
-            block->real_loc().to_str().c_str());
+              "Entity contains block%d@%s/%s after distribution",
+              block->id(),
+              block->real_loc().to_str().c_str(),
+              block->real_loc().to_str().c_str());
   } /* for(&e..) */
   return true;
 
@@ -153,9 +150,9 @@ error:
   return false;
 } /* verify_block_dist() */
 
-random_distributor::coord_search_res_t
-random_distributor::avail_coord_search(const ds::const_entity_list& entities,
-                                       const rmath::vector2d& block_dim) {
+random_distributor::coord_search_res_t random_distributor::avail_coord_search(
+    const ds::const_entity_list& entities,
+    const rmath::vector2d& block_dim) {
   rmath::vector2u rel;
   rmath::vector2u abs;
   rcppsw::math::rangeu area_xrange(m_grid.index_bases()[0], m_grid.shape()[0]);
@@ -180,11 +177,9 @@ random_distributor::avail_coord_search(const ds::const_entity_list& entities,
     rel = {x, y};
     abs = {rel.x() + loc.x(), rel.y() + loc.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
-        rmath::vector2d abs_r = rmath::uvec2dvec(abs, m_resolution);
-        auto status = loop_utils::placement_conflict(abs_r,
-                                                     block_dim, ent);
-        return status.x_conflict && status.y_conflict &&
-            count++ <= kMAX_DIST_TRIES;
+    rmath::vector2d abs_r = rmath::uvec2dvec(abs, m_resolution);
+    auto status = loop_utils::placement_conflict(abs_r, block_dim, ent);
+    return status.x_conflict && status.y_conflict && count++ <= kMAX_DIST_TRIES;
   }));
   if (count <= kMAX_DIST_TRIES) {
     return {true, rel, abs};

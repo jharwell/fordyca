@@ -1,7 +1,7 @@
 /**
- * @file sensing_parser.cpp
+ * @file positional_entropy_params.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,10 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/sensing_parser.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -29,35 +32,17 @@
 NS_START(fordyca, params);
 
 /*******************************************************************************
- * Global Variables
+ * Structure Definitions
  ******************************************************************************/
-constexpr char sensing_parser::kXMLRoot[];
-
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void sensing_parser::parse(const ticpp::Element& node) {
-  ticpp::Element snode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_ATTR(snode, m_params, los_dim);
-  m_proximity_parser.parse(snode);
-  m_params->proximity = *m_proximity_parser.parse_results();
-} /* parse() */
-
-void sensing_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, los_dim) << std::endl
-         << m_proximity_parser << build_footer();
-} /* show() */
-
-__rcsw_pure bool sensing_parser::validate(void) const {
-  CHECK(m_params->los_dim > 0.0);
-  CHECK(m_proximity_parser.validate());
-  return true;
-
-error:
-  return false;
-} /* validate() */
+/**
+ * @struct positional_entropy_params
+ * @ingroup params
+ */
+struct positional_entropy_params : public rcppsw::params::base_params {
+  bool enable{false};
+  uint n_iterations{0};
+};
 
 NS_END(params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARAMS_HPP_ */

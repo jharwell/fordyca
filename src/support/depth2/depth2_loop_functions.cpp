@@ -29,12 +29,12 @@
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
+#include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "fordyca/support/block_dist/base_distributor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -106,9 +106,8 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* send the robot its view of the world: what it sees and where it is */
   loop_utils::set_robot_pos<decltype(controller)>(robot);
-  ER_ASSERT(std::fmod(controller.los_dim(),
-                      arena_map()->grid_resolution())<=
-                      std::numeric_limits<double>::epsilon(),
+  ER_ASSERT(std::fmod(controller.los_dim(), arena_map()->grid_resolution()) <=
+                std::numeric_limits<double>::epsilon(),
             "LOS dimension (%f) not an even multiple of grid resolution (%f)",
             controller.los_dim(),
             arena_map()->grid_resolution());
@@ -120,8 +119,8 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = rmath::dvec2uvec(controller.position(),
-                                arena_map()->grid_resolution());
+  auto coord =
+      rmath::dvec2uvec(controller.position(), arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /*

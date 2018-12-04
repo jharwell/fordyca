@@ -77,17 +77,14 @@ ds::cache_vector dynamic_cache_creator::create_all(
      * included in a new cache, so attempt cache creation.
      */
     if (cache_i_blocks.size() >= m_min_blocks) {
-      ds::cache_vector c_avoid = avoidance_caches_calc(previous_caches,
-                                                       created_caches);
+      ds::cache_vector c_avoid =
+          avoidance_caches_calc(previous_caches, created_caches);
 
-      ds::block_list b_avoid = avoidance_blocks_calc(candidate_blocks,
-                                                     used_blocks,
-                                                     cache_i_blocks);
+      ds::block_list b_avoid =
+          avoidance_blocks_calc(candidate_blocks, used_blocks, cache_i_blocks);
 
-      rmath::vector2i center = calc_center(cache_i_blocks,
-                                           b_avoid,
-                                           c_avoid,
-                                           cache_dim);
+      rmath::vector2i center =
+          calc_center(cache_i_blocks, b_avoid, c_avoid, cache_dim);
 
       /*
        * We convert to discrete and then back to real coordinates so that our
@@ -109,9 +106,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  ds::block_list free_blocks = avoidance_blocks_calc(candidate_blocks,
-                                                     used_blocks,
-                                                     ds::block_list());
+  ds::block_list free_blocks =
+      avoidance_blocks_calc(candidate_blocks, used_blocks, ds::block_list());
 
   ER_ASSERT(creation_sanity_checks(created_caches, free_blocks),
             "One or more bad caches on creation");
@@ -131,17 +127,16 @@ ds::block_list dynamic_cache_creator::avoidance_blocks_calc(
     const ds::block_list& used_blocks,
     const ds::block_list& cache_i_blocks) const {
   ds::block_list avoidance_blocks;
-  std::copy_if(candidate_blocks.begin(),
-               candidate_blocks.end(),
-               std::back_inserter(avoidance_blocks),
-               [&] (const auto&b) {
-                 return used_blocks.end() == std::find(used_blocks.begin(),
-                                                       used_blocks.end(),
-                                                       b) &&
-                     cache_i_blocks.end() == std::find(cache_i_blocks.begin(),
-                                                       cache_i_blocks.end(),
-                                                       b);
-               });
+  std::copy_if(
+      candidate_blocks.begin(),
+      candidate_blocks.end(),
+      std::back_inserter(avoidance_blocks),
+      [&](const auto& b) {
+        return used_blocks.end() ==
+                   std::find(used_blocks.begin(), used_blocks.end(), b) &&
+               cache_i_blocks.end() ==
+                   std::find(cache_i_blocks.begin(), cache_i_blocks.end(), b);
+      });
   return avoidance_blocks;
 } /* avoidance_blocks_calc() */
 
@@ -154,9 +149,8 @@ ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
   /*
    * Block already in a new cache, so bail out.
    */
-  if (std::find(used_blocks.begin(),
-                used_blocks.end(),
-                candidates[index]) != used_blocks.end()) {
+  if (std::find(used_blocks.begin(), used_blocks.end(), candidates[index]) !=
+      used_blocks.end()) {
     return src_blocks;
   }
   /*
@@ -174,8 +168,8 @@ ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
      */
-    if ((candidates[index]->real_loc() - candidates[i]->real_loc())
-            .length() <= m_min_dist) {
+    if ((candidates[index]->real_loc() - candidates[i]->real_loc()).length() <=
+        m_min_dist) {
       ER_ASSERT(std::find(src_blocks.begin(), src_blocks.end(), candidates[i]) ==
                     src_blocks.end(),
                 "Block%d already on src list",
@@ -250,13 +244,13 @@ rmath::vector2i dynamic_cache_creator::calc_center(
       }
     } /* for(j..) */
 
-    for (auto &b : nc_blocks) {
+    for (auto& b : nc_blocks) {
       deconflict_res_t r = deconflict_loc_boundaries(cache_dim, center);
       if (r.status) {
         conflict = true;
         center = r.loc;
       }
-      r = deconflict_loc_entity(b.get(),b->real_loc(), center);
+      r = deconflict_loc_entity(b.get(), b->real_loc(), center);
       if (r.status) {
         conflict = true;
         center = r.loc;

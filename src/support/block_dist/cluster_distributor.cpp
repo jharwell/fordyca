@@ -62,9 +62,10 @@ bool cluster_distributor::distribute_block(
 bool cluster_distributor::distribute_blocks(ds::block_vector& blocks,
                                             ds::const_entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
-    ER_DEBUG("Could not distribute any of %zu blocks: Cluster capacity (%u) reached",
-             blocks.size(),
-             m_clust.capacity());
+    ER_DEBUG(
+        "Could not distribute any of %zu blocks: Cluster capacity (%u) reached",
+        blocks.size(),
+        m_clust.capacity());
     return false;
   }
   return m_dist.distribute_blocks(blocks, entities);

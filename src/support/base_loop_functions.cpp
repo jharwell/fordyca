@@ -27,12 +27,12 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/params/output_params.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
+#include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 
-#include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "fordyca/ds/arena_map.hpp"
+#include "rcppsw/algorithm/closest_pair2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,8 +45,7 @@ namespace rmath = rcppsw::math;
  * Constructors/Destructors
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.base"),
-      m_arena_map(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.base"), m_arena_map(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
@@ -118,12 +117,15 @@ void base_loop_functions::arena_map_init(
   }
 } /* arena_map_init() */
 
-void base_loop_functions::PreStep(void) { nearest_neighbors(); } /* PreStep() */
+void base_loop_functions::PreStep(void) {
+  robot_nearest_neighbors();
+} /* PreStep() */
+
 void base_loop_functions::Reset(void) {
   m_arena_map->distribute_all_blocks();
 } /* Reset() */
 
-std::vector<double> base_loop_functions::nearest_neighbors(void) const {
+std::vector<double> base_loop_functions::robot_nearest_neighbors(void) const {
   std::vector<rmath::vector2d> v;
   auto& robots =
       const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
@@ -171,5 +173,35 @@ std::vector<double> base_loop_functions::nearest_neighbors(void) const {
 
   return res;
 } /* nearest_neighbors() */
+
+std::vector<rmath::radians> base_loop_functions::robot_headings(void) const {
+  std::vector<rmath::radians> v;
+  auto& robots =
+      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
+          "foot-bot");
+
+  for (auto& entity_pair : robots) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto& controller = dynamic_cast<controller::base_controller&>(
+        robot->GetControllableEntity().GetController());
+    v.push_back(controller.heading().angle());
+  } /* for(&entity..) */
+  return v;
+} /* robot_headings() */
+
+std::vector<rmath::vector2d> base_loop_functions::robot_positions(void) const {
+  std::vector<rmath::vector2d> v;
+  auto& robots =
+      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
+          "foot-bot");
+
+  for (auto& entity_pair : robots) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto& controller = dynamic_cast<controller::base_controller&>(
+        robot->GetControllableEntity().GetController());
+    v.push_back(controller.position());
+  } /* for(&entity..) */
+  return v;
+} /* robot_headings() */
 
 NS_END(support, fordyca);

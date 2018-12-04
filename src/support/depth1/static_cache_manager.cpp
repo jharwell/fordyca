@@ -60,8 +60,8 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
    *
    * are eligible for being used to re-create the static cache.
    */
-  rmath::vector2u dcenter = rmath::dvec2uvec(mc_cache_loc,
-                                             arena_grid()->resolution());
+  rmath::vector2u dcenter =
+      rmath::dvec2uvec(mc_cache_loc, arena_grid()->resolution());
   ds::block_vector to_use;
   for (auto& b : blocks) {
     if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
@@ -174,10 +174,10 @@ base_cache_manager::creation_res_t static_cache_manager::create(
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
         events::cell_empty empty(b->discrete_loc());
         arena_grid()->access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
-        events::free_block_drop op(
-            b,
-            rmath::dvec2uvec(c->real_loc(), arena_grid()->resolution()),
-            arena_grid()->resolution());
+        events::free_block_drop op(b,
+                                   rmath::dvec2uvec(c->real_loc(),
+                                                    arena_grid()->resolution()),
+                                   arena_grid()->resolution());
         arena_grid()->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());
@@ -190,7 +190,7 @@ base_cache_manager::creation_res_t static_cache_manager::create(
    * have a block as its entity!
    */
   creator.update_host_cells(created);
-return creation_res_t{true, created};
+  return creation_res_t{true, created};
 } /* create() */
 
 NS_END(depth1, support, fordyca);

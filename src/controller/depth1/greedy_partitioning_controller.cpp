@@ -28,9 +28,9 @@
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/cache_sel_matrix_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
@@ -117,10 +117,6 @@ void greedy_partitioning_controller::non_unique_init(
   perception(rcppsw::make_unique<perception_subsystem>(
       param_repo->parse_results<params::perception_params>(), GetId()));
 
-  /*
-   * Initialize tasking by overriding stateful controller executive via
-   * strategy pattern.
-   */
   auto* cache_mat = param_repo->parse_results<params::cache_sel_matrix_params>();
   auto* block_mat = param_repo->parse_results<params::block_sel_matrix_params>();
   m_cache_sel_matrix =

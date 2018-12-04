@@ -25,14 +25,14 @@
 #include <vector>
 
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
+#include "fordyca/metrics/caches/location_metrics.hpp"
+#include "fordyca/metrics/caches/location_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/params/metrics_params.hpp"
-#include "fordyca/metrics/caches/location_metrics.hpp"
-#include "fordyca/metrics/caches/location_metrics_collector.hpp"
 
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
@@ -106,8 +106,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       "caches::locations",
       metrics_path() + "/" + params->cache_locations_fname,
       params->collect_interval,
-      rmath::dvec2uvec(params->arena_grid.upper,
-                       params->arena_grid.resolution));
+      rmath::dvec2uvec(params->arena_grid.upper, params->arena_grid.resolution));
   reset_all();
 }
 

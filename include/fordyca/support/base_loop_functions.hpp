@@ -29,9 +29,9 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/metrics/robot_interaction_metrics.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,9 +41,14 @@ NS_START(fordyca);
 namespace params {
 struct output_params;
 }
-namespace ds { class arena_map; }
+namespace ds {
+class arena_map;
+}
 
 NS_START(support);
+
+namespace rmetrics = rcppsw::metrics;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Classes
@@ -61,7 +66,7 @@ NS_START(support);
  * the \ref argos::CLoopFunctions class.
  */
 class base_loop_functions : public argos::CLoopFunctions,
-                            public metrics::robot_interaction_metrics,
+                            public rmetrics::swarm::convergence_metrics,
                             public rcppsw::er::client<base_loop_functions> {
  public:
   base_loop_functions(void);
@@ -73,8 +78,10 @@ class base_loop_functions : public argos::CLoopFunctions,
   void PreStep(void) override;
   void Reset(void) override;
 
-  /* loop metrics */
-  std::vector<double> nearest_neighbors(void) const override;
+  /* convergence metrics */
+  std::vector<double> robot_nearest_neighbors(void) const override;
+  std::vector<rmath::radians> robot_headings(void) const override;
+  std::vector<rmath::vector2d> robot_positions(void) const override;
 
   void ndc_push(void) {
     ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");

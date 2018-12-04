@@ -49,8 +49,7 @@ class immovable_cell_entity {
    * @brief Initialize a immovable entity with an initial location in the arena.
    */
   immovable_cell_entity(const rmath::vector2d& loc, double resolution)
-      : m_real_loc(loc),
-        m_discrete_loc(rmath::dvec2uvec(loc, resolution)) {}
+      : m_real_loc(loc), m_discrete_loc(rmath::dvec2uvec(loc, resolution)) {}
 
   virtual ~immovable_cell_entity(void) = default;
 

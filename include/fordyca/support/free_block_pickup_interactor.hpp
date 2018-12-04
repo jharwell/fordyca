@@ -76,7 +76,7 @@ class free_block_pickup_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep The current timestep.
    */
-  template<typename C = T>
+  template <typename C = T>
   void operator()(C& controller, uint timestep) {
     if (m_penalty_handler.is_serving_penalty(controller)) {
       if (m_penalty_handler.penalty_satisfied(controller, timestep)) {

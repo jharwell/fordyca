@@ -34,18 +34,19 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
-#include "fordyca/metrics/robot_interaction_metrics.hpp"
-#include "fordyca/metrics/robot_interaction_metrics_collector.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
+#include "rcppsw/metrics/swarm/convergence_metrics.hpp"
+#include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace fs = std::experimental::filesystem;
 NS_START(fordyca, metrics);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -85,16 +86,21 @@ base_metrics_aggregator::base_metrics_aggregator(
       "blocks::manipulation",
       metrics_path() + "/" + params->block_manipulation_fname,
       params->collect_interval);
+
   register_collector<metrics::robot_occupancy_metrics_collector>(
       "arena::robot_occupancy",
       metrics_path() + "/" + params->arena_robot_occupancy_fname,
       params->collect_interval,
-      rmath::dvec2uvec(params->arena_grid.upper,
-                       params->arena_grid.resolution));
-  register_collector<metrics::robot_interaction_metrics_collector>(
-      "loop::robot_interaction",
-      metrics_path() + "/" + params->loop_robot_interaction_fname,
-      params->collect_interval);
+      rmath::dvec2uvec(params->arena_grid.upper, params->arena_grid.resolution));
+
+  double max_dist = (params->arena_grid.lower - params->arena_grid.upper).length();
+  register_collector<rmetrics::swarm::convergence_metrics_collector>(
+      "swarm::convergence",
+      metrics_path() + "/" + params->swarm_convergence_fname,
+      params->collect_interval,
+      params->pos_entropy.enable,
+      rmath::ranged(0.0, max_dist),
+      max_dist / params->pos_entropy.n_iterations);
   reset_all();
 }
 
@@ -103,7 +109,7 @@ base_metrics_aggregator::base_metrics_aggregator(
  ******************************************************************************/
 void base_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
-  collect("loop::robot_interaction", *loop);
+  collect("swarm::convergence", *loop);
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(
@@ -111,7 +117,8 @@ void base_metrics_aggregator::collect_from_block(
   collect("blocks::transport", *block);
 } /* collect_from_block() */
 
-void base_metrics_aggregator::collect_from_arena(const ds::arena_map* const arena) {
+void base_metrics_aggregator::collect_from_arena(
+    const ds::arena_map* const arena) {
   collect("arena::robot_occupancy", *arena);
 } /* collect_from_arena() */
 

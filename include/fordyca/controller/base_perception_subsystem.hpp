@@ -30,9 +30,9 @@
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/perception_params.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -28,8 +28,8 @@
 
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/block_op_src.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,12 +79,10 @@ class block_op_filter : public er::client<block_op_filter<T>> {
   };
 
   explicit block_op_filter(ds::arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.block_op_filter"),
-        m_map(map) {}
+      : ER_CLIENT_INIT("fordyca.support.block_op_filter"), m_map(map) {}
 
   ~block_op_filter(void) override = default;
-  block_op_filter& operator=(const block_op_filter& other) =
-      delete;
+  block_op_filter& operator=(const block_op_filter& other) = delete;
   block_op_filter(const block_op_filter& other) = delete;
 
   /**
@@ -95,9 +93,9 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * and the reason why. (\c FALSE, -1) otherwise.
    */
   filter_res_t operator()(T& controller,
-                           block_op_src src,
-                           double cache_prox_dist,
-                           double block_prox_dist) {
+                          block_op_src src,
+                          double cache_prox_dist,
+                          double block_prox_dist) {
     /*
      * If the robot has not acquired a block, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a block but is still
@@ -162,7 +160,7 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * and the reason why. (\c FALSE, -1) otherwise.
    */
   filter_res_t cache_site_drop_filter(const T& controller,
-                                            double block_prox_dist) const {
+                                      double block_prox_dist) const {
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kCacheSite == controller.acquisition_goal() &&
           transport_goal_type::kCacheSite == controller.block_transport_goal())) {
@@ -187,7 +185,7 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    * and the reason why. (\c FALSE, -1) otherwise.
    */
   filter_res_t new_cache_drop_filter(const T& controller,
-                                           double cache_prox_dist) const {
+                                     double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kNewCache == controller.acquisition_goal() &&
           transport_goal_type::kNewCache == controller.block_transport_goal())) {

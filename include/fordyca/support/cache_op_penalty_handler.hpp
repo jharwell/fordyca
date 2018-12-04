@@ -28,9 +28,9 @@
 
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/support/temporal_penalty_handler.hpp"
-#include "fordyca/support/cache_op_src.hpp"
 #include "fordyca/support/cache_op_filter.hpp"
+#include "fordyca/support/cache_op_src.hpp"
+#include "fordyca/support/temporal_penalty_handler.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -98,8 +98,7 @@ class cache_op_penalty_handler
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
      */
-    auto filter = cache_op_filter<T>(m_map)(controller,
-                                            src);
+    auto filter = cache_op_filter<T>(m_map)(controller, src);
     if (filter.status) {
       return filter.reason;
     }

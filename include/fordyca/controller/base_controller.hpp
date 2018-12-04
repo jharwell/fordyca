@@ -149,7 +149,8 @@ class base_controller : public argos::CCI_Controller,
    * the loop functions.
    */
   void position(const rmath::vector2d& loc);
-  rmath::vector2d position(void) const;
+  const rmath::vector2d& position(void) const;
+  rmath::vector2d heading(void) const;
 
   /**
    * @brief Convenience function to add footbot ID to salient messages during
@@ -167,7 +168,6 @@ class base_controller : public argos::CCI_Controller,
    * @brief Remove the last NDC.
    */
   void ndc_pop(void) { ER_NDC_POP(); }
-
 
  protected:
   class saa_subsystem* saa_subsystem(void) {

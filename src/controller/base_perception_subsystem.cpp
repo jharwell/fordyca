@@ -208,7 +208,8 @@ void base_perception_subsystem::update_cell_stats(
   }   /* for(i..) */
 } /* update_cell_stats() */
 
-void base_perception_subsystem::los(std::unique_ptr<representation::line_of_sight>& los) {
+void base_perception_subsystem::los(
+    std::unique_ptr<representation::line_of_sight>& los) {
   m_los = std::move(los);
 } /* los() */
 

@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <vector>
 
+#include "fordyca/ds/block_vector.hpp"
 #include "fordyca/params/arena/block_manifest.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/factory/sharing_factory.hpp"
-#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces

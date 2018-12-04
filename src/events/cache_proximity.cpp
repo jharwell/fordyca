@@ -22,14 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_proximity.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/tasks/depth2/cache_finisher.hpp"
-#include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/events/cache_found.hpp"
+#include "fordyca/events/dynamic_cache_interactor.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/tasks/depth2/cache_finisher.hpp"
 
 /*******************************************************************************
  * Namespaces

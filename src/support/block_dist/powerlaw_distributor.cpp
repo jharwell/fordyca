@@ -67,8 +67,9 @@ bool powerlaw_distributor::distribute_block(
    */
   for (auto l = m_dist_map.begin(); l != m_dist_map.end(); ++l) {
     for (auto& dist : l->second) {
-      ER_INFO("Attempting distribution: block%d -> cluster [capacity=%u,count=%zu]",
-              block->id(),
+      ER_INFO(
+          "Attempting distribution: block%d -> cluster [capacity=%u,count=%zu]",
+          block->id(),
           l->first,
           dist.block_clusters().front()->block_count());
 
@@ -82,9 +83,9 @@ bool powerlaw_distributor::distribute_block(
   return false;
 } /* distribute_block() */
 
-powerlaw_distributor::cluster_paramvec powerlaw_distributor::
-guess_cluster_placements(ds::arena_grid& grid,
-                         const std::vector<uint>& clust_sizes) {
+powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_placements(
+    ds::arena_grid& grid,
+    const std::vector<uint>& clust_sizes) {
   cluster_paramvec params;
 
   for (size_t i = 0; i < clust_sizes.size(); ++i) {
@@ -181,16 +182,17 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid& grid) {
   }
 
   for (auto& bclustp : params) {
-  m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
-                                            bclustp.capacity,
-                                            m_arena_resolution);
+    m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
+                                              bclustp.capacity,
+                                              m_arena_resolution);
   } /* for(i..) */
   for (auto it = m_dist_map.begin(); it != m_dist_map.end(); ++it) {
     ER_INFO("Mapped %zu clusters of capacity %u", it->second.size(), it->first);
     for (auto& dist : it->second) {
-      ER_DEBUG("Cluster with origin@%s: capacity=%u",
-               dist.block_clusters().front()->view().origin()->loc().to_str().c_str(),
-               dist.block_clusters().front()->capacity());
+      ER_DEBUG(
+          "Cluster with origin@%s: capacity=%u",
+          dist.block_clusters().front()->view().origin()->loc().to_str().c_str(),
+          dist.block_clusters().front()->capacity());
     } /* for(dist..) */
   }   /* for(&l..) */
   return true;

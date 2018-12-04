@@ -144,9 +144,10 @@ class base_cache_creator : public er::client<base_cache_creator> {
   deconflict_res_t deconflict_loc_boundaries(double cache_dim,
                                              const rmath::vector2u& center) const;
 
-  deconflict_res_t deconflict_loc_entity(const representation::multicell_entity* ent,
-                                         const rmath::vector2d& ent_loc,
-                                         const rmath::vector2u& center) const;
+  deconflict_res_t deconflict_loc_entity(
+      const representation::multicell_entity* ent,
+      const rmath::vector2d& ent_loc,
+      const rmath::vector2u& center) const;
 
  private:
   // clang-format off

@@ -27,8 +27,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "fordyca/metrics/caches/utilization_metrics.hpp"
 #include "fordyca/metrics/caches/location_metrics.hpp"
+#include "fordyca/metrics/caches/utilization_metrics.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 

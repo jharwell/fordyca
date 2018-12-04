@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
@@ -55,7 +54,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                     this)),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
-  mc_map(map) {}
+      mc_map(map) {}
 
 /*******************************************************************************
  * Member Functions
@@ -134,8 +133,8 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   }
 } /* cache_acquired_cb() */
 
-__rcsw_const acquisition_goal_type acquire_existing_cache_fsm::acquisition_goal_internal(
-    void) const {
+__rcsw_const acquisition_goal_type
+acquire_existing_cache_fsm::acquisition_goal_internal(void) const {
   return acquisition_goal_type::kExistingCache;
 } /* acquisition_goal() */
 

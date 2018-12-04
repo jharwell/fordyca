@@ -121,7 +121,7 @@ class sensing_subsystem {
    * of self-localizing. That's not the point of this project, and this was much
    * faster/easier.
    */
-  rmath::vector2d position(void) const { return m_position; }
+  const rmath::vector2d& position(void) const { return m_position; }
 
   /**
    * @brief Set the robot's current location.

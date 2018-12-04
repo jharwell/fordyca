@@ -28,9 +28,9 @@
 
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/support/cache_op_penalty_handler.hpp"
-#include "fordyca/events/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces

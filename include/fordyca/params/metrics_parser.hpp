@@ -29,6 +29,7 @@
 #include "fordyca/params/metrics_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
+#include "fordyca/params/positional_entropy_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,7 +48,10 @@ NS_START(fordyca, params);
  */
 class metrics_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit metrics_parser(uint level) : xml_param_parser(level) {}
+  explicit metrics_parser(uint level)
+      : xml_param_parser(level),
+        m_pos_entropy(level + 1) {}
+  ~metrics_parser(void) override = default;
 
   /**
    * @brief The root tag that all loop functions relating to metrics parameters
@@ -72,6 +76,7 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
   // clang-format off
   bool                            m_parsed{false};
   std::shared_ptr<metrics_params> m_params{nullptr};
+  positional_entropy_parser       m_pos_entropy;
   // clang-format on
 };
 

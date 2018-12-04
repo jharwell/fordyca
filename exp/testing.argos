@@ -199,8 +199,11 @@
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
           loop_robot_interaction_fname="loop-robot-interaction.csv"
-          collect_interval="1000"
-          />
+          collect_interval="1000">
+          <positional_entropy
+              enable="true"
+              n_iterations="10"/>
+          </metrics>
     </output>
     <oracle
         enabled="false"

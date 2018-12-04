@@ -1,5 +1,5 @@
 /**
- * @file robot_interaction_metrics.hpp
+ * @file positional_entropy_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,44 +18,40 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
-#include "rcppsw/metrics/base_metrics.hpp"
+#include "fordyca/params/positional_entropy_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, params);
 
 /*******************************************************************************
- * Class Definitions
+ * Global Variables
  ******************************************************************************/
+constexpr char positional_entropy_parser::kXMLRoot[];
 
-/**
- * @class robot_interaction_metrics
- * @ingroup metrics
- *
- * @brief Defines the metrics to be collected regarding robot interaction in the
- * arena. Based on Szabo2014.
- *
- * Metrics are collected every timestep.
- */
-class robot_interaction_metrics : public virtual rcppsw::metrics::base_metrics {
- public:
-  robot_interaction_metrics(void) = default;
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void positional_entropy_parser::parse(const ticpp::Element& node) {
+    ticpp::Element mnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-  /**
-   * @brief Vector of distances (one per robot), to each robot's closest
-   * neighbor.
-   */
-  virtual std::vector<double> nearest_neighbors(void) const = 0;
-};
+    XML_PARSE_ATTR(mnode, m_params, enable);
+    if (m_params->enable) {
+      XML_PARSE_ATTR(mnode, m_params, n_iterations);
+    }
+} /* parse() */
 
-NS_END(metrics, fordyca);
+void positional_entropy_parser::show(std::ostream& stream) const {
+  stream << build_header();
+  stream << XML_ATTR_STR(m_params, enable) << std::endl
+         << XML_ATTR_STR(m_params, n_iterations) << std::endl
+         << build_footer();
+} /* show() */
 
-#endif /* INCLUDE_FORDYCA_METRICS_ROBOT_INTERACTION_METRICS_HPP_ */
+NS_END(params, fordyca);

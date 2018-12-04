@@ -53,9 +53,7 @@ representation::perceived_block new_cache_selector::operator()(
 
   double max_utility = 0.0;
   for (auto& c : new_caches) {
-    if (new_cache_is_excluded(existing_caches,
-                              new_caches,
-                              c.ent.get())) {
+    if (new_cache_is_excluded(existing_caches, new_caches, c.ent.get())) {
       continue;
     }
     math::new_cache_utility u(c.ent->real_loc(),
@@ -99,18 +97,19 @@ bool new_cache_selector::new_cache_is_excluded(
   double cluster_prox =
       boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
 
-  for (auto &ec : existing_caches) {
+  for (auto& ec : existing_caches) {
     double dist = (ec->real_loc() - new_cache->real_loc()).length();
     if (dist <= cache_prox) {
-      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
-               new_cache->id(),
-               new_cache->real_loc().to_str().c_str(),
-               new_cache->discrete_loc().to_str().c_str(),
-               ec->id(),
-               ec->real_loc().to_str().c_str(),
-               ec->discrete_loc().to_str().c_str(),
-               dist,
-               cache_prox);
+      ER_DEBUG(
+          "Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
+          new_cache->id(),
+          new_cache->real_loc().to_str().c_str(),
+          new_cache->discrete_loc().to_str().c_str(),
+          ec->id(),
+          ec->real_loc().to_str().c_str(),
+          ec->discrete_loc().to_str().c_str(),
+          dist,
+          cache_prox);
       return true;
     }
   } /* for(&ec..) */
@@ -125,25 +124,26 @@ bool new_cache_selector::new_cache_is_excluded(
    * So, we approximate a block distribution as a single block, and only choose
    * new caches that are sufficiently far from any potential clusters.
    */
-  for (auto &b : blocks) {
+  for (auto& b : blocks) {
     if (b.ent.get() == new_cache) {
       continue;
     }
     double dist = (b.ent->real_loc() - new_cache->real_loc()).length();
 
     if (dist <= cluster_prox) {
-      ER_DEBUG("Ignoring new cache%d@%s/%s: Too close to potential block cluster@%s/%s (%f <= %f)",
-               new_cache->id(),
-               new_cache->real_loc().to_str().c_str(),
-               new_cache->discrete_loc().to_str().c_str(),
-               b.ent->real_loc().to_str().c_str(),
-               b.ent->discrete_loc().to_str().c_str(),
-               dist,
-               cluster_prox);
+      ER_DEBUG(
+          "Ignoring new cache%d@%s/%s: Too close to potential block "
+          "cluster@%s/%s (%f <= %f)",
+          new_cache->id(),
+          new_cache->real_loc().to_str().c_str(),
+          new_cache->discrete_loc().to_str().c_str(),
+          b.ent->real_loc().to_str().c_str(),
+          b.ent->discrete_loc().to_str().c_str(),
+          dist,
+          cluster_prox);
       return true;
     }
   } /* for(&b..) */
-
 
   return false;
 } /* new_cache_is_excluded() */

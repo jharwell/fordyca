@@ -27,8 +27,8 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/depth0/stateful_controller_repository.hpp"
@@ -80,7 +80,6 @@ double stateful_controller::los_dim(void) const {
   return saa_subsystem()->sensing()->los_dim();
 } /* los_dim() */
 
-
 void stateful_controller::ControlStep(void) {
   ndc_pusht();
   if (nullptr != block()) {
@@ -98,7 +97,8 @@ void stateful_controller::ControlStep(void) {
   m_perception->update(m_perception->los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
+  saa_subsystem()->actuation()->throttling_update(
+      saa_subsystem()->sensing()->tick());
   m_fsm->run();
   ndc_pop();
 } /* ControlStep() */

@@ -24,6 +24,7 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/dbg/dbg.hpp"
@@ -40,7 +41,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -28,8 +28,8 @@
 
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/support/cache_op_penalty_handler.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/support/cache_op_penalty_handler.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************

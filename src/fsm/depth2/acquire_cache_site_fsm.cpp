@@ -24,8 +24,8 @@
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 
@@ -87,9 +87,7 @@ acquire_goal_fsm::candidate_type acquire_cache_site_fsm::site_select(void) const
                           saa_subsystem()->sensing()->position());
   if (best.x() < 0 || best.y() < 0) {
     ER_WARN("No cache could acquired for acquisition--internal error?")
-    return acquire_goal_fsm::candidate_type(false,
-                                            rmath::vector2d(),
-                                            -1);
+    return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
   }
   ER_INFO("Select cache site@%s for acquisition", best.to_str().c_str());
 
@@ -98,8 +96,8 @@ acquire_goal_fsm::candidate_type acquire_cache_site_fsm::site_select(void) const
                                           vector_fsm::kCACHE_SITE_ARRIVAL_TOL);
 } /* site_select() */
 
-__rcsw_const acquisition_goal_type acquire_cache_site_fsm::acquisition_goal_internal(
-    void) const {
+__rcsw_const acquisition_goal_type
+acquire_cache_site_fsm::acquisition_goal_internal(void) const {
   return acquisition_goal_type::kCacheSite;
 } /* acquisition_goal_internal() */
 

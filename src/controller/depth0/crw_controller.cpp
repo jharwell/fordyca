@@ -24,8 +24,8 @@
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include <fstream>
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 
@@ -76,7 +76,7 @@ void crw_controller::ControlStep(void) {
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
   saa_subsystem()->actuation()->throttling_update(
       saa_subsystem()->sensing()->tick());
-  m_fsm->run();
+  /* m_fsm->run(); */
   ndc_pop();
 } /* ControlStep() */
 

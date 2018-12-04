@@ -87,8 +87,7 @@ representation::perceived_block block_selector::calc_best(
             best.ent->real_loc().to_str().c_str(),
             max_utility);
   } else {
-    ER_WARN(
-        "No best block found: all known blocks excluded!");
+    ER_WARN("No best block found: all known blocks excluded!");
   }
   return best;
 } /* calc_best() */
@@ -100,11 +99,11 @@ bool block_selector::block_is_excluded(
                               block->yspan(block->real_loc()).span());
   if ((position - block->real_loc()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
-            block->id(),
-            block->real_loc().to_str().c_str(),
-            block->discrete_loc().to_str().c_str(),
-            (position - block->real_loc()).length(),
-            block_dim);
+             block->id(),
+             block->real_loc().to_str().c_str(),
+             block->discrete_loc().to_str().c_str(),
+             (position - block->real_loc()).length(),
+             block_dim);
     return true;
   }
   std::vector<int> exceptions = boost::get<std::vector<int>>(
@@ -113,9 +112,9 @@ bool block_selector::block_is_excluded(
         return id == block->id();
       })) {
     ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
-            block->id(),
-            block->real_loc().to_str().c_str(),
-            block->discrete_loc().to_str().c_str());
+             block->id(),
+             block->real_loc().to_str().c_str(),
+             block->discrete_loc().to_str().c_str());
     return true;
   }
   return false;

@@ -27,12 +27,12 @@
 #include "fordyca/metrics/world_model_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 
-#include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
+#include "fordyca/controller/depth0/stateful_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
 #include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,21 +65,22 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-template<class T>
-void depth0_metrics_aggregator::collect_from_controller(const T* const controller) {
+template <class T>
+void depth0_metrics_aggregator::collect_from_controller(
+    const T* const controller) {
   /*
    * Both CRW and stateful controllers provide these.
    */
   auto collision_m =
       dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
   auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
-  auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-      controller);
-  auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+  auto block_acq_m =
+      dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller);
+  auto manip_m =
+      dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
 
   ER_ASSERT(mov_m, "FSM does not provide movement metrics");
-  ER_ASSERT(block_acq_m,
-            "FSM does not provide block acquisition metrics");
+  ER_ASSERT(block_acq_m, "FSM does not provide block acquisition metrics");
   ER_ASSERT(collision_m, "FSM does not provide collision metrics");
   ER_ASSERT(manip_m, "FSM does not provide block manipulation metrics");
 
@@ -88,7 +89,7 @@ void depth0_metrics_aggregator::collect_from_controller(const T* const controlle
   collect("blocks::acquisition", *block_acq_m);
   collect("blocks::manipulation", *manip_m);
 
-/*
+  /*
  * Only stateful provides these.
  */
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);

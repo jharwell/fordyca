@@ -56,9 +56,9 @@ representation::perceived_cache existing_cache_selector::calc_best(
     if (cache_is_excluded(position, c.ent.get())) {
       continue;
     }
-    math::existing_cache_utility u(c.ent->real_loc(),
-                                   boost::get<rmath::vector2d>(
-                                       mc_matrix->find(cselm::kNestLoc)->second));
+    math::existing_cache_utility u(
+        c.ent->real_loc(),
+        boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility =
         u.calc(position, c.density.last_result(), c.ent->n_blocks());
@@ -103,10 +103,10 @@ bool existing_cache_selector::cache_is_excluded(
    */
   if (cache->contains_point(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s in search: robot@%s inside it",
-            cache->id(),
-            cache->real_loc().to_str().c_str(),
-            cache->discrete_loc().to_str().c_str(),
-            position.to_str().c_str());
+             cache->id(),
+             cache->real_loc().to_str().c_str(),
+             cache->discrete_loc().to_str().c_str(),
+             position.to_str().c_str());
     return true;
   }
 
@@ -123,9 +123,9 @@ bool existing_cache_selector::cache_is_excluded(
         return id == cache->id();
       })) {
     ER_DEBUG("Ignoring cache%d@%s/%s: On exception list",
-            cache->id(),
-            cache->real_loc().to_str().c_str(),
-            cache->discrete_loc().to_str().c_str());
+             cache->id(),
+             cache->real_loc().to_str().c_str(),
+             cache->discrete_loc().to_str().c_str());
     return true;
   }
   return false;

@@ -43,7 +43,7 @@ NS_START(fordyca, controller);
  * @brief Perform random walk exploration: wander force + avoidance force.
  */
 class random_explore_behavior : public explore_behavior,
-                                er::client<random_explore_behavior> {
+                                public er::client<random_explore_behavior> {
  public:
   explicit random_explore_behavior(controller::saa_subsystem* saa);
 

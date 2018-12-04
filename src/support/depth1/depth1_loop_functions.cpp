@@ -27,6 +27,7 @@
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth1/oracular_partitioning_controller.hpp"
 #include "fordyca/ds/cell2D.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -34,7 +35,6 @@
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "fordyca/events/existing_cache_interactor.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -128,9 +128,8 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* send the robot its view of the world: what it sees and where it is */
   loop_utils::set_robot_pos<decltype(controller)>(robot);
-  ER_ASSERT(std::fmod(controller.los_dim(),
-                      arena_map()->grid_resolution())
-            <= std::numeric_limits<double>::epsilon(),
+  ER_ASSERT(std::fmod(controller.los_dim(), arena_map()->grid_resolution()) <=
+                std::numeric_limits<double>::epsilon(),
             "LOS dimension (%f) not an even multiple of grid resolution (%f)",
             controller.los_dim(),
             arena_map()->grid_resolution());
@@ -141,8 +140,8 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord = rmath::dvec2uvec(controller.position(),
-                                arena_map()->grid_resolution());
+  auto coord =
+      rmath::dvec2uvec(controller.position(), arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
   /* Now watch it react to the environment */

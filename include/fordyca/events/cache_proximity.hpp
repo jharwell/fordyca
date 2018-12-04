@@ -32,7 +32,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_cache; }
+namespace representation {
+class base_cache;
+}
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller { namespace depth2 {
 class greedy_recpart_controller;

@@ -41,8 +41,12 @@ struct metrics_params;
 namespace support {
 class base_loop_functions;
 }
-namespace representation { class base_block; }
-namespace ds { class arena_map; }
+namespace representation {
+class base_block;
+}
+namespace ds {
+class arena_map;
+}
 NS_START(metrics);
 
 /*******************************************************************************
@@ -80,6 +84,8 @@ class base_metrics_aggregator
   const std::string& metrics_path(void) const { return m_metrics_path; }
 
  private:
+  static constexpr uint kPOS_ENTROPY_ITER = 10;
+
   // clang-format off
   std::string m_metrics_path{""};
   // clang-format on

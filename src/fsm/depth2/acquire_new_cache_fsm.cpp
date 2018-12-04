@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
@@ -64,12 +64,10 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
 } /* candidates_exsti() */
 
 acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const {
-
   /* A "new" cache is the same as a single block  */
   representation::perceived_block best =
-      controller::depth2::new_cache_selector(mc_matrix)(mc_map->perceived_blocks(),
-                                                        mc_map->caches(),
-                                                        sensors()->position());
+      controller::depth2::new_cache_selector(mc_matrix)(
+          mc_map->perceived_blocks(), mc_map->caches(), sensors()->position());
 
   /*
    * If this happens, all the blocks we know of are ineligible for us to
@@ -105,8 +103,8 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_const acquisition_goal_type acquire_new_cache_fsm::acquisition_goal_internal(
-    void) const {
+__rcsw_const acquisition_goal_type
+acquire_new_cache_fsm::acquisition_goal_internal(void) const {
   return acquisition_goal_type::kNewCache;
 } /* acquisition_goal() */
 

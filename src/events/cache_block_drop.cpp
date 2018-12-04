@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
@@ -37,7 +38,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces

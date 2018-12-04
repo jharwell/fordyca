@@ -80,25 +80,25 @@ rmath::vector2d cache_site_selector::calc_best(
           point[1],
           max_utility);
 
-return site;
+  return site;
 } /* calc_best() */
 
 bool cache_site_selector::verify_site(const rmath::vector2d& site,
                                       const ds::cache_list& known_caches,
                                       const ds::block_list& known_blocks) const {
-  for (auto &c : known_caches) {
+  for (auto& c : known_caches) {
     ER_ASSERT((c->real_loc() - site).length() >=
-        std::get<0>(m_constraints)[0].cache_prox_dist,
-        "Cache site@%s too close to cache%d (%f <= %f)",
+                  std::get<0>(m_constraints)[0].cache_prox_dist,
+              "Cache site@%s too close to cache%d (%f <= %f)",
               site.to_str().c_str(),
               c->id(),
               (c->real_loc() - site).length(),
               std::get<0>(m_constraints)[0].cache_prox_dist);
   } /* for(&c..) */
 
-  for (auto &b : known_blocks) {
+  for (auto& b : known_blocks) {
     ER_ASSERT((b->real_loc() - site).length() >=
-              std::get<1>(m_constraints)[0].block_prox_dist,
+                  std::get<1>(m_constraints)[0].block_prox_dist,
               "Cache site@%s too close to block%d (%f <= %f)",
               site.to_str().c_str(),
               b->id(),

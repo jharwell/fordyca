@@ -21,7 +21,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -30,6 +29,7 @@
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/cube_block.hpp"
 #include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
 
 /*******************************************************************************
@@ -62,7 +62,7 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
  * Member Functions
  ******************************************************************************/
 bool arena_map::initialize(support::base_loop_functions* loop) {
-  for (auto &l : m_nest.lights()) {
+  for (auto& l : m_nest.lights()) {
     loop->AddEntity(*l);
   } /* for(&l..) */
 
@@ -168,8 +168,7 @@ void arena_map::cache_extent_clear(
     for (uint j = ymin; j < ymax; ++j) {
       rmath::vector2u c = rmath::vector2u(i, j);
       if (c != victim->discrete_loc()) {
-        ER_ASSERT(victim->contains_point(
-                      rmath::uvec2dvec(c, grid_resolution())),
+        ER_ASSERT(victim->contains_point(rmath::uvec2dvec(c, grid_resolution())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   victim->id(),
                   i,

@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_grid.hpp"
-#include "rcppsw/common/common.hpp"
 #include "fordyca/ds/block_list.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,8 +50,7 @@ NS_START(fordyca, representation);
  */
 class block_cluster : public rcppsw::er::client<block_cluster> {
  public:
-  block_cluster(const ds::arena_grid::const_view& view,
-                uint capacity)
+  block_cluster(const ds::arena_grid::const_view& view, uint capacity)
       : ER_CLIENT_INIT("fordyca.representation.block_cluster"),
         m_view(view),
         m_capacity(capacity) {}

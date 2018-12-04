@@ -32,8 +32,8 @@
 #include <argos3/core/simulator/entity/controllable_entity.h>
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/support/los_visualizer.hpp"
 #include "fordyca/support/block_carry_visualizer.hpp"
+#include "fordyca/support/los_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -28,9 +28,9 @@
 
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/support/block_op_filter.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/temporal_penalty_handler.hpp"
-#include "fordyca/support/block_op_filter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -95,10 +95,8 @@ class block_op_penalty_handler
                              uint timestep,
                              double cache_prox_dist = -1,
                              double block_prox_dist = -1) {
-    auto filter = block_op_filter<T>(m_map)(controller,
-                                                    src,
-                                                    cache_prox_dist,
-                                                    block_prox_dist);
+    auto filter = block_op_filter<T>(
+        m_map)(controller, src, cache_prox_dist, block_prox_dist);
     if (filter.status) {
       return filter.reason;
     }

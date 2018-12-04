@@ -68,8 +68,12 @@ void base_controller::position(const rmath::vector2d& loc) {
   m_saa->sensing()->position(loc);
 }
 
-__rcsw_pure rmath::vector2d base_controller::position(void) const {
+__rcsw_pure const rmath::vector2d& base_controller::position(void) const {
   return m_saa->sensing()->position();
+}
+
+__rcsw_pure rmath::vector2d base_controller::heading(void) const {
+  return m_saa->sensing()->heading();
 }
 
 void base_controller::Init(ticpp::Element& node) {

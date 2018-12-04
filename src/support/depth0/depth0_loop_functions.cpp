@@ -26,6 +26,7 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 #include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
@@ -34,7 +35,6 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,8 +46,7 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 depth0_loop_functions::depth0_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.depth0"),
-      m_metrics_agg(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.depth0"), m_metrics_agg(nullptr) {}
 
 depth0_loop_functions::~depth0_loop_functions(void) = default;
 
@@ -59,27 +58,27 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
-    /* initialize output and metrics collection */
+  /* initialize output and metrics collection */
   auto* arena = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
       *params()->parse_results<params::output_params>();
   output.metrics.arena_grid = arena->grid;
 
   m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,
-                                                                  output_root());
+                                                                 output_root());
 
   /* intitialize robot interactions with environment */
   auto* arenap = params()->parse_results<params::arena::arena_map_params>();
-  m_crw_interactor =
-      rcppsw::make_unique<crw_interactor_type>(arena_map(),
-                                               m_metrics_agg.get(),
-                                               floor(),
-                                               &arenap->blocks.manipulation_penalty);
-  m_stateful_interactor =
-      rcppsw::make_unique<stateful_interactor_type>(arena_map(),
-                                                    m_metrics_agg.get(),
-                                                    floor(),
-                                                    &arenap->blocks.manipulation_penalty);
+  m_crw_interactor = rcppsw::make_unique<crw_interactor_type>(
+      arena_map(),
+      m_metrics_agg.get(),
+      floor(),
+      &arenap->blocks.manipulation_penalty);
+  m_stateful_interactor = rcppsw::make_unique<stateful_interactor_type>(
+      arena_map(),
+      m_metrics_agg.get(),
+      floor(),
+      &arenap->blocks.manipulation_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -93,7 +92,7 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 }
 
-template<class T>
+template <class T>
 void depth0_loop_functions::controller_configure(
     controller::base_controller* const c) {
   auto* stateful = dynamic_cast<controller::depth0::stateful_controller*>(c);
@@ -118,8 +117,8 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
    * know *ALL* of the controllers that are in the depth, and we can't/don't use
    * templates and/or inheritance to get what we need.
    */
-  auto* stateful = dynamic_cast<controller::depth0::stateful_controller*>(
-      &controller);
+  auto* stateful =
+      dynamic_cast<controller::depth0::stateful_controller*>(&controller);
   auto* crw = dynamic_cast<controller::depth0::crw_controller*>(&controller);
 
   /* collect metrics from robot before its state changes */
@@ -136,11 +135,9 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   loop_utils::set_robot_pos<decltype(controller)>(robot);
   set_robot_tick<decltype(controller)>(robot);
 
-
   if (nullptr != stateful) {
-    ER_ASSERT(std::fmod(stateful->los_dim(),
-                        arena_map()->grid_resolution())
-                        <= std::numeric_limits<double>::epsilon(),
+    ER_ASSERT(std::fmod(stateful->los_dim(), arena_map()->grid_resolution()) <=
+                  std::numeric_limits<double>::epsilon(),
               "LOS dimension (%f) not an even multiple of grid resolution (%f)",
               stateful->los_dim(),
               arena_map()->grid_resolution());
@@ -156,8 +153,8 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   }
 
   /* update arena map metrics with robot position */
-  auto coord = rmath::dvec2uvec(controller.position(),
-                                arena_map()->grid_resolution());
+  auto coord =
+      rmath::dvec2uvec(controller.position(), arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 } /* pre_step_iter() */
 

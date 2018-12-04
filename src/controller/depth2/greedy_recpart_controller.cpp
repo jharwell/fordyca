@@ -26,17 +26,17 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
 
 #include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces

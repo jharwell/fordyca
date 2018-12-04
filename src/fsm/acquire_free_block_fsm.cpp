@@ -25,8 +25,8 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_selector.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 
@@ -94,8 +94,8 @@ bool acquire_free_block_fsm::candidates_exist(void) const {
   return !mc_map->perceived_blocks().empty();
 } /* candidates_exsti() */
 
-__rcsw_const acquisition_goal_type acquire_free_block_fsm::acquisition_goal_internal(
-    void) const {
+__rcsw_const acquisition_goal_type
+acquire_free_block_fsm::acquisition_goal_internal(void) const {
   return acquisition_goal_type::kBlock;
 } /* acquisition_goal() */
 

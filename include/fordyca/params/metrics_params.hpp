@@ -28,6 +28,7 @@
 
 #include "fordyca/params/grid_params.hpp"
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/positional_entropy_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,6 +43,8 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct metrics_params : public rcppsw::params::base_params {
+  positional_entropy_params pos_entropy{};
+
   std::string fsm_movement_fname{""};
   std::string fsm_collision_fname{""};
 
@@ -71,7 +74,7 @@ struct metrics_params : public rcppsw::params::base_params {
   std::string output_dir{""};
 
   std::string arena_robot_occupancy_fname{""};
-  std::string loop_robot_interaction_fname{""};
+  std::string swarm_convergence_fname{""};
 
   std::string perception_world_model_fname{""};
   grid_params arena_grid{};
