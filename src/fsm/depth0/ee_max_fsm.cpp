@@ -1,5 +1,5 @@
 /**
- * @file crw_fsm.cpp
+ * @file ee_max_fsm.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth0/crw_fsm.hpp"
+#include "fordyca/fsm/depth0/ee_max_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
@@ -35,25 +35,26 @@ namespace state_machine = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
+ee_max_fsm::ee_max_fsm(controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
-      ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
-      HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
+      ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
+      HFSM_CONSTRUCT_STATE(retreat_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
-      entry_transport_to_nest(),
+      entry_retreat_to_nest(),
       entry_leaving_nest(),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(charge_at_nest, hfsm::top_state()),
       m_explore_fsm(saa,
                     std::make_unique<controller::random_explore_behavior>(saa),
-                    std::bind(&crw_fsm::block_detected, this)),
+                    std::bind(&ee_max_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&retreat_to_nest,
                                                nullptr,
-                                               &entry_transport_to_nest,
+                                               &entry_retreat_to_nest,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                                nullptr,
@@ -66,12 +67,13 @@ crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
                                                nullptr,
                                                &entry_wait_for_signal,
-                                               nullptr)} {}
+                                               nullptr),
+                   HFSM_STATE_MAP_ENTRY_EX(&charge_at_nest)} {}
 
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(crw_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
   /* first time running FSM */
   if (state_machine::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
@@ -91,7 +93,7 @@ HFSM_STATE_DEFINE(crw_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
+HFSM_STATE_DEFINE_ND(ee_max_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
     internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
   } else {
@@ -100,11 +102,12 @@ HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, state_machine::event_data) {
+HFSM_STATE_DEFINE(ee_max_fsm, wait_for_block_pickup, state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
-    internal_event(ST_TRANSPORT_TO_NEST);
+    internal_event(ST_RETREAT_TO_NEST);
+    // Tony: robot will also enter this state when battery is low handled individually by robot
   } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
     m_explore_fsm.task_reset();
     internal_event(ST_ACQUIRE_BLOCK);
@@ -112,24 +115,31 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, state_machine::event_data) {
+HFSM_STATE_DEFINE(ee_max_fsm, wait_for_block_drop, state_machine::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block drop signal received");
     internal_event(ST_LEAVING_NEST);
   }
   return controller::foraging_signal::HANDLED;
+
+  FSM_STATE_DEFINE_ND(ee_max_fsm, charge_at_nest) {
+    if (m_explore_fsm.task_finished()) {
+      internal_event(ST_CHARGE_AT_NEST);
+    }
+    // Tony: robot will handle next when to exit nest aka charged, time spent, and P-val allowed
+  }
 }
 
 
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-bool crw_fsm::is_exploring_for_goal(void) const {
+bool ee_max_fsm::is_exploring_for_goal(void) const {
   return current_state() == ST_ACQUIRE_BLOCK;
 } /* is_exploring_for_goal() */
 
-bool crw_fsm::goal_acquired(void) const {
+bool ee_max_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kBlock == acquisition_goal()) {
     return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::kNest == block_transport_goal()) {
@@ -141,25 +151,25 @@ bool crw_fsm::goal_acquired(void) const {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool crw_fsm::in_collision_avoidance(void) const {
+__rcsw_pure bool ee_max_fsm::in_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.in_collision_avoidance()) ||
          base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool crw_fsm::entered_collision_avoidance(void) const {
+__rcsw_pure bool ee_max_fsm::entered_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.entered_collision_avoidance()) ||
          base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool crw_fsm::exited_collision_avoidance(void) const {
+__rcsw_pure bool ee_max_fsm::exited_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.exited_collision_avoidance()) ||
          base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
-__rcsw_pure uint crw_fsm::collision_avoidance_duration(void) const {
+__rcsw_pure uint ee_max_fsm::collision_avoidance_duration(void) const {
   if (m_explore_fsm.task_running()) {
     return m_explore_fsm.collision_avoidance_duration();
   } else {
@@ -171,29 +181,29 @@ __rcsw_pure uint crw_fsm::collision_avoidance_duration(void) const {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void crw_fsm::init(void) {
+void ee_max_fsm::init(void) {
   base_foraging_fsm::init();
   m_explore_fsm.init();
 } /* init() */
 
-void crw_fsm::run(void) {
+void ee_max_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
 } /* run() */
 
-bool crw_fsm::block_detected(void) const {
+bool ee_max_fsm::block_detected(void) const {
   return saa_subsystem()->sensing()->block_detected();
 } /* block_detected() */
 
-transport_goal_type crw_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_NEST == current_state() ||
+transport_goal_type ee_max_fsm::block_transport_goal(void) const {
+  if (ST_RETREAT_TO_NEST == current_state() ||
       ST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::kNest;
   }
   return transport_goal_type::kNone;
 } /* block_transport_goal() */
 
-acquisition_goal_type crw_fsm::acquisition_goal(void) const {
+acquisition_goal_type ee_max_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||
       ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;

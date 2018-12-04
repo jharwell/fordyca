@@ -1,7 +1,7 @@
 /**
- * @file crw_fsm.hpp
+ * @file ee_max_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_EE_MAX_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH0_EE_MAX_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -49,23 +49,22 @@ using transport_goal_type = block_transporter::goal_type;
  ******************************************************************************/
 
 /**
- * @class crw_fsm
+ * @class ee_max_fsm
  * @ingroup fsm depth0
  *
- * @brief The FSM for the most basic foraging definition: each robot executing
- * this FSM roams around randomly until it finds a block, and then brings the
- * block back to the nest, and drops it.
+ * @brief The FSM for the most performing an energy efficient foraging method:
+ * each robot takes into consideration the battery left while foraging
  */
-class crw_fsm : public base_foraging_fsm,
-                               public er::client<crw_fsm>,
+class ee_max_fsm : public base_foraging_fsm,
+                               public er::client<ee_max_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
-                               public visitor::visitable_any<crw_fsm> {
+                               public visitor::visitable_any<ee_max_fsm> {
  public:
-  explicit crw_fsm(controller::saa_subsystem* saa);
+  explicit ee_max_fsm(controller::saa_subsystem* saa);
 
-  crw_fsm(const crw_fsm& fsm) = delete;
-  crw_fsm& operator=(const crw_fsm& fsm) = delete;
+  ee_max_fsm(const ee_max_fsm& fsm) = delete;
+  ee_max_fsm& operator=(const ee_max_fsm& fsm) = delete;
 
   /* collision metrics */
   FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
@@ -98,30 +97,32 @@ class crw_fsm : public base_foraging_fsm,
   enum fsm_states {
     ST_START, /* Initial state */
     ST_ACQUIRE_BLOCK,
-    ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
+    ST_RETREAT_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_WAIT_FOR_BLOCK_PICKUP,
     ST_WAIT_FOR_BLOCK_DROP,
-    ST_MAX_STATES
+    ST_CHARGE_AT_NEST,
+    ST_MAX_STATES,
   };
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
+  HFSM_STATE_INHERIT(base_foraging_fsm, retreat_to_nest,
                      state_machine::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
 
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_retreat_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  /* crw fsm states */
-  HFSM_STATE_DECLARE(crw_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(crw_fsm, acquire_block);
-  HFSM_STATE_DECLARE(crw_fsm, wait_for_block_pickup,
+  /* ee_max fsm states */
+  HFSM_STATE_DECLARE(ee_max_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(ee_max_fsm, acquire_block);
+  HFSM_STATE_DECLARE(ee_max_fsm, wait_for_block_pickup,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE(crw_fsm, wait_for_block_drop,
+  HFSM_STATE_DECLARE(ee_max_fsm, wait_for_block_drop,
                      state_machine::event_data);
+  HFSM_STATE_DECLARE_ND(ee_max_fsm, charge_at_nest);
 
 
   /**
@@ -143,4 +144,4 @@ class crw_fsm : public base_foraging_fsm,
 
 NS_END(depth0, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_CRW_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_ee_max_FSM_HPP_ */

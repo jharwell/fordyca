@@ -60,15 +60,6 @@ template <typename T>
 class arena_interactor : public depth0::arena_interactor<T>,
                          public er::client<arena_interactor<T>> {
  public:
-<<<<<<< HEAD
-  arena_interactor(const std::shared_ptr<rcppsw::er::server>& server,
-                   std::shared_ptr<representation::arena_map>& map_in,
-                   depth0::stateless_metrics_aggregator *metrics_agg,
-                   argos::CFloorEntity* floor_in,
-                   uint cache_usage_penalty)
-      : depth0::arena_interactor<T>(server, map_in, metrics_agg, floor_in),
-      m_cache_penalty_handler(server, map_in, cache_usage_penalty) {}
-=======
   arena_interactor(representation::arena_map* const map_in,
                    depth0::stateless_metrics_aggregator *const metrics_agg,
                    argos::CFloorEntity* const floor_in,
@@ -80,7 +71,6 @@ class arena_interactor : public depth0::arena_interactor<T>,
                                     block_manip_penalty),
     ER_CLIENT_INIT("fordyca.support.depth1.arena_interactor"),
       m_cache_penalty_handler(map_in, cache_usage_penalty) {}
->>>>>>> devel
 
   arena_interactor& operator=(const arena_interactor& other) = delete;
   arena_interactor(const arena_interactor& other) = delete;
