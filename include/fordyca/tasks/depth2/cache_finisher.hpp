@@ -26,7 +26,8 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/tasks/free_block_interactor.hpp"
+#include "fordyca/events/free_block_interactor.hpp"
+#include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -48,7 +49,8 @@ namespace task_allocation = rcppsw::task_allocation;
  * abortable, and has one task interface.
  */
 class cache_finisher : public foraging_task,
-                       public free_block_interactor,
+                       public events::free_block_interactor,
+                       public events::dynamic_cache_interactor,
                        public rcppsw::er::client<cache_finisher> {
  public:
   cache_finisher(const struct ta::task_allocation_params* params,
@@ -64,15 +66,17 @@ class cache_finisher : public foraging_task,
   void accept(events::free_block_drop& visitor) override;
   void accept(events::free_block_pickup& visitor) override;
   void accept(events::block_vanished& visitor) override;
+  void accept(events::block_proximity&) override {};
+  void accept(events::cache_proximity& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired);
-  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
+  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }

@@ -25,14 +25,14 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/support/depth0/stateful_metrics_aggregator.hpp"
+#include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/metrics/tasks/distribution_metrics.hpp"
+#include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 /*******************************************************************************
@@ -67,7 +67,7 @@ namespace er = rcppsw::er;
  * - Task execution metrics (per task)
  * - TAB metrics (rooted at generalist)
  */
-class depth1_metrics_aggregator : public depth0::stateful_metrics_aggregator,
+class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public er::client<depth1_metrics_aggregator> {
  public:
   using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
@@ -119,7 +119,7 @@ class depth1_metrics_aggregator : public depth0::stateful_metrics_aggregator,
         dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
             dynamic_cast<const ta::polled_task*>(controller->current_task())
                 ->mechanism());
-    auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::distribution_metrics*>(
+    auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
         controller);
 
 

@@ -24,12 +24,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth1/base_acquire_cache_fsm.hpp"
+#include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, depth2);
+NS_START(fordyca);
+
+namespace controller { class cache_sel_matrix; }
+namespace ds { class perceived_arena_map; }
+
+NS_START(fsm, depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -44,19 +49,30 @@ NS_START(fordyca, fsm, depth2);
  * cache or via random exploration). Once the chosen new cache has been
  * acquired, it signals that it has completed its task.
  */
-class acquire_new_cache_fsm : public depth1::base_acquire_cache_fsm,
-                              public er::client<acquire_new_cache_fsm> {
+class acquire_new_cache_fsm : public er::client<acquire_new_cache_fsm>,
+                              public acquire_goal_fsm {
  public:
-  acquire_new_cache_fsm(
-      const controller::cache_selection_matrix* csel_matrix,
-      controller::saa_subsystem* actuators,
-      ds::perceived_arena_map* map);
+  acquire_new_cache_fsm(const controller::cache_sel_matrix* matrix,
+                        controller::saa_subsystem* actuators,
+                        ds::perceived_arena_map* map);
+  ~acquire_new_cache_fsm(void) override = default;
 
-  /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
+  acquire_new_cache_fsm(const acquire_new_cache_fsm& fsm) = delete;
+  acquire_new_cache_fsm& operator=(const acquire_new_cache_fsm& fsm) = delete;
 
  private:
-  bool select_cache_for_acquisition(argos::CVector2 * acquisition) override;
+  /*
+   * See \ref acquire_goal_fsm for the purpose of these callbacks.
+   */
+  acquisition_goal_type acquisition_goal_internal(void) const;
+  acquire_goal_fsm::candidate_type cache_select(void) const;
+  bool candidates_exist(void) const;
+  bool cache_acquired_cb(bool explore_result) const;
+
+  // clang-format off
+  const controller::cache_sel_matrix* const mc_matrix;
+  const ds::perceived_arena_map*      const mc_map;
+  // clang-format on
 };
 
 NS_END(depth2, fsm, fordyca);

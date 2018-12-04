@@ -27,15 +27,19 @@
 #include <string>
 
 #include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "rcppsw/metrics/tasks/distribution_metrics.hpp"
+#include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace task_allocation {
 class bi_tdgraph_executive;
+class bi_tab;
+class executable_task;
 class polled_task;
 }}
+namespace visitor = rcppsw::patterns::visitor;
+namespace ta = rcppsw::task_allocation;
 
 NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
@@ -54,7 +58,7 @@ namespace depth1 { class controller_repository; }
 }
 
 NS_START(controller);
-class cache_selection_matrix;
+class cache_sel_matrix;
 NS_START(depth1);
 
 /*******************************************************************************
@@ -71,7 +75,7 @@ NS_START(depth1);
 class greedy_partitioning_controller : public depth0::stateful_controller,
                                        public er::client<greedy_partitioning_controller>,
                                        public visitor::visitable_any<greedy_partitioning_controller>,
-                                       public rcppsw::metrics::tasks::distribution_metrics {
+                                       public rcppsw::metrics::tasks::bi_tdgraph_metrics {
  public:
   greedy_partitioning_controller(void);
   ~greedy_partitioning_controller(void) override;
@@ -80,13 +84,23 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  /* task ditribution metrics */
+  /* task distribution metrics */
   int current_task_depth(void) const override;
   int current_task_id(void) const override;
   int current_task_tab(void) const override;
 
-  tasks::base_foraging_task* current_task(void) override;
-  const tasks::base_foraging_task* current_task(void) const override;
+  /* goal acquisition metrics */
+  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
+  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+
+  /* block transportation */
+  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+
+  /**
+   * @brief Get the current task the controller is executing.
+   */
+  virtual tasks::base_foraging_task* current_task(void);
+  virtual const tasks::base_foraging_task* current_task(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is
@@ -100,6 +114,14 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
+  const ta::bi_tab* active_tab(void) const;
+
+  /*
+   * Public to setup metric collection from tasks.
+   */
+  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+
   /**
    * @brief Get whether or not a task has been aborted this timestep.
    *
@@ -110,13 +132,15 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
    * false, and lead to inconsistent simulation state.
    */
   bool task_aborted(void) const { return m_task_aborted; }
-  void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
 
-
- protected:
-  const cache_selection_matrix*  cache_sel_matrix(void) const {
+  const class cache_sel_matrix* cache_sel_matrix(void) const {
     return m_cache_sel_matrix.get();
   }
+  class cache_sel_matrix* cache_sel_matrix(void) {
+    return m_cache_sel_matrix.get();
+  }
+
+ protected:
   /**
    * @brief Perform initialization that derived classes will also need to do.
    *
@@ -126,6 +150,17 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   void non_unique_init(ticpp::Element& node,
                        params::depth1::controller_repository* param_repo);
 
+  /*
+   * The \ref greedy_partitioning_controller owns the executive, but derived
+   * classes can access it and set it to whatever they want. This is done to
+   * reduce the amount of function overriding that would have to be performed
+   * otherwise if derived controllers each had private executives--slightly
+   * cleaner to do it this way I think.
+   *
+   * Strategy pattern!
+   */
+  void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
+
  private:
   /**
    * @brief Callback for task abort. Task argument unused for now--only need to
@@ -134,9 +169,10 @@ class greedy_partitioning_controller : public depth0::stateful_controller,
   void task_abort_cb(const ta::polled_task*);
 
   // clang-format off
-  bool                                    m_display_task{false};
-  bool                                    m_task_aborted{false};
-  std::unique_ptr<cache_selection_matrix> m_cache_sel_matrix;
+  bool                                      m_display_task{false};
+  bool                                      m_task_aborted{false};
+  std::unique_ptr<class cache_sel_matrix>   m_cache_sel_matrix;
+  std::unique_ptr<ta::bi_tdgraph_executive> m_executive;
   // clang-format on
 };
 

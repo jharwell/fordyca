@@ -4,8 +4,6 @@
 ((c++-mode
   (flycheck-gcc-language-standard . "c++14")
   (eval progn
-        (require 'rtags-init)
-        (require 'irony-mode-init)
         (let
             ((includes-list
               (list
@@ -39,35 +37,7 @@
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
                                                               "$localroot/include")))
           (add-to-list 'flycheck-gcc-args (concat "-isystem" "/usr/include/eigen3"))
-          (setq compile-command
-                (concat "make -C"
-                        (concat
-                         (projectile-project-root)
-                         "build")))
-          (add-hook 'c++-mode-hook 'google-style-hook)
-          (setq helm-locate-project-list (list "fordyca" "rcppsw"))
           )
-        (let
-            ((cc-search-dirs
-              (list
-               "/usr/include/eigen3"
-               (substitute-in-file-name "$localroot/include")
-               (concat
-                (projectile-project-root)
-                "src/*/*/*")
-               (concat
-                (projectile-project-root)
-                "include/fordyca/*/*/*")
-               (concat
-                (projectile-project-root)
-                "include/fordyca")
-               (concat
-                (projectile-project-root)
-                "include")
-               (concat
-                (projectile-project-root)
-                "../rcppsw/include"))))
-          (setq cc-search-directories cc-search-dirs))
         (c++-mode))))
 
 

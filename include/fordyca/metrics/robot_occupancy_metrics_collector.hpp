@@ -35,6 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+namespace rmath = rcppsw::math;
 namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
@@ -63,7 +64,7 @@ class robot_occupancy_metrics_collector
    */
   robot_occupancy_metrics_collector(const std::string& ofname,
                                     uint interval,
-                                    const rcppsw::math::dcoord2& dims);
+                                    const rmath::vector2u& dims);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;

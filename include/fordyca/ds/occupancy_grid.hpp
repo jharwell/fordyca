@@ -1,6 +1,5 @@
 /**
  * @file occupancy_grid.hpp
- * @ingroup ds
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -30,7 +29,7 @@
 
 #include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
@@ -56,7 +55,9 @@ using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
  * @class occupancy_grid
  * @ingroup ds
  *
- * @brief Multilayered grid of \ref cell2D and \ref rcppsw::swarm::pheromone_density.
+ * @brief Multilayered grid of cells and associated information
+ * density/relevance on the state of those cells. Used by robots in making
+ * decisions in how they execute their tasks.
  */
 class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
                        public visitor::accept_set<occupancy_grid,
@@ -64,7 +65,14 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
                                                   events::cell_empty>,
                        public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
+  /**
+   * @brief The index of the \ref rcppsw::swarm::pheromone_density layer.
+   */
   constexpr static uint kPheromone = 0;
+
+  /**
+   * @brief The index of the \ref cell2D layer.
+   */
   constexpr static uint kCell = 1;
 
   occupancy_grid(const struct params::occupancy_grid_params* c_params,
@@ -89,10 +97,29 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
   void known_cells_dec(void) { --m_known_cell_count; }
 
  private:
+  /**
+   * @brief Update the state of cell (i,j), which involves decreasing its
+   * pheromone density, and possibly reseting the cell to be empty if its
+   * density gets very close to 0.
+   */
   void cell_state_update(uint i, uint j);
+
+  /**
+   * @brief Initialize a cell in the occupancy grid, which sets the rate of
+   * pheromone decay for the cell, the cell's own reference to its
+   * location. Needed because the underlying boost data structure does not
+   * support non zero parameter constructors, and we do *NOT* want to use
+   * pointers to cells, because that kills our memory performance.
+   */
   void cell_init(uint i, uint j, double pheromone_rho);
 
   // clang-format off
+  /**
+   * @brief The threshold for a cell's pheromone density at which it will
+   * transition into back an UNKNOWN state, from whatever state it is currently
+   * in.
+   */
+
   static constexpr double             kEPSILON{0.0001};
 
   uint                                m_known_cell_count{0};

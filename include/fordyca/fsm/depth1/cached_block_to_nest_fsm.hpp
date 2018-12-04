@@ -24,9 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/acquire_block_fsm.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/depth1/acquire_existing_cache_fsm.hpp"
+#include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -79,9 +78,10 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
                                  public task_allocation::taskable,
                                  public visitor::visitable_any<cached_block_to_nest_fsm> {
  public:
-  cached_block_to_nest_fsm(const controller::cache_selection_matrix* sel_matrix,
+  cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
                            controller::saa_subsystem* saa,
                            ds::perceived_arena_map* map);
+  ~cached_block_to_nest_fsm(void) override = default;
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
   cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;
@@ -110,12 +110,12 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
 
   /* goal acquisition metrics */
   bool goal_acquired(void) const override;
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   acquisition_goal_type acquisition_goal(void) const override;
 
   /* block transportation */
-  FSM_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /**
    * @brief Reset the FSM
@@ -201,7 +201,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  depth1::acquire_existing_cache_fsm m_cache_fsm;
+  acquire_existing_cache_fsm m_cache_fsm;
   // clang-format on
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

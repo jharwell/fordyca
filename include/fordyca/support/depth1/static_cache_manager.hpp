@@ -27,10 +27,11 @@
 #include <vector>
 #include <utility>
 
-#include <argos3/core/utility/math/vector2.h>
-
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -45,6 +46,7 @@ class arena_cache;
 }
 NS_START(support, depth1);
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -61,22 +63,25 @@ class static_cache_manager : public base_cache_manager,
  public:
   static_cache_manager(const struct params::caches::caches_params* params,
                        ds::arena_grid* arena_grid,
-                       const argos::CVector2& cache_loc);
+                       const rmath::vector2d& cache_loc);
+
+
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
    *
-   * @param grid_resolution The resolution of the arena.
    * @param blocks The total block vector for the arena.
-   * @param arena_grid The grid for the arena.
    *
    * @return \c TRUE iff a static cache was actually created. Non-fatal failures
    * to create the static cache can occur if, for example, all blocks are
    * currently being carried by robots and there are not enough free blocks with
    * which to create a cache of the specified minimum size.
    */
-  std::pair<bool,
-            static_cache_manager::cache_vector> create(block_vector& blocks);
+  creation_res_t create(ds::block_vector& blocks);
+
+  creation_res_t create_conditional(ds::block_vector& blocks,
+                                     uint n_harvesters,
+                                     uint n_collectors);
 
  private:
   /**
@@ -92,11 +97,11 @@ class static_cache_manager : public base_cache_manager,
    * size of the cache. If it returns \c TRUE, then the second parameter of the
    * pair is the vector of blocks to use for cache creation.
    */
-  std::pair<bool, block_vector> calc_blocks_for_creation(block_vector& blocks);
+  block_calc_res_t calc_blocks_for_creation(ds::block_vector& blocks);
 
   // clang-format off
   const params::caches::caches_params mc_cache_params;
-  const argos::CVector2               mc_cache_loc;
+  const rmath::vector2d               mc_cache_loc;
   // clang-format on
 };
 

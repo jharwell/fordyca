@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
@@ -32,10 +32,10 @@
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
+#include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-#include "fordyca/tasks/depth2/cache_collector.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -47,20 +47,18 @@
  ******************************************************************************/
 NS_START(fordyca, controller, depth2);
 using ds::occupancy_grid;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 tasking_initializer::tasking_initializer(
-    const controller::block_selection_matrix* bsel_matrix,
-    const controller::cache_selection_matrix* csel_matrix,
+    const controller::block_sel_matrix* bsel_matrix,
+    const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : depth1::tasking_initializer(bsel_matrix,
-                                  csel_matrix,
-                                  saa,
-                                  perception),
-    ER_CLIENT_INIT("fordyca.controller.depth2.tasking_initializer") {}
+    : depth1::tasking_initializer(bsel_matrix, csel_matrix, saa, perception),
+      ER_CLIENT_INIT("fordyca.controller.depth2.tasking_initializer") {}
 
 tasking_initializer::~tasking_initializer(void) = default;
 
@@ -105,10 +103,10 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
       new tasks::depth2::cache_collector(task_params,
                                          std::move(cache_collector_fsm));
 
-  auto collector = graph()->find_vertex(
-      tasks::depth1::foraging_task::kCollectorName);
-  auto harvester = graph()->find_vertex(
-      tasks::depth1::foraging_task::kHarvesterName);
+  auto collector =
+      graph()->find_vertex(tasks::depth1::foraging_task::kCollectorName);
+  auto harvester =
+      graph()->find_vertex(tasks::depth1::foraging_task::kHarvesterName);
 
   collector->set_partitionable(true);
   collector->set_atomic(false);
@@ -121,9 +119,9 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
                        std::vector<ta::polled_task*>(
                            {cache_transferer, cache_collector}));
   return tasking_map{{"cache_starter", cache_starter},
-    {"cache_finisher", cache_finisher},
-    {"cache_transferer", cache_transferer},
-    {"cache_collector", cache_collector}};
+                     {"cache_finisher", cache_finisher},
+                     {"cache_transferer", cache_transferer},
+                     {"cache_collector", cache_collector}};
 } /* depth2_tasks_create() */
 
 void tasking_initializer::depth2_exec_est_init(
@@ -141,51 +139,49 @@ void tasking_initializer::depth2_exec_est_init(
      * have only been initialized as atomic tasks.
      */
     if (0 == std::rand() % 2) {
-      graph()->tab_child(graph()->root_tab(),
-                         graph()->root_tab()->child1())->last_subtask(cache_starter);
-      graph()->tab_child(graph()->root_tab(),
-                         graph()->root_tab()->child2())->last_subtask(cache_transferer);
+      graph()
+          ->tab_child(graph()->root_tab(), graph()->root_tab()->child1())
+          ->last_subtask(cache_starter);
+      graph()
+          ->tab_child(graph()->root_tab(), graph()->root_tab()->child2())
+          ->last_subtask(cache_transferer);
     } else {
-      graph()->tab_child(graph()->root_tab(),
-                         graph()->root_tab()->child1())->last_subtask(cache_finisher);
-      graph()->tab_child(graph()->root_tab(),
-                         graph()->root_tab()->child2())->last_subtask(cache_collector);
+      graph()
+          ->tab_child(graph()->root_tab(), graph()->root_tab()->child1())
+          ->last_subtask(cache_finisher);
+      graph()
+          ->tab_child(graph()->root_tab(), graph()->root_tab()->child2())
+          ->last_subtask(cache_collector);
     }
-    uint cs_min = task_params->exec_est.ranges.find("cache_starter")->second.get_min();
-    uint cs_max = task_params->exec_est.ranges.find("cache_starter")->second.get_max();
-    uint cf_min = task_params->exec_est.ranges.find("cache_finisher")->second.get_min();
-    uint cf_max = task_params->exec_est.ranges.find("cache_finisher")->second.get_max();
-    uint ct_min = task_params->exec_est.ranges.find("cache_transferer")->second.get_min();
-    uint ct_max = task_params->exec_est.ranges.find("cache_transferer")->second.get_max();
-    uint cc_min = task_params->exec_est.ranges.find("cache_collector")->second.get_min();
-    uint cc_max = task_params->exec_est.ranges.find("cache_collector")->second.get_max();
+    rmath::rangeu cs_bounds =
+        task_params->exec_est.ranges.find("cache_starter")->second;
+    rmath::rangeu cf_bounds =
+        task_params->exec_est.ranges.find("cache_finisher")->second;
+    rmath::rangeu ct_bounds =
+        task_params->exec_est.ranges.find("cache_transferer")->second;
+    rmath::rangeu cc_bounds =
+        task_params->exec_est.ranges.find("cache_collector")->second;
 
-    ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
+    ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
             cache_starter->name().c_str(),
-            cs_min,
-            cs_max,
+            cs_bounds.to_str().c_str(),
             cache_finisher->name().c_str(),
-            cf_min,
-            cf_max);
-    cache_starter->exec_estimate_init(cs_min, cs_max);
-    cache_finisher->exec_estimate_init(cf_min, cf_max);
+            cf_bounds.to_str().c_str());
+    cache_starter->exec_estimate_init(cs_bounds);
+    cache_finisher->exec_estimate_init(cf_bounds);
 
-    ER_INFO("Seeding exec estimate for tasks: '%s'=[%u,%u], '%s'=[%u,%u]",
+    ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
             cache_transferer->name().c_str(),
-            ct_min,
-            ct_max,
+            ct_bounds.to_str().c_str(),
             cache_collector->name().c_str(),
-            cc_min,
-            cc_max);
-    cache_transferer->exec_estimate_init(ct_min, ct_max);
-    cache_collector->exec_estimate_init(cc_min, cc_max);
+            cc_bounds.to_str().c_str());
+    cache_transferer->exec_estimate_init(ct_bounds);
+    cache_collector->exec_estimate_init(cc_bounds);
   }
 } /* depth2_exec_est_init() */
 
 std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
     params::depth2::controller_repository* const param_repo) {
-  stateful_tasking_init(param_repo);
-
   auto* executivep = param_repo->parse_results<ta::task_executive_params>();
   auto map1 = depth1_tasks_create(param_repo);
   depth1_exec_est_init(param_repo, map1);

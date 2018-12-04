@@ -29,7 +29,7 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/support/cache_op_penalty_handler.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
@@ -79,14 +79,12 @@ class existing_cache_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      penalty_type::kSrcExistingCacheDrop,
+                                      cache_op_src::kSrcExistingCacheDrop,
                                       timestep);
     }
   }
 
  private:
-  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
-
   /**
    * @brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache and is looking to drop an object in it.
@@ -95,7 +93,7 @@ class existing_cache_block_drop_interactor
     const temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
-    ER_ASSERT(nullptr != dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+    ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&

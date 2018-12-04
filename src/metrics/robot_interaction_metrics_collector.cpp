@@ -79,11 +79,11 @@ void robot_interaction_metrics_collector::collect(
     m_cum_stats = neighbors;
   } else {
     /*
-     * Note that each robot's distance to closest neighbor does not
-     * appear in the same place in the result array on subsequent timesteps. This
-     * is OK, because we are doing a cumulative addition with the results as we
-     * collect metrics, so it doesn't really matter that you are not doing
-     * strictly piecewise addition.
+     * Note that each robot's distance to closest neighbor does not appear in
+     * the same place in the result array on subsequent timesteps. This is OK,
+     * because we are doing a cumulative addition with the results as we collect
+     * metrics, so it doesn't really matter that you are not doing strictly
+     * piecewise addition.
      */
     std::transform(neighbors.begin(),
                    neighbors.end(),

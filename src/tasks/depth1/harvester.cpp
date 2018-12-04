@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/harvester.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
@@ -57,7 +57,7 @@ void harvester::task_start(const task_allocation::taskable_argument* const) {
   task_allocation::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-double harvester::abort_prob_calc(void) {
+__rcsw_pure double harvester::abort_prob_calc(void) {
   /*
    * Harvesters always have a small chance of aborting their task when not at a
    * task interface. Having the harvester task un-abortable until AFTER it
@@ -117,34 +117,34 @@ void harvester::accept(events::block_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         harvester,
+                         is_exploring_for_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         harvester,
+                         is_vectoring_to_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        goal_acquired,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         harvester,
+                         goal_acquired,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
-                        harvester,
-                        acquisition_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         harvester,
+                         acquisition_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        harvester,
-                        block_transport_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()));
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         harvester,
+                         block_transport_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
 
 /*******************************************************************************
  * Task Metrics

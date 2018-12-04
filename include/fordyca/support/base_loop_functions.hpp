@@ -41,6 +41,8 @@ NS_START(fordyca);
 namespace params {
 struct output_params;
 }
+namespace ds { class arena_map; }
+
 NS_START(support);
 
 /*******************************************************************************
@@ -69,6 +71,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   /* CLoopFunctions overrides */
   void Init(ticpp::Element&) override;
   void PreStep(void) override;
+  void Reset(void) override;
 
   /* loop metrics */
   std::vector<double> nearest_neighbors(void) const override;
@@ -81,23 +84,27 @@ class base_loop_functions : public argos::CLoopFunctions,
  protected:
   argos::CFloorEntity* floor(void) const { return m_floor; }
   const std::string& output_root(void) const { return m_output_root; }
-  const params::loop_function_repository& params(void) const {
-    return m_params;
+  const params::loop_function_repository* params(void) const {
+    return &m_params;
   }
-  params::loop_function_repository& params(void) { return m_params; }
+  params::loop_function_repository* params(void) { return &m_params; }
+  const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
+  ds::arena_map* arena_map(void) { return m_arena_map.get(); }
 
  private:
   /**
    * @brief Initialize logging for all support/loop function code.
    *
-   * @param output Parsed output parameters.n
+   * @param output Parsed output parameters.
    */
   void output_init(const struct params::output_params* const output);
+  void arena_map_init(const params::loop_function_repository* repo);
 
   // clang-format off
-  argos::CFloorEntity*                              m_floor{nullptr};
-  std::string                                       m_output_root{""};
-  params::loop_function_repository                  m_params{};
+  argos::CFloorEntity*             m_floor{nullptr};
+  std::string                      m_output_root{""};
+  params::loop_function_repository m_params{};
+  std::unique_ptr<ds::arena_map>   m_arena_map;
   // clang-format on
 };
 

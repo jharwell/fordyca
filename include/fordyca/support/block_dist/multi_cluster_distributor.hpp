@@ -56,7 +56,8 @@ class multi_cluster_distributor : public base_distributor,
   multi_cluster_distributor& operator=(const multi_cluster_distributor& s) = delete;
 
   bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                        entity_list& entities) override;
+                        ds::const_entity_list& entities) override;
+  ds::const_block_cluster_list block_clusters(void) const override;
 
  private:
   // clang-format off

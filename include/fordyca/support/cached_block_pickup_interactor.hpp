@@ -30,7 +30,7 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/support/cache_op_penalty_handler.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -78,14 +78,12 @@ class cached_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      penalty_type::kSrcExistingCachePickup,
+                                      cache_op_src::kSrcExistingCachePickup,
                                       timestep);
     }
   }
 
  private:
-  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
-
   /**
    * @brief Called after a robot has satisfied the cache usage penalty, and
    * actually performs the handshaking between the cache, the arena, and the
@@ -95,7 +93,7 @@ class cached_block_pickup_interactor
     const temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
-    ER_ASSERT(nullptr != dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+    ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(acquisition_goal_type::kExistingCache ==
@@ -120,7 +118,7 @@ class cached_block_pickup_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    if (p.id() == loop_utils::robot_on_cache(controller, *m_map)) {
+    if (p.id() != loop_utils::robot_on_cache(controller, *m_map)) {
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());

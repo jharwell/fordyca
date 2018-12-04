@@ -27,7 +27,7 @@
 #include "fordyca/events/block_drop_event.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,9 +35,13 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace fsm { namespace depth1 {
+namespace rmath = rcppsw::math;
+namespace ds {
+class perceived_arena_map;
+}
+namespace fsm {
 class block_to_goal_fsm;
-}} // namespace fsm::depth1
+} // namespace fsm
 namespace controller {
 namespace depth1 {
 class greedy_partitioning_controller;
@@ -75,17 +79,23 @@ class free_block_drop
                                 controller::depth2::greedy_recpart_controller,
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher,
-                                fsm::depth1::block_to_goal_fsm> {
+                                fsm::block_to_goal_fsm,
+                                ds::perceived_arena_map> {
  public:
+  /**
+   * @param block The block to drop.
+   * @param coord The discrete coordinates of the cell to drop the block in.
+   * @param resolution The resolution of the arena map.
+   */
   free_block_drop(const std::shared_ptr<representation::base_block>& block,
-                  rcppsw::math::dcoord2 coord,
+                  const rmath::vector2u& coord,
                   double resolution);
   ~free_block_drop(void) override = default;
 
   free_block_drop(const free_block_drop& op) = delete;
   free_block_drop& operator=(const free_block_drop& op) = delete;
 
-  /* stateless foraging */
+  /* depth0 foraging */
   void visit(ds::cell2D& cell) override;
   void visit(representation::base_block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
@@ -98,7 +108,8 @@ class free_block_drop
   void visit(controller::depth2::greedy_recpart_controller&) override;
   void visit(tasks::depth2::cache_starter&) override;
   void visit(tasks::depth2::cache_finisher&) override;
-  void visit(fsm::depth1::block_to_goal_fsm&) override;
+  void visit(fsm::block_to_goal_fsm&) override;
+  void visit(ds::perceived_arena_map& map) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

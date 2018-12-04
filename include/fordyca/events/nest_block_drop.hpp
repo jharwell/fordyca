@@ -37,8 +37,9 @@ namespace visitor = rcppsw::patterns::visitor;
 
 namespace fsm {
 namespace depth0 {
-class stateless_fsm;
+class crw_fsm;
 class stateful_fsm;
+class free_block_to_nest_fsm;
 } // namespace depth0
 namespace depth1 {
 class block_to_cache_fsm;
@@ -47,7 +48,7 @@ class cached_block_to_nest_fsm;
 } // namespace fsm
 namespace controller {
 namespace depth0 {
-class stateless_controller;
+class crw_controller;
 class stateful_controller;
 } // namespace depth0
 namespace depth1 {
@@ -83,11 +84,12 @@ class nest_block_drop
       public block_drop_event,
       public rcppsw::er::client<nest_block_drop>,
       public visitor::visit_set<controller::depth0::stateful_controller,
-                                controller::depth0::stateless_controller,
+                                controller::depth0::crw_controller,
                                 controller::depth1::greedy_partitioning_controller,
                                 controller::depth2::greedy_recpart_controller,
-                                fsm::depth0::stateless_fsm,
+                                fsm::depth0::crw_fsm,
                                 fsm::depth0::stateful_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm,
                                 tasks::depth0::generalist,
                                 tasks::depth1::collector> {
@@ -102,8 +104,8 @@ class nest_block_drop
   /* stateless foraging */
   void visit(ds::arena_map& map) override;
   void visit(representation::base_block& block) override;
-  void visit(fsm::depth0::stateless_fsm& fsm) override;
-  void visit(controller::depth0::stateless_controller& controller) override;
+  void visit(fsm::depth0::crw_fsm& fsm) override;
+  void visit(controller::depth0::crw_controller& controller) override;
 
   /* stateful foraging */
   void visit(controller::depth0::stateful_controller& controller) override;
@@ -111,6 +113,7 @@ class nest_block_drop
   void visit(tasks::depth0::generalist& task) override;
 
   /* depth1 foraging */
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
   void visit(
       controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;

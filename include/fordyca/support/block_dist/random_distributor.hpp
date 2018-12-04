@@ -24,13 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include <list>
 #include <vector>
 #include <random>
 
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/math/dcoord.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 
@@ -46,6 +45,7 @@ class cell2D;
 
 NS_START(support, block_dist);
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -66,17 +66,26 @@ namespace er = rcppsw::er;
 class random_distributor : public base_distributor,
                            public er::client<random_distributor> {
  public:
-  random_distributor(ds::arena_grid::view& grid,
+  random_distributor(const ds::arena_grid::view& grid,
                      double resolution);
 
   random_distributor& operator=(const random_distributor& s) = delete;
 
-  bool distribute_blocks(block_vector& blocks, entity_list& entities) override;
+  bool distribute_blocks(ds::block_vector& blocks,
+                         ds::const_entity_list& entities) override;
 
   bool distribute_block(std::shared_ptr<representation::base_block>& block,
-                        entity_list& entities) override;
+                        ds::const_entity_list& entities) override;
+  ds::const_block_cluster_list block_clusters(void) const override {
+    return ds::const_block_cluster_list();
+  }
 
  private:
+  struct coord_search_res_t {
+    bool            status;
+    rmath::vector2u rel;
+    rmath::vector2u abs;
+  };
   /**
    * @brief The maxmimum # of times the distribution will be attempted before
    * giving up.
@@ -88,16 +97,16 @@ class random_distributor : public base_distributor,
    * all specified entities, while also accounting for block size.
    *
    * @param entities The entities to avoid.
-   * @param coordv A (to be filled) vector of absolute and relative coordinates
-   *               within the arena view if an available location can be found.
    */
-  bool find_avail_coord(const entity_list& entity, std::vector<uint>& coordv);
-  bool verify_block_dist(const representation::base_block& block,
+  coord_search_res_t avail_coord_search(const ds::const_entity_list& entities,
+                                         const rmath::vector2d& block_dim);
+  bool verify_block_dist(const representation::base_block* block,
+                         const ds::const_entity_list& entities,
                          const ds::cell2D* cell);
 
   // clang-format off
   double                     m_resolution;
-  std::default_random_engine m_rng{std::random_device{}()};
+  std::default_random_engine m_rng{std::random_device {}()};
   ds::arena_grid::view       m_grid;
   // clang-format on
 };

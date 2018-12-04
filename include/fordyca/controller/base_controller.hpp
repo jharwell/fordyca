@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
-#include <argos3/core/utility/math/vector2.h>
 #include <string>
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,6 +45,8 @@ struct output_params;
 NS_START(controller);
 
 class saa_subsystem;
+namespace rmath = rcppsw::math;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -146,8 +148,8 @@ class base_controller : public argos::CCI_Controller,
    * robots would calculate this from sensor values, rather than it being set by
    * the loop functions.
    */
-  void robot_loc(argos::CVector2 loc);
-  argos::CVector2 robot_loc(void) const;
+  void position(const rmath::vector2d& loc);
+  rmath::vector2d position(void) const;
 
   /**
    * @brief Convenience function to add footbot ID to salient messages during
@@ -166,11 +168,12 @@ class base_controller : public argos::CCI_Controller,
    */
   void ndc_pop(void) { ER_NDC_POP(); }
 
+
  protected:
-  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
   class saa_subsystem* saa_subsystem(void) {
     return m_saa.get();
   }
+  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
 
  private:
   void output_init(const struct params::output_params* params);

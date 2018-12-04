@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateless_controller_repository.hpp"
+#include "fordyca/params/depth0/crw_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +41,7 @@ NS_START(fordyca, params, depth0);
  * @brief Collection of all parameter parsers and parse results needed by
  * \ref stateful_foraging_controller.
  */
-class stateful_controller_repository: public stateless_controller_repository {
+class stateful_controller_repository: public crw_controller_repository {
  public:
   stateful_controller_repository(void);
 };

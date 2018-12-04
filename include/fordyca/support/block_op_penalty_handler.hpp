@@ -25,12 +25,12 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <utility>
 
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/temporal_penalty_handler.hpp"
+#include "fordyca/support/block_op_filter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,21 +57,6 @@ class block_op_penalty_handler
     : public temporal_penalty_handler<T>,
       public er::client<block_op_penalty_handler<T>> {
  public:
-  enum penalty_src {
-    kSrcFreePickup,
-    kSrcNestDrop,
-    kSrcCacheSiteDrop,
-    kSrcNewCacheDrop,
-  };
-
-  enum penalty_status {
-    kStatusOK,
-    kStatusControllerNotReady,
-    kStatusControllerNotOnBlock,
-    kStatusControllerNotInCache,
-    kStatusBlockProximity,
-    kStatusCacheProximity
-  };
   using temporal_penalty_handler<T>::is_serving_penalty;
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
@@ -88,6 +73,8 @@ class block_op_penalty_handler
       delete;
   block_op_penalty_handler(const block_op_penalty_handler& other) = delete;
 
+  using filter_status = typename block_op_filter<T>::filter_status;
+
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
    * trying to drop/pickup a block. If so, create a \ref block_op_penalty object
@@ -103,17 +90,17 @@ class block_op_penalty_handler
    * @return \ref kStatusOK if a penalty has been initialized for a robot, a
    * non-zero code if it has not indicating why.
    */
-  penalty_status penalty_init(T& controller,
-                              penalty_src src,
-                              uint timestep,
-                              double cache_prox_dist = -1,
-                              double block_prox_dist = -1) {
-    auto filter = filter_controller(controller,
-                                    src,
-                                    cache_prox_dist,
-                                    block_prox_dist);
-    if (filter.first) {
-      return filter.second;
+  filter_status penalty_init(T& controller,
+                             block_op_src src,
+                             uint timestep,
+                             double cache_prox_dist = -1,
+                             double block_prox_dist = -1) {
+    auto filter = block_op_filter<T>(m_map)(controller,
+                                                    src,
+                                                    cache_prox_dist,
+                                                    block_prox_dist);
+    if (filter.status) {
+      return filter.reason;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot already serving block penalty?");
@@ -130,16 +117,15 @@ class block_op_penalty_handler
 
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));
-    return kStatusOK;
+    return filter_status::kStatusOK;
   }
 
  protected:
   using temporal_penalty_handler<T>::penalty_list;
-  using filter_status_type = std::pair<bool, penalty_status>;
 
  private:
   int penalty_id_calc(const T& controller,
-                      penalty_src src,
+                      block_op_src src,
                       double cache_prox_dist,
                       double block_prox_dist) const {
     int id = -1;
@@ -149,19 +135,22 @@ class block_op_penalty_handler
         ER_ASSERT(-1 != id, "Robot not on block?");
         break;
       case kSrcNestDrop:
-      ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
-                "Robot not carrying block?");
-      id = controller.block()->id();
-      break;
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
+                  "Robot not carrying block?");
+        id = controller.block()->id();
+        break;
       case kSrcCacheSiteDrop:
-        ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
                   "Robot not carrying block?");
         ER_ASSERT(block_prox_dist > 0.0,
                   "Block proximity distance not specified for cache site drop");
-      id = controller.block()->id();
-      break;
+        id = controller.block()->id();
+        break;
       case kSrcNewCacheDrop:
-        ER_ASSERT(nullptr != controller.block() && -1 != controller.block()->id(),
+        ER_ASSERT(nullptr != controller.block() &&
+                      -1 != controller.block()->id(),
                   "Robot not carrying block?");
         ER_ASSERT(cache_prox_dist > 0.0,
                   "Cache proximity distance not specified for new cache drop");
@@ -172,116 +161,6 @@ class block_op_penalty_handler
     }
     return id;
   } /* penalty_id_calc() */
-
-  /**
-   * @brief Filters out controllers that actually are not eligible to start
-   * serving penalties.
-   *
-   * @return (\c TRUE, penalty_status) iff the controller should be filtered out
-   * and the reason why. (\c FALSE, -1) otherwise.
-   */
-  filter_status_type filter_controller(T& controller,
-                                       penalty_src src,
-                                       double block_prox_dist,
-                                       double cache_prox_dist) {
-    /*
-     * If the robot has not acquired a block, or thinks it has but actually has
-     * not, nothing to do. If a robot is carrying a block but is still
-     * transporting it (even if it IS currently in the nest), nothing to do.
-     */
-    filter_status_type res;
-    switch (src) {
-      case kSrcFreePickup:
-        return free_pickup_filter(controller);
-      case kSrcNestDrop:
-        return nest_drop_filter(controller);
-      case kSrcCacheSiteDrop:
-        return cache_site_drop_filter(controller, block_prox_dist);
-      case kSrcNewCacheDrop:
-        return new_cache_drop_filter(controller, cache_prox_dist);
-      default:
-        ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
-    } /* switch() */
-    ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
-  }
-
-  /**
-   * @brief Filter out spurious penalty initializations for free block pickup
-   * (i.e. controller not ready/not intending to pickup a free block).
-   *
-   * @return (\c TRUE, penalty_status) iff the controller should be filtered out
-   * and the reason why. (\c FALSE, -1) otherwise.
-   */
- filter_status_type free_pickup_filter(const T& controller) const {
-    int block_id = loop_utils::robot_on_block(controller, *m_map);
-    if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kBlock == controller.acquisition_goal())) {
-      return filter_status_type(true, kStatusControllerNotReady);
-    } else if (-1 == block_id) {
-      return filter_status_type(true, kStatusControllerNotOnBlock);
-    }
-    return filter_status_type(false, kStatusOK);
-  }
-
-  /**
-   * @brief Filter out spurious penalty initializations for nest block drop
-   * (i.e. controller not ready/not intending to drop a block in the nest).
-   *
-   * @return (\c TRUE, penalty_status) iff the controller should be filtered out
-   * and the reason why. (\c FALSE, -1) otherwise.
-   */
-  filter_status_type nest_drop_filter(const T& controller) const {
-    if (!(controller.in_nest() && controller.goal_acquired())) {
-      return filter_status_type(true, kStatusControllerNotReady);
-    }
-    return filter_status_type(false, kStatusOK);
-  }
-
-  /**
-   * @brief Filter out spurious penalty initializations for cache site drop
-   * (i.e. controller not ready/not intending to drop a block), or another block
-   * is too close.
-   *
-   * @return (\c TRUE, penalty_status) iff the controller should be filtered out
-   * and the reason why. (\c FALSE, -1) otherwise.
-   */
-  filter_status_type cache_site_drop_filter(const T& controller,
-                                            double block_prox_dist) const {
-    int block_id = loop_utils::cache_site_block_proximity(controller,
-                                                          *m_map,
-                                                          block_prox_dist).first;
-    if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kCacheSite == controller.acquisition_goal())) {
-      return filter_status_type(true, kStatusControllerNotReady);
-    }
-    if (-1 != block_id) {
-      return filter_status_type(true, kStatusBlockProximity);
-    }
-    return filter_status_type(false, kStatusOK);
-  }
-
-  /**
-   * @brief Filter out spurious penalty initializations for new cache drop
-   * (i.e. controller not ready/not intending to drop a block), or
-   * is too close to another cache to do a free block drop at the chosen site.
-   *
-   * @return (\c TRUE, penalty_status) iff the controller should be filtered out
-   * and the reason why. (\c FALSE, -1) otherwise.
-   */
-  filter_status_type new_cache_drop_filter(const T& controller,
-                                           double cache_prox_dist) const {
-    if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kNewCache == controller.acquisition_goal())) {
-          return filter_status_type(true, kStatusControllerNotReady);
-    }
-    int cache_id = loop_utils::new_cache_cache_proximity(controller,
-                                                         *m_map,
-                                                         cache_prox_dist).first;
-    if (-1 != cache_id) {
-      return filter_status_type(true, kStatusCacheProximity);
-    }
-    return filter_status_type(false, kStatusOK);
-  }
 
   // clang-format off
   ds::arena_map* const m_map;

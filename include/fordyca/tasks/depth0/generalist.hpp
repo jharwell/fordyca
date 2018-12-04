@@ -59,13 +59,13 @@ class generalist : public foraging_task {
   void accept(events::block_vanished& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired);
-  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
+  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /* task metrics */
   bool task_at_interface(void) const override { return false; }

@@ -25,12 +25,13 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
-#include <argos3/core/utility/math/vector2.h>
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -42,7 +43,7 @@ NS_START(fordyca, metrics, fsm);
  * @brief Interface defining what metrics regarding movement traveled should be
  * collected from all robots.
  */
-class movement_metrics : public virtual rcppsw::metrics::base_metrics {
+class movement_metrics : virtual public rcppsw::metrics::base_metrics {
  public:
   movement_metrics(void) = default;
   ~movement_metrics(void) override = default;
@@ -58,7 +59,7 @@ class movement_metrics : public virtual rcppsw::metrics::base_metrics {
   /**
    * @brief Get the velocity that a robot has on a single timestep.
    */
-  virtual argos::CVector2 velocity(void) const = 0;
+  virtual rmath::vector2d velocity(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

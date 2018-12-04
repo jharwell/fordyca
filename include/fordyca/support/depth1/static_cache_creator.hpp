@@ -46,15 +46,16 @@ class static_cache_creator : public base_cache_creator,
                              public er::client<static_cache_creator> {
  public:
   static_cache_creator(ds::arena_grid* grid,
-                       const argos::CVector2& center,
+                       const rmath::vector2d& center,
                        double cache_dim);
 
-  cache_vector create_all(const cache_vector& existing_caches,
-                          block_vector& blocks) override;
+  ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+                              ds::block_vector& blocks,
+                              double) override;
 
  private:
   // clang-format off
-  argos::CVector2 m_center;
+  rmath::vector2d m_center;
   // clang-format on
 };
 

@@ -27,6 +27,8 @@
 #include <vector>
 
 #include "fordyca/ds/arena_grid.hpp"
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
@@ -48,12 +50,16 @@ struct arena_map_params;
 namespace representation {
 class arena_cache;
 }
+namespace support {
+class base_loop_functions;
+}
 NS_START(ds);
 
 class cell2D;
 namespace visitor = rcppsw::patterns::visitor;
 namespace decorator = rcppsw::patterns::decorator;
 namespace er = rcppsw::er;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -62,23 +68,28 @@ namespace er = rcppsw::er;
  * @class arena_map
  * @ingroup ds
  *
- * @brief The arena map stores a logical ds of the state of the
- * arena. Basically, it combines a 2D grid with sets of objects that populate
- * the grid and move around as the state of the arena changes.
+ * @brief Combines a 2D grid with sets of objects (blocks, caches, nests, etc.)
+ * that populate the grid and move around as the state of the arena
+ * changes. The idea is that the arena map should be as simple as possible,
+ * providing accessors and mutators, but not more complex logic, separating the
+ * data in manages from the algorithms that operate on that data.
  */
 class arena_map : public er::client<arena_map>,
                   public metrics::robot_occupancy_metrics,
                   public visitor::visitable_any<arena_map>,
                   public decorator::decorator<arena_grid> {
  public:
-  using cache_vector = std::vector<std::shared_ptr<representation::arena_cache>>;
-  using block_vector = std::vector<std::shared_ptr<representation::base_block>>;
   explicit arena_map(const struct params::arena::arena_map_params* params);
 
-  /* arena metrics */
-  bool has_robot(size_t i, size_t j) const override;
+  /* robot occupancy metrics */
+  bool has_robot(uint i, uint j) const override;
 
+  /**
+   * @brief Reset the # of caches that have been removed on a single timestep
+   * from the arena due to depletion.
+   */
   void caches_removed_reset(void) { m_caches_removed = 0; }
+
   void caches_removed(uint b) { m_caches_removed += b; }
   uint caches_removed(void) const { return m_caches_removed; }
 
@@ -92,6 +103,11 @@ class arena_map : public er::client<arena_map>,
   const block_vector& blocks(void) const { return m_blocks; }
 
   /**
+   * @brief Get the # of blocks available in the arena.
+   */
+  size_t n_blocks(void) const { return m_blocks.size(); }
+
+  /**
    * @brief Get the list of all the caches currently present in the arena and
    * active.
    */
@@ -99,12 +115,17 @@ class arena_map : public er::client<arena_map>,
   const cache_vector& caches(void) const { return m_caches; }
 
   /**
+   * @brief Get the # of caches currently in the arena.
+   */
+  size_t n_caches(void) const { return m_caches.size(); }
+
+  /**
    * @brief Add caches that have been created by robots in the arena to the
    * current set of active caches.
    */
   void caches_add(const cache_vector& caches) {
-    ER_INFO("Add %zu created caches", caches.size());
     m_caches.insert(m_caches.end(), caches.begin(), caches.end());
+    ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
   }
 
   /**
@@ -126,13 +147,13 @@ class arena_map : public er::client<arena_map>,
 
   template <int Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) {
-    return decoratee().access<Index>(d.first, d.second);
+      const rmath::vector2u& d) {
+    return decoratee().access<Index>(d);
   }
   template <int Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) const {
-    return decoratee().access<Index>(d.first, d.second);
+      const rmath::vector2u& d) const {
+    return decoratee().access<Index>(d);
   }
   template <int Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(size_t i,
@@ -169,33 +190,21 @@ class arena_map : public er::client<arena_map>,
   DECORATE_FUNC(yrsize, const);
 
   /**
-   * @brief Get the # of blocks available in the arena.
-   */
-  size_t n_blocks(void) const { return m_blocks.size(); }
-
-  /**
-   * @brief Get the # of caches currently in the arena.
-   */
-  size_t n_caches(void) const { return m_caches.size(); }
-
-  /**
    * @brief Determine if a robot is currently on top of a block (i.e. if the
    * center of the robot has crossed over into the space occupied by the block
    * extent).
    *
    * While the robots also have their own means of checking if they are on a
    * block or not, there are some false positives, so this function is used as
-   * the final arbiter when deciding whether or not to trigger a \ref
-   * block_found event or a \ref free_block_pickup event for a particular
-   * robot. This happens during initialization when the robot's sensors have not
-   * yet been properly initialized by ARGoS.
+   * the final arbiter when deciding whether or not to trigger a given event
+   * (such as \ref free_block_pickup) for a particular robot.
    *
    * @param pos The position of a robot.
    *
    * @return The ID of the block that the robot is on, or -1 if the robot is not
    * actually on a block.
    */
-  int robot_on_block(const argos::CVector2& pos) const;
+  int robot_on_block(const rmath::vector2d& pos) const;
 
   /**
    * @brief Determine if a robot is currently on top of a cache (i.e. if the
@@ -204,17 +213,15 @@ class arena_map : public er::client<arena_map>,
    *
    * While the robots also have their own means of checking if they are on a
    * cache or not, there are some false positives, so this function is used as
-   * the final arbiter when deciding whether or not to trigger a
-   * \ref cache_block_drop or a \ref cached_block_pickup event for a particular
-   * robot. This happens during initialization when the robot's sensors have not
-   * yet been properly initialized by ARGoS.
+   * the final arbiter when deciding whether or not to trigger a cache related
+   * event for a particular robot (such as \ref cached_block_pickup).
    *
    * @param pos The position of a robot.
    *
    * @return The ID of the cache that the robot is on, or -1 if the robot is not
    * actually on a cache.
    */
-  int robot_on_cache(const argos::CVector2& pos) const;
+  int robot_on_cache(const rmath::vector2d& pos) const;
 
   /**
    * @brief Get the subgrid for use in calculating a robot's LOS.
@@ -230,11 +237,18 @@ class arena_map : public er::client<arena_map>,
   }
   double grid_resolution(void) const { return decoratee().resolution(); }
   const representation::nest& nest(void) const { return m_nest; }
+  const support::block_dist::base_distributor* block_distributor(void) const {
+    return m_block_dispatcher.distributor();
+  }
 
   /**
-   * @brief Perform deferred initialization (@todo: Fill this in...)
+   * @brief Perform deferred initialization. This is not part the constructor so
+   * that it can be verified via return code. Currently it initializes:
+   *
+   * - The block distributor
+   * - Nest lights
    */
-  bool initialize(void);
+  bool initialize(support::base_loop_functions* loop);
 
  private:
   // clang-format off

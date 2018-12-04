@@ -83,7 +83,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
      * of the simulation, (2) update its own internal state.
      */
     if (controller.is_carrying_block()) {
-      ER_INFO("%s aborted task %s while carrying block%d",
+      ER_INFO("%s aborted task '%s' while carrying block%d",
               controller.GetId().c_str(),
               dynamic_cast<ta::logical_task*>(controller.current_task())
                   ->name()
@@ -91,7 +91,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
               controller.block()->id());
       task_abort_with_block(controller);
     } else {
-      ER_INFO("%s aborted task %s (no block)",
+      ER_INFO("%s aborted task '%s' (no block)",
               controller.GetId().c_str(),
               dynamic_cast<ta::logical_task*>(controller.current_task())
                   ->name()
@@ -104,7 +104,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
                   "Controller serving penalties from more than one source");
         h->penalty_abort(controller);
         aborted = true;
-        ER_INFO("%s aborted task %s while serving '%s' penalty",
+        ER_INFO("%s aborted task '%s' while serving '%s' penalty",
                 controller.GetId().c_str(),
                 dynamic_cast<ta::logical_task*>(controller.current_task())
                     ->name()
@@ -126,7 +126,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     bool conflict = false;
     for (auto& cache : m_map->caches()) {
       if (loop_utils::block_drop_overlap_with_cache(
-              controller.block(), cache, controller.robot_loc())) {
+              controller.block(), cache, controller.position())) {
         conflict = true;
       }
     } /* for(cache..) */
@@ -143,14 +143,14 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
      * is the only one a robot knows about (see #242).
      */
     if (loop_utils::block_drop_overlap_with_nest(
-            controller.block(), m_map->nest(), controller.robot_loc()) ||
+            controller.block(), m_map->nest(), controller.position()) ||
         loop_utils::block_drop_near_arena_boundary(
-            *m_map, controller.block(), controller.robot_loc())) {
+            *m_map, controller.block(), controller.position())) {
       conflict = true;
     }
     events::free_block_drop drop_op(
         controller.block(),
-        math::rcoord_to_dcoord(controller.robot_loc(), m_map->grid_resolution()),
+        rmath::dvec2uvec(controller.position(), m_map->grid_resolution()),
         m_map->grid_resolution());
     if (!conflict) {
       controller.visitor::template visitable_any<T>::accept(drop_op);

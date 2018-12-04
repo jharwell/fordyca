@@ -43,22 +43,19 @@ block_manifest_processor::block_manifest_processor(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-block_manifest_processor::block_vector block_manifest_processor::create_blocks(
-    void) {
-  block_vector v;
+ds::block_vector block_manifest_processor::create_blocks(void) {
+  ds::block_vector v;
   uint i;
   for (i = 0; i < mc_manifest.n_cube; ++i) {
-    v.push_back(create("cube",
-                       rcppsw::math::vector2d(mc_manifest.unit_dim,
-                                              mc_manifest.unit_dim),
-                       i));
+    v.push_back(create(
+        "cube", rmath::vector2d(mc_manifest.unit_dim, mc_manifest.unit_dim), i));
   } /* for(i..) */
   for (i = mc_manifest.n_cube; i < mc_manifest.n_cube + mc_manifest.n_ramp;
        ++i) {
-    v.push_back(create("ramp",
-                       rcppsw::math::vector2d(mc_manifest.unit_dim * 2,
-                                              mc_manifest.unit_dim),
-                       i));
+    v.push_back(
+        create("ramp",
+               rmath::vector2d(mc_manifest.unit_dim * 2, mc_manifest.unit_dim),
+               i));
   } /* for(i..) */
   return v;
 } /* create_blocks() */

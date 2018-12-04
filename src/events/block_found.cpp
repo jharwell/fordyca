@@ -39,14 +39,12 @@ namespace swarm = rcppsw::swarm;
  * Constructors/Destructor
  ******************************************************************************/
 block_found::block_found(std::unique_ptr<representation::base_block> block)
-    : perceived_cell_op(block->discrete_loc().first,
-                        block->discrete_loc().second),
+    : perceived_cell_op(block->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.block_found"),
       m_block(std::move(block)) {}
 
 block_found::block_found(const std::shared_ptr<representation::base_block>& block)
-    : perceived_cell_op(block->discrete_loc().first,
-                        block->discrete_loc().second),
+    : perceived_cell_op(block->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.block_found"),
       m_block(block) {}
 
@@ -133,13 +131,11 @@ void block_found::visit(ds::perceived_arena_map& map) {
     cell.accept(*this);
   }
   ER_ASSERT(cell.state_has_block(),
-            "Cell@(%u,%u) not in HAS_BLOCK",
-            cell.loc().first,
-            cell.loc().second);
+            "Cell@%s not in HAS_BLOCK",
+            cell.loc().to_str().c_str());
   ER_ASSERT(cell.block()->id() == m_block->id(),
-            "Block for cell@(%u,%u) ID mismatch: %d/%d",
-            cell.loc().first,
-            cell.loc().second,
+            "Block for cell@%s ID mismatch: %d/%d",
+            cell.loc().to_str().c_str(),
             m_block->id(),
             cell.block()->id());
 } /* visit() */

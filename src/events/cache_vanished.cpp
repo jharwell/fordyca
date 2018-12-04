@@ -24,7 +24,7 @@
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
 #include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/fsm/depth1/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 
 #include "fordyca/tasks/depth1/collector.hpp"
@@ -50,7 +50,7 @@ void cache_vanished::visit(
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
 
-  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
   ER_ASSERT(
       nullptr != task,
@@ -67,7 +67,7 @@ void cache_vanished::visit(tasks::depth1::collector& task) {
 } /* visit() */
 
 void cache_vanished::visit(tasks::depth1::harvester& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
@@ -75,7 +75,7 @@ void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-void cache_vanished::visit(fsm::depth1::block_to_goal_fsm& fsm) {
+void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
                    state_machine::event_type::NORMAL);
 } /* visit() */
@@ -88,7 +88,7 @@ void cache_vanished::visit(
   controller.ndc_push();
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
 
-  auto* task = dynamic_cast<tasks::depth1::existing_cache_interactor*>(
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
   ER_ASSERT(
       nullptr != task,
@@ -100,7 +100,7 @@ void cache_vanished::visit(
 } /* visit() */
 
 void cache_vanished::visit(tasks::depth2::cache_transferer& task) {
-  static_cast<fsm::depth1::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
 } /* visit() */
 
 NS_END(events, fordyca);

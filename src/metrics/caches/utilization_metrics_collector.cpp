@@ -71,36 +71,36 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
    */
   line += (!m_int_cache_ids.empty())
               ? std::to_string(static_cast<double>(m_stats.int_blocks) /
-                               (m_int_cache_ids.size()))
+                               (m_int_cache_ids.size() * interval()))
               : "0";
   line += separator();
 
   line += (!m_cum_cache_ids.empty())
               ? std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                               (m_cum_cache_ids.size()))
+                               (m_cum_cache_ids.size() * (timestep() + 1)))
               : "0";
   line += separator();
 
   line += (!m_int_cache_ids.empty())
               ? std::to_string(static_cast<double>(m_stats.int_pickups) /
-                               (m_int_cache_ids.size()))
+                               (m_int_cache_ids.size() * interval()))
               : "0";
   line += separator();
   line += (!m_cum_cache_ids.empty())
               ? std::to_string(static_cast<double>(m_stats.cum_pickups) /
-                               (m_cum_cache_ids.size()))
+                               (m_cum_cache_ids.size() * (timestep() + 1)))
               : "0";
   line += separator();
 
   line += (!m_int_cache_ids.empty())
               ? std::to_string(static_cast<double>(m_stats.int_drops) /
-                               (m_int_cache_ids.size()))
+                               (m_int_cache_ids.size() * interval()))
               : "0";
   line += separator();
 
   line += (!m_cum_cache_ids.empty())
               ? std::to_string(static_cast<double>(m_stats.cum_drops) /
-                               (m_cum_cache_ids.size()))
+                               (m_cum_cache_ids.size() * (timestep() + 1)))
               : "0";
   line += separator();
 
@@ -111,7 +111,7 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
 
 void utilization_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = static_cast<const utilization_metrics&>(metrics);
+  auto& m = dynamic_cast<const utilization_metrics&>(metrics);
   m_stats.int_blocks += m.n_blocks();
   m_int_cache_ids.insert(m.cache_id());
   m_stats.int_pickups += m.total_block_pickups();
@@ -127,6 +127,7 @@ void utilization_metrics_collector::reset_after_interval(void) {
   m_stats.int_blocks = 0;
   m_stats.int_pickups = 0;
   m_stats.int_drops = 0;
+  m_stats.int_blocks = 0;
   m_int_cache_ids.clear();
 } /* reset_after_interval() */
 

@@ -49,9 +49,9 @@ template <typename T>
 class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
  public:
   robot_arena_interactor(ds::arena_map* const map,
-                   stateless_metrics_aggregator *const metrics_agg,
-                   argos::CFloorEntity* const floor,
-                   const ct::waveform_params* const block_penalty)
+                         depth0_metrics_aggregator *const metrics_agg,
+                         argos::CFloorEntity* const floor,
+                         const ct::waveform_params* const block_penalty)
       : ER_CLIENT_INIT("fordyca.support.depth0.robot_arena_interactor"),
         m_free_pickup_interactor(map, floor, block_penalty),
         m_nest_drop_interactor(map, metrics_agg, floor, block_penalty) {}
@@ -65,7 +65,8 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
    * @param controller The controller to handle interactions for.
    * @param timestep The current timestep.
    */
-  void operator()(T& controller, uint timestep) {
+  template<typename C = T>
+  void operator()(C& controller, uint timestep) {
     if (controller.is_carrying_block()) {
       m_nest_drop_interactor(controller, timestep);
     } else { /* The foot-bot has no block item */

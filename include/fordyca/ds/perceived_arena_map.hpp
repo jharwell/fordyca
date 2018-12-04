@@ -27,6 +27,8 @@
 #include <list>
 #include <string>
 
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/representation/perceived_block.hpp"
 #include "fordyca/representation/perceived_cache.hpp"
@@ -53,24 +55,20 @@ namespace er = rcppsw::er;
  * @class perceived_arena_map
  * @ingroup ds
  *
- * @brief The perceived arena map (PAM) stores a logical ds of the
- * state of the arena, from the perspective of the robot.
+ * @brief The perceived arena map (PAM) stores a logical map of the state of the
+ * arena, from the perspective of the robot.
  *
- * Crucially, this class stores the caches SEPARATELY from the \ref arena_map
- * where they actually live (clone not reference), which decouples/simplifies a
- * lot of the tricky handshaking logic for picking up/dropping blocks in
- * caches. The PAM also does *NOT* track which cells are in CACHE_EXTENT, as
- * that is irrelevant for what the robots need (as of 9/14/18 anyway).
+ * Crucially, this class stores the caches and blocks SEPARATELY from the \ref
+ * arena_map where they actually live (clone not reference), which
+ * decouples/simplifies a lot of the tricky handshaking logic for picking
+ * up/dropping blocks in caches. The PAM also does *NOT* track which cells are
+ * in CACHE_EXTENT, as that is irrelevant for what the robots need (as of
+ * 9/14/18 anyway).
  */
 class perceived_arena_map : public er::client<perceived_arena_map>,
                             public decorator::decorator<occupancy_grid>,
                             public visitor::visitable_any<perceived_arena_map> {
  public:
-  using cache_list = std::list<std::shared_ptr<representation::base_cache>>;
-  using block_list = std::list<std::shared_ptr<representation::base_block>>;
-  using perceived_cache_list = std::list<representation::perceived_cache>;
-  using perceived_block_list = std::list<representation::perceived_block>;
-
   perceived_arena_map(
       const struct fordyca::params::occupancy_grid_params* c_params,
       const std::string& robot_id);
@@ -125,19 +123,24 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
    * If the block is already in our list of blocks we know about it needs to be
    * removed, because the new version we just got from our LOS is more up to
    * date.
+   *
+   * @return \c TRUE if a block was actually added to the PAM, and \c FALSE
+   * otherwise.
    */
   bool block_add(const std::shared_ptr<representation::base_block>& block);
 
   /*
    * @brief Remove a block from the list of known blocks, and update its cell to
    * be empty.
+   *
+   * @return \c TRUE if a block was removed, \c FALSE otherwise.
    */
   bool block_remove(const std::shared_ptr<representation::base_block>& victim);
 
   /**
    * @brief Access a particular element in the discretized grid representing the
    * robot's view of the arena. No bounds checking is performed, so if something
-   * is out of bounds, boost with fail with a bounds checking assertion.
+   * is out of bounds, boost will fail with a bounds checking assertion.
    *
    * @param i X coord.
    * @param j Y coord
@@ -157,12 +160,12 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
   }
   template <int Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) {
+      const rmath::vector2u& d) {
     return decoratee().access<Index>(d);
   }
   template <int Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      const rcppsw::math::dcoord2& d) const {
+      const rmath::vector2u& d) const {
     return decoratee().access<Index>(d);
   }
 
@@ -192,7 +195,7 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
    * resides in, and not the cache itself. These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  cache_list m_caches;
+  ds::cache_list m_caches;
 
   /**
    * @brief The blocks that the robot currently knows about. Their relevance is
@@ -200,7 +203,7 @@ class perceived_arena_map : public er::client<perceived_arena_map>,
    * resides in, and not the block itself.These are pointers, rather than a
    * contiguous array, to get better support from valgrind for debugging.
    */
-  block_list m_blocks;
+  ds::block_list m_blocks;
   // clang-format on
 };
 

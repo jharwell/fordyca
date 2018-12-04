@@ -42,9 +42,10 @@ NS_START(fordyca, metrics, blocks);
  * @brief Defines the metrics to be collected from blocks about the process of
  * manipulation (pickup, drop, etc.)
  */
-class manipulation_metrics : virtual public rcppsw::metrics::base_metrics {
+class manipulation_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
   manipulation_metrics(void) = default;
+  ~manipulation_metrics(void) override = default;
 
   /**
    * @brief If \c TRUE, then a free block was picked up this timestep.

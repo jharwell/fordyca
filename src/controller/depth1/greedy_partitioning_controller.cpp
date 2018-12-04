@@ -25,16 +25,17 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/block_selection_matrix.hpp"
-#include "fordyca/controller/cache_selection_matrix.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
-#include "fordyca/controller/depth1/sensing_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/params/block_sel_matrix_params.hpp"
+#include "fordyca/params/cache_sel_matrix_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/params/cache_selection_matrix_params.hpp"
-#include "fordyca/params/block_selection_matrix_params.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -50,7 +51,8 @@ using ds::occupancy_grid;
  ******************************************************************************/
 greedy_partitioning_controller::greedy_partitioning_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.depth1.greedy_partitioning"),
-      m_cache_sel_matrix() {}
+      m_cache_sel_matrix(),
+      m_executive() {}
 
 greedy_partitioning_controller::~greedy_partitioning_controller(void) = default;
 
@@ -59,6 +61,12 @@ greedy_partitioning_controller::~greedy_partitioning_controller(void) = default;
  ******************************************************************************/
 void greedy_partitioning_controller::ControlStep(void) {
   ndc_pusht();
+  if (nullptr != block()) {
+    ER_ASSERT(-1 != block()->robot_id(),
+              "Carried block%d has robot id=%d",
+              block()->id(),
+              block()->robot_id());
+  }
   perception()->update(depth0::stateful_controller::los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
@@ -98,7 +106,6 @@ void greedy_partitioning_controller::Init(ticpp::Element& node) {
 void greedy_partitioning_controller::non_unique_init(
     ticpp::Element& node,
     params::depth1::controller_repository* param_repo) {
-
   param_repo->parse_all(node);
 
   if (!param_repo->validate_all()) {
@@ -106,11 +113,7 @@ void greedy_partitioning_controller::non_unique_init(
     std::exit(EXIT_FAILURE);
   }
 
-  /* Put in new depth1 sensors and perception, ala strategy pattern */
-  saa_subsystem()->sensing(std::make_shared<depth1::sensing_subsystem>(
-      param_repo->parse_results<struct params::sensing_params>(),
-      &saa_subsystem()->sensing()->sensor_list()));
-
+  /* Put in new depth1 perception, ala strategy pattern */
   perception(rcppsw::make_unique<perception_subsystem>(
       param_repo->parse_results<params::perception_params>(), GetId()));
 
@@ -118,16 +121,30 @@ void greedy_partitioning_controller::non_unique_init(
    * Initialize tasking by overriding stateful controller executive via
    * strategy pattern.
    */
-  auto* cache_mat = param_repo->parse_results<params::cache_selection_matrix_params>();
-  auto* block_mat = param_repo->parse_results<params::block_selection_matrix_params>();
-  m_cache_sel_matrix = rcppsw::make_unique<cache_selection_matrix>(cache_mat,
-                                                                   block_mat->nest);
-  block_sel_matrix(rcppsw::make_unique<block_selection_matrix>(block_mat));
+  auto* cache_mat = param_repo->parse_results<params::cache_sel_matrix_params>();
+  auto* block_mat = param_repo->parse_results<params::block_sel_matrix_params>();
+  m_cache_sel_matrix =
+      rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
+  block_sel_matrix(rcppsw::make_unique<class block_sel_matrix>(block_mat));
+  m_executive = tasking_initializer(block_sel_matrix(),
+                                    m_cache_sel_matrix.get(),
+                                    saa_subsystem(),
+                                    perception())(param_repo);
 } /* non_unique_init() */
+
+void greedy_partitioning_controller::task_abort_cb(const ta::polled_task*) {
+  m_task_aborted = true;
+} /* task_abort_cb() */
+
+__rcsw_pure const ta::bi_tab* greedy_partitioning_controller::active_tab(
+    void) const {
+  return m_executive->active_tab();
+} /* active_tab() */
 
 __rcsw_pure tasks::base_foraging_task* greedy_partitioning_controller::current_task(
     void) {
-  return dynamic_cast<tasks::base_foraging_task*>(executive()->current_task());
+  return dynamic_cast<tasks::base_foraging_task*>(
+      m_executive.get()->current_task());
 } /* current_task() */
 
 __rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::
@@ -135,9 +152,31 @@ __rcsw_pure const tasks::base_foraging_task* greedy_partitioning_controller::
   return const_cast<greedy_partitioning_controller*>(this)->current_task();
 } /* current_task() */
 
-void greedy_partitioning_controller::task_abort_cb(const ta::polled_task*) {
-  m_task_aborted = true;
-} /* task_abort_cb() */
+void greedy_partitioning_controller::executive(
+    std::unique_ptr<ta::bi_tdgraph_executive> executive) {
+  m_executive = std::move(executive);
+}
+
+/*******************************************************************************
+ * Block Transportation
+ ******************************************************************************/
+TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
+                         greedy_partitioning_controller,
+                         block_transport_goal,
+                         current_task());
+
+/*******************************************************************************
+ * Goal Acquisition
+ ******************************************************************************/
+TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
+                         greedy_partitioning_controller,
+                         acquisition_goal,
+                         current_task());
+
+TASK_WRAPPER_DEFINEC_PTR(bool,
+                         greedy_partitioning_controller,
+                         goal_acquired,
+                         current_task());
 
 /*******************************************************************************
  * Task Distribution Metrics

@@ -42,7 +42,7 @@ namespace visitor = rcppsw::patterns::visitor;
  ******************************************************************************/
 /**
  * @class robot_interaction_metrics_collector
- * @ingroup metrics blocks
+ * @ingroup metrics
  *
  * @brief Collector for \ref robot_interaction_metrics.
  *

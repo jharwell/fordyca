@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/perception_subsystem.hpp"
+#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/perceived_arena_map.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -54,19 +55,10 @@ void perception_subsystem::process_los(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  representation::line_of_sight::const_cache_list caches = c_los->caches();
-  std::string accum;
-  std::for_each(caches.begin(),
-                caches.end(),
-                [&](const auto& c) {
-                  accum += "c" + std::to_string(c->id()) + "->(" +
-                           std::to_string(c->discrete_loc().first) + "," +
-                           std::to_string(c->discrete_loc().second) +  "),";
-                });
+  ds::const_cache_list caches = c_los->caches();
   if (!caches.empty()) {
-    ER_DEBUG("Caches in LOS: [%s]", accum.c_str());
+    ER_DEBUG("Caches in LOS: [%s]", dbg::caches_list(caches).c_str());
   }
-
 
   /*
    * If the robot thinks that a cell contains a cache, because the cell had one
@@ -76,46 +68,44 @@ void perception_subsystem::process_los(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
+      rmath::vector2u d = c_los->cell(i, j).loc();
       if (!c_los->cell(i, j).state_has_cache() &&
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
-        ER_DEBUG("Correct cache%d discrepency at (%u, %u)",
-                 map()->access<occupancy_grid::kCell>(d).cache()->id(),
-                 d.first,
-                 d.second);
-        map()->cache_remove(map()->access<occupancy_grid::kCell>(d).cache());
+        auto cache = map()->access<occupancy_grid::kCell>(d).cache();
+        ER_DEBUG("Correct cache%d@%s/%s discrepency",
+                 cache->id(),
+                 cache->real_loc().to_str().c_str(),
+                 cache->discrete_loc().to_str().c_str());
+        map()->cache_remove(cache);
       }
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto cache : c_los->caches()) {
+  for (auto& cache : c_los->caches()) {
     /*
      * The state of a cache can change between when the robot saw it last
      * (i.e. different # of blocks in it), and so you need to always process
      * caches in the LOS, even if you already know about them.
      */
-    ER_DEBUG("LOS: Cache%d@(%u,%u): %zu blocks",
+    ER_DEBUG("LOS: Cache%d@%s/%s: %zu blocks",
              cache->id(),
-             cache->discrete_loc().first,
-             cache->discrete_loc().second,
+             cache->real_loc().to_str().c_str(),
+             cache->discrete_loc().to_str().c_str(),
              cache->n_blocks());
     auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
-    auto& density = map()->access<occupancy_grid::kPheromone>(cache->discrete_loc());
 
     if (!cell.state_has_cache()) {
-      ER_INFO("Discovered cache%d(%u, %u): %zu blocks (density=%f, state=%d)",
+      ER_INFO("Discovered cache%d@%s/%s: %zu blocks",
               cache->id(),
-              cache->discrete_loc().first,
-              cache->discrete_loc().second,
-              cache->n_blocks(),
-              density.last_result(),
-              cell.fsm().current_state());
+              cache->real_loc().to_str().c_str(),
+              cache->discrete_loc().to_str().c_str(),
+              cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
-      ER_INFO("Fixed cache%d@(%u, %u) block count: %zu blocks -> %zu blocks",
+      ER_INFO("Fixed cache%d@%s/%s block count: %zu blocks -> %zu blocks",
               cache->id(),
-              cache->discrete_loc().first,
-              cache->discrete_loc().second,
+              cache->real_loc().to_str().c_str(),
+              cache->discrete_loc().to_str().c_str(),
               cell.cache()->n_blocks(),
               cache->n_blocks());
     }
@@ -143,15 +133,14 @@ void perception_subsystem::processed_los_verify(
    * Verify that for each cell that contained a cache in the LOS, the
    * corresponding cell in the PAM also contains the same cache.
    */
-  for (auto &cache : c_los->caches()) {
+  for (auto& cache : c_los->caches()) {
     auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
-    ER_ASSERT(cell.state_has_cache(), "Cell at (%u,%u) not in HAS_CACHE state",
-              cache->discrete_loc().first,
-              cache->discrete_loc().second);
+    ER_ASSERT(cell.state_has_cache(),
+              "Cell@%s not in HAS_CACHE state",
+              cache->discrete_loc().to_str().c_str());
     ER_ASSERT(cell.cache()->id() == cache->id(),
-              "Cell at (%u,%u) has wrong cache ID (%u vs %u)",
-              cache->discrete_loc().first,
-              cache->discrete_loc().second,
+              "Cell@%s has wrong cache ID (%u vs %u)",
+              cache->discrete_loc().to_str().c_str(),
               cache->id(),
               cell.cache()->id());
   } /* for(&block..) */
@@ -163,23 +152,20 @@ void perception_subsystem::processed_los_verify(
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
-      rcppsw::math::dcoord2 d = c_los->cell(i, j).loc();
+      rmath::vector2u d = c_los->cell(i, j).loc();
       auto& cell1 = c_los->cell(i, j);
       auto& cell2 = map()->access<occupancy_grid::kCell>(d);
       if (cell1.state_has_cache()) {
         ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
-                  "LOS/PAM disagree on state of cell at (%u, %u): %d/%d",
-                  d.first,
-                  d.second,
+                  "LOS/PAM disagree on state of cell@%s: %d/%d",
+                  d.to_str().c_str(),
                   cell1.fsm().current_state(),
                   cell2.fsm().current_state());
-        ER_ASSERT(
-            cell1.cache()->n_blocks() == cell2.cache()->n_blocks(),
-            "LOS/PAM disagree on # of blocks in cell at (%u, %u): %zu/%zu",
-            d.first,
-            d.second,
-            cell1.cache()->n_blocks(),
-            cell2.cache()->n_blocks());
+        ER_ASSERT(cell1.cache()->n_blocks() == cell2.cache()->n_blocks(),
+                  "LOS/PAM disagree on # of blocks in cell@%s: %zu/%zu",
+                  d.to_str().c_str(),
+                  cell1.cache()->n_blocks(),
+                  cell2.cache()->n_blocks());
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -188,13 +174,11 @@ void perception_subsystem::processed_los_verify(
     for (auto& c2 : map()->caches()) {
       if (*c1 == *c2) {
         auto& cell = map()->access<occupancy_grid::kCell>(c2->discrete_loc());
-        ER_ASSERT(
-            c1->n_blocks() == cell.cache()->n_blocks(),
-            "LOS/PAM disagree on # of blocks in cell at (%u, %u): %zu/%zu",
-            cell.loc().first,
-            cell.loc().second,
-            c1->n_blocks(),
-            cell.cache()->n_blocks());
+        ER_ASSERT(c1->n_blocks() == cell.cache()->n_blocks(),
+                  "LOS/PAM disagree on # of blocks in cell@%ss: %zu/%zu",
+                  cell.loc().to_str().c_str(),
+                  c1->n_blocks(),
+                  cell.cache()->n_blocks());
       }
     } /* for(c2..) */
   }

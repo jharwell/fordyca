@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 #include <string>
 
 #include "fordyca/controller/motion_throttling_handler.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/math/radians.hpp"
 #include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive.hpp"
 
@@ -38,6 +38,7 @@
 NS_START(fordyca, controller);
 namespace kinematics2D = rcppsw::robotics::kinematics2D;
 namespace hal = rcppsw::robotics::hal;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -50,7 +51,7 @@ class throttling_differential_drive : public kinematics2D::differential_drive {
   throttling_differential_drive(
       kinematics2D::differential_drive::drive_type type,
       double max_speed,
-      argos::CRadians soft_turn_max,
+      const rmath::radians& soft_turn_max,
       const hal::actuators::differential_drive_actuator& wheels,
       const ct::waveform_params* params)
       : differential_drive(wheels,

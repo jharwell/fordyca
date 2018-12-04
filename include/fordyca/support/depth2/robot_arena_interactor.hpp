@@ -58,7 +58,7 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
                                public er::client<robot_arena_interactor<T>> {
  public:
   robot_arena_interactor(ds::arena_map* const map_in,
-                         depth0::stateless_metrics_aggregator *const metrics_agg,
+                         depth0::depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor_in,
                          const ct::waveform_params* const block_manip_penalty,
                          const ct::waveform_params* const cache_usage_penalty,
@@ -87,38 +87,41 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
    *
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
+   *
+   * @return \c TRUE if a block was dropped to create a new cache, \c FALSE
+   * otherwise.
    */
-  void operator()(T& controller, uint timestep) {
+  bool operator()(T& controller, uint timestep) {
     std::list<temporal_penalty_handler<T>*> penalty_handlers =  {
       nest_drop_interactor().penalty_handler(),
       free_pickup_interactor().penalty_handler(),
       &cache_penalty_handler()
     };
     if (task_abort_interactor()(controller, penalty_handlers)) {
-      return;
+      return false;
     }
 
     if (controller.is_carrying_block()) {
       nest_drop_interactor()(controller, timestep);
       existing_cache_drop_interactor()(controller, timestep);
       m_cache_site_drop_interactor(controller, timestep);
-      m_new_cache_drop_interactor(controller, timestep);
+      return m_new_cache_drop_interactor(controller, timestep);
     } else { /* The foot-bot has no block item */
       free_pickup_interactor()(controller, timestep);
       cached_pickup_interactor()(controller, timestep);
+      return false;
     }
   }
 
- protected:
+
+ private:
   using depth1::robot_arena_interactor<T>::nest_drop_interactor;
   using depth1::robot_arena_interactor<T>::free_pickup_interactor;
   using depth1::robot_arena_interactor<T>::task_abort_interactor;
   using depth1::robot_arena_interactor<T>::cached_pickup_interactor;
   using depth1::robot_arena_interactor<T>::existing_cache_drop_interactor;
   using depth1::robot_arena_interactor<T>::cache_penalty_handler;
-  using penalty_type = typename cache_op_penalty_handler<T>::penalty_src;
 
- private:
   // clang-format off
   cache_site_block_drop_interactor<T> m_cache_site_drop_interactor;
   new_cache_block_drop_interactor<T>  m_new_cache_drop_interactor;

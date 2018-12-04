@@ -30,8 +30,8 @@
 #include "rcppsw/task_allocation/polled_task.hpp"
 
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth1/existing_cache_interactor.hpp"
-#include "fordyca/tasks/nest_interactor.hpp"
+#include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/nest_interactor.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -50,8 +50,8 @@ NS_START(fordyca, tasks, depth1);
  * nest. It is abortable, and has one task interface.
  */
 class collector : public foraging_task,
-                  public existing_cache_interactor,
-                  public nest_interactor,
+                  public events::existing_cache_interactor,
+                  public events::nest_interactor,
                   public rcppsw::er::client<collector> {
  public:
   collector(const struct ta::task_allocation_params* params,
@@ -73,13 +73,13 @@ class collector : public foraging_task,
   void accept(events::cache_block_drop&) override {}
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired);
-  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
+  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
 
   /* task metrics */
   bool task_at_interface(void) const override;

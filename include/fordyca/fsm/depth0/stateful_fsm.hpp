@@ -25,12 +25,11 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/acquire_block_fsm.hpp"
+#include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,61 +57,46 @@ using transport_goal_type = block_transporter::goal_type;
  * pickup the block and bring it all the way back to the nest.
  *
  * This FSM will only pickup free blocks. Once it has brought a block all the
- * way to the nest and dropped it in the nest, it will signal that its task is
- * complete.
+ * way to the nest and dropped it in the nest, it will repeat the same sequence
+ * (i.e. it loops indefinitely).
  */
 class stateful_fsm : public base_foraging_fsm,
                      er::client<stateful_fsm>,
                      public metrics::fsm::goal_acquisition_metrics,
                      public block_transporter,
-                     public task_allocation::taskable,
                      public visitor::visitable_any<depth0::stateful_fsm> {
  public:
-  stateful_fsm(const controller::block_selection_matrix* sel_matrix,
+  stateful_fsm(const controller::block_sel_matrix* sel_matrix,
                controller::saa_subsystem* saa,
                ds::perceived_arena_map* map);
 
-  /* taskable overrides */
-  void task_reset(void) override { init(); }
-  void task_start(const task_allocation::taskable_argument*) override {}
-  void task_execute(void) override;
-  bool task_finished(void) const override { return ST_FINISHED == current_state(); }
-  bool task_running(void) const override { return m_task_running; }
-
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
+  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
+  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLARE(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLARE(bool, is_vectoring_to_goal);
-  bool goal_acquired(void) const override;
-  acquisition_goal_type acquisition_goal(void) const override;
+  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
+  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
+  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+
+  void init(void) override;
 
   /**
-   * @brief Reset the FSM.
+   * @brief Run the FSM in its current state, without injecting an event.
    */
-  void init(void) override;
+  void run(void);
 
  protected:
   enum fsm_states {
     ST_START,
-    ST_ACQUIRE_BLOCK,     /* superstate for finding a block */
-    /**
-     * @brief State robots wait in after acquiring a block for the simulation to
-     * send them the block pickup signal. Having this extra state solves a lot
-     * of handshaking/off by one issues regarding the timing of doing so.
-     */
-    ST_WAIT_FOR_PICKUP,
-    ST_WAIT_FOR_DROP,
-    ST_TRANSPORT_TO_NEST, /* take block to nest */
+    ST_BLOCK_TO_NEST,     /* Find a block and bring it to the nest */
     ST_LEAVING_NEST,      /* Block dropped in nest--time to go */
-    ST_FINISHED,
     ST_MAX_STATES
   };
 
@@ -120,22 +104,11 @@ class stateful_fsm : public base_foraging_fsm,
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
-  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
-                     state_machine::event_data);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
-  /* depth0 foraging states */
+  /* foraging states */
   HFSM_STATE_DECLARE(stateful_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(stateful_fsm, acquire_block);
-  HFSM_STATE_DECLARE(stateful_fsm,
-                     wait_for_pickup,
-                     state_machine::event_data);
-  HFSM_STATE_DECLARE(stateful_fsm,
-                     wait_for_drop,
-                     state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(stateful_fsm, finished);
+  HFSM_STATE_DECLARE(stateful_fsm, block_to_nest, state_machine::event_data);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -148,8 +121,7 @@ class stateful_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  bool              m_task_running{false};
-  acquire_block_fsm m_block_fsm;
+  free_block_to_nest_fsm m_block_fsm;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

@@ -24,14 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/utility/math/vector2.h>
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/expression.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, math);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -53,19 +54,19 @@ NS_START(fordyca, math);
  */
 class existing_cache_utility : public rcppsw::math::expression<double> {
  public:
-  existing_cache_utility(const argos::CVector2& cache_loc,
-                         const argos::CVector2& nest_loc);
+  existing_cache_utility(const rmath::vector2d& cache_loc,
+                         const rmath::vector2d& nest_loc);
 
-  double calc(const argos::CVector2& rloc, double density, size_t n_blocks = 1);
-  double operator()(const argos::CVector2& rloc,
+  double calc(const rmath::vector2d& rloc, double density, size_t n_blocks = 1);
+  double operator()(const rmath::vector2d& rloc,
                     double density,
                     size_t n_blocks) {
     return calc(rloc, density, n_blocks);
   }
 
  private:
-  const argos::CVector2 mc_cache_loc;
-  const argos::CVector2 mc_nest_loc;
+  const rmath::vector2d mc_cache_loc;
+  const rmath::vector2d mc_nest_loc;
 };
 
 NS_END(math, fordyca);
