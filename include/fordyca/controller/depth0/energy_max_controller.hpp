@@ -54,7 +54,7 @@ class energy_max_controller : public stateless_foraging_controller {
 
   public:
     energy_max_controller(void);
-    ~energy_max_controller(void);  //override?
+    ~energy_max_controller(void) override;
 
     /* CCI_Controller overrides */
     void Init(argos::TConfigurationNode& node) override;
@@ -70,7 +70,6 @@ class energy_max_controller : public stateless_foraging_controller {
     double                                                   max_energy;
     double                                                   thresh_level;
     std::unique_ptr<fsm::depth0::stateless_foraging_fsm>     m_fsm;
-    sensor::battery_sensor                                   bs;
 
 }
 
