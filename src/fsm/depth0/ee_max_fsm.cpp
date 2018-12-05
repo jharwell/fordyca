@@ -38,23 +38,23 @@ namespace state_machine = rcppsw::patterns::state_machine;
 ee_max_fsm::ee_max_fsm(controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
-      HFSM_CONSTRUCT_STATE(retreat_to_nest, &start),
+      HFSM_CONSTRUCT_STATE(return_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
-      entry_retreat_to_nest(),
+      entry_return_to_nest(),
       entry_leaving_nest(),
       entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(charge_at_nest, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),
       m_explore_fsm(saa,
                     std::make_unique<controller::random_explore_behavior>(saa),
                     std::bind(&ee_max_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&retreat_to_nest,
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&return_to_nest,
                                                nullptr,
-                                               &entry_retreat_to_nest,
+                                               &entry_return_to_nest,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                                nullptr,
@@ -68,7 +68,7 @@ ee_max_fsm::ee_max_fsm(controller::saa_subsystem* const saa)
                                                nullptr,
                                                &entry_wait_for_signal,
                                                nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&charge_at_nest)} {}
+                   HFSM_STATE_MAP_ENTRY_EX(&charging)} {}
 
 /*******************************************************************************
  * States
@@ -106,7 +106,7 @@ HFSM_STATE_DEFINE(ee_max_fsm, wait_for_block_pickup, state_machine::event_data) 
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
-    internal_event(ST_RETREAT_TO_NEST);
+    internal_event(ST_RETURN_TO_NEST);
     // Tony: robot will also enter this state when battery is low handled individually by robot
   } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
     m_explore_fsm.task_reset();
@@ -123,9 +123,9 @@ HFSM_STATE_DEFINE(ee_max_fsm, wait_for_block_drop, state_machine::event_data) {
   }
   return controller::foraging_signal::HANDLED;
 
-  FSM_STATE_DEFINE_ND(ee_max_fsm, charge_at_nest) {
+  FSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
     if (m_explore_fsm.task_finished()) {
-      internal_event(ST_CHARGE_AT_NEST);
+      internal_event(ST_CHARGING);
     }
     // Tony: robot will handle next when to exit nest aka charged, time spent, and P-val allowed
   }
@@ -196,7 +196,7 @@ bool ee_max_fsm::block_detected(void) const {
 } /* block_detected() */
 
 transport_goal_type ee_max_fsm::block_transport_goal(void) const {
-  if (ST_RETREAT_TO_NEST == current_state() ||
+  if (ST_RETURN_TO_NEST == current_state() ||
       ST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::kNest;
   }

@@ -76,8 +76,8 @@
       const rcppsw::metrics::base_metrics& metrics) {
     auto& m = dynamic_cast<const transport_metrics&>(metrics);
     ++m_stats.cum_robots;
-    m_stats.cum_energy += m.avg_energy_level();
-    m_stats.cum_robots_at_nest += m.number_of_nest_robots();
+    m_stats.cum_energy += m.energy_level();
+    m_stats.cum_robots_at_nest += m.is_charging();
   } /* collect() */
 
   void transport_metrics_collector::reset_after_interval(void) {

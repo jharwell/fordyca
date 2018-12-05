@@ -36,7 +36,7 @@
   ******************************************************************************/
 
  /**
-  * @class energy_metrics
+  * @class energy_metrics_opt
   * @ingroup metrics energy
   *
   * @brief Defines the metrics to be collected from robots about the energy and
@@ -52,12 +52,12 @@
     /**
      * @brief Return the average energy level
      */
-    virtual double avg_energy_level(void) const = 0;
+    virtual double energy_level(void) const = 0;
 
     /**
      * @brief Return the number of robots in the nest
      */
-    virtual uint number_of_nest_robots(void) const = 0;
+    virtual int is_charging(void);
 
   };
 

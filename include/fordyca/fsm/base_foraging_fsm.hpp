@@ -150,9 +150,6 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, state_machine::event_data);
 
-  HFSM_STATE_DECLARE_ND(base_foraging_fsm, retreat_to_nest);
-  HFSM_STATE_DECLARE_ND(base_foraging_fsm, charge_at_nest);
-
   /**
    * @brief Robots entering this state will randomly change their exploration
    * direction to the specified direction. All signals are ignored in this
@@ -185,8 +182,6 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
 
-  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_retreat_to_nest);
-  HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_charge_at_nest);
 
  private:
   /**

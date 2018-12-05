@@ -97,21 +97,21 @@ class ee_max_fsm : public base_foraging_fsm,
   enum fsm_states {
     ST_START, /* Initial state */
     ST_ACQUIRE_BLOCK,
-    ST_RETREAT_TO_NEST,        /* Block found--bring it back to the nest */
+    ST_RETURN_TO_NEST,        /* Block found--bring it back to the nest */
     ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
     ST_WAIT_FOR_BLOCK_PICKUP,
     ST_WAIT_FOR_BLOCK_DROP,
-    ST_CHARGE_AT_NEST,
+    ST_CHARGING,
     ST_MAX_STATES,
   };
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, retreat_to_nest,
+  HFSM_STATE_INHERIT(base_foraging_fsm, return_to_nest,
                      state_machine::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
                      state_machine::event_data);
 
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_retreat_to_nest);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_return_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
@@ -122,7 +122,7 @@ class ee_max_fsm : public base_foraging_fsm,
                      state_machine::event_data);
   HFSM_STATE_DECLARE(ee_max_fsm, wait_for_block_drop,
                      state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(ee_max_fsm, charge_at_nest);
+  HFSM_STATE_DECLARE_ND(ee_max_fsm, charging);
 
 
   /**

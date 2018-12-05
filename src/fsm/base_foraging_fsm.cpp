@@ -46,14 +46,14 @@ base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(retreat_to_nest, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(charge_at_nest, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(return_nest, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),
       entry_transport_to_nest(),
       entry_leaving_nest(),
       entry_new_direction(),
       entry_wait_for_signal(),
-      entry_retreat_to_nest(),
-      entry_charge_at_nest(),
+      entry_return_to_nest(),
+      entry_charging(),
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_saa(saa) {}
@@ -181,17 +181,17 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, retreat_to_nest) {
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, return_to_nest) {
   if (current_state() != last_state()) {
-    ER_DEBUG("Executing ST_RETREAT_TO_NEST");
+    ER_DEBUG("Executing ST_RETURN_TO_NEST");
   }
 
-  
+
 }
 
-HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, charge_at_nest) {
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, charging) {
   if (current_state() != last_state()) {
-    ER_DEBUG("Executing ST_CHARGE_AT_NEST");
+    ER_DEBUG("Executing ST_CHARGING");
   }
 
 
@@ -210,10 +210,10 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
   actuators()->differential_drive().stop();
   actuators()->leds_set_color(utils::color::kWHITE);
 }
-HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_retreat_to_nest) {
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_return_to_nest) {
   m_saa->actuation()->leds_set_color(utils::color::kRED);
 }
-HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_charge_at_nest) {
+HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_charging) {
   m_saa->actuation()->leds_set_color(utils::color::kYELLOW);
 }
 
