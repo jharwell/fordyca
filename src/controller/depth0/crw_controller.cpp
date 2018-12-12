@@ -73,10 +73,10 @@ void crw_controller::ControlStep(void) {
               block()->robot_id());
   }
 
-  saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(
+  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->motion_throttle_update(
       saa_subsystem()->sensing()->tick());
-  /* m_fsm->run(); */
+  m_fsm->run();
   ndc_pop();
 } /* ControlStep() */
 
@@ -94,31 +94,6 @@ FSM_WRAPPER_DEFINEC_PTR(transport_goal_type,
                         crw_controller,
                         block_transport_goal,
                         m_fsm);
-
-/*******************************************************************************
- * Distance Metrics
- ******************************************************************************/
-__rcsw_pure double crw_controller::distance(void) const {
-  /*
-   * If you allow distance gathering at timesteps < 1, you get a big jump
-   * because of the prev/current location not being set up properly yet.
-   */
-  if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->sensing()->heading().length();
-  }
-  return 0;
-} /* distance() */
-
-rmath::vector2d crw_controller::velocity(void) const {
-  /*
-   * If you allow distance gathering at timesteps < 1, you get a big jump
-   * because of the prev/current location not being set up properly yet.
-   */
-  if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->linear_velocity();
-  }
-  return rmath::vector2d(0, 0);
-} /* velocity() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

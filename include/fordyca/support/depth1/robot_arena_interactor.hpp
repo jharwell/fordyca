@@ -104,6 +104,16 @@ class robot_arena_interactor : public depth0::robot_arena_interactor<T>,
     }
   }
 
+  /**
+   * @brief Given the current timestep, get the value of the cache usage penalty
+   * waveform that would apply if a robot were to start serving a penalty
+   * now. Cache usage penalty is the same no matter what the robot is doing, so
+   * it can safely be used for all cases (pickup, drop, etc.).
+   */
+  double cache_usage_penalty(double t) const {
+    return m_cache_penalty_handler.timestep_penalty(t);
+  }
+
  protected:
   using depth0::robot_arena_interactor<T>::nest_drop_interactor;
   using depth0::robot_arena_interactor<T>::free_pickup_interactor;

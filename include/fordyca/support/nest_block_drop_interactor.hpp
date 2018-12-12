@@ -93,6 +93,14 @@ class nest_block_drop_interactor
     return &m_penalty_handler;
   }
 
+  /**
+   * @brief Given the current timestep, get the value of the penalty waveform
+   * that would apply if a robot were to start serving a penalty.
+   */
+  double timestep_penalty(double t) const {
+    return m_penalty_handler.timestep_penalty(t);
+  }
+
  private:
   /**
    * @brief Determine if a robot is waiting to drop a block in the nest, and if

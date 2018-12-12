@@ -32,6 +32,7 @@
 #include "fordyca/params/loop_function_repository.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
+#include "fordyca/metrics/temporal_variance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,6 +68,7 @@ namespace rmath = rcppsw::math;
  */
 class base_loop_functions : public argos::CLoopFunctions,
                             public rmetrics::swarm::convergence_metrics,
+                            public metrics::temporal_variance_metrics,
                             public rcppsw::er::client<base_loop_functions> {
  public:
   base_loop_functions(void);
@@ -82,6 +84,11 @@ class base_loop_functions : public argos::CLoopFunctions,
   std::vector<double> robot_nearest_neighbors(void) const override;
   std::vector<rmath::radians> robot_headings(void) const override;
   std::vector<rmath::vector2d> robot_positions(void) const override;
+
+  /* temporal variance metrics */
+  double swarm_motion_throttle(void) const override;
+  double env_block_manipulation(void) const override { return 0.0; }
+  double env_cache_usage(void) const override { return 0.0; }
 
   void ndc_push(void) {
     ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");

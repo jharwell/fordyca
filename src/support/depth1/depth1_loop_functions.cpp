@@ -325,6 +325,14 @@ void depth1_loop_functions::cache_handling_init(
   }
 } /* cache_handling_init() */
 
+/*******************************************************************************
+ * Temporal Variance Metrics
+ ******************************************************************************/
+double depth1_loop_functions::env_cache_usage(void) const {
+  return m_interactor->cache_usage_penalty(
+      const_cast<depth1_loop_functions*>(this)->GetSpace().GetSimulationClock());
+} /* env_block_manipulation() */
+
 using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-prototypes"

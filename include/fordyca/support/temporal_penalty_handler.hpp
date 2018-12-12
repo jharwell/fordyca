@@ -76,6 +76,12 @@ class temporal_penalty_handler
   const std::string& name(void) const { return mc_name; }
 
   /**
+   * @brief Given the current timestep, get the value of the penalty waveform
+   * that would apply if a robot were to start serving a penalty.
+   */
+  double timestep_penalty(double t) const { return m_penalty->value(t); }
+
+  /**
    * @brief Determine if a robot has satisfied the \ref temporal_penalty
    * it is currently serving yet.
    *

@@ -40,6 +40,8 @@
 #include "fordyca/support/base_loop_functions.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
+#include "fordyca/metrics/temporal_variance_metrics.hpp"
+#include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -101,6 +103,10 @@ base_metrics_aggregator::base_metrics_aggregator(
       params->pos_entropy.enable,
       rmath::ranged(0.0, max_dist),
       max_dist / params->pos_entropy.n_iterations);
+
+  register_collector<metrics::temporal_variance_metrics_collector>(
+      "loop::temporal_variance",
+      metrics_path() + "/" + params->loop_temporal_variance_fname);
   reset_all();
 }
 
@@ -110,6 +116,7 @@ base_metrics_aggregator::base_metrics_aggregator(
 void base_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
   collect("swarm::convergence", *loop);
+  collect("loop::temporal_variance", *loop);
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(

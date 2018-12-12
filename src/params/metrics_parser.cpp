@@ -78,6 +78,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_ATTR(mnode, m_params, perception_world_model_fname);
     XML_PARSE_ATTR(mnode, m_params, arena_robot_occupancy_fname);
     XML_PARSE_ATTR(mnode, m_params, swarm_convergence_fname);
+    XML_PARSE_ATTR(mnode, m_params, loop_temporal_variance_fname);
     XML_PARSE_ATTR(mnode, m_params, collect_interval);
     m_parsed = true;
   }
@@ -107,6 +108,7 @@ void metrics_parser::show(std::ostream& stream) const {
          << XML_ATTR_STR(m_params, fsm_collision_fname) << std::endl
          << XML_ATTR_STR(m_params, fsm_movement_fname) << std::endl
          << XML_ATTR_STR(m_params, swarm_convergence_fname) << std::endl
+         << XML_ATTR_STR(m_params, loop_temporal_variance_fname) << std::endl
          << XML_ATTR_STR(m_params, arena_robot_occupancy_fname) << std::endl
          << XML_ATTR_STR(m_params, perception_world_model_fname) << std::endl
          << XML_ATTR_STR(m_params, output_dir) << std::endl

@@ -96,8 +96,8 @@ void stateful_controller::ControlStep(void) {
    */
   m_perception->update(m_perception->los());
 
-  saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(
+  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->motion_throttle_update(
       saa_subsystem()->sensing()->tick());
   m_fsm->run();
   ndc_pop();

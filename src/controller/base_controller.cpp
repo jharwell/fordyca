@@ -192,4 +192,33 @@ void base_controller::ndc_pusht(void) {
               GetId() + "]");
 }
 
+double base_controller::motion_throttle(void) const {
+  return saa_subsystem()->actuation()->differential_drive().motion_throttle();
+} /* motion_throttle() */
+
+/*******************************************************************************
+ * Movement Metrics
+ ******************************************************************************/
+__rcsw_pure double base_controller::distance(void) const {
+  /*
+   * If you allow distance gathering at timesteps < 1, you get a big jump
+   * because of the prev/current location not being set up properly yet.
+   */
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->sensing()->heading().length();
+  }
+  return 0;
+} /* distance() */
+
+rmath::vector2d base_controller::velocity(void) const {
+  /*
+   * If you allow distance gathering at timesteps < 1, you get a big jump
+   * because of the prev/current location not being set up properly yet.
+   */
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->linear_velocity();
+  }
+  return rmath::vector2d(0, 0);
+} /* velocity() */
+
 NS_END(controller, fordyca);

@@ -28,6 +28,8 @@
 #include <string>
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,6 +64,8 @@ namespace er = rcppsw::er;
  * overlays.
  */
 class base_controller : public argos::CCI_Controller,
+                        public metrics::fsm::movement_metrics,
+                        public metrics::fsm::goal_acquisition_metrics,
                         public rcppsw::er::client<base_controller> {
  public:
   base_controller(void);
@@ -73,6 +77,15 @@ class base_controller : public argos::CCI_Controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void Reset(void) override;
+
+  /* movement metrics */
+  double distance(void) const override;
+  rmath::vector2d velocity(void) const override;
+
+  /**
+   * @brief Return the current motion throttling applied to the robot.
+   */
+  double motion_throttle(void) const;
 
   /**
    * @brief Get the ID of the entity. Argos also provides this, but it doesn't

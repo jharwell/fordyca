@@ -22,6 +22,9 @@
   <category name="rcppsw.ta.executive" >
     <priority value ="info" />
   </category>
+  <category name="rcppsw.algorithm.clustering" >
+    <priority value ="off" />
+  </category>
     <category name="fordyca.support.tasking_oracle" >
     <priority value ="debug" />
   </category>

@@ -125,6 +125,9 @@ void base_loop_functions::Reset(void) {
   m_arena_map->distribute_all_blocks();
 } /* Reset() */
 
+/*******************************************************************************
+ * Metrics
+ ******************************************************************************/
 std::vector<double> base_loop_functions::robot_nearest_neighbors(void) const {
   std::vector<rmath::vector2d> v;
   auto& robots =
@@ -203,5 +206,20 @@ std::vector<rmath::vector2d> base_loop_functions::robot_positions(void) const {
   } /* for(&entity..) */
   return v;
 } /* robot_headings() */
+
+double base_loop_functions::swarm_motion_throttle(void) const {
+  double accum = 0.0;
+  auto& robots =
+      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
+          "foot-bot");
+
+  for (auto& entity_pair : robots) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto& controller = dynamic_cast<controller::base_controller&>(
+        robot->GetControllableEntity().GetController());
+    accum += controller.motion_throttle();
+  } /* for(&entity..) */
+  return accum / robots.size();
+} /* swarm_motion_throttle() */
 
 NS_END(support, fordyca);

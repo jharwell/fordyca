@@ -64,6 +64,9 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   void PreStep() override;
   void Reset(void) override;
 
+  /* temporal variance metrics */
+  double env_cache_usage(void) const override;
+
  protected:
   const class tasking_oracle* tasking_oracle(void) const {
     return m_tasking_oracle.get();

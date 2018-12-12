@@ -63,10 +63,6 @@ class crw_controller : public depth0_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
-  /* movement metrics */
-  double distance(void) const override;
-  rmath::vector2d velocity(void) const override;
-
   /* goal acquisition metrics */
   bool is_exploring_for_goal(void) const override { return false; }
   bool is_vectoring_to_goal(void) const override { return false; }

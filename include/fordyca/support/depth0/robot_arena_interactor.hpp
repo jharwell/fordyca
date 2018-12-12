@@ -74,6 +74,17 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
     }
   }
 
+  /**
+   * @brief Given the current timestep, get the value of the block manipulation
+   * penalty waveform that would apply if a robot were to start serving a
+   * penalty now. Block manipulation penalty is the same no matter what the
+   * robot is doing (for now...): dropping in nest, free block drop, free block
+   * pickup, etc. so this function can safely be used for all cases.
+   */
+  double block_manip_penalty(double t) const {
+    return m_nest_drop_interactor.timestep_penalty(t);
+  }
+
  protected:
   free_block_pickup_interactor<T>& free_pickup_interactor(void) {
     return m_free_pickup_interactor;

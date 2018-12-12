@@ -61,6 +61,9 @@ class depth0_loop_functions : public base_loop_functions,
   void Reset(void) override;
   void Destroy(void) override;
 
+  /* temporal variance metrics */
+  double env_block_manipulation(void) const override;
+
  protected:
   virtual void pre_step_final(void);
   template<typename T>

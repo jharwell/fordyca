@@ -69,8 +69,8 @@ void greedy_partitioning_controller::ControlStep(void) {
   }
   perception()->update(depth0::stateful_controller::los());
 
-  saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(
+  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
+  saa_subsystem()->actuation()->motion_throttle_update(
       saa_subsystem()->sensing()->tick());
 
   m_task_aborted = false;

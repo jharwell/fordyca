@@ -183,7 +183,7 @@ __rcsw_pure argos::CColor depth0_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void depth0_loop_functions::PreStep() {
+void depth0_loop_functions::PreStep(void) {
   ndc_push();
   base_loop_functions::PreStep();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -211,6 +211,14 @@ void depth0_loop_functions::pre_step_final(void) {
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 } /* pre_step_final() */
+
+/*******************************************************************************
+ * Temporal Variance Metrics
+ ******************************************************************************/
+double depth0_loop_functions::env_block_manipulation(void) const {
+  return m_crw_interactor->block_manip_penalty(
+      const_cast<depth0_loop_functions*>(this)->GetSpace().GetSimulationClock());
+} /* env_block_manipulation() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

@@ -198,7 +198,8 @@
           task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
-          loop_robot_interaction_fname="loop-robot-interaction.csv"
+          swarm_convergence_fname="swarm-convpergence.csv"
+          loop_temporal_variance_fname="loop-temporal-variance.csv"
           collect_interval="1000">
           <positional_entropy
               enable="true"
@@ -216,10 +217,10 @@
       <blocks>
         <manipulation_penalty>
           <waveform
-              type="Null"
+              type="Sine"
               frequency="0.01"
               amplitude="50"
-              offset="10"/>
+              offset="50"/>
         </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
