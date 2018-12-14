@@ -42,7 +42,7 @@ using cselm = cache_sel_matrix;
  ******************************************************************************/
 cache_site_selector::cache_site_selector(
     const controller::cache_sel_matrix* const matrix)
-    : client("fordyca.controller.depth2.cache_site_selector"),
+    : ER_CLIENT_INIT("fordyca.controller.depth2.cache_site_selector"),
       mc_matrix(matrix) {}
 
 /*******************************************************************************

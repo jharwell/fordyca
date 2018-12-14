@@ -28,6 +28,7 @@
 #include "fordyca/params/oracle_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
+#include "fordyca/params/convergence/convergence_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
@@ -54,6 +55,9 @@ loop_function_repository::loop_function_repository(void) {
       oracle_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
   register_parser<caches::caches_parser, caches::caches_params>(
       caches::caches_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<convergence::convergence_parser, convergence::convergence_params>(
+      convergence::convergence_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 

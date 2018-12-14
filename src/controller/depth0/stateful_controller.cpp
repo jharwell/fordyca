@@ -154,6 +154,8 @@ FSM_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
                         m_fsm);
 
 FSM_WRAPPER_DEFINEC_PTR(bool, stateful_controller, goal_acquired, m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(bool, stateful_controller, is_exploring_for_goal, m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(bool, stateful_controller, is_vectoring_to_goal, m_fsm);
 
 /*******************************************************************************
  * World Model Metrics

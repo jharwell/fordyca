@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="2" />
-    <experiment length="1000"
+    <experiment length="200"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -201,11 +201,18 @@
           swarm_convergence_fname="swarm-convpergence.csv"
           loop_temporal_variance_fname="loop-temporal-variance.csv"
           collect_interval="1000">
-          <positional_entropy
-              enable="true"
-              n_iterations="10"/>
           </metrics>
     </output>
+    <convergence>
+      <positional_entropy
+          enable="true"
+          n_iterations="10"/>
+      <interactivity
+          enable="true"/>
+      <angular_order
+          enable="true"/>
+    </convergence>
+
     <oracle
         enabled="false"
         task_exec_est="false"

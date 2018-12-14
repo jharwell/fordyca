@@ -1,5 +1,5 @@
 /**
- * @file positional_entropy_parser.cpp
+ * @file angular_order_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,37 +21,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/positional_entropy_parser.hpp"
+#include "fordyca/params/convergence/angular_order_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, convergence);
 
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char positional_entropy_parser::kXMLRoot[];
+constexpr char angular_order_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void positional_entropy_parser::parse(const ticpp::Element& node) {
+void angular_order_parser::parse(const ticpp::Element& node) {
     ticpp::Element mnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-    m_params =
-        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-
     XML_PARSE_ATTR(mnode, m_params, enable);
-    if (m_params->enable) {
-      XML_PARSE_ATTR(mnode, m_params, n_iterations);
-    }
 } /* parse() */
 
-void positional_entropy_parser::show(std::ostream& stream) const {
-  stream << build_header();
-  stream << XML_ATTR_STR(m_params, enable) << std::endl
-         << XML_ATTR_STR(m_params, n_iterations) << std::endl
-         << build_footer();
-} /* show() */
-
-NS_END(params, fordyca);
+NS_END(convergence, params, fordyca);

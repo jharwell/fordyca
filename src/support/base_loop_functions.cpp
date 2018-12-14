@@ -24,6 +24,8 @@
 #include "fordyca/support/base_loop_functions.hpp"
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <thread>
+
 #include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
@@ -38,14 +40,16 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace alg = rcppsw::algorithm;
+namespace ralg = rcppsw::algorithm;
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.base"), m_arena_map(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.base"),
+      m_metric_threads(std::thread::hardware_concurrency()),
+      m_arena_map(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
@@ -64,7 +68,7 @@ void base_loop_functions::output_init(
     m_output_root = output->output_root + "/" + output->output_dir;
   }
 
-#ifndef ER_NREPORT
+#ifndef RCPPSW_ER_NREPORT
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
                       m_output_root + "/events.log");
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
@@ -117,10 +121,6 @@ void base_loop_functions::arena_map_init(
   }
 } /* arena_map_init() */
 
-void base_loop_functions::PreStep(void) {
-  robot_nearest_neighbors();
-} /* PreStep() */
-
 void base_loop_functions::Reset(void) {
   m_arena_map->distribute_all_blocks();
 } /* Reset() */
@@ -155,23 +155,27 @@ std::vector<double> base_loop_functions::robot_nearest_neighbors(void) const {
    * algorithm).
    */
   std::vector<double> res;
+#pragma omp parallel for num_threads(m_metric_threads)
   for (size_t i = 0; i < robots.size() / 2; ++i) {
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
-    auto pts = alg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
+    auto pts = ralg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
     size_t old = v.size();
-    v.erase(std::remove_if(v.begin(),
-                           v.end(),
-                           [&](const auto& pt) {
-                             return pt == pts.p1 || pt == pts.p2;
-                           }),
-            v.end());
+#pragma omp critical
+    {
+      v.erase(std::remove_if(v.begin(),
+                             v.end(),
+                             [&](const auto& pt) {
+                               return pt == pts.p1 || pt == pts.p2;
+                             }),
+              v.end());
 
-    ER_ASSERT(old == v.size() + 2,
-              "Closest pair of points not removed from set");
-    res.push_back(pts.dist);
-    res.push_back(pts.dist);
+      ER_ASSERT(old == v.size() + 2,
+                "Closest pair of points not removed from set");
+      res.push_back(pts.dist);
+      res.push_back(pts.dist);
+    }
   } /* for(i..) */
 
   return res;

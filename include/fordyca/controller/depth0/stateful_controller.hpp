@@ -67,6 +67,8 @@ class stateful_controller : public crw_controller,
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLAREC(bool, goal_acquired);
+  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
   FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 
   /* world model metrics */

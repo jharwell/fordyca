@@ -1,7 +1,7 @@
 /**
- * @file actuation_subsystem.cpp
+ * @file interactivity_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,43 +21,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/params/actuation_params.hpp"
+#include "fordyca/params/convergence/interactivity_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
-using kinematics2D::differential_drive;
+NS_START(fordyca, params, convergence);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Global Variables
  ******************************************************************************/
-actuation_subsystem::actuation_subsystem(
-    const struct params::actuation_params* c_params,
-    struct actuator_list* const list)
-    : mc_params(*c_params),
-      m_actuators(*list),
-      m_drive(differential_drive::kFSMDrive,
-              c_params->differential_drive.max_speed,
-              c_params->differential_drive.soft_turn_max,
-              m_actuators.wheels,
-              &c_params->throttling) {}
-
-void actuation_subsystem::reset(void) {
-#ifdef FORDYCA_WITH_ROBOT_RAB
-  m_actuators.wifi.reset();
-#endif
-  m_drive.stop();
-} /* reset() */
+constexpr char interactivity_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuation_subsystem::leds_set_color(const utils::color& color) {
-#ifdef FORDYCA_WITH_ROBOT_LEDS
-  m_actuators.leds.set_color(-1, color);
-#endif
-} /* leds_set_color() */
+void interactivity_parser::parse(const ticpp::Element& node) {
+    ticpp::Element mnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    XML_PARSE_ATTR(mnode, m_params, enable);
+} /* parse() */
 
-NS_END(controller, fordyca);
+NS_END(convergence, params, fordyca);

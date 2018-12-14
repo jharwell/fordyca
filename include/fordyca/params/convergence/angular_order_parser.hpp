@@ -1,7 +1,7 @@
 /**
- * @file metrics_parser.hpp
+ * @file angular_order_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,53 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_METRICS_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_METRICS_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CONVERGENCE_ANGULAR_ORDER_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CONVERGENCE_ANGULAR_ORDER_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/params/convergence/angular_order_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, convergence);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class metrics_parser
+ * @class angular_order_parser
  * @ingroup params
  *
- * @brief Parses XML parameters related to metric collection into
- * \ref metrics_params.
+ * @brief Parses XML parameters related the calculation of swarm angular order
+ * into \ref angular_order_params.
  */
-class metrics_parser : public rcppsw::params::xml_param_parser {
+class angular_order_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit metrics_parser(uint level)
-      : xml_param_parser(level),
-        m_params(std::make_shared<std::remove_reference<decltype(*m_params)>::type>()) {}
-  ~metrics_parser(void) override = default;
+  explicit angular_order_parser(uint level) :
+      xml_param_parser(level),
+      m_params(std::make_shared<std::remove_reference<decltype(*m_params)>::type>()) {}
 
   /**
-   * @brief The root tag that all loop functions relating to metrics parameters
-   * should lie under in the XML tree.
+   * @brief The root tag that all loop functions relating to angular_order
+   * parameters should lie under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "metrics";
+  static constexpr char kXMLRoot[] = "angular_order";
 
-  void show(std::ostream& stream) const override;
-  bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
 
-  std::shared_ptr<metrics_params> parse_results(void) const { return m_params; }
+  std::shared_ptr<angular_order_params> parse_results(void) const { return m_params; }
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
@@ -73,11 +70,10 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
   }
 
   // clang-format off
-  bool                                   m_parsed{false};
-  std::shared_ptr<metrics_params>        m_params;
+  std::shared_ptr<angular_order_params> m_params;
   // clang-format on
 };
 
-NS_END(params, fordyca);
+NS_END(convergence, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_METRICS_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CONVERGENCE_ANGULAR_ORDER_PARSER_HPP_ */

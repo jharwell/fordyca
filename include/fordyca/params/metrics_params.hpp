@@ -28,7 +28,7 @@
 
 #include "fordyca/params/grid_params.hpp"
 #include "rcppsw/params/base_params.hpp"
-#include "fordyca/params/positional_entropy_params.hpp"
+#include "fordyca/params/convergence/convergence_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +43,7 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct metrics_params : public rcppsw::params::base_params {
-  positional_entropy_params pos_entropy{};
+  convergence::convergence_params convergence{};
 
   std::string fsm_movement_fname{""};
   std::string fsm_collision_fname{""};

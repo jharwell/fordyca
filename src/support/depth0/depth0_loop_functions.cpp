@@ -35,6 +35,7 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/params/convergence/convergence_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,8 +63,9 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
   auto* arena = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
       *params()->parse_results<params::output_params>();
+  auto conv = params()->parse_results<params::convergence::convergence_params>();
   output.metrics.arena_grid = arena->grid;
-
+  output.metrics.convergence = *conv;
   m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,
                                                                  output_root());
 

@@ -131,7 +131,7 @@ ds::block_list dynamic_cache_creator::avoidance_blocks_calc(
       candidate_blocks.begin(),
       candidate_blocks.end(),
       std::back_inserter(avoidance_blocks),
-      [&](const auto& b) {
+      [&](const auto& b) __rcsw_pure {
         return used_blocks.end() ==
                    std::find(used_blocks.begin(), used_blocks.end(), b) &&
                cache_i_blocks.end() ==

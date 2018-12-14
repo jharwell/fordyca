@@ -41,12 +41,6 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
   /* loop functions metrics not part of controller XML tree  */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    m_params =
-        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-
-    m_pos_entropy.parse(mnode);
-    m_params->pos_entropy = *m_pos_entropy.parse_results();
-
     XML_PARSE_ATTR(mnode, m_params, fsm_collision_fname);
     XML_PARSE_ATTR(mnode, m_params, fsm_movement_fname);
 

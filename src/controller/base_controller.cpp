@@ -77,7 +77,7 @@ __rcsw_pure rmath::vector2d base_controller::heading(void) const {
 }
 
 void base_controller::Init(ticpp::Element& node) {
-#ifndef ER_NREPORT
+#ifndef RCPPSW_ER_NREPORT
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
   } else {
@@ -100,32 +100,8 @@ void base_controller::Init(ticpp::Element& node) {
   output_init(params);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  struct actuation_subsystem::actuator_list alist = {
-      .wheels = hal::actuators::differential_drive_actuator(
-          GetActuator<argos::CCI_DifferentialSteeringActuator>(
-              "differential_steering")),
-      .leds = hal::actuators::led_actuator(
-          GetActuator<argos::CCI_LEDsActuator>("leds")),
-      .wifi = hal::actuators::wifi_actuator(
-          GetActuator<argos::CCI_RangeAndBearingActuator>(
-              "range_and_bearing"))};
-  struct sensing_subsystem::sensor_list slist = {
-      .rabs = hal::sensors::rab_wifi_sensor(
-          GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
-      .proximity = hal::sensors::proximity_sensor(
-          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
-      .light = hal::sensors::light_sensor(
-          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
-      .ground = hal::sensors::ground_sensor(
-          GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-              "footbot_motor_ground")),
-      .battery = hal::sensors::battery_sensor(
-          GetSensor<argos::CCI_BatterySensor>("battery"))};
-  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
-      param_repo.parse_results<struct params::actuation_params>(),
-      param_repo.parse_results<struct params::sensing_params>(),
-      &alist,
-      &slist);
+  saa_init(param_repo.parse_results<params::actuation_params>(),
+           param_repo.parse_results<params::sensing_params>());
   ndc_pop();
 } /* Init() */
 
@@ -133,6 +109,53 @@ void base_controller::Reset(void) {
   CCI_Controller::Reset();
   m_block.reset();
 } /* Reset() */
+
+void base_controller::saa_init(const params::actuation_params* const actuation_p,
+                               const params::sensing_params* const sensing_p) {
+  struct actuation_subsystem::actuator_list alist = {
+      .wheels = hal::actuators::differential_drive_actuator(
+          GetActuator<argos::CCI_DifferentialSteeringActuator>(
+              "differential_steering")),
+#ifdef FORDYCA_ROBOT_LEDS
+      .leds = hal::actuators::led_actuator(
+          GetActuator<argos::CCI_LEDsActuator>("leds")),
+#else
+      .leds = hal::actuators::led_actuator(nullptr),
+#endif
+#ifdef FORDYCA_WITH_ROBOT_RAB
+      .wifi = hal::actuators::wifi_actuator(
+          GetActuator<argos::CCI_RangeAndBearingActuator>(
+              "range_and_bearing")),
+#else
+      .wifi = hal::actuators::wifi_actuator(nullptr)
+#endif
+  };
+  struct sensing_subsystem::sensor_list slist = {
+    #ifdef FORDYCA_WITH_ROBOT_RAB
+      .rabs = hal::sensors::rab_wifi_sensor(
+          GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
+#else
+    .rabs = hal::sensors::rab_wifi_sensor(nullptr),
+#endif
+      .proximity = hal::sensors::proximity_sensor(
+          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
+      .light = hal::sensors::light_sensor(
+          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
+      .ground = hal::sensors::ground_sensor(
+          GetSensor<argos::CCI_FootBotMotorGroundSensor>(
+              "footbot_motor_ground")),
+#ifdef FORDYCA_WITH_ROBOT_RAB
+    .battery = hal::sensors::battery_sensor(
+      GetSensor<argos::CCI_BatterySensor>("battery")),
+#else
+    .battery = hal::sensors::battery_sensor(nullptr),
+#endif
+  };
+  m_saa = rcppsw::make_unique<controller::saa_subsystem>(actuation_p,
+                                                         sensing_p,
+                                                         &alist,
+                                                         &slist);
+} /* saa_init() */
 
 void base_controller::output_init(
     const struct params::output_params* const params) {
@@ -152,7 +175,7 @@ void base_controller::output_init(
     fs::create_directories(output_root);
   }
 
-#ifndef ER_NREPORT
+#ifndef RCPPSW_ER_NREPORT
   /*
    * Each file appender is attached to a root category in the FORDYCA
    * namespace. If you give different file appenders the same file, then the

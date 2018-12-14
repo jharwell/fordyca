@@ -1,5 +1,5 @@
 /**
- * @file positional_entropy_params.hpp
+ * @file interactivity_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CONVERGENCE_INTERACTIVITY_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CONVERGENCE_INTERACTIVITY_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,20 +29,19 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, convergence);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct positional_entropy_params
+ * @struct interactivity_params
  * @ingroup params
  */
-struct positional_entropy_params : public rcppsw::params::base_params {
+struct interactivity_params : public rcppsw::params::base_params {
   bool enable{false};
-  uint n_iterations{0};
 };
 
-NS_END(params, fordyca);
+NS_END(convergence, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_POSITIONAL_ENTROPY_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CONVERGENCE_INTERACTIVITY_PARAMS_HPP_ */

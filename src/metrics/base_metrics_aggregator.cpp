@@ -100,9 +100,11 @@ base_metrics_aggregator::base_metrics_aggregator(
       "swarm::convergence",
       metrics_path() + "/" + params->swarm_convergence_fname,
       params->collect_interval,
-      params->pos_entropy.enable,
+      params->convergence.pos_entropy.enable,
+      params->convergence.interactivity.enable,
+      params->convergence.ang_order.enable,
       rmath::ranged(0.0, max_dist),
-      max_dist / params->pos_entropy.n_iterations);
+      max_dist / params->convergence.pos_entropy.n_iterations);
 
   register_collector<metrics::temporal_variance_metrics_collector>(
       "loop::temporal_variance",

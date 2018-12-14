@@ -64,8 +64,8 @@ class crw_controller : public depth0_controller,
   void Reset(void) override;
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override { return false; }
   bool is_vectoring_to_goal(void) const override { return false; }
+  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
   FSM_WRAPPER_DECLAREC(bool, goal_acquired);
   FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
 

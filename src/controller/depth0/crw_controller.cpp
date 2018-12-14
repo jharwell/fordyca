@@ -84,6 +84,7 @@ void crw_controller::ControlStep(void) {
  * FSM Metrics
  ******************************************************************************/
 FSM_WRAPPER_DEFINEC_PTR(bool, crw_controller, goal_acquired, m_fsm);
+FSM_WRAPPER_DEFINEC_PTR(bool, crw_controller, is_exploring_for_goal, m_fsm);
 
 FSM_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
                         crw_controller,

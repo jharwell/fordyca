@@ -42,6 +42,8 @@ class line_of_sight;
 } // namespace representation
 namespace params {
 struct output_params;
+struct sensing_params;
+struct actuation_params;
 }
 
 NS_START(controller);
@@ -190,6 +192,7 @@ class base_controller : public argos::CCI_Controller,
 
  private:
   void output_init(const struct params::output_params* params);
+  void saa_init(const params::actuation_params*, const params::sensing_params*);
 
   // clang-format off
   bool                                        m_display_id{false};
