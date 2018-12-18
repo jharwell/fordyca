@@ -38,6 +38,7 @@
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/swarm/convergence/convergence_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,8 +70,10 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   auto* arenap = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
       *params()->parse_results<const struct params::output_params>();
+    auto* conv = params()->parse_results<rswc::convergence_params>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(&output.metrics,
+                                                                 conv,
                                                                  output_root());
 
   /* initialize cache handling and create initial cache */

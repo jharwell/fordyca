@@ -72,7 +72,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
  public:
   using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
-  depth1_metrics_aggregator(const struct params::metrics_params* params,
+  depth1_metrics_aggregator(const params::metrics_params* mparams,
+                            const rswc::convergence_params * cparams,
                             const std::string& output_root);
 
   /**

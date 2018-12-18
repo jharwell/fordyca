@@ -51,42 +51,43 @@ using task2 = tasks::depth2::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth2_metrics_aggregator::depth2_metrics_aggregator(
-    const struct params::metrics_params* params,
+    const params::metrics_params* const mparams,
+    const rswc::convergence_params * const cparams,
     const std::string& output_root)
-    : depth1_metrics_aggregator(params, output_root),
+    : depth1_metrics_aggregator(mparams, cparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::harvester",
-      metrics_path() + "/" + params->task_tab_collector_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_tab_collector_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::collector",
-      metrics_path() + "/" + params->task_tab_harvester_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_tab_harvester_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheStarterName),
-      metrics_path() + "/" + params->task_execution_cache_starter_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_cache_starter_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheFinisherName),
-      metrics_path() + "/" + params->task_execution_cache_finisher_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_cache_finisher_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheTransfererName),
-      metrics_path() + "/" + params->task_execution_cache_transferer_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_cache_transferer_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheCollectorName),
-      metrics_path() + "/" + params->task_execution_cache_collector_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_cache_collector_fname,
+      mparams->collect_interval);
 
   /*
    * Overwrite depth1; we have a deeper decomposition now
    */
   register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
-      metrics_path() + "/" + params->task_distribution_fname,
-      params->collect_interval,
+      metrics_path() + "/" + mparams->task_distribution_fname,
+      mparams->collect_interval,
       2);
   reset_all();
 }

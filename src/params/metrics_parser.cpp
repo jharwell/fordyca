@@ -41,6 +41,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
   /* loop functions metrics not part of controller XML tree  */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
+
     XML_PARSE_ATTR(mnode, m_params, fsm_collision_fname);
     XML_PARSE_ATTR(mnode, m_params, fsm_movement_fname);
 

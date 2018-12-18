@@ -54,11 +54,12 @@ namespace rmetrics = rcppsw::metrics;
  * Constructors/Destructors
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
-    const struct params::metrics_params* params,
+    const params::metrics_params* const mparams,
+    const rswc::convergence_params* const cparams,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
       collector_group(),
-      m_metrics_path(output_root + "/" + params->output_dir) {
+      m_metrics_path(output_root + "/" + mparams->output_dir) {
   if (!fs::exists(m_metrics_path)) {
     fs::create_directories(m_metrics_path);
   } else {
@@ -66,49 +67,44 @@ base_metrics_aggregator::base_metrics_aggregator(
   }
   register_collector<metrics::fsm::movement_metrics_collector>(
       "fsm::movement",
-      metrics_path() + "/" + params->fsm_movement_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->fsm_movement_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::fsm::collision_metrics_collector>(
       "fsm::collision",
-      metrics_path() + "/" + params->fsm_collision_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->fsm_collision_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "blocks::acquisition",
-      metrics_path() + "/" + params->block_acquisition_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->block_acquisition_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::blocks::transport_metrics_collector>(
       "blocks::transport",
-      metrics_path() + "/" + params->block_transport_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->block_transport_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::blocks::manipulation_metrics_collector>(
       "blocks::manipulation",
-      metrics_path() + "/" + params->block_manipulation_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->block_manipulation_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::robot_occupancy_metrics_collector>(
       "arena::robot_occupancy",
-      metrics_path() + "/" + params->arena_robot_occupancy_fname,
-      params->collect_interval,
-      rmath::dvec2uvec(params->arena_grid.upper, params->arena_grid.resolution));
+      metrics_path() + "/" + mparams->arena_robot_occupancy_fname,
+      mparams->collect_interval,
+      rmath::dvec2uvec(mparams->arena_grid.upper, mparams->arena_grid.resolution));
 
-  double max_dist = (params->arena_grid.lower - params->arena_grid.upper).length();
   register_collector<rmetrics::swarm::convergence_metrics_collector>(
       "swarm::convergence",
-      metrics_path() + "/" + params->swarm_convergence_fname,
-      params->collect_interval,
-      params->convergence.pos_entropy.enable,
-      params->convergence.interactivity.enable,
-      params->convergence.ang_order.enable,
-      rmath::ranged(0.0, max_dist),
-      max_dist / params->convergence.pos_entropy.n_iterations);
+      metrics_path() + "/" + mparams->swarm_convergence_fname,
+      mparams->collect_interval,
+      cparams);
 
   register_collector<metrics::temporal_variance_metrics_collector>(
       "loop::temporal_variance",
-      metrics_path() + "/" + params->loop_temporal_variance_fname);
+      metrics_path() + "/" + mparams->loop_temporal_variance_fname);
   reset_all();
 }
 

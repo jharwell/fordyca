@@ -104,6 +104,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
   ds::arena_map* arena_map(void) { return m_arena_map.get(); }
 
+
  private:
   /**
    * @brief Initialize logging for all support/loop function code.
@@ -114,7 +115,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   void arena_map_init(const params::loop_function_repository* repo);
 
   // clang-format off
-  uint                             m_metric_threads;
+  uint                             m_loop_threads{0};
   argos::CFloorEntity*             m_floor{nullptr};
   std::string                      m_output_root{""};
   params::loop_function_repository m_params{};

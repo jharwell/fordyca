@@ -28,7 +28,7 @@
 #include "fordyca/params/oracle_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
-#include "fordyca/params/convergence/convergence_parser.hpp"
+#include "rcppsw/swarm/convergence/convergence_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
@@ -36,6 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca, params);
 namespace ct = rcppsw::control;
+namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -56,8 +57,8 @@ loop_function_repository::loop_function_repository(void) {
   register_parser<caches::caches_parser, caches::caches_params>(
       caches::caches_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<convergence::convergence_parser, convergence::convergence_params>(
-      convergence::convergence_parser::kXMLRoot,
+  register_parser<rswc::convergence_parser, rswc::convergence_params>(
+      rswc::convergence_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 

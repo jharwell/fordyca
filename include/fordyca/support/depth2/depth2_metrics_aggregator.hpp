@@ -53,7 +53,8 @@ namespace er = rcppsw::er;
 class depth2_metrics_aggregator : public depth1::depth1_metrics_aggregator,
                                   public er::client<depth2_metrics_aggregator> {
  public:
-  depth2_metrics_aggregator(const struct params::metrics_params* params,
+  depth2_metrics_aggregator(const params::metrics_params* params,
+                            const rswc::convergence_params * const cparams,
                             const std::string& output_root);
 
   void task_alloc_cb(const ta::polled_task* task,

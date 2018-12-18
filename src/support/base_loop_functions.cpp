@@ -35,6 +35,7 @@
 
 #include "fordyca/ds/arena_map.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
+#include "rcppsw/swarm/convergence/convergence_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,13 +43,13 @@
 NS_START(fordyca, support);
 namespace ralg = rcppsw::algorithm;
 namespace rmath = rcppsw::math;
+namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.base"),
-      m_metric_threads(std::thread::hardware_concurrency()),
       m_arena_map(nullptr) {}
 
 /*******************************************************************************
@@ -84,7 +85,7 @@ void base_loop_functions::output_init(
 
 void base_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
-  /* parse all environment parameters and capture in logfile */
+  /* parse simulation input file */
   m_params.parse_all(node);
 
   /* initialize output and metrics collection */
@@ -92,6 +93,9 @@ void base_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize arena map and distribute blocks */
   arena_map_init(params());
+
+  /* initialize convergence calculations */
+  m_loop_threads = m_params.parse_results<rswc::convergence_params>()->n_threads;
 
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
@@ -155,7 +159,7 @@ std::vector<double> base_loop_functions::robot_nearest_neighbors(void) const {
    * algorithm).
    */
   std::vector<double> res;
-#pragma omp parallel for num_threads(m_metric_threads)
+#pragma omp parallel for num_threads(m_loop_threads)
   for (size_t i = 0; i < robots.size() / 2; ++i) {
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,

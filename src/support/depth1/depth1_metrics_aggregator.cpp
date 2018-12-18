@@ -60,53 +60,54 @@ namespace rmath = rcppsw::math;
  * Constructors/Destructors
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
-    const struct params::metrics_params* params,
+    const params::metrics_params* const mparams,
+    const rswc::convergence_params * const cparams,
     const std::string& output_root)
-    : depth0_metrics_aggregator(params, output_root),
+    : depth0_metrics_aggregator(mparams, cparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acquisition",
-      metrics_path() + "/" + params->cache_acquisition_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->cache_acquisition_fname,
+      mparams->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kCollectorName),
-      metrics_path() + "/" + params->task_execution_collector_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_collector_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kHarvesterName),
-      metrics_path() + "/" + params->task_execution_harvester_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_harvester_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task0::kGeneralistName),
-      metrics_path() + "/" + params->task_execution_generalist_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_generalist_fname,
+      mparams->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::generalist",
-      metrics_path() + "/" + params->task_tab_generalist_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_tab_generalist_fname,
+      mparams->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
-      metrics_path() + "/" + params->task_distribution_fname,
-      params->collect_interval,
+      metrics_path() + "/" + mparams->task_distribution_fname,
+      mparams->collect_interval,
       1);
 
   register_collector<metrics::caches::utilization_metrics_collector>(
       "caches::utilization",
-      metrics_path() + "/" + params->cache_utilization_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->cache_utilization_fname,
+      mparams->collect_interval);
   register_collector<metrics::caches::lifecycle_metrics_collector>(
       "caches::lifecycle",
-      metrics_path() + "/" + params->cache_lifecycle_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->cache_lifecycle_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::caches::location_metrics_collector>(
       "caches::locations",
-      metrics_path() + "/" + params->cache_locations_fname,
-      params->collect_interval,
-      rmath::dvec2uvec(params->arena_grid.upper, params->arena_grid.resolution));
+      metrics_path() + "/" + mparams->cache_locations_fname,
+      mparams->collect_interval,
+      rmath::dvec2uvec(mparams->arena_grid.upper, mparams->arena_grid.resolution));
   reset_all();
 }
 
