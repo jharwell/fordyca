@@ -88,13 +88,13 @@ class actuation_subsystem {
    * @brief Set whether or not temporary throttling of overall maximum speed is
    * enabled when a robot is carrying a block.
    */
-  void motion_throttle_toggle(bool en) { m_drive.motion_throttle_toggle(en); }
+  void motion_throttle_toggle(bool en) { m_drive.throttle_toggle(en); }
 
   /**
    * @brief Update the currently applied amount of throttling based on
    * presumably new configuration.
    */
-  void motion_throttle_update(uint timestep) { m_drive.motion_throttle_update(timestep); }
+  void motion_throttle_update(uint timestep) { m_drive.throttle_update(timestep); }
 
   /**
    * @brief Reset the actuations, including stopping the robot.

@@ -215,9 +215,9 @@ void base_controller::ndc_pusht(void) {
               GetId() + "]");
 }
 
-double base_controller::motion_throttle(void) const {
-  return saa_subsystem()->actuation()->differential_drive().motion_throttle();
-} /* motion_throttle() */
+double base_controller::applied_motion_throttle(void) const {
+  return saa_subsystem()->actuation()->differential_drive().applied_throttle();
+} /* applied_motion_throttle() */
 
 /*******************************************************************************
  * Movement Metrics

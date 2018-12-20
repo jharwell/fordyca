@@ -156,7 +156,6 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     ER_FATAL_SENTINEL("Bad depth0 controller");
   }
 
-  /* update arena map metrics with robot position */
   auto coord =
       rmath::dvec2uvec(controller.position(), arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;

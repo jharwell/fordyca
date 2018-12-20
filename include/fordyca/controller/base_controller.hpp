@@ -85,9 +85,10 @@ class base_controller : public argos::CCI_Controller,
   rmath::vector2d velocity(void) const override;
 
   /**
-   * @brief Return the current motion throttling applied to the robot.
+   * @brief Return the applied motion throttling for the robot. This is not
+   * necessarily the same as the active/configured throttling.
    */
-  double motion_throttle(void) const;
+  double applied_motion_throttle(void) const;
 
   /**
    * @brief Get the ID of the entity. Argos also provides this, but it doesn't

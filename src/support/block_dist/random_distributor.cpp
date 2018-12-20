@@ -72,6 +72,7 @@ bool random_distributor::distribute_block(
   ds::cell2D* cell = nullptr;
   coord_search_res_t res = avail_coord_search(entities, block->dims());
   if (!res.status) {
+    ER_WARN("Unable to find distribution coordinates for block%d", block->id());
     return false;
   }
   ER_INFO("Found coordinates for distribution: rel=%s, abs=%s",

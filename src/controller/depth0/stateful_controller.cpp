@@ -123,8 +123,11 @@ void stateful_controller::Init(ticpp::Element& node) {
   }
 
   /* initialize subsystems and perception */
-  m_perception = rcppsw::make_unique<base_perception_subsystem>(
-      param_repo.parse_results<params::perception_params>(), GetId());
+  params::perception_params p = *param_repo.parse_results<params::perception_params>();
+  p.grid.upper.x(p.grid.upper.x() + 1);
+  p.grid.upper.y(p.grid.upper.y() + 1);
+
+  m_perception = rcppsw::make_unique<base_perception_subsystem>(&p, GetId());
 
   auto* block_mat = param_repo.parse_results<params::block_sel_matrix_params>();
   m_block_sel_matrix = rcppsw::make_unique<class block_sel_matrix>(block_mat);

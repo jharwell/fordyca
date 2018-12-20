@@ -45,10 +45,11 @@ motion_throttling_handler::~motion_throttling_handler(void) = default;
  ******************************************************************************/
 void motion_throttling_handler::update(uint timestep) {
   if (m_en) {
-    m_current = m_waveform->value(timestep);
+    m_active = m_waveform->value(timestep);
   } else {
-    m_current = 0;
+    m_active = 0;
   }
+  m_applied = m_waveform->value(timestep);
 } /* update() */
 
 NS_END(controller, fordyca);

@@ -52,10 +52,18 @@ class motion_throttling_handler {
   ~motion_throttling_handler(void);
 
   /**
-   * @brief Get the current amount of motion_throttling (a percentage between 0 and 1)
-   * that is configured for block carry.
+   * @brief Get the applied amount of motion_throttling (a percentage between 0
+   * and 1) that should be applied to the robot. Only > 0 if the robot is
+   * actually carrying a block.
    */
-  double current_throttle(void) const { return m_current; }
+  double active_throttle(void) const { return m_active; }
+
+  /**
+   * @brief Get the current amount of motion_throttling (a percentage between 0
+   * and 1) that is configured for block carry and being applied to the robot
+   * (regardless if it is active or not).
+   */
+  double applied_throttle(void) const { return m_applied; }
 
   /**
    * @brief Set the current block carry state.
@@ -71,7 +79,8 @@ class motion_throttling_handler {
  private:
   // clang-format off
   bool   m_en{false};
-  double m_current{0.0};
+  double m_active{0.0};
+  double m_applied{0.0};
   std::unique_ptr<ct::waveform> m_waveform;
   // clang-format off
 };

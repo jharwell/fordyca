@@ -55,8 +55,15 @@ void actuation_parser::show(std::ostream& stream) const {
 } /* show() */
 
 __rcsw_pure bool actuation_parser::validate(void) const {
-  return m_differential_drive.validate() && m_steering.validate() &&
-         m_throttling.validate();
+  CHECK(m_differential_drive.validate());
+  CHECK(m_steering.validate());
+  CHECK(m_throttling.validate());
+  CHECK(m_params->throttling.amplitude < 1.0);
+  CHECK(m_params->throttling.offset <= 1.0);
+  return true;
+
+error:
+      return false;
 } /* validate() */
 
 NS_END(params, fordyca);

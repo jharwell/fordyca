@@ -225,7 +225,7 @@ double base_loop_functions::swarm_motion_throttle(void) const {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot->GetControllableEntity().GetController());
-    accum += controller.motion_throttle();
+    accum += controller.applied_motion_throttle();
   } /* for(&entity..) */
   return accum / robots.size();
 } /* swarm_motion_throttle() */

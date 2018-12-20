@@ -62,9 +62,10 @@ class throttling_differential_drive : public kinematics2D::differential_drive {
                            soft_turn_max),
         m_block_carry(params) {}
 
-  void motion_throttle_toggle(bool en) { m_block_carry.toggle(en); }
-  void motion_throttle_update(uint timestep) { m_block_carry.update(timestep); }
-  double motion_throttle(void) const { return m_block_carry.current_throttle(); }
+  void throttle_toggle(bool en) { m_block_carry.toggle(en); }
+  void throttle_update(uint timestep) { m_block_carry.update(timestep); }
+  double active_throttle(void) const { return m_block_carry.active_throttle(); }
+  double applied_throttle(void) const { return m_block_carry.applied_throttle(); }
 
  private:
   motion_throttling_handler m_block_carry;
