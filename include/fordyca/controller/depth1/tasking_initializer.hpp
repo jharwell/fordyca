@@ -44,12 +44,17 @@ struct oracle_params;
 namespace depth1 { class controller_repository; }
 }
 
+namespace ds {
+class dpo_store;
+}
+
 NS_START(controller);
 class cache_sel_matrix;
 class block_sel_matrix;
 class saa_subsystem;
 class base_perception_subsystem;
 NS_START(depth1);
+
 namespace ta = rcppsw::task_allocation;
 namespace er = rcppsw::er;
 
@@ -75,7 +80,7 @@ class tasking_initializer : public er::client<tasking_initializer> {
   tasking_initializer(const tasking_initializer& other) = delete;
 
   std::unique_ptr<ta::bi_tdgraph_executive>
-  operator()(params::depth1::controller_repository *const controller_repo);
+  operator()(const params::depth1::controller_repository& param_repo);
 
   using tasking_map = std::map<std::string, ta::polled_task*>;
 
@@ -83,15 +88,19 @@ class tasking_initializer : public er::client<tasking_initializer> {
   const base_perception_subsystem* perception(void) const { return m_perception; }
   base_perception_subsystem* perception(void) { return m_perception; }
 
+  const ds::dpo_store* dpo_store(void) const;
+  ds::dpo_store* dpo_store(void);
+
   controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   ta::bi_tdgraph* graph(void) { return m_graph; }
   const ta::bi_tdgraph* graph(void) const { return m_graph; }
   const class block_sel_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
 
   tasking_map depth1_tasks_create(
-      params::depth1::controller_repository* task_repo);
-  void depth1_exec_est_init(params::depth1::controller_repository* task_repo,
-                            const tasking_map& map);
+      const params::depth1::controller_repository& param_repo);
+  void depth1_exec_est_init(
+      const params::depth1::controller_repository& param_repo,
+      const tasking_map& map);
   const class cache_sel_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }
 
  private:

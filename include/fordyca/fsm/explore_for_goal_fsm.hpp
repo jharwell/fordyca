@@ -68,10 +68,10 @@ class explore_for_goal_fsm : public base_explore_fsm,
   ~explore_for_goal_fsm(void) override = default;
 
   /* collision metrics */
-  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
+  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
 
   /* taskable overrides */
   bool task_finished(void) const override {

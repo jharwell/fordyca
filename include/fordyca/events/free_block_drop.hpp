@@ -37,17 +37,17 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace rmath = rcppsw::math;
 namespace ds {
-class perceived_arena_map;
+class dpo_semantic_map;
 }
 namespace fsm {
 class block_to_goal_fsm;
 } // namespace fsm
 namespace controller {
 namespace depth1 {
-class greedy_partitioning_controller;
+class gp_mdpo_controller;
 }
 namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }
 } // namespace controller
 namespace tasks { namespace depth2 {
@@ -75,12 +75,12 @@ class free_block_drop
     : public cell_op,
       public rcppsw::er::client<free_block_drop>,
       public block_drop_event,
-      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
+      public visitor::visit_set<controller::depth1::gp_mdpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher,
                                 fsm::block_to_goal_fsm,
-                                ds::perceived_arena_map> {
+                                ds::dpo_semantic_map> {
  public:
   /**
    * @param block The block to drop.
@@ -102,14 +102,14 @@ class free_block_drop
   void visit(ds::arena_map& map) override;
 
   /* depth1 foraging */
-  void visit(controller::depth1::greedy_partitioning_controller&) override;
+  void visit(controller::depth1::gp_mdpo_controller&) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller&) override;
+  void visit(controller::depth2::grp_mdpo_controller&) override;
   void visit(tasks::depth2::cache_starter&) override;
   void visit(tasks::depth2::cache_finisher&) override;
   void visit(fsm::block_to_goal_fsm&) override;
-  void visit(ds::perceived_arena_map& map) override;
+  void visit(ds::dpo_semantic_map& map) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

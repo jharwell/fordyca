@@ -32,7 +32,7 @@
 NS_START(fordyca);
 
 namespace controller { class cache_sel_matrix; }
-namespace ds { class perceived_arena_map; }
+namespace ds { class dpo_store; }
 
 NS_START(fsm, depth2);
 
@@ -59,7 +59,7 @@ class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
  public:
   acquire_cache_site_fsm(const controller::cache_sel_matrix* matrix,
                          controller::saa_subsystem* saa,
-                         ds::perceived_arena_map* map);
+                         ds::dpo_store* store);
   ~acquire_cache_site_fsm(void) override = default;
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
@@ -77,7 +77,7 @@ class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
 
   // clang-format off
   const controller::cache_sel_matrix* const mc_matrix;
-  const ds::perceived_arena_map*      const mc_map;
+  const ds::dpo_store*      const           mc_store;
   // clang-format on
 };
 

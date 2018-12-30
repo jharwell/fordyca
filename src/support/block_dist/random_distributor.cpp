@@ -53,7 +53,7 @@ random_distributor::random_distributor(const ds::arena_grid::view& grid,
  ******************************************************************************/
 bool random_distributor::distribute_blocks(ds::block_vector& blocks,
                                            ds::const_entity_list& entities) {
-  rmath::vector2u loc = (*m_grid.origin()).loc();
+  __rcsw_unused rmath::vector2u loc = (*m_grid.origin()).loc();
   ER_INFO("Distributing %zu blocks in area: xrange=[%u-%lu], yrange=[%u-%lu]",
           blocks.size(),
           loc.x(),

@@ -184,10 +184,10 @@ class arena_map : public er::client<arena_map>,
   bool distribute_single_block(
       std::shared_ptr<representation::base_block>& block);
 
-  DECORATE_FUNC(xdsize, const);
-  DECORATE_FUNC(ydsize, const);
-  DECORATE_FUNC(xrsize, const);
-  DECORATE_FUNC(yrsize, const);
+  RCPPSW_DECORATE_FUNC(xdsize, const);
+  RCPPSW_DECORATE_FUNC(ydsize, const);
+  RCPPSW_DECORATE_FUNC(xrsize, const);
+  RCPPSW_DECORATE_FUNC(yrsize, const);
 
   /**
    * @brief Determine if a robot is currently on top of a block (i.e. if the

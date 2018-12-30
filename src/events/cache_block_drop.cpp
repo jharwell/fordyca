@@ -22,15 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
@@ -90,11 +89,11 @@ void cache_block_drop::visit(ds::arena_map& map) {
           index,
           m_block->id(),
           m_cache->id(),
-          dbg::blocks_list(m_cache->blocks()).c_str(),
+          rcppsw::to_string(m_cache->blocks()).c_str(),
           m_cache->n_blocks());
 } /* visit() */
 
-void cache_block_drop::visit(ds::perceived_arena_map& map) {
+void cache_block_drop::visit(ds::dpo_semantic_map& map) {
   map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
 } /* visit() */
 
@@ -111,8 +110,9 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
 } /* visit() */
 
 void cache_block_drop::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+    controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
+
   controller.block(nullptr);
   controller.perception()->map()->accept(*this);
 
@@ -129,6 +129,7 @@ void cache_block_drop::visit(
           m_block->id(),
           m_cache->id(),
           task_name.c_str());
+
   controller.ndc_pop();
 } /* visit() */
 
@@ -145,8 +146,9 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
  * Depth2 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+    controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
+
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
@@ -169,6 +171,7 @@ void cache_block_drop::visit(
           m_block->id(),
           m_cache->id(),
           polled->name().c_str());
+
   controller.ndc_pop();
 } /* visit() */
 

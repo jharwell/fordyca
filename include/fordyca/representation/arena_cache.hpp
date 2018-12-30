@@ -57,8 +57,9 @@ class arena_cache
   arena_cache(double dimension,
               double resolution,
               rmath::vector2d center,
-              const block_vector& blocks,
+              const ds::block_vector& blocks,
               int id);
+  ~arena_cache(void) override = default;
 
   /* metrics */
   size_t n_blocks(void) const override { return base_cache::n_blocks(); }

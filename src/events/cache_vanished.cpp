@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 
@@ -46,8 +46,9 @@ cache_vanished::cache_vanished(uint cache_id)
  * Depth1 Foraging
  ******************************************************************************/
 void cache_vanished::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+    controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
+
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(
@@ -58,6 +59,7 @@ void cache_vanished::visit(
       dynamic_cast<ta::logical_task*>(task)->name().c_str());
 
   task->accept(*this);
+
   controller.ndc_pop();
 } /* visit() */
 
@@ -84,8 +86,9 @@ void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void cache_vanished::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+    controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
+
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(
@@ -96,6 +99,7 @@ void cache_vanished::visit(
       dynamic_cast<ta::logical_task*>(task)->name().c_str());
 
   task->accept(*this);
+
   controller.ndc_pop();
 } /* visit() */
 

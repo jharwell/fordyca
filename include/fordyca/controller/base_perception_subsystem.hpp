@@ -24,26 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <vector>
-
-#include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
-#include "fordyca/params/perception_params.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/er/client.hpp"
+#include "fordyca/representation/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
-class perceived_arena_map;
-} // namespace ds
-
-NS_START(controller);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -51,48 +38,22 @@ NS_START(controller);
 /**
  * @class base_perception_subsystem
  * @ingroup controller
- *
- * @brief Manages all robot perception of the environment; vis a vie, how to
- * take what the sensors read and turn it into a useful internal
- * representation.
  */
-class base_perception_subsystem
-    : public rcppsw::er::client<base_perception_subsystem>,
-      public metrics::world_model_metrics {
+class base_perception_subsystem {
  public:
-  base_perception_subsystem(const params::perception_params* const params,
-                            const std::string& id);
-
-  /* world model metrics */
-  uint cell_state_inaccuracies(uint state) const override {
-    return m_cell_stats[state];
-  }
-  void reset_metrics(void) override;
-  double known_percentage(void) const override;
-  double unknown_percentage(void) const override;
-
-  /**
-   * @brief Update the robot's perception of the environment, passing it its
-   * current line of sight.
-   *
-   * @param los The current line of sight.
-   */
-  void update(const representation::line_of_sight* const los);
+  base_perception_subsystem(void) = default;
+  virtual ~base_perception_subsystem(void) = default;
 
   /**
    * @brief Reset the robot's perception of the environment to an initial state
    */
-  void reset(void);
-
-  const ds::perceived_arena_map* map(void) const { return m_map.get(); }
-  ds::perceived_arena_map* map(void) { return m_map.get(); }
+  virtual void reset(void) {}
 
   /**
-   * @brief Get the robot's current line-of-sight (LOS)
-   *
-   * Not used by \ref crw_controller.
+   * @brief Update the internal data structure/representation of the
+   * environment/arena, after the LOS has been updated.
    */
-  const representation::line_of_sight* los(void) const { return m_los.get(); }
+  virtual void update(void) = 0;
 
   /**
    * @brief Set the robots LOS for the next timestep.
@@ -104,40 +65,18 @@ class base_perception_subsystem
    *
    * @param los The new los
    */
-  void los(std::unique_ptr<representation::line_of_sight>& los);
-
- protected:
-  /*
-   * @brief Update the perceived arena map with the current line-of-sight,
-   * update the relevance of information (density) within it, and fix any blocks
-   * that should be hidden from our awareness.
-   *
-   * @param c_los The LOS to process.
-   */
-  virtual void process_los(const representation::line_of_sight* const c_los);
+  void los(std::unique_ptr<representation::line_of_sight> los) {
+    m_los = std::move(los);
+  }
 
   /**
-   * @brief The processing of the current LOS after processing (i.e. does the
-   * PAM now accurately reflect what was in the LOS)?
-   *
-   * @param c_los Current LOS.
+   * @brief Get the robot's current line-of-sight (LOS)
    */
-  virtual void processed_los_verify(
-      const representation::line_of_sight* const c_los) const;
+  const representation::line_of_sight* los(void) const { return m_los.get(); }
 
  private:
-  /**
-   * @brief Update the aggregate stats on inaccuracies in the robot's perceived
-   * arena map for this timestep.
-   *
-   * @param los The current LOS
-   */
-  void update_cell_stats(const representation::line_of_sight* const los);
-
   // clang-format off
-  std::vector<uint>                              m_cell_stats;
-  std::unique_ptr<representation::line_of_sight> m_los;
-  std::unique_ptr<ds::perceived_arena_map>       m_map;
+  std::unique_ptr<representation::line_of_sight> m_los{nullptr};
   // clang-format on
 };
 

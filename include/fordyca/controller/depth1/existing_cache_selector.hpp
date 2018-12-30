@@ -28,7 +28,7 @@
 
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/perceived_cache.hpp"
+#include "fordyca/ds/dp_cache_set.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,8 +65,8 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    *
    * @return The "best" existing cache.
    */
-  representation::perceived_cache calc_best(
-      const std::list<representation::perceived_cache>& existing_caches,
+  ds::const_dp_cache_set::value_type calc_best(
+      const ds::dp_cache_set& existing_caches,
       const rmath::vector2d& position);
 
  private:

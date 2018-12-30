@@ -23,13 +23,12 @@
  ******************************************************************************/
 #include "fordyca/events/cached_block_pickup.hpp"
 
-#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/dbg/dbg.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
@@ -138,7 +137,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
         cache_id,
         cell_op::x(),
         cell_op::y(),
-        dbg::blocks_list(m_real_cache->blocks()).c_str(),
+        rcppsw::to_string(m_real_cache->blocks()).c_str(),
         m_real_cache->n_blocks());
 
   } else {
@@ -164,7 +163,42 @@ void cached_block_pickup::visit(ds::arena_map& map) {
   m_pickup_block->accept(*this);
 } /* visit() */
 
-void cached_block_pickup::visit(ds::perceived_arena_map& map) {
+void cached_block_pickup::visit(ds::dpo_store& store) {
+  ER_ASSERT(store.contains(m_real_cache),
+            "Cache%d@%s not in DPO store",
+            m_real_cache->id(),
+            m_real_cache->discrete_loc().to_str().c_str());
+
+  ER_ASSERT(m_real_cache->contains_block(m_pickup_block),
+            "DPO cache%d@%s/%s does not contain pickup block%d",
+            m_real_cache->id(),
+            m_real_cache->real_loc().to_str().c_str(),
+            m_real_cache->discrete_loc().to_str().c_str(),
+            m_pickup_block->id());
+
+  if (m_real_cache->n_blocks() > base_cache::kMinBlocks) {
+    m_real_cache->block_remove(m_pickup_block);
+    ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
+            m_robot_index,
+            m_pickup_block->id(),
+            m_real_cache->id(),
+            cell_op::coord().to_str().c_str(),
+            rcppsw::to_string(m_real_cache->blocks()).c_str(),
+            m_real_cache->n_blocks());
+
+  } else {
+    __rcsw_unused int id = m_real_cache->id();
+    m_real_cache->block_remove(m_pickup_block);
+    store.cache_remove(m_real_cache);
+    ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
+            m_robot_index,
+            m_pickup_block->id(),
+            id,
+            cell_op::coord().to_str().c_str());
+  }
+} /* visit() */
+
+void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(cell_op::coord());
   ER_ASSERT(cell.state_has_cache(), "Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
@@ -187,12 +221,12 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
               "cell@%s with >= 2 blocks does not have cache",
               cell_op::coord().to_str().c_str());
 
-    ER_INFO("PAM: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
+    ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
             m_robot_index,
             m_pickup_block->id(),
             cell.cache()->id(),
             cell_op::coord().to_str().c_str(),
-            dbg::blocks_list(cell.cache()->blocks()).c_str(),
+            rcppsw::to_string(cell.cache()->blocks()).c_str(),
             cell.cache()->n_blocks());
 
   } else {
@@ -200,7 +234,7 @@ void cached_block_pickup::visit(ds::perceived_arena_map& map) {
     cell.cache()->block_remove(m_pickup_block);
 
     map.cache_remove(cell.cache());
-    ER_INFO("PAM: fb%u: block%d from cache%d@%s [depleted]",
+    ER_INFO("DPO Map: fb%u: block%d from cache%d@%s [depleted]",
             m_robot_index,
             m_pickup_block->id(),
             id,
@@ -218,9 +252,11 @@ void cached_block_pickup::visit(representation::base_block& block) {
 } /* visit() */
 
 void cached_block_pickup::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+    controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
-  controller.perception()->map()->accept(*this);
+
+  static_cast<controller::mdpo_perception_subsystem*>(
+      controller.perception())->map()->accept(*this);
   controller.block(m_pickup_block);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(
@@ -237,6 +273,7 @@ void cached_block_pickup::visit(
           m_pickup_block->id(),
           m_real_cache->id(),
           task_name.c_str());
+
   controller.ndc_pop();
 } /* visit() */
 
@@ -259,9 +296,11 @@ void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void cached_block_pickup::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+    controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
-  controller.perception()->map()->accept(*this);
+
+  static_cast<controller::mdpo_perception_subsystem*>(
+      controller.perception())->map()->accept(*this);
   controller.block(m_pickup_block);
 
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
@@ -286,6 +325,7 @@ void cached_block_pickup::visit(
           m_pickup_block->id(),
           m_real_cache->id(),
           polled->name().c_str());
+
   controller.ndc_pop();
 } /* visit() */
 

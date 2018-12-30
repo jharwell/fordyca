@@ -44,7 +44,7 @@ class bi_tab;
 namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
 
-namespace controller { namespace depth1 { class greedy_partitioning_controller; }}
+namespace controller { namespace depth1 { class gp_mdpo_controller; }}
 namespace representation { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);

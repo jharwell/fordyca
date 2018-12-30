@@ -116,7 +116,7 @@ void base_controller::saa_init(const params::actuation_params* const actuation_p
       .wheels = hal::actuators::differential_drive_actuator(
           GetActuator<argos::CCI_DifferentialSteeringActuator>(
               "differential_steering")),
-#ifdef FORDYCA_ROBOT_LEDS
+#ifdef FORDYCA_WITH_ROBOT_LEDS
       .leds = hal::actuators::led_actuator(
           GetActuator<argos::CCI_LEDsActuator>("leds")),
 #else

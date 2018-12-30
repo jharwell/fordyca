@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
-#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
@@ -64,7 +63,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free blocks=[%s] (%zu)",
            m_min_dist,
            m_min_blocks,
-           dbg::blocks_list(candidate_blocks).c_str(),
+           rcppsw::to_string(candidate_blocks).c_str(),
            candidate_blocks.size());
 
   ds::block_list used_blocks;
@@ -102,7 +101,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
       used_blocks.insert(used_blocks.end(),
                          cache_i_blocks.begin(),
                          cache_i_blocks.end());
-      ER_DEBUG("Used blocks=[%s]", dbg::blocks_list(used_blocks).c_str());
+      ER_DEBUG("Used blocks=[%s]", rcppsw::to_string(used_blocks).c_str());
     }
   } /* for(i..) */
 
@@ -218,7 +217,7 @@ rmath::vector2i dynamic_cache_creator::calc_center(
   if (existing_caches.empty()) {
     return rmath::vector2i(center.x(), center.y());
   }
-  ER_DEBUG("Deconflict caches=[%s]", dbg::caches_list(existing_caches).c_str());
+  ER_DEBUG("Deconflict caches=[%s]", rcppsw::to_string(existing_caches).c_str());
 
   /*
    * Every time we find an overlap we have to re-test all of the caches we've
@@ -270,8 +269,8 @@ rmath::vector2i dynamic_cache_creator::calc_center(
     ER_WARN(
         "No conflict-free center found in %u tries: caches=[%s],blocks=[%s]",
         kOVERLAP_SEARCH_MAX_TRIES,
-        dbg::caches_list(existing_caches).c_str(),
-        dbg::blocks_list(cache_i_blocks).c_str());
+        rcppsw::to_string(existing_caches).c_str(),
+        rcppsw::to_string(cache_i_blocks).c_str());
     return kInvalidCacheCenter;
   }
 

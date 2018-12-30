@@ -68,10 +68,10 @@ class crw_fsm : public base_foraging_fsm,
   crw_fsm& operator=(const crw_fsm& fsm) = delete;
 
   /* collision metrics */
-  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
+  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

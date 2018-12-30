@@ -63,7 +63,7 @@ void tasking_oracle::listener_add(ta::bi_tdgraph_executive* const executive) {
 void tasking_oracle::task_finish_cb(const ta::polled_task* task) {
   auto& est = boost::get<ta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
-  double old = est.last_result();
+  __rcsw_unused double old = est.last_result();
   est.calc(task->task_exec_estimate());
 
   ER_DEBUG("Update exec_est.%s on finish: %f -> %f",
@@ -87,7 +87,7 @@ void tasking_oracle::task_finish_cb(const ta::polled_task* task) {
 void tasking_oracle::task_abort_cb(const ta::polled_task* task) {
   auto& est = boost::get<ta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
-  double old = est.last_result();
+  __rcsw_unused double old = est.last_result();
   est.calc(task->task_exec_estimate());
 
   ER_DEBUG("Update exec_est.%s on abort: %f -> %f",

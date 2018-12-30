@@ -37,9 +37,6 @@
   <category name="fordyca.loop.support.block_dist" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.ds.occupancy_grid" >
-    <priority value ="info" />
-  </category>
   <category name="fordyca.support.depth2.dynamic_cache_creator" >
     <priority value ="trace" />
   </category>

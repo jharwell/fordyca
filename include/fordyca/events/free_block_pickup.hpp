@@ -38,7 +38,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm {
 namespace depth0 {
 class crw_fsm;
-class stateful_fsm;
+class dpo_fsm;
 class free_block_to_nest_fsm;
 } // namespace depth0
 class block_to_goal_fsm;
@@ -46,13 +46,14 @@ class block_to_goal_fsm;
 namespace controller {
 namespace depth0 {
 class crw_controller;
-class stateful_controller;
+class dpo_controller;
+class mdpo_controller;
 } // namespace depth0
 namespace depth1 {
-class greedy_partitioning_controller;
+class gp_mdpo_controller;
 }
 namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }
 } // namespace controller
 
@@ -86,11 +87,12 @@ class free_block_pickup
       public rcppsw::er::client<free_block_pickup>,
       public block_pickup_event,
       public visitor::visit_set<controller::depth0::crw_controller,
-                                controller::depth0::stateful_controller,
-                                controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
+                                controller::depth0::dpo_controller,
+                                controller::depth0::mdpo_controller,
+                                controller::depth1::gp_mdpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 fsm::depth0::crw_fsm,
-                                fsm::depth0::stateful_fsm,
+                                fsm::depth0::dpo_fsm,
                                 fsm::depth0::free_block_to_nest_fsm,
                                 fsm::block_to_goal_fsm,
                                 tasks::depth0::generalist,
@@ -106,7 +108,7 @@ class free_block_pickup
   free_block_pickup(const free_block_pickup& op) = delete;
   free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
-  /* stateless foraging */
+  /* CRW foraging */
   void visit(ds::arena_map& map) override;
   void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
@@ -114,21 +116,22 @@ class free_block_pickup
   void visit(controller::depth0::crw_controller& controller) override;
   void visit(fsm::depth0::crw_fsm& fsm) override;
 
-  /* stateful foraging */
-  void visit(ds::perceived_arena_map& map) override;
-  void visit(fsm::depth0::stateful_fsm& fsm) override;
-  void visit(controller::depth0::stateful_controller& controller) override;
+  /* Depth0 DPO/MDPO foraging */
+  void visit(ds::dpo_store& store) override;
+  void visit(ds::dpo_semantic_map& map) override;
+  void visit(fsm::depth0::dpo_fsm& fsm) override;
+  void visit(controller::depth0::dpo_controller& controller) override;
+  void visit(controller::depth0::mdpo_controller& controller) override;
 
-  /* depth1 foraging */
+  /* depth1 DPO/MDPO foraging */
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
-  void visit(
-      controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(tasks::depth1::harvester& task) override;
 
-  /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  /* depth2 DPO/MDPO foraging */
+  void visit(controller::depth2::grp_mdpo_controller& controller) override;
   void visit(tasks::depth2::cache_starter& task) override;
   void visit(tasks::depth2::cache_finisher& task) override;
 

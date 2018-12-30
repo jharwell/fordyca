@@ -36,7 +36,7 @@
 NS_START(fordyca);
 
 namespace ds {
-class perceived_arena_map;
+class dpo_store;
 }
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 namespace ta = rcppsw::task_allocation;
@@ -62,7 +62,7 @@ class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
  public:
   acquire_free_block_fsm(const controller::block_sel_matrix* matrix,
                          controller::saa_subsystem* saa,
-                         ds::perceived_arena_map* map);
+                         ds::dpo_store* store);
 
   ~acquire_free_block_fsm(void) override = default;
 
@@ -81,7 +81,7 @@ class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
 
   // clang-format off
   const controller::block_sel_matrix* const mc_matrix;
-  const ds::perceived_arena_map*      const mc_map;
+  const ds::dpo_store*      const           mc_store;
   // clang-format on
 };
 

@@ -32,6 +32,7 @@
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
+#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +58,6 @@ class base_cache : public multicell_entity,
                    public immovable_cell_entity,
                    public prototype::clonable<base_cache> {
  public:
-  using block_vector = std::vector<std::shared_ptr<base_block>>;
   /**
    * @brief The minimum # of blocks required for a cache to exist (less than
    * this and you just have a bunch of blocks)
@@ -77,10 +77,29 @@ class base_cache : public multicell_entity,
   base_cache(double dimension,
              double resolution,
              const rmath::vector2d& center,
-             const std::vector<std::shared_ptr<base_block>>& blocks,
+             const ds::block_vector& blocks,
              int id);
+  ~base_cache(void) override = default;
 
-  __rcsw_pure bool operator==(const base_cache& other) const {
+  /**
+   * @brief Disallow direct object comparisons, because we may want to compare
+   * for equality in terms of IDs or object locations, and it is better to
+   * require explicit comparisons for BOTH, rather than just one. It also makes
+   * it unecessary to have to remember which type of comparison operator==()
+   * does for this class.
+   */
+  bool operator==(const base_cache& other) const = delete;
+
+  /**
+   * @brief Compare two \ref base_cache objects for equality based on their ID.
+   */
+  bool idcmp(const base_cache& other) const { return this->id() == other.id(); }
+
+  /**
+   * @brief Compare two \ref base_cache objects for equality based on their
+   * discrete location.
+   */
+  bool loccmp(const base_cache& other) const {
     return this->discrete_loc() == other.discrete_loc();
   }
 
@@ -97,8 +116,8 @@ class base_cache : public multicell_entity,
   /**
    * @brief Get a list of the blocks currently in the cache.
    */
-  block_vector& blocks(void) { return m_blocks; }
-  const block_vector& blocks(void) const { return m_blocks; }
+  ds::block_vector& blocks(void) { return m_blocks; }
+  const ds::block_vector& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Add a new block to the cache's list of blocks.
@@ -142,10 +161,10 @@ class base_cache : public multicell_entity,
 
  private:
   // clang-format off
-  static int   m_next_id;
+  static int       m_next_id;
 
-  double       m_resolution;
-  block_vector m_blocks;
+  double           m_resolution;
+  ds::block_vector m_blocks;
   // clang-format on
 };
 

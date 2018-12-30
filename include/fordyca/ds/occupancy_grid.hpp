@@ -42,8 +42,9 @@ class cell_unknown;
 class cell_empty;
 } // namespace events
 namespace params {
-struct occupancy_grid_params;
-}
+namespace perception {
+struct perception_params;
+}}
 
 NS_START(ds);
 using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
@@ -75,7 +76,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
    */
   constexpr static uint kCell = 1;
 
-  occupancy_grid(const struct params::occupancy_grid_params* c_params,
+  occupancy_grid(const params::perception::perception_params* c_params,
                  const std::string& robot_id);
 
   /**

@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/perceived_cell_op.hpp"
+#include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -34,6 +34,14 @@ NS_START(fordyca);
 
 namespace representation {
 class base_block;
+}
+namespace controller { namespace depth2 {
+class grp_mdpo_controller;
+}} // namespace controller::depth2
+
+namespace ds {
+class dpo_semantic_map;
+class dpo_store;
 }
 
 NS_START(events);
@@ -45,14 +53,14 @@ NS_START(events);
  * @class block_found
  * @ingroup events
  *
- * @brief Event that is created whenever a NEW block (i.e. one that is not
- * currently known to the robot, but that has possibly been seen before and had
- * its relevance expire) is found via appearing in a robot's LOS. These events
- * are not processed by the \ref arena_map, and exist only in a robot's
- * perception.
+ * @brief Event that is created whenever a block (possibly known, possibly
+ * unknown) appears in a robot's LOS.
  */
-class block_found : public perceived_cell_op,
-                    public rcppsw::er::client<block_found> {
+class block_found : public rcppsw::er::client<block_found>,
+                    public cell_op,
+                    visitor::visit_set<controller::depth2::grp_mdpo_controller,
+                                       ds::dpo_store,
+                                       ds::dpo_semantic_map> {
  public:
   explicit block_found(std::unique_ptr<representation::base_block> block);
   explicit block_found(const std::shared_ptr<representation::base_block>& block);
@@ -61,13 +69,16 @@ class block_found : public perceived_cell_op,
   block_found(const block_found& op) = delete;
   block_found& operator=(const block_found& op) = delete;
 
-  /* stateful foraging */
+  /* DPO foraging */
+  void visit(ds::dpo_store& store) override;
+
+  /* MDPO foraging */
   void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::perceived_arena_map& map) override;
+  void visit(ds::dpo_semantic_map& map) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::grp_mdpo_controller& controller) override;
 
  private:
   // clang-format off

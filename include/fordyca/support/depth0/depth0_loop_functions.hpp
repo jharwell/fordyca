@@ -78,8 +78,9 @@ class depth0_loop_functions : public base_loop_functions,
    * than trying to get everything to fit together with a single abstract base
    * class controller (i.e. \ref depth0_controller). Waaaayyyyy cleaner.
    */
-  using crw_interactor_type = robot_arena_interactor<controller::depth0::crw_controller>;
-  using stateful_interactor_type = robot_arena_interactor<controller::depth0::stateful_controller>;
+  using crw_itype = robot_arena_interactor<controller::depth0::crw_controller>;
+  using dpo_itype = robot_arena_interactor<controller::depth0::dpo_controller>;
+  using mdpo_itype = robot_arena_interactor<controller::depth0::mdpo_controller>;
 
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
@@ -88,8 +89,9 @@ class depth0_loop_functions : public base_loop_functions,
 
   // clang-format off
   std::unique_ptr<depth0_metrics_aggregator> m_metrics_agg;
-  std::unique_ptr<crw_interactor_type>       m_crw_interactor{nullptr};
-  std::unique_ptr<stateful_interactor_type>  m_stateful_interactor{nullptr};
+  std::unique_ptr<crw_itype>                 m_crw_interactor{nullptr};
+  std::unique_ptr<dpo_itype>                 m_dpo_interactor{nullptr};
+  std::unique_ptr<mdpo_itype>                m_mdpo_interactor{nullptr};
   // clang-format on
 };
 

@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include <string>
+
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -41,7 +43,13 @@ using cache_vector_type = std::shared_ptr<representation::arena_cache>;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using cache_vector = std::vector<cache_vector_type>;
+class cache_vector : public std::vector<cache_vector_type> {
+ public:
+  using std::vector<cache_vector_type>::vector;
+  using value_type = std::vector<cache_vector_type>::value_type;
+
+  std::string to_str(void) const;
+};
 
 NS_END(ds, fordyca);
 

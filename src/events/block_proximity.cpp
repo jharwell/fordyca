@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_proximity.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
@@ -46,8 +46,9 @@ block_proximity::block_proximity(
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
+void block_proximity::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
+
   ER_INFO("Abort block drop: block%d proximity", m_block->id());
   events::block_found found(m_block);
   c.perception()->map()->accept(found);
@@ -57,6 +58,7 @@ void block_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
             "Non cache starter task %s received block proximity event",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
   task->accept(*this);
+
   c.ndc_pop();
 } /* visit() */
 

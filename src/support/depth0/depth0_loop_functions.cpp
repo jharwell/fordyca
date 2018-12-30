@@ -25,7 +25,7 @@
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -73,12 +73,17 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
 
   /* intitialize robot interactions with environment */
   auto* arenap = params()->parse_results<params::arena::arena_map_params>();
-  m_crw_interactor = rcppsw::make_unique<crw_interactor_type>(
+  m_crw_interactor = rcppsw::make_unique<crw_itype>(
       arena_map(),
       m_metrics_agg.get(),
       floor(),
       &arenap->blocks.manipulation_penalty);
-  m_stateful_interactor = rcppsw::make_unique<stateful_interactor_type>(
+  m_dpo_interactor = rcppsw::make_unique<dpo_itype>(
+      arena_map(),
+      m_metrics_agg.get(),
+      floor(),
+      &arenap->blocks.manipulation_penalty);
+  m_mdpo_interactor = rcppsw::make_unique<mdpo_itype>(
       arena_map(),
       m_metrics_agg.get(),
       floor(),
@@ -99,13 +104,13 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
 template <class T>
 void depth0_loop_functions::controller_configure(
     controller::base_controller* const c) {
-  auto* stateful = dynamic_cast<controller::depth0::stateful_controller*>(c);
+  auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(c);
   /*
    * If NULL, then visualization has been disabled.
    */
   auto* vparams = params()->parse_results<struct params::visualization_params>();
-  if (nullptr != stateful && nullptr != vparams) {
-    stateful->display_los(vparams->robot_los);
+  if (nullptr != mdpo && nullptr != vparams) {
+    mdpo->display_los(vparams->robot_los);
   }
   if (nullptr != vparams) {
     c->display_id(vparams->robot_id);
@@ -121,13 +126,15 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
    * know *ALL* of the controllers that are in the depth, and we can't/don't use
    * templates and/or inheritance to get what we need.
    */
-  auto* stateful =
-      dynamic_cast<controller::depth0::stateful_controller*>(&controller);
+  auto* dpo = dynamic_cast<controller::depth0::dpo_controller*>(&controller);
+  auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(&controller);
   auto* crw = dynamic_cast<controller::depth0::crw_controller*>(&controller);
 
   /* collect metrics from robot before its state changes */
-  if (nullptr != stateful) {
-    m_metrics_agg->collect_from_controller(stateful);
+  if (nullptr != mdpo) {
+  m_metrics_agg->collect_from_controller(mdpo);
+  } else if (nullptr != dpo) {
+    m_metrics_agg->collect_from_controller(dpo);
   } else if (nullptr != crw) {
     m_metrics_agg->collect_from_controller(crw);
   }
@@ -139,18 +146,28 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   loop_utils::set_robot_pos<decltype(controller)>(robot);
   set_robot_tick<decltype(controller)>(robot);
 
-  if (nullptr != stateful) {
-    ER_ASSERT(std::fmod(stateful->los_dim(), arena_map()->grid_resolution()) <=
+  if (nullptr != dpo || nullptr != mdpo) {
+    ER_ASSERT(std::fmod(dpo->los_dim(), arena_map()->grid_resolution()) <=
                   std::numeric_limits<double>::epsilon(),
               "LOS dimension (%f) not an even multiple of grid resolution (%f)",
-              stateful->los_dim(),
+              dpo->los_dim(),
               arena_map()->grid_resolution());
-    uint los_grid_size = stateful->los_dim() / arena_map()->grid_resolution();
-    loop_utils::set_robot_los<decltype(*stateful)>(robot,
+    uint los_grid_size = dpo->los_dim() / arena_map()->grid_resolution();
+    loop_utils::set_robot_los<decltype(*dpo)>(robot,
                                                    los_grid_size,
                                                    *arena_map());
-    (*m_stateful_interactor)(*stateful, GetSpace().GetSimulationClock());
-  } else if (nullptr != crw) {
+  }
+
+  /*
+   * Now update the robot's state as a result of arena interactions. For MDPO
+   * controllers, the DPO pointer will *ALSO* be non-null, so the order of the
+   * if()s here is important.
+   */
+  if (nullptr != mdpo) {
+    (*m_mdpo_interactor)(*mdpo, GetSpace().GetSimulationClock());
+  } else if (nullptr != dpo) {
+    (*m_dpo_interactor)(*dpo, GetSpace().GetSimulationClock());
+  }  else if (nullptr != crw) {
     (*m_crw_interactor)(*crw, GetSpace().GetSimulationClock());
   } else {
     ER_FATAL_SENTINEL("Bad depth0 controller");

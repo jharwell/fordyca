@@ -100,7 +100,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
     uint y_max = y + clust_sizes[i] / (x_max - x);
 
     auto view = grid.layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
-    rmath::vector2u loc = (*view.origin()).loc();
+    __rcsw_unused rmath::vector2u loc = (*view.origin()).loc();
     ER_TRACE("Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
              i,
              loc.x() + view.index_bases()[0],

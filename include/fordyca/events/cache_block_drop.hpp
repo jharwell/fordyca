@@ -37,10 +37,10 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth1 {
-class greedy_partitioning_controller;
+class gp_mdpo_controller;
 }
 namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }
 } // namespace controller
 
@@ -49,7 +49,7 @@ class arena_cache;
 } // namespace representation
 
 namespace ds {
-class perceived_arena_map;
+class dpo_semantic_map;
 } // namespace ds
 namespace fsm {
 class block_to_goal_fsm;
@@ -81,12 +81,12 @@ class cache_block_drop
     : public cell_op,
       public rcppsw::er::client<cache_block_drop>,
       public block_drop_event,
-      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
+      public visitor::visit_set<controller::depth1::gp_mdpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_transferer,
                                 fsm::block_to_goal_fsm,
-                                ds::perceived_arena_map,
+                                ds::dpo_semantic_map,
                                 representation::arena_cache> {
  public:
   cache_block_drop(const std::shared_ptr<representation::base_block>& block,
@@ -101,16 +101,16 @@ class cache_block_drop
   void visit(class ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(ds::arena_map& map) override;
-  void visit(ds::perceived_arena_map& map) override;
+  void visit(ds::dpo_semantic_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
   void visit(
-      controller::depth1::greedy_partitioning_controller& controller) override;
+      controller::depth1::gp_mdpo_controller& controller) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller&) override;
+  void visit(controller::depth2::grp_mdpo_controller&) override;
   void visit(tasks::depth2::cache_transferer& task) override;
 
  private:

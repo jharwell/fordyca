@@ -47,7 +47,7 @@ class block;
 } // namespace representation
 
 namespace ds {
-class perceived_arena_map;
+class dpo_store;
 } // namespace ds
 
 namespace task_allocation = rcppsw::task_allocation;
@@ -80,7 +80,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
  public:
   cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
                            controller::saa_subsystem* saa,
-                           ds::perceived_arena_map* map);
+                           ds::dpo_store* store);
   ~cached_block_to_nest_fsm(void) override = default;
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
@@ -110,12 +110,12 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
 
   /* goal acquisition metrics */
   bool goal_acquired(void) const override;
-  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   acquisition_goal_type acquisition_goal(void) const override;
 
   /* block transportation */
-  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   /**
    * @brief Reset the FSM

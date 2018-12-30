@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { namespace depth2 { class greedy_recpart_controller; }}
+namespace controller { namespace depth2 { class grp_mdpo_controller; }}
 
 NS_START(support, depth2);
 namespace er = rcppsw::er;

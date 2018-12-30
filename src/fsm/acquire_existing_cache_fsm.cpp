@@ -24,7 +24,7 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
 /*******************************************************************************
@@ -39,7 +39,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const controller::cache_sel_matrix* matrix,
     bool is_pickup,
     controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
+    ds::dpo_store* const store)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
       acquire_goal_fsm(
           saa,
@@ -54,7 +54,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                     this)),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
-      mc_map(map) {}
+      mc_store(store) {}
 
 /*******************************************************************************
  * Member Functions
@@ -62,21 +62,20 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 bool acquire_existing_cache_fsm::calc_acquisition_location(
     rmath::vector2d* const loc) {
   controller::depth1::existing_cache_selector selector(mc_is_pickup, mc_matrix);
-  representation::perceived_cache best =
-      selector.calc_best(mc_map->perceived_caches(),
-                         saa_subsystem()->sensing()->position());
+  auto best = selector.calc_best(mc_store->caches(),
+                                 saa_subsystem()->sensing()->position());
   /*
    * If this happens, all the caches we know of are too close for us to vector
    * to, or otherwise unsuitable.
    */
-  if (nullptr == best.ent) {
+  if (nullptr == best.ent()) {
     return false;
   }
   ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
-          best.ent->id(),
-          best.ent->real_loc().to_str().c_str(),
-          best.ent->discrete_loc().to_str().c_str(),
-          best.density.last_result());
+          best.ent()->id(),
+          best.ent()->real_loc().to_str().c_str(),
+          best.ent()->discrete_loc().to_str().c_str(),
+          best.density().last_result());
 
   /*
    * Now that we have the location of the best cache, we need to pick a random
@@ -85,15 +84,15 @@ bool acquire_existing_cache_fsm::calc_acquisition_location(
    * that all robots be able to make it to the center/near center of the cache
    * in order to utilize it (this is more realistic too).
    */
-  auto xrange = best.ent->xspan(best.ent->real_loc());
-  auto yrange = best.ent->yspan(best.ent->real_loc());
+  auto xrange = best.ent()->xspan(best.ent()->real_loc());
+  auto yrange = best.ent()->yspan(best.ent()->real_loc());
   std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
   std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
 
   *loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
   ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
           loc->to_str().c_str(),
-          best.ent->id(),
+          best.ent()->id(),
           xrange.to_str().c_str(),
           yrange.to_str().c_str());
   return true;
@@ -115,8 +114,8 @@ acquire_goal_fsm::candidate_type acquire_existing_cache_fsm::existing_cache_sele
   }
 } /* existing_cache_select() */
 
-bool acquire_existing_cache_fsm::candidates_exist(void) const {
-  return !mc_map->perceived_caches().empty();
+__rcsw_pure bool acquire_existing_cache_fsm::candidates_exist(void) const {
+  return !mc_store->caches().empty();
 } /* candidates() */
 
 bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {

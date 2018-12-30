@@ -24,8 +24,8 @@
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth1/oracular_partitioning_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/ogp_mdpo_controller.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
@@ -96,7 +96,7 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller =
-        dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
+        dynamic_cast<controller::depth1::gp_mdpo_controller&>(
             robot.GetControllableEntity().GetController());
     controller_configure(controller);
   } /* for(&entity..) */
@@ -111,7 +111,7 @@ void depth1_loop_functions::oracle_init(void) {
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
     const auto& controller0 =
-        dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
+        dynamic_cast<controller::depth1::gp_mdpo_controller&>(
             robot0.GetControllableEntity().GetController());
     auto* bigraph =
         dynamic_cast<const ta::bi_tdgraph*>(controller0.executive()->graph());
@@ -121,7 +121,7 @@ void depth1_loop_functions::oracle_init(void) {
 
 void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto& controller =
-      dynamic_cast<controller::depth1::greedy_partitioning_controller&>(
+      dynamic_cast<controller::depth1::gp_mdpo_controller&>(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
@@ -156,7 +156,7 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
    * If NULL, then visualization has been disabled.
    */
   auto& greedy =
-      dynamic_cast<controller::depth1::greedy_partitioning_controller&>(c);
+      dynamic_cast<controller::depth1::gp_mdpo_controller&>(c);
   auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
@@ -165,7 +165,7 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
   auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     auto& oracular =
-        dynamic_cast<controller::depth1::oracular_partitioning_controller&>(c);
+        dynamic_cast<controller::depth1::ogp_mdpo_controller&>(c);
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
                   m_tasking_oracle.get(),

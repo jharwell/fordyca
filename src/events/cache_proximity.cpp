@@ -22,14 +22,15 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,12 +46,14 @@ cache_proximity::cache_proximity(std::shared_ptr<representation::base_cache> cac
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
+void cache_proximity::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
+
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
 
   events::cache_found found(m_cache);
-  c.perception()->map()->accept(found);
+  static_cast<controller::mdpo_perception_subsystem*>(
+      c.perception())->map()->accept(found);
 
   auto* task = dynamic_cast<tasks::depth2::cache_finisher*>(c.current_task());
   ER_ASSERT(nullptr != task,
@@ -58,6 +61,7 @@ void cache_proximity::visit(controller::depth2::greedy_recpart_controller& c) {
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
 
   task->accept(*this);
+
   c.ndc_pop();
 } /* visit() */
 

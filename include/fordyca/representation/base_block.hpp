@@ -82,10 +82,30 @@ class base_block : public multicell_entity,
   base_block(const rmath::vector2d& dim, const ut::color& color, int id)
       : multicell_entity(dim, color, id), movable_cell_entity() {}
 
-  __rcsw_pure bool operator==(const base_block& other) const {
-    return this->id() == other.id();
-  }
   ~base_block(void) override = default;
+
+  /**
+   * @brief Disallow direct object comparisons, because we may want to compare
+   * for equality in terms of IDs or object locations, and it is better to
+   * require explicit comparisons for BOTH, rather than just one. It also makes
+   * it unecessary to have to remember which type of comparison operator==()
+   * does for this class.
+   */
+  bool operator==(const base_block& other) const = delete;
+
+  /**
+   * @brief Compare two \ref base_block objects for equality based on their ID.
+   */
+  bool idcmp(const base_block& other) const { return this->id() == other.id(); }
+
+
+  /**
+   * @brief Compare two \ref base_block objects for equality based on their
+   * discrete location.
+   */
+  bool loccmp(const base_block& other) const {
+    return this->discrete_loc() == other.discrete_loc();
+  }
 
   /* transport metrics */
   void reset_metrics(void) override;

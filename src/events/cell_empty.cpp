@@ -25,7 +25,7 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +64,7 @@ void cell_empty::visit(ds::occupancy_grid& grid) {
   cell.accept(*this);
 } /* visit() */
 
-void cell_empty::visit(ds::perceived_arena_map& map) {
+void cell_empty::visit(ds::dpo_semantic_map& map) {
   map.decoratee().accept(*this);
 } /* visit() */
 

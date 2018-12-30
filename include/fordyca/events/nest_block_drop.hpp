@@ -38,7 +38,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace fsm {
 namespace depth0 {
 class crw_fsm;
-class stateful_fsm;
+class dpo_fsm;
 class free_block_to_nest_fsm;
 } // namespace depth0
 namespace depth1 {
@@ -49,13 +49,14 @@ class cached_block_to_nest_fsm;
 namespace controller {
 namespace depth0 {
 class crw_controller;
-class stateful_controller;
+class dpo_controller;
+class mdpo_controller;
 } // namespace depth0
 namespace depth1 {
-class greedy_partitioning_controller;
+class gp_mdpo_controller;
 }
 namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }
 } // namespace controller
 
@@ -83,12 +84,13 @@ class nest_block_drop
     : public visitor::visitor,
       public block_drop_event,
       public rcppsw::er::client<nest_block_drop>,
-      public visitor::visit_set<controller::depth0::stateful_controller,
-                                controller::depth0::crw_controller,
-                                controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
+      public visitor::visit_set<controller::depth0::crw_controller,
+                                controller::depth0::dpo_controller,
+                                controller::depth0::mdpo_controller,
+                                controller::depth1::gp_mdpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 fsm::depth0::crw_fsm,
-                                fsm::depth0::stateful_fsm,
+                                fsm::depth0::dpo_fsm,
                                 fsm::depth0::free_block_to_nest_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm,
                                 tasks::depth0::generalist,
@@ -101,26 +103,26 @@ class nest_block_drop
   nest_block_drop(const nest_block_drop& op) = delete;
   nest_block_drop& operator=(const nest_block_drop& op) = delete;
 
-  /* stateless foraging */
+  /* Foraging support */
   void visit(ds::arena_map& map) override;
+
+  /* Depth0 DPO/MDPO foraging */
   void visit(representation::base_block& block) override;
   void visit(fsm::depth0::crw_fsm& fsm) override;
   void visit(controller::depth0::crw_controller& controller) override;
+  void visit(controller::depth0::dpo_controller& controller) override;
+  void visit(fsm::depth0::dpo_fsm& fsm) override;
+  void visit(controller::depth0::mdpo_controller& controller) override;
 
-  /* stateful foraging */
-  void visit(controller::depth0::stateful_controller& controller) override;
-  void visit(fsm::depth0::stateful_fsm& fsm) override;
-  void visit(tasks::depth0::generalist& task) override;
-
-  /* depth1 foraging */
+  /* Depth1 foraging */
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
-  void visit(
-      controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;
+  void visit(tasks::depth0::generalist& task) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller&) override;
+  void visit(controller::depth2::grp_mdpo_controller&) override;
 
   /**
    * @brief Get the handle on the block that has been dropped.

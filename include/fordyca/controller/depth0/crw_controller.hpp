@@ -65,12 +65,12 @@ class crw_controller : public depth0_controller,
 
   /* goal acquisition metrics */
   bool is_vectoring_to_goal(void) const override { return false; }
-  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
-  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
+  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
 
   /* block transportation */
-  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }

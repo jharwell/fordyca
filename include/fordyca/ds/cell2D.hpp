@@ -73,11 +73,11 @@ class cell2D : public visitor::visitable_any<cell2D>,
   const fsm::cell2D_fsm& fsm(void) const { return decoratee(); }
 
   /* state inquiry */
-  DECORATE_FUNC(state_is_known, const);
-  DECORATE_FUNC(state_has_block, const);
-  DECORATE_FUNC(state_has_cache, const);
-  DECORATE_FUNC(state_in_cache_extent, const);
-  DECORATE_FUNC(state_is_empty, const);
+  RCPPSW_DECORATE_FUNC(state_is_known, const);
+  RCPPSW_DECORATE_FUNC(state_has_block, const);
+  RCPPSW_DECORATE_FUNC(state_has_cache, const);
+  RCPPSW_DECORATE_FUNC(state_in_cache_extent, const);
+  RCPPSW_DECORATE_FUNC(state_is_empty, const);
 
   /**
    * @brief Reset the cell to its UNKNOWN state.
@@ -87,7 +87,7 @@ class cell2D : public visitor::visitable_any<cell2D>,
     m_entity.reset();
   }
 
-  DECORATE_FUNC(block_count, const);
+  RCPPSW_DECORATE_FUNC(block_count, const);
 
   /**
    * @brief Set the entity associated with this cell.
@@ -108,7 +108,7 @@ class cell2D : public visitor::visitable_any<cell2D>,
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<const representation::base_block> block(void) const;
+  std::shared_ptr<representation::base_block> block(void) const;
   std::shared_ptr<representation::base_block> block(void);
 
   /**
@@ -117,7 +117,7 @@ class cell2D : public visitor::visitable_any<cell2D>,
    * Will be NULL unless it contains a cache, so check the cell's state before
    * calling this function.
    */
-  const std::shared_ptr<representation::base_cache> cache(void) const;
+  std::shared_ptr<representation::base_cache> cache(void) const;
   std::shared_ptr<representation::base_cache> cache(void);
 
  private:

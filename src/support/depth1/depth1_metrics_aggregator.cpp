@@ -42,7 +42,7 @@
 #include "rcppsw/task_allocation/bi_tab.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"

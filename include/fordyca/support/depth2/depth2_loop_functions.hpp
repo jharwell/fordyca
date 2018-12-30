@@ -59,7 +59,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void Reset(void) override;
 
  private:
-  using interactor = robot_arena_interactor<controller::depth2::greedy_recpart_controller>;
+  using interactor = robot_arena_interactor<controller::depth2::grp_mdpo_controller>;
 
   /**
    * @brief Handle creation of dynamic caches during initialization, reset, or

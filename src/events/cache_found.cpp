@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_cache.hpp"
 
@@ -34,23 +34,68 @@
 NS_START(fordyca, events);
 using ds::occupancy_grid;
 using representation::base_cache;
-namespace swarm = rcppsw::swarm;
+namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
-    : perceived_cell_op(cache->discrete_loc()),
+    : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
 
 cache_found::cache_found(const std::shared_ptr<representation::base_cache>& cache)
-    : perceived_cell_op(cache->discrete_loc()),
+    : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
 
 /*******************************************************************************
- * Depth1 Foraging
+ * DPO Foraging
+ ******************************************************************************/
+void cache_found::visit(ds::dpo_store& store) {
+  /**
+   * Remove any and all blocks from the known blocks set that exist in
+   * the same space that a cache occupies (including the host cell).
+   *
+   * Such contradictions can arise if we previously saw some of the leftover
+   * blocks when a cache is destroyed, and left the area before a new cache was
+   * created near the old cache's location. When we return to the arena and find
+   * a new cache there, we are tracking blocks that no longer exist in the
+   * arena.
+   */
+  auto it = store.blocks().begin();
+  while (it != store.blocks().end()) {
+    if (m_cache->contains_point(it->ent()->real_loc())) {
+      ER_TRACE("Remove block%d hidden behind cache%d",
+               it->ent()->id(),
+               m_cache->id());
+      store.block_remove(it->ent_obj());
+      ++it;
+    }
+  } /* while(it..) */
+
+  auto known = store.find(m_cache);
+  rswarm::pheromone_density density;
+  if (nullptr != known) {
+      density = known->density();
+
+      /*
+       * Repeat pheromone deposits only affect caches that are already known and
+       * that we are tracking accurately.
+       */
+      if (store.repeat_deposit()) {
+        density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+      }
+  } else {
+    density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
+  }
+
+  store.cache_update(ds::const_dp_cache_set::value_type(m_cache, density));
+} /* visit() */
+
+
+/*******************************************************************************
+ * MDPO Foraging
  ******************************************************************************/
 void cache_found::visit(ds::cell2D& cell) {
   cell.entity(m_cache);
@@ -91,9 +136,9 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
   } /* for(i..) */
 } /* visit() */
 
-void cache_found::visit(ds::perceived_arena_map& map) {
+void cache_found::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  swarm::pheromone_density& density =
+  rswarm::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
   if (!cell.state_is_known()) {
     map.known_cells_inc();
@@ -119,15 +164,14 @@ void cache_found::visit(ds::perceived_arena_map& map) {
    */
   auto it = map.blocks().begin();
   while (it != map.blocks().end()) {
-    if (m_cache->contains_point((*it)->real_loc())) {
+    if (m_cache->contains_point(it->ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
-               (*it)->id(),
+               it->ent()->id(),
                m_cache->id());
 
-      events::cell_empty op((*it)->discrete_loc());
-      map.access<occupancy_grid::kCell>((*it)->discrete_loc()).accept(op);
-      it = map.blocks().erase(it);
-    } else {
+      events::cell_empty op(it->ent()->discrete_loc());
+      map.access<occupancy_grid::kCell>(it->ent()->discrete_loc()).accept(op);
+      map.block_remove(it->ent_obj());
       ++it;
     }
   } /* while(it..) */
@@ -154,24 +198,31 @@ void cache_found::visit(ds::perceived_arena_map& map) {
   }
 
   if (map.pheromone_repeat_deposit()) {
-    density.pheromone_add(1.0);
+    density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
   } else {
     /*
      * Seeing a new cache on empty square or one that used to contain a block.
      */
     if (!cell.state_has_cache()) {
       density.reset();
-      density.pheromone_add(1.0);
+      density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
     } else { /* Seeing a known cache again--set its relevance to the max */
-      density.pheromone_set(1.0);
+      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   }
-  map.cache_add(m_cache);
+  map.cache_update(ds::const_dp_cache_set::value_type(m_cache, density));
   cell.accept(*this);
 } /* visit() */
 
-void cache_found::visit(controller::depth2::greedy_recpart_controller& c) {
+/*******************************************************************************
+ * Depth2 Foraging
+ ******************************************************************************/
+void cache_found::visit(controller::depth2::grp_mdpo_controller& c) {
+  c.ndc_push();
+
   c.perception()->map()->accept(*this);
+
+  c.ndc_pop();
 } /* visit() */
 
 NS_END(events, fordyca);

@@ -28,10 +28,11 @@
 #include "fordyca/params/metrics_params.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/controller/depth0/stateful_controller.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
@@ -45,7 +46,9 @@ NS_START(fordyca, support, depth0);
 template void depth0_metrics_aggregator::collect_from_controller(
     const controller::depth0::crw_controller* const c);
 template void depth0_metrics_aggregator::collect_from_controller(
-    const controller::depth0::stateful_controller* const c);
+    const controller::depth0::dpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::mdpo_controller* const c);
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -70,7 +73,7 @@ template <class T>
 void depth0_metrics_aggregator::collect_from_controller(
     const T* const controller) {
   /*
-   * Both CRW and stateful controllers provide these.
+   * All depth0 controllers provide these.
    */
   auto collision_m =
       dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
@@ -91,8 +94,8 @@ void depth0_metrics_aggregator::collect_from_controller(
   collect("blocks::manipulation", *manip_m);
 
   /*
- * Only stateful provides these.
- */
+   * Only MDPO provides these.
+   */
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   if (nullptr != worldm_m) {
     collect("perception::world_model", *worldm_m);

@@ -37,7 +37,7 @@ class base_cache;
 }
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller { namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }} // namespace controller::depth2
 
 namespace fsm {
@@ -61,7 +61,7 @@ NS_START(events);
  */
 class cache_proximity
     : public rcppsw::er::client<cache_proximity>,
-      public visitor::visit_set<controller::depth2::greedy_recpart_controller,
+      public visitor::visit_set<controller::depth2::grp_mdpo_controller,
                                 tasks::depth2::cache_finisher,
                                 fsm::block_to_goal_fsm> {
  public:
@@ -72,7 +72,7 @@ class cache_proximity
   cache_proximity& operator=(const cache_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& c) override;
+  void visit(controller::depth2::grp_mdpo_controller& c) override;
   void visit(tasks::depth2::cache_finisher& task) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
 

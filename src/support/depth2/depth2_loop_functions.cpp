@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/depth2_loop_functions.hpp"
 
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/controller/depth2/oracular_recpart_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/ogrp_mdpo_controller.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -89,7 +89,7 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller =
-        dynamic_cast<controller::depth2::greedy_recpart_controller&>(
+        dynamic_cast<controller::depth2::grp_mdpo_controller&>(
             robot.GetControllableEntity().GetController());
     controller_configure(controller);
   } /* for(&entity..) */
@@ -99,7 +99,7 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
 
 void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto& controller =
-      dynamic_cast<controller::depth2::greedy_recpart_controller&>(
+      dynamic_cast<controller::depth2::grp_mdpo_controller&>(
           robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
@@ -143,7 +143,7 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
   /*
    * If NULL, then visualization has been disabled.
    */
-  auto& greedy = dynamic_cast<controller::depth2::greedy_recpart_controller&>(c);
+  auto& greedy = dynamic_cast<controller::depth2::grp_mdpo_controller&>(c);
   auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
@@ -152,7 +152,7 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
   auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
     auto& oracular =
-        dynamic_cast<controller::depth2::oracular_recpart_controller&>(c);
+        dynamic_cast<controller::depth2::ogrp_mdpo_controller&>(c);
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
                   tasking_oracle(),

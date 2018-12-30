@@ -40,7 +40,7 @@ constexpr size_t base_cache::kMinBlocks;
 base_cache::base_cache(double dimension,
                        double resolution,
                        const rmath::vector2d& center,
-                       const std::vector<std::shared_ptr<base_block>>& blocks,
+                       const ds::block_vector& blocks,
                        int id)
     : multicell_entity(rmath::vector2d(dimension, dimension),
                        rcppsw::utils::color::kGRAY40),

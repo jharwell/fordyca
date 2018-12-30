@@ -32,7 +32,7 @@
 #include "rcppsw/task_allocation/bi_tab.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"

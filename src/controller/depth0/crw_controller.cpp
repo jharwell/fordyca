@@ -83,18 +83,19 @@ void crw_controller::ControlStep(void) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINEC_PTR(bool, crw_controller, goal_acquired, m_fsm);
-FSM_WRAPPER_DEFINEC_PTR(bool, crw_controller, is_exploring_for_goal, m_fsm);
+FSM_OVERRIDE_DEF(bool, crw_controller, goal_acquired, *m_fsm, const);
 
-FSM_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
-                        crw_controller,
-                        acquisition_goal,
-                        m_fsm);
+FSM_OVERRIDE_DEF(bool, crw_controller, is_exploring_for_goal, *m_fsm, const);
 
-FSM_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                        crw_controller,
-                        block_transport_goal,
-                        m_fsm);
+FSM_OVERRIDE_DEF(acquisition_goal_type,
+                 crw_controller,
+                 acquisition_goal,
+                 *m_fsm, const);
+
+FSM_OVERRIDE_DEF(transport_goal_type,
+                 crw_controller,
+                 block_transport_goal,
+                 *m_fsm, const);
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

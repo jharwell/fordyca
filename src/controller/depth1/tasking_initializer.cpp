@@ -28,8 +28,10 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
@@ -70,25 +72,25 @@ tasking_initializer::~tasking_initializer(void) = default;
  * Member Functions
  ******************************************************************************/
 tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
-    params::depth1::controller_repository* const param_repo) {
-  auto* task_params = param_repo->parse_results<ta::task_allocation_params>();
+    const params::depth1::controller_repository& param_repo) {
+  auto* task_params = param_repo.parse_results<ta::task_allocation_params>();
   m_graph = new ta::bi_tdgraph(task_params);
   ER_ASSERT(mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(mc_csel_matrix, "NULL cache selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
       rcppsw::make_unique<fsm::depth0::free_block_to_nest_fsm>(
-          mc_bsel_matrix, m_saa, m_perception->map());
+          mc_bsel_matrix, m_saa, dpo_store());
   std::unique_ptr<ta::taskable> collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          cache_sel_matrix(), saa_subsystem(), perception()->map());
+          cache_sel_matrix(), saa_subsystem(), dpo_store());
 
   std::unique_ptr<ta::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_existing_cache_fsm>(
           block_sel_matrix(),
           mc_csel_matrix,
           saa_subsystem(),
-          perception()->map());
+          dpo_store());
 
   tasks::depth1::collector* collector =
       new tasks::depth1::collector(task_params, std::move(collector_fsm));
@@ -109,9 +111,9 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
 } /* depth1_tasks_create() */
 
 void tasking_initializer::depth1_exec_est_init(
-    params::depth1::controller_repository* const param_repo,
+    const params::depth1::controller_repository& param_repo,
     const tasking_map& map) {
-  auto* task_params = param_repo->parse_results<ta::task_allocation_params>();
+  auto* task_params = param_repo.parse_results<ta::task_allocation_params>();
   if (task_params->exec_est.seed_enabled) {
     /*
      * Generalist is not partitionable in depth 0 initialization, so this has
@@ -147,14 +149,33 @@ void tasking_initializer::depth1_exec_est_init(
 } /* depth1_exec_est_init() */
 
 std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(
-    params::depth1::controller_repository* const param_repo) {
+    const params::depth1::controller_repository& param_repo) {
   auto map = depth1_tasks_create(param_repo);
-  auto* executivep = param_repo->parse_results<ta::task_executive_params>();
+  auto* executivep = param_repo.parse_results<ta::task_executive_params>();
   m_graph->active_tab_init(executivep->tab_init_method);
   depth1_exec_est_init(param_repo, map);
 
-  auto* execp = param_repo->parse_results<ta::task_executive_params>();
+  auto* execp = param_repo.parse_results<ta::task_executive_params>();
   return rcppsw::make_unique<ta::bi_tdgraph_executive>(execp, m_graph);
 } /* initialize() */
+
+const ds::dpo_store* tasking_initializer::dpo_store(void) const {
+  auto dpo = dynamic_cast<const dpo_perception_subsystem*>(perception());
+  auto mdpo = dynamic_cast<const mdpo_perception_subsystem*>(perception());
+
+  if (nullptr != dpo) {
+    return dpo->store();
+  } else if (nullptr != mdpo) {
+    return &mdpo->map()->store();
+  } else {
+    ER_FATAL_SENTINEL("Unknown perception subsystem type");
+  }
+} /* dpo_store() */
+
+ds::dpo_store* tasking_initializer::dpo_store(void) {
+  return const_cast<ds::dpo_store*>(
+      const_cast<const tasking_initializer*>(this)->dpo_store());
+} /* dpo_store() */
+
 
 NS_END(depth1, controller, fordyca);

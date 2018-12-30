@@ -42,7 +42,8 @@ NS_START(fordyca, params);
  * @class grid_parser
  * @ingroup params
  *
- * @brief Parses XML parameters for \ref arena_map grid into \ref grid_params.
+ * @brief Parses XML parameters for various 2D grid structures into
+ * \ref grid_params.
  */
 
 class grid_parser : public rcppsw::params::xml_param_parser {
@@ -55,7 +56,6 @@ class grid_parser : public rcppsw::params::xml_param_parser {
    */
   static constexpr char kXMLRoot[] = "grid";
 
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
@@ -68,7 +68,9 @@ class grid_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
+  /* clang-format off */
   std::shared_ptr<grid_params> m_params{nullptr};
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);
