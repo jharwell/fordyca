@@ -34,7 +34,7 @@ NS_START(fordyca, representation);
  * Member Functions
  ******************************************************************************/
 ds::block_list line_of_sight::blocks(void) const {
-  ds::block_list blocks;
+  ds::block_list blocks{};
   for (uint i = 0; i < m_view.shape()[0]; ++i) {
     for (uint j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];

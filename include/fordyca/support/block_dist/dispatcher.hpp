@@ -71,8 +71,9 @@ class dispatcher {
   static constexpr char kDIST_QUAD_SRC[] = "quad_source";
   static constexpr char kDIST_POWERLAW[] = "powerlaw";
 
-  dispatcher(ds::arena_grid& grid,
-             const struct params::arena::block_dist_params* params);
+  dispatcher(ds::arena_grid* grid,
+             const params::arena::block_dist_params* params,
+             double arena_padding);
   ~dispatcher(void);
 
   dispatcher(const dispatcher& s) = delete;
@@ -110,10 +111,20 @@ class dispatcher {
   const base_distributor* distributor(void) const { return m_dist.get(); }
 
  private:
+  /**
+   * @brief The minimum X index within the \ref ds::arena_grid handed to the
+   * dispatcher that blocks will be distributed to, in order to avoid robots
+   * repeatedly running into the walls of the arena as they try to acquire a
+   * block that is too close and triggers their obstacle avoidance.
+   */
+  static uint constexpr kINDEX_MIN = 2;
+
   // clang-format off
+  const double                                  mc_padding;
   const struct params::arena::block_dist_params mc_params;
+
   std::string                                   m_dist_type;
-  ds::arena_grid&                               m_grid;
+  ds::arena_grid*                               m_grid{nullptr};
   std::unique_ptr<base_distributor>             m_dist;
 
   // clang-format on

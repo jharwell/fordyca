@@ -104,9 +104,9 @@ void dpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::block_list blocks = c_los->blocks();
-  if (!blocks.empty()) {
-    ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
+  ds::block_list los_blocks = c_los->blocks();
+  if (!los_blocks.empty()) {
+    ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
   }
 
   /*
@@ -116,7 +116,6 @@ void dpo_perception_subsystem::process_los_blocks(
    * moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  auto los_blocks = c_los->blocks();
   for (auto &&block : m_store->blocks()) {
     if (c_los->contains_loc(block.ent()->discrete_loc())) {
       auto it = std::find_if(los_blocks.begin(),

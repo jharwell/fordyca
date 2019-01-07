@@ -240,7 +240,7 @@
               n_clusters="15"
               />
           <manifest
-              n_cube="20"
+              n_cube="10"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -286,7 +286,7 @@
            pixels_per_meter="50" />
 
     <box id="wall_north" size="12,0.1,0.5" movable="false">
-      <body position="6,6,0" orientation="0,0,0" />
+      <body position="6,6.1,0" orientation="0,0,0" />
     </box>
     <box id="wall_south" size="12,0.1,0.5" movable="false">
       <body position="6,0,0" orientation="0,0,0" />
@@ -316,28 +316,28 @@
   <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d0">
-     <boundaries>
-        <top height="1" />
-        <bottom height="0" />
-        <sides>
-          <vertex point="0,0" />
-          <vertex point="6,0" />
-          <vertex point="6,6" />
-          <vertex point="0,6" />
-        </sides>
-     </boundaries>
-    </dynamics2d>
-    <dynamics2d id="dyn2d1">
-     <boundaries>
-        <top height="1" />
-        <bottom height="0" />
-        <sides>
-          <vertex point="6,0" />
-          <vertex point="12,0" />
-          <vertex point="12,6" />
-          <vertex point="6,6" />
-        </sides>
-     </boundaries>
+    <!--  <boundaries> -->
+    <!--     <top height="1" /> -->
+    <!--     <bottom height="0" /> -->
+    <!--     <sides> -->
+    <!--       <vertex point="0,0" /> -->
+    <!--       <vertex point="6,0" /> -->
+    <!--       <vertex point="6,6" /> -->
+    <!--       <vertex point="0,6" /> -->
+    <!--     </sides> -->
+    <!--  </boundaries> -->
+    <!-- </dynamics2d> -->
+    <!-- <dynamics2d id="dyn2d1"> -->
+    <!--  <boundaries> -->
+    <!--     <top height="1" /> -->
+    <!--     <bottom height="0" /> -->
+    <!--     <sides> -->
+    <!--       <vertex point="6,0" /> -->
+    <!--       <vertex point="12,0" /> -->
+    <!--       <vertex point="12,6" /> -->
+    <!--       <vertex point="6,6" /> -->
+    <!--     </sides> -->
+    <!--  </boundaries> -->
      </dynamics2d>
   </physics_engines>
 
@@ -352,28 +352,28 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl autoplay="true"> -->
-  <!--      <frame_grabbing directory="frames" -->
-  <!--                      base_name="frame_" -->
-  <!--                      format="png" -->
-  <!--                      quality="100" /> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="6,3,6" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--       <placement idx="1" -->
-  <!--                  position="6,0,5" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth0_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl autoplay="true">
+       <frame_grabbing directory="frames"
+                       base_name="frame_"
+                       format="png"
+                       quality="100" />
+      <camera>
+        <placement idx="0"
+                   position="6,3,6"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+        <placement idx="1"
+                   position="6,0,5"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth0_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

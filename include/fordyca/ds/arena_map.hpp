@@ -79,6 +79,7 @@ class arena_map : public er::client<arena_map>,
                   public visitor::visitable_any<arena_map>,
                   public decorator::decorator<arena_grid> {
  public:
+
   explicit arena_map(const struct params::arena::arena_map_params* params);
 
   /* robot occupancy metrics */
@@ -240,6 +241,15 @@ class arena_map : public er::client<arena_map>,
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
   }
+
+
+  /**
+   * @brief The amount of padding to add to the arena map so that LOS
+   * calculations when a robot is VERY close to the upper edge of the arena in x
+   * or y, and the conversion to discrete coordinates/rounding would cause an
+   * off-by-one out-of-bounds access are avoided.
+   */
+  double arena_padding(void) const { return 1.0; }
 
   /**
    * @brief Perform deferred initialization. This is not part the constructor so

@@ -42,20 +42,16 @@ NS_START(fordyca, ds);
  ******************************************************************************/
 arena_map::arena_map(const struct params::arena::arena_map_params* params)
     : ER_CLIENT_INIT("fordyca.ds.arena_map"),
-      /*
-       * +1 in order to avoid out-of-bounds accesses when a robot is VERY close
-       * to the upper edge of the arena in x or y, and the conversion to
-       * discrete coordinates/rounding would cause an off-by-one out-of-bounds
-       * access.
-       */
       decorator(params->grid.resolution,
-                static_cast<uint>(params->grid.upper.x() + 1),
-                static_cast<uint>(params->grid.upper.y() + 1)),
+                static_cast<uint>(params->grid.upper.x() + arena_padding()),
+                static_cast<uint>(params->grid.upper.y() + arena_padding())),
       m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
                    .create_blocks()),
       m_caches(),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
-      m_block_dispatcher(decoratee(), &params->blocks.dist) {
+      m_block_dispatcher(&decoratee(),
+                         &params->blocks.dist,
+                         arena_padding()) {
   ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
           xrsize(),
           yrsize(),
