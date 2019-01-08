@@ -39,7 +39,7 @@ class base_cache;
 namespace ds {
 class dpo_store;
 class dpo_semantic_map;
-}
+} // namespace ds
 
 namespace controller { namespace depth2 {
 class grp_mdpo_controller;

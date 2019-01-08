@@ -33,9 +33,9 @@
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
+#include "rcppsw/swarm/convergence/convergence_params.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,9 +67,8 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
       *params()->parse_results<const struct params::output_params>();
   auto* conv = params()->parse_results<rswc::convergence_params>();
   output.metrics.arena_grid = arenap->grid;
-  m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
-                                                                 conv,
-                                                                 output_root());
+  m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(
+      &output.metrics, conv, output_root());
 
   /* initialize cache handling */
   auto* cachep = params()->parse_results<params::caches::caches_params>();
@@ -88,9 +87,8 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller =
-        dynamic_cast<controller::depth2::grp_mdpo_controller&>(
-            robot.GetControllableEntity().GetController());
+    auto& controller = dynamic_cast<controller::depth2::grp_mdpo_controller&>(
+        robot.GetControllableEntity().GetController());
     controller_configure(controller);
   } /* for(&entity..) */
   ER_INFO("Initialization finished");
@@ -98,9 +96,8 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
 }
 
 void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller =
-      dynamic_cast<controller::depth2::grp_mdpo_controller&>(
-          robot.GetControllableEntity().GetController());
+  auto& controller = dynamic_cast<controller::depth2::grp_mdpo_controller&>(
+      robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
   m_metrics_agg->collect_from_controller(&controller);
@@ -151,8 +148,7 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
 
   auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
-    auto& oracular =
-        dynamic_cast<controller::depth2::ogrp_mdpo_controller&>(c);
+    auto& oracular = dynamic_cast<controller::depth2::ogrp_mdpo_controller&>(c);
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
                   tasking_oracle(),

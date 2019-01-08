@@ -104,8 +104,9 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
      * DO need to be able to modify their grid view. Here we do not need it, so
      * we have to cast.
      */
-    auto view = const_cast<ds::arena_grid*>(grid)->
-                layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
+    auto view =
+        const_cast<ds::arena_grid*>(grid)->layer<arena_grid::kCell>()->subgrid(
+            x, y, x_max, y_max);
     __rcsw_unused rmath::vector2u loc = (*view.origin()).loc();
     ER_TRACE("Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
              i,

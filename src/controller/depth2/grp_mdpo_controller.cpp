@@ -25,16 +25,16 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/depth2/tasking_initializer.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
@@ -93,7 +93,6 @@ void grp_mdpo_controller::Init(ticpp::Element& node) {
 
 void grp_mdpo_controller::shared_init(
     const params::depth2::controller_repository& param_repo) {
-
   /*
    * Create initial executive, binding the task abort callback to determine task
    * abort in loop functions.
@@ -113,17 +112,15 @@ void grp_mdpo_controller::shared_init(
    * Set task alloction callback, rebind task abort callback (original was lost
    * when we replaced the executive).
    */
-  executive()->task_alloc_notify(
-      std::bind(&grp_mdpo_controller::task_alloc_cb,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2));
+  executive()->task_alloc_notify(std::bind(&grp_mdpo_controller::task_alloc_cb,
+                                           this,
+                                           std::placeholders::_1,
+                                           std::placeholders::_2));
   executive()->task_abort_notify(std::bind(
       &grp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */
 
-__rcsw_pure tasks::base_foraging_task* grp_mdpo_controller::current_task(
-    void) {
+__rcsw_pure tasks::base_foraging_task* grp_mdpo_controller::current_task(void) {
   return dynamic_cast<tasks::base_foraging_task*>(executive()->current_task());
 } /* current_task() */
 
@@ -133,7 +130,7 @@ __rcsw_pure const tasks::base_foraging_task* grp_mdpo_controller::current_task(
 } /* current_task() */
 
 void grp_mdpo_controller::task_alloc_cb(const ta::polled_task* const task,
-                                              const ta::bi_tab* const) {
+                                        const ta::bi_tab* const) {
   if (!m_bsel_exception_added) {
     block_sel_matrix()->sel_exceptions_clear();
   }

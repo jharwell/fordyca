@@ -95,7 +95,7 @@ bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
         return true;
       }
     } /* for(j..) */
-  } /* for(i..) */
+  }   /* for(i..) */
   return false;
 } /* contains_loc() */
 

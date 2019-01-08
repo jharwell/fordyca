@@ -151,7 +151,7 @@ base_cache_manager::creation_res_t static_cache_manager::create(
   if (!ret.status) {
     ER_WARN("Unable to create static cache @%s: Not enough free blocks",
             mc_cache_loc.to_str().c_str());
-    return creation_res_t{true, ds::cache_vector()};
+    return creation_res_t{false, ds::cache_vector()};
   }
   ds::cache_vector created;
   /* no existing caches, so empty vector */

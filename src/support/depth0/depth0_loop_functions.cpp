@@ -67,27 +67,26 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
   auto* conv = params()->parse_results<rswc::convergence_params>();
   output.metrics.arena_grid = arena->grid;
 
-  m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,
-                                                                 conv,
-                                                                 output_root());
+  m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(
+      &output.metrics, conv, output_root());
 
   /* intitialize robot interactions with environment */
   auto* arenap = params()->parse_results<params::arena::arena_map_params>();
-  m_crw_interactor = rcppsw::make_unique<crw_itype>(
-      arena_map(),
-      m_metrics_agg.get(),
-      floor(),
-      &arenap->blocks.manipulation_penalty);
-  m_dpo_interactor = rcppsw::make_unique<dpo_itype>(
-      arena_map(),
-      m_metrics_agg.get(),
-      floor(),
-      &arenap->blocks.manipulation_penalty);
-  m_mdpo_interactor = rcppsw::make_unique<mdpo_itype>(
-      arena_map(),
-      m_metrics_agg.get(),
-      floor(),
-      &arenap->blocks.manipulation_penalty);
+  m_crw_interactor =
+      rcppsw::make_unique<crw_itype>(arena_map(),
+                                     m_metrics_agg.get(),
+                                     floor(),
+                                     &arenap->blocks.manipulation_penalty);
+  m_dpo_interactor =
+      rcppsw::make_unique<dpo_itype>(arena_map(),
+                                     m_metrics_agg.get(),
+                                     floor(),
+                                     &arenap->blocks.manipulation_penalty);
+  m_mdpo_interactor =
+      rcppsw::make_unique<mdpo_itype>(arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      &arenap->blocks.manipulation_penalty);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -132,7 +131,7 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* collect metrics from robot before its state changes */
   if (nullptr != mdpo) {
-  m_metrics_agg->collect_from_controller(mdpo);
+    m_metrics_agg->collect_from_controller(mdpo);
   } else if (nullptr != dpo) {
     m_metrics_agg->collect_from_controller(dpo);
   } else if (nullptr != crw) {
@@ -153,9 +152,7 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
               dpo->los_dim(),
               arena_map()->grid_resolution());
     uint los_grid_size = dpo->los_dim() / arena_map()->grid_resolution();
-    loop_utils::set_robot_los<decltype(*dpo)>(robot,
-                                                   los_grid_size,
-                                                   *arena_map());
+    loop_utils::set_robot_los<decltype(*dpo)>(robot, los_grid_size, *arena_map());
   }
 
   /*
@@ -167,7 +164,7 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     (*m_mdpo_interactor)(*mdpo, GetSpace().GetSimulationClock());
   } else if (nullptr != dpo) {
     (*m_dpo_interactor)(*dpo, GetSpace().GetSimulationClock());
-  }  else if (nullptr != crw) {
+  } else if (nullptr != crw) {
     (*m_crw_interactor)(*crw, GetSpace().GetSimulationClock());
   } else {
     ER_FATAL_SENTINEL("Bad depth0 controller");

@@ -24,18 +24,20 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dpo_set.hpp"
-#include "fordyca/ds/dp_block_set.hpp"
-#include "fordyca/ds/dp_cache_set.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
+#include "fordyca/ds/dpo_map.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace perception { struct pheromone_params; }}
+namespace params { namespace perception {
+struct pheromone_params;
+}} // namespace params::perception
 NS_START(ds);
 
 namespace visitor = rcppsw::patterns::visitor;
@@ -58,7 +60,7 @@ namespace rmath = rcppsw::math;
 class dpo_store : public er::client<dpo_store>,
                   public visitor::visitable_any<dpo_store> {
  public:
-  template<typename T>
+  template <typename T>
   using dp_entity = representation::dp_entity<T>;
 
   enum update_status {
@@ -96,15 +98,15 @@ class dpo_store : public er::client<dpo_store>,
    * @brief Get all blocks the robot is currently aware of, and their
    * corresponding pheromone levels.
    */
-  ds::dp_block_set& blocks(void) { return m_blocks; }
-  const ds::dp_block_set& blocks(void) const { return m_blocks; }
+  ds::dp_block_map& blocks(void) { return m_blocks; }
+  const ds::dp_block_map& blocks(void) const { return m_blocks; }
 
   /**
    * @brief Get all caches the robot is currently aware of, and their
    * corresponding pheromone levels.
    */
-  ds::dp_cache_set& caches(void) { return m_caches; }
-  const ds::dp_cache_set& caches(void) const { return m_caches; }
+  ds::dp_cache_map& caches(void) { return m_caches; }
+  const ds::dp_cache_map& caches(void) const { return m_caches; }
 
   bool repeat_deposit(void) const { return mc_repeat_deposit; }
   double rho(void) const { return mc_rho; }
@@ -121,10 +123,10 @@ class dpo_store : public er::client<dpo_store>,
   bool contains(const std::shared_ptr<representation::base_block>& block) const;
   bool contains(const std::shared_ptr<representation::base_cache>& cache) const;
 
-  const const_dp_block_set::value_type* find(
+  const dp_block_map::value_type* find(
       const std::shared_ptr<representation::base_block>& block) const;
 
-  const const_dp_cache_set::value_type* find(
+  const dp_cache_map::value_type* find(
       const std::shared_ptr<representation::base_cache>& cache) const;
 
   /**
@@ -170,8 +172,8 @@ class dpo_store : public er::client<dpo_store>,
   /* clang-format off */
   bool             mc_repeat_deposit;
   double           mc_rho;
-  ds::dp_block_set m_blocks{};
-  ds::dp_cache_set m_caches{};
+  ds::dp_block_map m_blocks{};
+  ds::dp_cache_map m_caches{};
   /* clang-format on */
 };
 

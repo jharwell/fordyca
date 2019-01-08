@@ -24,8 +24,8 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
 
 /*******************************************************************************
  * Namespaces

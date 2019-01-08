@@ -61,7 +61,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
     const params::metrics_params* const mparams,
-    const rswc::convergence_params * const cparams,
+    const rswc::convergence_params* const cparams,
     const std::string& output_root)
     : depth0_metrics_aggregator(mparams, cparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
@@ -107,7 +107,8 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       "caches::locations",
       metrics_path() + "/" + mparams->cache_locations_fname,
       mparams->collect_interval,
-      rmath::dvec2uvec(mparams->arena_grid.upper, mparams->arena_grid.resolution));
+      rmath::dvec2uvec(mparams->arena_grid.upper,
+                       mparams->arena_grid.resolution));
   reset_all();
 }
 

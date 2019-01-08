@@ -49,9 +49,7 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
                    .create_blocks()),
       m_caches(),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
-      m_block_dispatcher(&decoratee(),
-                         &params->blocks.dist,
-                         arena_padding()) {
+      m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()) {
   ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
           xrsize(),
           yrsize(),

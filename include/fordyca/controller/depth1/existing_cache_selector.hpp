@@ -28,7 +28,7 @@
 
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/ds/dp_cache_set.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,8 +65,8 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    *
    * @return The "best" existing cache.
    */
-  ds::const_dp_cache_set::value_type calc_best(
-      const ds::dp_cache_set& existing_caches,
+  ds::dp_cache_map::value_type calc_best(
+      const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position);
 
  private:

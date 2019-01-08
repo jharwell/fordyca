@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/base_cache.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
+#include "fordyca/representation/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,11 +38,10 @@ namespace rswarm = rcppsw::swarm;
  ******************************************************************************/
 dpo_semantic_map::dpo_semantic_map(
     const params::perception::perception_params* c_params,
-                 const std::string& robot_id)
+    const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.dpo_semantic_map"),
       decorator(c_params, robot_id),
       m_store(&c_params->pheromone) {}
-
 
 /*******************************************************************************
  * Member Functions
@@ -51,7 +50,7 @@ bool dpo_semantic_map::cache_remove(
     const std::shared_ptr<representation::base_cache>& victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
-            victim->discrete_loc().to_str().c_str());
+             victim->discrete_loc().to_str().c_str());
     events::cell_empty op(victim->discrete_loc());
     decoratee().access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
     return true;
@@ -63,7 +62,7 @@ bool dpo_semantic_map::block_remove(
     const std::shared_ptr<representation::base_block>& victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
-            victim->discrete_loc().to_str().c_str());
+             victim->discrete_loc().to_str().c_str());
     events::cell_empty op(victim->discrete_loc());
     access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
     return true;
@@ -75,13 +74,13 @@ void dpo_semantic_map::decay_all(void) {
   decoratee().update();
   m_store.decay_all();
 
-  for (auto &b : m_store.blocks()) {
+  for (auto&& b : m_store.blocks().values_range()) {
     const rmath::vector2u& loc = b.ent()->discrete_loc();
     rswarm::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
     ER_ASSERT(std::fabs((map_density - b.density()).last_result()) <=
-              std::numeric_limits<double>::epsilon(),
+                  std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP block%d density disagree: %f vs %f",
               loc.to_str().c_str(),
               b.ent()->id(),
@@ -89,13 +88,13 @@ void dpo_semantic_map::decay_all(void) {
               b.density().last_result());
   } /* for(&b..) */
 
-  for (auto &c : m_store.caches()) {
+  for (auto&& c : m_store.caches().values_range()) {
     const rmath::vector2u& loc = c.ent()->discrete_loc();
     rswarm::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
     ER_ASSERT(std::fabs((map_density - c.density()).last_result()) <=
-              std::numeric_limits<double>::epsilon(),
+                  std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP cache%d density disagree: %f vs %f",
               loc.to_str().c_str(),
               c.ent()->id(),

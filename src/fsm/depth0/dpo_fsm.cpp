@@ -35,8 +35,8 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const controller::block_sel_matrix* const sel_matrix,
-                           controller::saa_subsystem* const saa,
-                           ds::dpo_store* const store)
+                 controller::saa_subsystem* const saa,
+                 ds::dpo_store* const store)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.dpo"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -91,19 +91,23 @@ HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, state_machine::event_data) {
 __rcsw_pure FSM_OVERRIDE_DEF(bool,
                              dpo_fsm,
                              in_collision_avoidance,
-                             m_block_fsm, const);
+                             m_block_fsm,
+                             const);
 __rcsw_pure FSM_OVERRIDE_DEF(bool,
                              dpo_fsm,
                              entered_collision_avoidance,
-                             m_block_fsm, const);
+                             m_block_fsm,
+                             const);
 __rcsw_pure FSM_OVERRIDE_DEF(bool,
                              dpo_fsm,
                              exited_collision_avoidance,
-                             m_block_fsm, const);
+                             m_block_fsm,
+                             const);
 __rcsw_pure FSM_OVERRIDE_DEF(uint,
                              dpo_fsm,
                              collision_avoidance_duration,
-                             m_block_fsm, const);
+                             m_block_fsm,
+                             const);
 
 /*******************************************************************************
  * Goal Acquisition Metrics
@@ -113,11 +117,13 @@ FSM_OVERRIDE_DEF(bool, dpo_fsm, is_vectoring_to_goal, m_block_fsm, const);
 FSM_OVERRIDE_DEF(acquisition_goal_type,
                  dpo_fsm,
                  acquisition_goal,
-                 m_block_fsm, const);
+                 m_block_fsm,
+                 const);
 FSM_OVERRIDE_DEF(transport_goal_type,
                  dpo_fsm,
                  block_transport_goal,
-                 m_block_fsm, const);
+                 m_block_fsm,
+                 const);
 FSM_OVERRIDE_DEF(bool, dpo_fsm, goal_acquired, m_block_fsm, const);
 
 /*******************************************************************************

@@ -23,12 +23,12 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/params/depth0/mdpo_controller_repository.hpp"
-#include "fordyca/representation/base_block.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
+#include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
+#include "fordyca/params/depth0/mdpo_controller_repository.hpp"
+#include "fordyca/params/perception/perception_params.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,8 +40,7 @@ namespace ta = rcppsw::task_allocation;
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_controller::mdpo_controller(void)
-    : dpo_controller(),
-      ER_CLIENT_INIT("fordyca.controller.depth0.mdpo") {}
+    : dpo_controller(), ER_CLIENT_INIT("fordyca.controller.depth0.mdpo") {}
 
 mdpo_controller::~mdpo_controller(void) = default;
 
@@ -113,14 +112,15 @@ void mdpo_controller::shared_init(
 } /* shared_init() */
 
 void mdpo_controller::private_init(void) {
-  dpo_controller::fsm(rcppsw::make_unique<fsm::depth0::dpo_fsm>(
-      block_sel_matrix(),
-      base_controller::saa_subsystem(),
-      &perception()->map()->store()));
+  dpo_controller::fsm(
+      rcppsw::make_unique<fsm::depth0::dpo_fsm>(block_sel_matrix(),
+                                                base_controller::saa_subsystem(),
+                                                &perception()->map()->store()));
 } /* private_init() */
 
 const mdpo_perception_subsystem* mdpo_controller::perception(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(dpo_controller::perception());
+  return static_cast<const mdpo_perception_subsystem*>(
+      dpo_controller::perception());
 } /* perception() */
 
 mdpo_perception_subsystem* mdpo_controller::perception(void) {
@@ -131,18 +131,18 @@ mdpo_perception_subsystem* mdpo_controller::perception(void) {
  * World Model Metrics
  ******************************************************************************/
 uint mdpo_controller::cell_state_inaccuracies(uint state) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      perception())->cell_state_inaccuracies(state);
+  return static_cast<const mdpo_perception_subsystem*>(perception())
+      ->cell_state_inaccuracies(state);
 } /* cell_state_inaccuracies() */
 
 double mdpo_controller::known_percentage(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      perception())->known_percentage();
+  return static_cast<const mdpo_perception_subsystem*>(perception())
+      ->known_percentage();
 } /* known_percentage() */
 
 double mdpo_controller::unknown_percentage(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      perception())->unknown_percentage();
+  return static_cast<const mdpo_perception_subsystem*>(perception())
+      ->unknown_percentage();
 } /* unknown_percentage() */
 
 using namespace argos; // NOLINT

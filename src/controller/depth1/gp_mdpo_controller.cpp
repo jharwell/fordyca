@@ -25,16 +25,15 @@
 #include <fstream>
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/cache_sel_matrix_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -100,7 +99,6 @@ void gp_mdpo_controller::Init(ticpp::Element& node) {
 
 void gp_mdpo_controller::shared_init(
     const params::depth1::controller_repository& param_repo) {
-
   /* MDPO perception subsystem, block selection matrix */
   mdpo_controller::shared_init(param_repo);
 
@@ -108,37 +106,33 @@ void gp_mdpo_controller::shared_init(
   auto* block_mat = param_repo.parse_results<params::block_sel_matrix_params>();
 
   /* cache selection matrix */
-  m_cache_sel_matrix = rcppsw::make_unique<class cache_sel_matrix>(cache_mat,
-                                                                   block_mat->nest);
+  m_cache_sel_matrix =
+      rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
 
   /* task executive */
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
                                     saa_subsystem(),
                                     perception())(param_repo);
-  executive()->task_abort_notify(
-      std::bind(&gp_mdpo_controller::task_abort_cb,
-                this,
-                std::placeholders::_1));
+  executive()->task_abort_notify(std::bind(
+      &gp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */
 
 void gp_mdpo_controller::task_abort_cb(const ta::polled_task*) {
   m_task_aborted = true;
 } /* task_abort_cb() */
 
-__rcsw_pure const ta::bi_tab* gp_mdpo_controller::active_tab(
-    void) const {
+__rcsw_pure const ta::bi_tab* gp_mdpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
-__rcsw_pure tasks::base_foraging_task* gp_mdpo_controller::current_task(
-    void) {
+__rcsw_pure tasks::base_foraging_task* gp_mdpo_controller::current_task(void) {
   return dynamic_cast<tasks::base_foraging_task*>(
       m_executive.get()->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* gp_mdpo_controller::
-    current_task(void) const {
+__rcsw_pure const tasks::base_foraging_task* gp_mdpo_controller::current_task(
+    void) const {
   return const_cast<gp_mdpo_controller*>(this)->current_task();
 } /* current_task() */
 
@@ -163,10 +157,7 @@ TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
                          acquisition_goal,
                          current_task());
 
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         gp_mdpo_controller,
-                         goal_acquired,
-                         current_task());
+TASK_WRAPPER_DEFINEC_PTR(bool, gp_mdpo_controller, goal_acquired, current_task());
 
 /*******************************************************************************
  * Task Distribution Metrics
@@ -191,7 +182,6 @@ using namespace argos; // NOLINT
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_CONTROLLER(gp_mdpo_controller,
-                    "gp_mdpo_controller");
+REGISTER_CONTROLLER(gp_mdpo_controller, "gp_mdpo_controller");
 #pragma clang diagnostic pop
 NS_END(depth1, controller, fordyca);

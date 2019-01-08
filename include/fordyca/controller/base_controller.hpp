@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
 #include <string>
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +44,7 @@ namespace params {
 struct output_params;
 struct sensing_params;
 struct actuation_params;
-}
+} // namespace params
 
 NS_START(controller);
 

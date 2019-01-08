@@ -46,8 +46,8 @@ cache_site_selector::cache_site_selector(
  * Member Functions
  ******************************************************************************/
 rmath::vector2d cache_site_selector::calc_best(
-    const ds::dp_cache_set& known_caches,
-    const ds::dp_block_set& known_blocks,
+    const ds::dp_cache_map& known_caches,
+    const ds::dp_block_map& known_blocks,
     rmath::vector2d position) {
   double max_utility;
   std::vector<double> point;
@@ -81,11 +81,11 @@ rmath::vector2d cache_site_selector::calc_best(
 } /* calc_best() */
 
 bool cache_site_selector::verify_site(const rmath::vector2d& site,
-                                      const ds::dp_cache_set& known_caches,
-                                      const ds::dp_block_set& known_blocks) const {
-  for (auto& c : known_caches) {
+                                      const ds::dp_cache_map& known_caches,
+                                      const ds::dp_block_map& known_blocks) const {
+  for (auto& c : known_caches.values_range()) {
     ER_ASSERT((c.ent()->real_loc() - site).length() >=
-              std::get<0>(m_constraints)[0].cache_prox_dist,
+                  std::get<0>(m_constraints)[0].cache_prox_dist,
               "Cache site@%s too close to cache%d (%f <= %f)",
               site.to_str().c_str(),
               c.ent()->id(),
@@ -93,7 +93,7 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
               std::get<0>(m_constraints)[0].cache_prox_dist);
   } /* for(&c..) */
 
-  for (auto& b : known_blocks) {
+  for (auto& b : known_blocks.values_range()) {
     ER_ASSERT((b.ent()->real_loc() - site).length() >=
                   std::get<1>(m_constraints)[0].block_prox_dist,
               "Cache site@%s too close to block%d (%f <= %f)",
@@ -112,8 +112,8 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
 } /* verify_site() */
 
 void cache_site_selector::opt_initialize(
-    const ds::dp_cache_set& known_caches,
-    const ds::dp_block_set& known_blocks,
+    const ds::dp_cache_map& known_caches,
+    const ds::dp_block_map& known_blocks,
     rmath::vector2d position,
     struct site_utility_data* const utility_data,
     std::vector<double>* const initial_guess) {
@@ -161,10 +161,11 @@ void cache_site_selector::opt_initialize(
           yrange.to_str().c_str());
 } /* opt_initialize() */
 
-void cache_site_selector::constraints_create(const ds::dp_cache_set& known_caches,
-                                             const ds::dp_block_set& known_blocks,
-                                             const rmath::vector2d& nest_loc) {
-  for (auto& c : known_caches) {
+void cache_site_selector::constraints_create(
+    const ds::dp_cache_map& known_caches,
+    const ds::dp_block_map& known_blocks,
+    const rmath::vector2d& nest_loc) {
+  for (auto& c : known_caches.values_range()) {
     std::get<0>(m_constraints)
         .push_back({c.ent(),
                     this,
@@ -172,7 +173,7 @@ void cache_site_selector::constraints_create(const ds::dp_cache_set& known_cache
                         mc_matrix->find(cselm::kCacheProxDist)->second)});
   } /* for(&c..) */
 
-  for (auto& b : known_blocks) {
+  for (auto& b : known_blocks.values_range()) {
     std::get<1>(m_constraints)
         .push_back({b.ent(),
                     this,

@@ -104,8 +104,7 @@ class cache_block_drop
   void visit(ds::dpo_semantic_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(
-      controller::depth1::gp_mdpo_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
 

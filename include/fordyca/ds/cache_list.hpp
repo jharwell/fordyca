@@ -33,7 +33,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_cache; }
+namespace representation {
+class base_cache;
+}
 NS_START(ds);
 
 using cache_list_type = std::shared_ptr<representation::base_cache>;

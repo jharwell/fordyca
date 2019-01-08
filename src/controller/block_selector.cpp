@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_selector.hpp"
+
 #include "fordyca/math/block_utility.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cube_block.hpp"
@@ -42,14 +43,14 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::const_dp_block_set::value_type block_selector::calc_best(
-    const ds::dp_block_set& blocks,
+ds::dp_block_map::value_type block_selector::calc_best(
+    const ds::dp_block_map& blocks,
     const rmath::vector2d& position) {
   double max_utility = 0.0;
-  ds::const_dp_block_set::value_type best{nullptr, {}};
+  ds::dp_block_map::value_type best{nullptr, {}};
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
-  for (auto& b : blocks) {
+  for (const auto& b : blocks.values_range()) {
     if (block_is_excluded(position, b.ent())) {
       continue;
     }

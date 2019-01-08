@@ -27,27 +27,25 @@
 #include <list>
 #include <string>
 
-#include "fordyca/ds/occupancy_grid.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
-#include "fordyca/ds/dp_block_set.hpp"
-#include "fordyca/ds/dp_cache_set.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
-namespace perception {
+namespace params { namespace perception {
 struct perception_params;
-}}
+}} // namespace params::perception
 
 NS_START(ds);
 
 namespace decorator = rcppsw::patterns::decorator;
 namespace visitor = rcppsw::patterns::visitor;
 namespace er = rcppsw::er;
-
 
 /*******************************************************************************
  * Class Definitions

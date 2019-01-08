@@ -52,7 +52,7 @@ using task2 = tasks::depth2::foraging_task;
  ******************************************************************************/
 depth2_metrics_aggregator::depth2_metrics_aggregator(
     const params::metrics_params* const mparams,
-    const rswc::convergence_params * const cparams,
+    const rswc::convergence_params* const cparams,
     const std::string& output_root)
     : depth1_metrics_aggregator(mparams, cparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {

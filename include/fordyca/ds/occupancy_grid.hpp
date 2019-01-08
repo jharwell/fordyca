@@ -41,10 +41,9 @@ namespace events {
 class cell_unknown;
 class cell_empty;
 } // namespace events
-namespace params {
-namespace perception {
+namespace params { namespace perception {
 struct perception_params;
-}}
+}} // namespace params::perception
 
 NS_START(ds);
 using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;

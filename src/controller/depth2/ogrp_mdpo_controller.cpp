@@ -23,12 +23,12 @@
  ******************************************************************************/
 #include "fordyca/controller/depth2/ogrp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +39,6 @@ NS_START(fordyca, controller, depth2);
  * Member Functions
  ******************************************************************************/
 void ogrp_mdpo_controller::Init(ticpp::Element& node) {
-
   ndc_push();
   ER_INFO("Initializing...");
   params::depth2::controller_repository param_repo;

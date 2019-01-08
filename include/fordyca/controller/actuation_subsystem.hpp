@@ -94,7 +94,9 @@ class actuation_subsystem {
    * @brief Update the currently applied amount of throttling based on
    * presumably new configuration.
    */
-  void motion_throttle_update(uint timestep) { m_drive.throttle_update(timestep); }
+  void motion_throttle_update(uint timestep) {
+    m_drive.throttle_update(timestep);
+  }
 
   /**
    * @brief Reset the actuations, including stopping the robot.

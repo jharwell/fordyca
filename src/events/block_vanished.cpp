@@ -90,8 +90,7 @@ void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void block_vanished::visit(
-    controller::depth1::gp_mdpo_controller& controller) {
+void block_vanished::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
   ER_INFO(
@@ -130,8 +129,7 @@ void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_vanished::visit(
-    controller::depth2::grp_mdpo_controller& controller) {
+void block_vanished::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
   ER_INFO("Abort pickup/drop from/in block: block%d vanished", m_block_id);

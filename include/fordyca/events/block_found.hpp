@@ -42,7 +42,7 @@ class grp_mdpo_controller;
 namespace ds {
 class dpo_semantic_map;
 class dpo_store;
-}
+} // namespace ds
 
 NS_START(events);
 

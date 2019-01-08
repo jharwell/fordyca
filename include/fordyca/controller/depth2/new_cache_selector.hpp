@@ -28,8 +28,8 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/ds/dp_cache_set.hpp"
-#include "fordyca/ds/dp_block_set.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
 
 
 /*******************************************************************************
@@ -66,14 +66,14 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
    *
    * @return The "best" new cache.
    */
-  ds::const_dp_block_set::value_type operator()(
-      const ds::dp_block_set& new_caches,
-      const ds::dp_cache_set& existing_caches,
+  ds::dp_block_map::value_type operator()(
+      const ds::dp_block_map& new_caches,
+      const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position) const;
 
  private:
-  bool new_cache_is_excluded(const ds::dp_cache_set& existing_caches,
-                             const ds::dp_block_set& blocks,
+  bool new_cache_is_excluded(const ds::dp_cache_map& existing_caches,
+                             const ds::dp_block_map& blocks,
                              const representation::base_block* const new_cache) const;
 
   // clang-format off

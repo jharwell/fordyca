@@ -109,12 +109,10 @@ void nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(
-    controller::depth1::gp_mdpo_controller& controller) {
+void nest_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
   controller.block(nullptr);
   auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
@@ -152,8 +150,7 @@ void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(
-    controller::depth2::grp_mdpo_controller& controller) {
+void nest_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
   controller.block(nullptr);
   __rcsw_unused auto* polled =

@@ -26,10 +26,10 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
@@ -79,18 +79,16 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
   ER_ASSERT(mc_csel_matrix, "NULL cache selection matrix");
 
   std::unique_ptr<ta::taskable> generalist_fsm =
-      rcppsw::make_unique<fsm::depth0::free_block_to_nest_fsm>(
-          mc_bsel_matrix, m_saa, dpo_store());
+      rcppsw::make_unique<fsm::depth0::free_block_to_nest_fsm>(mc_bsel_matrix,
+                                                               m_saa,
+                                                               dpo_store());
   std::unique_ptr<ta::taskable> collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
           cache_sel_matrix(), saa_subsystem(), dpo_store());
 
   std::unique_ptr<ta::taskable> harvester_fsm =
       rcppsw::make_unique<fsm::depth1::block_to_existing_cache_fsm>(
-          block_sel_matrix(),
-          mc_csel_matrix,
-          saa_subsystem(),
-          dpo_store());
+          block_sel_matrix(), mc_csel_matrix, saa_subsystem(), dpo_store());
 
   tasks::depth1::collector* collector =
       new tasks::depth1::collector(task_params, std::move(collector_fsm));
@@ -176,6 +174,5 @@ ds::dpo_store* tasking_initializer::dpo_store(void) {
   return const_cast<ds::dpo_store*>(
       const_cast<const tasking_initializer*>(this)->dpo_store());
 } /* dpo_store() */
-
 
 NS_END(depth1, controller, fordyca);

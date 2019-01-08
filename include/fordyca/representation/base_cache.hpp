@@ -28,11 +28,11 @@
 #include <utility>
 #include <vector>
 
+#include "fordyca/ds/block_vector.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
-#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces

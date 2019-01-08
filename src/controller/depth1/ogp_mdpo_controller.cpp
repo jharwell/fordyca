@@ -23,12 +23,12 @@
  ******************************************************************************/
 #include "fordyca/controller/depth1/ogp_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,14 +59,10 @@ void ogp_mdpo_controller::Init(ticpp::Element& node) {
 } /* Init() */
 
 void ogp_mdpo_controller::oracle_init(void) {
-  executive()->task_abort_notify(
-      std::bind(&ogp_mdpo_controller::task_abort_cb,
-                this,
-                std::placeholders::_1));
-  executive()->task_finish_notify(
-      std::bind(&ogp_mdpo_controller::task_finish_cb,
-                this,
-                std::placeholders::_1));
+  executive()->task_abort_notify(std::bind(
+      &ogp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
+  executive()->task_finish_notify(std::bind(
+      &ogp_mdpo_controller::task_finish_cb, this, std::placeholders::_1));
 } /* oracle_init() */
 
 void ogp_mdpo_controller::task_abort_cb(ta::polled_task* task) {
@@ -112,7 +108,6 @@ using namespace argos; // NOLINT
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_CONTROLLER(ogp_mdpo_controller,
-                    "ogp_mdpo_controller");
+REGISTER_CONTROLLER(ogp_mdpo_controller, "ogp_mdpo_controller");
 #pragma clang diagnostic pop
 NS_END(depth1, controller, fordyca);

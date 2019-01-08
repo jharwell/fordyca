@@ -36,12 +36,12 @@
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
+#include "fordyca/metrics/temporal_variance_metrics.hpp"
+#include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
-#include "fordyca/metrics/temporal_variance_metrics.hpp"
-#include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -94,7 +94,8 @@ base_metrics_aggregator::base_metrics_aggregator(
       "arena::robot_occupancy",
       metrics_path() + "/" + mparams->arena_robot_occupancy_fname,
       mparams->collect_interval,
-      rmath::dvec2uvec(mparams->arena_grid.upper, mparams->arena_grid.resolution));
+      rmath::dvec2uvec(mparams->arena_grid.upper,
+                       mparams->arena_grid.resolution));
 
   register_collector<rmetrics::swarm::convergence_metrics_collector>(
       "swarm::convergence",

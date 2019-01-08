@@ -25,16 +25,16 @@
 #include <fstream>
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/depth0/dpo_controller_repository.hpp"
+#include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,12 +67,10 @@ void dpo_controller::perception(
   m_perception = std::move(perception);
 }
 
-__rcsw_pure const representation::line_of_sight* dpo_controller::los(
-    void) const {
+__rcsw_pure const representation::line_of_sight* dpo_controller::los(void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get())->los();
 }
-void dpo_controller::los(
-    std::unique_ptr<representation::line_of_sight> new_los) {
+void dpo_controller::los(std::unique_ptr<representation::line_of_sight> new_los) {
   m_perception->los(std::move(new_los));
 }
 
@@ -131,9 +129,10 @@ void dpo_controller::Init(ticpp::Element& node) {
 
 void dpo_controller::shared_init(
     const params::depth0::dpo_controller_repository& param_repo) {
-
-  auto perception = param_repo.parse_results<params::perception::perception_params>();
-  auto block_matrix = param_repo.parse_results<params::block_sel_matrix_params>();
+  auto perception =
+      param_repo.parse_results<params::perception::perception_params>();
+  auto block_matrix =
+      param_repo.parse_results<params::block_sel_matrix_params>();
 
   /* DPO perception subsystem */
   m_perception = rcppsw::make_unique<dpo_perception_subsystem>(perception);
@@ -149,7 +148,6 @@ void dpo_controller::private_init(void) {
       static_cast<dpo_perception_subsystem*>(m_perception.get())->store());
 } /* private_init() */
 
-
 void dpo_controller::Reset(void) {
   crw_controller::Reset();
   m_perception->reset();
@@ -158,13 +156,14 @@ void dpo_controller::Reset(void) {
 FSM_OVERRIDE_DEF(transport_goal_type,
                  dpo_controller,
                  block_transport_goal,
-                 *m_fsm, const);
-
+                 *m_fsm,
+                 const);
 
 FSM_OVERRIDE_DEF(acquisition_goal_type,
                  dpo_controller,
                  acquisition_goal,
-                 *m_fsm, const);
+                 *m_fsm,
+                 const);
 
 FSM_OVERRIDE_DEF(bool, dpo_controller, goal_acquired, *m_fsm, const);
 FSM_OVERRIDE_DEF(bool, dpo_controller, is_exploring_for_goal, *m_fsm, const);

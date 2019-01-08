@@ -90,12 +90,14 @@ FSM_OVERRIDE_DEF(bool, crw_controller, is_exploring_for_goal, *m_fsm, const);
 FSM_OVERRIDE_DEF(acquisition_goal_type,
                  crw_controller,
                  acquisition_goal,
-                 *m_fsm, const);
+                 *m_fsm,
+                 const);
 
 FSM_OVERRIDE_DEF(transport_goal_type,
                  crw_controller,
                  block_transport_goal,
-                 *m_fsm, const);
+                 *m_fsm,
+                 const);
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

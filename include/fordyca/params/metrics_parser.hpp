@@ -49,7 +49,9 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit metrics_parser(uint level)
       : xml_param_parser(level),
-        m_params(std::make_shared<std::remove_reference<decltype(*m_params)>::type>()) {}
+        m_params(
+            std::make_shared<std::remove_reference<decltype(*m_params)>::type>()) {
+  }
   ~metrics_parser(void) override = default;
 
   /**

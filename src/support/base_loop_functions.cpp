@@ -49,8 +49,7 @@ namespace rswc = rcppsw::swarm::convergence;
  * Constructors/Destructors
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.base"),
-      m_arena_map(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.base"), m_arena_map(nullptr) {}
 
 /*******************************************************************************
  * Member Functions

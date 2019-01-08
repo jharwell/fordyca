@@ -79,7 +79,6 @@ class arena_map : public er::client<arena_map>,
                   public visitor::visitable_any<arena_map>,
                   public decorator::decorator<arena_grid> {
  public:
-
   explicit arena_map(const struct params::arena::arena_map_params* params);
 
   /* robot occupancy metrics */
@@ -241,7 +240,6 @@ class arena_map : public er::client<arena_map>,
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
   }
-
 
   /**
    * @brief The amount of padding to add to the arena map so that LOS

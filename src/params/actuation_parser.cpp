@@ -63,7 +63,7 @@ __rcsw_pure bool actuation_parser::validate(void) const {
   return true;
 
 error:
-      return false;
+  return false;
 } /* validate() */
 
 NS_END(params, fordyca);

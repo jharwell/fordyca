@@ -161,11 +161,13 @@ __rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) cons
 FSM_OVERRIDE_DEF(bool,
                  free_block_to_nest_fsm,
                  is_exploring_for_goal,
-                 m_block_fsm, const);
+                 m_block_fsm,
+                 const);
 FSM_OVERRIDE_DEF(bool,
                  free_block_to_nest_fsm,
                  is_vectoring_to_goal,
-                 m_block_fsm, const);
+                 m_block_fsm,
+                 const);
 
 acquisition_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||

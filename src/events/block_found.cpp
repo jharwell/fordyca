@@ -22,13 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
-#include "fordyca/events/cell_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,10 +45,9 @@ block_found::block_found(std::unique_ptr<representation::base_block> block)
       cell_op(block->discrete_loc()),
       m_block(std::move(block)) {}
 
-block_found::block_found(
-    const std::shared_ptr<representation::base_block>& block)
+block_found::block_found(const std::shared_ptr<representation::base_block>& block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
-     cell_op(block->discrete_loc()),
+      cell_op(block->discrete_loc()),
       m_block(block) {}
 
 /*******************************************************************************
@@ -59,7 +58,7 @@ void block_found::visit(ds::dpo_store& store) {
    * If the cell in the arena that we thought contained a cache now contains a
    * block, remove the out-of-date cache.
    */
-  for (auto &&c : store.caches()) {
+  for (auto&& c : store.caches().values_range()) {
     if (m_block->discrete_loc() == c.ent()->discrete_loc()) {
       store.cache_remove(c.ent_obj());
 
@@ -68,7 +67,7 @@ void block_found::visit(ds::dpo_store& store) {
        * given cell has changed. This is regardless of the status repeat
        * deposits, which only affect repeated sightings of KNOWN objects.
        */
-      const_cast<ds::dp_cache_set::value_type&>(c).density().reset();
+      const_cast<ds::dp_cache_map::value_type&>(c).density().reset();
     }
   } /* for(&&c..) */
 
@@ -102,7 +101,7 @@ void block_found::visit(ds::dpo_store& store) {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  store.block_update(ds::const_dp_block_set::value_type(m_block, density));
+  store.block_update(ds::dp_block_map::value_type(m_block, density));
 } /* visit() */
 
 /*******************************************************************************
@@ -178,8 +177,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
    * #229.
    */
-  auto res = map.block_update(ds::const_dp_block_set::value_type(m_block,
-                                                                 density));
+  auto res = map.block_update(ds::dp_block_map::value_type(m_block, density));
   if (res.status) {
     if (ds::dpo_store::update_status::kBlockMoved == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",

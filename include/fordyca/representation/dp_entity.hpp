@@ -47,11 +47,12 @@ namespace rswarm = rcppsw::swarm;
  * When performing equality tests between instances, only the underlying entity
  * is considered (relevance is ignored).
  */
-template<class T>
+template <class T>
 class dp_entity {
  public:
+  dp_entity(void) = default;
   dp_entity(const std::shared_ptr<T>& ent,
-             const rcppsw::swarm::pheromone_density& density)
+            const rcppsw::swarm::pheromone_density& density)
       : m_ent(ent), m_density(density) {}
 
   /**
@@ -63,13 +64,6 @@ class dp_entity {
     return m_ent->idcmp(*other.ent());
   }
 
-  /*
-   * Needed for placement into std::set. Since m_ent is a std::shared_ptr, it
-   * will use direct pointer comparison, which is fine because we don't care.
-   */
-  bool operator<(const dp_entity<T>& other) const {
-    return m_ent < other.m_ent;
-  }
   const std::shared_ptr<T>& ent_obj(void) const { return m_ent; }
 
   T* ent(void) { return m_ent.get(); }
@@ -78,15 +72,15 @@ class dp_entity {
   const rswarm::pheromone_density& density(void) const { return m_density; }
   rswarm::pheromone_density& density(void) { return m_density; }
 
-  void update(void) { m_density.update(); }
+  void density(const rswarm::pheromone_density& density) {
+    m_density = density;
+  }
 
-  void density(const rswarm::pheromone_density& density) { m_density = density; }
-
-
-  /* clang-format on */
+ private:
+  /* clang-format off */
   std::shared_ptr<T>        m_ent;
   rswarm::pheromone_density m_density;
-  /* clang-format off */
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

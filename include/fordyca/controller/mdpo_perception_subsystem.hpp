@@ -27,10 +27,10 @@
 #include <string>
 #include <vector>
 
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"

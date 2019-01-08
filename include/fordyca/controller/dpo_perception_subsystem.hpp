@@ -26,17 +26,21 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace ds { class dpo_store; }
-namespace params { namespace perception { struct perception_params; }}
+namespace ds {
+class dpo_store;
+}
+namespace params { namespace perception {
+struct perception_params;
+}} // namespace params::perception
 
 NS_START(controller);
 
@@ -93,7 +97,8 @@ class dpo_perception_subsystem
    *
    * @param c_los Current LOS.
    */
-  void processed_los_verify(const representation::line_of_sight* const c_los) const;
+  void processed_los_verify(
+      const representation::line_of_sight* const c_los) const;
 
  private:
   // clang-format off

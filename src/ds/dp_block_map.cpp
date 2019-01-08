@@ -1,5 +1,5 @@
 /**
- * @file dp_cache_set.cpp
+ * @file dp_block_map.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,9 +21,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_set.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
 #include <numeric>
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,12 +33,13 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string dp_cache_set::to_str(void) const {
-  return std::accumulate(this->begin(),
-                         this->end(),
+std::string dp_block_map::to_str(void) const {
+  auto range = values_range();
+  return std::accumulate(range.begin(),
+                         range.end(),
                          std::string(),
-                         [&](const std::string& a, const auto& c) {
-                           return a + "c" + std::to_string(c.ent()->id()) + ",";
+                         [&](const std::string& a, const auto& b) {
+                           return a + "b" + std::to_string(b.ent()->id()) + ",";
                          });
 } /* to_str() */
 

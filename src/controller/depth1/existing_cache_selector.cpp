@@ -45,14 +45,14 @@ existing_cache_selector::existing_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::const_dp_cache_set::value_type existing_cache_selector::calc_best(
-    const ds::dp_cache_set& existing_caches,
+ds::dp_cache_map::value_type existing_cache_selector::calc_best(
+    const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position) {
-  ds::const_dp_cache_set::value_type best(nullptr, {});
+  ds::dp_cache_map::value_type best(nullptr, {});
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
-  for (auto& c : existing_caches) {
+  for (auto& c : existing_caches.values_range()) {
     if (cache_is_excluded(position, c.ent())) {
       continue;
     }

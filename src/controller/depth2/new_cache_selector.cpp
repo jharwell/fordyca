@@ -43,15 +43,15 @@ new_cache_selector::new_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::const_dp_block_set::value_type new_cache_selector::operator()(
-    const ds::dp_block_set& new_caches,
-    const ds::dp_cache_set& existing_caches,
+ds::dp_block_map::value_type new_cache_selector::operator()(
+    const ds::dp_block_map& new_caches,
+    const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position) const {
-  ds::const_dp_block_set::value_type best(nullptr, {});
+  ds::dp_block_map::value_type best(nullptr, {});
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
-  for (auto& c : new_caches) {
+  for (auto& c : new_caches.values_range()) {
     if (new_cache_is_excluded(existing_caches, new_caches, c.ent())) {
       continue;
     }
@@ -88,15 +88,15 @@ ds::const_dp_block_set::value_type new_cache_selector::operator()(
 } /* operator() */
 
 bool new_cache_selector::new_cache_is_excluded(
-    const ds::dp_cache_set& existing_caches,
-    const ds::dp_block_set& blocks,
+    const ds::dp_cache_map& existing_caches,
+    const ds::dp_block_map& blocks,
     const representation::base_block* const new_cache) const {
   double cache_prox =
       boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second);
   double cluster_prox =
       boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
 
-  for (auto& ec : existing_caches) {
+  for (auto& ec : existing_caches.values_range()) {
     double dist = (ec.ent()->real_loc() - new_cache->real_loc()).length();
     if (dist <= cache_prox) {
       ER_DEBUG(
@@ -123,7 +123,7 @@ bool new_cache_selector::new_cache_is_excluded(
    * So, we approximate a block distribution as a single block, and only choose
    * new caches that are sufficiently far from any potential clusters.
    */
-  for (auto& b : blocks) {
+  for (auto& b : blocks.values_range()) {
     if (b.ent() == new_cache) {
       continue;
     }

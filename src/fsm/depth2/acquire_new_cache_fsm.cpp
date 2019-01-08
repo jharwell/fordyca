@@ -65,10 +65,8 @@ __rcsw_pure bool acquire_new_cache_fsm::candidates_exist(void) const {
 
 acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const {
   /* A "new" cache is the same as a single block  */
-  auto best = controller::depth2::new_cache_selector(mc_matrix)(
-      mc_store->blocks(),
-      mc_store->caches(),
-      sensors()->position());
+  auto best = controller::depth2::new_cache_selector(
+      mc_matrix)(mc_store->blocks(), mc_store->caches(), sensors()->position());
 
   /*
    * If this happens, all the blocks we know of are ineligible for us to
@@ -91,8 +89,9 @@ acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa_subsystem()->sensing()->position();
-  for (auto& b : mc_store->blocks()) {
-    if ((b.ent()->real_loc() - position).length() <= vector_fsm::kCACHE_ARRIVAL_TOL) {
+  for (auto& b : mc_store->blocks().values_range()) {
+    if ((b.ent()->real_loc() - position).length() <=
+        vector_fsm::kCACHE_ARRIVAL_TOL) {
       return true;
     }
   } /* for(&b..) */

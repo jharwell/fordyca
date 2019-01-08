@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -129,7 +129,7 @@ void free_block_pickup::visit(ds::dpo_store& store) {
             m_block->id(),
             m_block->discrete_loc().to_str().c_str());
   store.block_remove(m_block);
-  ER_ASSERT(store.contains(m_block),
+  ER_ASSERT(!store.contains(m_block),
             "Block%d@%s in DPO store after removal",
             m_block->id(),
             m_block->discrete_loc().to_str().c_str());
@@ -169,8 +169,7 @@ void free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
                    rfsm::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(
-    controller::depth0::mdpo_controller& controller) {
+void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_push();
 
   controller.perception()->map()->accept(*this);
@@ -182,12 +181,12 @@ void free_block_pickup::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(
-    controller::depth0::dpo_controller& controller) {
+void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::dpo_perception_subsystem*>(
-      controller.perception())->store()->accept(*this);
+  static_cast<controller::dpo_perception_subsystem*>(controller.perception())
+      ->store()
+      ->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
   controller.free_pickup_event(true);
@@ -199,16 +198,15 @@ void free_block_pickup::visit(
 /*******************************************************************************
  * DPO/MDPO Depth1 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(
-    controller::depth1::gp_mdpo_controller& controller) {
+void free_block_pickup::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
   controller.perception()->map()->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
 
-  __rcsw_unused auto* polled = dynamic_cast<ta::polled_task*>(
-      controller.current_task());
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
   auto* task =
       dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,

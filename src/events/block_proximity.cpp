@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_proximity.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"

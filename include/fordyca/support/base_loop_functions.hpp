@@ -29,10 +29,10 @@
 #include <string>
 #include <vector>
 
+#include "fordyca/metrics/temporal_variance_metrics.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
-#include "fordyca/metrics/temporal_variance_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -103,7 +103,6 @@ class base_loop_functions : public argos::CLoopFunctions,
   params::loop_function_repository* params(void) { return &m_params; }
   const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
   ds::arena_map* arena_map(void) { return m_arena_map.get(); }
-
 
  private:
   /**

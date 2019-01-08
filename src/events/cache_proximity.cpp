@@ -22,15 +22,15 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,8 +52,9 @@ void cache_proximity::visit(controller::depth2::grp_mdpo_controller& c) {
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
 
   events::cache_found found(m_cache);
-  static_cast<controller::mdpo_perception_subsystem*>(
-      c.perception())->map()->accept(found);
+  static_cast<controller::mdpo_perception_subsystem*>(c.perception())
+      ->map()
+      ->accept(found);
 
   auto* task = dynamic_cast<tasks::depth2::cache_finisher*>(c.current_task());
   ER_ASSERT(nullptr != task,

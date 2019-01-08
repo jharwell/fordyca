@@ -93,8 +93,7 @@ class cache_vanished
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;
   void visit(tasks::depth1::harvester& task) override;
-  void visit(
-      controller::depth1::gp_mdpo_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
 
   /* depth2 foraging */
   void visit(controller::depth2::grp_mdpo_controller& controller) override;

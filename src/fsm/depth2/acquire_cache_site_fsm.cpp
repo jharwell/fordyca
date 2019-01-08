@@ -61,7 +61,7 @@ __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
     bool explore_result) const {
   ER_ASSERT(!explore_result, "Found cache site by exploring?");
   rmath::vector2d position = saa_subsystem()->sensing()->position();
-  for (auto& b : mc_store->blocks()) {
+  for (auto& b : mc_store->blocks().values_range()) {
     if ((position - b.ent()->real_loc()).length() <=
         boost::get<double>(mc_matrix->find("block_prox_dist")->second)) {
       ER_WARN("Cannot acquire cache site@%s: Block%d@%s too close",

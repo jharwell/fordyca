@@ -45,8 +45,7 @@ cache_vanished::cache_vanished(uint cache_id)
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cache_vanished::visit(
-    controller::depth1::gp_mdpo_controller& controller) {
+void cache_vanished::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
@@ -85,8 +84,7 @@ void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_vanished::visit(
-    controller::depth2::grp_mdpo_controller& controller) {
+void cache_vanished::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
   ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);

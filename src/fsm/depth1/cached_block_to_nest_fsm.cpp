@@ -161,12 +161,14 @@ cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
 FSM_OVERRIDE_DEF(bool,
                  cached_block_to_nest_fsm,
                  is_exploring_for_goal,
-                 m_cache_fsm, const);
+                 m_cache_fsm,
+                 const);
 
 FSM_OVERRIDE_DEF(bool,
                  cached_block_to_nest_fsm,
                  is_vectoring_to_goal,
-                 m_cache_fsm, const);
+                 m_cache_fsm,
+                 const);
 
 bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kExistingCache == acquisition_goal()) {

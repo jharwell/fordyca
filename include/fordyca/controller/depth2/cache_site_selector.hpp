@@ -32,8 +32,8 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/ds/dp_block_set.hpp"
-#include "fordyca/ds/dp_cache_set.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -94,8 +94,8 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * @return The location of the best cache site, or (-1, -1) if no best cache
    * site could be found (can happen if NLopt mysteriously fails).
    */
-  rmath::vector2d calc_best(const ds::dp_cache_set& known_caches,
-                            const ds::dp_block_set& known_blocks,
+  rmath::vector2d calc_best(const ds::dp_cache_map& known_caches,
+                            const ds::dp_block_map& known_blocks,
                             rmath::vector2d position);
 
  private:
@@ -139,20 +139,20 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * @brief Create constraints for known caches, known blocks, and relating to
    * the nest.
    */
-  void constraints_create(const ds::dp_cache_set& known_caches,
-                          const ds::dp_block_set& known_blocks,
+  void constraints_create(const ds::dp_cache_map& known_caches,
+                          const ds::dp_block_map& known_blocks,
                           const rmath::vector2d& nest_loc);
 
 
-  void opt_initialize(const ds::dp_cache_set& known_caches,
-                      const ds::dp_block_set& known_blocks,
+  void opt_initialize(const ds::dp_cache_map& known_caches,
+                      const ds::dp_block_map& known_blocks,
                       rmath::vector2d position,
                       struct site_utility_data* utility_data,
                       std::vector<double>* initial_guess);
 
   bool verify_site(const rmath::vector2d& site,
-                   const ds::dp_cache_set& known_caches,
-                   const ds::dp_block_set& known_blocks) const;
+                   const ds::dp_cache_map& known_caches,
+                   const ds::dp_block_map& known_blocks) const;
 
   // clang-format off
   const controller::cache_sel_matrix* const mc_matrix;

@@ -98,7 +98,6 @@ class base_block : public multicell_entity,
    */
   bool idcmp(const base_block& other) const { return this->id() == other.id(); }
 
-
   /**
    * @brief Compare two \ref base_block objects for equality based on their
    * discrete location.

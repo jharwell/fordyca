@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
+#include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/ds/dpo_store.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -116,13 +116,12 @@ void dpo_perception_subsystem::process_los_blocks(
    * moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  for (auto &&block : m_store->blocks()) {
+  for (auto&& block : m_store->blocks().values_range()) {
     if (c_los->contains_loc(block.ent()->discrete_loc())) {
-      auto it = std::find_if(los_blocks.begin(),
-                             los_blocks.end(),
-                             [&](const auto& b) {
-                               return b->idcmp(*block.ent_obj());
-                             });
+      auto it =
+          std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
+            return b->idcmp(*block.ent_obj());
+          });
       if (los_blocks.end() == it) {
         /*
          * Needed for assert() to prevent last reference to shared_ptr being

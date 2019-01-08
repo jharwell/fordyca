@@ -117,16 +117,14 @@ void free_block_drop::visit(ds::arena_map& map) {
 /*******************************************************************************
  * Depth1
  ******************************************************************************/
-void free_block_drop::visit(
-    controller::depth1::gp_mdpo_controller& controller) {
+void free_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
 /*******************************************************************************
  * Depth2
  ******************************************************************************/
-void free_block_drop::visit(
-    controller::depth2::grp_mdpo_controller& controller) {
+void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());

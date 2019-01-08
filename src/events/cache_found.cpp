@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_cache.hpp"
@@ -63,36 +63,33 @@ void cache_found::visit(ds::dpo_store& store) {
    * a new cache there, we are tracking blocks that no longer exist in the
    * arena.
    */
-  auto it = store.blocks().begin();
-  while (it != store.blocks().end()) {
-    if (m_cache->contains_point(it->ent()->real_loc())) {
+  for (auto&& b : store.blocks().values_range()) {
+    if (m_cache->contains_point(b.ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
-               it->ent()->id(),
+               b.ent()->id(),
                m_cache->id());
-      store.block_remove(it->ent_obj());
-      ++it;
+      store.block_remove(b.ent_obj());
     }
   } /* while(it..) */
 
   auto known = store.find(m_cache);
   rswarm::pheromone_density density;
   if (nullptr != known) {
-      density = known->density();
+    density = known->density();
 
-      /*
+    /*
        * Repeat pheromone deposits only affect caches that are already known and
        * that we are tracking accurately.
        */
-      if (store.repeat_deposit()) {
-        density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
-      }
+    if (store.repeat_deposit()) {
+      density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+    }
   } else {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  store.cache_update(ds::const_dp_cache_set::value_type(m_cache, density));
+  store.cache_update(ds::dp_cache_map::value_type(m_cache, density));
 } /* visit() */
-
 
 /*******************************************************************************
  * MDPO Foraging
@@ -158,23 +155,22 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * cache is destroyed, and left the area before a new cache could be
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
-   *
-   * @todo This is a hack, and once the robot computes its own LOS rather than
-   * being sent it the need for this will disappear.
    */
-  auto it = map.blocks().begin();
-  while (it != map.blocks().end()) {
-    if (m_cache->contains_point(it->ent()->real_loc())) {
+  std::list<const std::shared_ptr<representation::base_block>*> rms;
+  for (auto&& b : map.blocks().values_range()) {
+    if (m_cache->contains_point(b.ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
-               it->ent()->id(),
+               b.ent()->id(),
                m_cache->id());
-
-      events::cell_empty op(it->ent()->discrete_loc());
-      map.access<occupancy_grid::kCell>(it->ent()->discrete_loc()).accept(op);
-      map.block_remove(it->ent_obj());
-      ++it;
+      rms.push_back(&b.ent_obj());
     }
-  } /* while(it..) */
+  } /* for(&&b..) */
+
+  for (auto&& b : rms) {
+    events::cell_empty op((*b)->discrete_loc());
+    map.access<occupancy_grid::kCell>((*b)->discrete_loc()).accept(op);
+    map.block_remove(*b);
+  } /* for(&&b..) */
 
   /*
    * If the cell is currently in a HAS_CACHE state, then that means that this
@@ -210,7 +206,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   }
-  map.cache_update(ds::const_dp_cache_set::value_type(m_cache, density));
+  map.cache_update(ds::dp_cache_map::value_type(m_cache, density));
   cell.accept(*this);
 } /* visit() */
 

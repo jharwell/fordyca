@@ -1,5 +1,5 @@
 /**
- * @file dp_block_set.hpp
+ * @file dp_cache_map.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,45 +18,54 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_DP_BLOCK_SET_HPP_
-#define INCLUDE_FORDYCA_DS_DP_BLOCK_SET_HPP_
+#ifndef INCLUDE_FORDYCA_DS_DP_CACHE_MAP_HPP_
+#define INCLUDE_FORDYCA_DS_DP_CACHE_MAP_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/ds/dpo_map.hpp"
 #include "rcppsw/common/common.hpp"
-#include "fordyca/ds/dpo_set.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_block; }
+namespace representation {
+class base_cache;
+}
 NS_START(ds);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dp_block_set : public dpo_set<representation::base_block> {
+/**
+ * @class dp_cache_map
+ * @ingroup ds
+ * @brief The cache map is a representation of the robot's perception of caches
+ * in the arena. It uses the locations of caches as keys, as caches are
+ * immovable during simulation. Using cache IDs as keys for insertion/removal
+ * would result in incorrect behavior, as a cache with ID 0 that has been
+ * depleted would not be replaced with a newer version of that cache with ID 1
+ * during LOS process (it would be inserted into the map, but the old version
+ * would not be removed, as they would be considered different objects).
+ */
+class dp_cache_map
+    : public dpo_map<rmath::vector2u, representation::base_cache> {
  public:
-  using dpo_set<representation::base_block>::dpo_set;
-  using value_type = dpo_set<representation::base_block>::value_type;
+  using dpo_map<rmath::vector2u, representation::base_cache>::dpo_map;
 
   /**
-   * @brief Build a string from the list of DP blocks that a robot is tracking
+   * @brief Build a string from the list of DP caches that a robot is tracking
    * for logging.
    */
   std::string to_str(void) const;
 };
 
-class const_dp_block_set : public dpo_set<const representation::base_block> {
- public:
-  using dpo_set<const representation::base_block>::dpo_set;
-  using value_type = dpo_set<representation::base_block>::value_type;
-};
-
 NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_DP_BLOCK_SET_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_DP_CACHE_MAP_HPP_ */

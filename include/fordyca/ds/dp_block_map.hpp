@@ -1,5 +1,5 @@
 /**
- * @file dp_cache_set.hpp
+ * @file dp_block_map.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,45 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_DP_CACHE_SET_HPP_
-#define INCLUDE_FORDYCA_DS_DP_CACHE_SET_HPP_
+#ifndef INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_
+#define INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/ds/dpo_map.hpp"
 #include "rcppsw/common/common.hpp"
-#include "fordyca/ds/dpo_set.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_cache; }
+namespace representation {
+class base_block;
+}
 NS_START(ds);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class dp_cache_set : public dpo_set<representation::base_cache> {
+/**
+ * @class dp_block_mapp
+ * @ingroup ds
+ * @brief The block map is a representation of the robot's perception of blocks
+ * in the arena. It uses integers as keys, because blocks are mobile (i.e. can
+ * move between instants of time where the robot sees them), and
+ * inserting/removing blocks from the map using location comparison will not
+ * give correct results.
+ */
+class dp_block_map : public dpo_map<int, representation::base_block> {
  public:
-  using dpo_set<representation::base_cache>::dpo_set;
-  using value_type = dpo_set<representation::base_cache>::value_type;
+  using dpo_map<int, representation::base_block>::dpo_map;
 
   /**
-   * @brief Build a string from the list of DP caches that a robot is tracking
+   * @brief Build a string from the list of DP blocks that a robot is tracking
    * for logging.
    */
   std::string to_str(void) const;
 };
 
-class const_dp_cache_set : public dpo_set<const representation::base_cache> {
- public:
-  using dpo_set<const representation::base_cache>::dpo_set;
-  using value_type = dpo_set<representation::base_cache>::value_type;
-};
-
 NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_DP_CACHE_SET_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_DP_BLOCK_MAP_HPP_ */

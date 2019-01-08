@@ -76,7 +76,6 @@ void mdpo_perception_subsystem::process_los(
 
 void mdpo_perception_subsystem::process_los_blocks(
     const representation::line_of_sight* const c_los) {
-
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -129,14 +128,11 @@ void mdpo_perception_subsystem::process_los_blocks(
                block->id(),
                block->real_loc().to_str().c_str(),
                block->discrete_loc().to_str().c_str());
-      auto it = std::find_if(m_map->blocks().begin(),
-                             m_map->blocks().end(),
-                             [&](const auto& b) {
-                               return b.ent()->id() == cell.block()->id();
-                             });
-      ER_ASSERT(it != m_map->blocks().end(),
-                "Known block%d not in PAM",
-                block->id());
+      auto range = m_map->blocks().values_range();
+      auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
+        return b.ent()->id() == cell.block()->id();
+      });
+      ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id());
     }
     events::block_found op(block->clone());
     m_map->accept(op);
@@ -145,14 +141,14 @@ void mdpo_perception_subsystem::process_los_blocks(
 
 void mdpo_perception_subsystem::process_los_caches(
     const representation::line_of_sight* const c_los) {
-    /*
+  /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::cache_list caches = c_los->caches();
-  if (!caches.empty()) {
-    ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(caches).c_str());
+  ds::cache_list los_caches = c_los->caches();
+  if (!los_caches.empty()) {
+    ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
   }
 
   /*
@@ -176,7 +172,7 @@ void mdpo_perception_subsystem::process_los_caches(
     } /* for(j..) */
   }   /* for(i..) */
 
-  for (auto& cache : c_los->caches()) {
+  for (auto& cache : los_caches) {
     /*
      * The state of a cache can change between when the robot saw it last
      * (i.e. different # of blocks in it), and so you need to always process

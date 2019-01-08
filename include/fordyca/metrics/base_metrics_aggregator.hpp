@@ -32,11 +32,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw {
-namespace swarm {
-namespace convergence {
+namespace rcppsw { namespace swarm { namespace convergence {
 struct convergence_params;
-}}}
+}}} // namespace rcppsw::swarm::convergence
 
 NS_START(fordyca);
 namespace rswc = rcppsw::swarm::convergence;
@@ -72,7 +70,7 @@ class base_metrics_aggregator
       public rcppsw::metrics::collector_group {
  public:
   base_metrics_aggregator(const params::metrics_params* mparams,
-                          const rswc::convergence_params * cparams,
+                          const rswc::convergence_params* cparams,
                           const std::string& output_root);
   virtual ~base_metrics_aggregator(void) = default;
 

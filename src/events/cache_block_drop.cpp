@@ -22,11 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -109,8 +109,7 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.has_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(
-    controller::depth1::gp_mdpo_controller& controller) {
+void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);
@@ -145,8 +144,7 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_block_drop::visit(
-    controller::depth2::grp_mdpo_controller& controller) {
+void cache_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
