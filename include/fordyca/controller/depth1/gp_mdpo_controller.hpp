@@ -26,39 +26,14 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/controller/depth0/mdpo_controller.hpp"
-#include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
+#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
-class bi_tdgraph_executive;
-class bi_tab;
-class executable_task;
-class polled_task;
-}}
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
-
-NS_START(fordyca);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
-
-namespace tasks {
-namespace depth0 { class generalist; }
-namespace depth1 {
-class harvester;
-class collector;
-class foraging_task;
-}
-}
-namespace params {
-namespace depth1 { class controller_repository; }
-}
-
-NS_START(controller);
-class cache_sel_matrix;
+NS_START(fordyca, controller);
+class mdpo_perception_subsystem;
 NS_START(depth1);
 
 /*******************************************************************************
@@ -72,78 +47,32 @@ NS_START(depth1);
  * \ref harvester, and \ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks, and uses a Mapped
  * DPO (MDPO) data store for tracking arena state and object relavance.
+ *
+ * Note that this class does not inherit from \ref depth0::mdpo_controller,
+ * because that would mean duplicating all of the executive setup
+ * logic/callbacks that are also present in the \ref depth1::gp_dpo_controller.
+ * Cleaner to do it this way.
  */
-class gp_mdpo_controller : public depth0::mdpo_controller,
-                          public er::client<gp_mdpo_controller>,
-                          public visitor::visitable_any<gp_mdpo_controller>,
-                          public rcppsw::metrics::tasks::bi_tdgraph_metrics {
+class gp_mdpo_controller : public depth1::gp_dpo_controller,
+                           public er::client<gp_mdpo_controller>,
+                           public visitor::visitable_any<gp_mdpo_controller>,
+                           public metrics::world_model_metrics {
  public:
   gp_mdpo_controller(void);
   ~gp_mdpo_controller(void) override;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
-  void ControlStep(void) override;
 
-  /* task distribution metrics */
-  int current_task_depth(void) const override;
-  int current_task_id(void) const override;
-  int current_task_tab(void) const override;
+  /* world model metrics */
+  uint cell_state_inaccuracies(uint state) const override;
+  double known_percentage(void) const override;
+  double unknown_percentage(void) const override;
 
-  /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
-
-  /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
-
-  /**
-   * @brief Get the current task the controller is executing.
-   */
-  virtual tasks::base_foraging_task* current_task(void);
-  virtual const tasks::base_foraging_task* current_task(void) const;
-
-  /**
-   * @brief Set whether or not a robot is supposed to display the task it is
-   * currently working on above itself during simulation.
-   */
-  void display_task(bool display_task) { m_display_task = display_task; }
-
-  /**
-   * @brief If \c TRUE, then the robot should display the task it is currently
-   * working on above itself during simulation.
-   */
-  bool display_task(void) const { return m_display_task; }
-
-  const ta::bi_tab* active_tab(void) const;
-
-  /*
-   * Public to setup metric collection from tasks.
-   */
-  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
-
-  /**
-   * @brief Get whether or not a task has been aborted this timestep.
-   *
-   * This functionality CANNOT use the abort state of the \ref current_task()
-   * because as soon as a task is aborted, the executive allocates a new task
-   * the *same* timestep, and so when the loop functions check if a task has
-   * been aborted, using the current task's abort status will always return
-   * false, and lead to inconsistent simulation state.
-   */
-  bool task_aborted(void) const { return m_task_aborted; }
-
-  const class cache_sel_matrix* cache_sel_matrix(void) const {
-    return m_cache_sel_matrix.get();
-  }
-  class cache_sel_matrix* cache_sel_matrix(void) {
-    return m_cache_sel_matrix.get();
-  }
+  const mdpo_perception_subsystem* perception(void) const;
+  mdpo_perception_subsystem* perception(void);
 
  protected:
-  void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
-
   /**
    * @brief Initialization that derived classes may also need to perform, if
    * they want to use any of the following parts of this class's functionality
@@ -159,27 +88,7 @@ class gp_mdpo_controller : public depth0::mdpo_controller,
    */
   void shared_init(const params::depth1::controller_repository& param_repo);
 
-  /*
-   * The \ref gp_mdpo_controller owns the executive, but derived classes can
-   * access it and set it to whatever they want (strategy pattern). This is done
-   * to reduce the amount of function overriding that would have to be performed
-   * otherwise if derived controllers each had private executives.
-   */
-  void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
-
-  /**
-   * @brief Callback for task abort. Task argument unused for now--only need to
-   * know that a task WAS aborted. \see \ref task_aborted().
-   */
-  void task_abort_cb(const ta::polled_task*);
-
  private:
-  // clang-format off
-  bool                                      m_display_task{false};
-  bool                                      m_task_aborted{false};
-  std::unique_ptr<class cache_sel_matrix>   m_cache_sel_matrix;
-  std::unique_ptr<ta::bi_tdgraph_executive> m_executive;
-  // clang-format on
 };
 
 NS_END(depth1, controller, fordyca);

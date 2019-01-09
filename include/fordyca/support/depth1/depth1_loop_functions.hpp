@@ -35,6 +35,7 @@
 NS_START(fordyca);
 namespace params { namespace caches { struct caches_params; }}
 
+namespace controller { namespace depth1 { class gp_dpo_controller; }}
 NS_START(support);
 class tasking_oracle;
 
@@ -76,7 +77,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   }
 
  private:
-  using interactor = robot_arena_interactor<controller::depth1::gp_mdpo_controller>;
+  using interactor = robot_arena_interactor<controller::depth1::gp_dpo_controller>;
 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
@@ -90,9 +91,10 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * - Enabled tasking oracle (if applicable) via task executive hooks
    * - Enabling tasking metric aggregation via task executive hooks
    *
-   * @param c The controller to configure.
+   * @param controller The controller to configure.
    */
-  void controller_configure(controller::base_controller& c);
+  template<class ControllerType>
+  void controller_configure(ControllerType& controller);
 
   /**
    * @brief Initialize all oracles.

@@ -27,6 +27,7 @@
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -169,27 +170,28 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
             m_real_cache->id(),
             m_real_cache->discrete_loc().to_str().c_str());
 
-  ER_ASSERT(m_real_cache->contains_block(m_pickup_block),
+  auto pcache = store.find(m_real_cache);
+  ER_ASSERT(pcache->ent()->contains_block(m_pickup_block),
             "DPO cache%d@%s/%s does not contain pickup block%d",
-            m_real_cache->id(),
-            m_real_cache->real_loc().to_str().c_str(),
-            m_real_cache->discrete_loc().to_str().c_str(),
+            pcache->ent()->id(),
+            pcache->ent()->real_loc().to_str().c_str(),
+            pcache->ent()->discrete_loc().to_str().c_str(),
             m_pickup_block->id());
 
-  if (m_real_cache->n_blocks() > base_cache::kMinBlocks) {
-    m_real_cache->block_remove(m_pickup_block);
-    ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
+  if (pcache->ent()->n_blocks() > base_cache::kMinBlocks) {
+    pcache->ent_obj()->block_remove(m_pickup_block);
+    ER_INFO("DPO Store: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
             m_robot_index,
             m_pickup_block->id(),
-            m_real_cache->id(),
+            pcache->ent()->id(),
             cell_op::coord().to_str().c_str(),
-            rcppsw::to_string(m_real_cache->blocks()).c_str(),
-            m_real_cache->n_blocks());
+            rcppsw::to_string(pcache->ent()->blocks()).c_str(),
+            pcache->ent()->n_blocks());
 
   } else {
-    __rcsw_unused int id = m_real_cache->id();
-    m_real_cache->block_remove(m_pickup_block);
-    store.cache_remove(m_real_cache);
+    __rcsw_unused int id = pcache->ent()->id();
+    pcache->ent_obj()->block_remove(m_pickup_block);
+    store.cache_remove(pcache->ent_obj());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
             m_robot_index,
             m_pickup_block->id(),
@@ -252,12 +254,36 @@ void cached_block_pickup::visit(representation::base_block& block) {
 } /* visit() */
 
 void cached_block_pickup::visit(
+    controller::depth1::gp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  static_cast<controller::dpo_perception_subsystem*>(
+      controller.perception())->store()->accept(*this);
+  controller.block(m_pickup_block);
+
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
+      controller.current_task());
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+
+  ER_ASSERT(
+      nullptr != task,
+      "Non existing cache interactor task '%s' causing cached block pickup",
+      task_name.c_str());
+  task->accept(*this);
+
+  ER_INFO("Picked up block%d from cache%d,task='%s'",
+          m_pickup_block->id(),
+          m_real_cache->id(),
+          task_name.c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cached_block_pickup::visit(
     controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::mdpo_perception_subsystem*>(controller.perception())
-      ->map()
-      ->accept(*this);
+  controller.perception()->map()->accept(*this);
   controller.block(m_pickup_block);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(

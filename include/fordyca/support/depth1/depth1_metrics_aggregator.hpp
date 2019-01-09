@@ -105,12 +105,17 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
       dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
 
   ER_ASSERT(movement_m, "Controller does not provide FSM movement metrics");
-  ER_ASSERT(worldm_m, "Controller does not provide world model metrics");
+
+  /* only MDPO controllers provide these */
+  if (nullptr != worldm_m) {
+    collect("perception::world_model", *worldm_m);
+  }
+
   ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
 
   collect("fsm::movement", *movement_m);
   collect("blocks::manipulation", *manip_m);
-  collect("perception::world_model", *worldm_m);
+
 
   if (nullptr != controller->current_task()) {
     auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(

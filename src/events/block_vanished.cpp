@@ -10,7 +10,7 @@
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
-n * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
@@ -90,6 +90,23 @@ void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
+void block_vanished::visit(controller::depth1::gp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  ER_INFO(
+      "Abort pickup executing task %s: block%d vanished",
+      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
+      m_block_id);
+  auto* task =
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non-free block interactor task %s triggered block vanished event",
+            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  task->accept(*this);
+
+  controller.ndc_pop();
+} /* visit() */
+
 void block_vanished::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 

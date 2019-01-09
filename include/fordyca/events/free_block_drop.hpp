@@ -44,6 +44,7 @@ class block_to_goal_fsm;
 } // namespace fsm
 namespace controller {
 namespace depth1 {
+class gp_dpo_controller;
 class gp_mdpo_controller;
 }
 namespace depth2 {
@@ -75,7 +76,8 @@ class free_block_drop
     : public cell_op,
       public rcppsw::er::client<free_block_drop>,
       public block_drop_event,
-      public visitor::visit_set<controller::depth1::gp_mdpo_controller,
+      public visitor::visit_set<controller::depth1::gp_dpo_controller,
+                                controller::depth1::gp_mdpo_controller,
                                 controller::depth2::grp_mdpo_controller,
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher,
@@ -102,6 +104,7 @@ class free_block_drop
   void visit(ds::arena_map& map) override;
 
   /* depth1 foraging */
+  void visit(controller::depth1::gp_dpo_controller&) override;
   void visit(controller::depth1::gp_mdpo_controller&) override;
 
   /* depth2 foraging */

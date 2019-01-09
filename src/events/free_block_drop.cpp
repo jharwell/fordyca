@@ -121,6 +121,10 @@ void free_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) 
   controller.block(nullptr);
 } /* visit() */
 
+void free_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
+  controller.block(nullptr);
+} /* visit() */
+
 /*******************************************************************************
  * Depth2
  ******************************************************************************/

@@ -94,13 +94,12 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot.GetControllableEntity().GetController());
-    controller_configure<controller::base_controller*>(&controller);
+    controller_configure(&controller);
   } /* for(entity..) */
   ER_INFO("Initialization finished");
   ndc_pop();
 }
 
-template <class T>
 void depth0_loop_functions::controller_configure(
     controller::base_controller* const c) {
   auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(c);

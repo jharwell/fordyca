@@ -47,6 +47,14 @@ NS_START(fordyca, support, depth1);
 using ds::arena_grid;
 
 /*******************************************************************************
+ * Template Instantiations
+ ******************************************************************************/
+template void depth1_loop_functions::controller_configure(
+    controller::depth1::gp_dpo_controller& controller);
+template void depth1_loop_functions::controller_configure(
+    controller::depth1::gp_mdpo_controller& controller);
+
+/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 depth1_loop_functions::depth1_loop_functions(void)
@@ -94,10 +102,13 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::depth1::gp_mdpo_controller&>(
-        robot.GetControllableEntity().GetController());
-    controller_configure(controller);
+    auto gp_dpo = dynamic_cast<controller::depth1::gp_dpo_controller*>(
+        &robot.GetControllableEntity().GetController());
+    auto gp_mdpo = dynamic_cast<controller::depth1::gp_mdpo_controller*>(
+        &robot.GetControllableEntity().GetController());
+    controller_configure((nullptr != gp_mdpo) ? *gp_mdpo : *gp_dpo);
   } /* for(&entity..) */
+
   ER_INFO("Initialization finished");
   ndc_pop();
 }
@@ -118,7 +129,7 @@ void depth1_loop_functions::oracle_init(void) {
 } /* oracle_init() */
 
 void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller = dynamic_cast<controller::depth1::gp_mdpo_controller&>(
+  auto& controller = dynamic_cast<controller::depth1::gp_dpo_controller&>(
       robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
@@ -148,19 +159,19 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
-void depth1_loop_functions::controller_configure(controller::base_controller& c) {
+template<class ControllerType>
+void depth1_loop_functions::controller_configure(ControllerType& controller) {
   /*
    * If NULL, then visualization has been disabled.
    */
-  auto& greedy = dynamic_cast<controller::depth1::gp_mdpo_controller&>(c);
   auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
-    greedy.display_task(vparams->robot_task);
+    controller.display_task(vparams->robot_task);
   }
 
   auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
-    auto& oracular = dynamic_cast<controller::depth1::ogp_mdpo_controller&>(c);
+    auto& oracular = dynamic_cast<controller::depth1::ogp_mdpo_controller&>(controller);
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
                   m_tasking_oracle.get(),
@@ -171,15 +182,15 @@ void depth1_loop_functions::controller_configure(controller::base_controller& c)
                   std::placeholders::_1));
     oracular.tasking_oracle(m_tasking_oracle.get());
   }
-  greedy.executive()->task_finish_notify(
+  controller.executive()->task_finish_notify(
       std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
                 m_metrics_agg.get(),
                 std::placeholders::_1));
-  greedy.executive()->task_abort_notify(
+  controller.executive()->task_abort_notify(
       std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
                 m_metrics_agg.get(),
                 std::placeholders::_1));
-  greedy.executive()->task_alloc_notify(
+  controller.executive()->task_alloc_notify(
       std::bind(&depth1_metrics_aggregator::task_alloc_cb,
                 m_metrics_agg.get(),
                 std::placeholders::_1,

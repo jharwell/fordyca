@@ -37,6 +37,7 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth1 {
+class gp_dpo_controller;
 class gp_mdpo_controller;
 }
 namespace depth2 {
@@ -81,7 +82,8 @@ class cache_block_drop
     : public cell_op,
       public rcppsw::er::client<cache_block_drop>,
       public block_drop_event,
-      public visitor::visit_set<controller::depth1::gp_mdpo_controller,
+      public visitor::visit_set<controller::depth1::gp_dpo_controller,
+                                controller::depth1::gp_mdpo_controller,
                                 controller::depth2::grp_mdpo_controller,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_transferer,
@@ -104,9 +106,10 @@ class cache_block_drop
   void visit(ds::dpo_semantic_map& map) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(controller::depth1::gp_mdpo_controller& controller) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
+  void visit(controller::depth1::gp_dpo_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
 
   /* depth2 foraging */
   void visit(controller::depth2::grp_mdpo_controller&) override;

@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <dpo_controller id="ffc"
+    <mdpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -158,7 +158,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </dpo_controller>
+    </mdpo_controller>
 
   </controllers>
 

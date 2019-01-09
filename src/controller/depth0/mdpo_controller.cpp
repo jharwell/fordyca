@@ -131,18 +131,15 @@ mdpo_perception_subsystem* mdpo_controller::perception(void) {
  * World Model Metrics
  ******************************************************************************/
 uint mdpo_controller::cell_state_inaccuracies(uint state) const {
-  return static_cast<const mdpo_perception_subsystem*>(perception())
-      ->cell_state_inaccuracies(state);
+  return perception()->cell_state_inaccuracies(state);
 } /* cell_state_inaccuracies() */
 
 double mdpo_controller::known_percentage(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(perception())
-      ->known_percentage();
+  return perception()->known_percentage();
 } /* known_percentage() */
 
 double mdpo_controller::unknown_percentage(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(perception())
-      ->unknown_percentage();
+  return perception()->unknown_percentage();
 } /* unknown_percentage() */
 
 using namespace argos; // NOLINT

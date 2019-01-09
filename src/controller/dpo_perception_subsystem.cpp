@@ -69,11 +69,15 @@ void dpo_perception_subsystem::process_los(
 
 void dpo_perception_subsystem::process_los_caches(
     const representation::line_of_sight* const c_los) {
-  ds::cache_list caches = c_los->caches();
-  if (!caches.empty()) {
-    ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(caches).c_str());
+  ds::cache_list los_caches = c_los->caches();
+  if (!los_caches.empty()) {
+    ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
   }
-  for (auto& cache : caches) {
+
+  /* Fix our tracking of blocks that no longer exist in our perception */
+  los_tracking_sync(c_los, los_caches);
+
+  for (auto&& cache : los_caches) {
     if (!m_store->contains(cache)) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id(),
@@ -110,31 +114,10 @@ void dpo_perception_subsystem::process_los_blocks(
   }
 
   /*
-   * If one of the blocks we are tracking should be in our LOS and actually is
-   * not, then our tracked version is out of date and needs to be removed. This
-   * logic does NOT handle cases where the tracked block is in our LOS, but has
-   * moved since we last saw it (since that is limited to at most a single
-   * block, it is handled by the \ref block_found event).
+   * Fix our tracking of blocks that no longer exist in our perception/have
+   * moved.
    */
-  for (auto&& block : m_store->blocks().values_range()) {
-    if (c_los->contains_loc(block.ent()->discrete_loc())) {
-      auto it =
-          std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
-            return b->idcmp(*block.ent_obj());
-          });
-      if (los_blocks.end() == it) {
-        /*
-         * Needed for assert() to prevent last reference to shared_ptr being
-         * removed and object destruction.
-         */
-        auto tmp = block;
-        m_store->block_remove(tmp.ent_obj());
-        ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
-                  "Block%d still exists in store after removal",
-                  tmp.ent()->id());
-      }
-    }
-  } /* for(&&block..) */
+  los_tracking_sync(c_los, los_blocks);
 
   for (auto&& block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(),
@@ -156,6 +139,69 @@ void dpo_perception_subsystem::process_los_blocks(
     m_store->accept(op);
   } /* for(block..) */
 } /* process_los() */
+
+void dpo_perception_subsystem::los_tracking_sync(
+    const representation::line_of_sight* const c_los,
+    const ds::cache_list& caches) {
+  /*
+   * If the location of one of the caches we are tracking is in our LOS, then
+   * the corresponding cache should also be in our LOS. If it is not, then our
+   * tracked version is out of date and needs to be removed.
+   */
+  for (auto&& cache : m_store->caches().values_range()) {
+    if (c_los->contains_loc(cache.ent()->discrete_loc())) {
+      auto it =
+          std::find_if(caches.begin(), caches.end(), [&](const auto& c) {
+            return c->loccmp(*cache.ent_obj());
+          });
+
+      if (caches.end() == it) {
+        /*
+         * Needed for assert() to prevent last reference to shared_ptr being
+         * removed and object destruction.
+         */
+        auto tmp = cache;
+        m_store->cache_remove(tmp.ent_obj());
+        ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
+                  "Cache%d still exists in store after removal",
+                  tmp.ent()->id());
+      }
+    }
+  } /* for(&&block..) */
+} /* los_tracking_sync() */
+
+void dpo_perception_subsystem::los_tracking_sync(
+    const representation::line_of_sight* const c_los,
+    const ds::block_list& blocks) {
+  /*
+   * If the location of one of the blocks we are tracking is in our LOS, then
+   * the corresponding block should also be in our LOS. If it is not, then our
+   * tracked version is out of date and needs to be removed.
+   *
+   * This logic does NOT handle cases where the tracked block is in our LOS, but
+   * has moved since we last saw it (since that is limited to at most a single
+   * block, it is handled by the \ref block_found event).
+   */
+  for (auto&& block : m_store->blocks().values_range()) {
+    if (c_los->contains_loc(block.ent()->discrete_loc())) {
+      auto it =
+          std::find_if(blocks.begin(), blocks.end(), [&](const auto& b) {
+            return b->idcmp(*block.ent_obj());
+          });
+      if (blocks.end() == it) {
+        /*
+         * Needed for assert() to prevent last reference to shared_ptr being
+         * removed and object destruction.
+         */
+        auto tmp = block;
+        m_store->block_remove(tmp.ent_obj());
+        ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
+                  "Block%d still exists in store after removal",
+                  tmp.ent()->id());
+      }
+    }
+  } /* for(&&block..) */
+} /* los_tracking_sync() */
 
 void dpo_perception_subsystem::processed_los_verify(
     const representation::line_of_sight* const c_los) const {

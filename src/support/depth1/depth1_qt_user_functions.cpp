@@ -25,7 +25,7 @@
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/support/task_visualizer.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
@@ -49,7 +49,7 @@ depth1_qt_user_functions::depth1_qt_user_functions(void) {
 void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   depth0_qt_user_functions::Draw(c_entity);
 
-  auto& controller = dynamic_cast<controller::gp_mdpo_controller&>(
+  auto& controller = dynamic_cast<controller::gp_dpo_controller&>(
       c_entity.GetControllableEntity().GetController());
 
   if (controller.display_task()) {

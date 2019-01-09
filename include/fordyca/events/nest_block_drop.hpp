@@ -53,6 +53,7 @@ class dpo_controller;
 class mdpo_controller;
 } // namespace depth0
 namespace depth1 {
+class gp_dpo_controller;
 class gp_mdpo_controller;
 }
 namespace depth2 {
@@ -87,6 +88,7 @@ class nest_block_drop
       public visitor::visit_set<controller::depth0::crw_controller,
                                 controller::depth0::dpo_controller,
                                 controller::depth0::mdpo_controller,
+                                controller::depth1::gp_dpo_controller,
                                 controller::depth1::gp_mdpo_controller,
                                 controller::depth2::grp_mdpo_controller,
                                 fsm::depth0::crw_fsm,
@@ -116,6 +118,7 @@ class nest_block_drop
 
   /* Depth1 foraging */
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
+  void visit(controller::depth1::gp_dpo_controller& controller) override;
   void visit(controller::depth1::gp_mdpo_controller& controller) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;

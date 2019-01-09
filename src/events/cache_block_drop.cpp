@@ -109,6 +109,27 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.has_block_drop();
 } /* visit() */
 
+void cache_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
+      controller.current_task());
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block drop",
+            task_name.c_str());
+  task->accept(*this);
+
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          task_name.c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 

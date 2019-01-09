@@ -198,6 +198,27 @@ void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
 /*******************************************************************************
  * DPO/MDPO Depth1 Foraging
  ******************************************************************************/
+void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  static_cast<controller::dpo_perception_subsystem*>(
+      controller.perception())->store()->accept(*this);
+  controller.free_pickup_event(true);
+  controller.block(m_block);
+
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
+  auto* task =
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non free block interactor task %s causing free block pickup",
+            polled->name().c_str());
+
+  task->accept(*this);
+  ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
 void free_block_pickup::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 

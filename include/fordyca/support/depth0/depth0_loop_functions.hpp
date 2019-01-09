@@ -84,7 +84,6 @@ class depth0_loop_functions : public base_loop_functions,
 
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  template<class T>
   void controller_configure(controller::base_controller* c);
 
   // clang-format off

@@ -91,6 +91,11 @@ class dpo_perception_subsystem
   void process_los_blocks(const representation::line_of_sight* const c_los);
   void process_los_caches(const representation::line_of_sight* const c_los);
 
+  void los_tracking_sync(const representation::line_of_sight* const c_los,
+                         const ds::cache_list& caches);
+  void los_tracking_sync(const representation::line_of_sight* const c_los,
+                         const ds::block_list& blocks);
+
   /**
    * @brief The processing of the current LOS after processing (i.e. does the
    * PAM now accurately reflect what was in the LOS)?

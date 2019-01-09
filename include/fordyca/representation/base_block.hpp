@@ -88,7 +88,7 @@ class base_block : public multicell_entity,
    * @brief Disallow direct object comparisons, because we may want to compare
    * for equality in terms of IDs or object locations, and it is better to
    * require explicit comparisons for BOTH, rather than just one. It also makes
-   * it unecessary to have to remember which type of comparison operator==()
+   * it unecessary to have to remember which type the comparison operator==()
    * does for this class.
    */
   bool operator==(const base_block& other) const = delete;
