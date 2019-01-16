@@ -177,11 +177,11 @@ class free_block_pickup_interactor
     m_floor->SetChanged();
   }
 
-  // clang-format off
+  /* clang-format off */
   argos::CFloorEntity*             const m_floor;
   ds::arena_map* const                   m_map;
   block_op_penalty_handler<T>            m_penalty_handler;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

@@ -126,9 +126,9 @@ class cache_op_penalty_handler
   using temporal_penalty_handler<T>::penalty_list;
 
  private:
-  // clang-format off
+  /* clang-format off */
   ds::arena_map* const m_map;
-  // clang-format on
+  /* clang-format on */
 };
 NS_END(support, fordyca);
 

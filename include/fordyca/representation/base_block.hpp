@@ -188,14 +188,14 @@ class base_block : public multicell_entity,
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   int    m_robot_id{-1};
   uint   m_transporters{0};
   bool   m_first_pickup{false};
   double m_first_pickup_time{0.0};
   double m_dist_time{0.0};
   double m_nest_drop_time{0.0};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

@@ -130,11 +130,11 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
   const rmath::vector2u& center(void) const { return m_center; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   rmath::vector2u m_center;
   grid_view       m_view;
   ds::cache_list  m_caches;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

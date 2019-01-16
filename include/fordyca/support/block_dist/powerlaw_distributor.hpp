@@ -128,13 +128,13 @@ class powerlaw_distributor : public base_distributor,
   cluster_paramvec compute_cluster_placements(const ds::arena_grid* grid,
                                              uint n_clusters);
 
-  // clang-format off
+  /* clang-format off */
   double                                         m_arena_resolution{0.0};
   uint                                           m_n_clusters{0};
   std::map<uint, std::list<cluster_distributor>> m_dist_map{};
   std::default_random_engine                     m_rng {std::random_device {}()};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

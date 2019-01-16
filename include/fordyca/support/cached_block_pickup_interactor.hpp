@@ -160,7 +160,7 @@ class cached_block_pickup_interactor
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   argos::CFloorEntity*             const m_floor;
   ds::arena_map* const                   m_map;
   /**
@@ -168,7 +168,7 @@ class cached_block_pickup_interactor
    * pickup/cache block drop interactions can occur in a single timestep.
    */
   cache_op_penalty_handler<T>*     const m_penalty_handler;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

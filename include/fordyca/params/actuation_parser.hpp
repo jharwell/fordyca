@@ -76,12 +76,12 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<actuation_params>           m_params{nullptr};
   kinematics2D::differential_drive_xml_parser m_differential_drive;
   steering_force2D_parser                     m_steering;
   ct::waveform_xml_parser                     m_throttling;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);

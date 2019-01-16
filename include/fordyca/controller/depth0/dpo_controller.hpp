@@ -157,13 +157,13 @@ class dpo_controller : public crw_controller,
    */
   void private_init(void);
 
-  // clang-format off
+  /* clang-format off */
   bool                                       m_display_los{false};
   rmath::vector2d                            m_light_loc;
   std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
   std::unique_ptr<fsm::depth0::dpo_fsm>      m_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, controller, fordyca);

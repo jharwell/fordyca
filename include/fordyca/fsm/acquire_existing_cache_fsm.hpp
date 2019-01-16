@@ -80,12 +80,12 @@ class acquire_existing_cache_fsm
   bool cache_acquired_cb(bool explore_result) const;
   bool cache_exploration_term_cb(void) const;
 
-  // clang-format off
+  /* clang-format off */
   const bool                                mc_is_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;
   std::default_random_engine                m_rd{};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

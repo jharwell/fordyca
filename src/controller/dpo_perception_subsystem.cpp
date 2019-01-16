@@ -150,10 +150,9 @@ void dpo_perception_subsystem::los_tracking_sync(
    */
   for (auto&& cache : m_store->caches().values_range()) {
     if (c_los->contains_loc(cache.ent()->discrete_loc())) {
-      auto it =
-          std::find_if(caches.begin(), caches.end(), [&](const auto& c) {
-            return c->loccmp(*cache.ent_obj());
-          });
+      auto it = std::find_if(caches.begin(), caches.end(), [&](const auto& c) {
+        return c->loccmp(*cache.ent_obj());
+      });
 
       if (caches.end() == it) {
         /*
@@ -184,10 +183,9 @@ void dpo_perception_subsystem::los_tracking_sync(
    */
   for (auto&& block : m_store->blocks().values_range()) {
     if (c_los->contains_loc(block.ent()->discrete_loc())) {
-      auto it =
-          std::find_if(blocks.begin(), blocks.end(), [&](const auto& b) {
-            return b->idcmp(*block.ent_obj());
-          });
+      auto it = std::find_if(blocks.begin(), blocks.end(), [&](const auto& b) {
+        return b->idcmp(*block.ent_obj());
+      });
       if (blocks.end() == it) {
         /*
          * Needed for assert() to prevent last reference to shared_ptr being

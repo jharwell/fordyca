@@ -61,10 +61,10 @@ class block_cluster : public rcppsw::er::client<block_cluster> {
   const ds::arena_grid::const_view& view(void) const { return m_view; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   ds::arena_grid::const_view m_view;
   uint                       m_capacity;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

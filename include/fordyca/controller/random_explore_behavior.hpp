@@ -60,12 +60,12 @@ class random_explore_behavior : public explore_behavior,
   uint collision_avoidance_duration(void) const override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   bool m_entered_avoidance{false};
   bool m_exited_avoidance{false};
   bool m_in_avoidance{false};
   uint m_avoidance_start{0};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

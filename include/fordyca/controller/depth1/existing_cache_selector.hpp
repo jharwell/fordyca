@@ -81,10 +81,10 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    */
   bool cache_is_excluded(const rmath::vector2d& position,
                          const representation::base_cache* const cache) const;
-  // clang-format off
+  /* clang-format off */
   bool                          m_is_pickup;
   const cache_sel_matrix* const mc_matrix;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, controller, fordyca);

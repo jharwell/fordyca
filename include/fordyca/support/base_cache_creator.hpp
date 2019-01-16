@@ -150,11 +150,11 @@ class base_cache_creator : public er::client<base_cache_creator> {
       const rmath::vector2u& center) const;
 
  private:
-  // clang-format off
+  /* clang-format off */
   double                             m_cache_dim;
   ds::arena_grid*                    m_grid;
   mutable std::default_random_engine m_rng{};
-  // clang-format on
+  /* clang-format on */
 };
 NS_END(fordyca, depth1);
 

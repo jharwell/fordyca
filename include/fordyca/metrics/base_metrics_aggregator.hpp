@@ -92,9 +92,9 @@ class base_metrics_aggregator
  private:
   static constexpr uint kPOS_ENTROPY_ITER = 10;
 
-  // clang-format off
+  /* clang-format off */
   std::string m_metrics_path{""};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(metrics, fordyca);

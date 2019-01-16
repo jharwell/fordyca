@@ -117,11 +117,11 @@ class mdpo_perception_subsystem
    */
   void update_cell_stats(const representation::line_of_sight* const los);
 
-  // clang-format off
+  /* clang-format off */
   std::vector<uint>                              m_cell_stats;
   std::unique_ptr<representation::line_of_sight> m_los;
   std::unique_ptr<ds::dpo_semantic_map>          m_map;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

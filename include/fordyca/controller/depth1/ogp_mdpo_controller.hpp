@@ -94,9 +94,9 @@ class ogp_mdpo_controller : public gp_mdpo_controller,
    */
   void task_finish_cb(ta::polled_task* task);
 
-  // clang-format off
+  /* clang-format off */
   const support::tasking_oracle* mc_tasking_oracle{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, controller, fordyca);

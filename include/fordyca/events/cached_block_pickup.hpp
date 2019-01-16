@@ -44,7 +44,7 @@ namespace controller {
 namespace depth1 {
 class gp_dpo_controller;
 class gp_mdpo_controller;
-}
+} // namespace depth1
 namespace depth2 {
 class grp_mdpo_controller;
 }
@@ -118,7 +118,7 @@ class cached_block_pickup
   void visit(tasks::depth2::cache_collector& task) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint                                         m_robot_index;
   uint                                         m_timestep;
   std::shared_ptr<representation::arena_cache> m_real_cache;
@@ -133,7 +133,7 @@ class cached_block_pickup
    * block, that needs to be sent to the cell that the cache used to live on.
    */
   std::shared_ptr<representation::base_block>  m_orphan_block{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

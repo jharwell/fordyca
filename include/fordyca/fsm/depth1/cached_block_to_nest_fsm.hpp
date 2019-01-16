@@ -200,9 +200,9 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
     return &mc_state_map[index];
   }
 
-  // clang-format off
+  /* clang-format off */
   acquire_existing_cache_fsm m_cache_fsm;
-  // clang-format on
+  /* clang-format on */
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 

@@ -101,10 +101,10 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   free_block_pickup_interactor<T>        m_free_pickup_interactor;
   nest_block_drop_interactor<T>          m_nest_drop_interactor;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, support, fordyca);

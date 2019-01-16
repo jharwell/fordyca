@@ -169,12 +169,12 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
     m_floor->SetChanged();
   }
 
-  // clang-format off
+  /* clang-format off */
   argos::CFloorEntity*  const m_floor;
   ds::arena_map* const        m_map;
   block_op_penalty_handler<T> m_penalty_handler;
   dynamic_cache_manager*const m_cache_manager;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

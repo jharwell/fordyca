@@ -133,11 +133,11 @@ class explore_for_goal_fsm : public base_explore_fsm,
    */
   static constexpr uint kMIN_EXPLORE_TIME = 50;
 
-  // clang-format off
+  /* clang-format off */
   uint                                          m_explore_time{0};
   std::unique_ptr<controller::explore_behavior> m_explore_behavior;
   std::function<bool(void)>                     m_goal_detect;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

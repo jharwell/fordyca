@@ -83,9 +83,9 @@ class block_selector : public rcppsw::er::client<block_selector> {
   bool block_is_excluded(const rmath::vector2d& position,
                          const representation::base_block* block) const;
 
-  // clang-format off
+  /* clang-format off */
   const block_sel_matrix* const mc_matrix;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fordyca, controller);

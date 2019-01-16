@@ -195,11 +195,11 @@ class base_controller : public argos::CCI_Controller,
   void output_init(const struct params::output_params* params);
   void saa_init(const params::actuation_params*, const params::sensing_params*);
 
-  // clang-format off
+  /* clang-format off */
   bool                                        m_display_id{false};
   std::shared_ptr<representation::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

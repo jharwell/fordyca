@@ -79,11 +79,11 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void controller_configure(controller::base_controller& c);
   void cache_handling_init(const struct params::caches::caches_params* cachep);
 
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<interactor>                m_interactor{};
   std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg{};
   std::unique_ptr<dynamic_cache_manager>     m_cache_manager{};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

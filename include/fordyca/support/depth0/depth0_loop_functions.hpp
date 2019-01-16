@@ -86,12 +86,12 @@ class depth0_loop_functions : public base_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
   void controller_configure(controller::base_controller* c);
 
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<depth0_metrics_aggregator> m_metrics_agg;
   std::unique_ptr<crw_itype>                 m_crw_interactor{nullptr};
   std::unique_ptr<dpo_itype>                 m_dpo_interactor{nullptr};
   std::unique_ptr<mdpo_itype>                m_mdpo_interactor{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, support, fordyca);

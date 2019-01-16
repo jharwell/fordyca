@@ -100,8 +100,10 @@ class gp_dpo_controller : public depth0::dpo_controller,
   /**
    * @brief Get the current task the controller is executing.
    */
-  virtual tasks::base_foraging_task* current_task(void);
-  virtual const tasks::base_foraging_task* current_task(void) const;
+  tasks::base_foraging_task* current_task(void);
+  const tasks::base_foraging_task* current_task(void) const;
+
+  int task_id(const std::string& task_name) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display the task it is
@@ -174,12 +176,12 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void task_abort_cb(const ta::polled_task*);
 
  private:
-  // clang-format off
+  /* clang-format off */
   bool                                      m_display_task{false};
   bool                                      m_task_aborted{false};
   std::unique_ptr<class cache_sel_matrix>   m_cache_sel_matrix;
   std::unique_ptr<ta::bi_tdgraph_executive> m_executive;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, controller, fordyca);

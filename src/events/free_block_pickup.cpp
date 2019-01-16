@@ -201,8 +201,9 @@ void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
 void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::dpo_perception_subsystem*>(
-      controller.perception())->store()->accept(*this);
+  static_cast<controller::dpo_perception_subsystem*>(controller.perception())
+      ->store()
+      ->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
 

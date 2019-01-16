@@ -39,7 +39,7 @@ namespace controller {
 namespace depth1 {
 class gp_dpo_controller;
 class gp_mdpo_controller;
-}
+} // namespace depth1
 namespace depth2 {
 class grp_mdpo_controller;
 }
@@ -116,11 +116,11 @@ class cache_block_drop
   void visit(tasks::depth2::cache_transferer& task) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   double                                       m_resolution;
   std::shared_ptr<representation::base_block>  m_block;
   std::shared_ptr<representation::arena_cache> m_cache;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

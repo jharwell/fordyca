@@ -160,12 +160,12 @@ class base_cache : public multicell_entity,
   std::unique_ptr<base_cache> clone(void) const override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   static int       m_next_id;
 
   double           m_resolution;
   ds::block_vector m_blocks;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

@@ -75,10 +75,10 @@ class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
   bool site_exploration_term_cb(void) const;
   bool site_acquired_cb(bool explore_result) const;
 
-  // clang-format off
+  /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, fsm, fordyca);

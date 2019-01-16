@@ -110,8 +110,8 @@ void gp_dpo_controller::shared_init(
                                     m_cache_sel_matrix.get(),
                                     saa_subsystem(),
                                     perception())(param_repo);
-  executive()->task_abort_notify(std::bind(
-      &gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
+  executive()->task_abort_notify(
+      std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */
 
 void gp_dpo_controller::task_abort_cb(const ta::polled_task*) {
@@ -167,6 +167,11 @@ int gp_dpo_controller::current_task_id(void) const {
   return executive()->graph()->vertex_id(
       dynamic_cast<const ta::polled_task*>(current_task()));
 } /* current_task_id() */
+
+int gp_dpo_controller::task_id(const std::string& task_name) const {
+  auto v = executive()->graph()->find_vertex(task_name);
+  return executive()->graph()->vertex_id(v);
+} /* task_id() */
 
 __rcsw_pure int gp_dpo_controller::current_task_tab(void) const {
   return dynamic_cast<const ta::bi_tdgraph*>(executive()->graph())

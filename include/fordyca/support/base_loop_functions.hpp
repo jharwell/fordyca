@@ -113,13 +113,13 @@ class base_loop_functions : public argos::CLoopFunctions,
   void output_init(const struct params::output_params* const output);
   void arena_map_init(const params::loop_function_repository* repo);
 
-  // clang-format off
+  /* clang-format off */
   uint                             m_loop_threads{0};
   argos::CFloorEntity*             m_floor{nullptr};
   std::string                      m_output_root{""};
   params::loop_function_repository m_params{};
   std::unique_ptr<ds::arena_map>   m_arena_map;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

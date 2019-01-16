@@ -74,12 +74,12 @@ class perception_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   bool                               m_parsed{false};
   std::shared_ptr<perception_params> m_params{nullptr};
   grid_parser                        m_occupancy;
   pheromone_parser                   m_pheromone;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(perception, params, fordyca);

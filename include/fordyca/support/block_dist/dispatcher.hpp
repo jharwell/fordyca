@@ -119,7 +119,7 @@ class dispatcher {
    */
   static uint constexpr kINDEX_MIN = 2;
 
-  // clang-format off
+  /* clang-format off */
   const double                                  mc_padding;
   const struct params::arena::block_dist_params mc_params;
 
@@ -127,7 +127,7 @@ class dispatcher {
   ds::arena_grid*                               m_grid{nullptr};
   std::unique_ptr<base_distributor>             m_dist;
 
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

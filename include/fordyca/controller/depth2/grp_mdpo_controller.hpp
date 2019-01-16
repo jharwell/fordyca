@@ -71,16 +71,13 @@ class grp_mdpo_controller : public depth1::gp_mdpo_controller,
   void bsel_exception_added(bool b) { m_bsel_exception_added = b; }
   void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
-  tasks::base_foraging_task* current_task(void) override;
-  const tasks::base_foraging_task* current_task(void) const override;
-
   void shared_init(const params::depth2::controller_repository& param_repo);
 
  private:
   void task_alloc_cb(const ta::polled_task* const task,
                      const ta::bi_tab* const);
 
-  // clang-format off
+  /* clang-format off */
   /**
    * @brief \c TRUE if the controller's most recently completed task involved
    * the dropping of a free block (i.e. culminated in a \ref free_block_drop).
@@ -89,7 +86,7 @@ class grp_mdpo_controller : public depth1::gp_mdpo_controller,
    */
   bool m_bsel_exception_added{false};
   bool m_csel_exception_added{false};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, controller, fordyca);

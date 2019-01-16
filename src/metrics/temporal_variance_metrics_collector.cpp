@@ -41,12 +41,12 @@ temporal_variance_metrics_collector::temporal_variance_metrics_collector(
  ******************************************************************************/
 std::string temporal_variance_metrics_collector::csv_header_build(
     const std::string& header) {
-  // clang-format off
+  /* clang-format off */
   return base_metrics_collector::csv_header_build(header) +
       "swarm_motion_throttle" + separator() +
       "env_block_manip" + separator() +
       "env_cache_usage" + separator();
-  // clang-format on
+  /* clang-format on */
 } /* csv_header_build() */
 
 bool temporal_variance_metrics_collector::csv_line_build(std::string& line) {

@@ -81,9 +81,9 @@ class block_found : public rcppsw::er::client<block_found>,
   void visit(controller::depth2::grp_mdpo_controller& controller) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<representation::base_block> m_block;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

@@ -41,11 +41,11 @@ lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofna
  ******************************************************************************/
 std::string lifecycle_metrics_collector::csv_header_build(
     const std::string& header) {
-  // clang-format off
+  /* clang-format off */
   return base_metrics_collector::csv_header_build(header) +
       "int_created" + separator() +
       "int_depleted" + separator();
-  // clang-format on
+  /* clang-format on */
 } /* csv_header_build() */
 
 void lifecycle_metrics_collector::reset(void) {

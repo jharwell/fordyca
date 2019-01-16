@@ -122,10 +122,10 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
   using depth1::robot_arena_interactor<T>::existing_cache_drop_interactor;
   using depth1::robot_arena_interactor<T>::cache_penalty_handler;
 
-  // clang-format off
+  /* clang-format off */
   cache_site_block_drop_interactor<T> m_cache_site_drop_interactor;
   new_cache_block_drop_interactor<T>  m_new_cache_drop_interactor;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

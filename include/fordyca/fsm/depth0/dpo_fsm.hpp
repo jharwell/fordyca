@@ -120,9 +120,9 @@ class dpo_fsm : public base_foraging_fsm,
   return &mc_state_map[index];
   }
 
-  // clang-format off
+  /* clang-format off */
   free_block_to_nest_fsm m_block_fsm;
-  // clang-format on
+  /* clang-format on */
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

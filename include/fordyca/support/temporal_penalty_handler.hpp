@@ -196,12 +196,12 @@ class temporal_penalty_handler
 
   uint original_penalty(void) const { return m_orig_penalty; }
 
-  // clang-format off
+  /* clang-format off */
   mutable uint                   m_orig_penalty{0};
   const std::string              mc_name;
   std::list<temporal_penalty<T>> m_penalty_list;
   std::unique_ptr<ct::waveform>  m_penalty;
-  // clang-format on
+  /* clang-format on */
 };
 NS_END(support, fordyca);
 

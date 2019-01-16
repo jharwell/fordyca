@@ -71,11 +71,11 @@ class blocks_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   ct::waveform_xml_parser        m_manipulation_penalty;
   block_dist_parser              m_dist;
   std::shared_ptr<blocks_params> m_params{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(arena, params, fordyca);

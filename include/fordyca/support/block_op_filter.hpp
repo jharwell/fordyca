@@ -201,9 +201,9 @@ class block_op_filter : public er::client<block_op_filter<T>> {
     return filter_res_t{false, kStatusOK};
   }
 
-  // clang-format off
+  /* clang-format off */
   ds::arena_map* const m_map;
-  // clang-format on
+  /* clang-format on */
 };
 NS_END(support, fordyca);
 

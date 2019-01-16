@@ -66,10 +66,10 @@ class cache_site_utility : public rcppsw::math::sigmoid,
   double operator()(const rmath::vector2d& site_loc) { return calc(site_loc); }
 
  private:
-  // clang-format off
+  /* clang-format off */
   const rmath::vector2d mc_position;
   const rmath::vector2d mc_nest_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(math, fordyca);

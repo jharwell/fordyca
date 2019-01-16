@@ -77,12 +77,12 @@ class motion_throttling_handler {
   void update(uint timestep);
 
  private:
-  // clang-format off
+  /* clang-format off */
   bool   m_en{false};
   double m_active{0.0};
   double m_applied{0.0};
   std::unique_ptr<ct::waveform> m_waveform;
-  // clang-format off
+  /* clang-format off */
 };
 
 NS_END(controller, fordyca);

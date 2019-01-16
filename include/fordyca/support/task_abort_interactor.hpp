@@ -163,10 +163,10 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     m_floor->SetChanged();
   }
 
-  // clang-format off
+  /* clang-format off */
   ds::arena_map* const       m_map;
   argos::CFloorEntity* const m_floor;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

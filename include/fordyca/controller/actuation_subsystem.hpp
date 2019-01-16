@@ -104,11 +104,11 @@ class actuation_subsystem {
   void reset(void);
 
  private:
-  // clang-format off
+  /* clang-format off */
   const struct params::actuation_params    mc_params;
   struct actuator_list                     m_actuators;
   throttling_differential_drive            m_drive;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

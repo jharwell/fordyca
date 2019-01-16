@@ -259,13 +259,13 @@ class arena_map : public er::client<arena_map>,
   bool initialize(support::base_loop_functions* loop);
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint                            m_caches_removed{0};
   block_vector                    m_blocks;
   cache_vector                    m_caches;
   representation::nest            m_nest;
   support::block_dist::dispatcher m_block_dispatcher;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(ds, fordyca);

@@ -66,10 +66,10 @@ class immovable_cell_entity {
   const rmath::vector2u& discrete_loc(void) const { return m_discrete_loc; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   rmath::vector2d       m_real_loc;
   rmath::vector2u m_discrete_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

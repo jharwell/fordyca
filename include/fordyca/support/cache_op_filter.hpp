@@ -124,9 +124,9 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
     return filter_res_t{true, kStatusControllerNotReady};
   }
 
-  // clang-format off
+  /* clang-format off */
   ds::arena_map* const m_map;
-  // clang-format on
+  /* clang-format on */
 };
 NS_END(support, fordyca);
 

@@ -146,12 +146,12 @@ class robot_arena_interactor : public depth0::robot_arena_interactor<T>,
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   cache_op_penalty_handler<T>             m_cache_penalty_handler;
   support::task_abort_interactor<T>       m_task_abort_interactor;
   cached_block_pickup_interactor<T>       m_cached_pickup_interactor;
   existing_cache_block_drop_interactor<T> m_existing_cache_drop_interactor;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, support, fordyca);

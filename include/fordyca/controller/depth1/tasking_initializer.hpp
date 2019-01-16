@@ -104,14 +104,14 @@ class tasking_initializer : public er::client<tasking_initializer> {
   const class cache_sel_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   controller::saa_subsystem* const                m_saa;
   base_perception_subsystem* const                m_perception;
   const controller::cache_sel_matrix* const mc_csel_matrix;
   const controller::block_sel_matrix* const mc_bsel_matrix;
 
   ta::bi_tdgraph*                                 m_graph;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, controller, fordyca);

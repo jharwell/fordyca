@@ -75,9 +75,9 @@ class base_perception_subsystem {
   const representation::line_of_sight* los(void) const { return m_los.get(); }
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<representation::line_of_sight> m_los{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

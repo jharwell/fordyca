@@ -69,10 +69,10 @@ class cache_transferer_fsm : public block_to_goal_fsm {
   bool is_acquiring_src_cache(void) const;
 
  private:
-  // clang-format off
+  /* clang-format off */
   acquire_existing_cache_fsm m_src_cache_fsm;
   acquire_existing_cache_fsm m_dest_cache_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, fsm, fordyca);

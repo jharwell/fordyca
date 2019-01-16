@@ -70,10 +70,10 @@ class phototaxis_force_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format on
+  /* clang-format on */
   bool m_parsed{false};
   std::shared_ptr<phototaxis_force_params> m_params{nullptr};
-  // clang-format off
+  /* clang-format off */
 };
 
 NS_END(params, fordyca);

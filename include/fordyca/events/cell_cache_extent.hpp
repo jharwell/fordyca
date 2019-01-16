@@ -68,9 +68,9 @@ class cell_cache_extent : public cell_op,
   void visit(ds::arena_map& map) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<representation::base_cache> m_cache;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

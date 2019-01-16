@@ -55,9 +55,9 @@ class block_manifest_processor
   ds::block_vector create_blocks(void);
 
  private:
-  // clang-format off
+  /* clang-format off */
   const params::arena::block_manifest mc_manifest;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

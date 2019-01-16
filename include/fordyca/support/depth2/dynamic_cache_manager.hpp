@@ -117,9 +117,9 @@ class dynamic_cache_manager : public base_cache_manager,
       const ds::const_block_cluster_list& clusters,
       const ds::block_vector& blocks);
 
-  // clang-format off
+  /* clang-format off */
   const params::caches::caches_params mc_cache_params;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

@@ -43,7 +43,7 @@ class mdpo_controller;
 namespace depth1 {
 class gp_dpo_controller;
 class gp_mdpo_controller;
-}
+} // namespace depth1
 namespace depth2 {
 class grp_mdpo_controller;
 }

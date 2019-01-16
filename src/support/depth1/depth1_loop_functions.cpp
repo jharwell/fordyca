@@ -35,7 +35,7 @@
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
+#include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 #include "rcppsw/swarm/convergence/convergence_params.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -45,6 +45,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
 using ds::arena_grid;
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Template Instantiations
@@ -159,7 +160,7 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   (*m_interactor)(controller, GetSpace().GetSimulationClock());
 } /* pre_step_iter() */
 
-template<class ControllerType>
+template <class ControllerType>
 void depth1_loop_functions::controller_configure(ControllerType& controller) {
   /*
    * If NULL, then visualization has been disabled.
@@ -171,7 +172,8 @@ void depth1_loop_functions::controller_configure(ControllerType& controller) {
 
   auto* oraclep = params()->parse_results<params::oracle_params>();
   if (oraclep->enabled) {
-    auto& oracular = dynamic_cast<controller::depth1::ogp_mdpo_controller&>(controller);
+    auto& oracular =
+        dynamic_cast<controller::depth1::ogp_mdpo_controller&>(controller);
     oracular.executive()->task_finish_notify(
         std::bind(&tasking_oracle::task_finish_cb,
                   m_tasking_oracle.get(),
@@ -268,6 +270,49 @@ void depth1_loop_functions::Reset() {
   ndc_pop();
 }
 
+std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
+  /*
+   * Homogeneous swarm, so we can just take the first robot to get a handle on
+   * the task IDs for the tasks we are interested in. We also assume that all
+   * controllers in depth1 are derived from the DPO controller.
+   */
+  argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
+      (*const_cast<depth1_loop_functions*>(this)
+            ->GetSpace()
+            .GetEntitiesByType("foot-bot")
+            .begin())
+          .second);
+  auto gp_dpo = dynamic_cast<controller::depth1::gp_dpo_controller*>(
+      &robot.GetControllableEntity().GetController());
+  ER_ASSERT(nullptr != gp_dpo, "Controller not derived from GP_DPO");
+  auto& collector = static_cast<rmetrics::tasks::bi_tdgraph_metrics_collector&>(
+      *(*m_metrics_agg)["tasks::distribution"]);
+
+  /*
+   * These are interval counts, which means they are likely much greater than
+   * the current actual # of harvesters/collectors in the swarm, so we have to
+   * correct for that.
+   */
+  uint n_harvesters = collector.int_task_counts()[gp_dpo->task_id(
+      tasks::depth1::foraging_task::kHarvesterName)];
+  n_harvesters =
+      n_harvesters / std::max(collector.timestep() % collector.interval(), 1U);
+  uint n_collectors = collector.int_task_counts()[gp_dpo->task_id(
+      tasks::depth1::foraging_task::kCollectorName)];
+  n_collectors =
+      n_collectors / std::max(collector.timestep() % collector.interval(), 1U);
+  return std::make_pair(n_harvesters, n_collectors);
+} /* d1_task_counts() */
+
+uint depth1_loop_functions::n_free_blocks(void) const {
+  auto accum = [&](uint sum, const auto& b) {
+    return sum + (-1 == b->robot_id());
+  };
+
+  return std::accumulate(
+      arena_map()->blocks().begin(), arena_map()->blocks().end(), 0, accum);
+} /* n_free_blocks() */
+
 void depth1_loop_functions::pre_step_final(void) {
   /*
    * The cache is recreated with a probability that depends on the relative
@@ -277,15 +322,11 @@ void depth1_loop_functions::pre_step_final(void) {
    * recreated immediately. And if there are no foragers, there is no chance
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
+  auto pair = d1_task_counts();
   if (arena_map()->caches().empty()) {
-    auto& collector =
-        static_cast<rcppsw::metrics::tasks::bi_tab_metrics_collector&>(
-            *(*m_metrics_agg)["tasks::tab::generalist"]);
-    uint n_harvesters = collector.int_subtask1_count();
-    uint n_collectors = collector.int_subtask2_count();
     auto ret = m_cache_manager->create_conditional(arena_map()->blocks(),
-                                                   n_harvesters,
-                                                   n_collectors);
+                                                   pair.first,
+                                                   pair.second);
 
     if (ret.status) {
       arena_map()->caches_add(ret.caches);
@@ -298,7 +339,12 @@ void depth1_loop_functions::pre_step_final(void) {
       m_cache_manager->cache_created();
       floor()->SetChanged();
     } else {
-      ER_WARN("Unable to (re)-create static cache--not enough free blocks?");
+      ER_INFO(
+          "Could not create static cache: n_harvesters=%u,n_collectors=%u,free "
+          "blocks=%u",
+          pair.first,
+          pair.second,
+          n_free_blocks());
     }
   }
 

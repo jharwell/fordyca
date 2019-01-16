@@ -80,9 +80,9 @@ class nest : public multicell_entity, public immovable_cell_entity {
   light_list init_square(void) const;
   light_list init_rect(void) const;
 
-  // clang-format off
+  /* clang-format off */
   light_list m_lights;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

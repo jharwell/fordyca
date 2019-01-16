@@ -76,9 +76,9 @@ class crw_controller : public depth0_controller,
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<fsm::depth0::crw_fsm> m_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, controller, fordyca);

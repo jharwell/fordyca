@@ -157,12 +157,12 @@ class nest_block_drop_interactor
     m_floor->SetChanged();
   }
 
-  // clang-format off
+  /* clang-format off */
   argos::CFloorEntity*             const   m_floor;
   depth0::depth0_metrics_aggregator* const m_metrics_agg;
   ds::arena_map* const                     m_map;
   block_op_penalty_handler<T>              m_penalty_handler;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

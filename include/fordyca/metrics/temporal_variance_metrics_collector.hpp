@@ -62,11 +62,11 @@ class temporal_variance_metrics_collector
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  // clang-format off
+  /* clang-format off */
   double m_swarm_motion_throttle{0.0};
   double m_env_block_manip{0.0};
   double m_env_cache_usage{0.0};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(metrics, fordyca);

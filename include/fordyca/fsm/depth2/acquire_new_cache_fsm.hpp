@@ -69,10 +69,10 @@ class acquire_new_cache_fsm : public er::client<acquire_new_cache_fsm>,
   bool candidates_exist(void) const;
   bool cache_acquired_cb(bool explore_result) const;
 
-  // clang-format off
+  /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, fsm, fordyca);

@@ -106,9 +106,9 @@ class dpo_perception_subsystem
       const representation::line_of_sight* const c_los) const;
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<ds::dpo_store>                 m_store;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

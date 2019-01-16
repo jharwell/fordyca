@@ -58,11 +58,11 @@ class depth0_controller : public base_controller,
   void penalty_served(uint penalty) { m_penalty = penalty; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint m_penalty{false};
   bool m_free_pickup_event{false};
   bool m_free_drop_event{false};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, controller, fordyca);

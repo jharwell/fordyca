@@ -179,7 +179,7 @@ class sensing_subsystem {
   rmath::vector2d find_closest_obstacle(void) const;
 
  private:
-  // clang-format off
+  /* clang-format off */
   const double                                   mc_obstacle_delta;
   const double                                   mc_los_dim;
 
@@ -188,7 +188,7 @@ class sensing_subsystem {
   rmath::vector2d                                m_prev_position;
   struct sensor_list                             m_sensors;
   rmath::range<rmath::radians>                   m_fov;
-  // clang-format off
+  /* clang-format off */
 };
 
 NS_END(controller, fordyca);

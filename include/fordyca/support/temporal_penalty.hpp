@@ -80,12 +80,12 @@ class temporal_penalty {
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   int           mc_id;
   uint          mc_penalty;
   uint          mc_start_time;
   const T*const mc_controller;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/params/depth1/controller_repository.hpp"
+#include "fordyca/params/perception/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,7 +75,6 @@ void gp_mdpo_controller::shared_init(
   gp_dpo_controller::perception(
       rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 } /* shared_init() */
-
 
 const mdpo_perception_subsystem* gp_mdpo_controller::perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(

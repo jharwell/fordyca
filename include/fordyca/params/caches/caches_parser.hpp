@@ -77,13 +77,13 @@ class caches_parser: public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   bool                           m_parsed{false};
   std::shared_ptr<caches_params> m_params{nullptr};
   ct::waveform_xml_parser        m_waveform;
   static_cache_parser            m_static;
   dynamic_cache_parser           m_dynamic;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(caches, params, fordyca);

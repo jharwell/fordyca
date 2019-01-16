@@ -75,11 +75,11 @@ class block_carry_visualizer
    */
   void draw(const representation::base_block* block, uint robot_id);
 
-  // clang-format off
+  /* clang-format off */
   double                               m_block_vis_offset{0.0};
   double                               m_text_vis_offset{0.0};
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fordyca, support);

@@ -65,11 +65,11 @@ class world_model_metrics_collector
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  // clang-format off
+  /* clang-format off */
   std::vector<uint>   m_stats;
   std::vector<double> m_known{};
   std::vector<double> m_unknown{};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(metrics, fordyca);

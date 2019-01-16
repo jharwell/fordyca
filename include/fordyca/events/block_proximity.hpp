@@ -76,9 +76,9 @@ class block_proximity
   void visit(tasks::depth2::cache_starter& task) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<representation::base_block> m_block;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

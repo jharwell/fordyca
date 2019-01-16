@@ -121,11 +121,11 @@ class cell2D : public visitor::visitable_any<cell2D>,
   std::shared_ptr<representation::base_cache> cache(void);
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::string                                       m_robot_id{""};
   std::shared_ptr<representation::base_cell_entity> m_entity{nullptr};
   rmath::vector2u                             m_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(ds, fordyca);

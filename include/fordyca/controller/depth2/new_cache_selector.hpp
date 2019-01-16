@@ -76,9 +76,9 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
                              const ds::dp_block_map& blocks,
                              const representation::base_block* const new_cache) const;
 
-  // clang-format off
+  /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, controller, fordyca);

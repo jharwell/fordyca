@@ -120,15 +120,6 @@ void grp_mdpo_controller::shared_init(
       &grp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* shared_init() */
 
-__rcsw_pure tasks::base_foraging_task* grp_mdpo_controller::current_task(void) {
-  return dynamic_cast<tasks::base_foraging_task*>(executive()->current_task());
-} /* current_task() */
-
-__rcsw_pure const tasks::base_foraging_task* grp_mdpo_controller::current_task(
-    void) const {
-  return const_cast<grp_mdpo_controller*>(this)->current_task();
-} /* current_task() */
-
 void grp_mdpo_controller::task_alloc_cb(const ta::polled_task* const task,
                                         const ta::bi_tab* const) {
   if (!m_bsel_exception_added) {

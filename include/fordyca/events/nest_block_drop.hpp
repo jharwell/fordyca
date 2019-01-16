@@ -55,7 +55,7 @@ class mdpo_controller;
 namespace depth1 {
 class gp_dpo_controller;
 class gp_mdpo_controller;
-}
+} // namespace depth1
 namespace depth2 {
 class grp_mdpo_controller;
 }
@@ -135,10 +135,10 @@ class nest_block_drop
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint                                        m_timestep;
   std::shared_ptr<representation::base_block> m_block;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

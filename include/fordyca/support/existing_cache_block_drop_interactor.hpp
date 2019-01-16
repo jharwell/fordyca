@@ -159,11 +159,11 @@ class existing_cache_block_drop_interactor
     controller.visitor::template visitable_any<T>::accept(drop_op);
   }
 
-  // clang-format off
+  /* clang-format off */
   argos::CFloorEntity*             const m_floor;
   ds::arena_map* const                   m_map;
   cache_op_penalty_handler<T>* const     m_penalty_handler;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

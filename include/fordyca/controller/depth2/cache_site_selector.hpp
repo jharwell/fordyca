@@ -154,11 +154,11 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
                    const ds::dp_cache_map& known_caches,
                    const ds::dp_block_map& known_blocks) const;
 
-  // clang-format off
+  /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;
   nlopt::opt     m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
   constraint_set m_constraints{};
-  // clang-format on
+  /* clang-format on */
 };
 
 double __cache_constraint_func(const std::vector<double>& x,

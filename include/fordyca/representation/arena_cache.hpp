@@ -74,11 +74,11 @@ class arena_cache
   void penalty_served(uint duration) { m_penalty_count += duration; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint   m_block_pickups{0};
   uint   m_block_drops{0};
   uint   m_penalty_count{0};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

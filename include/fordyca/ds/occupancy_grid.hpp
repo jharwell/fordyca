@@ -113,7 +113,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
    */
   void cell_init(uint i, uint j, double pheromone_rho);
 
-  // clang-format off
+  /* clang-format off */
   /**
    * @brief The threshold for a cell's pheromone density at which it will
    * transition into back an UNKNOWN state, from whatever state it is currently
@@ -125,7 +125,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
   uint                                m_known_cell_count{0};
   bool                                m_pheromone_repeat_deposit;
   std::string                         m_robot_id;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(ds, fordyca);

@@ -26,8 +26,8 @@
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -257,8 +257,9 @@ void cached_block_pickup::visit(
     controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::dpo_perception_subsystem*>(
-      controller.perception())->store()->accept(*this);
+  static_cast<controller::dpo_perception_subsystem*>(controller.perception())
+      ->store()
+      ->accept(*this);
   controller.block(m_pickup_block);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(

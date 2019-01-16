@@ -69,9 +69,9 @@ class los_visualizer : public rcppsw::er::client<los_visualizer> {
   void draw(const representation::line_of_sight* const los,
             double grid_resolution);
 
-  // clang-format off
+  /* clang-format off */
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fordyca, support);

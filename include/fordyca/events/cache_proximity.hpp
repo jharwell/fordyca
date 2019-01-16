@@ -77,9 +77,9 @@ class cache_proximity
   void visit(fsm::block_to_goal_fsm& fsm) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<representation::base_cache> m_cache;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

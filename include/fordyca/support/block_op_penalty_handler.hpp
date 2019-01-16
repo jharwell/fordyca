@@ -160,9 +160,9 @@ class block_op_penalty_handler
     return id;
   } /* penalty_id_calc() */
 
-  // clang-format off
+  /* clang-format off */
   ds::arena_map* const m_map;
-  // clang-format on
+  /* clang-format on */
 };
 NS_END(support, fordyca);
 
