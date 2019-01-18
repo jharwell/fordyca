@@ -28,7 +28,7 @@
 #include <list>
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/support/cache_op_penalty_handler.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 #include "rcppsw/task_allocation/logical_task.hpp"
 
 /*******************************************************************************
@@ -36,6 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca, support);
 namespace ta = rcppsw::task_allocation;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -50,7 +51,7 @@ namespace ta = rcppsw::task_allocation;
 template <typename T>
 class task_abort_interactor : public er::client<task_abort_interactor<T>> {
  public:
-  using penalty_handler_list = std::list<temporal_penalty_handler<T>*>;
+  using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
 
   task_abort_interactor(ds::arena_map* const map_in,
                         argos::CFloorEntity* const floor_in)
@@ -58,8 +59,17 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
         m_map(map_in),
         m_floor(floor_in) {}
 
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
+  task_abort_interactor(const task_abort_interactor& other) = default;
   task_abort_interactor& operator=(const task_abort_interactor& other) = delete;
-  task_abort_interactor(const task_abort_interactor& other) = delete;
 
   /**
    * @brief Handle cases in which a robot aborts its current task, and perform

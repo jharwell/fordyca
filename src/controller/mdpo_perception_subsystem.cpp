@@ -285,6 +285,10 @@ void mdpo_perception_subsystem::update_cell_stats(
   }   /* for(i..) */
 } /* update_cell_stats() */
 
+ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
+  return m_map->store();
+} /* dpo_store() */
+
 /*******************************************************************************
  * World Model Metrics
  ******************************************************************************/

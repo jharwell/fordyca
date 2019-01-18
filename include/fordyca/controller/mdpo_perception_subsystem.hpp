@@ -42,6 +42,7 @@ NS_START(fordyca);
 
 namespace ds {
 class dpo_semantic_map;
+class dpo_store;
 } // namespace ds
 
 NS_START(controller);
@@ -86,6 +87,10 @@ class mdpo_perception_subsystem
 
   const ds::dpo_semantic_map* map(void) const { return m_map.get(); }
   ds::dpo_semantic_map* map(void) { return m_map.get(); }
+  const ds::dpo_store* dpo_store(void) const override {
+    return const_cast<mdpo_perception_subsystem*>(this)->dpo_store();
+  }
+  ds::dpo_store* dpo_store(void) override;
 
  private:
   /*

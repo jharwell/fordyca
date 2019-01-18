@@ -41,8 +41,7 @@ actuation_subsystem::actuation_subsystem(
       m_drive(differential_drive::kFSMDrive,
               c_params->differential_drive.max_speed,
               c_params->differential_drive.soft_turn_max,
-              m_actuators.wheels,
-              &c_params->throttling) {}
+              m_actuators.wheels) {}
 
 void actuation_subsystem::reset(void) {
 #ifdef FORDYCA_WITH_ROBOT_RAB

@@ -196,7 +196,7 @@ void dpo_store::clear_all(void) {
   m_caches.clear();
 } /* clear_all() */
 
-bool dpo_store::contains(
+__rcsw_pure bool dpo_store::contains(
     const std::shared_ptr<representation::base_block>& block) const {
   return m_blocks.contains(block->id());
 } /* contains() */
@@ -206,7 +206,7 @@ bool dpo_store::contains(
   return m_caches.contains(cache->discrete_loc());
 } /* contains() */
 
-const dp_block_map::value_type* dpo_store::find(
+__rcsw_pure const dp_block_map::value_type* dpo_store::find(
     const std::shared_ptr<representation::base_block>& block) const {
   return m_blocks.find(block->id());
 } /* find() */

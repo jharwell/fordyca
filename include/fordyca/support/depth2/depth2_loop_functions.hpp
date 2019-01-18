@@ -27,7 +27,7 @@
 #include <list>
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/support/depth2/robot_arena_interactor.hpp"
+#include "fordyca/support/depth2/controller_interactor_mapper.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,8 +59,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void Reset(void) override;
 
  private:
-  using interactor = robot_arena_interactor<controller::depth2::grp_mdpo_controller>;
-
+  using interactor_map = rcppsw::ds::type_map<grp_dpo_itype, grp_mdpo_itype>;
   /**
    * @brief Handle creation of dynamic caches during initialization, reset, or
    * when triggered by events during simulation.
@@ -80,9 +79,9 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void cache_handling_init(const struct params::caches::caches_params* cachep);
 
   /* clang-format off */
-  std::unique_ptr<interactor>                m_interactor{};
-  std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg{};
-  std::unique_ptr<dynamic_cache_manager>     m_cache_manager{};
+  std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<dynamic_cache_manager>     m_cache_manager;
+  std::unique_ptr<interactor_map>            m_interactors;
   /* clang-format on */
 };
 

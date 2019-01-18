@@ -34,7 +34,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+
+namespace support { namespace tv {
+class tv_controller;
+}} // namespace support::tv
+
+NS_START(controller);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace hal = rcppsw::robotics::hal;
@@ -82,20 +88,6 @@ class actuation_subsystem {
   throttling_differential_drive& differential_drive(void) { return m_drive; }
   const throttling_differential_drive& differential_drive(void) const {
     return m_drive;
-  }
-
-  /**
-   * @brief Set whether or not temporary throttling of overall maximum speed is
-   * enabled when a robot is carrying a block.
-   */
-  void motion_throttle_toggle(bool en) { m_drive.throttle_toggle(en); }
-
-  /**
-   * @brief Update the currently applied amount of throttling based on
-   * presumably new configuration.
-   */
-  void motion_throttle_update(uint timestep) {
-    m_drive.throttle_update(timestep);
   }
 
   /**

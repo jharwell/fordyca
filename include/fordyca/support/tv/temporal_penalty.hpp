@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_TEMPORAL_PENALTY_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_TEMPORAL_PENALTY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,14 +29,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, support, tv);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class temporal_penalty
- * @ingroup support depth1
+ * @ingroup support tv
  *
  * @brief Handles subjecting a robot to a penalty when doing something via a
  * timeout in which the robot will sit still.
@@ -88,6 +88,6 @@ class temporal_penalty {
   /* clang-format on */
 };
 
-NS_END(support, fordyca);
+NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_TEMPORAL_PENALTY_HPP_ */

@@ -22,10 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
+
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,6 +65,15 @@ void gp_mdpo_controller::Init(ticpp::Element& node) {
   ndc_pop();
 } /* Init() */
 
+void gp_mdpo_controller::ControlStep(void) {
+  ndc_pusht();
+
+  perception()->update();
+  task_aborted(false);
+  executive()->run();
+  ndc_pop();
+} /* ControlStep() */
+
 void gp_mdpo_controller::shared_init(
     const params::depth1::controller_repository& param_repo) {
   /* block/cache selection matrices, executive  */
@@ -74,14 +87,22 @@ void gp_mdpo_controller::shared_init(
 
   gp_dpo_controller::perception(
       rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+
+  /*
+   * Task executive. Even though we use the same executive as the \ref
+   * gp_dpo_controller, we have to replace it because we have our own perception
+   * subsystem, which is used to create the executive's graph.
+   */
+  executive(tasking_initializer(block_sel_matrix(),
+                                cache_sel_matrix(),
+                                saa_subsystem(),
+                                perception())(param_repo));
+  executive()->task_abort_notify(std::bind(
+      &gp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
+
 } /* shared_init() */
 
-const mdpo_perception_subsystem* gp_mdpo_controller::perception(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      dpo_controller::perception());
-} /* perception() */
-
-mdpo_perception_subsystem* gp_mdpo_controller::perception(void) {
+__rcsw_pure mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
@@ -89,15 +110,15 @@ mdpo_perception_subsystem* gp_mdpo_controller::perception(void) {
  * World Model Metrics
  ******************************************************************************/
 uint gp_mdpo_controller::cell_state_inaccuracies(uint state) const {
-  return perception()->cell_state_inaccuracies(state);
+  return mdpo_perception()->cell_state_inaccuracies(state);
 } /* cell_state_inaccuracies() */
 
 double gp_mdpo_controller::known_percentage(void) const {
-  return perception()->known_percentage();
+  return mdpo_perception()->known_percentage();
 } /* known_percentage() */
 
 double gp_mdpo_controller::unknown_percentage(void) const {
-  return perception()->unknown_percentage();
+  return mdpo_perception()->unknown_percentage();
 } /* unknown_percentage() */
 
 using namespace argos; // NOLINT

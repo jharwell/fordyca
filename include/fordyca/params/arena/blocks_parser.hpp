@@ -49,7 +49,6 @@ class blocks_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit blocks_parser(uint level)
       : xml_param_parser(level),
-        m_manipulation_penalty(level + 1),
         m_dist(level + 1) {}
 
   /**
@@ -59,7 +58,6 @@ class blocks_parser : public rcppsw::params::xml_param_parser {
   static constexpr char kXMLRoot[] = "blocks";
 
   void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
@@ -72,7 +70,6 @@ class blocks_parser : public rcppsw::params::xml_param_parser {
   }
 
   /* clang-format off */
-  ct::waveform_xml_parser        m_manipulation_penalty;
   block_dist_parser              m_dist;
   std::shared_ptr<blocks_params> m_params{nullptr};
   /* clang-format on */

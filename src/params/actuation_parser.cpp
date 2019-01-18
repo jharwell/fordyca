@@ -40,26 +40,16 @@ void actuation_parser::parse(const ticpp::Element& node) {
   ticpp::Element anode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_differential_drive.parse(anode);
   m_steering.parse(anode);
-  m_throttling.parse(get_node(anode, "block_carry_throttle"));
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_params->differential_drive = *m_differential_drive.parse_results();
   m_params->steering = *m_steering.parse_results();
-  m_params->throttling = *m_throttling.parse_results();
 } /* parse() */
-
-void actuation_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_differential_drive << m_steering << m_throttling
-         << build_footer();
-} /* show() */
 
 __rcsw_pure bool actuation_parser::validate(void) const {
   CHECK(m_differential_drive.validate());
   CHECK(m_steering.validate());
-  CHECK(m_throttling.validate());
-  CHECK(m_params->throttling.amplitude < 1.0);
-  CHECK(m_params->throttling.offset <= 1.0);
   return true;
 
 error:

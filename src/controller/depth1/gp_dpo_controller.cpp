@@ -64,14 +64,11 @@ void gp_dpo_controller::ControlStep(void) {
               block()->id(),
               block()->robot_id());
   }
-  perception()->update();
 
-  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
-  saa_subsystem()->actuation()->motion_throttle_update(
-      saa_subsystem()->sensing()->tick());
-
+  dpo_perception()->update();
   m_task_aborted = false;
   executive()->run();
+
   ndc_pop();
 } /* ControlStep() */
 

@@ -82,14 +82,11 @@ class tasking_initializer : public er::client<tasking_initializer> {
   std::unique_ptr<ta::bi_tdgraph_executive>
   operator()(const params::depth1::controller_repository& param_repo);
 
+ protected:
   using tasking_map = std::map<std::string, ta::polled_task*>;
 
- protected:
   const base_perception_subsystem* perception(void) const { return m_perception; }
   base_perception_subsystem* perception(void) { return m_perception; }
-
-  const ds::dpo_store* dpo_store(void) const;
-  ds::dpo_store* dpo_store(void);
 
   controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   ta::bi_tdgraph* graph(void) { return m_graph; }

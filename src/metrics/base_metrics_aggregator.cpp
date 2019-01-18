@@ -40,6 +40,8 @@
 #include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
+
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
 
@@ -115,7 +117,7 @@ base_metrics_aggregator::base_metrics_aggregator(
 void base_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
   collect("swarm::convergence", *loop);
-  collect("loop::temporal_variance", *loop);
+  collect("loop::temporal_variance", *loop->tv_controller());
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(

@@ -1,7 +1,7 @@
 /**
- * @file block_op_src.hpp
+ * @file tv_controller_params.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,29 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_SRC_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_SRC_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <string>
+#include "rcppsw/params/base_params.hpp"
+#include "rcppsw/control/waveform_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, params, tv);
+namespace rct = rcppsw::control;
 
 /*******************************************************************************
- * Type Definitions
+ * Structure Definitions
  ******************************************************************************/
-enum block_op_src {
-  kSrcFreePickup,
-  kSrcNestDrop,
-  kSrcCacheSiteDrop,
-  kSrcNewCacheDrop,
+/**
+ * @struct tv_controller_params
+ * @ingroup params tv
+ */
+struct tv_controller_params : public rcppsw::params::base_params {
+  rct::waveform_params block_manipulation_penalty{};
+  rct::waveform_params block_carry_throttle{};
+  rct::waveform_params cache_usage_penalty{};
 };
 
-NS_END(support, fordyca);
+NS_END(tv, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_BLOCK_OP_SRC_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_ */

@@ -257,9 +257,7 @@ void cached_block_pickup::visit(
     controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::dpo_perception_subsystem*>(controller.perception())
-      ->store()
-      ->accept(*this);
+  controller.dpo_perception()->dpo_store()->accept(*this);
   controller.block(m_pickup_block);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(
@@ -284,7 +282,7 @@ void cached_block_pickup::visit(
     controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  controller.perception()->map()->accept(*this);
+  controller.mdpo_perception()->map()->accept(*this);
   controller.block(m_pickup_block);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(
@@ -327,9 +325,7 @@ void cached_block_pickup::visit(
     controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::mdpo_perception_subsystem*>(controller.perception())
-      ->map()
-      ->accept(*this);
+  controller.mdpo_perception()->map()->accept(*this);
   controller.block(m_pickup_block);
 
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());

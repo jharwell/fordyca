@@ -70,19 +70,24 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
 
   std::unique_ptr<ta::taskable> cache_starter_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_cache_site_fsm>(
-          block_sel_matrix(), cache_sel_matrix(), saa_subsystem(), dpo_store());
+          block_sel_matrix(),
+          cache_sel_matrix(),
+          saa_subsystem(),
+          perception()->dpo_store());
 
   std::unique_ptr<ta::taskable> cache_finisher_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_new_cache_fsm>(
-          block_sel_matrix(), cache_sel_matrix(), saa_subsystem(), dpo_store());
+          block_sel_matrix(),
+          cache_sel_matrix(),
+          saa_subsystem(),
+          perception()->dpo_store());
 
   std::unique_ptr<ta::taskable> cache_transferer_fsm =
-      rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(cache_sel_matrix(),
-                                                             saa_subsystem(),
-                                                             dpo_store());
+      rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(
+          cache_sel_matrix(), saa_subsystem(), perception()->dpo_store());
   std::unique_ptr<ta::taskable> cache_collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-          cache_sel_matrix(), saa_subsystem(), dpo_store());
+          cache_sel_matrix(), saa_subsystem(), perception()->dpo_store());
 
   auto cache_starter =
       new tasks::depth2::cache_starter(task_params,

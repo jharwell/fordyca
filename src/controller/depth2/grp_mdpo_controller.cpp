@@ -1,5 +1,5 @@
 /**
- * @file grp_mdpopart__controller.cpp
+ * @file grp_mdpo_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -22,21 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include <fstream>
-
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
-#include "fordyca/params/sensing_params.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/tasks/depth2/foraging_task.hpp"
-
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/params/perception/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,30 +39,9 @@ NS_START(fordyca, controller, depth2);
 grp_mdpo_controller::grp_mdpo_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.depth2.grp_mdpo") {}
 
-grp_mdpo_controller::~grp_mdpo_controller(void) = default;
-
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grp_mdpo_controller::ControlStep(void) {
-  ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
-  perception()->update();
-
-  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
-  saa_subsystem()->actuation()->motion_throttle_update(
-      saa_subsystem()->sensing()->tick());
-
-  task_aborted(false);
-  executive()->run();
-  ndc_pop();
-} /* ControlStep() */
-
 void grp_mdpo_controller::Init(ticpp::Element& node) {
   base_controller::Init(node);
   ndc_push();
@@ -93,53 +62,22 @@ void grp_mdpo_controller::Init(ticpp::Element& node) {
 
 void grp_mdpo_controller::shared_init(
     const params::depth2::controller_repository& param_repo) {
-  /*
-   * Create initial executive, binding the task abort callback to determine task
-   * abort in loop functions.
-   */
-  gp_mdpo_controller::shared_init(param_repo);
+  /* block/cache selection matrices, executive  */
+  grp_dpo_controller::shared_init(param_repo);
 
-  /*
-   * Rebind executive to use depth2 task decomposition graph instead of depth1
-   * version.
-   */
-  executive(tasking_initializer(block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa_subsystem(),
-                                perception())(param_repo));
+  /* MDPO perception subsystem */
+  params::perception::perception_params p =
+      *param_repo.parse_results<params::perception::perception_params>();
+  p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
+  p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
-  /*
-   * Set task alloction callback, rebind task abort callback (original was lost
-   * when we replaced the executive).
-   */
-  executive()->task_alloc_notify(std::bind(&grp_mdpo_controller::task_alloc_cb,
-                                           this,
-                                           std::placeholders::_1,
-                                           std::placeholders::_2));
-  executive()->task_abort_notify(std::bind(
-      &grp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
+  gp_dpo_controller::perception(
+      rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 } /* shared_init() */
 
-void grp_mdpo_controller::task_alloc_cb(const ta::polled_task* const task,
-                                        const ta::bi_tab* const) {
-  if (!m_bsel_exception_added) {
-    block_sel_matrix()->sel_exceptions_clear();
-  }
-  m_bsel_exception_added = false;
-
-  /*
-   * We only care about the cache selection exceptions for the cache transferer
-   * task. If that is not the task we just allocated ourself, then even if we
-   * just finished the cache transferer task and added a cache to one of the
-   * exception lists, remove it.
-   */
-  if (!m_csel_exception_added ||
-      task->name() != tasks::depth2::foraging_task::kCacheTransfererName) {
-    cache_sel_matrix()->sel_exceptions_clear();
-  }
-  m_bsel_exception_added = false;
-  m_csel_exception_added = false;
-} /* task_alloc_cb() */
+__rcsw_pure mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void) {
+  return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
+} /* mdpo_perception() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

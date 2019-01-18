@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HANDLER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HANDLER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_TEMPORAL_PENALTY_HANDLER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_TEMPORAL_PENALTY_HANDLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,7 +28,7 @@
 #include <string>
 
 #include "fordyca/support/loop_utils/loop_utils.hpp"
-#include "fordyca/support/temporal_penalty.hpp"
+#include "fordyca/support/tv/temporal_penalty.hpp"
 #include "rcppsw/control/periodic_waveform.hpp"
 #include "rcppsw/control/waveform_generator.hpp"
 #include "rcppsw/control/waveform_params.hpp"
@@ -37,8 +37,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
-namespace ct = rcppsw::control;
+NS_START(fordyca, support, tv);
+
+namespace rct = rcppsw::control;
 namespace er = rcppsw::er;
 
 /*******************************************************************************
@@ -47,7 +48,7 @@ namespace er = rcppsw::er;
 
 /**
  * @class temporal_penalty_handler
- * @ingroup support
+ * @ingroup support tv
  *
  * @brief The penalty handler for penalties for robots (e.g. how long they have
  * to wait when they pickup/drop a block).
@@ -59,19 +60,26 @@ template <typename T>
 class temporal_penalty_handler
     : public er::client<temporal_penalty_handler<T>> {
  public:
+  using iterator_type = typename std::list<temporal_penalty<T>>::iterator;
+
   /**
    * @brief Initialize the penalty handler.
    *
    * @param params Parameters for penalty waveform generation.
    */
-  explicit temporal_penalty_handler(const ct::waveform_params* const params,
+  explicit temporal_penalty_handler(const rct::waveform_params* const params,
                                     const std::string& name)
       : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
         mc_name(name),
-        m_penalty_list(),
-        m_penalty(ct::waveform_generator()(params->type, params)) {}
+        m_penalty(rct::waveform_generator()(params->type, params)) {}
+
 
   ~temporal_penalty_handler(void) override = default;
+  temporal_penalty_handler& operator=(const temporal_penalty_handler& other) =
+                                     delete;
+  temporal_penalty_handler(const temporal_penalty_handler& other) =
+                                     delete;
+
 
   const std::string& name(void) const { return mc_name; }
 
@@ -79,7 +87,12 @@ class temporal_penalty_handler
    * @brief Given the current timestep, get the value of the penalty waveform
    * that would apply if a robot were to start serving a penalty.
    */
-  double timestep_penalty(double t) const { return m_penalty->value(t); }
+  double timestep_penalty(double t) const {
+    if (LIKELY(nullptr != m_penalty)) {
+      m_penalty->value(t);
+    }
+    return 0.0;
+  }
 
   /**
    * @brief Determine if a robot has satisfied the \ref temporal_penalty
@@ -136,7 +149,7 @@ class temporal_penalty_handler
               "Robot still serving penalty after abort?!");
   }
 
-  typename std::list<temporal_penalty<T>>::iterator find(const T& controller) {
+  iterator_type find(const T& controller) {
     return std::find_if(m_penalty_list.begin(),
                         m_penalty_list.end(),
                         [&](const temporal_penalty<T>& p) {
@@ -199,10 +212,10 @@ class temporal_penalty_handler
   /* clang-format off */
   mutable uint                   m_orig_penalty{0};
   const std::string              mc_name;
-  std::list<temporal_penalty<T>> m_penalty_list;
-  std::unique_ptr<ct::waveform>  m_penalty;
+  std::list<temporal_penalty<T>> m_penalty_list{};
+  std::unique_ptr<rct::waveform> m_penalty;
   /* clang-format on */
 };
-NS_END(support, fordyca);
+NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_TEMPORAL_PENALTY_HANDLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_TEMPORAL_PENALTY_HANDLER_HPP_ */

@@ -40,6 +40,7 @@ namespace depth0 { class dpo_controller_repository; }
 
 NS_START(controller);
 class base_perception_subsystem;
+class dpo_perception_subsystem;
 class block_sel_matrix;
 namespace depth0 { class sensing_subsystem; }
 
@@ -66,6 +67,10 @@ class dpo_controller : public crw_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
   void Reset(void) override;
+
+  std::type_index type_index(void) const override {
+    return std::type_index(typeid(*this));
+  }
 
   /* goal acquisition metrics */
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
@@ -99,8 +104,15 @@ class dpo_controller : public crw_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  const base_perception_subsystem* perception(void) const { return m_perception.get(); }
+  const base_perception_subsystem* perception(void) const {
+    return m_perception.get();
+  }
   base_perception_subsystem* perception(void) { return m_perception.get(); }
+
+  dpo_perception_subsystem* dpo_perception(void);
+  const dpo_perception_subsystem* dpo_perception(void) const {
+    return const_cast<dpo_controller*>(this)->dpo_perception();
+  }
 
   const fsm::depth0::dpo_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::dpo_fsm* fsm(void) { return m_fsm.get(); }

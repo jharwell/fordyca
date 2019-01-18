@@ -24,26 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
-class bi_tdgraph_executive;
-}}
-
-NS_START(fordyca);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
-
-namespace tasks { namespace depth2 {
-class foraging_task;
-}}
-namespace params { namespace depth2 { class controller_repository; }}
-NS_START(controller, depth2);
+NS_START(fordyca, controller);
+class mdpo_perception_subsystem;
+NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -57,36 +45,22 @@ NS_START(controller, depth2);
  * changes in the environment and/or execution/interface times of the tasks, and
  * using a Mapped DPO data store for tracking arena state and object relevance.
  */
-class grp_mdpo_controller : public depth1::gp_mdpo_controller,
-                                  public er::client<grp_mdpo_controller>,
-                                  public visitor::visitable_any<grp_mdpo_controller> {
+class grp_mdpo_controller : public depth2::grp_dpo_controller,
+                            public er::client<grp_mdpo_controller>,
+                            public visitor::visitable_any<grp_mdpo_controller> {
  public:
   grp_mdpo_controller(void);
-  ~grp_mdpo_controller(void) override;
+  ~grp_mdpo_controller(void) override = default;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
-  void ControlStep(void) override;
-
-  void bsel_exception_added(bool b) { m_bsel_exception_added = b; }
-  void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
   void shared_init(const params::depth2::controller_repository& param_repo);
 
- private:
-  void task_alloc_cb(const ta::polled_task* const task,
-                     const ta::bi_tab* const);
-
-  /* clang-format off */
-  /**
-   * @brief \c TRUE if the controller's most recently completed task involved
-   * the dropping of a free block (i.e. culminated in a \ref free_block_drop).
-   * Needed so that if the robot's next task requires picking up a free block
-   * that the robot does not pick up the same block it just dropped.
-   */
-  bool m_bsel_exception_added{false};
-  bool m_csel_exception_added{false};
-  /* clang-format on */
+  mdpo_perception_subsystem* mdpo_perception(void);
+  const mdpo_perception_subsystem* mdpo_perception(void) const {
+    return const_cast<grp_mdpo_controller*>(this)->mdpo_perception();
+  }
 };
 
 NS_END(depth2, controller, fordyca);

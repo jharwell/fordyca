@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
 #include <string>
+#include <typeindex>
+
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "rcppsw/er/client.hpp"
@@ -35,6 +37,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace support { namespace tv {
+class tv_controller;
+}} // namespace support::tv
 
 namespace representation {
 class base_block;
@@ -79,6 +84,8 @@ class base_controller : public argos::CCI_Controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void Reset(void) override;
+
+  virtual std::type_index type_index(void) const = 0;
 
   /* movement metrics */
   double distance(void) const override;
@@ -133,6 +140,8 @@ class base_controller : public argos::CCI_Controller,
   void block(const std::shared_ptr<representation::base_block>& block) {
     m_block = block;
   }
+
+  void tv_init(const support::tv::tv_controller* tv_controller);
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
@@ -196,6 +205,7 @@ class base_controller : public argos::CCI_Controller,
   void saa_init(const params::actuation_params*, const params::sensing_params*);
 
   /* clang-format off */
+  const support::tv::tv_controller*           m_tv_controller{nullptr};
   bool                                        m_display_id{false};
   std::shared_ptr<representation::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;

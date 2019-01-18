@@ -30,7 +30,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+
+namespace ds {
+class dpo_store;
+}
+
+NS_START(controller);
 
 /*******************************************************************************
  * Class Definitions
@@ -54,6 +60,9 @@ class base_perception_subsystem {
    * environment/arena, after the LOS has been updated.
    */
   virtual void update(void) = 0;
+
+  virtual const ds::dpo_store* dpo_store(void) const { return nullptr; }
+  virtual ds::dpo_store* dpo_store(void) { return nullptr; }
 
   /**
    * @brief Set the robots LOS for the next timestep.

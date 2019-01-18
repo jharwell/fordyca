@@ -24,11 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "fordyca/controller/motion_throttling_handler.hpp"
+#include "fordyca/support/tv/motion_throttling_handler.hpp"
 #include "rcppsw/common/common.hpp"
-#include "rcppsw/math/radians.hpp"
 #include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive.hpp"
 
@@ -36,6 +33,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
+
 namespace kinematics2D = rcppsw::robotics::kinematics2D;
 namespace hal = rcppsw::robotics::hal;
 namespace rmath = rcppsw::math;
@@ -52,25 +50,34 @@ class throttling_differential_drive : public kinematics2D::differential_drive {
       kinematics2D::differential_drive::drive_type type,
       double max_speed,
       const rmath::radians& soft_turn_max,
-      const hal::actuators::differential_drive_actuator& wheels,
-      const ct::waveform_params* params)
+      const hal::actuators::differential_drive_actuator& wheels)
       : differential_drive(wheels,
                            type,
                            kWheelRadius,
                            kInterWheelDistance,
                            max_speed,
-                           soft_turn_max),
-        m_block_carry(params) {}
+                           soft_turn_max) {}
 
-  void throttle_toggle(bool en) { m_block_carry.toggle(en); }
-  void throttle_update(uint timestep) { m_block_carry.update(timestep); }
-  double active_throttle(void) const { return m_block_carry.active_throttle(); }
+  throttling_differential_drive(const throttling_differential_drive& other) =
+      delete;
+  const throttling_differential_drive& operator=(
+      const throttling_differential_drive& other) = delete;
+
+  double active_throttle(void) const {
+    return mc_throttling->active_throttle();
+  }
   double applied_throttle(void) const {
-    return m_block_carry.applied_throttle();
+    return mc_throttling->applied_throttle();
+  }
+
+  void throttling(const support::tv::motion_throttling_handler* throttling) {
+    mc_throttling = throttling;
   }
 
  private:
-  motion_throttling_handler m_block_carry;
+  /* clang-format off */
+  const support::tv::motion_throttling_handler* mc_throttling{nullptr};
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

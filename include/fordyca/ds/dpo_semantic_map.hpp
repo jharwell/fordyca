@@ -133,8 +133,8 @@ class dpo_semantic_map : public er::client<dpo_semantic_map>,
   bool cache_remove(const std::shared_ptr<representation::base_cache>& victim);
   bool block_remove(const std::shared_ptr<representation::base_block>& victim);
 
-  const dpo_store& store(void) const { return m_store; }
-  dpo_store& store(void) { return m_store; }
+  const dpo_store* store(void) const { return &m_store; }
+  dpo_store* store(void) { return &m_store; }
 
  private:
   /* clang-format off */
@@ -143,12 +143,12 @@ class dpo_semantic_map : public er::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_WRAP_MEMFUNC(block_update, store());
-  RCPPSW_WRAP_MEMFUNC(cache_update, store());
-  RCPPSW_WRAP_MEMFUNC(blocks, store());
-  RCPPSW_WRAP_MEMFUNC(caches, store());
-  RCPPSW_WRAP_MEMFUNC(blocks, store(), const);
-  RCPPSW_WRAP_MEMFUNC(caches, store(), const);
+  RCPPSW_WRAP_MEMFUNC(block_update, (*store()));
+  RCPPSW_WRAP_MEMFUNC(cache_update, (*store()));
+  RCPPSW_WRAP_MEMFUNC(blocks, (*store()));
+  RCPPSW_WRAP_MEMFUNC(caches, (*store()));
+  RCPPSW_WRAP_MEMFUNC(blocks, (*store()), const);
+  RCPPSW_WRAP_MEMFUNC(caches, (*store()), const);
 };
 
 NS_END(ds, fordyca);

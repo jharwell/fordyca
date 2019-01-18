@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/support/block_op_penalty_handler.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
@@ -53,17 +53,27 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
  public:
   new_cache_block_drop_interactor(ds::arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
-                                   const ct::waveform_params* const block_penalty,
+                                  tv::tv_controller* const tv_controller,
                                    dynamic_cache_manager* const cache_manager)
       : ER_CLIENT_INIT("fordyca.support.depth2.new_cache_block_drop_interactor"),
         m_floor(floor_in),
         m_map(map_in),
-        m_penalty_handler(map_in, block_penalty, "New cache block drop"),
-        m_cache_manager(cache_manager) {}
+        m_cache_manager(cache_manager),
+        m_penalty_handler(tv_controller->template penalty_handler<T>(
+            tv::block_op_src::kSrcNewCacheDrop)) {}
 
-  new_cache_block_drop_interactor& operator=(
-      const new_cache_block_drop_interactor& other) = delete;
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
   new_cache_block_drop_interactor(
+      const new_cache_block_drop_interactor& other) = default;
+  new_cache_block_drop_interactor& operator=(
       const new_cache_block_drop_interactor& other) = delete;
 
   /**
@@ -75,9 +85,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
    * @return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
   bool operator()(T& controller, uint timestep) {
-    if (m_penalty_handler.is_serving_penalty(controller)) {
-      if (m_penalty_handler.penalty_satisfied(controller,
-                                              timestep)) {
+    if (m_penalty_handler->is_serving_penalty(controller)) {
+      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
         return finish_new_cache_block_drop(controller);
       }
     } else {
@@ -89,11 +98,11 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
        * waiting until after the penalty is served to figure out that the
        * robot is too close to a block/cache.
        */
-      penalty_status status = m_penalty_handler.penalty_init(controller,
-                                                             block_op_src::kSrcNewCacheDrop,
-                                                             timestep,
-                                                             m_cache_manager->cache_proximity_dist(),
-                                                             m_cache_manager->block_proximity_dist());
+      penalty_status status = m_penalty_handler->penalty_init(controller,
+                                                   tv::block_op_src::kSrcNewCacheDrop,
+                                                   timestep,
+                                                   m_cache_manager->cache_proximity_dist(),
+                                                   m_cache_manager->block_proximity_dist());
       if (penalty_status::kStatusCacheProximity == status) {
         auto prox_status = loop_utils::new_cache_cache_proximity(controller,
                                                                  *m_map,
@@ -107,7 +116,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   }
 
  private:
-  using penalty_status = typename block_op_penalty_handler<T>::filter_status;
+  using penalty_status = typename tv::tv_controller::filter_status<T>;
 
   void cache_proximity_notify(T& controller,
                               const loop_utils::proximity_status_t& status) {
@@ -139,13 +148,13 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
    * has acquired a cache site and is looking to drop an object on it.
    */
   bool finish_new_cache_block_drop(T& controller) {
-    const temporal_penalty<T>& p = m_penalty_handler.next();
+    const tv::temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              acquisition_goal_type::kNewCache == controller.current_task()->acquisition_goal(),
+              tv::acquisition_goal_type::kNewCache == controller.current_task()->acquisition_goal(),
               "Controller not waiting for new cache block drop");
     auto status = loop_utils::new_cache_cache_proximity(controller,
                                                        *m_map,
@@ -183,8 +192,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
       return false;
     } else {
       perform_new_cache_block_drop(controller, p);
-      m_penalty_handler.remove(p);
-      ER_ASSERT(!m_penalty_handler.is_serving_penalty(controller),
+      m_penalty_handler->remove(p);
+      ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
       return true;
     }
@@ -195,7 +204,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
    * preconditions have been satisfied.
    */
   void perform_new_cache_block_drop(T& controller,
-                                    const temporal_penalty<T>& penalty) {
+                                    const tv::temporal_penalty<T>& penalty) {
     events::free_block_drop drop_op(m_map->blocks()[penalty.id()],
                                     rmath::dvec2uvec(controller.position(),
                                                      m_map->grid_resolution()),
@@ -207,10 +216,10 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   }
 
   /* clang-format off */
-  argos::CFloorEntity*  const m_floor;
-  ds::arena_map* const        m_map;
-  block_op_penalty_handler<T> m_penalty_handler;
-  dynamic_cache_manager*const m_cache_manager;
+  argos::CFloorEntity*  const            m_floor;
+  ds::arena_map* const                   m_map;
+  dynamic_cache_manager*const            m_cache_manager;
+  tv::block_op_penalty_handler<T>* const m_penalty_handler;
   /* clang-format on */
 };
 

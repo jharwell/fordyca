@@ -32,6 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace controller { namespace depth2 {
+class grp_dpo_controller;
 class grp_mdpo_controller;
 }} // namespace controller::depth2
 namespace representation {
@@ -58,7 +59,8 @@ namespace visitor = rcppsw::patterns::visitor;
  * aware of blocks its ability to complete its current task.
  */
 class block_proximity
-    : public visitor::visit_set<controller::depth2::grp_mdpo_controller,
+    : public visitor::visit_set<controller::depth2::grp_dpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 fsm::block_to_goal_fsm,
                                 tasks::depth2::cache_starter>,
       public rcppsw::er::client<block_proximity> {
@@ -71,6 +73,7 @@ class block_proximity
   block_proximity& operator=(const block_proximity& op) = delete;
 
   /* depth2 foraging */
+  void visit(controller::depth2::grp_dpo_controller& controller) override;
   void visit(controller::depth2::grp_mdpo_controller& controller) override;
   void visit(fsm::block_to_goal_fsm& task) override;
   void visit(tasks::depth2::cache_starter& task) override;

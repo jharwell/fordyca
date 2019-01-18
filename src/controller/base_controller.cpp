@@ -40,6 +40,7 @@
 #include "fordyca/params/base_controller_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -215,6 +216,12 @@ void base_controller::ndc_pusht(void) {
 double base_controller::applied_motion_throttle(void) const {
   return saa_subsystem()->actuation()->differential_drive().applied_throttle();
 } /* applied_motion_throttle() */
+
+void base_controller::tv_init(const support::tv::tv_controller* tv_controller) {
+  m_tv_controller = tv_controller;
+  saa_subsystem()->actuation()->differential_drive().throttling(
+      tv_controller->movement_throttling_handler(entity_id()));
+} /* tv_init() */
 
 /*******************************************************************************
  * Movement Metrics

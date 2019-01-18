@@ -93,11 +93,8 @@ void dpo_controller::ControlStep(void) {
    * FSM loop.
    */
   m_perception->update();
-
-  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
-  saa_subsystem()->actuation()->motion_throttle_update(
-      saa_subsystem()->sensing()->tick());
   m_fsm->run();
+
   ndc_pop();
 } /* ControlStep() */
 
@@ -142,11 +139,15 @@ void dpo_controller::shared_init(
 } /* shared_init() */
 
 void dpo_controller::private_init(void) {
-  m_fsm = rcppsw::make_unique<fsm::depth0::dpo_fsm>(
-      m_block_sel_matrix.get(),
-      base_controller::saa_subsystem(),
-      static_cast<dpo_perception_subsystem*>(m_perception.get())->store());
+  m_fsm =
+      rcppsw::make_unique<fsm::depth0::dpo_fsm>(m_block_sel_matrix.get(),
+                                                base_controller::saa_subsystem(),
+                                                m_perception->dpo_store());
 } /* private_init() */
+
+dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
+  return static_cast<dpo_perception_subsystem*>(m_perception.get());
+} /* dpo_perception() */
 
 void dpo_controller::Reset(void) {
   crw_controller::Reset();

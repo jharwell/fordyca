@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_CACHE_OP_SRC_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_CACHE_OP_SRC_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_SRC_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_SRC_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, support, tv);
 
 /*******************************************************************************
  * Type Definitions
@@ -39,6 +39,6 @@ enum cache_op_src {
   kSrcExistingCachePickup,
 };
 
-NS_END(support, fordyca);
+NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_CACHE_OP_SRC_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_SRC_HPP_ */

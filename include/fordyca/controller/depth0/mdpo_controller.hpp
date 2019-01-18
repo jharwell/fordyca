@@ -69,13 +69,19 @@ class mdpo_controller : public dpo_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
+  std::type_index type_index(void) const override {
+    return std::type_index(typeid(*this));
+  }
+
   /* world model metrics */
   uint cell_state_inaccuracies(uint state) const override;
   double known_percentage(void) const override;
   double unknown_percentage(void) const override;
 
-  const mdpo_perception_subsystem* perception(void) const;
-  mdpo_perception_subsystem* perception(void);
+  mdpo_perception_subsystem* mdpo_perception(void);
+  const mdpo_perception_subsystem* mdpo_perception(void) const {
+    return const_cast<mdpo_controller*>(this)->mdpo_perception();
+  }
 
   /**
    * @brief Initialization that derived classes may also need to perform, if the

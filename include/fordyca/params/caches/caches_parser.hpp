@@ -29,7 +29,6 @@
 #include "rcppsw/common/common.hpp"
 #include "fordyca/params/caches/caches_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
-#include "rcppsw/control/waveform_xml_parser.hpp"
 #include "fordyca/params/caches/static_cache_parser.hpp"
 #include "fordyca/params/caches/dynamic_cache_parser.hpp"
 
@@ -51,7 +50,6 @@ class caches_parser: public rcppsw::params::xml_param_parser {
  public:
   explicit caches_parser(uint level)
       : xml_param_parser(level),
-        m_waveform(level + 1),
         m_static(level + 1),
         m_dynamic(level + 1) {}
 
@@ -62,7 +60,6 @@ class caches_parser: public rcppsw::params::xml_param_parser {
   static constexpr char kXMLRoot[] = "caches";
 
   void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
@@ -80,7 +77,6 @@ class caches_parser: public rcppsw::params::xml_param_parser {
   /* clang-format off */
   bool                           m_parsed{false};
   std::shared_ptr<caches_params> m_params{nullptr};
-  ct::waveform_xml_parser        m_waveform;
   static_cache_parser            m_static;
   dynamic_cache_parser           m_dynamic;
   /* clang-format on */

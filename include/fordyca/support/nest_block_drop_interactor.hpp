@@ -30,8 +30,8 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/support/block_op_penalty_handler.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,15 +60,27 @@ class nest_block_drop_interactor
   nest_block_drop_interactor(ds::arena_map* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
                              argos::CFloorEntity* const floor,
-                             const ct::waveform_params* const block_penalty)
-      : ER_CLIENT_INIT("fordyca.support.depth0.nest_block_drop_interactor"),
+                             tv::tv_controller* tv_controller)
+      : ER_CLIENT_INIT("fordyca.support.nest_block_drop_interactor"),
         m_floor(floor),
         m_metrics_agg(metrics_agg),
         m_map(map),
-        m_penalty_handler(map, block_penalty, "Nest block drop") {}
+        m_penalty_handler(
+            tv_controller->penalty_handler<T>(tv::block_op_src::kSrcNestDrop)) {
+  }
+
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
+  nest_block_drop_interactor(const nest_block_drop_interactor& other) = default;
   nest_block_drop_interactor& operator=(
       const nest_block_drop_interactor& other) = delete;
-  nest_block_drop_interactor(const nest_block_drop_interactor& other) = delete;
 
   /**
    * @brief The actual handling function for the robot-arena nest block drop
@@ -78,27 +90,15 @@ class nest_block_drop_interactor
    * @param timestep The current timestep.
    */
   void operator()(T& controller, uint timestep) {
-    if (m_penalty_handler.is_serving_penalty(controller)) {
-      if (m_penalty_handler.penalty_satisfied(controller, timestep)) {
+    if (m_penalty_handler->is_serving_penalty(controller)) {
+      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
         finish_nest_block_drop(controller, timestep);
       }
     } else {
-      m_penalty_handler.penalty_init(controller,
-                                     block_op_src::kSrcNestDrop,
+      m_penalty_handler->penalty_init(controller,
+                                     tv::block_op_src::kSrcNestDrop,
                                      timestep);
     }
-  }
-
-  block_op_penalty_handler<T>* penalty_handler(void) {
-    return &m_penalty_handler;
-  }
-
-  /**
-   * @brief Given the current timestep, get the value of the penalty waveform
-   * that would apply if a robot were to start serving a penalty.
-   */
-  double timestep_penalty(double t) const {
-    return m_penalty_handler.timestep_penalty(t);
   }
 
  private:
@@ -110,17 +110,17 @@ class nest_block_drop_interactor
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
     ER_ASSERT(transport_goal_type::kNest == controller.block_transport_goal(),
               "Controller still has nest as goal");
-    ER_ASSERT(m_penalty_handler.is_serving_penalty(controller),
+    ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving drop penalty");
     /*
      * More than 1 robot can drop a block in a timestep, so we have to
      * search for this robot's controller.
      */
-    const temporal_penalty<T>& p = *m_penalty_handler.find(controller);
+    const tv::temporal_penalty<T>& p = *m_penalty_handler->find(controller);
 
     perform_nest_block_drop(controller, p, timestep);
-    m_penalty_handler.remove(p);
-    ER_ASSERT(!m_penalty_handler.is_serving_penalty(controller),
+    m_penalty_handler->remove(p);
+    ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
               "Multiple instances of same controller serving drop penalty");
   }
 
@@ -129,7 +129,7 @@ class nest_block_drop_interactor
    * preconditions have been satisfied.
    */
   void perform_nest_block_drop(T& controller,
-                               const temporal_penalty<T>& penalty,
+                               const tv::temporal_penalty<T>& penalty,
                                uint timestep) {
     /*
      * We have to do this asynchronous to the rest of metric collection, because
@@ -158,10 +158,10 @@ class nest_block_drop_interactor
   }
 
   /* clang-format off */
-  argos::CFloorEntity*             const   m_floor;
+  argos::CFloorEntity* const               m_floor;
   depth0::depth0_metrics_aggregator* const m_metrics_agg;
   ds::arena_map* const                     m_map;
-  block_op_penalty_handler<T>              m_penalty_handler;
+  tv::block_op_penalty_handler<T>* const   m_penalty_handler;
   /* clang-format on */
 };
 

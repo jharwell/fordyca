@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_CACHE_OP_FILTER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_CACHE_OP_FILTER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_FILTER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_FILTER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,13 +28,13 @@
 
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/support/cache_op_src.hpp"
+#include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, support, tv);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
@@ -46,7 +46,7 @@ namespace er = rcppsw::er;
 
 /**
  * @class cache_op_filter
- * @ingroup support
+ * @ingroup support tv
  *
  * @brief The filter for cache operation for robots (e.g. picking up, dropping
  * in places that involve existing caches.
@@ -128,6 +128,6 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
   ds::arena_map* const m_map;
   /* clang-format on */
 };
-NS_END(support, fordyca);
+NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_CACHE_OP_FILTER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_CACHE_OP_FILTER_HPP_ */

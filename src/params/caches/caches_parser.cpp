@@ -45,9 +45,6 @@ void caches_parser::parse(const ticpp::Element& node) {
 
     m_static.parse(cnode);
     m_dynamic.parse(cnode);
-    m_waveform.parse(
-        get_node(const_cast<ticpp::Element&>(cnode), "usage_penalty"));
-    m_params->usage_penalty = *m_waveform.parse_results();
     m_params->static_ = *m_static.parse_results();
     m_params->dynamic = *m_dynamic.parse_results();
 
@@ -56,22 +53,10 @@ void caches_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-void caches_parser::show(std::ostream& stream) const {
-  if (!m_parsed) {
-    stream << build_header() << "<< Not Parsed >>" << std::endl
-           << build_footer();
-    return;
-  }
-
-  stream << build_header() << std::endl
-         << XML_ATTR_STR(m_params, dimension) << std::endl
-         << m_static << m_dynamic << m_waveform << m_waveform << build_footer();
-} /* show() */
-
 __rcsw_pure bool caches_parser::validate(void) const {
   if (m_parsed) {
     CHECK(m_params->dimension > 0.0);
-    return m_dynamic.validate() && m_static.validate() && m_waveform.validate();
+    return m_dynamic.validate() && m_static.validate();
   }
 
 error:

@@ -216,7 +216,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
 void cache_found::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
 
-  c.perception()->map()->accept(*this);
+  c.mdpo_perception()->map()->accept(*this);
 
   c.ndc_pop();
 } /* visit() */

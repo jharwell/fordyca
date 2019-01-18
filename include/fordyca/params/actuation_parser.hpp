@@ -28,7 +28,6 @@
 
 #include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/steering_force2D_parser.hpp"
-#include "rcppsw/control/waveform_xml_parser.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive_xml_parser.hpp"
 
 /*******************************************************************************
@@ -52,8 +51,7 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   explicit actuation_parser(uint level)
       : xml_param_parser(level),
         m_differential_drive(level + 1),
-        m_steering(level + 1),
-        m_throttling(level + 1) {}
+        m_steering(level + 1) {}
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the
@@ -61,7 +59,6 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
    */
   static constexpr char kXMLRoot[] = "actuation";
 
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
@@ -80,7 +77,6 @@ class actuation_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<actuation_params>           m_params{nullptr};
   kinematics2D::differential_drive_xml_parser m_differential_drive;
   steering_force2D_parser                     m_steering;
-  ct::waveform_xml_parser                     m_throttling;
   /* clang-format on */
 };
 

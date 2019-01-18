@@ -63,9 +63,6 @@ void mdpo_controller::ControlStep(void) {
    */
   perception()->update();
 
-  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
-  saa_subsystem()->actuation()->motion_throttle_update(
-      saa_subsystem()->sensing()->tick());
   fsm()->run();
   ndc_pop();
 } /* ControlStep() */
@@ -115,15 +112,10 @@ void mdpo_controller::private_init(void) {
   dpo_controller::fsm(
       rcppsw::make_unique<fsm::depth0::dpo_fsm>(block_sel_matrix(),
                                                 base_controller::saa_subsystem(),
-                                                &perception()->map()->store()));
+                                                perception()->dpo_store()));
 } /* private_init() */
 
-const mdpo_perception_subsystem* mdpo_controller::perception(void) const {
-  return static_cast<const mdpo_perception_subsystem*>(
-      dpo_controller::perception());
-} /* perception() */
-
-mdpo_perception_subsystem* mdpo_controller::perception(void) {
+__rcsw_pure mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
@@ -131,15 +123,15 @@ mdpo_perception_subsystem* mdpo_controller::perception(void) {
  * World Model Metrics
  ******************************************************************************/
 uint mdpo_controller::cell_state_inaccuracies(uint state) const {
-  return perception()->cell_state_inaccuracies(state);
+  return mdpo_perception()->cell_state_inaccuracies(state);
 } /* cell_state_inaccuracies() */
 
 double mdpo_controller::known_percentage(void) const {
-  return perception()->known_percentage();
+  return mdpo_perception()->known_percentage();
 } /* known_percentage() */
 
 double mdpo_controller::unknown_percentage(void) const {
-  return perception()->unknown_percentage();
+  return mdpo_perception()->unknown_percentage();
 } /* unknown_percentage() */
 
 using namespace argos; // NOLINT

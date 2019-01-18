@@ -172,7 +172,7 @@ void free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
 void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_push();
 
-  controller.perception()->map()->accept(*this);
+  controller.mdpo_perception()->map()->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
   controller.free_pickup_event(true);
@@ -184,9 +184,7 @@ void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
 void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::dpo_perception_subsystem*>(controller.perception())
-      ->store()
-      ->accept(*this);
+  controller.dpo_perception()->dpo_store()->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
   controller.free_pickup_event(true);
@@ -201,9 +199,7 @@ void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
 void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
-  static_cast<controller::dpo_perception_subsystem*>(controller.perception())
-      ->store()
-      ->accept(*this);
+  controller.dpo_perception()->dpo_store()->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
 
@@ -220,10 +216,11 @@ void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller)
 
   controller.ndc_pop();
 } /* visit() */
+
 void free_block_pickup::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  controller.perception()->map()->accept(*this);
+  controller.mdpo_perception()->map()->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
 
@@ -266,7 +263,8 @@ void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 void free_block_pickup::visit(
     controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
-  controller.perception()->map()->accept(*this);
+
+  controller.mdpo_perception()->map()->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
 

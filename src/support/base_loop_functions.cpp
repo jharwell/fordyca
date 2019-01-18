@@ -24,17 +24,17 @@
 #include "fordyca/support/base_loop_functions.hpp"
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <thread>
-
-#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
+#include "fordyca/params/tv/tv_controller_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 
 #include "fordyca/ds/arena_map.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/swarm/convergence/convergence_params.hpp"
 
 /*******************************************************************************
@@ -49,7 +49,9 @@ namespace rswc = rcppsw::swarm::convergence;
  * Constructors/Destructors
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.base"), m_arena_map(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.base"),
+      m_arena_map(nullptr),
+      m_tv_controller(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
@@ -96,10 +98,27 @@ void base_loop_functions::Init(ticpp::Element& node) {
   /* initialize convergence calculations */
   m_loop_threads = m_params.parse_results<rswc::convergence_params>()->n_threads;
 
+  /* initialize temporal variance injection */
+  tv_init(params()->parse_results<params::tv::tv_controller_params>());
+
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
   ndc_pop();
 } /* Init() */
+
+void base_loop_functions::tv_init(
+    const params::tv::tv_controller_params* const tvp) {
+  m_tv_controller =
+      rcppsw::make_unique<tv::tv_controller>(tvp, this, arena_map());
+
+  for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(pair.second);
+    auto& controller = dynamic_cast<controller::base_controller&>(
+        robot->GetControllableEntity().GetController());
+    m_tv_controller->register_controller(controller.entity_id());
+    controller.tv_init(m_tv_controller.get());
+  } /* for(&pair..) */
+} /* tv_init() */
 
 void base_loop_functions::arena_map_init(
     const params::loop_function_repository* const repo) {
@@ -213,20 +232,5 @@ std::vector<rmath::vector2d> base_loop_functions::robot_positions(void) const {
   } /* for(&entity..) */
   return v;
 } /* robot_headings() */
-
-double base_loop_functions::swarm_motion_throttle(void) const {
-  double accum = 0.0;
-  auto& robots =
-      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
-
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    accum += controller.applied_motion_throttle();
-  } /* for(&entity..) */
-  return accum / robots.size();
-} /* swarm_motion_throttle() */
 
 NS_END(support, fordyca);

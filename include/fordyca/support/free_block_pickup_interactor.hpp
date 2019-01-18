@@ -31,8 +31,8 @@
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/support/block_op_penalty_handler.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,15 +59,26 @@ class free_block_pickup_interactor
  public:
   free_block_pickup_interactor(ds::arena_map* const map,
                                argos::CFloorEntity* const floor,
-                               const ct::waveform_params* const block_penalty)
+                               tv::tv_controller* tv_controller)
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
         m_floor(floor),
         m_map(map),
-        m_penalty_handler(map, block_penalty, "Free block pickup") {}
+        m_penalty_handler(tv_controller->penalty_handler<T>(
+            tv::block_op_src::kSrcFreePickup)) {}
+
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
+  free_block_pickup_interactor(const free_block_pickup_interactor& other) =
+      default;
   free_block_pickup_interactor& operator=(
       const free_block_pickup_interactor& other) = delete;
-  free_block_pickup_interactor(const free_block_pickup_interactor& other) =
-      delete;
 
   /**
    * @brief The actual handlipng function for the free block pickup arena-robot
@@ -76,21 +87,16 @@ class free_block_pickup_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep The current timestep.
    */
-  template <typename C = T>
-  void operator()(C& controller, uint timestep) {
-    if (m_penalty_handler.is_serving_penalty(controller)) {
-      if (m_penalty_handler.penalty_satisfied(controller, timestep)) {
+  void operator()(T& controller, uint timestep) {
+    if (m_penalty_handler->is_serving_penalty(controller)) {
+      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
         finish_free_block_pickup(controller, timestep);
       }
     } else {
-      m_penalty_handler.penalty_init(controller,
-                                     block_op_src::kSrcFreePickup,
+      m_penalty_handler->penalty_init(controller,
+                                     tv::block_op_src::kSrcFreePickup,
                                      timestep);
     }
-  }
-
-  block_op_penalty_handler<T>* penalty_handler(void) {
-    return &m_penalty_handler;
   }
 
  private:
@@ -102,14 +108,14 @@ class free_block_pickup_interactor
     ER_ASSERT(controller.goal_acquired() && acquisition_goal_type::kBlock ==
                                                 controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
-    ER_ASSERT(m_penalty_handler.is_serving_penalty(controller),
+    ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving pickup penalty");
 
     /*
      * More than 1 robot can pick up a block in a timestep, so we have to
      * search for this robot's controller
      */
-    const temporal_penalty<T>& p = *m_penalty_handler.find(controller);
+    const tv::temporal_penalty<T>& p = *m_penalty_handler->find(controller);
 
     /*
      * If two robots both are serving penalties on the same ramp block (possible
@@ -130,16 +136,16 @@ class free_block_pickup_interactor
     if (p.id() != loop_utils::robot_on_block(controller, *m_map)) {
       ER_WARN("%s cannot pickup block%d: No such block",
               controller.GetId().c_str(),
-              m_penalty_handler.find(controller)->id());
+              m_penalty_handler->find(controller)->id());
       events::block_vanished vanished(p.id());
       controller.visitor::template visitable_any<T>::accept(vanished);
     } else {
       perform_free_block_pickup(controller, p, timestep);
       m_floor->SetChanged();
     }
-    m_penalty_handler.remove(p);
+    m_penalty_handler->remove(p);
     ER_ASSERT(
-        !m_penalty_handler.is_serving_penalty(controller),
+        !m_penalty_handler->is_serving_penalty(controller),
         "Multiple instances of same controller serving block pickup penalty");
   }
 
@@ -148,7 +154,7 @@ class free_block_pickup_interactor
    * preconditions have been satisfied.
    */
   void perform_free_block_pickup(T& controller,
-                                 const temporal_penalty<T>& penalty,
+                                 const tv::temporal_penalty<T>& penalty,
                                  uint timestep) {
     auto it =
         std::find_if(m_map->blocks().begin(),
@@ -178,9 +184,9 @@ class free_block_pickup_interactor
   }
 
   /* clang-format off */
-  argos::CFloorEntity*             const m_floor;
+  argos::CFloorEntity*const              m_floor;
   ds::arena_map* const                   m_map;
-  block_op_penalty_handler<T>            m_penalty_handler;
+  tv::block_op_penalty_handler<T>* const m_penalty_handler;
   /* clang-format on */
 };
 

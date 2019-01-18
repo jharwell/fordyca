@@ -21,6 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+/*
+ * This is needed because without it boost instantiates static assertions that
+ * verify that every possible handler<controller> instantiation is valid, which
+ * includes checking for depth1 controllers being valid for new cache drop/cache
+ * site drop events. These will not happen in reality (or shouldn't), and if
+ * they do it's 100% OK to crash with an exception.
+ */
+#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
@@ -33,8 +41,10 @@
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
+#include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
+
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 #include "rcppsw/swarm/convergence/convergence_params.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
@@ -60,6 +70,7 @@ template void depth1_loop_functions::controller_configure(
  ******************************************************************************/
 depth1_loop_functions::depth1_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.depth1"),
+      m_interactors(nullptr),
       m_tasking_oracle(nullptr),
       m_metrics_agg(nullptr),
       m_cache_manager(nullptr) {}
@@ -89,12 +100,13 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   cache_handling_init(cachep);
 
   /* intitialize robot interactions with environment */
-  m_interactor =
-      rcppsw::make_unique<interactor>(arena_map(),
-                                      m_metrics_agg.get(),
-                                      floor(),
-                                      &arenap->blocks.manipulation_penalty,
-                                      &cachep->usage_penalty);
+  m_interactors = rcppsw::make_unique<interactor_map>();
+  m_interactors->emplace(
+      typeid(controller::depth1::gp_dpo_controller),
+      gp_dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+  m_interactors->emplace(
+      typeid(controller::depth1::gp_mdpo_controller),
+      gp_mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
 
   /* initialize oracles */
   oracle_init();
@@ -130,34 +142,46 @@ void depth1_loop_functions::oracle_init(void) {
 } /* oracle_init() */
 
 void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller = dynamic_cast<controller::depth1::gp_dpo_controller&>(
-      robot.GetControllableEntity().GetController());
+  auto controller = dynamic_cast<controller::depth1::gp_dpo_controller*>(
+      &robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  m_metrics_agg->collect_from_controller(&controller);
-  controller.free_pickup_event(false);
-  controller.free_drop_event(false);
+  m_metrics_agg->collect_from_controller(controller);
+  controller->free_pickup_event(false);
+  controller->free_drop_event(false);
 
   /* send the robot its view of the world: what it sees and where it is */
-  loop_utils::set_robot_pos<decltype(controller)>(robot);
-  ER_ASSERT(std::fmod(controller.los_dim(), arena_map()->grid_resolution()) <=
+  loop_utils::set_robot_pos<decltype(*controller)>(robot);
+  ER_ASSERT(std::fmod(controller->los_dim(), arena_map()->grid_resolution()) <=
                 std::numeric_limits<double>::epsilon(),
             "LOS dimension (%f) not an even multiple of grid resolution (%f)",
-            controller.los_dim(),
+            controller->los_dim(),
             arena_map()->grid_resolution());
-  uint los_grid_size = controller.los_dim() / arena_map()->grid_resolution();
-  loop_utils::set_robot_los<decltype(controller)>(robot,
-                                                  los_grid_size,
-                                                  *arena_map());
-  set_robot_tick<decltype(controller)>(robot);
+  uint los_grid_size = controller->los_dim() / arena_map()->grid_resolution();
+  loop_utils::set_robot_los<decltype(*controller)>(robot,
+                                                   los_grid_size,
+                                                   *arena_map());
+  set_robot_tick<decltype(*controller)>(robot);
 
   /* update arena map metrics with robot position */
   auto coord =
-      rmath::dvec2uvec(controller.position(), arena_map()->grid_resolution());
+      rmath::dvec2uvec(controller->position(), arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 
-  /* Now watch it react to the environment */
-  (*m_interactor)(controller, GetSpace().GetSimulationClock());
+  /*
+   * The MAGIC of boost so that we can avoid a series of if()/else if() for each
+   * of the types of controllers in depth0 for robot-arena interactions.
+   *
+   * We use the runtime type of the controller we have to index into a map
+   * containing a boost::variant of robot_arena_interactor<T>'s. The variant we
+   * access in the map will be one with the active type being
+   * robot_arena_interactor<runtime-type-of-current-controller>.
+   *
+   * We then just use a simple visitor to perform all robot-arena interactions.
+   */
+  boost::apply_visitor(
+      controller_interactor_mapper(controller, GetSpace().GetSimulationClock()),
+      m_interactors->at(controller->type_index()));
 } /* pre_step_iter() */
 
 template <class ControllerType>
@@ -379,14 +403,6 @@ void depth1_loop_functions::cache_handling_init(
     arena_map()->caches_add(ret.caches);
   }
 } /* cache_handling_init() */
-
-/*******************************************************************************
- * Temporal Variance Metrics
- ******************************************************************************/
-double depth1_loop_functions::env_cache_usage(void) const {
-  return m_interactor->cache_usage_penalty(
-      const_cast<depth1_loop_functions*>(this)->GetSpace().GetSimulationClock());
-} /* env_block_manipulation() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

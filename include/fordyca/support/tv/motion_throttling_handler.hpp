@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_MOTION_THROTTLING_HANDLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_MOTION_THROTTLING_HANDLER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_MOTION_THROTTLING_HANDLER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_MOTION_THROTTLING_HANDLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,8 +33,8 @@ namespace rcppsw { namespace control {
 struct waveform_params;
 class waveform;
 }} // namespace rcppsw::control
-NS_START(fordyca, controller);
-class actuation_subsystem;
+
+NS_START(fordyca, support, tv);
 namespace ct = rcppsw::control;
 
 /*******************************************************************************
@@ -42,7 +42,7 @@ namespace ct = rcppsw::control;
  ******************************************************************************/
 /**
  * @class motion_throttling_handler
- * @ingroup controller
+ * @ingroup support tv
  *
  * @brief Handler for a type of motion_throttling for the robot actuators
  */
@@ -85,6 +85,6 @@ class motion_throttling_handler {
   /* clang-format off */
 };
 
-NS_END(controller, fordyca);
+NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_MOTION_THROTTLING_HANDLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_MOTION_THROTTLING_HANDLER_HPP_ */

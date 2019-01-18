@@ -1,5 +1,5 @@
 /**
- * @file motion_throttling_handler.cpp
+ * @file block_op_src.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,38 +18,29 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_BLOCK_OP_SRC_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_BLOCK_OP_SRC_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/motion_throttling_handler.hpp"
-#include "rcppsw/control/waveform.hpp"
-#include "rcppsw/control/waveform_generator.hpp"
-#include "rcppsw/control/waveform_params.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, support, tv);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Type Definitions
  ******************************************************************************/
-motion_throttling_handler::motion_throttling_handler(
-    const ct::waveform_params* const params)
-    : m_waveform(ct::waveform_generator()(params->type, params)) {}
+enum block_op_src {
+  kSrcFreePickup,
+  kSrcNestDrop,
+  kSrcCacheSiteDrop,
+  kSrcNewCacheDrop,
+};
 
-motion_throttling_handler::~motion_throttling_handler(void) = default;
+NS_END(tv, support, fordyca);
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void motion_throttling_handler::update(uint timestep) {
-  if (m_en) {
-    m_active = m_waveform->value(timestep);
-  } else {
-    m_active = 0;
-  }
-  m_applied = m_waveform->value(timestep);
-} /* update() */
-
-NS_END(controller, fordyca);
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_BLOCK_OP_SRC_HPP_ */

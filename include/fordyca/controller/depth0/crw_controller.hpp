@@ -63,6 +63,10 @@ class crw_controller : public depth0_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
+  std::type_index type_index(void) const override {
+    return std::type_index(typeid(*this));
+  }
+
   /* goal acquisition metrics */
   bool is_vectoring_to_goal(void) const override { return false; }
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);

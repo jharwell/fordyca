@@ -48,16 +48,27 @@ NS_START(fordyca, support, depth0);
 template <typename T>
 class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
  public:
+  using controller_type = T;
+
   robot_arena_interactor(ds::arena_map* const map,
                          depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor,
-                         const ct::waveform_params* const block_penalty)
+                         tv::tv_controller* const tv_controller)
       : ER_CLIENT_INIT("fordyca.support.depth0.robot_arena_interactor"),
-        m_free_pickup_interactor(map, floor, block_penalty),
-        m_nest_drop_interactor(map, metrics_agg, floor, block_penalty) {}
+        m_free_pickup_interactor(map, floor, tv_controller),
+        m_nest_drop_interactor(map, metrics_agg, floor, tv_controller) {}
 
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
+  robot_arena_interactor(const robot_arena_interactor& other) = default;
   robot_arena_interactor& operator=(const robot_arena_interactor& other) = delete;
-  robot_arena_interactor(const robot_arena_interactor& other) = delete;
 
   /**
    * @brief The actual handling function for the interactions.
@@ -74,36 +85,10 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
     }
   }
 
-  /**
-   * @brief Given the current timestep, get the value of the block manipulation
-   * penalty waveform that would apply if a robot were to start serving a
-   * penalty now. Block manipulation penalty is the same no matter what the
-   * robot is doing (for now...): dropping in nest, free block drop, free block
-   * pickup, etc. so this function can safely be used for all cases.
-   */
-  double block_manip_penalty(double t) const {
-    return m_nest_drop_interactor.timestep_penalty(t);
-  }
-
- protected:
-  free_block_pickup_interactor<T>& free_pickup_interactor(void) {
-    return m_free_pickup_interactor;
-  }
-  const free_block_pickup_interactor<T>& free_pickup_interactor(void) const {
-    return m_free_pickup_interactor;
-  }
-  nest_block_drop_interactor<T>& nest_drop_interactor(void) {
-    return m_nest_drop_interactor;
-  }
-
-  const nest_block_drop_interactor<T>& nest_drop_interactor(void) const {
-    return m_nest_drop_interactor;
-  }
-
  private:
   /* clang-format off */
-  free_block_pickup_interactor<T>        m_free_pickup_interactor;
-  nest_block_drop_interactor<T>          m_nest_drop_interactor;
+  free_block_pickup_interactor<T> m_free_pickup_interactor;
+  nest_block_drop_interactor<T>   m_nest_drop_interactor;
   /* clang-format on */
 };
 

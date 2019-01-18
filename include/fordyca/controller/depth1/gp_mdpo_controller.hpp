@@ -63,14 +63,17 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
+  void ControlStep(void) override;
 
   /* world model metrics */
   uint cell_state_inaccuracies(uint state) const override;
   double known_percentage(void) const override;
   double unknown_percentage(void) const override;
 
-  const mdpo_perception_subsystem* perception(void) const;
-  mdpo_perception_subsystem* perception(void);
+  mdpo_perception_subsystem* mdpo_perception(void);
+  const mdpo_perception_subsystem* mdpo_perception(void) const {
+    return const_cast<gp_mdpo_controller*>(this)->mdpo_perception();
+  }
 
  protected:
   /**

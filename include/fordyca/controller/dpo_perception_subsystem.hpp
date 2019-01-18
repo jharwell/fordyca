@@ -75,8 +75,8 @@ class dpo_perception_subsystem
    */
   void reset(void) override;
 
-  const ds::dpo_store* store(void) const { return m_store.get(); }
-  ds::dpo_store* store(void) { return m_store.get(); }
+  const ds::dpo_store* dpo_store(void) const override { return m_store.get(); }
+  ds::dpo_store* dpo_store(void) override { return m_store.get(); }
 
  private:
   /*

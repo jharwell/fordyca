@@ -21,6 +21,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+/*
+ * This is needed because without it boost instantiates static assertions that
+ * verify that every possible handler<controller> instantiation is valid, which
+ * includes checking for depth1 controllers being valid for new cache drop/cache
+ * site drop events. These will not happen in reality (or shouldn't), and if
+ * they do it's 100% OK to crash with an exception.
+ */
+#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
@@ -35,6 +43,9 @@
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/representation/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/support/depth0/robot_arena_interactor.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
+
 #include "rcppsw/swarm/convergence/convergence_params.hpp"
 
 /*******************************************************************************
@@ -48,7 +59,9 @@ namespace rswc = rcppsw::swarm::convergence;
  * Constructors/Destructor
  ******************************************************************************/
 depth0_loop_functions::depth0_loop_functions(void)
-    : ER_CLIENT_INIT("fordyca.loop.depth0"), m_metrics_agg(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.loop.depth0"),
+      m_metrics_agg(nullptr),
+      m_interactors(nullptr) {}
 
 depth0_loop_functions::~depth0_loop_functions(void) = default;
 
@@ -71,22 +84,16 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
       &output.metrics, conv, output_root());
 
   /* intitialize robot interactions with environment */
-  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
-  m_crw_interactor =
-      rcppsw::make_unique<crw_itype>(arena_map(),
-                                     m_metrics_agg.get(),
-                                     floor(),
-                                     &arenap->blocks.manipulation_penalty);
-  m_dpo_interactor =
-      rcppsw::make_unique<dpo_itype>(arena_map(),
-                                     m_metrics_agg.get(),
-                                     floor(),
-                                     &arenap->blocks.manipulation_penalty);
-  m_mdpo_interactor =
-      rcppsw::make_unique<mdpo_itype>(arena_map(),
-                                      m_metrics_agg.get(),
-                                      floor(),
-                                      &arenap->blocks.manipulation_penalty);
+  m_interactors = rcppsw::make_unique<interactor_map>();
+  m_interactors->emplace(
+      typeid(controller::depth0::crw_controller),
+      crw_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+  m_interactors->emplace(
+      typeid(controller::depth0::dpo_controller),
+      dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+  m_interactors->emplace(
+      typeid(controller::depth0::mdpo_controller),
+      mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -116,17 +123,17 @@ void depth0_loop_functions::controller_configure(
 } /* controller_configure() */
 
 void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto& controller = static_cast<controller::depth0::depth0_controller&>(
-      robot.GetControllableEntity().GetController());
+  auto controller = static_cast<controller::depth0::depth0_controller*>(
+      &robot.GetControllableEntity().GetController());
 
   /*
    * This is the one place in the depth0 event handling code where we need to
    * know *ALL* of the controllers that are in the depth, and we can't/don't use
    * templates and/or inheritance to get what we need.
    */
-  auto* dpo = dynamic_cast<controller::depth0::dpo_controller*>(&controller);
-  auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(&controller);
-  auto* crw = dynamic_cast<controller::depth0::crw_controller*>(&controller);
+  auto* dpo = dynamic_cast<controller::depth0::dpo_controller*>(controller);
+  auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(controller);
+  auto* crw = dynamic_cast<controller::depth0::crw_controller*>(controller);
 
   /* collect metrics from robot before its state changes */
   if (nullptr != mdpo) {
@@ -137,12 +144,12 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     m_metrics_agg->collect_from_controller(crw);
   }
 
-  controller.free_pickup_event(false);
-  controller.free_drop_event(false);
+  controller->free_pickup_event(false);
+  controller->free_drop_event(false);
 
   /* Send the robot its new line of sight */
-  loop_utils::set_robot_pos<decltype(controller)>(robot);
-  set_robot_tick<decltype(controller)>(robot);
+  loop_utils::set_robot_pos<decltype(*controller)>(robot);
+  set_robot_tick<decltype(*controller)>(robot);
 
   if (nullptr != dpo || nullptr != mdpo) {
     ER_ASSERT(std::fmod(dpo->los_dim(), arena_map()->grid_resolution()) <=
@@ -155,22 +162,22 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   }
 
   /*
-   * Now update the robot's state as a result of arena interactions. For MDPO
-   * controllers, the DPO pointer will *ALSO* be non-null, so the order of the
-   * if()s here is important.
+   * The MAGIC of boost so that we can avoid a series of if()/else if() for each
+   * of the types of controllers in depth0 for robot-arena interactions.
+   *
+   * We use the runtime type of the controller we have to index into a map
+   * containing a boost::variant of robot_arena_interactor<T>'s. The variant we
+   * access in the map will be one with the active type being
+   * robot_arena_interactor<runtime-type-of-current-controller>.
+   *
+   * We then just use a simple visitor to perform all robot-arena interactions.
    */
-  if (nullptr != mdpo) {
-    (*m_mdpo_interactor)(*mdpo, GetSpace().GetSimulationClock());
-  } else if (nullptr != dpo) {
-    (*m_dpo_interactor)(*dpo, GetSpace().GetSimulationClock());
-  } else if (nullptr != crw) {
-    (*m_crw_interactor)(*crw, GetSpace().GetSimulationClock());
-  } else {
-    ER_FATAL_SENTINEL("Bad depth0 controller");
-  }
+  boost::apply_visitor(
+      controller_interactor_mapper(controller, GetSpace().GetSimulationClock()),
+      m_interactors->at(controller->type_index()));
 
   auto coord =
-      rmath::dvec2uvec(controller.position(), arena_map()->grid_resolution());
+      rmath::dvec2uvec(controller->position(), arena_map()->grid_resolution());
   arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
 } /* pre_step_iter() */
 
@@ -227,14 +234,6 @@ void depth0_loop_functions::pre_step_final(void) {
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 } /* pre_step_final() */
-
-/*******************************************************************************
- * Temporal Variance Metrics
- ******************************************************************************/
-double depth0_loop_functions::env_block_manipulation(void) const {
-  return m_crw_interactor->block_manip_penalty(
-      const_cast<depth0_loop_functions*>(this)->GetSpace().GetSimulationClock());
-} /* env_block_manipulation() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

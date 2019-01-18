@@ -29,7 +29,8 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/support/cache_op_penalty_handler.hpp"
+#include "fordyca/support/tv/cache_op_src.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
@@ -37,6 +38,7 @@
  ******************************************************************************/
 NS_START(fordyca, support);
 namespace ta = rcppsw::task_allocation;
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -52,18 +54,25 @@ template <typename T>
 class existing_cache_block_drop_interactor
     : public er::client<existing_cache_block_drop_interactor<T>> {
  public:
-  existing_cache_block_drop_interactor(
-      ds::arena_map* const map_in,
-      argos::CFloorEntity* const floor_in,
-      cache_op_penalty_handler<T>* penalty_handler)
+  existing_cache_block_drop_interactor(ds::arena_map* const map_in,
+                                       tv::tv_controller* tv_controller)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
-        m_floor(floor_in),
         m_map(map_in),
-        m_penalty_handler(penalty_handler) {}
+        m_penalty_handler(tv_controller->penalty_handler<T>(
+            tv::cache_op_src::kSrcExistingCacheDrop)) {}
 
-  existing_cache_block_drop_interactor& operator=(
-      const existing_cache_block_drop_interactor& other) = delete;
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
   existing_cache_block_drop_interactor(
+      const existing_cache_block_drop_interactor& other) = default;
+  existing_cache_block_drop_interactor& operator=(
       const existing_cache_block_drop_interactor& other) = delete;
 
   /**
@@ -79,8 +88,8 @@ class existing_cache_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      cache_op_src::kSrcExistingCacheDrop,
-                                      timestep);
+                                     tv::cache_op_src::kSrcExistingCacheDrop,
+                                     timestep);
     }
   }
 
@@ -90,14 +99,14 @@ class existing_cache_block_drop_interactor
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    const temporal_penalty<T>& p = m_penalty_handler->next();
+    const tv::temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  acquisition_goal_type::kExistingCache ==
+                  tv::acquisition_goal_type::kExistingCache ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
 
@@ -141,7 +150,7 @@ class existing_cache_block_drop_interactor
    * preconditions have been satisfied.
    */
   void perform_cache_block_drop(T& controller,
-                                const temporal_penalty<T>& penalty) {
+                                const tv::temporal_penalty<T>& penalty) {
     auto it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
@@ -160,9 +169,8 @@ class existing_cache_block_drop_interactor
   }
 
   /* clang-format off */
-  argos::CFloorEntity*             const m_floor;
-  ds::arena_map* const                   m_map;
-  cache_op_penalty_handler<T>* const     m_penalty_handler;
+  ds::arena_map* const                  m_map;
+  tv::cache_op_penalty_handler<T>*const m_penalty_handler;
   /* clang-format on */
 };
 

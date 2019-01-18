@@ -73,9 +73,6 @@ void crw_controller::ControlStep(void) {
               block()->robot_id());
   }
 
-  saa_subsystem()->actuation()->motion_throttle_toggle(is_carrying_block());
-  saa_subsystem()->actuation()->motion_throttle_update(
-      saa_subsystem()->sensing()->tick());
   m_fsm->run();
   ndc_pop();
 } /* ControlStep() */

@@ -59,6 +59,7 @@ namespace depth1 { class controller_repository; }
 
 NS_START(controller);
 class cache_sel_matrix;
+class dpo_perception_subsystem;
 NS_START(depth1);
 
 /*******************************************************************************
@@ -78,6 +79,8 @@ class gp_dpo_controller : public depth0::dpo_controller,
                           public visitor::visitable_any<gp_dpo_controller>,
                           public rcppsw::metrics::tasks::bi_tdgraph_metrics {
  public:
+  using dpo_controller::perception;
+
   gp_dpo_controller(void);
   ~gp_dpo_controller(void) override;
 

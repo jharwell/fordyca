@@ -134,7 +134,7 @@ void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller)
   controller.ndc_push();
 
   controller.block(nullptr);
-  controller.perception()->map()->accept(*this);
+  controller.mdpo_perception()->map()->accept(*this);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
