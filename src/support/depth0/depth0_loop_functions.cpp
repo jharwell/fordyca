@@ -208,6 +208,7 @@ __rcsw_pure argos::CColor depth0_loop_functions::GetFloorColor(
 
 void depth0_loop_functions::PreStep(void) {
   ndc_push();
+
   base_loop_functions::PreStep();
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
@@ -217,6 +218,7 @@ void depth0_loop_functions::PreStep(void) {
   m_metrics_agg->collect_from_arena(arena_map());
   m_metrics_agg->collect_from_loop(this);
   pre_step_final();
+
   ndc_pop();
 } /* PreStep() */
 

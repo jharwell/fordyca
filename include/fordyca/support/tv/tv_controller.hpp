@@ -44,23 +44,23 @@
  * Macros
  ******************************************************************************/
 #define BLOCK_HANDLERS                                                  \
-  std::shared_ptr<block_op_penalty_handler<controller::depth0::crw_controller>> , \
-    std::shared_ptr<block_op_penalty_handler<controller::depth0::dpo_controller>>, \
-    std::shared_ptr<block_op_penalty_handler<controller::depth0::mdpo_controller>>, \
-    std::shared_ptr<block_op_penalty_handler<controller::depth1::gp_dpo_controller>>, \
-    std::shared_ptr<block_op_penalty_handler<controller::depth1::gp_mdpo_controller>>,\
-    std::shared_ptr<block_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
-    std::shared_ptr<block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
+  std::unique_ptr<block_op_penalty_handler<controller::depth0::crw_controller>> , \
+    std::unique_ptr<block_op_penalty_handler<controller::depth0::dpo_controller>>, \
+    std::unique_ptr<block_op_penalty_handler<controller::depth0::mdpo_controller>>, \
+    std::unique_ptr<block_op_penalty_handler<controller::depth1::gp_dpo_controller>>, \
+    std::unique_ptr<block_op_penalty_handler<controller::depth1::gp_mdpo_controller>>,\
+    std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
+    std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
 
 #define EXISTING_CACHE_HANDLERS                                                  \
-  std::shared_ptr<cache_op_penalty_handler<controller::depth1::gp_dpo_controller>>, \
-    std::shared_ptr<cache_op_penalty_handler<controller::depth1::gp_mdpo_controller>>,\
-    std::shared_ptr<cache_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
-    std::shared_ptr<cache_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
+  std::unique_ptr<cache_op_penalty_handler<controller::depth1::gp_dpo_controller>>, \
+    std::unique_ptr<cache_op_penalty_handler<controller::depth1::gp_mdpo_controller>>,\
+    std::unique_ptr<cache_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
+    std::unique_ptr<cache_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
 
 #define FREE_BLOCK_DROP_HANDLERS                                                  \
-  std::shared_ptr<block_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
-    std::shared_ptr<block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
+  std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
+    std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
 
 /*******************************************************************************
  * Namespaces/Decls

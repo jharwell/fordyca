@@ -253,6 +253,7 @@ argos::CColor depth2_loop_functions::GetFloorColor(
 
 void depth2_loop_functions::PreStep() {
   ndc_push();
+
   base_loop_functions::PreStep();
 
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -269,6 +270,7 @@ void depth2_loop_functions::PreStep() {
   }
 
   pre_step_final();
+
   ndc_pop();
 } /* PreStep() */
 

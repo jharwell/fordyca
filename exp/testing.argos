@@ -6,8 +6,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" />
-    <experiment length="10000"
+    <system threads="4" />
+    <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <gp_mdpo_controller id="ffc"
+    <gp_dpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -60,7 +60,7 @@
               </src_sigmoid_sel>
           </task_abort>
           <task_partition
-              always_partition="true"
+              always_partition="false"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -150,7 +150,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </gp_mdpo_controller>
+    </gp_dpo_controller>
 
   </controllers>
 
@@ -215,7 +215,7 @@
       <blocks>
         <manipulation_penalty>
           <waveform
-              type="Sine"
+              type="Null"
               frequency="0.01"
               amplitude="50"
               offset="50"
@@ -223,22 +223,22 @@
         </manipulation_penalty>
         <carry_throttle>
           <waveform
-              type="Null"
-              frequency="100"
+              type="Sine"
+              frequency="0.004"
               amplitude="0.4"
-              offset="0.1"
+              offset="0.4"
               phase="0"/>
         </carry_throttle>
       </blocks>
       <caches>
-        <usage>
+        <usage_penalty>
           <waveform
               type="Null"
               frequency="100"
               amplitude="500"
               offset="10"
               phase="0"/>
-        </usage>
+        </usage_penalty>
       </caches>
     </temporal_variance>
 
@@ -255,7 +255,7 @@
               n_clusters="15"
               />
           <manifest
-              n_cube="10"
+              n_cube="25"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -304,7 +304,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="64" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

@@ -74,10 +74,10 @@ void dpo_perception_subsystem::process_los_caches(
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
   }
 
-  /* Fix our tracking of blocks that no longer exist in our perception */
+  /* Fix our tracking of caches that no longer exist in our perception */
   los_tracking_sync(c_los, los_caches);
 
-  for (auto&& cache : los_caches) {
+  for (auto& cache : los_caches) {
     if (!m_store->contains(cache)) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id(),
@@ -142,28 +142,25 @@ void dpo_perception_subsystem::process_los_blocks(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const representation::line_of_sight* const c_los,
-    const ds::cache_list& caches) {
+    const ds::cache_list& los_caches) {
   /*
    * If the location of one of the caches we are tracking is in our LOS, then
    * the corresponding cache should also be in our LOS. If it is not, then our
    * tracked version is out of date and needs to be removed.
    */
-  for (auto&& cache : m_store->caches().values_range()) {
+  for (auto& cache : m_store->caches().values_range()) {
     if (c_los->contains_loc(cache.ent()->discrete_loc())) {
-      auto it = std::find_if(caches.begin(), caches.end(), [&](const auto& c) {
+      auto it = std::find_if(los_caches.begin(),
+                             los_caches.end(),
+                             [&](const auto& c) {
         return c->loccmp(*cache.ent_obj());
       });
 
-      if (caches.end() == it) {
-        /*
-         * Needed for assert() to prevent last reference to shared_ptr being
-         * removed and object destruction.
-         */
-        auto tmp = cache;
-        m_store->cache_remove(tmp.ent_obj());
-        ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
+      if (los_caches.end() == it) {
+        m_store->cache_remove(cache.ent_obj());
+        ER_ASSERT(nullptr == m_store->find(cache.ent_obj()),
                   "Cache%d still exists in store after removal",
-                  tmp.ent()->id());
+                  cache.ent()->id());
       }
     }
   } /* for(&&block..) */

@@ -106,6 +106,10 @@ void base_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 } /* Init() */
 
+void base_loop_functions::PreStep(void) {
+  m_tv_controller->update();
+} /* PreStep() */
+
 void base_loop_functions::tv_init(
     const params::tv::tv_controller_params* const tvp) {
   m_tv_controller =

@@ -261,6 +261,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
 
 void depth1_loop_functions::PreStep() {
   ndc_push();
+
   base_loop_functions::PreStep();
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
@@ -278,6 +279,7 @@ void depth1_loop_functions::PreStep() {
   m_metrics_agg->collect_from_arena(arena_map());
   m_metrics_agg->collect_from_loop(this);
   pre_step_final();
+
   ndc_pop();
 } /* PreStep() */
 

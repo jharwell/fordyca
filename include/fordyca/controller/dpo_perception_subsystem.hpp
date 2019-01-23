@@ -92,9 +92,9 @@ class dpo_perception_subsystem
   void process_los_caches(const representation::line_of_sight* const c_los);
 
   void los_tracking_sync(const representation::line_of_sight* const c_los,
-                         const ds::cache_list& caches);
+                         const ds::cache_list& los_caches);
   void los_tracking_sync(const representation::line_of_sight* const c_los,
-                         const ds::block_list& blocks);
+                         const ds::block_list& los_blocks);
 
   /**
    * @brief The processing of the current LOS after processing (i.e. does the
