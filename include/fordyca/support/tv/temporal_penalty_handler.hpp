@@ -89,7 +89,7 @@ class temporal_penalty_handler
    */
   double timestep_penalty(double t) const {
     if (LIKELY(nullptr != m_penalty)) {
-      m_penalty->value(t);
+      return m_penalty->value(t);
     }
     return 0.0;
   }

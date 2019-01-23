@@ -211,7 +211,6 @@ void tv_controller::update(void) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot->GetControllableEntity().GetController());
-
     m_motion_throttling.at(controller.entity_id())
         .toggle(controller.is_carrying_block());
     m_motion_throttling.at(controller.entity_id()).update(timestep);

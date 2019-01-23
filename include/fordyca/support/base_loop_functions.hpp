@@ -81,6 +81,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   /* CLoopFunctions overrides */
   void Init(ticpp::Element&) override;
   void Reset(void) override;
+  void PreStep(void) override;
 
   /* convergence metrics */
   std::vector<double> robot_nearest_neighbors(void) const override;

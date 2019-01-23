@@ -28,14 +28,13 @@
 #include <string>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -48,9 +47,7 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * Metrics are output at the specified interval.
  */
-class lifecycle_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<lifecycle_metrics_collector> {
+class lifecycle_metrics_collector : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.

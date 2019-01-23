@@ -98,7 +98,11 @@ After successful compilation, follow these steps to run a foraging scenario:
 1. Set the `ARGOS_PLUGIN_PATH` variable to contain the path to the
    `libfordyca.so` file. On bash, that is:
 
-        export ARGOS_PLUGIN_PATH=/path/to/fordyca/build/lib
+        export ARGOS_PLUGIN_PATH=/path/to/where/argos/lib/dir:/path/to/fordyca/build/lib
+
+   Note that you need BOTH of these terms in the path, because this defines the
+   ENTIRE search space for argos to look for libraries (including its own core
+   libraries).
 
 2. Unless you disable event reporting, you will need to set the path to the
    log4cxx configuration file. On bash that is:
@@ -165,10 +169,9 @@ access to that directory as part of the gini group.
 
   3. Make sure you have the necessary environment variables set correctly.
 
-  4. If you get a `std::bad_cast` exception (or something similar), then verify
-     that the name of [controller, loop functions, qt user functions], are
-     correct, per the table above.
-
+  4. If you get a `std::bad_cast`, `boost::get`, or similar exception, then
+     verify that the name of [controller, loop functions, qt user functions],
+     are correct, per the table above.
 
 # Contributing
 

@@ -29,14 +29,13 @@
 
 #include "rcppsw/ds/grid2D.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
 namespace rmath = rcppsw::math;
-namespace visitor = rcppsw::patterns::visitor;
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -54,9 +53,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * written out as cumulative averages) representing proportions of which cells
  * in the arena contain/have contained a cache in the past.
  */
-class location_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<location_metrics_collector> {
+class location_metrics_collector : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

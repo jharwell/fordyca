@@ -38,7 +38,7 @@ constexpr char arena_map_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void arena_map_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element anode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   m_grid.parse(anode);

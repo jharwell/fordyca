@@ -82,15 +82,6 @@ void free_block_drop::visit(representation::base_block& block) {
 void free_block_drop::visit(ds::arena_map& map) {
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::coord());
 
-  if (cell.state_has_cache()) {
-    cache_block_drop op(m_block,
-                        std::static_pointer_cast<representation::arena_cache>(
-                            cell.cache()),
-                        m_resolution);
-    map.accept(op);
-    return;
-  }
-
   /*
    * Dropping a block onto a cell that already contains a single block (but not
    * a cache) does not work, so we have to fudge it and just distribute the
@@ -102,16 +93,24 @@ void free_block_drop::visit(ds::arena_map& map) {
    * Even in depth2, when dynamic cache creation is enabled, robots drop blocks
    * NEXT to others to start caches, NOT on top of them.
    *
-   * This was a terrible bug to track down.
+   * I already changed this once and had to track down and re-fix it. DO NOT
+   * CHANGE AGAIN UNLESS REALLY REALLY SURE WHAT I AM DOING.
    */
-  if (cell.state_has_block()) {
+  if (cell.state_has_cache()) {
+    cache_block_drop op(m_block,
+                        std::static_pointer_cast<representation::arena_cache>(
+                            cell.cache()),
+                        m_resolution);
+    map.accept(op);
+  } else if (cell.state_has_block()) {
     map.distribute_single_block(m_block);
+  } else {
+    /*
+     * Cell does not have a block/cache on it, so it is safe to drop the block
+     * on it and change the cell state.
+     */
+    cell.accept(*this);
   }
-  /*
-   * Cell does not have a block/cache on it; either empty or unknown (base
-   * case).
-   */
-  cell.accept(*this);
 } /* visit() */
 
 /*******************************************************************************

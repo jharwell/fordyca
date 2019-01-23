@@ -37,7 +37,7 @@ constexpr char battery_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void battery_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bynode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bynode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();

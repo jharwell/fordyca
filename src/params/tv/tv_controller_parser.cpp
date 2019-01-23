@@ -42,23 +42,23 @@ void tv_controller_parser::parse(const ticpp::Element& node) {
     return;
   }
 
-  ticpp::Element tvnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element tvnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
   /* block temporal variance configured */
   if (nullptr != tvnode.FirstChild("blocks", false)) {
     ticpp::Element bnode =
-        get_node(const_cast<ticpp::Element&>(tvnode), "blocks");
+        node_get(const_cast<ticpp::Element&>(tvnode), "blocks");
 
     if (nullptr != bnode.FirstChild("manipulation_penalty", false)) {
       m_block_manip.parse(
-          get_node(const_cast<ticpp::Element&>(bnode), "manipulation_penalty"));
+          node_get(const_cast<ticpp::Element&>(bnode), "manipulation_penalty"));
       m_params->block_manipulation_penalty = *m_block_manip.parse_results();
     }
     if (nullptr != bnode.FirstChild("carry_throttle", false)) {
       m_block_carry.parse(
-          get_node(const_cast<ticpp::Element&>(bnode), "carry_throttle"));
+          node_get(const_cast<ticpp::Element&>(bnode), "carry_throttle"));
       m_params->block_carry_throttle = *m_block_carry.parse_results();
     }
   }
@@ -66,9 +66,10 @@ void tv_controller_parser::parse(const ticpp::Element& node) {
   /* cache temporal variance configured */
   if (nullptr != tvnode.FirstChild("caches", false)) {
     ticpp::Element cnode =
-        get_node(const_cast<ticpp::Element&>(tvnode), "caches");
-    if (nullptr != cnode.FirstChild("usage", false)) {
-      m_cache_usage.parse(get_node(const_cast<ticpp::Element&>(cnode), "usage"));
+        node_get(const_cast<ticpp::Element&>(tvnode), "caches");
+    if (nullptr != cnode.FirstChild("usage_penalty", false)) {
+      m_cache_usage.parse(node_get(const_cast<ticpp::Element&>(cnode),
+                                   "usage_penalty"));
       m_params->cache_usage_penalty = *m_cache_usage.parse_results();
     }
   }

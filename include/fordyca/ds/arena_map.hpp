@@ -232,7 +232,7 @@ class arena_map : public er::client<arena_map>,
    *
    * @return The subgrid.
    */
-  rcppsw::ds::grid_view<cell2D> subgrid(size_t x, size_t y, size_t radius) {
+  rcppsw::ds::base_grid2D<cell2D>::grid_view subgrid(size_t x, size_t y, size_t radius) {
     return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
   double grid_resolution(void) const { return decoratee().resolution(); }
