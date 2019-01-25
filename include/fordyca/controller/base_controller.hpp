@@ -26,6 +26,10 @@
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
 #include <string>
+#include <typeindex>
+
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -33,6 +37,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace support { namespace tv {
+class tv_controller;
+}} // namespace support::tv
 
 namespace representation {
 class base_block;
@@ -40,7 +47,9 @@ class line_of_sight;
 } // namespace representation
 namespace params {
 struct output_params;
-}
+struct sensing_params;
+struct actuation_params;
+} // namespace params
 
 NS_START(controller);
 
@@ -62,6 +71,8 @@ namespace er = rcppsw::er;
  * overlays.
  */
 class base_controller : public argos::CCI_Controller,
+                        public metrics::fsm::movement_metrics,
+                        public metrics::fsm::goal_acquisition_metrics,
                         public rcppsw::er::client<base_controller> {
  public:
   base_controller(void);
@@ -73,6 +84,18 @@ class base_controller : public argos::CCI_Controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void Reset(void) override;
+
+  virtual std::type_index type_index(void) const = 0;
+
+  /* movement metrics */
+  double distance(void) const override;
+  rmath::vector2d velocity(void) const override;
+
+  /**
+   * @brief Return the applied motion throttling for the robot. This is not
+   * necessarily the same as the active/configured throttling.
+   */
+  double applied_motion_throttle(void) const;
 
   /**
    * @brief Get the ID of the entity. Argos also provides this, but it doesn't
@@ -118,6 +141,8 @@ class base_controller : public argos::CCI_Controller,
     m_block = block;
   }
 
+  void tv_init(const support::tv::tv_controller* tv_controller);
+
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
    *
@@ -149,7 +174,8 @@ class base_controller : public argos::CCI_Controller,
    * the loop functions.
    */
   void position(const rmath::vector2d& loc);
-  rmath::vector2d position(void) const;
+  const rmath::vector2d& position(void) const;
+  rmath::vector2d heading(void) const;
 
   /**
    * @brief Convenience function to add footbot ID to salient messages during
@@ -168,7 +194,6 @@ class base_controller : public argos::CCI_Controller,
    */
   void ndc_pop(void) { ER_NDC_POP(); }
 
-
  protected:
   class saa_subsystem* saa_subsystem(void) {
     return m_saa.get();
@@ -177,12 +202,14 @@ class base_controller : public argos::CCI_Controller,
 
  private:
   void output_init(const struct params::output_params* params);
+  void saa_init(const params::actuation_params*, const params::sensing_params*);
 
-  // clang-format off
+  /* clang-format off */
+  const support::tv::tv_controller*           m_tv_controller{nullptr};
   bool                                        m_display_id{false};
   std::shared_ptr<representation::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

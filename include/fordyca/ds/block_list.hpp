@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <string>
+
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -33,20 +35,30 @@
 NS_START(fordyca);
 namespace representation {
 class base_block;
-struct perceived_block;
-} // namespace representation
+}
 NS_START(ds);
 
 using block_list_type = std::shared_ptr<representation::base_block>;
 using const_block_list_type = std::shared_ptr<const representation::base_block>;
-using perceived_block_list_type = representation::perceived_block;
 
 /*******************************************************************************
- * Type Definitions
+ * Class Definitions
  ******************************************************************************/
-using block_list = std::list<block_list_type>;
-using const_block_list = std::list<const_block_list_type>;
-using perceived_block_list = std::list<perceived_block_list_type>;
+class block_list : public std::list<block_list_type> {
+ public:
+  using std::list<block_list_type>::list;
+  using value_type = std::list<block_list_type>::value_type;
+
+  std::string to_str(void) const;
+};
+
+class const_block_list : public std::list<const_block_list_type> {
+ public:
+  using std::list<const_block_list_type>::list;
+  using value_type = std::list<const_block_list_type>::value_type;
+
+  std::string to_str(void) const;
+};
 
 NS_END(ds, fordyca);
 

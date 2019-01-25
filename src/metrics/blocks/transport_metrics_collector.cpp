@@ -41,7 +41,7 @@ transport_metrics_collector::transport_metrics_collector(const std::string& ofna
  ******************************************************************************/
 std::string transport_metrics_collector::csv_header_build(
     const std::string& header) {
-  // clang-format off
+  /* clang-format off */
   return base_metrics_collector::csv_header_build(header) +
       "int_collected" + separator() +
       "cum_collected" + separator() +
@@ -55,7 +55,7 @@ std::string transport_metrics_collector::csv_header_build(
       "cum_avg_transport_time" + separator() +
       "int_avg_initial_wait_time" + separator() +
       "cum_avg_initial_wait_time" + separator();
-  // clang-format on
+  /* clang-format on */
 } /* csv_header_build() */
 
 void transport_metrics_collector::reset(void) {

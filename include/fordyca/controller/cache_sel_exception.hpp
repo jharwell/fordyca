@@ -40,10 +40,7 @@ NS_START(fordyca, controller);
  *
  */
 struct cache_sel_exception {
-  enum type {
-    kPickup,
-    kDrop
-  };
+  enum type { kPickup, kDrop };
 
   int id;
   enum type type;

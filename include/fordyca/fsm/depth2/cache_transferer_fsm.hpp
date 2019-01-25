@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace ds { class perceived_arena_map; }
+namespace ds { class dpo_store; }
 
 NS_START(fsm, depth2);
 using transport_goal_type = fsm::block_transporter::goal_type;
@@ -53,7 +53,7 @@ class cache_transferer_fsm : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(const controller::cache_sel_matrix* matrix,
                        controller::saa_subsystem* saa,
-                       ds::perceived_arena_map* map);
+                       ds::dpo_store* store);
   ~cache_transferer_fsm(void) override = default;
 
   cache_transferer_fsm(const cache_transferer_fsm& fsm) = delete;
@@ -69,10 +69,10 @@ class cache_transferer_fsm : public block_to_goal_fsm {
   bool is_acquiring_src_cache(void) const;
 
  private:
-  // clang-format off
+  /* clang-format off */
   acquire_existing_cache_fsm m_src_cache_fsm;
   acquire_existing_cache_fsm m_dest_cache_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, fsm, fordyca);

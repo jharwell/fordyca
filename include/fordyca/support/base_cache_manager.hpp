@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 #include "rcppsw/common/common.hpp"
-#include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -91,11 +91,11 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics {
   ds::arena_grid* arena_grid(void) { return m_grid; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint                   m_cache_created{0};
   uint                   m_cache_depleted{0};
   ds::arena_grid * const m_grid;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

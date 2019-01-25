@@ -34,28 +34,34 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
-#include "fordyca/metrics/robot_interaction_metrics.hpp"
-#include "fordyca/metrics/robot_interaction_metrics_collector.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
+#include "fordyca/metrics/temporal_variance_metrics.hpp"
+#include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
+
+#include "rcppsw/metrics/swarm/convergence_metrics.hpp"
+#include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace fs = std::experimental::filesystem;
 NS_START(fordyca, metrics);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
-    const struct params::metrics_params* params,
+    const params::metrics_params* const mparams,
+    const rswc::convergence_params* const cparams,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
       collector_group(),
-      m_metrics_path(output_root + "/" + params->output_dir) {
+      m_metrics_path(output_root + "/" + mparams->output_dir) {
   if (!fs::exists(m_metrics_path)) {
     fs::create_directories(m_metrics_path);
   } else {
@@ -63,38 +69,45 @@ base_metrics_aggregator::base_metrics_aggregator(
   }
   register_collector<metrics::fsm::movement_metrics_collector>(
       "fsm::movement",
-      metrics_path() + "/" + params->fsm_movement_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->fsm_movement_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::fsm::collision_metrics_collector>(
       "fsm::collision",
-      metrics_path() + "/" + params->fsm_collision_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->fsm_collision_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "blocks::acquisition",
-      metrics_path() + "/" + params->block_acquisition_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->block_acquisition_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::blocks::transport_metrics_collector>(
       "blocks::transport",
-      metrics_path() + "/" + params->block_transport_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->block_transport_fname,
+      mparams->collect_interval);
 
   register_collector<metrics::blocks::manipulation_metrics_collector>(
       "blocks::manipulation",
-      metrics_path() + "/" + params->block_manipulation_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->block_manipulation_fname,
+      mparams->collect_interval);
+
   register_collector<metrics::robot_occupancy_metrics_collector>(
       "arena::robot_occupancy",
-      metrics_path() + "/" + params->arena_robot_occupancy_fname,
-      params->collect_interval,
-      rmath::dvec2uvec(params->arena_grid.upper,
-                       params->arena_grid.resolution));
-  register_collector<metrics::robot_interaction_metrics_collector>(
-      "loop::robot_interaction",
-      metrics_path() + "/" + params->loop_robot_interaction_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->arena_robot_occupancy_fname,
+      mparams->collect_interval,
+      rmath::dvec2uvec(mparams->arena_grid.upper,
+                       mparams->arena_grid.resolution));
+
+  register_collector<rmetrics::swarm::convergence_metrics_collector>(
+      "swarm::convergence",
+      metrics_path() + "/" + mparams->swarm_convergence_fname,
+      mparams->collect_interval,
+      cparams);
+
+  register_collector<metrics::temporal_variance_metrics_collector>(
+      "loop::temporal_variance",
+      metrics_path() + "/" + mparams->loop_temporal_variance_fname);
   reset_all();
 }
 
@@ -103,7 +116,8 @@ base_metrics_aggregator::base_metrics_aggregator(
  ******************************************************************************/
 void base_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
-  collect("loop::robot_interaction", *loop);
+  collect("swarm::convergence", *loop);
+  collect("loop::temporal_variance", *loop->tv_controller());
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(
@@ -111,7 +125,8 @@ void base_metrics_aggregator::collect_from_block(
   collect("blocks::transport", *block);
 } /* collect_from_block() */
 
-void base_metrics_aggregator::collect_from_arena(const ds::arena_map* const arena) {
+void base_metrics_aggregator::collect_from_arena(
+    const ds::arena_map* const arena) {
   collect("arena::robot_occupancy", *arena);
 } /* collect_from_arena() */
 

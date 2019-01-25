@@ -124,7 +124,7 @@ class sensing_subsystem {
    * of self-localizing. That's not the point of this project, and this was much
    * faster/easier.
    */
-  rmath::vector2d position(void) const { return m_position; }
+  const rmath::vector2d& position(void) const { return m_position; }
 
   /**
    * @brief Set the robot's current location.
@@ -184,7 +184,7 @@ class sensing_subsystem {
   std::vector<uint8_t> recieve_message();
 
  private:
-  // clang-format off
+  /* clang-format off */
   const double                                   mc_obstacle_delta;
   const double                                   mc_los_dim;
 
@@ -193,7 +193,7 @@ class sensing_subsystem {
   rmath::vector2d                                m_prev_position;
   struct sensor_list                             m_sensors;
   rmath::range<rmath::radians>                   m_fov;
-  // clang-format off
+  /* clang-format off */
 };
 
 NS_END(controller, fordyca);

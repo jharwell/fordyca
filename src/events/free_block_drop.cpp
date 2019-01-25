@@ -25,12 +25,12 @@
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
@@ -117,16 +117,18 @@ void free_block_drop::visit(ds::arena_map& map) {
 /*******************************************************************************
  * Depth1
  ******************************************************************************/
-void free_block_drop::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+void free_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.block(nullptr);
+} /* visit() */
+
+void free_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
 /*******************************************************************************
  * Depth2
  ******************************************************************************/
-void free_block_drop::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
@@ -157,10 +159,11 @@ void free_block_drop::visit(
           m_block->real_loc().to_str().c_str(),
           polled->name().c_str());
   controller.block(nullptr);
+
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_drop::visit(ds::perceived_arena_map& map) {
+void free_block_drop::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(cell_op::coord());
   cell.accept(*this);
 } /* visit() */

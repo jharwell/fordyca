@@ -28,14 +28,16 @@
 
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/support/cache_op_penalty_handler.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/support/tv/cache_op_src.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
+namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -51,25 +53,34 @@ template <typename T>
 class cached_block_pickup_interactor
     : public er::client<cached_block_pickup_interactor<T>> {
  public:
-  cached_block_pickup_interactor(
-      ds::arena_map* const map_in,
-      argos::CFloorEntity* const floor_in,
-      cache_op_penalty_handler<T>* const penalty_handler)
+  cached_block_pickup_interactor(ds::arena_map* const map_in,
+                                 argos::CFloorEntity* const floor_in,
+                                 tv::tv_controller* tv_controller)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
-        m_penalty_handler(penalty_handler) {}
+        m_penalty_handler(tv_controller->penalty_handler<T>(
+            tv::cache_op_src::kSrcExistingCachePickup)) {}
 
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
+  cached_block_pickup_interactor(const cached_block_pickup_interactor& other) =
+      default;
   cached_block_pickup_interactor& operator=(
       const cached_block_pickup_interactor& other) = delete;
-  cached_block_pickup_interactor(const cached_block_pickup_interactor& other) =
-      delete;
 
   /**
    * @brief The actual handling function for interactions.
    *
    * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
+   * @param timestep   The current timestepp.
    */
   void operator()(T& controller, uint timestep) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
@@ -78,8 +89,8 @@ class cached_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      cache_op_src::kSrcExistingCachePickup,
-                                      timestep);
+                                     tv::cache_op_src::kSrcExistingCachePickup,
+                                     timestep);
     }
   }
 
@@ -90,13 +101,13 @@ class cached_block_pickup_interactor
    * robot for block pickup.
    */
   void finish_cached_block_pickup(T& controller, uint timestep) {
-    const temporal_penalty<T>& p = m_penalty_handler->next();
+    const tv::temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
-    ER_ASSERT(acquisition_goal_type::kExistingCache ==
+    ER_ASSERT(tv::acquisition_goal_type::kExistingCache ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
 
@@ -138,7 +149,7 @@ class cached_block_pickup_interactor
    * preconditions have been satisfied.
    */
   void perform_cached_block_pickup(T& controller,
-                                   const temporal_penalty<T>& penalty,
+                                   const tv::temporal_penalty<T>& penalty,
                                    uint timestep) {
     auto it =
         std::find_if(m_map->caches().begin(),
@@ -160,15 +171,11 @@ class cached_block_pickup_interactor
   }
 
  private:
-  // clang-format off
-  argos::CFloorEntity*             const m_floor;
+  /* clang-format off */
+  argos::CFloorEntity* const             m_floor;
   ds::arena_map* const                   m_map;
-  /**
-   * @brief Pointer, rather than member, because at most 1 cached block
-   * pickup/cache block drop interactions can occur in a single timestep.
-   */
-  cache_op_penalty_handler<T>*     const m_penalty_handler;
-  // clang-format on
+  tv::cache_op_penalty_handler<T>* const m_penalty_handler;
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

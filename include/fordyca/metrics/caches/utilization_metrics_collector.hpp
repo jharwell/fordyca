@@ -78,7 +78,7 @@ class utilization_metrics_collector
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  // clang-format off
+  /* clang-format off */
   struct stats   m_stats{};
 
   /**
@@ -88,7 +88,7 @@ class utilization_metrics_collector
   std::set<int>  m_int_cache_ids{};
 
   std::set<int>  m_cum_cache_ids{};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(caches, metrics, fordyca);

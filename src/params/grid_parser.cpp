@@ -38,24 +38,23 @@ constexpr char grid_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void grid_parser::parse(const ticpp::Element& node) {
-  ticpp::Element gnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-  std::vector<std::string> res;
-  rcppsw::utils::line_parser parser(' ');
-  res = parser.parse(gnode.GetAttribute("size"));
+  /*
+   * May not exist if we are parsing part of an XML tree for perception that
+   * does not use grids.
+   */
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element gnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+    std::vector<std::string> res;
+    rcppsw::utils::line_parser parser(' ');
+    res = parser.parse(gnode.GetAttribute("size"));
 
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_ATTR(gnode, m_params, resolution);
-  m_params->lower.set(0, 0);
-  m_params->upper.set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));
+    m_params =
+        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+    XML_PARSE_ATTR(gnode, m_params, resolution);
+    m_params->lower.set(0, 0);
+    m_params->upper.set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));
+  }
 } /* parse() */
-
-void grid_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, resolution) << std::endl
-         << "lower=" << m_params->lower << std::endl
-         << "upper=" << m_params->upper << std::endl
-         << build_footer();
-} /* show() */
 
 __rcsw_pure bool grid_parser::validate(void) const {
   CHECK(m_params->resolution > 0.0);

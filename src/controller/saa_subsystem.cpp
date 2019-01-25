@@ -62,7 +62,9 @@ void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
            m_steering.value().angle().value(),
            m_steering.value().length());
 
-  m_actuation->differential_drive().fsm_drive(m_steering.value().length(),
+  double speed = m_steering.value().length() *
+                 (1.0 - m_actuation->differential_drive().active_throttle());
+  m_actuation->differential_drive().fsm_drive(speed,
                                               m_steering.value().angle(),
                                               force);
   m_steering.reset();

@@ -36,7 +36,7 @@ NS_START(fordyca);
 namespace ds {
 class arena_map;
 class occupancy_grid;
-class perceived_arena_map;
+class dpo_semantic_map;
 } // namespace ds
 
 namespace rmath = rcppsw::math;
@@ -59,7 +59,7 @@ NS_START(events);
 class cell_empty : public cell_op,
                    public visitor::can_visit<ds::arena_map>,
                    public visitor::can_visit<ds::occupancy_grid>,
-                   public visitor::can_visit<ds::perceived_arena_map>,
+                   public visitor::can_visit<ds::dpo_semantic_map>,
                    public rcppsw::er::client<cell_empty> {
  public:
   explicit cell_empty(const rmath::vector2u& coord)
@@ -72,7 +72,7 @@ class cell_empty : public cell_op,
 
   /* stateful foraging */
   void visit(ds::occupancy_grid& grid) override;
-  void visit(ds::perceived_arena_map& map) override;
+  void visit(ds::dpo_semantic_map& map) override;
 };
 
 NS_END(events, fordyca);

@@ -50,6 +50,8 @@ class sensing_parser : public rcppsw::params::xml_param_parser {
   explicit sensing_parser(uint level)
       : xml_param_parser(level), m_proximity_parser(level + 1) {}
 
+  ~sensing_parser(void) override = default;
+
   /**
    * @brief The root tag that all robot sensing parameters should lie under in
    * the XML tree.
@@ -70,10 +72,10 @@ class sensing_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<sensing_params> m_params{nullptr};
   proximity_sensor_parser         m_proximity_parser;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);

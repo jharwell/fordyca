@@ -34,10 +34,10 @@ NS_START(fordyca, fsm, depth2);
 cache_transferer_fsm::cache_transferer_fsm(
     const controller::cache_sel_matrix* const matrix,
     controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
+    ds::dpo_store* const store)
     : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa),
-      m_src_cache_fsm(matrix, true, saa, map),
-      m_dest_cache_fsm(matrix, false, saa, map) {}
+      m_src_cache_fsm(matrix, true, saa, store),
+      m_dest_cache_fsm(matrix, false, saa, store) {}
 
 /*******************************************************************************
  * FSM Metrics

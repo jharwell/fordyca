@@ -67,8 +67,9 @@ bool powerlaw_distributor::distribute_block(
    */
   for (auto l = m_dist_map.begin(); l != m_dist_map.end(); ++l) {
     for (auto& dist : l->second) {
-      ER_INFO("Attempting distribution: block%d -> cluster [capacity=%u,count=%zu]",
-              block->id(),
+      ER_INFO(
+          "Attempting distribution: block%d -> cluster [capacity=%u,count=%zu]",
+          block->id(),
           l->first,
           dist.block_clusters().front()->block_count());
 
@@ -82,24 +83,31 @@ bool powerlaw_distributor::distribute_block(
   return false;
 } /* distribute_block() */
 
-powerlaw_distributor::cluster_paramvec powerlaw_distributor::
-guess_cluster_placements(ds::arena_grid& grid,
-                         const std::vector<uint>& clust_sizes) {
+powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_placements(
+    const ds::arena_grid* const grid,
+    const std::vector<uint>& clust_sizes) {
   cluster_paramvec params;
 
   for (size_t i = 0; i < clust_sizes.size(); ++i) {
     std::uniform_int_distribution<int> xgen(
-        clust_sizes[i] / 2 + 1, grid.xdsize() - clust_sizes[i] / 2 - 1);
+        clust_sizes[i] / 2 + 1, grid->xdsize() - clust_sizes[i] / 2 - 1);
     std::uniform_int_distribution<int> ygen(
-        clust_sizes[i] / 2 + 1, grid.ydsize() - clust_sizes[i] / 2 - 1);
+        clust_sizes[i] / 2 + 1, grid->ydsize() - clust_sizes[i] / 2 - 1);
 
     uint x = xgen(m_rng);
     uint y = ygen(m_rng);
     uint x_max = x + std::sqrt(clust_sizes[i]);
     uint y_max = y + clust_sizes[i] / (x_max - x);
 
-    auto view = grid.layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
-    rmath::vector2u loc = (*view.origin()).loc();
+    /*
+     * Cast needed so that clusters can correctly be constructed later, and they
+     * DO need to be able to modify their grid view. Here we do not need it, so
+     * we have to cast.
+     */
+    auto view =
+        const_cast<ds::arena_grid*>(grid)->layer<arena_grid::kCell>()->subgrid(
+            x, y, x_max, y_max);
+    __rcsw_unused rmath::vector2u loc = (*view.origin()).loc();
     ER_TRACE("Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
              i,
              loc.x() + view.index_bases()[0],
@@ -151,7 +159,8 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
 } /* check_cluster_placements() */
 
 powerlaw_distributor::cluster_paramvec powerlaw_distributor::
-    compute_cluster_placements(ds::arena_grid& grid, uint n_clusters) {
+    compute_cluster_placements(const ds::arena_grid* const grid,
+                               uint n_clusters) {
   ER_INFO("Computing cluster placements for %u clusters", n_clusters);
 
   std::vector<uint> clust_sizes;
@@ -173,7 +182,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::
   return cluster_paramvec{};
 } /* compute_cluster_placements() */
 
-bool powerlaw_distributor::map_clusters(ds::arena_grid& grid) {
+bool powerlaw_distributor::map_clusters(const ds::arena_grid* const grid) {
   cluster_paramvec params = compute_cluster_placements(grid, m_n_clusters);
   if (params.empty()) {
     ER_WARN("Unable to compute all cluster placements");
@@ -181,16 +190,17 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid& grid) {
   }
 
   for (auto& bclustp : params) {
-  m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
-                                            bclustp.capacity,
-                                            m_arena_resolution);
+    m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
+                                              bclustp.capacity,
+                                              m_arena_resolution);
   } /* for(i..) */
   for (auto it = m_dist_map.begin(); it != m_dist_map.end(); ++it) {
     ER_INFO("Mapped %zu clusters of capacity %u", it->second.size(), it->first);
     for (auto& dist : it->second) {
-      ER_DEBUG("Cluster with origin@%s: capacity=%u",
-               dist.block_clusters().front()->view().origin()->loc().to_str().c_str(),
-               dist.block_clusters().front()->capacity());
+      ER_DEBUG(
+          "Cluster with origin@%s: capacity=%u",
+          dist.block_clusters().front()->view().origin()->loc().to_str().c_str(),
+          dist.block_clusters().front()->capacity());
     } /* for(dist..) */
   }   /* for(&l..) */
   return true;

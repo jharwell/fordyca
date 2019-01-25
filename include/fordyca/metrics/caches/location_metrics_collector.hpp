@@ -74,10 +74,10 @@ class location_metrics_collector
   std::string csv_header_build(const std::string&) override;
   bool csv_line_build(std::string& line) override;
 
-  // clang-format off
+  /* clang-format off */
   rcppsw::ds::grid2D<uint> m_stats;
   uint                     m_total{0};  // Total count of all caches across all timesteps
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(caches, metrics, fordyca);

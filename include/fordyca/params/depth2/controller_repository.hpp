@@ -40,7 +40,7 @@ NS_START(fordyca, params, depth2);
  * @ingroup params depth2
  *
  * @brief Collection of all parameter parsers and parse results needed
- * by the \ref depth2::foraging_controller.
+ * by depth2 controllers.
  */
 class controller_repository: public depth1::controller_repository {
  public:

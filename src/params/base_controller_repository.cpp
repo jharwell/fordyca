@@ -31,8 +31,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ct = rcppsw::control;
-
 NS_START(fordyca, params);
 
 /*******************************************************************************
@@ -45,9 +43,9 @@ base_controller_repository::base_controller_repository(void) {
       actuation_parser::kXMLRoot, actuation_parser::kHeader1);
   register_parser<sensing_parser, sensing_params>(sensing_parser::kXMLRoot,
                                                   sensing_parser::kHeader1);
-  register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
-                                               ct::waveform_xml_parser::kXMLRoot,
-                                           ct::waveform_xml_parser::kHeader1);
+  register_parser<rcppsw::control::waveform_xml_parser>(std::string("block_carry_") +
+                                               rcppsw::control::waveform_xml_parser::kXMLRoot,
+                                           rcppsw::control::waveform_xml_parser::kHeader1);
   register_parser<communication_parser, communication_params>(
       communication_parser::kXMLRoot, communication_parser::kHeader1);
 }

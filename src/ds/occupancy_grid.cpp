@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/occupancy_grid.hpp"
 #include "fordyca/events/cell_unknown.hpp"
-#include "fordyca/params/occupancy_grid_params.hpp"
+#include "fordyca/params/perception/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,12 +34,12 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 occupancy_grid::occupancy_grid(
-    const struct params::occupancy_grid_params* c_params,
+    const params::perception::perception_params* c_params,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
-      stacked_grid(c_params->grid.resolution,
-                   c_params->grid.upper.x(),
-                   c_params->grid.upper.y()),
+      stacked_grid(c_params->occupancy_grid.resolution,
+                   c_params->occupancy_grid.upper.x(),
+                   c_params->occupancy_grid.upper.y()),
       m_pheromone_repeat_deposit(c_params->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
   ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
@@ -65,7 +65,7 @@ void occupancy_grid::update(void) {
 
   for (uint i = 0; i < xmax; ++i) {
     for (uint j = 0; j < ymax; ++j) {
-      access<kPheromone>(i, j).calc();
+      access<kPheromone>(i, j).update();
     } /* for(j..) */
   }   /* for(i..) */
 
