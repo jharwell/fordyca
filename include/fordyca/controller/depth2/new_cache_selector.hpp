@@ -28,9 +28,9 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
 
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,19 +66,19 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
    *
    * @return The "best" new cache.
    */
-  representation::perceived_block operator()(
-      const ds::perceived_block_list& new_caches,
-      const ds::cache_list& existing_caches,
+  ds::dp_block_map::value_type operator()(
+      const ds::dp_block_map& new_caches,
+      const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position) const;
 
  private:
-  bool new_cache_is_excluded(const ds::cache_list& existing_caches,
-                             const ds::perceived_block_list& blocks,
+  bool new_cache_is_excluded(const ds::dp_cache_map& existing_caches,
+                             const ds::dp_block_map& blocks,
                              const representation::base_block* const new_cache) const;
 
-  // clang-format off
+  /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, controller, fordyca);

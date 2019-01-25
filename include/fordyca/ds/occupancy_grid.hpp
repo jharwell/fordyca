@@ -41,9 +41,9 @@ namespace events {
 class cell_unknown;
 class cell_empty;
 } // namespace events
-namespace params {
-struct occupancy_grid_params;
-}
+namespace params { namespace perception {
+struct perception_params;
+}} // namespace params::perception
 
 NS_START(ds);
 using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
@@ -75,7 +75,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
    */
   constexpr static uint kCell = 1;
 
-  occupancy_grid(const struct params::occupancy_grid_params* c_params,
+  occupancy_grid(const params::perception::perception_params* c_params,
                  const std::string& robot_id);
 
   /**
@@ -113,7 +113,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
    */
   void cell_init(uint i, uint j, double pheromone_rho);
 
-  // clang-format off
+  /* clang-format off */
   /**
    * @brief The threshold for a cell's pheromone density at which it will
    * transition into back an UNKNOWN state, from whatever state it is currently
@@ -125,7 +125,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
   uint                                m_known_cell_count{0};
   bool                                m_pheromone_repeat_deposit;
   std::string                         m_robot_id;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(ds, fordyca);

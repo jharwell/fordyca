@@ -32,7 +32,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace swarm { namespace convergence {
+struct convergence_params;
+}}} // namespace rcppsw::swarm::convergence
+
 NS_START(fordyca);
+namespace rswc = rcppsw::swarm::convergence;
 
 namespace params {
 struct metrics_params;
@@ -41,8 +46,12 @@ struct metrics_params;
 namespace support {
 class base_loop_functions;
 }
-namespace representation { class base_block; }
-namespace ds { class arena_map; }
+namespace representation {
+class base_block;
+}
+namespace ds {
+class arena_map;
+}
 NS_START(metrics);
 
 /*******************************************************************************
@@ -60,7 +69,8 @@ class base_metrics_aggregator
     : public rcppsw::er::client<base_metrics_aggregator>,
       public rcppsw::metrics::collector_group {
  public:
-  base_metrics_aggregator(const struct params::metrics_params* params,
+  base_metrics_aggregator(const params::metrics_params* mparams,
+                          const rswc::convergence_params* cparams,
                           const std::string& output_root);
   virtual ~base_metrics_aggregator(void) = default;
 
@@ -80,9 +90,11 @@ class base_metrics_aggregator
   const std::string& metrics_path(void) const { return m_metrics_path; }
 
  private:
-  // clang-format off
+  static constexpr uint kPOS_ENTROPY_ITER = 10;
+
+  /* clang-format off */
   std::string m_metrics_path{""};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(metrics, fordyca);

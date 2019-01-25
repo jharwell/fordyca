@@ -24,13 +24,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/core/simulator/entity/floor_entity.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include "rcppsw/ds/type_map.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/support/depth0/robot_arena_interactor.hpp"
+#include "fordyca/support/depth0/controller_interactor_mapper.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace er = rcppsw::er;
 namespace controller { namespace depth0 { class depth0_controller; }}
 NS_START(support, depth0);
 
@@ -40,7 +44,7 @@ class depth0_metrics_aggregator;
  * Classes
  ******************************************************************************/
 /**
- * @class depth0_loop_functions
+p * @class depth0_loop_functions
  * @ingroup support depth0
  *
  * @brief Contains the simulation support functions for depth0 foraging, such
@@ -51,7 +55,7 @@ class depth0_metrics_aggregator;
  * - Sending robot the current simulation tick each timestep.
  */
 class depth0_loop_functions : public base_loop_functions,
-                                public er::client<depth0_loop_functions> {
+                              public er::client<depth0_loop_functions> {
  public:
   depth0_loop_functions(void);
   ~depth0_loop_functions(void) override;
@@ -70,24 +74,17 @@ class depth0_loop_functions : public base_loop_functions,
   }
 
  private:
-  /*
-   * We use a unique interactor type for each controller in this depth, rather
-   * than trying to get everything to fit together with a single abstract base
-   * class controller (i.e. \ref depth0_controller). Waaaayyyyy cleaner.
-   */
-  using crw_interactor_type = robot_arena_interactor<controller::depth0::crw_controller>;
-  using stateful_interactor_type = robot_arena_interactor<controller::depth0::stateful_controller>;
-
+  using interactor_map = rcppsw::ds::type_map<crw_itype,
+                                              dpo_itype,
+                                              mdpo_itype>;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  template<class T>
   void controller_configure(controller::base_controller* c);
 
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<depth0_metrics_aggregator> m_metrics_agg;
-  std::unique_ptr<crw_interactor_type>       m_crw_interactor{nullptr};
-  std::unique_ptr<stateful_interactor_type>  m_stateful_interactor{nullptr};
-  // clang-format on
+  std::unique_ptr<interactor_map>            m_interactors;
+  /* clang-format on */
 };
 
 NS_END(depth0, support, fordyca);

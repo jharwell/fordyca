@@ -29,12 +29,11 @@
 #include <string>
 #include <vector>
 
-
+#include "fordyca/controller/cache_sel_exception.hpp"
 #include "rcppsw/common/common.hpp"
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/controller/cache_sel_exception.hpp"
-#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,10 +45,8 @@ struct cache_sel_matrix_params;
 NS_START(controller);
 namespace rmath = rcppsw::math;
 namespace er = rcppsw::er;
-using cache_sel_variant = boost::variant<double,
-                                         rmath::vector2d,
-                                         rmath::rangeu,
-                                         std::vector<int>>;
+using cache_sel_variant =
+    boost::variant<double, rmath::vector2d, rmath::rangeu, std::vector<int>>;
 
 /*******************************************************************************
  * Class Definitions

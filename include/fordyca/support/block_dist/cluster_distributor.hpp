@@ -61,10 +61,10 @@ class cluster_distributor : public base_distributor,
   ds::const_block_cluster_list block_clusters(void) const override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   representation::block_cluster m_clust;
   random_distributor            m_dist;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

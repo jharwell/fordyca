@@ -53,7 +53,7 @@ class block_to_cache_site_fsm : public block_to_goal_fsm {
   block_to_cache_site_fsm(const controller::block_sel_matrix* bsel_matrix,
                           const controller::cache_sel_matrix* csel_matrix,
                           controller::saa_subsystem* saa,
-                          ds::perceived_arena_map* map);
+                          ds::dpo_store* store);
   ~block_to_cache_site_fsm(void) override = default;
 
   block_to_cache_site_fsm(const block_to_cache_site_fsm& fsm) = delete;
@@ -66,10 +66,10 @@ class block_to_cache_site_fsm : public block_to_goal_fsm {
   transport_goal_type block_transport_goal(void) const override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   acquire_cache_site_fsm m_cache_fsm;
   acquire_free_block_fsm m_block_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, fsm, fordyca);

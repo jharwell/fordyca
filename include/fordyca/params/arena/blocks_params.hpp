@@ -26,14 +26,12 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/params/base_params.hpp"
-#include "rcppsw/control/waveform_params.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, arena);
-namespace ct = rcppsw::control;
 
 /*******************************************************************************
  * Structure Definitions
@@ -43,7 +41,6 @@ namespace ct = rcppsw::control;
  * @ingroup params arena
  */
 struct blocks_params : public rcppsw::params::base_params {
-  ct::waveform_params manipulation_penalty{};
   struct block_dist_params dist{};
 };
 

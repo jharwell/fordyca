@@ -22,14 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/dbg/dbg.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/arena_cache.hpp"
@@ -37,7 +37,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -90,11 +89,11 @@ void cache_block_drop::visit(ds::arena_map& map) {
           index,
           m_block->id(),
           m_cache->id(),
-          dbg::blocks_list(m_cache->blocks()).c_str(),
+          rcppsw::to_string(m_cache->blocks()).c_str(),
           m_cache->n_blocks());
 } /* visit() */
 
-void cache_block_drop::visit(ds::perceived_arena_map& map) {
+void cache_block_drop::visit(ds::dpo_semantic_map& map) {
   map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
 } /* visit() */
 
@@ -110,11 +109,32 @@ void cache_block_drop::visit(representation::arena_cache& cache) {
   cache.has_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+void cache_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
+
   controller.block(nullptr);
-  controller.perception()->map()->accept(*this);
+  auto* task = dynamic_cast<events::existing_cache_interactor*>(
+      controller.current_task());
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+
+  ER_ASSERT(nullptr != task,
+            "Non existing cache interactor task %s causing cached block drop",
+            task_name.c_str());
+  task->accept(*this);
+
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          task_name.c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  controller.mdpo_perception()->map()->accept(*this);
 
   auto* task = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
@@ -129,6 +149,7 @@ void cache_block_drop::visit(
           m_block->id(),
           m_cache->id(),
           task_name.c_str());
+
   controller.ndc_pop();
 } /* visit() */
 
@@ -144,9 +165,9 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void cache_block_drop::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+void cache_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
+
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(
       controller.current_task());
@@ -169,6 +190,7 @@ void cache_block_drop::visit(
           m_block->id(),
           m_cache->id(),
           polled->name().c_str());
+
   controller.ndc_pop();
 } /* visit() */
 

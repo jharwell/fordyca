@@ -22,6 +22,9 @@
   <category name="rcppsw.ta.executive" >
     <priority value ="info" />
   </category>
+  <category name="rcppsw.algorithm.clustering" >
+    <priority value ="off" />
+  </category>
     <category name="fordyca.support.tasking_oracle" >
     <priority value ="debug" />
   </category>
@@ -32,9 +35,6 @@
     <priority value ="all" />
   </category>
   <category name="fordyca.loop.support.block_dist" >
-    <priority value ="info" />
-  </category>
-  <category name="fordyca.ds.occupancy_grid" >
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.dynamic_cache_creator" >

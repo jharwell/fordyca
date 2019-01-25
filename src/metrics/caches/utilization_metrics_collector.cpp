@@ -42,7 +42,7 @@ utilization_metrics_collector::utilization_metrics_collector(
  ******************************************************************************/
 std::string utilization_metrics_collector::csv_header_build(
     const std::string& header) {
-  // clang-format off
+  /* clang-format off */
   return base_metrics_collector::csv_header_build(header) +
       "int_avg_blocks" + separator() +
       "cum_avg_blocks" + separator() +
@@ -52,7 +52,7 @@ std::string utilization_metrics_collector::csv_header_build(
       "cum_avg_drops"  + separator() +
       "int_unique_caches" + separator() +
       "cum_unique_caches" + separator();
-  // clang-format on
+  /* clang-format on */
 } /* csv_header_build() */
 
 void utilization_metrics_collector::reset(void) {

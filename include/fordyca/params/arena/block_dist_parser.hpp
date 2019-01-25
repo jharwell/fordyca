@@ -76,11 +76,11 @@ class block_dist_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   block_manifest_parser              m_manifest;
   powerlaw_dist_parser               m_powerlaw;
   std::shared_ptr<block_dist_params> m_params{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(arena, params, fordyca);

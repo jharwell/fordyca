@@ -92,10 +92,9 @@ __rcsw_pure bool block_drop_overlap_with_nest(
          nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
 } /* block_drop_overlap_with_nest() */
 
-proximity_status_t cache_site_block_proximity(
-    const controller::base_controller& c,
-    const ds::arena_map& map,
-    double block_prox_dist) {
+proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
+                                              const ds::arena_map& map,
+                                              double block_prox_dist) {
   for (const auto& b : map.blocks()) {
     if ((b->real_loc() - c.position()).length() <= block_prox_dist) {
       return {b->id(), b->real_loc() - c.position()};
@@ -104,10 +103,9 @@ proximity_status_t cache_site_block_proximity(
   return {-1, rmath::vector2d()};
 } /* cache_site_block_proximity() */
 
-proximity_status_t new_cache_cache_proximity(
-    const controller::base_controller& c,
-    const ds::arena_map& map,
-    double proximity_dist) {
+proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,
+                                             const ds::arena_map& map,
+                                             double proximity_dist) {
   for (const auto& cache : map.caches()) {
     if ((cache->real_loc() - c.position()).length() <= proximity_dist) {
       return {cache->id(), cache->real_loc() - c.position()};
@@ -116,18 +114,17 @@ proximity_status_t new_cache_cache_proximity(
   return {-1, rmath::vector2d()};
 } /* new_cache_cache_proximity() */
 
-placement_status_t placement_conflict(const rmath::vector2d& rloc,
-                               const rmath::vector2d& dims,
-                               const representation::multicell_entity* const entity) {
+placement_status_t placement_conflict(
+    const rmath::vector2d& rloc,
+    const rmath::vector2d& dims,
+    const representation::multicell_entity* const entity) {
   auto movable =
       dynamic_cast<const representation::movable_cell_entity*>(entity);
   auto immovable =
       dynamic_cast<const representation::immovable_cell_entity*>(entity);
 
-  auto loc_xspan = representation::multicell_entity::xspan(rloc,
-                                                           dims.x());
-  auto loc_yspan = representation::multicell_entity::yspan(rloc,
-                                                           dims.y());
+  auto loc_xspan = representation::multicell_entity::xspan(rloc, dims.x());
+  auto loc_yspan = representation::multicell_entity::yspan(rloc, dims.y());
   placement_status_t status;
   if (nullptr != movable) {
     auto ent_xspan = entity->xspan(movable->real_loc());

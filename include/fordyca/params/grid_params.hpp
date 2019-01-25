@@ -38,7 +38,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @struct grid_params
- * @ingroup params
+ * @ingroup params perception
  */
 struct grid_params : public rcppsw::params::base_params {
   double resolution{0.0};

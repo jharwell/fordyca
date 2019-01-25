@@ -70,9 +70,9 @@ class block_manifest_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<block_manifest> m_params{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(arena, params, fordyca);

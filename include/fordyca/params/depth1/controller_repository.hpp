@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/stateful_controller_repository.hpp"
+#include "fordyca/params/depth0/mdpo_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,9 +39,9 @@ NS_START(fordyca, params, depth1);
  * @ingroup params depth1
  *
  * @brief Collection of all parameter parsers and parse results needed
- * by the \ref depth1::foraging_controller.
+ * by depth1 controllers.
  */
-class controller_repository: public depth0::stateful_controller_repository {
+class controller_repository: public depth0::mdpo_controller_repository {
  public:
   controller_repository(void);
 };

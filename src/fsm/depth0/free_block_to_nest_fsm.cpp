@@ -37,7 +37,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 free_block_to_nest_fsm::free_block_to_nest_fsm(
     const controller::block_sel_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
+    ds::dpo_store* const store)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.free_block_to_nest"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -50,7 +50,7 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
       HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_block_fsm(sel_matrix, saa, map),
+      m_block_fsm(sel_matrix, saa, store),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup,
@@ -158,14 +158,16 @@ __rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) cons
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINEC(bool,
-                    free_block_to_nest_fsm,
-                    is_exploring_for_goal,
-                    m_block_fsm);
-FSM_WRAPPER_DEFINEC(bool,
-                    free_block_to_nest_fsm,
-                    is_vectoring_to_goal,
-                    m_block_fsm);
+FSM_OVERRIDE_DEF(bool,
+                 free_block_to_nest_fsm,
+                 is_exploring_for_goal,
+                 m_block_fsm,
+                 const);
+FSM_OVERRIDE_DEF(bool,
+                 free_block_to_nest_fsm,
+                 is_vectoring_to_goal,
+                 m_block_fsm,
+                 const);
 
 acquisition_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||

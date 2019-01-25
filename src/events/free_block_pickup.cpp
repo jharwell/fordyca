@@ -22,17 +22,18 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -81,7 +82,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_block->discrete_loc() ==
                 rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
-  rmath::vector2d old_r = m_block->real_loc();
+  __rcsw_unused rmath::vector2d old_r = m_block->real_loc();
   events::cell_empty op(cell_op::coord());
   map.accept(op);
   m_block->accept(*this);
@@ -93,7 +94,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
 } /* visit() */
 
 /*******************************************************************************
- * Stateless Foraging
+ * CRW Foraging
  ******************************************************************************/
 void free_block_pickup::visit(representation::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
@@ -120,15 +121,34 @@ void free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
 } /* visit() */
 
 /*******************************************************************************
- * Stateful Foraging
+ * DPO/MDPO Depth0 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(ds::perceived_arena_map& map) {
-  ER_ASSERT(m_block->discrete_loc() ==
-                rmath::vector2u(cell_op::x(), cell_op::y()),
-            "Coordinates for block/cell do not agree");
+void free_block_pickup::visit(ds::dpo_store& store) {
+  ER_ASSERT(store.contains(m_block),
+            "Block%d@%s not in DPO store",
+            m_block->id(),
+            m_block->discrete_loc().to_str().c_str());
+  store.block_remove(m_block);
+  ER_ASSERT(!store.contains(m_block),
+            "Block%d@%s in DPO store after removal",
+            m_block->id(),
+            m_block->discrete_loc().to_str().c_str());
+} /* visit() */
+
+void free_block_pickup::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
 
+  ER_ASSERT(m_block->discrete_loc() == cell.loc(),
+            "Coordinates for block%d@%s/cell@%s do not agree",
+            m_block->id(),
+            m_block->discrete_loc().to_str().c_str(),
+            cell.loc().to_str().c_str());
+
+  ER_ASSERT(m_block->id() == cell.block()->id(),
+            "Pickup/cell block mismatch: %u vs %u",
+            m_block->id(),
+            cell.block()->id());
   /*
    * @bug: This should just be an assert. However, due to #242, the fact that
    * blocks can appear close to the wall, and rcppsw #82, this may not always be
@@ -144,33 +164,47 @@ void free_block_pickup::visit(ds::perceived_arena_map& map) {
   }
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::stateful_fsm& fsm) {
+void free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
                    rfsm::event_type::NORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(
-    controller::depth0::stateful_controller& controller) {
+void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_push();
-  controller.perception()->map()->accept(*this);
+
+  controller.mdpo_perception()->map()->accept(*this);
   controller.fsm()->accept(*this);
   controller.block(m_block);
   controller.free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.dpo_perception()->dpo_store()->accept(*this);
+  controller.fsm()->accept(*this);
+  controller.block(m_block);
+  controller.free_pickup_event(true);
+  ER_INFO("Picked up block%d", m_block->id());
+
   controller.ndc_pop();
 } /* visit() */
 
 /*******************************************************************************
- * Depth1 Foraging
+ * DPO/MDPO Depth1 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
-  controller.perception()->map()->accept(*this);
+
+  controller.dpo_perception()->dpo_store()->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
 
-  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
   auto* task =
       dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
@@ -179,6 +213,28 @@ void free_block_pickup::visit(
 
   task->accept(*this);
   ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_pickup::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.mdpo_perception()->map()->accept(*this);
+  controller.free_pickup_event(true);
+  controller.block(m_block);
+
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
+  auto* task =
+      dynamic_cast<events::free_block_interactor*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non free block interactor task %s causing free block pickup",
+            polled->name().c_str());
+
+  task->accept(*this);
+  ER_INFO("Picked up block%d", m_block->id());
+
   controller.ndc_pop();
 } /* visit() */
 
@@ -202,16 +258,18 @@ void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 } /* visit() */
 
 /*******************************************************************************
- * Depth2 Foraging
+ * DPO/MDPO Depth2 Foraging
  ******************************************************************************/
 void free_block_pickup::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+    controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
-  controller.perception()->map()->accept(*this);
+
+  controller.mdpo_perception()->map()->accept(*this);
   controller.free_pickup_event(true);
   controller.block(m_block);
 
-  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
   auto* task =
       dynamic_cast<events::free_block_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,

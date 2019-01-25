@@ -128,10 +128,10 @@ class dynamic_cache_creator : public base_cache_creator,
   ds::cache_vector avoidance_caches_calc(const ds::cache_vector& previous_caches,
                                          const ds::cache_vector& created_caches) const;
 
-  // clang-format off
+  /* clang-format off */
   double                             m_min_dist;
   uint                               m_min_blocks;
-  // clang-format on
+  /* clang-format on */
 };
 
 

@@ -69,10 +69,10 @@ class battery_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<battery_params> m_params{nullptr};
   metrics_parser m_metrics_parser;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);

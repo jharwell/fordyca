@@ -47,7 +47,12 @@ NS_START(fordyca, params);
  */
 class metrics_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit metrics_parser(uint level) : xml_param_parser(level) {}
+  explicit metrics_parser(uint level)
+      : xml_param_parser(level),
+        m_params(
+            std::make_shared<std::remove_reference<decltype(*m_params)>::type>()) {
+  }
+  ~metrics_parser(void) override = default;
 
   /**
    * @brief The root tag that all loop functions relating to metrics parameters
@@ -69,10 +74,10 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
-  bool                            m_parsed{false};
-  std::shared_ptr<metrics_params> m_params{nullptr};
-  // clang-format on
+  /* clang-format off */
+  bool                                   m_parsed{false};
+  std::shared_ptr<metrics_params>        m_params;
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);

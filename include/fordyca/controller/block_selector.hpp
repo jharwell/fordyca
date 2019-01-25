@@ -27,8 +27,7 @@
 #include <list>
 
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/representation/perceived_block.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -63,8 +62,8 @@ class block_selector : public rcppsw::er::client<block_selector> {
    *
    * @return A pointer to the "best" block, along with its utility value.
    */
-  representation::perceived_block calc_best(const ds::perceived_block_list& blocks,
-                                            const rmath::vector2d& position);
+  ds::dp_block_map::value_type calc_best(const ds::dp_block_map& blocks,
+                                         const rmath::vector2d& position);
 
  private:
   /**
@@ -84,9 +83,9 @@ class block_selector : public rcppsw::er::client<block_selector> {
   bool block_is_excluded(const rmath::vector2d& position,
                          const representation::base_block* block) const;
 
-  // clang-format off
+  /* clang-format off */
   const block_sel_matrix* const mc_matrix;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fordyca, controller);

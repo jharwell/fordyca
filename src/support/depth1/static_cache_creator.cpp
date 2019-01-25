@@ -50,7 +50,7 @@ ds::cache_vector static_cache_creator::create_all(
     ds::block_vector& blocks,
     double) {
   ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
-  std::vector<std::shared_ptr<representation::arena_cache>> caches;
+  ds::cache_vector caches;
 
   ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
             "Cannot create static cache from < %zu blocks",

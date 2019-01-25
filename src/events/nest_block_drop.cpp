@@ -23,13 +23,13 @@
  ******************************************************************************/
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
@@ -51,7 +51,7 @@ nest_block_drop::nest_block_drop(std::shared_ptr<representation::base_block> blo
       m_block(block) {}
 
 /*******************************************************************************
- * Foraging Support
+ * Member Functions
  ******************************************************************************/
 void nest_block_drop::visit(ds::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(), "Undefined robot index");
@@ -60,7 +60,7 @@ void nest_block_drop::visit(ds::arena_map& map) {
 } /* visit() */
 
 /*******************************************************************************
- * Stateless Foraging
+ * Depth0 Foraging
  ******************************************************************************/
 void nest_block_drop::visit(representation::base_block& block) {
   block.reset_metrics();
@@ -82,39 +82,67 @@ void nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
                    state_machine::event_type::NORMAL);
 } /* visit() */
 
-/*******************************************************************************
- * Stateful Foraging
- ******************************************************************************/
-void nest_block_drop::visit(controller::depth0::stateful_controller& controller) {
+void nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_push();
 
   controller.fsm()->accept(*this);
   controller.block(nullptr);
   controller.free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
+
   controller.ndc_pop();
 } /* visit() */
 
-void nest_block_drop::visit(fsm::depth0::stateful_fsm& fsm) {
+void nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
+} /* visit() */
+
+void nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.fsm()->accept(*this);
+  controller.block(nullptr);
+  controller.free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
 } /* visit() */
 
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+void nest_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
+
   controller.block(nullptr);
   auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
-  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non nest-interactor task %s causing nest block drop",
             polled->name().c_str());
   task->accept(*this);
   controller.free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void nest_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
+  ER_ASSERT(nullptr != task,
+            "Non nest-interactor task %s causing nest block drop",
+            polled->name().c_str());
+  task->accept(*this);
+  controller.free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
   controller.ndc_pop();
 } /* visit() */
 
@@ -141,11 +169,12 @@ void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+void nest_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
+
   controller.block(nullptr);
-  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
+  __rcsw_unused auto* polled =
+      dynamic_cast<ta::polled_task*>(controller.current_task());
   auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
   ER_ASSERT(nullptr != task,
             "Non nest-interactor task %s causing nest block drop",
@@ -153,6 +182,7 @@ void nest_block_drop::visit(
   task->accept(*this);
   controller.free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
+
   controller.ndc_pop();
 } /* visit() */
 

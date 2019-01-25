@@ -24,9 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth2/cache_site_block_drop_interactor.hpp"
 #include "fordyca/support/depth2/new_cache_block_drop_interactor.hpp"
+#include "fordyca/support/task_abort_interactor.hpp"
+#include "fordyca/support/cached_block_pickup_interactor.hpp"
+#include "fordyca/support/existing_cache_block_drop_interactor.hpp"
+#include "fordyca/support/free_block_pickup_interactor.hpp"
+#include "fordyca/support/nest_block_drop_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,33 +58,43 @@ class dynamic_cache_manager;
  * - Creating a new cache.
  */
 template <typename T>
-class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
-                               public er::client<robot_arena_interactor<T>> {
+class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
  public:
-  robot_arena_interactor(ds::arena_map* const map_in,
+  using controller_type = T;
+  robot_arena_interactor(ds::arena_map* const map,
                          depth0::depth0_metrics_aggregator *const metrics_agg,
-                         argos::CFloorEntity* const floor_in,
-                         const ct::waveform_params* const block_manip_penalty,
-                         const ct::waveform_params* const cache_usage_penalty,
+                         argos::CFloorEntity* const floor,
+                         tv::tv_controller* const tv_controller,
                          dynamic_cache_manager* const cache_manager)
-      : depth1::robot_arena_interactor<T>(map_in,
-                                          metrics_agg,
-                                          floor_in,
-                                          block_manip_penalty,
-                                          cache_usage_penalty),
-    ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
-    m_cache_site_drop_interactor(map_in,
-                                 floor_in,
-                                 block_manip_penalty,
-                                 cache_manager),
-    m_new_cache_drop_interactor(map_in,
-                                floor_in,
-                                block_manip_penalty,
-                                cache_manager) {}
+      : ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
+        m_tv_controller(tv_controller),
+        m_free_pickup_interactor(map, floor, tv_controller),
+        m_nest_drop_interactor(map, metrics_agg, floor, tv_controller),
+        m_task_abort_interactor(map, floor),
+        m_cached_pickup_interactor(map, floor, tv_controller),
+        m_existing_cache_drop_interactor(map, tv_controller),
+        m_cache_site_drop_interactor(map,
+                                     floor,
+                                     tv_controller,
+                                     cache_manager),
+        m_new_cache_drop_interactor(map,
+                                    floor,
+                                    tv_controller,
+                                    cache_manager) {}
 
+  /**
+   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
+   *
+   * @todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
+   */
+  robot_arena_interactor(const robot_arena_interactor& other) = default;
   robot_arena_interactor& operator=(
       const robot_arena_interactor& other) = delete;
-  robot_arena_interactor(const robot_arena_interactor& other) = delete;
+
 
   /**
    * @brief The actual handling function for interactions.
@@ -92,40 +106,36 @@ class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
    * otherwise.
    */
   bool operator()(T& controller, uint timestep) {
-    std::list<temporal_penalty_handler<T>*> penalty_handlers =  {
-      nest_drop_interactor().penalty_handler(),
-      free_pickup_interactor().penalty_handler(),
-      &cache_penalty_handler()
-    };
-    if (task_abort_interactor()(controller, penalty_handlers)) {
+    if (m_task_abort_interactor(controller,
+                                m_tv_controller->template all_penalty_handlers<T>())) {
       return false;
     }
 
     if (controller.is_carrying_block()) {
-      nest_drop_interactor()(controller, timestep);
-      existing_cache_drop_interactor()(controller, timestep);
+      m_nest_drop_interactor(controller, timestep);
+      m_existing_cache_drop_interactor(controller, timestep);
       m_cache_site_drop_interactor(controller, timestep);
       return m_new_cache_drop_interactor(controller, timestep);
     } else { /* The foot-bot has no block item */
-      free_pickup_interactor()(controller, timestep);
-      cached_pickup_interactor()(controller, timestep);
+      m_free_pickup_interactor(controller, timestep);
+      m_cached_pickup_interactor(controller, timestep);
       return false;
     }
   }
 
 
  private:
-  using depth1::robot_arena_interactor<T>::nest_drop_interactor;
-  using depth1::robot_arena_interactor<T>::free_pickup_interactor;
-  using depth1::robot_arena_interactor<T>::task_abort_interactor;
-  using depth1::robot_arena_interactor<T>::cached_pickup_interactor;
-  using depth1::robot_arena_interactor<T>::existing_cache_drop_interactor;
-  using depth1::robot_arena_interactor<T>::cache_penalty_handler;
+  /* clang-format off */
+  tv::tv_controller* const                m_tv_controller;
 
-  // clang-format off
-  cache_site_block_drop_interactor<T> m_cache_site_drop_interactor;
-  new_cache_block_drop_interactor<T>  m_new_cache_drop_interactor;
-  // clang-format on
+  free_block_pickup_interactor<T>         m_free_pickup_interactor;
+  nest_block_drop_interactor<T>           m_nest_drop_interactor;
+  task_abort_interactor<T>                m_task_abort_interactor;
+  cached_block_pickup_interactor<T>       m_cached_pickup_interactor;
+  existing_cache_block_drop_interactor<T> m_existing_cache_drop_interactor;
+  cache_site_block_drop_interactor<T>     m_cache_site_drop_interactor;
+  new_cache_block_drop_interactor<T>      m_new_cache_drop_interactor;
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

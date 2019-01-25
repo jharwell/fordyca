@@ -108,11 +108,11 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<controller::actuation_subsystem> m_actuation;
   std::shared_ptr<sensing_subsystem>               m_sensing;
   steering_force2D                                 m_steering;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

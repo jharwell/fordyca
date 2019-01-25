@@ -76,9 +76,9 @@ class steering_force2D : public steering::force_calculator,
   void anti_phototaxis(void);
 
  private:
-  // clang-format off
+  /* clang-format off */
   phototaxis_force m_phototaxis_force;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(control, fordyca);

@@ -37,20 +37,22 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth0 {
 class crw_controller;
-class stateful_controller;
+class dpo_controller;
+class mdpo_controller;
 } // namespace depth0
 namespace depth1 {
-class greedy_partitioning_controller;
-}
+class gp_dpo_controller;
+class gp_mdpo_controller;
+} // namespace depth1
 namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }
 } // namespace controller
 
 namespace fsm {
 namespace depth0 {
 class crw_fsm;
-class stateful_fsm;
+class dpo_fsm;
 class free_block_to_nest_fsm;
 } // namespace depth0
 class block_to_goal_fsm;
@@ -84,15 +86,17 @@ NS_START(events);
 class block_vanished
     : public rcppsw::er::client<block_vanished>,
       public visitor::visit_set<controller::depth0::crw_controller,
-                                controller::depth0::stateful_controller,
-                                controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
+                                controller::depth0::dpo_controller,
+                                controller::depth0::mdpo_controller,
+                                controller::depth1::gp_dpo_controller,
+                                controller::depth1::gp_mdpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 tasks::depth0::generalist,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher,
                                 fsm::depth0::crw_fsm,
-                                fsm::depth0::stateful_fsm,
+                                fsm::depth0::dpo_fsm,
                                 fsm::depth0::free_block_to_nest_fsm,
                                 fsm::block_to_goal_fsm> {
  public:
@@ -104,20 +108,21 @@ class block_vanished
 
   /* depth0 foraging */
   void visit(controller::depth0::crw_controller& controller) override;
-  void visit(controller::depth0::stateful_controller& controller) override;
+  void visit(controller::depth0::dpo_controller& controller) override;
+  void visit(controller::depth0::mdpo_controller& controller) override;
   void visit(tasks::depth0::generalist& task) override;
   void visit(fsm::depth0::crw_fsm& fsm) override;
-  void visit(fsm::depth0::stateful_fsm& fsm) override;
+  void visit(fsm::depth0::dpo_fsm& fsm) override;
 
   /* depth1 foraging */
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
-  void visit(
-      controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(controller::depth1::gp_dpo_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::grp_mdpo_controller& controller) override;
   void visit(tasks::depth2::cache_starter& task) override;
   void visit(tasks::depth2::cache_finisher& task) override;
 

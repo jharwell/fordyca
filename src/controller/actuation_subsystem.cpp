@@ -41,19 +41,22 @@ actuation_subsystem::actuation_subsystem(
       m_drive(differential_drive::kFSMDrive,
               c_params->differential_drive.max_speed,
               c_params->differential_drive.soft_turn_max,
-              m_actuators.wheels,
-              &c_params->throttling) {}
+              m_actuators.wheels) {}
 
 void actuation_subsystem::reset(void) {
+#ifdef FORDYCA_WITH_ROBOT_RAB
   m_actuators.wifi.reset();
+#endif
   m_drive.stop();
 } /* reset() */
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuation_subsystem::leds_set_color(const utils::color& color) {
+void actuation_subsystem::leds_set_color(__rcsw_unused const utils::color& color) {
+#ifdef FORDYCA_WITH_ROBOT_LEDS
   m_actuators.leds.set_color(-1, color);
+#endif
 } /* leds_set_color() */
 
 NS_END(controller, fordyca);

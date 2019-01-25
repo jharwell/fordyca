@@ -55,9 +55,7 @@ class nest : public multicell_entity, public immovable_cell_entity {
    */
   using light_list = std::list<argos::CLightEntity*>;
 
-  nest(const rmath::vector2d& dim,
-       const rmath::vector2d& loc,
-       double resolution);
+  nest(const rmath::vector2d& dim, const rmath::vector2d& loc, double resolution);
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the
@@ -82,9 +80,9 @@ class nest : public multicell_entity, public immovable_cell_entity {
   light_list init_square(void) const;
   light_list init_rect(void) const;
 
-  // clang-format off
+  /* clang-format off */
   light_list m_lights;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

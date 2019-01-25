@@ -30,10 +30,11 @@
 #pragma GCC diagnostic pop
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth0/stateful_controller.hpp"
-#include "fordyca/support/los_visualizer.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/support/block_carry_visualizer.hpp"
+#include "fordyca/support/los_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +53,7 @@ depth0_qt_user_functions::depth0_qt_user_functions(void) {
  * Member Functions
  ******************************************************************************/
 void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  auto* stateful = dynamic_cast<const controller::depth0::stateful_controller*>(
+  auto* mdpo = dynamic_cast<const controller::depth0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
   auto* crw = dynamic_cast<const controller::depth0::crw_controller*>(
       &c_entity.GetControllableEntity().GetController());
@@ -65,9 +66,9 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
     block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
         .draw(crw->block().get(), crw->GetId().size());
   }
-  if (nullptr != stateful && stateful->display_los()) {
-    los_visualizer(this).draw(stateful->los(),
-                              stateful->perception()->map()->grid_resolution());
+  if (nullptr != mdpo && mdpo->display_los()) {
+    los_visualizer(this).draw(mdpo->los(),
+                              mdpo->mdpo_perception()->map()->grid_resolution());
   }
 }
 

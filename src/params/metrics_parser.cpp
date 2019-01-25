@@ -37,10 +37,10 @@ constexpr char metrics_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void metrics_parser::parse(const ticpp::Element& node) {
+  ticpp::Element mnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+
+  /* loop functions metrics not part of controller XML tree  */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element mnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
-    m_params =
-        std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
     XML_PARSE_ATTR(mnode, m_params, fsm_collision_fname);
     XML_PARSE_ATTR(mnode, m_params, fsm_movement_fname);
 
@@ -71,9 +71,9 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
     XML_PARSE_ATTR(mnode, m_params, perception_world_model_fname);
     XML_PARSE_ATTR(mnode, m_params, arena_robot_occupancy_fname);
-    XML_PARSE_ATTR(mnode, m_params, loop_robot_interaction_fname);
+    XML_PARSE_ATTR(mnode, m_params, swarm_convergence_fname);
+    XML_PARSE_ATTR(mnode, m_params, loop_temporal_variance_fname);
     XML_PARSE_ATTR(mnode, m_params, collect_interval);
-
     m_parsed = true;
   }
 } /* parse() */
@@ -84,6 +84,7 @@ void metrics_parser::show(std::ostream& stream) const {
     stream << "<<  Not Parsed >>" << std::endl << build_footer();
     return;
   }
+
   stream << XML_ATTR_STR(m_params, block_acquisition_fname) << std::endl
          << XML_ATTR_STR(m_params, block_transport_fname) << std::endl
          << XML_ATTR_STR(m_params, block_manipulation_fname) << std::endl
@@ -100,9 +101,11 @@ void metrics_parser::show(std::ostream& stream) const {
          << XML_ATTR_STR(m_params, task_distribution_fname) << std::endl
          << XML_ATTR_STR(m_params, fsm_collision_fname) << std::endl
          << XML_ATTR_STR(m_params, fsm_movement_fname) << std::endl
-         << XML_ATTR_STR(m_params, output_dir) << std::endl
+         << XML_ATTR_STR(m_params, swarm_convergence_fname) << std::endl
+         << XML_ATTR_STR(m_params, loop_temporal_variance_fname) << std::endl
          << XML_ATTR_STR(m_params, arena_robot_occupancy_fname) << std::endl
          << XML_ATTR_STR(m_params, perception_world_model_fname) << std::endl
+         << XML_ATTR_STR(m_params, output_dir) << std::endl
          << XML_ATTR_STR(m_params, collect_interval) << std::endl
          << build_footer();
 } /* show() */

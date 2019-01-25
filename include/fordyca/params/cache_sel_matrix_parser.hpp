@@ -69,9 +69,9 @@ class cache_sel_matrix_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<cache_sel_matrix_params> m_params{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);

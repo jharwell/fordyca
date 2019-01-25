@@ -70,11 +70,11 @@ class block_sel_matrix_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<block_sel_matrix_params> m_params{nullptr};
   block_priorities_parser                  m_priorities;
 
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);

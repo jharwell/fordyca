@@ -32,10 +32,12 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation { class base_cache; }
-namespace visitor = rcppsw::patterns::visitor;
+namespace representation {
+class base_cache;
+}
 namespace controller { namespace depth2 {
-class greedy_recpart_controller;
+class grp_dpo_controller;
+class grp_mdpo_controller;
 }} // namespace controller::depth2
 
 namespace fsm {
@@ -44,6 +46,8 @@ class block_to_goal_fsm;
 namespace tasks { namespace depth2 {
 class cache_finisher;
 }} // namespace tasks::depth2
+
+namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(events);
 
@@ -59,7 +63,8 @@ NS_START(events);
  */
 class cache_proximity
     : public rcppsw::er::client<cache_proximity>,
-      public visitor::visit_set<controller::depth2::greedy_recpart_controller,
+      public visitor::visit_set<controller::depth2::grp_dpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 tasks::depth2::cache_finisher,
                                 fsm::block_to_goal_fsm> {
  public:
@@ -70,14 +75,15 @@ class cache_proximity
   cache_proximity& operator=(const cache_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& c) override;
+  void visit(controller::depth2::grp_dpo_controller& c) override;
+  void visit(controller::depth2::grp_mdpo_controller& c) override;
   void visit(tasks::depth2::cache_finisher& task) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<representation::base_cache> m_cache;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);
