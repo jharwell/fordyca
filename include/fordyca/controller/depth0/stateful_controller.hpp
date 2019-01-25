@@ -69,7 +69,7 @@ class stateful_controller : public crw_controller,
 
   void perform_communication(void);
   void integrate_recieved_packet(rcppsw::robotics::hal::wifi_packet packet);
-  argos::CVector2 get_most_valuable_cell(void);
+  rcppsw::math::vector2u get_most_valuable_cell(void);
 
   /* goal acquisition metrics */
   FSM_WRAPPER_DECLAREC(bool, goal_acquired);
@@ -133,14 +133,10 @@ class stateful_controller : public crw_controller,
   rmath::vector2d                            m_light_loc;
   std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
-<<<<<<< HEAD
-  std::unique_ptr<ta::bi_tdgraph_executive>  m_executive;
+  std::unique_ptr<fsm::depth0::stateful_fsm> m_fsm;
   struct params::communication_params        m_communication_params;
   uint                                       m_arena_x;
   uint                                       m_arena_y;
-=======
-  std::unique_ptr<fsm::depth0::stateful_fsm> m_fsm;
->>>>>>> devel
   // clang-format on
 };
 

@@ -41,7 +41,6 @@
 #include "fordyca/representation/base_cache.hpp"
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/math/utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,14 +57,10 @@ stateful_controller::stateful_controller(void)
       m_light_loc(),
       m_block_sel_matrix(),
       m_perception(),
-<<<<<<< HEAD
-      m_executive(),
+      m_fsm(),
       m_communication_params(),
       m_arena_x(0),
       m_arena_y(0) {}
-=======
-      m_fsm() {}
->>>>>>> devel
 
 stateful_controller::~stateful_controller(void) = default;
 
@@ -113,18 +108,14 @@ void stateful_controller::ControlStep(void) {
   m_perception->update(m_perception->los());
 
   saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-<<<<<<< HEAD
-  saa_subsystem()->actuation()->throttling_update(stateful_sensors()->tick());
+  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
+  m_fsm->run();
 
   if(m_communication_params.on) {
     perform_communication();
   }
 
-  m_executive->run();
-=======
-  saa_subsystem()->actuation()->throttling_update(saa_subsystem()->sensing()->tick());
   m_fsm->run();
->>>>>>> devel
   ndc_pop();
 } /* ControlStep() */
 
@@ -159,16 +150,9 @@ void stateful_controller::Init(ticpp::Element& node) {
       base_controller::saa_subsystem(),
       m_perception->map());
 
-<<<<<<< HEAD
   auto* comm_params = param_repo.parse_results<params::communication_params>();
   m_communication_params = *comm_params;
 
-  /* initialize tasking */
-  m_executive = stateful_tasking_initializer(m_block_sel_matrix.get(),
-                                             saa_subsystem(),
-                                             perception())(&param_repo);
-=======
->>>>>>> devel
   ER_INFO("Initialization finished");
   ndc_pop();
 
@@ -182,7 +166,6 @@ void stateful_controller::Reset(void) {
   m_perception->reset();
 } /* Reset() */
 
-<<<<<<< HEAD
 void stateful_controller::perform_communication(void) {
   std::vector<uint8_t> recieved_packet_data =
     saa_subsystem()->sensing()->recieve_message();
@@ -206,9 +189,9 @@ void stateful_controller::perform_communication(void) {
       y_coord = static_cast <int> (rand()) % m_arena_y;
     // Utility function
     } else if (m_communication_params.mode == 2) {
-      argos::CVector2 cell = get_most_valuable_cell();
-      x_coord = cell.GetX();
-      y_coord = cell.GetY();
+      rcppsw::math::vector2u cell = get_most_valuable_cell();
+      x_coord = cell.x();
+      y_coord = cell.y();
     } else {
       x_coord = 2;
       y_coord = 2;
@@ -275,9 +258,9 @@ void stateful_controller::integrate_recieved_packet(hal::wifi_packet packet) {
   int ent_id = static_cast<int>(packet.data[3]);
   // type of block (if it's not a block it will be -1)
 
-  rcppsw::math::dcoord2 disc_loc = rcppsw::math::dcoord2(x_coord, y_coord);
+  rcppsw::math::vector2u disc_loc = rcppsw::math::vector2u(x_coord, y_coord);
 
-  auto rcoord_vector = fordyca::math::dcoord_to_rcoord(disc_loc,
+  auto rcoord_vector = uvec2dvec(disc_loc,
     perception()->map()->grid_resolution());
 
 
@@ -325,15 +308,16 @@ void stateful_controller::integrate_recieved_packet(hal::wifi_packet packet) {
   } /* if (state > 2) */
 } /* integrate_recieved_packet */
 
-argos::CVector2 stateful_controller::get_most_valuable_cell(void) {
-  argos::CVector2 cell_coords;
+rcppsw::math::vector2u stateful_controller::get_most_valuable_cell(void) {
+  rcppsw::math::vector2u cell_coords;
 
-  int nest_x_coord = boost::get<argos::CVector2>(
-    m_block_sel_matrix->find("nest_loc")->second).GetX();
+  // Get information regarding the location of the nest
+  rcppsw::math::vector2d nest_loc = boost::get<rcppsw::math::vector2d>(
+    m_block_sel_matrix->find("nest_loc")->second);
+  int nest_x_coord = nest_loc.x();
+  int nest_y_coord = nest_loc.y();
 
-  int nest_y_coord = boost::get<argos::CVector2>(
-    m_block_sel_matrix->find("nest_loc")->second).GetY();
-
+  // Initialize variables for keeping track of most valuable location
   int communicated_cell_value = 0;
   int current_cell_value = 0;
 
@@ -368,21 +352,14 @@ argos::CVector2 stateful_controller::get_most_valuable_cell(void) {
     } /* for(j..) */
   } /* for(i..) */
 
-  cell_coords.SetX(cell_x);
-  cell_coords.SetY(cell_y);
+  cell_coords.set(cell_x, cell_y);
   return cell_coords;
 } /* get_most_valuable_cell */
 
-FSM_WRAPPER_DEFINE_PTR(transport_goal_type,
+FSM_WRAPPER_DEFINEC_PTR(transport_goal_type,
                        stateful_controller,
                        block_transport_goal,
-                       current_task());
-=======
-FSM_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                        stateful_controller,
-                        block_transport_goal,
-                        m_fsm);
->>>>>>> devel
+                       m_fsm);
 
 FSM_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
                         stateful_controller,

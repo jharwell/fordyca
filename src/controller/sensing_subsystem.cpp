@@ -93,7 +93,7 @@ bool sensing_subsystem::cache_detected(void) const {
   return m_sensors.ground.detect(0.4, 0.1, 3);
 } /* block_detected() */
 
-std::vector<uint8_t> base_sensing_subsystem::recieve_message() {
+std::vector<uint8_t> sensing_subsystem::recieve_message() {
   auto readings = m_sensors.rabs.readings();
   for (auto reading : readings) {
     std::vector<uint8_t> data = reading.data;
