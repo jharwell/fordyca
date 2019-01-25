@@ -46,7 +46,7 @@ world_model_metrics_collector::world_model_metrics_collector(
  ******************************************************************************/
 std::string world_model_metrics_collector::csv_header_build(
     const std::string& header) {
-  // clang-format off
+  /* clang-format off */
   return base_metrics_collector::csv_header_build(header) +
       "ST_EMPTY_inaccuracies" + separator() +
       "ST_HAS_BLOCK_inaccuracies" + separator() +
@@ -54,7 +54,7 @@ std::string world_model_metrics_collector::csv_header_build(
       "known_percentage" + separator() +
       "unknown_percentage" + separator() +
       "knowledge_ratio" + separator();
-  // clang-format on
+  /* clang-format on */
 } /* csv_header_build() */
 
 void world_model_metrics_collector::reset(void) {

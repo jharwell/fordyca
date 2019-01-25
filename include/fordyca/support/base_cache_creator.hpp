@@ -43,6 +43,7 @@ NS_START(fordyca);
 namespace representation {
 class arena_cache;
 class base_block;
+class multicell_entity;
 } // namespace representation
 NS_START(support);
 namespace er = rcppsw::er;
@@ -98,17 +99,20 @@ class base_cache_creator : public er::client<base_cache_creator> {
   void update_host_cells(ds::cache_vector& caches);
 
  protected:
-  struct deconflict_result {
-    deconflict_result(bool b, const rmath::vector2u& l) :
-        status(b),
-        loc(l) {}
-
+  struct deconflict_res_t {
     bool status;
     rmath::vector2u loc;
   };
 
   const ds::arena_grid* grid(void) const { return m_grid; }
   ds::arena_grid* grid(void) { return m_grid; }
+
+  /**
+   * @brief Create a single cache in the arena from the specified set of blocks
+   * at the specified location. Note that the blocks are passed by value because
+   * they are (possibly) modified by this function in a way that callers
+   * probably do not want.
+   */
   std::unique_ptr<representation::arena_cache> create_single_cache(
       ds::block_list blocks,
       const rmath::vector2d& center);
@@ -118,6 +122,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    *
    * - No block contained in one cache is contained in another.
    * - No two newly created caches overlap.
+   * - No block that is not currently contained in a cache overlaps any cache.
    *
    * This function is provided for derived classes to use when they implement
    * \ref create_all().
@@ -125,7 +130,8 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
    * otherwise.
    */
-  bool creation_sanity_checks(const ds::cache_vector& new_caches) const;
+  bool creation_sanity_checks(const ds::cache_vector& new_caches,
+                              const ds::block_list& free_blocks) const;
 
   /**
    * @brief Given the size of the cache-to-be and its tentative location in the
@@ -135,25 +141,20 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * This function is provided for derived classes to use when they implement
    * \ref create_all().
    */
-  rmath::vector2u deconflict_arena_boundaries(double cache_dim,
-                                              const rmath::vector2u& center) const;
-  /**
-   * @brief Deconflict new cache cache from overlapping with any existing caches
-   * (including taking the span of the new cache into account).
-   *
-   * This function is provided for derived classes to use when they implement
-   * \ref create_all().
-   */
-  deconflict_result deconflict_existing_cache(
-      const representation::base_cache& cache,
+  deconflict_res_t deconflict_loc_boundaries(double cache_dim,
+                                             const rmath::vector2u& center) const;
+
+  deconflict_res_t deconflict_loc_entity(
+      const representation::multicell_entity* ent,
+      const rmath::vector2d& ent_loc,
       const rmath::vector2u& center) const;
 
  private:
-  // clang-format off
+  /* clang-format off */
   double                             m_cache_dim;
   ds::arena_grid*                    m_grid;
   mutable std::default_random_engine m_rng{};
-  // clang-format on
+  /* clang-format on */
 };
 NS_END(fordyca, depth1);
 

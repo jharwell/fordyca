@@ -50,7 +50,7 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-base_cache_manager::block_calc_result static_cache_manager::calc_blocks_for_creation(
+base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creation(
     ds::block_vector& blocks) {
   /*
    * Only blocks that are not:
@@ -60,8 +60,8 @@ base_cache_manager::block_calc_result static_cache_manager::calc_blocks_for_crea
    *
    * are eligible for being used to re-create the static cache.
    */
-  rmath::vector2u dcenter = rmath::dvec2uvec(mc_cache_loc,
-                                             arena_grid()->resolution());
+  rmath::vector2u dcenter =
+      rmath::dvec2uvec(mc_cache_loc, arena_grid()->resolution());
   ds::block_vector to_use;
   for (auto& b : blocks) {
     if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
@@ -118,10 +118,10 @@ base_cache_manager::block_calc_result static_cache_manager::calc_blocks_for_crea
         mc_cache_params.static_.size);
     ret = false;
   }
-  return block_calc_result(ret, to_use);
+  return block_calc_res_t{ret, to_use};
 } /* calc_blocks_for_creation() */
 
-base_cache_manager::creation_result static_cache_manager::create_conditional(
+base_cache_manager::creation_res_t static_cache_manager::create_conditional(
     ds::block_vector& blocks,
     uint n_harvesters,
     uint n_collectors) {
@@ -131,11 +131,11 @@ base_cache_manager::creation_result static_cache_manager::create_conditional(
       static_cast<double>(std::rand()) / RAND_MAX) {
     return create(blocks);
   } else {
-    return creation_result(false, ds::cache_vector());
+    return creation_res_t{false, ds::cache_vector()};
   }
 } /* create_conditional() */
 
-base_cache_manager::creation_result static_cache_manager::create(
+base_cache_manager::creation_res_t static_cache_manager::create(
     ds::block_vector& blocks) {
   ER_DEBUG("(Re)-Creating static cache");
   ER_ASSERT(mc_cache_params.static_.size >=
@@ -151,7 +151,7 @@ base_cache_manager::creation_result static_cache_manager::create(
   if (!ret.status) {
     ER_WARN("Unable to create static cache @%s: Not enough free blocks",
             mc_cache_loc.to_str().c_str());
-    return creation_result(true, ds::cache_vector());
+    return creation_res_t{false, ds::cache_vector()};
   }
   ds::cache_vector created;
   /* no existing caches, so empty vector */
@@ -174,10 +174,10 @@ base_cache_manager::creation_result static_cache_manager::create(
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
         events::cell_empty empty(b->discrete_loc());
         arena_grid()->access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
-        events::free_block_drop op(
-            b,
-            rmath::dvec2uvec(c->real_loc(), arena_grid()->resolution()),
-            arena_grid()->resolution());
+        events::free_block_drop op(b,
+                                   rmath::dvec2uvec(c->real_loc(),
+                                                    arena_grid()->resolution()),
+                                   arena_grid()->resolution());
         arena_grid()->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());
@@ -190,7 +190,7 @@ base_cache_manager::creation_result static_cache_manager::create(
    * have a block as its entity!
    */
   creator.update_host_cells(created);
-  return creation_result(true, created);
+  return creation_res_t{true, created};
 } /* create() */
 
 NS_END(depth1, support, fordyca);

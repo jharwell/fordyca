@@ -24,9 +24,9 @@
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/base_cache.hpp"
 

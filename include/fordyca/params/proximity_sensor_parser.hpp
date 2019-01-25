@@ -48,9 +48,11 @@ class proximity_sensor_parser : public rcppsw::params::xml_param_parser {
  public:
   explicit proximity_sensor_parser(uint level) : xml_param_parser(level) {}
 
+  ~proximity_sensor_parser(void) override = default;
+
   /**
-   * @brief The root tag that all robot proximity_sensor parameters should lie under in
-   * the XML tree.
+   * @brief The root tag that all robot proximity sensor parameters should lie
+   * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "proximity_sensor";
 

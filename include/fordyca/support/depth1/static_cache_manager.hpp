@@ -77,9 +77,9 @@ class static_cache_manager : public base_cache_manager,
    * currently being carried by robots and there are not enough free blocks with
    * which to create a cache of the specified minimum size.
    */
-  creation_result create(ds::block_vector& blocks);
+  creation_res_t create(ds::block_vector& blocks);
 
-  creation_result create_conditional(ds::block_vector& blocks,
+  creation_res_t create_conditional(ds::block_vector& blocks,
                                      uint n_harvesters,
                                      uint n_collectors);
 
@@ -97,12 +97,12 @@ class static_cache_manager : public base_cache_manager,
    * size of the cache. If it returns \c TRUE, then the second parameter of the
    * pair is the vector of blocks to use for cache creation.
    */
-  block_calc_result calc_blocks_for_creation(ds::block_vector& blocks);
+  block_calc_res_t calc_blocks_for_creation(ds::block_vector& blocks);
 
-  // clang-format off
+  /* clang-format off */
   const params::caches::caches_params mc_cache_params;
   const rmath::vector2d               mc_cache_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, support, fordyca);

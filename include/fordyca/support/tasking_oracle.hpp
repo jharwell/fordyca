@@ -85,9 +85,9 @@ class tasking_oracle : public er::client<tasking_oracle> {
   void task_finish_cb(const ta::polled_task* task);
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::map<std::string, mapped_type> m_map{};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

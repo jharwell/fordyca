@@ -183,14 +183,14 @@ class acquire_goal_fsm : public base_foraging_fsm,
     return &mc_state_map[index];
   }
 
-  // clang-format off
+  /* clang-format off */
   vector_fsm                m_vector_fsm;
   explore_for_goal_fsm      m_explore_fsm;
   acquisition_goal_ftype    m_acquisition_goal;
   goal_candidates_ftype     m_candidates_exist;
   goal_select_ftype         m_goal_select;
   std::function<bool(bool)> m_goal_acquired_cb;
-  // clang-format on
+  /* clang-format on */
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

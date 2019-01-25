@@ -39,7 +39,8 @@ class base_block;
 
 namespace ds {
 class arena_map;
-class perceived_arena_map;
+class dpo_semantic_map;
+class dpo_store;
 } // namespace ds
 
 NS_START(events);
@@ -56,7 +57,8 @@ NS_START(events);
  */
 class block_pickup_event
     : public visitor::visit_set<ds::arena_map,
-                                ds::perceived_arena_map,
+                                ds::dpo_semantic_map,
+                                ds::dpo_store,
                                 representation::base_block> {};
 
 NS_END(events, fordyca);

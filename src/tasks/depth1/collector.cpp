@@ -58,7 +58,7 @@ void collector::task_start(const ta::taskable_argument* const) {
   ta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-double collector::abort_prob_calc(void) {
+__rcsw_pure double collector::abort_prob_calc(void) {
   /*
    * Collectors always have a small chance of aborting their task when not at a
    * task interface. Not strictly necessary at least for now, but it IS

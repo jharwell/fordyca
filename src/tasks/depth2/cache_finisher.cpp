@@ -53,7 +53,7 @@ void cache_finisher::task_start(const task_allocation::taskable_argument* const)
   task_allocation::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-double cache_finisher::abort_prob_calc(void) {
+__rcsw_pure double cache_finisher::abort_prob_calc(void) {
   if (-1 == active_interface()) {
     return ta::abort_probability::kMIN_ABORT_PROB;
   } else {

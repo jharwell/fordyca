@@ -228,10 +228,10 @@ class vector_fsm : public base_foraging_fsm,
     return &kSTATE_MAP[index];
   }
 
-  // clang-format off
+  /* clang-format off */
   struct fsm_state m_state;
   struct goal_data m_goal_data;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

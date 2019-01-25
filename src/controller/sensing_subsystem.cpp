@@ -22,8 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include <limits>
-
 #include "fordyca/params/sensing_params.hpp"
 
 /*******************************************************************************
@@ -37,13 +35,13 @@ NS_START(fordyca, controller);
 sensing_subsystem::sensing_subsystem(
     const struct params::sensing_params* const params,
     const struct sensor_list* const list)
-    : m_tick(0),
-      mc_obstacle_delta(params->proximity.delta),
+    : mc_obstacle_delta(params->proximity.delta),
+      mc_los_dim(params->los_dim),
+      m_tick(0),
       m_position(),
       m_prev_position(),
       m_sensors(*list),
-      m_fov(rmath::radians(-5 * M_PI / 6),
-            rmath::radians(5 * M_PI / 6)) {}
+      m_fov(rmath::radians(-5 * M_PI / 6), rmath::radians(5 * M_PI / 6)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -67,8 +65,8 @@ rmath::vector2d sensing_subsystem::find_closest_obstacle(void) const {
 
 bool sensing_subsystem::threatening_obstacle_exists(void) const {
   return m_sensors.proximity.prox_obj_exists(position(),
-                                                 mc_obstacle_delta,
-                                                 m_fov);
+                                             mc_obstacle_delta,
+                                             m_fov);
 } /* threatening_obstacle_exists() */
 
 bool sensing_subsystem::block_detected(void) const {
@@ -82,7 +80,7 @@ bool sensing_subsystem::block_detected(void) const {
    *
    * Blocks are black, so sensors should return 0 when the robot is on a block.
    */
-    return m_sensors.ground.detect(0.0, 0.05, 4);
+  return m_sensors.ground.detect(0.0, 0.05, 4);
 } /* block_detected() */
 
 bool sensing_subsystem::cache_detected(void) const {

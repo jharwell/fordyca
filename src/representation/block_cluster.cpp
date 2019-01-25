@@ -44,7 +44,8 @@ __rcsw_pure ds::const_block_list block_cluster::blocks(void) const {
                 cell.loc().to_str().c_str());
       if (cell.state_has_block()) {
         auto block = cell.block();
-        ER_ASSERT(nullptr != block, "Cell@%s null block",
+        ER_ASSERT(nullptr != block,
+                  "Cell@%s null block",
                   cell.loc().to_str().c_str());
         ret.push_back(block);
       }

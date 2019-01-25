@@ -26,8 +26,6 @@
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 
@@ -40,8 +38,6 @@ NS_START(fordyca, controller, depth0);
  * Class Definitions
  ******************************************************************************/
 class depth0_controller : public base_controller,
-                          public metrics::fsm::movement_metrics,
-                          public metrics::fsm::goal_acquisition_metrics,
                           public metrics::blocks::manipulation_metrics,
                           public fsm::block_transporter {
  public:
@@ -54,7 +50,7 @@ class depth0_controller : public base_controller,
   bool cache_pickup_event(void) const override { return false; }
   bool cache_drop_event(void) const override { return false; }
 
-    /* block manipulation metrics */
+  /* block manipulation metrics */
   uint penalty_served(void) const override { return m_penalty; }
 
   void free_pickup_event(bool b) { m_free_pickup_event = b; }
@@ -62,11 +58,11 @@ class depth0_controller : public base_controller,
   void penalty_served(uint penalty) { m_penalty = penalty; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint m_penalty{false};
   bool m_free_pickup_event{false};
   bool m_free_drop_event{false};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, controller, fordyca);

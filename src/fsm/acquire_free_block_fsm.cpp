@@ -25,9 +25,9 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_selector.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
@@ -42,7 +42,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_free_block_fsm::acquire_free_block_fsm(
     const controller::block_sel_matrix* const sel_matrix,
     controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
+    ds::dpo_store* const store)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
           saa,
@@ -54,7 +54,7 @@ acquire_free_block_fsm::acquire_free_block_fsm(
                     std::placeholders::_1),
           std::bind(&acquire_free_block_fsm::block_exploration_term_cb, this)),
       mc_matrix(sel_matrix),
-      mc_map(map) {}
+      mc_store(store) {}
 
 /*******************************************************************************
  * Member Functions
@@ -79,23 +79,23 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
 
 acquire_goal_fsm::candidate_type acquire_free_block_fsm::block_select(void) const {
   controller::block_selector selector(mc_matrix);
-  auto best = selector.calc_best(mc_map->perceived_blocks(),
+  auto best = selector.calc_best(mc_store->blocks(),
                                  saa_subsystem()->sensing()->position());
-  if (nullptr == best.ent) {
+  if (nullptr == best.ent()) {
     return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
   } else {
     return acquire_goal_fsm::candidate_type(true,
-                                            best.ent->real_loc(),
+                                            best.ent()->real_loc(),
                                             vector_fsm::kBLOCK_ARRIVAL_TOL);
   }
 } /* block_select() */
 
-bool acquire_free_block_fsm::candidates_exist(void) const {
-  return !mc_map->perceived_blocks().empty();
+__rcsw_pure bool acquire_free_block_fsm::candidates_exist(void) const {
+  return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
-acquisition_goal_type acquire_free_block_fsm::acquisition_goal_internal(
-    void) const {
+__rcsw_const acquisition_goal_type
+acquire_free_block_fsm::acquisition_goal_internal(void) const {
   return acquisition_goal_type::kBlock;
 } /* acquisition_goal() */
 

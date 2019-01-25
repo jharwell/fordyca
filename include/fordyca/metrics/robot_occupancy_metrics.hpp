@@ -44,7 +44,7 @@ NS_START(fordyca, metrics);
  *
  * Metrics are collected every timestep.
  */
-class robot_occupancy_metrics : virtual public rcppsw::metrics::base_metrics {
+class robot_occupancy_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
   robot_occupancy_metrics(void) = default;
 
@@ -52,7 +52,7 @@ class robot_occupancy_metrics : virtual public rcppsw::metrics::base_metrics {
    * @brief Should return \c TRUE iff there is currently a robot is the cell at
    * (i,j) in the robot_occupancy.
    */
-  virtual bool has_robot(size_t i, size_t j) const = 0;
+  virtual bool has_robot(uint i, uint j) const = 0;
 };
 
 NS_END(metrics, fordyca);

@@ -34,7 +34,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+
+namespace support { namespace tv {
+class tv_controller;
+}} // namespace support::tv
+
+NS_START(controller);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace hal = rcppsw::robotics::hal;
@@ -85,28 +91,16 @@ class actuation_subsystem {
   }
 
   /**
-   * @brief Set whether or not temporary throttling of overall maximum speed is
-   * enabled when a robot is carrying a block.
-   */
-  void block_carry_throttle(bool en) { m_drive.block_carry_throttle(en); }
-
-  /**
-   * @brief Update the currently applied amount of throttling based on
-   * presumably new configuration.
-   */
-  void throttling_update(uint timestep) { m_drive.throttling_update(timestep); }
-
-  /**
    * @brief Reset the actuations, including stopping the robot.
    */
   void reset(void);
 
  private:
-  // clang-format off
+  /* clang-format off */
   const struct params::actuation_params    mc_params;
   struct actuator_list                     m_actuators;
   throttling_differential_drive            m_drive;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

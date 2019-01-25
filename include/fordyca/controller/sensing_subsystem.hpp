@@ -76,7 +76,9 @@ class sensing_subsystem {
    * @param list List of handles to sensing devices.
    */
   sensing_subsystem(const struct params::sensing_params* params,
-                         const struct sensor_list* list);
+                    const struct sensor_list* list);
+
+  double los_dim(void) const { return mc_los_dim; }
 
   /**
    * @brief Get the list of sensors that the subsystem is managing.
@@ -119,7 +121,7 @@ class sensing_subsystem {
    * of self-localizing. That's not the point of this project, and this was much
    * faster/easier.
    */
-  rmath::vector2d position(void) const { return m_position; }
+  const rmath::vector2d& position(void) const { return m_position; }
 
   /**
    * @brief Set the robot's current location.
@@ -177,14 +179,16 @@ class sensing_subsystem {
   rmath::vector2d find_closest_obstacle(void) const;
 
  private:
-  // clang-format off
-  uint                                           m_tick;
+  /* clang-format off */
   const double                                   mc_obstacle_delta;
+  const double                                   mc_los_dim;
+
+  uint                                           m_tick;
   rmath::vector2d                                m_position;
   rmath::vector2d                                m_prev_position;
   struct sensor_list                             m_sensors;
   rmath::range<rmath::radians>                   m_fov;
-  // clang-format off
+  /* clang-format off */
 };
 
 NS_END(controller, fordyca);

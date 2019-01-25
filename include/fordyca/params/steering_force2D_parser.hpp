@@ -68,10 +68,10 @@ class steering_force2D_parser : public steering::force_calculator_xml_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<steering_force2D_params> m_params{};
   phototaxis_force_parser                  m_phototaxis;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(params, fordyca);

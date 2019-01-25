@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <greedy_recpart_controller id="ffc"
+    <gp_mdpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -36,12 +36,12 @@
                output_dir="__current_date__"
                />
         </output>
-        <occupancy_grid>
+        <perception>
           <grid resolution="0.2"
                 size="12, 6, 2"/>
           <pheromone rho="0.00001"
                      repeat_deposit="false"/>
-        </occupancy_grid>
+        </perception>
         <task_executive
             update_exec_ests="true"
             update_interface_ests="true"
@@ -124,18 +124,12 @@
             site_xrange="2:10"
             site_yrange="2.5:3"
             />
-        <sensing>
+        <sensing
+            los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
                             delta="0.0001" />
-        </sensing>
+          </sensing>
         <actuation>
-          <block_carry_throttle>
-            <waveform
-                type="Null"
-                frequency="100"
-                amplitude="0.4"
-                offset="0.1"/>
-          </block_carry_throttle>
           <steering2D>
             <avoidance_force lookahead="0.5"
                              max="8"/>
@@ -156,7 +150,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </greedy_recpart_controller>
+    </gp_mdpo_controller>
 
   </controllers>
 
@@ -164,7 +158,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth1_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -183,6 +177,7 @@
           cache_acquisition_fname="cache-acquisition.csv"
           cache_utilization_fname="cache-utilization.csv"
           cache_lifecycle_fname="cache-lifecycle.csv"
+          cache_locations_fname="cache-locations.csv"
           task_execution_generalist_fname="task-execution-generalist.csv"
           task_execution_collector_fname="task-execution-collector.csv"
           task_execution_harvester_fname="task-execution-harvester.csv"
@@ -196,26 +191,61 @@
           task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
-          loop_robot_interaction_fname="loop-robot-interaction.csv"
-          collect_interval="1000"
-          />
+          swarm_convergence_fname="swarm-convpergence.csv"
+          loop_temporal_variance_fname="loop-temporal-variance.csv"
+          collect_interval="1000">
+          </metrics>
     </output>
+    <convergence
+        n_threads="0">
+      <positional_entropy
+          enable="true"
+          horizon="0:13.41"
+          horizon_delta="1.34"/>
+      <interactivity enable="true"/>
+      <angular_order enable="true"/>
+    </convergence>
+
     <oracle
         enabled="false"
         task_exec_est="false"
         task_interface_est="false"
         />
+    <temporal_variance>
+      <blocks>
+        <manipulation_penalty>
+          <waveform
+              type="Sine"
+              frequency="0.01"
+              amplitude="50"
+              offset="50"
+              phase="0"/>
+        </manipulation_penalty>
+        <carry_throttle>
+          <waveform
+              type="Null"
+              frequency="100"
+              amplitude="0.4"
+              offset="0.1"
+              phase="0"/>
+        </carry_throttle>
+      </blocks>
+      <caches>
+        <usage>
+          <waveform
+              type="Null"
+              frequency="100"
+              amplitude="500"
+              offset="10"
+              phase="0"/>
+        </usage>
+      </caches>
+    </temporal_variance>
+
     <arena_map>
       <grid resolution="0.2"
             size="12, 6, 2"/>
       <blocks>
-        <manipulation_penalty>
-          <waveform
-              type="Null"
-              frequency="0.01"
-              amplitude="50"
-              offset="10"/>
-        </manipulation_penalty>
         <distribution
             arena_resolution="0.2"
             dist_type="single_source">
@@ -225,7 +255,7 @@
               n_clusters="15"
               />
           <manifest
-              n_cube="20"
+              n_cube="10"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -233,29 +263,18 @@
       </blocks>
       <nest size="1.0, 4.0" center="2, 3" />
     </arena_map>
-    <caches
-        dimension="0.8">
-      <static enable="false"
+    <caches dimension="0.8">
+      <static enable="true"
               size="2"
-              respawn_scale_factor="0.05"
-              >
-      </static>
-      <usage_penalty>
-        <waveform
-            type="Null"
-            frequency="100"
-            amplitude="500"
-            offset="10"/>
-      </usage_penalty>
+              respawn_scale_factor="0.05"/>
       <dynamic enable="true"
                min_dist="0.8"
                min_blocks="2"
                robot_drop_only="true"/>
-
     </caches>
 
     <visualization robot_id="true"
-                   robot_los="false"
+                   robot_los="true"
                    robot_task="true"
                    block_id="false"
                    />
@@ -270,7 +289,7 @@
            pixels_per_meter="50" />
 
     <box id="wall_north" size="12,0.1,0.5" movable="false">
-      <body position="6,6,0" orientation="0,0,0" />
+      <body position="6,6.1,0" orientation="0,0,0" />
     </box>
     <box id="wall_south" size="12,0.1,0.5" movable="false">
       <body position="6,0,0" orientation="0,0,0" />
@@ -281,25 +300,6 @@
     <box id="wall_west" size="0.1,6,0.5" movable="false">
       <body position="0,3,0" orientation="0,0,0" />
     </box>
-
-    <light id="light1"
-           position="2,1.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="10.0"
-           medium="leds" />
-    <light id="light2"
-           position="2,3,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="10.0"
-           medium="leds" />
-    <light id="light3"
-           position="2,4.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="10.0"
-           medium="leds" />
 
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
@@ -355,28 +355,28 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl>
-       <frame_grabbing directory="frames"
-                       base_name="frame_"
-                       format="png"
-                       quality="100" />
-      <camera>
-        <placement idx="0"
-                   position="6,3,6"
-                   look_at="6,3,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-        <placement idx="1"
-                   position="6,0,5"
-                   look_at="6,3,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="depth2_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl autoplay="true"> -->
+  <!--      <frame_grabbing directory="frames" -->
+  <!--                      base_name="frame_" -->
+  <!--                      format="png" -->
+  <!--                      quality="100" /> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="6,3,6" -->
+  <!--                  look_at="6,3,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--       <placement idx="1" -->
+  <!--                  position="6,0,5" -->
+  <!--                  look_at="6,3,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="depth0_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

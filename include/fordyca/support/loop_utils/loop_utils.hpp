@@ -49,9 +49,14 @@ namespace rmath = rcppsw::math;
 /*******************************************************************************
  * Types
  ******************************************************************************/
-struct proximity_status {
+struct proximity_status_t {
   int entity_id;
   rmath::vector2d distance;
+};
+
+struct placement_status_t {
+  bool x_conflict;
+  bool y_conflict;
 };
 
 /*******************************************************************************
@@ -131,7 +136,7 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
  * @return (block id of cache that is too close (-1 if none), distance to said
  *         block).
  */
-proximity_status cache_site_block_proximity(
+proximity_status_t cache_site_block_proximity(
     const controller::base_controller& controller,
     const ds::arena_map& map,
     double block_prox_dist);
@@ -147,7 +152,7 @@ proximity_status cache_site_block_proximity(
  * @return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).
  */
-proximity_status new_cache_cache_proximity(
+proximity_status_t new_cache_cache_proximity(
     const controller::base_controller& controller,
     const ds::arena_map& map,
     double proximity_dist);
@@ -161,7 +166,9 @@ proximity_status new_cache_cache_proximity(
  * the robot, probably using on-board cameras.
  */
 template <typename T>
-void set_robot_los(argos::CFootBotEntity& robot, ds::arena_map& map) {
+void set_robot_los(argos::CFootBotEntity& robot,
+                   uint los_grid_size,
+                   ds::arena_map& map) {
   rmath::vector2d pos;
   pos.set(const_cast<argos::CFootBotEntity&>(robot)
               .GetEmbodiedEntity()
@@ -177,9 +184,18 @@ void set_robot_los(argos::CFootBotEntity& robot, ds::arena_map& map) {
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   std::unique_ptr<representation::line_of_sight> new_los =
       rcppsw::make_unique<representation::line_of_sight>(
-          map.subgrid(position.x(), position.y(), 2), position);
-  controller.los(new_los);
+          map.subgrid(position.x(), position.y(), los_grid_size), position);
+  controller.los(std::move(new_los));
 }
+
+/**
+ * @brief Determine if an entity of the specified dimensions, placed at the
+ * specified location (or that currently exists at the specified location), will
+ * overlap the specified (different) entity (or does overlap it).
+ */
+placement_status_t placement_conflict(const rmath::vector2d& rloc,
+                                      const rmath::vector2d& dims,
+                                      const representation::multicell_entity* const entity);
 
 NS_END(loop_utils, support, fordyca);
 

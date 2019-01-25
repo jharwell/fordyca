@@ -54,9 +54,9 @@ class static_cache_creator : public base_cache_creator,
                               double) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   rmath::vector2d m_center;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, support, fordyca);

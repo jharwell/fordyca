@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
     const controller::cache_sel_matrix* sel_matrix,
     controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
+    ds::dpo_store* const store)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth1.cached_block_to_nest"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
@@ -51,7 +51,7 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
       HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_cache_fsm(sel_matrix, true, saa, map),
+      m_cache_fsm(sel_matrix, true, saa, store),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup,
@@ -158,15 +158,17 @@ cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINEC(bool,
-                    cached_block_to_nest_fsm,
-                    is_exploring_for_goal,
-                    m_cache_fsm);
+FSM_OVERRIDE_DEF(bool,
+                 cached_block_to_nest_fsm,
+                 is_exploring_for_goal,
+                 m_cache_fsm,
+                 const);
 
-FSM_WRAPPER_DEFINEC(bool,
-                    cached_block_to_nest_fsm,
-                    is_vectoring_to_goal,
-                    m_cache_fsm);
+FSM_OVERRIDE_DEF(bool,
+                 cached_block_to_nest_fsm,
+                 is_vectoring_to_goal,
+                 m_cache_fsm,
+                 const);
 
 bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kExistingCache == acquisition_goal()) {

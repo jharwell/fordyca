@@ -36,10 +36,11 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth1 {
-class greedy_partitioning_controller;
-}
+class gp_dpo_controller;
+class gp_mdpo_controller;
+} // namespace depth1
 namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }
 } // namespace controller
 
@@ -74,8 +75,9 @@ NS_START(events);
  */
 class cache_vanished
     : public rcppsw::er::client<cache_vanished>,
-      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
+      public visitor::visit_set<controller::depth1::gp_dpo_controller,
+                                controller::depth1::gp_mdpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 tasks::depth1::collector,
                                 tasks::depth1::harvester,
                                 tasks::depth2::cache_transferer,
@@ -93,11 +95,11 @@ class cache_vanished
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
   void visit(tasks::depth1::collector& task) override;
   void visit(tasks::depth1::harvester& task) override;
-  void visit(
-      controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(controller::depth1::gp_dpo_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::grp_mdpo_controller& controller) override;
   void visit(tasks::depth2::cache_transferer& controller) override;
 
  private:

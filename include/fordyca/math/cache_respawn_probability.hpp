@@ -53,10 +53,10 @@ class cache_respawn_probability : public rcppsw::math::expression<double> {
   /**
    * @brief Calculate the probability of respawn
    *
-   * @param n_foragers # robots currently executing Forager task.
+   * @param n_harvesters # robots currently executing Harvester task.
    * @param n_collectors # robots currently executing Collector task.
    */
-  double calc(size_t n_foragers, size_t n_collectors);
+  double calc(uint n_harvesters, uint n_collectors);
 
  private:
   const double mc_scale_factor;

@@ -25,12 +25,15 @@
 #include <vector>
 
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
+#include "fordyca/metrics/caches/location_metrics.hpp"
+#include "fordyca/metrics/caches/location_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/params/metrics_params.hpp"
+
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
@@ -39,7 +42,7 @@
 #include "rcppsw/task_allocation/bi_tab.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
@@ -51,52 +54,61 @@
 NS_START(fordyca, support, depth1);
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
-    const struct params::metrics_params* params,
+    const params::metrics_params* const mparams,
+    const rswc::convergence_params* const cparams,
     const std::string& output_root)
-    : depth0_metrics_aggregator(params, output_root),
+    : depth0_metrics_aggregator(mparams, cparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acquisition",
-      metrics_path() + "/" + params->cache_acquisition_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->cache_acquisition_fname,
+      mparams->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kCollectorName),
-      metrics_path() + "/" + params->task_execution_collector_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_collector_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kHarvesterName),
-      metrics_path() + "/" + params->task_execution_harvester_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_harvester_fname,
+      mparams->collect_interval);
   register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task0::kGeneralistName),
-      metrics_path() + "/" + params->task_execution_generalist_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_execution_generalist_fname,
+      mparams->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::generalist",
-      metrics_path() + "/" + params->task_tab_generalist_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->task_tab_generalist_fname,
+      mparams->collect_interval);
 
   register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
-      metrics_path() + "/" + params->task_distribution_fname,
-      params->collect_interval,
+      metrics_path() + "/" + mparams->task_distribution_fname,
+      mparams->collect_interval,
       1);
 
   register_collector<metrics::caches::utilization_metrics_collector>(
       "caches::utilization",
-      metrics_path() + "/" + params->cache_utilization_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->cache_utilization_fname,
+      mparams->collect_interval);
   register_collector<metrics::caches::lifecycle_metrics_collector>(
       "caches::lifecycle",
-      metrics_path() + "/" + params->cache_lifecycle_fname,
-      params->collect_interval);
+      metrics_path() + "/" + mparams->cache_lifecycle_fname,
+      mparams->collect_interval);
+
+  register_collector<metrics::caches::location_metrics_collector>(
+      "caches::locations",
+      metrics_path() + "/" + mparams->cache_locations_fname,
+      mparams->collect_interval,
+      rmath::dvec2uvec(mparams->arena_grid.upper,
+                       mparams->arena_grid.resolution));
   reset_all();
 }
 
@@ -105,7 +117,10 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
  ******************************************************************************/
 void depth1_metrics_aggregator::collect_from_cache(
     const representation::arena_cache* const cache) {
-  collect("caches::utilization", *cache);
+  auto util_m = dynamic_cast<const metrics::caches::utilization_metrics*>(cache);
+  auto loc_m = dynamic_cast<const metrics::caches::location_metrics*>(cache);
+  collect("caches::utilization", *util_m);
+  collect("caches::locations", *loc_m);
 } /* collect_from_cache() */
 
 void depth1_metrics_aggregator::collect_from_cache_manager(

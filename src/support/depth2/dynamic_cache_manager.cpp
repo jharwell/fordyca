@@ -26,8 +26,8 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/representation/arena_cache.hpp"
 #include "fordyca/representation/base_block.hpp"
-#include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 #include "fordyca/representation/block_cluster.hpp"
+#include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +48,7 @@ dynamic_cache_manager::dynamic_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-base_cache_manager::creation_result dynamic_cache_manager::create(
+base_cache_manager::creation_res_t dynamic_cache_manager::create(
     const ds::cache_vector& existing_caches,
     const ds::const_block_cluster_list& clusters,
     ds::block_vector& blocks) {
@@ -58,23 +58,24 @@ base_cache_manager::creation_result dynamic_cache_manager::create(
       mc_cache_params.dynamic.min_dist,
       mc_cache_params.dynamic.min_blocks);
 
-  auto pair = calc_blocks_for_creation(existing_caches, clusters, blocks);
-  if (!pair.status) {
-    return creation_result(false, ds::cache_vector());
+  block_calc_res_t r =
+      calc_blocks_for_creation(existing_caches, clusters, blocks);
+  if (!r.status) {
+    return creation_res_t{false, ds::cache_vector()};
   }
-  auto created = creator.create_all(existing_caches,
-                                    pair.blocks,
-                                    mc_cache_params.dimension);
+
+  ds::cache_vector created =
+      creator.create_all(existing_caches, r.blocks, mc_cache_params.dimension);
 
   /*
    * Must be after fixing hidden blocks, otherwise the cache host cell will
    * have a block as its entity!
    */
   creator.update_host_cells(created);
-  return creation_result(!created.empty(), created);
+  return creation_res_t{!created.empty(), created};
 } /* create() */
 
-base_cache_manager::block_calc_result dynamic_cache_manager::calc_blocks_for_creation(
+base_cache_manager::block_calc_res_t dynamic_cache_manager::calc_blocks_for_creation(
     const ds::cache_vector& existing_caches,
     const ds::const_block_cluster_list& clusters,
     const ds::block_vector& blocks) {
@@ -90,18 +91,19 @@ base_cache_manager::block_calc_result dynamic_cache_manager::calc_blocks_for_cre
                                       return !c->contains_block(b);
                                     }) &&
 
-                     /* blocks cannot be in clusters */
-                     std::all_of(clusters.begin(),
-                                 clusters.end(),
-                                 [&](const auto& clust) {
-                                   /* constructed, so must assign before search */
-                                   auto cblocks = clust->blocks();
-                                   return cblocks.end() == std::find(cblocks.begin(),
-                                                                     cblocks.end(),
-                                                                     b);
-                                 }) &&
-                     /* blocks cannot be carried by a robot */
-                     -1 == b->robot_id();
+                        /* blocks cannot be in clusters */
+                        std::all_of(clusters.begin(),
+                                    clusters.end(),
+                                    [&](const auto& clust) {
+                                      /* constructed, so must assign before search */
+                                      auto cblocks = clust->blocks();
+                                      return cblocks.end() ==
+                                             std::find(cblocks.begin(),
+                                                       cblocks.end(),
+                                                       b);
+                                    }) &&
+                        /* blocks cannot be carried by a robot */
+                        -1 == b->robot_id();
                });
 
   bool ret = true;
@@ -148,7 +150,7 @@ base_cache_manager::block_calc_result dynamic_cache_manager::calc_blocks_for_cre
             mc_cache_params.dynamic.min_blocks);
     ret = false;
   }
-  return block_calc_result(ret, to_use);
+  return block_calc_res_t{ret, to_use};
 } /* calc_blocks_for_creation() */
 
 NS_END(depth2, support, fordyca);

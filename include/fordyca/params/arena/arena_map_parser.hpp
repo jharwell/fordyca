@@ -77,12 +77,12 @@ class arena_map_parser : public rcppsw::params::xml_param_parser {
     return m_params;
   }
 
-  // clang-format off
+  /* clang-format off */
   std::shared_ptr<arena_map_params> m_params{nullptr};
   grid_parser                       m_grid;
   blocks_parser                     m_blocks;
   nest_parser                       m_nest;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(arena, params, fordyca);

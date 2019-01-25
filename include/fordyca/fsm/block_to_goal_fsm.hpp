@@ -158,10 +158,10 @@ class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
     return &mc_state_map[index];
   }
 
-  // clang-format off
+  /* clang-format off */
   acquire_goal_fsm* const  m_goal_fsm;
   acquire_goal_fsm * const m_block_fsm;
-  // clang-format on
+  /* clang-format on */
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

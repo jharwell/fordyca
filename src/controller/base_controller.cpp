@@ -40,6 +40,7 @@
 #include "fordyca/params/base_controller_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/support/tv/tv_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,12 +69,16 @@ void base_controller::position(const rmath::vector2d& loc) {
   m_saa->sensing()->position(loc);
 }
 
-__rcsw_pure rmath::vector2d base_controller::position(void) const {
+__rcsw_pure const rmath::vector2d& base_controller::position(void) const {
   return m_saa->sensing()->position();
 }
 
+__rcsw_pure rmath::vector2d base_controller::heading(void) const {
+  return m_saa->sensing()->heading();
+}
+
 void base_controller::Init(ticpp::Element& node) {
-#ifndef ER_NREPORT
+#ifndef RCPPSW_ER_NREPORT
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
   } else {
@@ -96,32 +101,8 @@ void base_controller::Init(ticpp::Element& node) {
   output_init(params);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  struct actuation_subsystem::actuator_list alist = {
-      .wheels = hal::actuators::differential_drive_actuator(
-          GetActuator<argos::CCI_DifferentialSteeringActuator>(
-              "differential_steering")),
-      .leds = hal::actuators::led_actuator(
-          GetActuator<argos::CCI_LEDsActuator>("leds")),
-      .wifi = hal::actuators::wifi_actuator(
-          GetActuator<argos::CCI_RangeAndBearingActuator>(
-              "range_and_bearing"))};
-  struct sensing_subsystem::sensor_list slist = {
-      .rabs = hal::sensors::rab_wifi_sensor(
-          GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
-      .proximity = hal::sensors::proximity_sensor(
-          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
-      .light = hal::sensors::light_sensor(
-          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
-      .ground = hal::sensors::ground_sensor(
-          GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-              "footbot_motor_ground")),
-      .battery = hal::sensors::battery_sensor(
-          GetSensor<argos::CCI_BatterySensor>("battery"))};
-  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
-      param_repo.parse_results<struct params::actuation_params>(),
-      param_repo.parse_results<struct params::sensing_params>(),
-      &alist,
-      &slist);
+  saa_init(param_repo.parse_results<params::actuation_params>(),
+           param_repo.parse_results<params::sensing_params>());
   ndc_pop();
 } /* Init() */
 
@@ -129,6 +110,50 @@ void base_controller::Reset(void) {
   CCI_Controller::Reset();
   m_block.reset();
 } /* Reset() */
+
+void base_controller::saa_init(const params::actuation_params* const actuation_p,
+                               const params::sensing_params* const sensing_p) {
+  struct actuation_subsystem::actuator_list alist = {
+      .wheels = hal::actuators::differential_drive_actuator(
+          GetActuator<argos::CCI_DifferentialSteeringActuator>(
+              "differential_steering")),
+#ifdef FORDYCA_WITH_ROBOT_LEDS
+      .leds = hal::actuators::led_actuator(
+          GetActuator<argos::CCI_LEDsActuator>("leds")),
+#else
+      .leds = hal::actuators::led_actuator(nullptr),
+#endif
+#ifdef FORDYCA_WITH_ROBOT_RAB
+      .wifi = hal::actuators::wifi_actuator(
+          GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")),
+#else
+      .wifi = hal::actuators::wifi_actuator(nullptr)
+#endif
+  };
+  struct sensing_subsystem::sensor_list slist = {
+#ifdef FORDYCA_WITH_ROBOT_RAB
+      .rabs = hal::sensors::rab_wifi_sensor(
+          GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
+#else
+      .rabs = hal::sensors::rab_wifi_sensor(nullptr),
+#endif
+      .proximity = hal::sensors::proximity_sensor(
+          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
+      .light = hal::sensors::light_sensor(
+          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
+      .ground = hal::sensors::ground_sensor(
+          GetSensor<argos::CCI_FootBotMotorGroundSensor>(
+              "footbot_motor_ground")),
+#ifdef FORDYCA_WITH_ROBOT_RAB
+      .battery = hal::sensors::battery_sensor(
+          GetSensor<argos::CCI_BatterySensor>("battery")),
+#else
+      .battery = hal::sensors::battery_sensor(nullptr),
+#endif
+  };
+  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
+      actuation_p, sensing_p, &alist, &slist);
+} /* saa_init() */
 
 void base_controller::output_init(
     const struct params::output_params* const params) {
@@ -148,7 +173,7 @@ void base_controller::output_init(
     fs::create_directories(output_root);
   }
 
-#ifndef ER_NREPORT
+#ifndef RCPPSW_ER_NREPORT
   /*
    * Each file appender is attached to a root category in the FORDYCA
    * namespace. If you give different file appenders the same file, then the
@@ -187,5 +212,40 @@ void base_controller::ndc_pusht(void) {
   ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick()) + "] [" +
               GetId() + "]");
 }
+
+double base_controller::applied_motion_throttle(void) const {
+  return saa_subsystem()->actuation()->differential_drive().applied_throttle();
+} /* applied_motion_throttle() */
+
+void base_controller::tv_init(const support::tv::tv_controller* tv_controller) {
+  m_tv_controller = tv_controller;
+  saa_subsystem()->actuation()->differential_drive().throttling(
+      tv_controller->movement_throttling_handler(entity_id()));
+} /* tv_init() */
+
+/*******************************************************************************
+ * Movement Metrics
+ ******************************************************************************/
+__rcsw_pure double base_controller::distance(void) const {
+  /*
+   * If you allow distance gathering at timesteps < 1, you get a big jump
+   * because of the prev/current location not being set up properly yet.
+   */
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->sensing()->heading().length();
+  }
+  return 0;
+} /* distance() */
+
+rmath::vector2d base_controller::velocity(void) const {
+  /*
+   * If you allow distance gathering at timesteps < 1, you get a big jump
+   * because of the prev/current location not being set up properly yet.
+   */
+  if (saa_subsystem()->sensing()->tick() > 1) {
+    return saa_subsystem()->linear_velocity();
+  }
+  return rmath::vector2d(0, 0);
+} /* velocity() */
 
 NS_END(controller, fordyca);

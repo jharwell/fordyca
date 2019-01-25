@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/base_metrics_aggregator.hpp"
 #include <string>
+#include "fordyca/metrics/base_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +49,8 @@ namespace er = rcppsw::er;
 class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
                                   public er::client<depth0_metrics_aggregator> {
  public:
-  depth0_metrics_aggregator(const struct params::metrics_params* params,
+  depth0_metrics_aggregator(const params::metrics_params* mparams,
+                            const rswc::convergence_params * cparams,
                             const std::string& output_root);
 
   /*

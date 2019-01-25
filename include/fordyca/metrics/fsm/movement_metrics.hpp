@@ -43,7 +43,7 @@ namespace rmath = rcppsw::math;
  * @brief Interface defining what metrics regarding movement traveled should be
  * collected from all robots.
  */
-class movement_metrics : public virtual rcppsw::metrics::base_metrics {
+class movement_metrics : virtual public rcppsw::metrics::base_metrics {
  public:
   movement_metrics(void) = default;
   ~movement_metrics(void) override = default;

@@ -70,10 +70,10 @@ class task_visualizer : public rcppsw::er::client<task_visualizer> {
    */
   void draw(const ta::logical_task* const current_task);
 
-  // clang-format off
+  /* clang-format off */
   double                               m_text_vis_offset{0.0};
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fordyca, support);

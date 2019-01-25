@@ -24,6 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/plugins/simulator/entities/light_entity.h>
+#include <list>
+
 #include "fordyca/representation/immovable_cell_entity.hpp"
 #include "fordyca/representation/multicell_entity.hpp"
 
@@ -44,9 +47,15 @@ NS_START(fordyca, representation);
  */
 class nest : public multicell_entity, public immovable_cell_entity {
  public:
-  nest(const rmath::vector2d& dim, const rmath::vector2d& loc, double resolution)
-      : multicell_entity(dim, rcppsw::utils::color::kGRAY70),
-        immovable_cell_entity(loc, resolution) {}
+  /**
+   * @brief We use raw pointers to indicate that ARGoS owns the constructed
+   * lights. If we own them, then when ARGoS goes to delete them after the
+   * experiment has ended the arena has already been deconstructed and the
+   * nest lights along with them, and an exception is thrown.
+   */
+  using light_list = std::list<argos::CLightEntity*>;
+
+  nest(const rmath::vector2d& dim, const rmath::vector2d& loc, double resolution);
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the
@@ -63,6 +72,17 @@ class nest : public multicell_entity, public immovable_cell_entity {
     return xspan(real_loc()).contains(point.x()) &&
            yspan(real_loc()).contains(point.y());
   }
+
+  light_list& lights(void) { return m_lights; }
+
+ private:
+  light_list init_lights(void) const;
+  light_list init_square(void) const;
+  light_list init_rect(void) const;
+
+  /* clang-format off */
+  light_list m_lights;
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

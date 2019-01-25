@@ -73,10 +73,10 @@ class movable_cell_entity {
   void discrete_loc(const rmath::vector2u& loc) { m_discrete_loc = loc; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   rmath::vector2d       m_real_loc;
   rmath::vector2u m_discrete_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

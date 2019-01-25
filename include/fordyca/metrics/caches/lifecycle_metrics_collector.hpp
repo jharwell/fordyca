@@ -74,9 +74,9 @@ class lifecycle_metrics_collector
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  // clang-format off
+  /* clang-format off */
   struct stats   m_stats;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(caches, metrics, fordyca);

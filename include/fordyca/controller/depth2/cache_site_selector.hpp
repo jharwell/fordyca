@@ -32,18 +32,13 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/ds/cache_list.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace representation {
-class base_cache;
-class base_block;
-}
-NS_START(controller);
+NS_START(fordyca, controller);
 class cache_sel_matrix;
 namespace rmath = rcppsw::math;
 NS_START(depth2);
@@ -62,12 +57,12 @@ NS_START(depth2);
 class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
  public:
   struct cache_constraint_data {
-    representation::base_cache* cache{nullptr};
+    const representation::base_cache* mc_cache{nullptr};
     cache_site_selector*        selector{nullptr};
     double                      cache_prox_dist{0.0};
   };
   struct block_constraint_data {
-    representation::base_block* block{nullptr};
+    const representation::base_block* mc_block{nullptr};
     cache_site_selector*        selector{nullptr};
     double                      block_prox_dist{0.0};
   };
@@ -99,8 +94,8 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * @return The location of the best cache site, or (-1, -1) if no best cache
    * site could be found (can happen if NLopt mysteriously fails).
    */
-  rmath::vector2d calc_best(const ds::cache_list& known_caches,
-                            const ds::block_list& known_blocks,
+  rmath::vector2d calc_best(const ds::dp_cache_map& known_caches,
+                            const ds::dp_block_map& known_blocks,
                             rmath::vector2d position);
 
  private:
@@ -144,26 +139,26 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * @brief Create constraints for known caches, known blocks, and relating to
    * the nest.
    */
-  void constraints_create(const ds::cache_list& known_caches,
-                          const ds::block_list& known_blocks,
+  void constraints_create(const ds::dp_cache_map& known_caches,
+                          const ds::dp_block_map& known_blocks,
                           const rmath::vector2d& nest_loc);
 
 
-  void opt_initialize(const ds::cache_list& known_caches,
-                      const ds::block_list& known_blocks,
+  void opt_initialize(const ds::dp_cache_map& known_caches,
+                      const ds::dp_block_map& known_blocks,
                       rmath::vector2d position,
                       struct site_utility_data* utility_data,
                       std::vector<double>* initial_guess);
 
   bool verify_site(const rmath::vector2d& site,
-                   const ds::cache_list& known_caches,
-                   const ds::block_list& known_blocks) const;
+                   const ds::dp_cache_map& known_caches,
+                   const ds::dp_block_map& known_blocks) const;
 
-  // clang-format off
+  /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;
   nlopt::opt     m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
   constraint_set m_constraints{};
-  // clang-format on
+  /* clang-format on */
 };
 
 double __cache_constraint_func(const std::vector<double>& x,

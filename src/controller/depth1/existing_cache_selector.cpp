@@ -45,29 +45,29 @@ existing_cache_selector::existing_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::perceived_cache existing_cache_selector::calc_best(
-    const std::list<representation::perceived_cache>& existing_caches,
+ds::dp_cache_map::value_type existing_cache_selector::calc_best(
+    const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position) {
-  representation::perceived_cache best;
+  ds::dp_cache_map::value_type best(nullptr, {});
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
-  for (auto& c : existing_caches) {
-    if (cache_is_excluded(position, c.ent.get())) {
+  for (auto& c : existing_caches.values_range()) {
+    if (cache_is_excluded(position, c.ent())) {
       continue;
     }
-    math::existing_cache_utility u(c.ent->real_loc(),
-                                   boost::get<rmath::vector2d>(
-                                       mc_matrix->find(cselm::kNestLoc)->second));
+    math::existing_cache_utility u(
+        c.ent()->real_loc(),
+        boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility =
-        u.calc(position, c.density.last_result(), c.ent->n_blocks());
+        u.calc(position, c.density().last_result(), c.ent()->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for existing_cache%d@%s/%s, density=%f: %f",
-             c.ent->id(),
-             c.ent->real_loc().to_str().c_str(),
-             c.ent->discrete_loc().to_str().c_str(),
-             c.density.last_result(),
+             c.ent()->id(),
+             c.ent()->real_loc().to_str().c_str(),
+             c.ent()->discrete_loc().to_str().c_str(),
+             c.density().last_result(),
              utility);
 
     if (utility > max_utility) {
@@ -76,11 +76,11 @@ representation::perceived_cache existing_cache_selector::calc_best(
     }
   } /* for(existing_cache..) */
 
-  if (nullptr != best.ent) {
+  if (nullptr != best.ent()) {
     ER_INFO("Best utility: existing_cache%d@%s/%s: %f",
-            best.ent->id(),
-            best.ent->real_loc().to_str().c_str(),
-            best.ent->discrete_loc().to_str().c_str(),
+            best.ent()->id(),
+            best.ent()->real_loc().to_str().c_str(),
+            best.ent()->discrete_loc().to_str().c_str(),
             max_utility);
   } else {
     ER_WARN("No best existing cache found: all known caches excluded!");
@@ -103,10 +103,10 @@ bool existing_cache_selector::cache_is_excluded(
    */
   if (cache->contains_point(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s in search: robot@%s inside it",
-            cache->id(),
-            cache->real_loc().to_str().c_str(),
-            cache->discrete_loc().to_str().c_str(),
-            position.to_str().c_str());
+             cache->id(),
+             cache->real_loc().to_str().c_str(),
+             cache->discrete_loc().to_str().c_str(),
+             position.to_str().c_str());
     return true;
   }
 
@@ -123,9 +123,9 @@ bool existing_cache_selector::cache_is_excluded(
         return id == cache->id();
       })) {
     ER_DEBUG("Ignoring cache%d@%s/%s: On exception list",
-            cache->id(),
-            cache->real_loc().to_str().c_str(),
-            cache->discrete_loc().to_str().c_str());
+             cache->id(),
+             cache->real_loc().to_str().c_str(),
+             cache->discrete_loc().to_str().c_str());
     return true;
   }
   return false;

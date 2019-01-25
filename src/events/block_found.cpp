@@ -22,10 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/representation/base_block.hpp"
+#include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
@@ -33,23 +35,77 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 using ds::occupancy_grid;
-namespace swarm = rcppsw::swarm;
+namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 block_found::block_found(std::unique_ptr<representation::base_block> block)
-    : perceived_cell_op(block->discrete_loc()),
-      ER_CLIENT_INIT("fordyca.events.block_found"),
+    : ER_CLIENT_INIT("fordyca.events.block_found"),
+      cell_op(block->discrete_loc()),
       m_block(std::move(block)) {}
 
 block_found::block_found(const std::shared_ptr<representation::base_block>& block)
-    : perceived_cell_op(block->discrete_loc()),
-      ER_CLIENT_INIT("fordyca.events.block_found"),
+    : ER_CLIENT_INIT("fordyca.events.block_found"),
+      cell_op(block->discrete_loc()),
       m_block(block) {}
 
 /*******************************************************************************
  * Depth0 Foraging
+ ******************************************************************************/
+void block_found::visit(ds::dpo_store& store) {
+  /*
+   * If the cell in the arena that we thought contained a cache now contains a
+   * block, remove the out-of-date cache.
+   */
+  for (auto&& c : store.caches().values_range()) {
+    if (m_block->discrete_loc() == c.ent()->discrete_loc()) {
+      store.cache_remove(c.ent_obj());
+
+      /*
+       * We need to start a new decay count because the type of object in a
+       * given cell has changed. This is regardless of the status repeat
+       * deposits, which only affect repeated sightings of KNOWN objects.
+       */
+      const_cast<ds::dp_cache_map::value_type&>(c).density().reset();
+    }
+  } /* for(&&c..) */
+
+  rswarm::pheromone_density density;
+  auto known = store.find(m_block);
+  if (nullptr != known) {
+    /*
+     * If the block we just "found" is already known and has a different
+     * location than we think it should, then our tracked version is out of date
+     * and needs to be removed.
+     */
+    if (!known->ent()->loccmp(*m_block)) {
+      ER_INFO("Removing block%d@%s: Moved to %s",
+              known->ent()->id(),
+              known->ent()->discrete_loc().to_str().c_str(),
+              m_block->discrete_loc().to_str().c_str());
+      store.block_remove(known->ent_obj());
+      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
+    } else {
+      density = known->density();
+
+      /*
+       * Repeat pheromone deposits only affect blocks that are already known and
+       * that we are tracking accurately.
+       */
+      if (store.repeat_deposit()) {
+        density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+      }
+    }
+  } else {
+    density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
+  }
+
+  store.block_update(ds::dp_block_map::value_type(m_block, density));
+} /* visit() */
+
+/*******************************************************************************
+ * MDPO Foraging
  ******************************************************************************/
 void block_found::visit(ds::cell2D& cell) {
   cell.entity(m_block);
@@ -68,9 +124,9 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
             "Perceived cell in incorrect state after block found event");
 } /* visit() */
 
-void block_found::visit(ds::perceived_arena_map& map) {
+void block_found::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  swarm::pheromone_density& density =
+  rswarm::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
 
   if (!cell.state_is_known()) {
@@ -103,30 +159,44 @@ void block_found::visit(ds::perceived_arena_map& map) {
   }
 
   if (map.pheromone_repeat_deposit()) {
-    density.pheromone_add(1.0);
+    density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
   } else {
     /*
      * Seeing a new block on empty square or one that used to contain a cache.
      */
     if (!cell.state_has_block()) {
       density.reset();
-      density.pheromone_add(1.0);
+      density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
     } else { /* Seeing a known block again--set its relevance to the max */
-      density.pheromone_set(1.0);
+      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   }
   /*
-   * ONLY if we actually added a block the list of known blocks do we update
-   * what block the cell points to. If we do it unconditionally, we are left
+   * ONLY if the underlying DPO store actually changed do we update what block
+   * the cell points to. If we do it unconditionally, we are left
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
    * #229.
    */
-  if (map.block_add(m_block)) {
+  auto res = map.block_update(ds::dp_block_map::value_type(m_block, density));
+  if (res.status) {
+    if (ds::dpo_store::update_status::kBlockMoved == res.reason) {
+      ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
+               res.old_loc.to_str().c_str(),
+               m_block->id(),
+               res.old_loc.to_str().c_str(),
+               m_block->discrete_loc().to_str().c_str());
+      events::cell_empty op(res.old_loc);
+      map.access<occupancy_grid::kCell>(res.old_loc).accept(op);
+    } else {
+      ER_ASSERT(ds::dpo_store::update_status::kNewBlockAdded == res.reason,
+                "Bad reason for DPO store update: %d",
+                res.reason);
+    }
+
     /*
-     * The density of the cell for the newly discovered block needs to be
-     * reset, as the cell may have contained a different cache/block which no
-     * longer exists, and we need to start a new density decay count for the
-     * newly discovered block.
+     * At this point we know that if the block was previously tracked, its old
+     * host cell has been updated and the block updated in the store, so we are
+     * good to update the NEW host cell to point to the block.
      */
     cell.accept(*this);
   }
@@ -143,8 +213,12 @@ void block_found::visit(ds::perceived_arena_map& map) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_found::visit(controller::depth2::greedy_recpart_controller& c) {
-  c.perception()->map()->accept(*this);
+void block_found::visit(controller::depth2::grp_mdpo_controller& c) {
+  c.ndc_push();
+
+  c.mdpo_perception()->map()->accept(*this);
+
+  c.ndc_pop();
 } /* visit() */
 
 NS_END(events, fordyca);

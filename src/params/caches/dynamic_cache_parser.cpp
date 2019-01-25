@@ -59,7 +59,7 @@ void dynamic_cache_parser::show(std::ostream& stream) const {
          << build_footer();
 } /* show() */
 
-__rcsw_pure bool dynamic_cache_parser::validate(void) const {
+__rcsw_const bool dynamic_cache_parser::validate(void) const {
   CHECK(m_params->min_dist > 0);
   CHECK(m_params->min_blocks > 0);
 
