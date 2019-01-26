@@ -70,9 +70,9 @@ void mdpo_controller::ControlStep(void) {
    */
   perception()->update();
 
-  if(m_communication_params.on) {
-    perform_communication();
-  }
+  // if(m_communication_params.on) {
+  //   perform_communication();
+  // }
 
   fsm()->run();
   ndc_pop();
@@ -100,11 +100,11 @@ void mdpo_controller::Init(ticpp::Element& node) {
   shared_init(param_repo);
   private_init();
 
-  auto* comm_params = param_repo.parse_results<params::communication_params>();
-  m_communication_params = *comm_params;
-
-  m_arena_x = mdpo_perception()->map()->xdsize();
-  m_arena_y = mdpo_perception()->map()->ydsize();
+  // auto* comm_params = param_repo.parse_results<params::communication_params>();
+  // m_communication_params = *comm_params;
+  //
+  // m_arena_x = mdpo_perception()->map()->xdsize();
+  // m_arena_y = mdpo_perception()->map()->ydsize();
 
   ER_INFO("Initialization finished");
   ndc_pop();
@@ -257,7 +257,7 @@ rcppsw::math::vector2u mdpo_controller::get_most_valuable_cell(void) {
 
   // Get information regarding the location of the nest
   rcppsw::math::vector2d nest_loc = boost::get<rcppsw::math::vector2d>(
-    m_block_sel_matrix->find("nest_loc")->second);
+    block_sel_matrix()->find("nest_loc")->second);
   int nest_x_coord = nest_loc.x();
   int nest_y_coord = nest_loc.y();
 

@@ -55,8 +55,8 @@ namespace ta = rcppsw::task_allocation;
 dpo_controller::dpo_controller(void)
     : crw_controller(),
       ER_CLIENT_INIT("fordyca.controller.depth0.dpo"),
-      m_block_sel_matrix(),
       m_light_loc(),
+      m_block_sel_matrix(),
       m_perception(),
       m_fsm() {}
 

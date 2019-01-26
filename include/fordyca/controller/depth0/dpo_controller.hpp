@@ -158,10 +158,6 @@ class dpo_controller : public crw_controller,
    */
   void shared_init(const params::depth0::dpo_controller_repository& param_repo);
 
-  /* clang-format off */
-  std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
-  /* clang-format on */
-
  private:
   /**
    * @brief Perform private initialization for the controller:
@@ -178,6 +174,7 @@ class dpo_controller : public crw_controller,
   /* clang-format off */
   bool                                       m_display_los{false};
   rmath::vector2d                            m_light_loc;
+  std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
   std::unique_ptr<fsm::depth0::dpo_fsm>      m_fsm;
   /* clang-format on */
