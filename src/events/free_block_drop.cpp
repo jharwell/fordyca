@@ -25,12 +25,12 @@
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
@@ -82,15 +82,6 @@ void free_block_drop::visit(representation::base_block& block) {
 void free_block_drop::visit(ds::arena_map& map) {
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::coord());
 
-  if (cell.state_has_cache()) {
-    cache_block_drop op(m_block,
-                        std::static_pointer_cast<representation::arena_cache>(
-                            cell.cache()),
-                        m_resolution);
-    map.accept(op);
-    return;
-  }
-
   /*
    * Dropping a block onto a cell that already contains a single block (but not
    * a cache) does not work, so we have to fudge it and just distribute the
@@ -102,31 +93,41 @@ void free_block_drop::visit(ds::arena_map& map) {
    * Even in depth2, when dynamic cache creation is enabled, robots drop blocks
    * NEXT to others to start caches, NOT on top of them.
    *
-   * This was a terrible bug to track down.
+   * I already changed this once and had to track down and re-fix it. DO NOT
+   * CHANGE AGAIN UNLESS REALLY REALLY SURE WHAT I AM DOING.
    */
-  if (cell.state_has_block()) {
+  if (cell.state_has_cache()) {
+    cache_block_drop op(m_block,
+                        std::static_pointer_cast<representation::arena_cache>(
+                            cell.cache()),
+                        m_resolution);
+    map.accept(op);
+  } else if (cell.state_has_block()) {
     map.distribute_single_block(m_block);
+  } else {
+    /*
+     * Cell does not have a block/cache on it, so it is safe to drop the block
+     * on it and change the cell state.
+     */
+    cell.accept(*this);
   }
-  /*
-   * Cell does not have a block/cache on it; either empty or unknown (base
-   * case).
-   */
-  cell.accept(*this);
 } /* visit() */
 
 /*******************************************************************************
  * Depth1
  ******************************************************************************/
-void free_block_drop::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+void free_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.block(nullptr);
+} /* visit() */
+
+void free_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
 /*******************************************************************************
  * Depth2
  ******************************************************************************/
-void free_block_drop::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
   auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
@@ -157,10 +158,11 @@ void free_block_drop::visit(
           m_block->real_loc().to_str().c_str(),
           polled->name().c_str());
   controller.block(nullptr);
+
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_drop::visit(ds::perceived_arena_map& map) {
+void free_block_drop::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(cell_op::coord());
   cell.accept(*this);
 } /* visit() */

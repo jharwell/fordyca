@@ -57,10 +57,10 @@ class phototaxis_force {
 
   rmath::vector2d operator()() const;
 
-  // clang-format off
+  /* clang-format off */
   double                                   m_max;
   std::shared_ptr<sensing_subsystem>  m_sensors;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

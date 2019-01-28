@@ -60,14 +60,14 @@ class tasking_initializer : public depth1::tasking_initializer,
   ~tasking_initializer(void) override;
 
   std::unique_ptr<ta::bi_tdgraph_executive>
-  operator()(params::depth2::controller_repository *const param_repo);
+  operator()(const params::depth2::controller_repository& param_repo);
 
   using depth1::tasking_initializer::tasking_map;
 
  protected:
   tasking_map depth2_tasks_create(
-      params::depth2::controller_repository* task_repo);
-  void depth2_exec_est_init(params::depth2::controller_repository* task_repo,
+      const params::depth2::controller_repository& task_repo);
+  void depth2_exec_est_init(const params::depth2::controller_repository& task_repo,
                             const tasking_map& map);
 };
 

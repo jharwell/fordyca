@@ -29,9 +29,9 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/metrics/robot_interaction_metrics.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,10 +40,20 @@ NS_START(fordyca);
 
 namespace params {
 struct output_params;
+namespace tv {
+struct tv_controller_params;
 }
-namespace ds { class arena_map; }
-
+} // namespace params
+namespace ds {
+class arena_map;
+}
 NS_START(support);
+
+namespace tv {
+class tv_controller;
+}
+namespace rmath = rcppsw::math;
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Classes
@@ -61,7 +71,7 @@ NS_START(support);
  * the \ref argos::CLoopFunctions class.
  */
 class base_loop_functions : public argos::CLoopFunctions,
-                            public metrics::robot_interaction_metrics,
+                            public rmetrics::swarm::convergence_metrics,
                             public rcppsw::er::client<base_loop_functions> {
  public:
   base_loop_functions(void);
@@ -70,16 +80,21 @@ class base_loop_functions : public argos::CLoopFunctions,
 
   /* CLoopFunctions overrides */
   void Init(ticpp::Element&) override;
-  void PreStep(void) override;
   void Reset(void) override;
+  void PreStep(void) override;
 
-  /* loop metrics */
-  std::vector<double> nearest_neighbors(void) const override;
+  /* convergence metrics */
+  std::vector<double> robot_nearest_neighbors(void) const override;
+  std::vector<rmath::radians> robot_headings(void) const override;
+  std::vector<rmath::vector2d> robot_positions(void) const override;
 
   void ndc_push(void) {
     ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
   }
   void ndc_pop(void) { ER_NDC_POP(); }
+  const tv::tv_controller* tv_controller(void) const {
+    return m_tv_controller.get();
+  }
 
  protected:
   argos::CFloorEntity* floor(void) const { return m_floor; }
@@ -87,6 +102,8 @@ class base_loop_functions : public argos::CLoopFunctions,
   const params::loop_function_repository* params(void) const {
     return &m_params;
   }
+  tv::tv_controller* tv_controller(void) { return m_tv_controller.get(); }
+
   params::loop_function_repository* params(void) { return &m_params; }
   const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
   ds::arena_map* arena_map(void) { return m_arena_map.get(); }
@@ -99,13 +116,16 @@ class base_loop_functions : public argos::CLoopFunctions,
    */
   void output_init(const struct params::output_params* const output);
   void arena_map_init(const params::loop_function_repository* repo);
+  void tv_init(const params::tv::tv_controller_params* tvp);
 
-  // clang-format off
-  argos::CFloorEntity*             m_floor{nullptr};
-  std::string                      m_output_root{""};
-  params::loop_function_repository m_params{};
-  std::unique_ptr<ds::arena_map>   m_arena_map;
-  // clang-format on
+  /* clang-format off */
+  uint                               m_loop_threads{0};
+  argos::CFloorEntity*               m_floor{nullptr};
+  std::string                        m_output_root{""};
+  params::loop_function_repository   m_params{};
+  std::unique_ptr<ds::arena_map>     m_arena_map;
+  std::unique_ptr<tv::tv_controller> m_tv_controller;
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

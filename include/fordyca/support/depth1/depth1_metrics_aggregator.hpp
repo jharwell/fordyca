@@ -44,7 +44,7 @@ class bi_tab;
 namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
 
-namespace controller { namespace depth1 { class greedy_partitioning_controller; }}
+namespace controller { namespace depth1 { class gp_mdpo_controller; }}
 namespace representation { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);
@@ -72,7 +72,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
  public:
   using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
-  depth1_metrics_aggregator(const struct params::metrics_params* params,
+  depth1_metrics_aggregator(const params::metrics_params* mparams,
+                            const rswc::convergence_params * cparams,
                             const std::string& output_root);
 
   /**
@@ -104,12 +105,17 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
       dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
 
   ER_ASSERT(movement_m, "Controller does not provide FSM movement metrics");
-  ER_ASSERT(worldm_m, "Controller does not provide world model metrics");
+
+  /* only MDPO controllers provide these */
+  if (nullptr != worldm_m) {
+    collect("perception::world_model", *worldm_m);
+  }
+
   ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
 
   collect("fsm::movement", *movement_m);
   collect("blocks::manipulation", *manip_m);
-  collect("perception::world_model", *worldm_m);
+
 
   if (nullptr != controller->current_task()) {
     auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(

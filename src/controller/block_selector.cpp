@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_selector.hpp"
+
 #include "fordyca/math/block_utility.hpp"
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cube_block.hpp"
@@ -42,15 +43,15 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::perceived_block block_selector::calc_best(
-    const ds::perceived_block_list& blocks,
+ds::dp_block_map::value_type block_selector::calc_best(
+    const ds::dp_block_map& blocks,
     const rmath::vector2d& position) {
   double max_utility = 0.0;
-  representation::perceived_block best{nullptr, {}};
+  ds::dp_block_map::value_type best{nullptr, {}};
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
-  for (auto& b : blocks) {
-    if (block_is_excluded(position, b.ent.get())) {
+  for (const auto& b : blocks.values_range()) {
+    if (block_is_excluded(position, b.ent())) {
       continue;
     }
 
@@ -59,20 +60,20 @@ representation::perceived_block block_selector::calc_best(
      * undoubtedly have to change in the future.
      */
     double priority =
-        (dynamic_cast<representation::cube_block*>(b.ent.get()))
+        (dynamic_cast<const representation::cube_block*>(b.ent()))
             ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
             : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =
         boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
-    double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
-        position, b.density.last_result(), priority);
+    double utility = math::block_utility(b.ent()->real_loc(), nest_loc)(
+        position, b.density().last_result(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
-             b.ent->id(),
-             b.ent->real_loc().to_str().c_str(),
-             b.ent->discrete_loc().to_str().c_str(),
-             b.density.last_result(),
+             b.ent()->id(),
+             b.ent()->real_loc().to_str().c_str(),
+             b.ent()->discrete_loc().to_str().c_str(),
+             b.density().last_result(),
              utility);
     if (utility > max_utility) {
       best = b;
@@ -80,15 +81,14 @@ representation::perceived_block block_selector::calc_best(
     }
   } /* for(block..) */
 
-  if (nullptr != best.ent) {
+  if (nullptr != best.ent()) {
     ER_INFO("Best utility: block%d@%s/%s: %f",
-            best.ent->id(),
-            best.ent->real_loc().to_str().c_str(),
-            best.ent->real_loc().to_str().c_str(),
+            best.ent()->id(),
+            best.ent()->real_loc().to_str().c_str(),
+            best.ent()->discrete_loc().to_str().c_str(),
             max_utility);
   } else {
-    ER_WARN(
-        "No best block found: all known blocks excluded!");
+    ER_WARN("No best block found: all known blocks excluded!");
   }
   return best;
 } /* calc_best() */
@@ -100,11 +100,11 @@ bool block_selector::block_is_excluded(
                               block->yspan(block->real_loc()).span());
   if ((position - block->real_loc()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
-            block->id(),
-            block->real_loc().to_str().c_str(),
-            block->discrete_loc().to_str().c_str(),
-            (position - block->real_loc()).length(),
-            block_dim);
+             block->id(),
+             block->real_loc().to_str().c_str(),
+             block->discrete_loc().to_str().c_str(),
+             (position - block->real_loc()).length(),
+             block_dim);
     return true;
   }
   std::vector<int> exceptions = boost::get<std::vector<int>>(
@@ -113,9 +113,9 @@ bool block_selector::block_is_excluded(
         return id == block->id();
       })) {
     ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
-            block->id(),
-            block->real_loc().to_str().c_str(),
-            block->discrete_loc().to_str().c_str());
+             block->id(),
+             block->real_loc().to_str().c_str(),
+             block->discrete_loc().to_str().c_str());
     return true;
   }
   return false;

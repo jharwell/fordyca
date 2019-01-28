@@ -1,8 +1,20 @@
 ################################################################################
+# Configuration Options                                                        #
+################################################################################
+set(WITH_FOOTBOOT_LEDS "YES" CACHE STRING "Enable footbot robots to control their LEDS via actuators")
+set(WITH_FOOTBOOT_RAB "YES" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
+
+define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_LEDS"
+  BRIEF_DOCS "Enable footbot robots to control their LEDS"
+  FULL_DOCS "Default=yes.")
+define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_RAB"
+  BRIEF_DOCS "Enable footbot robots to use the RAB medium"
+  FULL_DOCS "Default=yes.")
+
+################################################################################
 # External Projects                                                            #
 ################################################################################
 set(${target}_CHECK_LANGUAGE "CXX")
-set(${target}_HAS_RECURSIVE_DIRS NO)
 
 if(BUILD_ON_MSI)
   set(ARGOS_INSTALL_PREFIX /home/gini/shared/swarm)
@@ -18,7 +30,7 @@ set(CMAKE_AUTOMOC OFF)
 # RCPPSW
 add_subdirectory(ext/rcppsw)
 
- ################################################################################
+################################################################################
 # Includes                                                                     #
 ################################################################################
 set(${target}_INCLUDE_DIRS
@@ -33,8 +45,6 @@ set(${target}_SYS_INCLUDE_DIRS
 ################################################################################
 # Libraries                                                                    #
 ################################################################################
-get_filename_component(target ${CMAKE_CURRENT_LIST_DIR} NAME)
-
 # Define link libraries
 set(${target}_LIBRARIES
   rcppsw
@@ -65,7 +75,6 @@ set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 add_library(${target} SHARED ${${target}_ROOT_SRC})
 add_dependencies(${target} rcsw rcppsw)
 
-target_compile_definitions(${target} PUBLIC HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT)
 target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
 target_include_directories(${target} SYSTEM PUBLIC
   /usr/include/lua5.2
@@ -75,6 +84,20 @@ target_include_directories(${target} SYSTEM PUBLIC
   ${${target}_SYS_INCLUDE_DIRS}
   )
 target_link_libraries(${target} ${${target}_LIBRARIES})
+
+################################################################################
+# Compile Definitions                                                          #
+################################################################################
+
+target_compile_definitions(${target} PUBLIC HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT)
+
+if (WITH_FOOTBOT_LEDS)
+  target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_LEDS)
+endif()
+
+if (WITH_FOOTBOT_RAB)
+  target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_RAB)
+endif()
 
 if (BUILD_ON_MSI)
   target_compile_options(${target} PUBLIC -Wno-missing-include-dirs)

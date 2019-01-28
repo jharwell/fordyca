@@ -104,11 +104,11 @@ class random_distributor : public base_distributor,
                          const ds::const_entity_list& entities,
                          const ds::cell2D* cell);
 
-  // clang-format off
+  /* clang-format off */
   double                     m_resolution;
   std::default_random_engine m_rng{std::random_device {}()};
   ds::arena_grid::view       m_grid;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
 
 /*******************************************************************************
@@ -280,12 +280,13 @@ rmath::vector2d base_foraging_fsm::randomize_vector_angle(
   return rmath::vector2d(tmp.GetX(), tmp.GetY());
 } /* randomize_vector_angle() */
 
-const std::shared_ptr<const controller::sensing_subsystem> base_foraging_fsm::
-    sensors(void) const {
+const std::shared_ptr<const controller::sensing_subsystem> base_foraging_fsm::sensors(
+    void) const {
   return m_saa->sensing();
 } /* base_sensors() */
 
-const std::shared_ptr<controller::sensing_subsystem> base_foraging_fsm::sensors(void) {
+const std::shared_ptr<controller::sensing_subsystem> base_foraging_fsm::sensors(
+    void) {
   return m_saa->sensing();
 } /* base_actuation() */
 

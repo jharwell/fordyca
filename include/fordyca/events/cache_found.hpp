@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/perceived_cell_op.hpp"
+#include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -35,6 +35,15 @@ NS_START(fordyca);
 namespace representation {
 class base_cache;
 }
+
+namespace ds {
+class dpo_store;
+class dpo_semantic_map;
+} // namespace ds
+
+namespace controller { namespace depth2 {
+class grp_mdpo_controller;
+}} // namespace controller::depth2
 
 NS_START(events);
 
@@ -49,7 +58,10 @@ NS_START(events);
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public perceived_cell_op,
+class cache_found : public cell_op,
+                    visitor::visit_set<controller::depth2::grp_mdpo_controller,
+                                       ds::dpo_store,
+                                       ds::dpo_semantic_map>,
                     public rcppsw::er::client<cache_found> {
  public:
   explicit cache_found(std::unique_ptr<representation::base_cache> cache);
@@ -59,15 +71,16 @@ class cache_found : public perceived_cell_op,
   cache_found(const cache_found& op) = delete;
   cache_found& operator=(const cache_found& op) = delete;
 
-  /* stateful foraging */
-  void visit(ds::cell2D& cell) override;
+  /* DPO foraging */
+  void visit(ds::dpo_store& store) override;
 
-  /* depth1 foraging */
-  void visit(ds::perceived_arena_map& map) override;
+  /* MDPO foraging */
+  void visit(ds::cell2D& cell) override;
+  void visit(ds::dpo_semantic_map& map) override;
   void visit(fsm::cell2D_fsm& fsm) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::grp_mdpo_controller& controller) override;
 
  private:
   std::shared_ptr<representation::base_cache> m_cache;

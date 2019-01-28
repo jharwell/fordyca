@@ -74,9 +74,10 @@ struct metrics_params : public rcppsw::params::base_params {
   std::string output_dir{""};
 
   std::string arena_robot_occupancy_fname{""};
-  std::string loop_robot_interaction_fname{""};
-
+  std::string swarm_convergence_fname{""};
+  std::string loop_temporal_variance_fname{""};
   std::string perception_world_model_fname{""};
+
   grid_params arena_grid{};
   uint collect_interval{0};
 };

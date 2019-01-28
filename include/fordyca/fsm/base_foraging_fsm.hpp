@@ -213,7 +213,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   static constexpr uint kNEST_COUNT_MAX_STEPS = 25;
 
-  // clang-format off
+  /* clang-format off */
   bool                             m_entered_avoidance{false};
   bool                             m_exited_avoidance{false};
   bool                             m_in_avoidance{false};
@@ -223,7 +223,7 @@ class base_foraging_fsm : public state_machine::hfsm,
   rmath::radians                   m_new_dir;
   argos::CRandom::CRNG*            m_rng;
   controller::saa_subsystem* const m_saa;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

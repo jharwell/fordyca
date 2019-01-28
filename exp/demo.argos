@@ -117,16 +117,18 @@
                   />
         </block_selection_matrix>
         <cache_selection_matrix
-            cache_prox_dist="1.0"
+            cache_prox_dist="1.6"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
+            cluster_prox_dist="1.0"
             site_xrange="2:10"
             site_yrange="2.5:3"
             />
-        <sensing>
+        <sensing
+            los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
                             delta="0.0001" />
-        </sensing>
+          </sensing>
         <actuation>
           <block_carry_throttle>
             <waveform
@@ -182,6 +184,7 @@
           cache_acquisition_fname="cache-acquisition.csv"
           cache_utilization_fname="cache-utilization.csv"
           cache_lifecycle_fname="cache-lifecycle.csv"
+          cache_locations_fname="cache-locations.csv"
           task_execution_generalist_fname="task-execution-generalist.csv"
           task_execution_collector_fname="task-execution-collector.csv"
           task_execution_harvester_fname="task-execution-harvester.csv"
@@ -195,10 +198,21 @@
           task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
-          loop_robot_interaction_fname="loop-robot-interaction.csv"
-          collect_interval="1000"
-          />
+          swarm_convergence_fname="swarm-convpergence.csv"
+          loop_temporal_variance_fname="loop-temporal-variance.csv"
+          collect_interval="1000">
+          </metrics>
     </output>
+    <convergence>
+      <positional_entropy
+          enable="true"
+          n_iterations="10"/>
+      <interactivity
+          enable="true"/>
+      <angular_order
+          enable="true"/>
+    </convergence>
+
     <oracle
         enabled="false"
         task_exec_est="false"
@@ -279,25 +293,6 @@
     <box id="wall_west" size="0.1,6,0.5" movable="false">
       <body position="0,3,0" orientation="0,0,0" />
     </box>
-
-    <light id="light1"
-           position="2,1.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="10.0"
-           medium="leds" />
-    <light id="light2"
-           position="2,3,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="10.0"
-           medium="leds" />
-    <light id="light3"
-           position="2,4.5,1.0"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="10.0"
-           medium="leds" />
 
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />

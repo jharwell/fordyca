@@ -25,11 +25,8 @@
 #include <random>
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
 #include "fordyca/representation/base_cache.hpp"
-#include "fordyca/representation/perceived_block.hpp"
-#include "fordyca/representation/perceived_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,15 +39,15 @@ using cselm = cache_sel_matrix;
  ******************************************************************************/
 cache_site_selector::cache_site_selector(
     const controller::cache_sel_matrix* const matrix)
-    : client("fordyca.controller.depth2.cache_site_selector"),
+    : ER_CLIENT_INIT("fordyca.controller.depth2.cache_site_selector"),
       mc_matrix(matrix) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 rmath::vector2d cache_site_selector::calc_best(
-    const ds::cache_list& known_caches,
-    const ds::block_list& known_blocks,
+    const ds::dp_cache_map& known_caches,
+    const ds::dp_block_map& known_blocks,
     rmath::vector2d position) {
   double max_utility;
   std::vector<double> point;
@@ -80,29 +77,29 @@ rmath::vector2d cache_site_selector::calc_best(
           point[1],
           max_utility);
 
-return site;
+  return site;
 } /* calc_best() */
 
 bool cache_site_selector::verify_site(const rmath::vector2d& site,
-                                      const ds::cache_list& known_caches,
-                                      const ds::block_list& known_blocks) const {
-  for (auto &c : known_caches) {
-    ER_ASSERT((c->real_loc() - site).length() >=
-        std::get<0>(m_constraints)[0].cache_prox_dist,
-        "Cache site@%s too close to cache%d (%f <= %f)",
+                                      const ds::dp_cache_map& known_caches,
+                                      const ds::dp_block_map& known_blocks) const {
+  for (auto& c : known_caches.values_range()) {
+    ER_ASSERT((c.ent()->real_loc() - site).length() >=
+                  std::get<0>(m_constraints)[0].cache_prox_dist,
+              "Cache site@%s too close to cache%d (%f <= %f)",
               site.to_str().c_str(),
-              c->id(),
-              (c->real_loc() - site).length(),
+              c.ent()->id(),
+              (c.ent()->real_loc() - site).length(),
               std::get<0>(m_constraints)[0].cache_prox_dist);
   } /* for(&c..) */
 
-  for (auto &b : known_blocks) {
-    ER_ASSERT((b->real_loc() - site).length() >=
-              std::get<1>(m_constraints)[0].block_prox_dist,
+  for (auto& b : known_blocks.values_range()) {
+    ER_ASSERT((b.ent()->real_loc() - site).length() >=
+                  std::get<1>(m_constraints)[0].block_prox_dist,
               "Cache site@%s too close to block%d (%f <= %f)",
               site.to_str().c_str(),
-              b->id(),
-              (b->real_loc() - site).length(),
+              b.ent()->id(),
+              (b.ent()->real_loc() - site).length(),
               std::get<1>(m_constraints)[0].block_prox_dist);
   } /* for(&b..) */
   const nest_constraint_data* ndata = &std::get<2>(m_constraints)[0];
@@ -115,16 +112,16 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
 } /* verify_site() */
 
 void cache_site_selector::opt_initialize(
-    const ds::cache_list& known_caches,
-    const ds::block_list& known_blocks,
+    const ds::dp_cache_map& known_caches,
+    const ds::dp_block_map& known_blocks,
     rmath::vector2d position,
     struct site_utility_data* const utility_data,
     std::vector<double>* const initial_guess) {
   rmath::vector2d nest_loc =
       boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
 
-  ER_INFO("Known blocks: [%s]", dbg::blocks_list(known_blocks).c_str());
-  ER_INFO("Known caches: [%s]", dbg::caches_list(known_caches).c_str());
+  ER_INFO("Known blocks: [%s]", rcppsw::to_string(known_blocks).c_str());
+  ER_INFO("Known caches: [%s]", rcppsw::to_string(known_caches).c_str());
 
   /*
    * If there are no constraints on the problem, the COBYLA method hangs, BUT
@@ -164,20 +161,21 @@ void cache_site_selector::opt_initialize(
           yrange.to_str().c_str());
 } /* opt_initialize() */
 
-void cache_site_selector::constraints_create(const ds::cache_list& known_caches,
-                                             const ds::block_list& known_blocks,
-                                             const rmath::vector2d& nest_loc) {
-  for (auto& c : known_caches) {
+void cache_site_selector::constraints_create(
+    const ds::dp_cache_map& known_caches,
+    const ds::dp_block_map& known_blocks,
+    const rmath::vector2d& nest_loc) {
+  for (auto& c : known_caches.values_range()) {
     std::get<0>(m_constraints)
-        .push_back({c.get(),
+        .push_back({c.ent(),
                     this,
                     boost::get<double>(
                         mc_matrix->find(cselm::kCacheProxDist)->second)});
   } /* for(&c..) */
 
-  for (auto& b : known_blocks) {
+  for (auto& b : known_blocks.values_range()) {
     std::get<1>(m_constraints)
-        .push_back({b.get(),
+        .push_back({b.ent(),
                     this,
                     boost::get<double>(
                         mc_matrix->find(cselm::kBlockProxDist)->second)});
@@ -217,7 +215,7 @@ __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
   cache_site_selector::cache_constraint_data* c =
       reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
   double val = c->cache_prox_dist -
-               (rmath::vector2d(x[0], x[1]) - c->cache->real_loc()).length();
+               (rmath::vector2d(x[0], x[1]) - c->mc_cache->real_loc()).length();
   return val;
 } /* __cache_constraint_func() */
 
@@ -240,10 +238,10 @@ __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
-  cache_site_selector::block_constraint_data* c =
+  cache_site_selector::block_constraint_data* b =
       reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
-  double val = c->block_prox_dist -
-               (rmath::vector2d(x[0], x[1]) - c->block->real_loc()).length();
+  double val = b->block_prox_dist -
+               (rmath::vector2d(x[0], x[1]) - b->mc_block->real_loc()).length();
   return val;
 } /* __block_constraint_func() */
 

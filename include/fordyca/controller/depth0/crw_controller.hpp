@@ -63,26 +63,26 @@ class crw_controller : public depth0_controller,
   void ControlStep(void) override;
   void Reset(void) override;
 
-  /* movement metrics */
-  double distance(void) const override;
-  rmath::vector2d velocity(void) const override;
+  std::type_index type_index(void) const override {
+    return std::type_index(typeid(*this));
+  }
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override { return false; }
   bool is_vectoring_to_goal(void) const override { return false; }
-  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
-  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
+  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
 
   /* block transportation */
-  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<fsm::depth0::crw_fsm> m_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, controller, fordyca);

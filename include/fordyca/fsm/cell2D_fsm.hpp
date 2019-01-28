@@ -110,9 +110,9 @@ class cell2D_fsm : public state_machine::simple_fsm,
     return &kSTATE_MAP[index];
   }
 
-  // clang-format off
+  /* clang-format off */
   uint m_block_count{0};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, forydca);

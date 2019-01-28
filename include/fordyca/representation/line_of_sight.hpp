@@ -75,8 +75,8 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
         m_view(c_view),
         m_caches() {}
 
-  ds::const_block_list blocks(void) const;
-  ds::const_cache_list caches(void) const;
+  ds::block_list blocks(void) const;
+  ds::cache_list caches(void) const;
 
   /**
    * @brief Get the size of the X dimension for a LOS.
@@ -96,6 +96,11 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
    * @return The Y dimension.
    */
   grid_view::size_type ysize(void) const { return m_view.shape()[1]; }
+
+  /**
+   * @brief Determine if the *ABSOLUTE* arena location is contained in the LOS.
+   */
+  bool contains_loc(const rmath::vector2u& loc) const;
 
   /**
    * @brief Get the # elements in a LOS.
@@ -125,11 +130,11 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
   const rmath::vector2u& center(void) const { return m_center; }
 
  private:
-  // clang-format off
-  rmath::vector2u             m_center;
-  grid_view                         m_view;
-  ds::const_cache_list              m_caches;
-  // clang-format on
+  /* clang-format off */
+  rmath::vector2u m_center;
+  grid_view       m_view;
+  ds::cache_list  m_caches;
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

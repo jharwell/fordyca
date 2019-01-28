@@ -64,10 +64,10 @@ class block_utility : public rcppsw::math::expression<double> {
   }
 
  private:
-  // clang-format off
+  /* clang-format off */
   const rmath::vector2d mc_block_loc;
   const rmath::vector2d mc_nest_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(math, fordyca);

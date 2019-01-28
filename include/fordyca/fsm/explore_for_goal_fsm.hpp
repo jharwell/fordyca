@@ -68,10 +68,10 @@ class explore_for_goal_fsm : public base_explore_fsm,
   ~explore_for_goal_fsm(void) override = default;
 
   /* collision metrics */
-  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
+  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
 
   /* taskable overrides */
   bool task_finished(void) const override {
@@ -133,11 +133,11 @@ class explore_for_goal_fsm : public base_explore_fsm,
    */
   static constexpr uint kMIN_EXPLORE_TIME = 50;
 
-  // clang-format off
+  /* clang-format off */
   uint                                          m_explore_time{0};
   std::unique_ptr<controller::explore_behavior> m_explore_behavior;
   std::function<bool(void)>                     m_goal_detect;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

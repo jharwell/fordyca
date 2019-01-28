@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <vector>
 
+#include "fordyca/ds/block_vector.hpp"
 #include "fordyca/params/arena/block_manifest.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/factory/sharing_factory.hpp"
-#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,9 +55,9 @@ class block_manifest_processor
   ds::block_vector create_blocks(void);
 
  private:
-  // clang-format off
+  /* clang-format off */
   const params::arena::block_manifest mc_manifest;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

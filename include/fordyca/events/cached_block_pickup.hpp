@@ -42,10 +42,11 @@ class cached_block_to_nest_fsm;
 } // namespace fsm
 namespace controller {
 namespace depth1 {
-class greedy_partitioning_controller;
-}
+class gp_dpo_controller;
+class gp_mdpo_controller;
+} // namespace depth1
 namespace depth2 {
-class greedy_recpart_controller;
+class grp_mdpo_controller;
 }
 } // namespace controller
 namespace representation {
@@ -79,8 +80,9 @@ class cached_block_pickup
     : public cell_op,
       public rcppsw::er::client<cached_block_pickup>,
       public block_pickup_event,
-      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
+      public visitor::visit_set<controller::depth1::gp_dpo_controller,
+                                controller::depth1::gp_mdpo_controller,
+                                controller::depth2::grp_mdpo_controller,
                                 fsm::block_to_goal_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm,
                                 tasks::depth1::collector,
@@ -100,22 +102,23 @@ class cached_block_pickup
   void visit(ds::arena_map& map) override;
   void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::perceived_arena_map& map) override;
+  void visit(ds::dpo_semantic_map& map) override;
+  void visit(ds::dpo_store& store) override;
   void visit(representation::base_block& block) override;
   void visit(representation::arena_cache& cache) override;
-  void visit(
-      controller::depth1::greedy_partitioning_controller& controller) override;
   void visit(tasks::depth1::collector& task) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
+  void visit(controller::depth1::gp_dpo_controller& controller) override;
+  void visit(controller::depth1::gp_mdpo_controller& controller) override;
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::grp_mdpo_controller& controller) override;
   void visit(tasks::depth2::cache_transferer& task) override;
   void visit(tasks::depth2::cache_collector& task) override;
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint                                         m_robot_index;
   uint                                         m_timestep;
   std::shared_ptr<representation::arena_cache> m_real_cache;
@@ -130,7 +133,7 @@ class cached_block_pickup
    * block, that needs to be sent to the cell that the cache used to live on.
    */
   std::shared_ptr<representation::base_block>  m_orphan_block{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(events, fordyca);

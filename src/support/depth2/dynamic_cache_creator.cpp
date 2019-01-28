@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
-#include "fordyca/dbg/dbg.hpp"
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
@@ -64,7 +63,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free blocks=[%s] (%zu)",
            m_min_dist,
            m_min_blocks,
-           dbg::blocks_list(candidate_blocks).c_str(),
+           rcppsw::to_string(candidate_blocks).c_str(),
            candidate_blocks.size());
 
   ds::block_list used_blocks;
@@ -77,17 +76,14 @@ ds::cache_vector dynamic_cache_creator::create_all(
      * included in a new cache, so attempt cache creation.
      */
     if (cache_i_blocks.size() >= m_min_blocks) {
-      ds::cache_vector c_avoid = avoidance_caches_calc(previous_caches,
-                                                       created_caches);
+      ds::cache_vector c_avoid =
+          avoidance_caches_calc(previous_caches, created_caches);
 
-      ds::block_list b_avoid = avoidance_blocks_calc(candidate_blocks,
-                                                     used_blocks,
-                                                     cache_i_blocks);
+      ds::block_list b_avoid =
+          avoidance_blocks_calc(candidate_blocks, used_blocks, cache_i_blocks);
 
-      rmath::vector2i center = calc_center(cache_i_blocks,
-                                           b_avoid,
-                                           c_avoid,
-                                           cache_dim);
+      rmath::vector2i center =
+          calc_center(cache_i_blocks, b_avoid, c_avoid, cache_dim);
 
       /*
        * We convert to discrete and then back to real coordinates so that our
@@ -105,13 +101,12 @@ ds::cache_vector dynamic_cache_creator::create_all(
       used_blocks.insert(used_blocks.end(),
                          cache_i_blocks.begin(),
                          cache_i_blocks.end());
-      ER_DEBUG("Used blocks=[%s]", dbg::blocks_list(used_blocks).c_str());
+      ER_DEBUG("Used blocks=[%s]", rcppsw::to_string(used_blocks).c_str());
     }
   } /* for(i..) */
 
-  ds::block_list free_blocks = avoidance_blocks_calc(candidate_blocks,
-                                                     used_blocks,
-                                                     ds::block_list());
+  ds::block_list free_blocks =
+      avoidance_blocks_calc(candidate_blocks, used_blocks, ds::block_list());
 
   ER_ASSERT(creation_sanity_checks(created_caches, free_blocks),
             "One or more bad caches on creation");
@@ -131,17 +126,16 @@ ds::block_list dynamic_cache_creator::avoidance_blocks_calc(
     const ds::block_list& used_blocks,
     const ds::block_list& cache_i_blocks) const {
   ds::block_list avoidance_blocks;
-  std::copy_if(candidate_blocks.begin(),
-               candidate_blocks.end(),
-               std::back_inserter(avoidance_blocks),
-               [&] (const auto&b) {
-                 return used_blocks.end() == std::find(used_blocks.begin(),
-                                                       used_blocks.end(),
-                                                       b) &&
-                     cache_i_blocks.end() == std::find(cache_i_blocks.begin(),
-                                                       cache_i_blocks.end(),
-                                                       b);
-               });
+  std::copy_if(
+      candidate_blocks.begin(),
+      candidate_blocks.end(),
+      std::back_inserter(avoidance_blocks),
+      [&](const auto& b) __rcsw_pure {
+        return used_blocks.end() ==
+                   std::find(used_blocks.begin(), used_blocks.end(), b) &&
+               cache_i_blocks.end() ==
+                   std::find(cache_i_blocks.begin(), cache_i_blocks.end(), b);
+      });
   return avoidance_blocks;
 } /* avoidance_blocks_calc() */
 
@@ -154,9 +148,8 @@ ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
   /*
    * Block already in a new cache, so bail out.
    */
-  if (std::find(used_blocks.begin(),
-                used_blocks.end(),
-                candidates[index]) != used_blocks.end()) {
+  if (std::find(used_blocks.begin(), used_blocks.end(), candidates[index]) !=
+      used_blocks.end()) {
     return src_blocks;
   }
   /*
@@ -174,8 +167,8 @@ ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
      */
-    if ((candidates[index]->real_loc() - candidates[i]->real_loc())
-            .length() <= m_min_dist) {
+    if ((candidates[index]->real_loc() - candidates[i]->real_loc()).length() <=
+        m_min_dist) {
       ER_ASSERT(std::find(src_blocks.begin(), src_blocks.end(), candidates[i]) ==
                     src_blocks.end(),
                 "Block%d already on src list",
@@ -224,7 +217,7 @@ rmath::vector2i dynamic_cache_creator::calc_center(
   if (existing_caches.empty()) {
     return rmath::vector2i(center.x(), center.y());
   }
-  ER_DEBUG("Deconflict caches=[%s]", dbg::caches_list(existing_caches).c_str());
+  ER_DEBUG("Deconflict caches=[%s]", rcppsw::to_string(existing_caches).c_str());
 
   /*
    * Every time we find an overlap we have to re-test all of the caches we've
@@ -250,13 +243,13 @@ rmath::vector2i dynamic_cache_creator::calc_center(
       }
     } /* for(j..) */
 
-    for (auto &b : nc_blocks) {
+    for (auto& b : nc_blocks) {
       deconflict_res_t r = deconflict_loc_boundaries(cache_dim, center);
       if (r.status) {
         conflict = true;
         center = r.loc;
       }
-      r = deconflict_loc_entity(b.get(),b->real_loc(), center);
+      r = deconflict_loc_entity(b.get(), b->real_loc(), center);
       if (r.status) {
         conflict = true;
         center = r.loc;
@@ -276,8 +269,8 @@ rmath::vector2i dynamic_cache_creator::calc_center(
     ER_WARN(
         "No conflict-free center found in %u tries: caches=[%s],blocks=[%s]",
         kOVERLAP_SEARCH_MAX_TRIES,
-        dbg::caches_list(existing_caches).c_str(),
-        dbg::blocks_list(cache_i_blocks).c_str());
+        rcppsw::to_string(existing_caches).c_str(),
+        rcppsw::to_string(cache_i_blocks).c_str());
     return kInvalidCacheCenter;
   }
 

@@ -38,12 +38,12 @@ cache_respawn_probability::cache_respawn_probability(double scale_factor)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double cache_respawn_probability::calc(size_t n_foragers, size_t n_collectors) {
+double cache_respawn_probability::calc(uint n_harvesters, uint n_collectors) {
   double tmp;
   if (0 == n_collectors) {
-    tmp = mc_scale_factor * n_foragers;
+    tmp = mc_scale_factor * n_harvesters;
   } else {
-    tmp = mc_scale_factor * n_foragers / n_collectors;
+    tmp = mc_scale_factor * n_harvesters / n_collectors;
   }
   return set_result(1 - std::exp(-tmp));
 } /* calc() */

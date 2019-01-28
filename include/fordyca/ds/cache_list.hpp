@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <string>
+
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -33,20 +35,30 @@
 NS_START(fordyca);
 namespace representation {
 class base_cache;
-struct perceived_cache;
-} // namespace representation
+}
 NS_START(ds);
 
 using cache_list_type = std::shared_ptr<representation::base_cache>;
 using const_cache_list_type = std::shared_ptr<const representation::base_cache>;
-using perceived_cache_list_type = representation::perceived_cache;
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using cache_list = std::list<cache_list_type>;
-using const_cache_list = std::list<const_cache_list_type>;
-using perceived_cache_list = std::list<perceived_cache_list_type>;
+class cache_list : public std::list<cache_list_type> {
+ public:
+  using std::list<cache_list_type>::list;
+  using value_type = std::list<cache_list_type>::value_type;
+
+  std::string to_str(void) const;
+};
+
+class const_cache_list : public std::list<const_cache_list_type> {
+ public:
+  using std::list<const_cache_list_type>::list;
+  using value_type = std::list<const_cache_list_type>::value_type;
+
+  std::string to_str(void) const;
+};
 
 NS_END(ds, fordyca);
 

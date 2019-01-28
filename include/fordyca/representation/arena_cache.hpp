@@ -27,8 +27,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "fordyca/metrics/caches/utilization_metrics.hpp"
 #include "fordyca/metrics/caches/location_metrics.hpp"
+#include "fordyca/metrics/caches/utilization_metrics.hpp"
 #include "fordyca/representation/base_cache.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
@@ -57,8 +57,9 @@ class arena_cache
   arena_cache(double dimension,
               double resolution,
               rmath::vector2d center,
-              const block_vector& blocks,
+              const ds::block_vector& blocks,
               int id);
+  ~arena_cache(void) override = default;
 
   /* metrics */
   size_t n_blocks(void) const override { return base_cache::n_blocks(); }
@@ -73,11 +74,11 @@ class arena_cache
   void penalty_served(uint duration) { m_penalty_count += duration; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint   m_block_pickups{0};
   uint   m_block_drops{0};
   uint   m_penalty_count{0};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

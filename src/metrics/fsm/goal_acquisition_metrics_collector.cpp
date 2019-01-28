@@ -42,7 +42,7 @@ goal_acquisition_metrics_collector::goal_acquisition_metrics_collector(
  ******************************************************************************/
 std::string goal_acquisition_metrics_collector::csv_header_build(
     const std::string& header) {
-  // clang-format off
+  /* clang-format off */
   return base_metrics_collector::csv_header_build(header) +
       "int_avg_acquiring_goal" + separator() +
       "cum_avg_acquiring_goal" + separator() +
@@ -50,7 +50,7 @@ std::string goal_acquisition_metrics_collector::csv_header_build(
       "cum_avg_vectoring_to_goal" + separator() +
       "int_avg_exploring_for_goal" + separator() +
       "cum_avg_exploring_for_goal" + separator();
-  // clang-format on
+  /* clang-format on */
 } /* csv_header_build() */
 
 void goal_acquisition_metrics_collector::reset(void) {

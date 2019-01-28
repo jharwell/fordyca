@@ -33,8 +33,8 @@ NS_START(fordyca, representation);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::const_block_list line_of_sight::blocks(void) const {
-  ds::const_block_list blocks;
+ds::block_list line_of_sight::blocks(void) const {
+  ds::block_list blocks{};
   for (uint i = 0; i < m_view.shape()[0]; ++i) {
     for (uint j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];
@@ -50,22 +50,21 @@ ds::const_block_list line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-ds::const_cache_list line_of_sight::caches(void) const {
-  ds::const_cache_list caches = m_caches;
+ds::cache_list line_of_sight::caches(void) const {
+  ds::cache_list caches = m_caches;
 
   for (uint i = 0; i < m_view.shape()[0]; ++i) {
     for (uint j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
-        auto cache = std::dynamic_pointer_cast<base_cache>(cell.entity());
-        ER_ASSERT(nullptr != cell.cache(),
-                  "Cell at(%u,%u) in HAS_CACHE state, but does not have cache",
-                  i,
-                  j);
-        ER_ASSERT(nullptr != cell.cache(),
-                  "Cache at(%u,%u) has too few blocks (%zu < %zu)",
-                  i,
-                  j,
+        auto cache = cell.cache();
+        ER_ASSERT(nullptr != cache,
+                  "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
+                  cell.loc().to_str().c_str());
+        ER_ASSERT(cache->n_blocks() >= base_cache::kMinBlocks,
+                  "Cache%d@%s has too few blocks (%zu < %zu)",
+                  cache->id(),
+                  cache->discrete_loc().to_str().c_str(),
                   cache->n_blocks(),
                   base_cache::kMinBlocks);
         /*
@@ -87,6 +86,17 @@ ds::const_cache_list line_of_sight::caches(void) const {
 __rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
   return const_cast<line_of_sight*>(this)->cell(i, j);
 }
+
+bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
+  for (size_t i = 0; i < xsize(); ++i) {
+    for (size_t j = 0; j < ysize(); ++j) {
+      if (cell(i, j).loc() == loc) {
+        return true;
+      }
+    } /* for(j..) */
+  }   /* for(i..) */
+  return false;
+} /* contains_loc() */
 
 __rcsw_pure ds::cell2D& line_of_sight::cell(uint i, uint j) {
   ER_ASSERT(i < m_view.shape()[0],

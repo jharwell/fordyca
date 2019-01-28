@@ -28,7 +28,7 @@
 
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/representation/perceived_cache.hpp"
+#include "fordyca/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,8 +65,8 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    *
    * @return The "best" existing cache.
    */
-  representation::perceived_cache calc_best(
-      const std::list<representation::perceived_cache>& existing_caches,
+  ds::dp_cache_map::value_type calc_best(
+      const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position);
 
  private:
@@ -81,10 +81,10 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    */
   bool cache_is_excluded(const rmath::vector2d& position,
                          const representation::base_cache* const cache) const;
-  // clang-format off
+  /* clang-format off */
   bool                          m_is_pickup;
   const cache_sel_matrix* const mc_matrix;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, controller, fordyca);

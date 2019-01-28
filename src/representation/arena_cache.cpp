@@ -34,7 +34,7 @@ NS_START(fordyca, representation);
 arena_cache::arena_cache(double dimension,
                          double resolution,
                          rmath::vector2d center,
-                         const block_vector& blocks,
+                         const ds::block_vector& blocks,
                          int id)
     : base_cache(dimension, resolution, center, blocks, id) {}
 

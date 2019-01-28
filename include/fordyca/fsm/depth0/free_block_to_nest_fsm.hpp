@@ -37,7 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace ds { class perceived_arena_map; }
+namespace ds { class dpo_semantic_map; }
 namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
@@ -64,7 +64,7 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
  public:
   free_block_to_nest_fsm(const controller::block_sel_matrix* sel_matrix,
                          controller::saa_subsystem* saa,
-                         ds::perceived_arena_map* map);
+                         ds::dpo_store* store);
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -85,8 +85,8 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
-  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
+  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   bool goal_acquired(void) const override;
   acquisition_goal_type acquisition_goal(void) const override;
 
@@ -143,9 +143,9 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   return &mc_state_map[index];
   }
 
-  // clang-format off
+  /* clang-format off */
   acquire_free_block_fsm m_block_fsm;
-  // clang-format on
+  /* clang-format on */
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

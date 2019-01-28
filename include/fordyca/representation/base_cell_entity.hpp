@@ -89,11 +89,11 @@ class base_cell_entity {
   const rcppsw::utils::color& color(void) const { return m_color; }
 
  private:
-  // clang-format off
+  /* clang-format off */
   int                   m_id;
   bool                  m_display_id;
   rcppsw::utils::color  m_color;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(representation, fordyca);

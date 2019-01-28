@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <vector>
+
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -41,7 +43,13 @@ using block_vector_type = std::shared_ptr<representation::base_block>;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using block_vector = std::vector<block_vector_type>;
+class block_vector : public std::vector<block_vector_type> {
+ public:
+  using std::vector<block_vector_type>::vector;
+  using value_type = std::vector<block_vector_type>::value_type;
+
+  std::string to_str(void) const;
+};
 
 NS_END(ds, fordyca);
 

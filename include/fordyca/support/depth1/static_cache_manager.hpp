@@ -99,10 +99,10 @@ class static_cache_manager : public base_cache_manager,
    */
   block_calc_res_t calc_blocks_for_creation(ds::block_vector& blocks);
 
-  // clang-format off
+  /* clang-format off */
   const params::caches::caches_params mc_cache_params;
   const rmath::vector2d               mc_cache_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, support, fordyca);

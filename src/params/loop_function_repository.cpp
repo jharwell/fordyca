@@ -27,15 +27,17 @@
 #include "fordyca/params/caches/caches_parser.hpp"
 #include "fordyca/params/oracle_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
+#include "fordyca/params/tv/tv_controller_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
+#include "rcppsw/swarm/convergence/convergence_parser.hpp"
 
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
-namespace ct = rcppsw::control;
+namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -46,6 +48,9 @@ loop_function_repository::loop_function_repository(void) {
   register_parser<arena::arena_map_parser, arena::arena_map_params>(
       arena::arena_map_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<tv::tv_controller_parser, tv::tv_controller_params>(
+      tv::tv_controller_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
   register_parser<visualization_parser, visualization_params>(
       visualization_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
@@ -55,6 +60,9 @@ loop_function_repository::loop_function_repository(void) {
       oracle_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
   register_parser<caches::caches_parser, caches::caches_params>(
       caches::caches_parser::kXMLRoot,
+      rcppsw::params::xml_param_parser::kHeader1);
+  register_parser<rswc::convergence_parser, rswc::convergence_params>(
+      rswc::convergence_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 }
 

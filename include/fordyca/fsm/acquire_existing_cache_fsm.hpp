@@ -39,7 +39,7 @@ namespace representation {
 class cache;
 }
 namespace ds {
-class perceived_arena_map;
+class dpo_store;
 }
 
 NS_START(fsm);
@@ -61,7 +61,7 @@ class acquire_existing_cache_fsm
   acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
                              bool is_pickup,
                              controller::saa_subsystem* saa,
-                             ds::perceived_arena_map* map);
+                             ds::dpo_store* store);
   ~acquire_existing_cache_fsm(void) override = default;
 
   acquire_existing_cache_fsm(const acquire_existing_cache_fsm& fsm) = delete;
@@ -80,12 +80,12 @@ class acquire_existing_cache_fsm
   bool cache_acquired_cb(bool explore_result) const;
   bool cache_exploration_term_cb(void) const;
 
-  // clang-format off
+  /* clang-format off */
   const bool                                mc_is_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
-  const ds::perceived_arena_map*      const mc_map;
+  const ds::dpo_store*      const           mc_store;
   std::default_random_engine                m_rd{};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

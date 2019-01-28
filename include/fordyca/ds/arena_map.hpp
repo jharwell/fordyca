@@ -184,10 +184,10 @@ class arena_map : public er::client<arena_map>,
   bool distribute_single_block(
       std::shared_ptr<representation::base_block>& block);
 
-  DECORATE_FUNC(xdsize, const);
-  DECORATE_FUNC(ydsize, const);
-  DECORATE_FUNC(xrsize, const);
-  DECORATE_FUNC(yrsize, const);
+  RCPPSW_DECORATE_FUNC(xdsize, const);
+  RCPPSW_DECORATE_FUNC(ydsize, const);
+  RCPPSW_DECORATE_FUNC(xrsize, const);
+  RCPPSW_DECORATE_FUNC(yrsize, const);
 
   /**
    * @brief Determine if a robot is currently on top of a block (i.e. if the
@@ -242,6 +242,14 @@ class arena_map : public er::client<arena_map>,
   }
 
   /**
+   * @brief The amount of padding to add to the arena map so that LOS
+   * calculations when a robot is VERY close to the upper edge of the arena in x
+   * or y, and the conversion to discrete coordinates/rounding would cause an
+   * off-by-one out-of-bounds access are avoided.
+   */
+  double arena_padding(void) const { return 1.0; }
+
+  /**
    * @brief Perform deferred initialization. This is not part the constructor so
    * that it can be verified via return code. Currently it initializes:
    *
@@ -251,13 +259,13 @@ class arena_map : public er::client<arena_map>,
   bool initialize(support::base_loop_functions* loop);
 
  private:
-  // clang-format off
+  /* clang-format off */
   uint                            m_caches_removed{0};
   block_vector                    m_blocks;
   cache_vector                    m_caches;
   representation::nest            m_nest;
   support::block_dist::dispatcher m_block_dispatcher;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(ds, fordyca);
