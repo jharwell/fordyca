@@ -49,7 +49,7 @@ namespace sensor rcppsw::robotics::hal::sensors;
  * efficiency.
  */
 
-class energy_max_controller : public stateless_foraging_controller {
+class energy_max_controller : public depth0_controller {
 
 
   public:
@@ -63,13 +63,15 @@ class energy_max_controller : public stateless_foraging_controller {
 
     /* Energy functions */
     void sense_energy(void) { energy_level = bs.readings().time_left}
+    // what is bs? battery sensor?
 
   private:
     // put in a energy params struct? Put in actuator manager class?
     double                                                   energy_level;
     double                                                   max_energy;
     double                                                   thresh_level;
-    std::unique_ptr<fsm::depth0::stateless_foraging_fsm>     m_fsm;
+    std::unique_ptr<fsm::depth0::ee_max_fsm>                 m_fsm;
+    std::unique_ptr<sensor::battery_sensor>                  bs;
 
 }
 
