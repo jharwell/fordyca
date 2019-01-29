@@ -67,8 +67,9 @@ void tv_controller_parser::parse(const ticpp::Element& node) {
   if (nullptr != tvnode.FirstChild("caches", false)) {
     ticpp::Element cnode =
         get_node(const_cast<ticpp::Element&>(tvnode), "caches");
-    if (nullptr != cnode.FirstChild("usage", false)) {
-      m_cache_usage.parse(get_node(const_cast<ticpp::Element&>(cnode), "usage"));
+    if (nullptr != cnode.FirstChild("usage_penalty", false)) {
+      m_cache_usage.parse(get_node(const_cast<ticpp::Element&>(cnode),
+                                   "usage_penalty"));
       m_params->cache_usage_penalty = *m_cache_usage.parse_results();
     }
   }

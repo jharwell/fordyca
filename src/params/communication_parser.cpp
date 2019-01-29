@@ -44,8 +44,8 @@ void communication_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(anode, m_params, on);
   XML_PARSE_ATTR(anode, m_params, mode);
   XML_PARSE_ATTR(anode, m_params, max_message_length);
-  XML_PARSE_ATTR(anode, m_params, chance_to_continue_communication);
-  XML_PARSE_ATTR(anode, m_params, chance_to_start_communication);
+  XML_PARSE_ATTR(anode, m_params, chance_to_send_communication);
+  XML_PARSE_ATTR(anode, m_params, chance_to_recieve_communication);
 } /* parse() */
 
 void communication_parser::show(std::ostream& stream) const {
@@ -54,21 +54,19 @@ void communication_parser::show(std::ostream& stream) const {
   stream << XML_ATTR_STR(m_params, on)
          << XML_ATTR_STR(m_params, mode)
          << XML_ATTR_STR(m_params, max_message_length)
-         << XML_ATTR_STR(m_params, chance_to_continue_communication)
-         << XML_ATTR_STR(m_params, chance_to_start_communication)
+         << XML_ATTR_STR(m_params, chance_to_send_communication)
+         << XML_ATTR_STR(m_params, chance_to_recieve_communication)
          << std::endl
          << build_footer();
 } /* show() */
 
 __rcsw_pure bool communication_parser::validate(void) const {
-    return (m_params->mode == 2 ||
-            m_params->mode == 1) &&
-           m_params->max_message_length >= 0 &&
+    return m_params->max_message_length >= 0 &&
            m_params->max_message_length <= 20 &&
-           m_params->chance_to_continue_communication >= 0.0 &&
-           m_params->chance_to_continue_communication <= 1.0 &&
-           m_params->chance_to_start_communication >= 0.0 &&
-           m_params->chance_to_start_communication <= 1.0;
+           m_params->chance_to_send_communication >= 0.0 &&
+           m_params->chance_to_send_communication <= 1.0 &&
+           m_params->chance_to_recieve_communication >= 0.0 &&
+           m_params->chance_to_recieve_communication <= 1.0;
 } /* validate() */
 
 

@@ -27,8 +27,6 @@
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "fordyca/params/communication_params.hpp"
-#include "rcppsw/robotics/hal/wifi_packet.hpp"
 
 /*******************************************************************************
  * Namespaces

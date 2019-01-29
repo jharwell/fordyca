@@ -36,13 +36,6 @@
 #include "fordyca/params/sensing_params.hpp"
 #include "fordyca/representation/base_block.hpp"
 
-#include "fordyca/representation/base_cell_entity.hpp"
-#include "fordyca/representation/ramp_block.hpp"
-#include "fordyca/representation/cube_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
-#include "fordyca/metrics/blocks/transport_metrics.hpp"
-#include "fordyca/events/block_found.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/

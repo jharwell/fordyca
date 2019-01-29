@@ -57,15 +57,14 @@ ds::cache_list line_of_sight::caches(void) const {
     for (uint j = 0; j < m_view.shape()[1]; ++j) {
       const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
-        auto cache = std::dynamic_pointer_cast<base_cache>(cell.entity());
-        ER_ASSERT(nullptr != cell.cache(),
-                  "Cell at(%u,%u) in HAS_CACHE state, but does not have cache",
-                  i,
-                  j);
-        ER_ASSERT(nullptr != cell.cache(),
-                  "Cache at(%u,%u) has too few blocks (%zu < %zu)",
-                  i,
-                  j,
+        auto cache = cell.cache();
+        ER_ASSERT(nullptr != cache,
+                  "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
+                  cell.loc().to_str().c_str());
+        ER_ASSERT(cache->n_blocks() >= base_cache::kMinBlocks,
+                  "Cache%d@%s has too few blocks (%zu < %zu)",
+                  cache->id(),
+                  cache->discrete_loc().to_str().c_str(),
                   cache->n_blocks(),
                   base_cache::kMinBlocks);
         /*

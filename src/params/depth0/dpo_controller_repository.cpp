@@ -24,9 +24,6 @@
 #include "fordyca/params/depth0/dpo_controller_repository.hpp"
 #include "fordyca/params/block_sel_matrix_parser.hpp"
 #include "fordyca/params/perception/perception_parser.hpp"
-
-#include "fordyca/params/communication_params.hpp"
-#include "fordyca/params/communication_parser.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -38,10 +35,6 @@ NS_START(fordyca, params, depth0);
 dpo_controller_repository::dpo_controller_repository(void) {
   register_parser<block_sel_matrix_parser, block_sel_matrix_params>(
       block_sel_matrix_parser::kXMLRoot, block_sel_matrix_parser::kHeader1);
-
-  // register_parser<communication_parser, communication_params>(
-  //     communication_parser::kXMLRoot, communication_parser::kHeader1);
-
   register_parser<perception::perception_parser, perception::perception_params>(
       perception::perception_parser::kXMLRoot,
       perception::perception_parser::kHeader1);

@@ -28,6 +28,8 @@
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
+#include "fordyca/params/communication_params.hpp"
+#include "rcppsw/robotics/hal/wifi_packet.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,6 +72,7 @@ class mdpo_controller : public dpo_controller,
   void ControlStep(void) override;
 
   void perform_communication(void);
+  void fill_packet(void);
   void integrate_recieved_packet(rcppsw::robotics::hal::wifi_packet packet);
   rcppsw::math::vector2u get_most_valuable_cell(void);
 

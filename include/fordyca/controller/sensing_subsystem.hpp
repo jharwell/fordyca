@@ -181,7 +181,7 @@ class sensing_subsystem {
    */
   rmath::vector2d find_closest_obstacle(void) const;
 
-  std::vector<uint8_t> recieve_message();
+  std::vector<std::vector<uint8_t>> recieve_message();
 
  private:
   /* clang-format off */

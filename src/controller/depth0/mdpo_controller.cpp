@@ -70,9 +70,9 @@ void mdpo_controller::ControlStep(void) {
    */
   perception()->update();
 
-  // if(m_communication_params.on) {
-  //   perform_communication();
-  // }
+  if(m_communication_params.on) {
+    perform_communication();
+  }
 
   fsm()->run();
   ndc_pop();
@@ -100,99 +100,109 @@ void mdpo_controller::Init(ticpp::Element& node) {
   shared_init(param_repo);
   private_init();
 
-  // auto* comm_params = param_repo.parse_results<params::communication_params>();
-  // m_communication_params = *comm_params;
-  //
-  // m_arena_x = mdpo_perception()->map()->xdsize();
-  // m_arena_y = mdpo_perception()->map()->ydsize();
+  auto* comm_params = param_repo.parse_results<params::communication_params>();
+  m_communication_params = *comm_params;
+
+  m_arena_x = mdpo_perception()->map()->xdsize();
+  m_arena_y = mdpo_perception()->map()->ydsize();
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void mdpo_controller::perform_communication(void) {
-  std::vector<uint8_t> recieved_packet_data =
+  std::vector<std::vector<uint8_t>> recieved_packet_data =
     saa_subsystem()->sensing()->recieve_message();
   float probability = static_cast <float> (rand()) /
       static_cast <float> (RAND_MAX);
 
-  hal::wifi_packet packet = hal::wifi_packet();
   if (!recieved_packet_data.empty() && probability >=
-      (1 - m_communication_params.chance_to_continue_communication)) {
-    packet.data = recieved_packet_data;
-    integrate_recieved_packet(packet);
-    saa_subsystem()->actuation()->start_sending_message(packet);
+      (1 - m_communication_params.chance_to_recieve_communication)) {
+    hal::wifi_packet packet = hal::wifi_packet();
+    for(std::vector<uint8_t> individual_message : recieved_packet_data) {
+      packet.data = individual_message;
+      integrate_recieved_packet(packet);
+    }
+    fill_packet();
   } else if (probability >= (1 -
-      m_communication_params.chance_to_start_communication)) {
-    int x_coord;
-    int y_coord;
-
-    // Random Mode
-    if(m_communication_params.mode == 1) {
-      x_coord = static_cast <int> (rand()) % m_arena_x;
-      y_coord = static_cast <int> (rand()) % m_arena_y;
-    // Utility function
-    } else if (m_communication_params.mode == 2) {
-      rcppsw::math::vector2u cell = get_most_valuable_cell();
-      x_coord = cell.x();
-      y_coord = cell.y();
-    } else {
-      x_coord = 2;
-      y_coord = 2;
-    }
-
-    ds::cell2D cell = mdpo_perception()->map()->
-      access<ds::occupancy_grid::kCell>(x_coord, y_coord);
-    packet.data.push_back(static_cast<uint8_t>(x_coord)); // X Coord of cell
-    packet.data.push_back(static_cast<uint8_t>(y_coord)); // Y Coord of cell
-
-    // The state is what the cell contains (nothing, block, or cache)
-    int state = 1;
-    if (cell.state_is_empty()) {
-      state = 2;
-    } else if (cell.state_has_block()) {
-      state = 3;
-    } else if (cell.state_has_cache()) {
-      state = 4;
-    }
-    // Type of entity (block / cache) (will be 1 if the cell state is unknown)
-    packet.data.push_back(static_cast<uint8_t>(state));
-
-    auto entity = cell.entity();
-    int id = 0;
-
-    // Type is specific to blocks as there are ramp and cube blocks.
-    int type = 1;
-    if (entity) {
-      id = entity->id();
-
-      // Block
-      if (state == 3) {
-        // Ramp block
-        if (cell.block()->type() == metrics::blocks::transport_metrics::kRamp) {
-          type = 2;
-        // Cube block
-        } else {
-          type = 3;
-        } /* if block type */
-      } /* if state */
-    } /* if entity */
-
-    // Entity ID (will be 0 if the cell is unknown)
-    packet.data.push_back(static_cast<uint8_t>(id));
-
-    // Type of block
-    packet.data.push_back(static_cast<uint8_t>(type));
-
-    rcppsw::swarm::pheromone_density& density = mdpo_perception()->map()->
-      access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
-    packet.data.push_back(static_cast<uint8_t>(density.last_result() * 10));
-
-    saa_subsystem()->actuation()->start_sending_message(packet);
+      m_communication_params.chance_to_send_communication)) {
+    fill_packet();
   } else {
     saa_subsystem()->actuation()->stop_sending_message();
   } /* if !recieved_packet_data.empty() */
 } /* perform_communication */
+
+void mdpo_controller::fill_packet(void) {
+  hal::wifi_packet packet = hal::wifi_packet();
+  int x_coord;
+  int y_coord;
+
+  const char* mode = m_communication_params.mode.c_str();
+
+  // Random Mode
+  if(std::strcmp(mode, "random") == 0) {
+    x_coord = static_cast <int> (rand()) % m_arena_x;
+    y_coord = static_cast <int> (rand()) % m_arena_y;
+  // Utility function
+} else if (std::strcmp(mode, "utility") == 0) {
+    rcppsw::math::vector2u cell = get_most_valuable_cell();
+    x_coord = cell.x();
+    y_coord = cell.y();
+  } else {
+    // Fail safe coords
+    x_coord = 2;
+    y_coord = 2;
+  }
+
+  ds::cell2D cell = mdpo_perception()->map()->
+    access<ds::occupancy_grid::kCell>(x_coord, y_coord);
+  packet.data.push_back(static_cast<uint8_t>(x_coord)); // X Coord of cell
+  packet.data.push_back(static_cast<uint8_t>(y_coord)); // Y Coord of cell
+
+  // The state is what the cell contains (nothing, block, or cache)
+  int state = 1;
+  if (cell.state_is_empty()) {
+    state = 2;
+  } else if (cell.state_has_block()) {
+    state = 3;
+  } else if (cell.state_has_cache()) {
+    state = 4;
+  }
+  // Type of entity (block / cache) (will be 1 if the cell state is unknown)
+  packet.data.push_back(static_cast<uint8_t>(state));
+
+  auto entity = cell.entity();
+  int id = 0;
+
+  // Type is specific to blocks as there are ramp and cube blocks.
+  int type = 1;
+  if (entity) {
+    id = entity->id();
+
+    // Block
+    if (state == 3) {
+      // Ramp block
+      if (cell.block()->type() == metrics::blocks::transport_metrics::kRamp) {
+        type = 2;
+      // Cube block
+      } else {
+        type = 3;
+      } /* if block type */
+    } /* if state */
+  } /* if entity */
+
+  // Entity ID (will be 0 if the cell is unknown)
+  packet.data.push_back(static_cast<uint8_t>(id));
+
+  // Type of block
+  packet.data.push_back(static_cast<uint8_t>(type));
+
+  rcppsw::swarm::pheromone_density& density = mdpo_perception()->map()->
+    access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
+  packet.data.push_back(static_cast<uint8_t>(density.last_result() * 10));
+
+  saa_subsystem()->actuation()->start_sending_message(packet);
+}
 
 void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet) {
   // Data extraction
@@ -200,15 +210,15 @@ void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet) {
   int y_coord = static_cast<int>(packet.data[1]);
   int state = static_cast<int>(packet.data[2]);
   int ent_id = static_cast<int>(packet.data[3]);
-  // type of block (if it's not a block it will be -1)
 
   rcppsw::math::vector2u disc_loc = rcppsw::math::vector2u(x_coord, y_coord);
 
   auto rcoord_vector = uvec2dvec(disc_loc,
     mdpo_perception()->map()->grid_resolution());
 
-
+  // type of block (if it's not a block it will be -1)
   int type = static_cast<int>(packet.data[4]);
+
   double pheromone_density = static_cast<double>(packet.data[5]) / 10;
 
   if (state > 2) {
@@ -217,7 +227,7 @@ void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet) {
 
     // If the recieved pheromone density is less than the known, don't
     // integrate the recieved information.
-    if (density.last_result() + 0.001 >= pheromone_density) {
+    if (pheromone_density <= 0.1 || density.last_result() >= pheromone_density) {
       return;
     }
 
@@ -233,7 +243,7 @@ void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet) {
         mdpo_perception()->map()->accept(*(
           new fordyca::events::block_found(block_ptr)));
       // cube block
-    } else if (type == 3) {
+      } else if (type == 3) {
         std::shared_ptr<representation::cube_block> block_ptr (new
           representation::cube_block(rcppsw::math::vector2d(1, 1), ent_id));
         block_ptr->real_loc(rcoord_vector);
@@ -243,11 +253,10 @@ void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet) {
           new fordyca::events::block_found(block_ptr)));
       } /* if type */
 
-      density.pheromone_set(pheromone_density);
+      // density.pheromone_set();
     // caches
     } else {
-      // TODO: Add caches to percieved_arena_map
-
+      // TODO: Add caches to percieved_arena_map (for different controller)
     } /* if (state == 3) / else */
   } /* if (state > 2) */
 } /* integrate_recieved_packet */
