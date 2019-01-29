@@ -67,7 +67,7 @@
    }
  } /* Reset() */
 
- void stateless_foraging_controller::ControlStep(void) {
+ void energy_max_controller::ControlStep(void) {
    saa_subsystem()->actuation()->block_throttle_toggle(is_carrying_block());
    saa_subsystem()->actuation()->block_throttle_update();
    m_fsm->run();

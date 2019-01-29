@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
  #include "fordyca/params/energy_params.hpp"
+ #include "fordyca/fsm/depth0/ee_max_fsm.hpp"
 
  /*******************************************************************************
   * Namespaces
@@ -46,10 +47,23 @@
   *
   *
   */
- class energy_subssytem {
+ class energy_subsystem {
   public:
+    energy_subsystem(const params::energy_params* params, const std::string& id);
+    virtual ~energy_subsystem(void) = default;
 
+    virtual void reset(void) {}
 
+  private:
 
+    void energy_drain(void);
+    void energy_adapt(int k_robots, int f_success);
+
+    std::unique_ptr<fsm::depth0::ee_max_fsm>              e_fsm;
+    float                                                 energy;
+    float                                                 deltaE;
+    float                                                 elow_thres;
+    float                                                 ehigh_thres;
+    float                                                 capacity;
 
  }
