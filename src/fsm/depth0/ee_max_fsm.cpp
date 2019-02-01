@@ -31,12 +31,16 @@
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
 namespace state_machine = rcppsw::patterns::state_machine;
+namespace ta = rcppsw:task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
+
+// get pointer to taskable object (crw_fsm)
 ee_max_fsm::ee_max_fsm(controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
+      ta::taskable taskable_fsm,
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
       HFSM_CONSTRUCT_STATE(return_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),

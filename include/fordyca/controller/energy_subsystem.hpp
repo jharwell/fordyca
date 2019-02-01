@@ -56,6 +56,7 @@
 
   private:
 
+    void energy_check(void);
     void energy_drain(void);
     void energy_adapt(int k_robots, int f_success);
 

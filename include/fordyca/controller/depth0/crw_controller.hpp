@@ -34,7 +34,6 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw:task_allocation
 namespace fsm { namespace depth0 { class crw_fsm; }}
 
 NS_START(controller);
@@ -55,8 +54,7 @@ NS_START(depth0);
  */
 class crw_controller : public depth0_controller,
                        public er::client<crw_controller>,
-                       public visitor::visitable_any<crw_controller>,
-                       public task_allocation::taskable<crw_controller> {
+                       public visitor::visitable_any<crw_controller> {
  public:
   crw_controller(void);
   ~crw_controller(void) override;
@@ -69,13 +67,6 @@ class crw_controller : public depth0_controller,
   std::type_index type_index(void) const override {
     return std::type_index(typeid(*this));
   }
-
-  /* taskable overrides */
-  void task_execute(void) override;
-  bool task_finished(void) const override;
-  bool task_running(void) const override;
-  void task_reset(void) override;
-  void task_start(void) override;
 
 
   /* goal acquisition metrics */

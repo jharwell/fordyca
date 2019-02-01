@@ -38,6 +38,7 @@ NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
+namespace task_allocation = rcppsw:task_allocation;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
@@ -60,7 +61,8 @@ class crw_fsm : public base_foraging_fsm,
                                public er::client<crw_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
-                               public visitor::visitable_any<crw_fsm> {
+                               public visitor::visitable_any<crw_fsm>,
+                               public task_allocation::taskable<crw_fsm>  {
  public:
   explicit crw_fsm(controller::saa_subsystem* saa);
 
@@ -78,6 +80,18 @@ class crw_fsm : public base_foraging_fsm,
   bool is_exploring_for_goal(void) const override;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override;
+
+  /* taskable overrides */
+  void task_execute(void) override;
+  void task_start(const ta::taskable_argument*) override {}
+  bool task_finished(void) const override {
+    // return ST_FINISHED == current_state();
+  }
+  bool task_running(void) const override {
+    // return ST_ACQUIRE_GOAL == current_state();
+  }
+  void task_reset(void) override { init(); }
+
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;

@@ -141,8 +141,6 @@ class ee_max_fsm : public base_foraging_fsm,
   explore_for_goal_fsm m_explore_fsm;
   // clang-format on
 
-  crw_controller m_controller;
-
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
