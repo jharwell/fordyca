@@ -34,9 +34,11 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+namespace task_allocation = rcppsw:task_allocation
 namespace fsm { namespace depth0 { class crw_fsm; }}
 
 NS_START(controller);
+class energy_subsystem;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 NS_START(depth0);
@@ -53,7 +55,8 @@ NS_START(depth0);
  */
 class crw_controller : public depth0_controller,
                        public er::client<crw_controller>,
-                       public visitor::visitable_any<crw_controller> {
+                       public visitor::visitable_any<crw_controller>,
+                       public task_allocation::taskable<crw_controller> {
  public:
   crw_controller(void);
   ~crw_controller(void) override;
@@ -66,6 +69,14 @@ class crw_controller : public depth0_controller,
   std::type_index type_index(void) const override {
     return std::type_index(typeid(*this));
   }
+
+  /* taskable overrides */
+  void task_execute(void) override;
+  bool task_finished(void) const override;
+  bool task_running(void) const override;
+  void task_reset(void) override;
+  void task_start(void) override;
+
 
   /* goal acquisition metrics */
   bool is_vectoring_to_goal(void) const override { return false; }
@@ -82,6 +93,7 @@ class crw_controller : public depth0_controller,
  private:
   /* clang-format off */
   std::unique_ptr<fsm::depth0::crw_fsm> m_fsm;
+  std::unique_ptr<energy_subsystem> m_energy;
   /* clang-format on */
 };
 

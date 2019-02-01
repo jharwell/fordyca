@@ -30,6 +30,8 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/controller/crw_controller.hpp"
+
 
 /*******************************************************************************
  * Namespaces
@@ -138,6 +140,8 @@ class ee_max_fsm : public base_foraging_fsm,
   // clang-format off
   explore_for_goal_fsm m_explore_fsm;
   // clang-format on
+
+  crw_controller m_controller;
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };

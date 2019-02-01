@@ -73,6 +73,7 @@ void crw_controller::ControlStep(void) {
               block()->robot_id());
   }
 
+  
   m_fsm->run();
   ndc_pop();
 } /* ControlStep() */
