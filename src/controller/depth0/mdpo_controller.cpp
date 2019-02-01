@@ -253,7 +253,7 @@ void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet) {
           new fordyca::events::block_found(block_ptr)));
       } /* if type */
 
-      // density.pheromone_set();
+      // density.pheromone_set(pheromone_density);
     // caches
     } else {
       // TODO: Add caches to percieved_arena_map (for different controller)

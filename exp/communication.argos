@@ -361,7 +361,7 @@
   <!-- * Visualization * -->
   <!-- ****************** -->
   <visualization>
-     <qt-opengl autoplay="true">
+     <qt-opengl autoplay="false">
         <frame_grabbing directory="frames"
                         base_name="frame_"
                         format="png"
