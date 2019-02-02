@@ -54,6 +54,8 @@
 
     virtual void reset(void) {}
 
+    void update(void);
+
   private:
 
     void energy_check(void);

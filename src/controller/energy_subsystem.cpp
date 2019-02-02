@@ -46,7 +46,8 @@ energy_subsystem::~energy_subsystem(void) = default;
 void energy_subsystem::reset(void) {  }
 
 void energy_subsystem::energy_drain(void) {
-  switch(/*state*/) {
+/*
+  switch(/*state*) {
     case searching:
       energy = energy - alphaS;
       deltaE = deltaE + alphaS;
@@ -60,6 +61,7 @@ void energy_subsystem::energy_drain(void) {
       deltaE = deltaE + p;
       break;
   }
+  */
 }
 
 void energy_subsystem::energy_adapt(int k_robots, int f_success) {
