@@ -59,14 +59,18 @@
   private:
 
     void energy_check(void);
+    void endgame(void);
     void energy_drain(void);
     void energy_adapt(int k_robots, int f_success);
 
     std::unique_ptr<fsm::depth0::ee_max_fsm>              e_fsm;
+    int                                                   w[3];
+    int                                                   wC[3];
     float                                                 energy;
     float                                                 deltaE;
     float                                                 elow_thres;
     float                                                 ehigh_thres;
     float                                                 capacity;
+    std::string                                           EEE_method;
 
  }
