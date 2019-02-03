@@ -41,6 +41,7 @@ NS_START(fordyca);
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
+namespace ta = rcppsw:task_allocation;
 
 NS_START(fsm, depth0);
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
@@ -63,7 +64,7 @@ class ee_max_fsm : public base_foraging_fsm,
                                public block_transporter,
                                public visitor::visitable_any<ee_max_fsm> {
  public:
-  explicit ee_max_fsm(controller::saa_subsystem* saa);
+  explicit ee_max_fsm(ta::taskable* task);
 
   ee_max_fsm(const ee_max_fsm& fsm) = delete;
   ee_max_fsm& operator=(const ee_max_fsm& fsm) = delete;
@@ -122,7 +123,6 @@ class ee_max_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  explore_for_goal_fsm m_explore_fsm;
   ta::taskable* taskable_fsm
   // clang-format on
 

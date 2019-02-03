@@ -35,6 +35,7 @@
  namespace state_machine = rcppsw::patterns::state_machine;
  namespace hal = rcppsw::robotics::hal;
  namespace utils = rcppsw::utils;
+ namespace ta = rcppsw:task_allocation;
 
  /*******************************************************************************
   * Class Definitions
@@ -49,7 +50,7 @@
   */
  class energy_subsystem {
   public:
-    energy_subsystem(const params::energy_params* params, const std::string& id);
+    energy_subsystem(const params::energy_params* params, const ta::taskable* task);
     virtual ~energy_subsystem(void) = default;
 
     virtual void reset(void) {}
@@ -64,6 +65,7 @@
     void energy_adapt(int k_robots, int f_success);
 
     std::unique_ptr<fsm::depth0::ee_max_fsm>              e_fsm;
+
     int                                                   w[3];
     int                                                   wC[3];
     float                                                 energy;

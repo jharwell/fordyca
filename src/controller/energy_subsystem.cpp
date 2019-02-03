@@ -35,14 +35,15 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 energy_subsystem::energy_subsystem(
-    const struct params::energy_params* const params)
+    const struct params::energy_params* const params, ta:taskable* task)
     : ER_CLIENT_INIT("fordyca.controller.energy"),
       w{params->weight1, params->weight2, params->weight3},
       wC{params->weight1C, params->weight2C, params->weight3C},
       elow_thres(params->elow),
       ehigh_thres(params->ehigh),
       capacity(params->capacity),
-      EEE_method(params->EEE) {}
+      EEE_method(params->EEE),
+      e_fsm(task) {}
 
 energy_subsystem::~energy_subsystem(void) = default;
 

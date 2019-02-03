@@ -38,17 +38,14 @@ namespace ta = rcppsw:task_allocation;
  ******************************************************************************/
 
 // get pointer to taskable object (crw_fsm)
-ee_max_fsm::ee_max_fsm(controller::saa_subsystem* const saa, ta::taskable* const taskable)
+ee_max_fsm::ee_max_fsm(ta::taskable* const task)
     : base_foraging_fsm(saa, ST_MAX_STATES),
-      ta::taskable* taskable_fsm(taskable),
+      ta::taskable* taskable_fsm(task),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(foraging, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(retreating, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),
-      m_explore_fsm(saa,
-                    std::make_unique<controller::random_explore_behavior>(saa),
-                    std::bind(&ee_max_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&foraging),
                    HFSM_STATE_MAP_ENTRY_EX(&retreating),
@@ -59,22 +56,7 @@ ee_max_fsm::ee_max_fsm(controller::saa_subsystem* const saa, ta::taskable* const
  ******************************************************************************/
 HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
   /* first time running FSM */
-  if (state_machine::event_type::NORMAL == data->type()) {
-    internal_event(ST_ACQUIRE_BLOCK);
-    return controller::foraging_signal::HANDLED;
-  }
-  if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::LEFT_NEST == data->signal()) {
-      m_explore_fsm.task_start(nullptr);
-      internal_event(ST_ACQUIRE_BLOCK);
-      return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
-      internal_event(ST_WAIT_FOR_BLOCK_DROP);
-      return controller::foraging_signal::HANDLED;
-    }
-  }
-  ER_FATAL_SENTINEL("Unhandled signal");
-  return controller::foraging_signal::HANDLED;
+
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
@@ -86,7 +68,7 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, retreating) {
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
-  
+
 }
 
 /*
@@ -132,9 +114,10 @@ HFSM_STATE_DEFINE(ee_max_fsm, wait_for_block_drop, state_machine::event_data) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
+/*
 bool ee_max_fsm::is_exploring_for_goal(void) const {
   return current_state() == ST_ACQUIRE_BLOCK;
-} /* is_exploring_for_goal() */
+} /* is_exploring_for_goal()
 
 bool ee_max_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kBlock == acquisition_goal()) {
@@ -146,51 +129,23 @@ bool ee_max_fsm::goal_acquired(void) const {
 } /* goal_acquired() */
 
 /*******************************************************************************
- * Collision Metrics
- ******************************************************************************/
-__rcsw_pure bool ee_max_fsm::in_collision_avoidance(void) const {
-  return (m_explore_fsm.task_running() &&
-          m_explore_fsm.in_collision_avoidance()) ||
-         base_foraging_fsm::in_collision_avoidance();
-} /* in_collision_avoidance() */
-
-__rcsw_pure bool ee_max_fsm::entered_collision_avoidance(void) const {
-  return (m_explore_fsm.task_running() &&
-          m_explore_fsm.entered_collision_avoidance()) ||
-         base_foraging_fsm::entered_collision_avoidance();
-} /* entered_collision_avoidance() */
-
-__rcsw_pure bool ee_max_fsm::exited_collision_avoidance(void) const {
-  return (m_explore_fsm.task_running() &&
-          m_explore_fsm.exited_collision_avoidance()) ||
-         base_foraging_fsm::exited_collision_avoidance();
-} /* exited_collision_avoidance() */
-
-__rcsw_pure uint ee_max_fsm::collision_avoidance_duration(void) const {
-  if (m_explore_fsm.task_running()) {
-    return m_explore_fsm.collision_avoidance_duration();
-  } else {
-    return base_foraging_fsm::collision_avoidance_duration();
-  }
-  return 0;
-} /* collision_avoidance_duration() */
-
-/*******************************************************************************
  * General Member Functions
  ******************************************************************************/
+
+/*
 void ee_max_fsm::init(void) {
   base_foraging_fsm::init();
   m_explore_fsm.init();
-} /* init() */
+} /* init()
 
 void ee_max_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
                state_machine::event_type::NORMAL);
-} /* run() */
+} /* run()
 
 bool ee_max_fsm::block_detected(void) const {
   return saa_subsystem()->sensing()->block_detected();
-} /* block_detected() */
+} /* block_detected()
 
 transport_goal_type ee_max_fsm::block_transport_goal(void) const {
   if (ST_RETURN_TO_NEST == current_state() ||
@@ -198,7 +153,7 @@ transport_goal_type ee_max_fsm::block_transport_goal(void) const {
     return transport_goal_type::kNest;
   }
   return transport_goal_type::kNone;
-} /* block_transport_goal() */
+} /* block_transport_goal()
 
 acquisition_goal_type ee_max_fsm::acquisition_goal(void) const {
   if (ST_ACQUIRE_BLOCK == current_state() ||

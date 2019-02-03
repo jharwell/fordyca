@@ -53,6 +53,7 @@ void crw_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
   m_fsm = rcppsw::make_unique<fsm::depth0::crw_fsm>(
       base_controller::saa_subsystem());
+  m_energy = rcppsw::make_unique<energy_subsystem>(m_fsm);
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
