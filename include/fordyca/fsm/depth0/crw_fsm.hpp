@@ -96,6 +96,9 @@ class crw_fsm : public base_foraging_fsm,
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;
 
+  int get_k_collision(void) { return k_collisions; }
+  void reset_collisions(void) { k_collisions = 0; }
+
   /**
    * @brief (Re)-initialize the FSM.
    */
@@ -147,6 +150,8 @@ class crw_fsm : public base_foraging_fsm,
   HFSM_DEFINE_STATE_MAP_ACCESSOR(state_map_ex, index) override {
   return (&mc_state_map[index]);
   }
+
+  int k_collisions;
 
   /* clang-format off */
   explore_for_goal_fsm m_explore_fsm;

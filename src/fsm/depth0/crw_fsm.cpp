@@ -38,6 +38,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
+      k_collisions(0);
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       entry_transport_to_nest(),
@@ -154,6 +155,7 @@ __rcsw_pure bool crw_fsm::entered_collision_avoidance(void) const {
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool crw_fsm::exited_collision_avoidance(void) const {
+  k_collisions = k_collisions + 1;
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.exited_collision_avoidance()) ||
          base_foraging_fsm::exited_collision_avoidance();

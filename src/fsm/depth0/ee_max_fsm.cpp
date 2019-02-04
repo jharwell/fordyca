@@ -38,10 +38,12 @@ namespace ta = rcppsw:task_allocation;
  ******************************************************************************/
 
 // get pointer to taskable object (crw_fsm)
-ee_max_fsm::ee_max_fsm(ta::taskable* const task, const controller::ee_decision_matrix* matrix)
+ee_max_fsm::ee_max_fsm(ta::taskable* const task, const controller::ee_decision_matrix* matrix,
+                        controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ta::taskable* taskable_fsm(task),
       mc_matrix(matrix),
+      m_sensing(saa->sensing()),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(foraging, hfsm::top_state()),
@@ -57,34 +59,42 @@ ee_max_fsm::ee_max_fsm(ta::taskable* const task, const controller::ee_decision_m
  ******************************************************************************/
 HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
   /* first time running FSM */
-
+  if (state_machine::event_type::NORMAL == data->type()) {
+    internal_event(ST_FORAGING);
+    return controller::foraging_signal::HANDLED;
+  }
+  ER_FATAL_SENTINEL("Unhandled signal");
+  return controller::foraging_signal::HANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
   controller::ee_selector selector(mc_matrix);
   float low_energy = selector.getLowerThres();
+  double current_energy = m_sensing->battery()->readings().available_charge;
   if (current_energy <= low_energy) {
     internal_event(ST_RETREATING);
-    return;
-  }
+  } else {
+    if(taskable_fsm.task_finished()) {
+      taskable_fsm.task_reset();
+      taskable_fsm.task_start();
+    }
 
-  if(block picked up) {
-    internal_event(ST_RETREATING);
+    taskable_fsm.task_execute();
   }
 
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, retreating) {
-  if(robot is in nest) {
+  if(m_sensing->in_nest()) {
     // update threshold values?
     internal_event(ST_CHARGING);
   }
-
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
   controller::ee_selector selector(mc_matrix);
   float charged_energy = selector.getHigherThres();
+  double current_energy = m_sensing->battery()->readings().available_charge;
   if (current_energy == charged_energy) {
     internal_event(ST_FORAGING);
     return;

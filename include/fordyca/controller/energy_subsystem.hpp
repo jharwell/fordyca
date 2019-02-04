@@ -54,6 +54,7 @@
     virtual ~energy_subsystem(void) = default;
 
     virtual void reset(void) {}
+    void success_pickup(int success) { is_successful_pickup = 1;}
 
     void update(void);
 
@@ -64,15 +65,16 @@
     void energy_drain(void);
     void energy_adapt(int k_robots, int f_success);
 
-    ee_decision_matrix                                    mc_matrix;
+    const controller::ee_decision_matrix* const           mc_matrix;
     std::unique_ptr<fsm::depth0::ee_max_fsm>              e_fsm;
     int                                                   w[3];
     int                                                   wC[3];
-    float                                                 energy;
     float                                                 deltaE;
     float                                                 elow_thres;
     float                                                 ehigh_thres;
     float                                                 capacity;
+    int                                                   is_successful_pickup;
+    bool                                                  is_new_thresh;
     std::string                                           EEE_method;
 
  }

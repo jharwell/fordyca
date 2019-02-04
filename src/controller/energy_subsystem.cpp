@@ -29,13 +29,16 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+namespace energy_fsm = fsm::depth0::ee_max_fsm;
+
+NS_START(controller);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 energy_subsystem::energy_subsystem(
-    const struct params::energy_params* const params, ta:taskable* task)
+    const struct params::energy_params* const params, ta:taskable* task, controller::saa_subsystem* saa)
     : ER_CLIENT_INIT("fordyca.controller.energy"),
       w{params->weight1, params->weight2, params->weight3},
       wC{params->weight1C, params->weight2C, params->weight3C},
@@ -43,8 +46,10 @@ energy_subsystem::energy_subsystem(
       ehigh_thres(params->ehigh),
       capacity(params->capacity),
       EEE_method(params->EEE),
+      is_successful_pickup(0),
+      is_new_thresh(true),
       mc_matrix(),
-      e_fsm(task, mc_matrix) {}
+      e_fsm(task, mc_matrix, saa) {}
 
 energy_subsystem::~energy_subsystem(void) = default;
 
@@ -57,33 +62,24 @@ void energy_check(void)  { }
 
 void energy_subsystem::endgame(void) { }
 
-void energy_subsystem::energy_drain(void) {
-/*
-  switch(/*state*) {
-    case searching:
-      energy = energy - alphaS;
-      deltaE = deltaE + alphaS;
-      break;
-    case retreating:
-      energy = energy - alphaR;
-      deltaE = deltaE + alphaR;
-      break;
-    case collecting:
-      energy = energy - p;
-      deltaE = deltaE + p;
-      break;
+
+void energy_subsystem::energy_adapt(int k_robots) {
+  if(e_fsm->current_state() == energy_fsm::ST_CHARGING && is_new_thresh) {
+    elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
+                            + ((!is_successful_pickup)*w2) + (k_robots*w3);
+
+    capacity = capacity - (is_successful_pickup * max(0, (energy_init - deltaE))*w1C)
+                        + ((!is_successful_pickup)*w2C) + (k_robots*w3C);
+
+    ehigh_thres = elow_thres + capacity;
+
+    mc_matrix->setData(elow_thres, ehigh_thres);
+
+    is_successful_pickup = 0;
+    is_new_thresh = false;
+  } else if (e_fsm->current_state() == energy_fsm::ST_FORAGING) {
+    is_new_thresh = true;
   }
-  */
-}
-
-void energy_subsystem::energy_adapt(int k_robots, int f_success) {
-  elow_thres = elow_thres - (f_success * max(0, (energy_init - deltaE))*w1)
-                          + ((!f_success)*w2) + (k_robots*w3);
-
-  capacity = capacity - (f_success * max(0, (energy_init - deltaE))*w1C)
-                      + ((!f_success)*w2C) + (k_robots*w3C);
-
-  ehigh_thres = elow_thres + capacity;
 }
 
 NS_END(controller, fordyca);

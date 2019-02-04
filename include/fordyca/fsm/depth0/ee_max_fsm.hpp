@@ -64,7 +64,8 @@ class ee_max_fsm : public base_foraging_fsm,
                                public block_transporter,
                                public visitor::visitable_any<ee_max_fsm> {
  public:
-  explicit ee_max_fsm(ta::taskable* task, const controller::ee_decision_matrix* matrix);
+  explicit ee_max_fsm(ta::taskable* task, const controller::ee_decision_matrix* matrix,
+                      controller::saa_subsystem* saa);
 
   ee_max_fsm(const ee_max_fsm& fsm) = delete;
   ee_max_fsm& operator=(const ee_max_fsm& fsm) = delete;
@@ -121,6 +122,7 @@ class ee_max_fsm : public base_foraging_fsm,
   // clang-format off
   ta::taskable* taskable_fsm;
   const controller::ee_decision_matrix* const mc_matrix;
+  std::shared_ptr<sensing_subsystem>          m_sensing;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
