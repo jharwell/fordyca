@@ -46,7 +46,7 @@
   * @brief Select the energy thresholds and capacity that a robot knows about,
   * for use in energy FSM.
   */
- class block_selector : public rcppsw::er::client<energy_selector> {
+ class ee_selector : public rcppsw::er::client<ee_selector> {
  public:
   explicit energy_selector(const ee_decision_matrix* sel_matrix);
 
@@ -55,7 +55,14 @@
   energy_selector& operator=(const energy_selector& other) = delete;
   energy_selector(const energy_selector& other) = delete;
 
+  float getLowerThres(void);
+  float getHigherThres(void);
+
  private:
+
+   // maybe a function that checks that the thresholds are positive and one is
+   // greater than the other.
+
   /* clang-format off */
   const ee_decision_matrix* const mc_matrix;
   /* clang-format on */

@@ -36,9 +36,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
-struct ee_decision_matrix_params;
-}
 NS_START(controller);
 
 /*
@@ -62,7 +59,15 @@ using block_sel_variant =
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
 
-class ee_decision_matrix : public std::map<std::string, block_sel_variant> {
+class ee_decision_matrix {
+  public:
+    float e_lowerT;
+    float e_higherT;
+
+    explicit block_sel_matrix();
+
+    void setData(float eLow, float eHigh);
+
 
 };
 

@@ -38,9 +38,10 @@ namespace ta = rcppsw:task_allocation;
  ******************************************************************************/
 
 // get pointer to taskable object (crw_fsm)
-ee_max_fsm::ee_max_fsm(ta::taskable* const task)
+ee_max_fsm::ee_max_fsm(ta::taskable* const task, const controller::ee_decision_matrix* matrix)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ta::taskable* taskable_fsm(task),
+      mc_matrix(matrix),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(foraging, hfsm::top_state()),
@@ -60,15 +61,34 @@ HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
+  controller::ee_selector selector(mc_matrix);
+  float low_energy = selector.getLowerThres();
+  if (current_energy <= low_energy) {
+    internal_event(ST_RETREATING);
+    return;
+  }
+
+  if(block picked up) {
+    internal_event(ST_RETREATING);
+  }
 
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, retreating) {
+  if(robot is in nest) {
+    // update threshold values?
+    internal_event(ST_CHARGING);
+  }
 
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
-
+  controller::ee_selector selector(mc_matrix);
+  float charged_energy = selector.getHigherThres();
+  if (current_energy == charged_energy) {
+    internal_event(ST_FORAGING);
+    return;
+  }
 }
 
 /*

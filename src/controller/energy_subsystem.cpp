@@ -43,7 +43,8 @@ energy_subsystem::energy_subsystem(
       ehigh_thres(params->ehigh),
       capacity(params->capacity),
       EEE_method(params->EEE),
-      e_fsm(task) {}
+      mc_matrix(),
+      e_fsm(task, mc_matrix) {}
 
 energy_subsystem::~energy_subsystem(void) = default;
 

@@ -40,5 +40,12 @@
 /*******************************************************************************
  * Member Functions
 ******************************************************************************/
+float energy_selector::getLowerThres(void) {
+  return mc_matrix->e_lowerT;
+}
+
+float energy_selector::getHigherThres(void) {
+  return mc_matrix->e_higherT;
+}
 
 NS_END(controller, fordyca);

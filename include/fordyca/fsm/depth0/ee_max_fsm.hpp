@@ -64,7 +64,7 @@ class ee_max_fsm : public base_foraging_fsm,
                                public block_transporter,
                                public visitor::visitable_any<ee_max_fsm> {
  public:
-  explicit ee_max_fsm(ta::taskable* task);
+  explicit ee_max_fsm(ta::taskable* task, const controller::ee_decision_matrix* matrix);
 
   ee_max_fsm(const ee_max_fsm& fsm) = delete;
   ee_max_fsm& operator=(const ee_max_fsm& fsm) = delete;
@@ -81,9 +81,6 @@ class ee_max_fsm : public base_foraging_fsm,
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override;
 
-  /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
-
   /**
    * @brief (Re)-initialize the FSM.
    */
@@ -95,7 +92,6 @@ class ee_max_fsm : public base_foraging_fsm,
   void run(void);
 
  private:
-  bool block_detected(void) const;
 
   enum fsm_states {
     ST_START, /* Initial state */
@@ -123,7 +119,8 @@ class ee_max_fsm : public base_foraging_fsm,
   }
 
   // clang-format off
-  ta::taskable* taskable_fsm
+  ta::taskable* taskable_fsm;
+  const controller::ee_decision_matrix* const mc_matrix;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

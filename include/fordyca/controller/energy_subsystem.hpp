@@ -64,8 +64,8 @@
     void energy_drain(void);
     void energy_adapt(int k_robots, int f_success);
 
+    ee_decision_matrix                                    mc_matrix;
     std::unique_ptr<fsm::depth0::ee_max_fsm>              e_fsm;
-
     int                                                   w[3];
     int                                                   wC[3];
     float                                                 energy;
