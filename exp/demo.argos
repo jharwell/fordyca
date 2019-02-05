@@ -17,11 +17,7 @@
   <controllers>
 
     <stateful_controller id="ffc"
-<<<<<<< HEAD:exp/single-source.argos
-                               library="build/lib/libfordyca">
-=======
                                library="libfordyca">
->>>>>>> devel:exp/demo.argos
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -160,11 +156,6 @@
           <differential_drive soft_turn_max="15"
                               max_speed="10.0" />
         </actuation>
-        <communication on="true"
-                       mode="2"
-                       max_message_length="10"
-                       chance_to_continue_communication="0.5"
-                       chance_to_start_communication="0.75"/>
       </params>
     </stateful_controller>
 
@@ -173,11 +164,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-<<<<<<< HEAD:exp/single-source.argos
-  <loop_functions library="build/lib/libfordyca"
-=======
   <loop_functions library="libfordyca"
->>>>>>> devel:exp/demo.argos
                   label="stateful_loop_functions">
     <battery
         power_station_amount="0"
@@ -310,8 +297,8 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="6" max_trials="1000">
-        <foot-bot id="fb" rab_range="3" rab_data_size="15">
+      <entity quantity="16" max_trials="1000">
+        <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->
         </foot-bot>

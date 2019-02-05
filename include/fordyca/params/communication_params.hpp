@@ -1,7 +1,7 @@
 /**
  * @file actuation_params.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 Nathan White, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,8 +40,8 @@ NS_START(fordyca, params);
  * @ingroup params
  */
 struct communication_params : public rcppsw::params::base_params {
-  double chance_to_send_communication{0.0};
-  double chance_to_recieve_communication{0.0};
+  double prob_send{0.0};
+  double prob_receive{0.0};
   int max_message_length{0};
   std::string mode{"random"};
   bool on{false};

@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <gp_mdpo_controller id="ffc"
+    <mdpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -24,7 +24,7 @@
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="true" />
+        <footbot_proximity implementation="default" show_rays="false" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
@@ -149,8 +149,13 @@
           <differential_drive soft_turn_max="15"
                               max_speed="10.0" />
         </actuation>
+        <communication on="true"
+                       mode="utility"
+                       max_message_length="10"
+                       prob_send="0.3"
+                       prob_receive="0.9" />
       </params>
-    </gp_mdpo_controller>
+    </mdpo_controller>
 
   </controllers>
 
@@ -158,7 +163,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth0_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -255,7 +260,7 @@
               n_clusters="15"
               />
           <manifest
-              n_cube="10"
+              n_cube="25"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -274,8 +279,8 @@
     </caches>
 
     <visualization robot_id="true"
-                   robot_los="true"
-                   robot_task="true"
+                   robot_los="false"
+                   robot_task="false"
                    block_id="false"
                    />
   </loop_functions>
@@ -355,28 +360,28 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl autoplay="true"> -->
-  <!--      <frame_grabbing directory="frames" -->
-  <!--                      base_name="frame_" -->
-  <!--                      format="png" -->
-  <!--                      quality="100" /> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="6,3,6" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--       <placement idx="1" -->
-  <!--                  position="6,0,5" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth0_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl autoplay="true">
+       <frame_grabbing directory="frames"
+                       base_name="frame_"
+                       format="png"
+                       quality="100" />
+      <camera>
+        <placement idx="0"
+                   position="6,3,6"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+        <placement idx="1"
+                   position="6,0,5"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth0_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

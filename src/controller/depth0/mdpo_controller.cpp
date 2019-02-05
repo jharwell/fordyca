@@ -45,9 +45,7 @@ namespace ta = rcppsw::task_allocation;
 mdpo_controller::mdpo_controller(void)
     : dpo_controller(),
      ER_CLIENT_INIT("fordyca.controller.depth0.mdpo"),
-     m_communication_params(),
-     m_arena_x(0),
-     m_arena_y(0) {}
+     m_communication_params() {}
 
 mdpo_controller::~mdpo_controller(void) = default;
 
@@ -71,7 +69,7 @@ void mdpo_controller::ControlStep(void) {
   perception()->update();
 
   if(m_communication_params.on) {
-    perform_communication();
+    communication_check();
   }
 
   fsm()->run();
@@ -103,31 +101,42 @@ void mdpo_controller::Init(ticpp::Element& node) {
   auto* comm_params = param_repo.parse_results<params::communication_params>();
   m_communication_params = *comm_params;
 
-  m_arena_x = mdpo_perception()->map()->xdsize();
-  m_arena_y = mdpo_perception()->map()->ydsize();
-
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
-void mdpo_controller::perform_communication(void) {
+void mdpo_controller::communication_check(void) {
+  // Receive vector of all messages available
   std::vector<std::vector<uint8_t>> recieved_packet_data =
     saa_subsystem()->sensing()->recieve_message();
-  float probability = static_cast <float> (rand()) /
+
+  // Calculate probabilities for sending and receiving a message
+  float prob_receive = static_cast <float> (rand()) /
+      static_cast <float> (RAND_MAX);
+  float prob_send = static_cast <float> (rand()) /
       static_cast <float> (RAND_MAX);
 
-  if (!recieved_packet_data.empty() && probability >=
-      (1 - m_communication_params.chance_to_recieve_communication)) {
+  // Make sure there are available message to integrate and that the probability
+  // is in an acceptable range.
+  if (!recieved_packet_data.empty() && prob_receive >=
+      (1 - m_communication_params.prob_receive)) {
     hal::wifi_packet packet = hal::wifi_packet();
+
+    // Iterate over every message and integrate its contents with the robot's
+    // internal mapping
     for(std::vector<uint8_t> individual_message : recieved_packet_data) {
       packet.data = individual_message;
       integrate_recieved_packet(packet);
     }
-    fill_packet();
-  } else if (probability >= (1 -
-      m_communication_params.chance_to_send_communication)) {
+  }
+
+  // If prob_send is acceptable, then fill the packet's contents and begin
+  // communication.
+  if (prob_send >= (1 - m_communication_params.prob_send)) {
     fill_packet();
   } else {
+    // Only stop sending messages when the probabilty for sending falls below
+    // an acceptable number.
     saa_subsystem()->actuation()->stop_sending_message();
   } /* if !recieved_packet_data.empty() */
 } /* perform_communication */
@@ -137,14 +146,12 @@ void mdpo_controller::fill_packet(void) {
   int x_coord;
   int y_coord;
 
-  const char* mode = m_communication_params.mode.c_str();
-
   // Random Mode
-  if(std::strcmp(mode, "random") == 0) {
-    x_coord = static_cast <int> (rand()) % m_arena_x;
-    y_coord = static_cast <int> (rand()) % m_arena_y;
+  if(m_communication_params.mode.compare("random") == 0) {
+    x_coord = static_cast <int> (rand()) % mdpo_perception()->map()->xdsize();
+    y_coord = static_cast <int> (rand()) % mdpo_perception()->map()->ydsize();
   // Utility function
-} else if (std::strcmp(mode, "utility") == 0) {
+} else if (m_communication_params.mode.compare("utility") == 0) {
     rcppsw::math::vector2u cell = get_most_valuable_cell();
     x_coord = cell.x();
     y_coord = cell.y();
@@ -274,8 +281,8 @@ rcppsw::math::vector2u mdpo_controller::get_most_valuable_cell(void) {
   int communicated_cell_value = 0;
   int current_cell_value = 0;
 
-  int arena_x_coord = static_cast<int>(m_arena_x);
-  int arena_y_coord = static_cast<int>(m_arena_y);
+  int arena_x_coord = static_cast<int>(mdpo_perception()->map()->xdsize());
+  int arena_y_coord = static_cast<int>(mdpo_perception()->map()->ydsize());
   int cell_x = 0;
   int cell_y = 0;
 
@@ -291,8 +298,8 @@ rcppsw::math::vector2u mdpo_controller::get_most_valuable_cell(void) {
           access<ds::occupancy_grid::kPheromone>(i, j);
 
         // Distance from the nest * number of blocks * pheromone density
-        current_cell_value = ((((i - nest_x_coord)^2) +
-          ((j - nest_y_coord)^2))^(1/2)) * current_cell.block_count() *
+        current_cell_value = (1/((((i - nest_x_coord)^2) +
+          ((j - nest_y_coord)^2))^(1/2))) * current_cell.block_count() *
            density.last_result();
 
         // Update variables

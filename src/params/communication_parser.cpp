@@ -1,7 +1,7 @@
 /**
  * @file actuation_parser.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 Nathan White, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,8 +44,8 @@ void communication_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(anode, m_params, on);
   XML_PARSE_ATTR(anode, m_params, mode);
   XML_PARSE_ATTR(anode, m_params, max_message_length);
-  XML_PARSE_ATTR(anode, m_params, chance_to_send_communication);
-  XML_PARSE_ATTR(anode, m_params, chance_to_recieve_communication);
+  XML_PARSE_ATTR(anode, m_params, prob_send);
+  XML_PARSE_ATTR(anode, m_params, prob_receive);
 } /* parse() */
 
 void communication_parser::show(std::ostream& stream) const {
@@ -54,8 +54,8 @@ void communication_parser::show(std::ostream& stream) const {
   stream << XML_ATTR_STR(m_params, on)
          << XML_ATTR_STR(m_params, mode)
          << XML_ATTR_STR(m_params, max_message_length)
-         << XML_ATTR_STR(m_params, chance_to_send_communication)
-         << XML_ATTR_STR(m_params, chance_to_recieve_communication)
+         << XML_ATTR_STR(m_params, prob_send)
+         << XML_ATTR_STR(m_params, prob_receive)
          << std::endl
          << build_footer();
 } /* show() */
@@ -63,10 +63,10 @@ void communication_parser::show(std::ostream& stream) const {
 __rcsw_pure bool communication_parser::validate(void) const {
     return m_params->max_message_length >= 0 &&
            m_params->max_message_length <= 20 &&
-           m_params->chance_to_send_communication >= 0.0 &&
-           m_params->chance_to_send_communication <= 1.0 &&
-           m_params->chance_to_recieve_communication >= 0.0 &&
-           m_params->chance_to_recieve_communication <= 1.0;
+           m_params->prob_send >= 0.0 &&
+           m_params->prob_send <= 1.0 &&
+           m_params->prob_receive >= 0.0 &&
+           m_params->prob_receive <= 1.0;
 } /* validate() */
 
 

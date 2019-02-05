@@ -71,11 +71,6 @@ class mdpo_controller : public dpo_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  void perform_communication(void);
-  void fill_packet(void);
-  void integrate_recieved_packet(rcppsw::robotics::hal::wifi_packet packet);
-  rcppsw::math::vector2u get_most_valuable_cell(void);
-
   std::type_index type_index(void) const override {
     return std::type_index(typeid(*this));
   }
@@ -109,10 +104,42 @@ class mdpo_controller : public dpo_controller,
    */
   void private_init(void);
 
+  /**
+   * @brief Checks for available messages from nearby robots, and
+   * probabilistically integrates their contents. Also probabilistically
+   * sends messages to nearby robots.
+   *
+   * Called from \ref ControlStep().
+   */
+  void communication_check(void);
+
+  /**
+   * @brief Calls get_most_valuable_cell, and fills a rab_wifi_packet with
+   * information representing the current state of that cell.
+   *
+   * Called iteratively from \ref communication_check().
+   */
+  void fill_packet(void);
+
+  /**
+   * @brief Integrate a received communication packet's contents with the
+   * robot's internal environmental mapping.
+   *
+   * Called from \ref communication_check().
+   */
+  void integrate_recieved_packet(rcppsw::robotics::hal::wifi_packet packet);
+
+  /**
+   * @brief Returns a vector containing the (X,Y) coordinates of the cell deamed
+   * most valuable according to block count, distance from the nest, and current
+   * pheromon levels.
+   *
+   * Called from \ref fill_packet().
+   */
+  rcppsw::math::vector2u get_most_valuable_cell(void);
+
   /* clang-format off */
   struct params::communication_params        m_communication_params;
-  uint                                       m_arena_x;
-  uint                                       m_arena_y;
   /* clang-format on */
 };
 
