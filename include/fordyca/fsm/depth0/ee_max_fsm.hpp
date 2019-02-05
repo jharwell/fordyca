@@ -103,6 +103,10 @@ class ee_max_fsm : public base_foraging_fsm,
   };
 
   /* ee_max fsm states */
+  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
+                     state_machine::event_data);
+  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
+
   HFSM_STATE_DECLARE(ee_max_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(ee_max_fsm, foraging);
   HFSM_STATE_DECLARE_ND(ee_max_fsm, retreating);

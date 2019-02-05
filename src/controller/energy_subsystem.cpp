@@ -48,6 +48,7 @@ energy_subsystem::energy_subsystem(
       EEE_method(params->EEE),
       is_successful_pickup(0),
       is_new_thresh(true),
+      is_EEE(false),
       mc_matrix(),
       e_fsm(task, mc_matrix, saa) {}
 
@@ -60,25 +61,49 @@ void energy_subsystem::reset(void) {  }
 
 void energy_check(void)  { }
 
-void energy_subsystem::endgame(void) { }
+void energy_subsystem::endgame(int k_robots) {
+  switch(EEE_method) {
+    case "Well-informed":
+        break;
+    case "Ill-informed":
+        break;
+    case "Null-informed":
+        break;
+  }
+}
 
 
 void energy_subsystem::energy_adapt(int k_robots) {
-  if(e_fsm->current_state() == energy_fsm::ST_CHARGING && is_new_thresh) {
-    elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
-                            + ((!is_successful_pickup)*w2) + (k_robots*w3);
+  if(is_EEE) {
+    endgame(k_robots);
+  } else {
 
-    capacity = capacity - (is_successful_pickup * max(0, (energy_init - deltaE))*w1C)
-                        + ((!is_successful_pickup)*w2C) + (k_robots*w3C);
+    if(e_fsm->current_state() == energy_fsm::ST_CHARGING && is_new_thresh) {
+      elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
+                              + ((!is_successful_pickup)*w2) + (k_robots*w3);
 
-    ehigh_thres = elow_thres + capacity;
+      capacity = capacity - (is_successful_pickup * max(0, (energy_init - deltaE))*w1C)
+                          + ((!is_successful_pickup)*w2C) + (k_robots*w3C);
 
-    mc_matrix->setData(elow_thres, ehigh_thres);
+      if(elow_thres < 0)
+        elow_thres = 0;
 
-    is_successful_pickup = 0;
-    is_new_thresh = false;
-  } else if (e_fsm->current_state() == energy_fsm::ST_FORAGING) {
-    is_new_thresh = true;
+      ehigh_thres = elow_thres + capacity;
+
+      if(ehigh_thres > 1)
+        ehigh_thres = 1;
+
+      if((ehigh_thres - elow_thres) == 1) {
+
+      }
+
+      mc_matrix->setData(elow_thres, ehigh_thres);
+
+      is_successful_pickup = 0;
+      is_new_thresh = false;
+    } else if (e_fsm->current_state() == energy_fsm::ST_FORAGING) {
+      is_new_thresh = true;
+    }
   }
 }
 

@@ -51,7 +51,10 @@ ee_max_fsm::ee_max_fsm(ta::taskable* const task, const controller::ee_decision_m
       HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&foraging),
-                   HFSM_STATE_MAP_ENTRY_EX(&retreating),
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
+                                               nullptr,
+                                               &entry_transport_to_nest,
+                                               nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&charging)} {}
 
 /*******************************************************************************

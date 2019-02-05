@@ -50,7 +50,8 @@
   */
  class energy_subsystem {
   public:
-    energy_subsystem(const params::energy_params* params, const ta::taskable* task);
+    energy_subsystem(const params::energy_params* params, const ta::taskable* task,
+                     controller::saa_subsystem* saa);
     virtual ~energy_subsystem(void) = default;
 
     virtual void reset(void) {}
@@ -75,6 +76,9 @@
     float                                                 capacity;
     int                                                   is_successful_pickup;
     bool                                                  is_new_thresh;
+    bool                                                  is_EEE;
+    int                                                   tau;
+    int                                                   maxTau;                                      
     std::string                                           EEE_method;
 
  }
