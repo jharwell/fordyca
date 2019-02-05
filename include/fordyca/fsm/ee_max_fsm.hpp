@@ -30,7 +30,6 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/controller/crw_controller.hpp"
 
 
 /*******************************************************************************

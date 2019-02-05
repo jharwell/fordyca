@@ -34,15 +34,15 @@
   * @ingroup params
   */
   struct energy_params : public rcppsw::params::base_params {
-    float elow{};
-    float ehigh{};
-    float capacity{};
-    float weight1{1};
-    float weight2{1};
-    float weight3{1};
-    float weight1C{1};
-    float weight2C{1};
-    float weight3C{1};
+    float elow{-1};
+    float ehigh{-1};
+    float capacity{-1};
+    float weight1{-1};
+    float weight2{-1};
+    float weight3{-1};
+    float weight1C{-1};
+    float weight2C{-1};
+    float weight3C{-1};
     std::string EEE{""};
 
   }

@@ -45,7 +45,8 @@
   * @ingroup controller
   *
   * @brief Handles the battery energy allocation and usage for each robot.
-  * Determines how much energy will be allocated to
+  * Determines how much energy will be allocated to the robot for the foraging task.
+  *
   *
   *
   */
@@ -61,14 +62,21 @@
     void update(void);
 
   private:
-
-    void energy_check(void);
+    /**
+     * @brief How the robot will perform and allocate or not allocate energy for foraging
+     * when maximum battery potential has reached.
+     */
     void endgame(void);
-    void energy_drain(void);
+
+    /**
+     * @brief How the robot will update the energy thresholds and capacity for deciding
+     * how much energy to allocate next time it starts foraging. It decides this based on
+     * the performance from last round of foraging.
+     */
     void energy_adapt(int k_robots, int f_success);
 
     const controller::ee_decision_matrix* const           mc_matrix;
-    std::unique_ptr<fsm::ee_max_fsm>                      e_fsm;
+    fsm::ee_max_fsm                                       e_fsm;  
     std::shared_ptr<sensing_subsystem>                    m_sensing;
     int                                                   w[3];
     int                                                   wC[3];

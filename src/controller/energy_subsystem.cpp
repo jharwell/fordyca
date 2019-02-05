@@ -60,9 +60,6 @@ energy_subsystem::~energy_subsystem(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void energy_subsystem::reset(void) {  }
-
-void energy_check(void)  { }
 
 void energy_subsystem::endgame(int k_robots) {
   if(EEE_method == "Well-informed") {
@@ -96,6 +93,11 @@ void energy_subsystem::energy_adapt(int k_robots) {
   } else {
 
     if(e_fsm->current_state() == energy_fsm::ST_CHARGING && is_new_thresh) {
+      /* updated based on three criteria:
+          How early if achieved a successful pickup
+          If there was a failed pickup
+          If encountered any robots.
+      */
       elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
                               + ((!is_successful_pickup)*w2) + (k_robots*w3);
 

@@ -43,7 +43,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * @class energy_metrics_collector
  * @ingroup metrics energy
  *
- * @brief Collector for \ref energy_metrics_opt.
+ * @brief Collector for \ref energy_opt_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */

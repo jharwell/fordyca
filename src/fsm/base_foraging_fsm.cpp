@@ -47,13 +47,11 @@ base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
       HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(return_nest, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),
       entry_transport_to_nest(),
       entry_leaving_nest(),
       entry_new_direction(),
       entry_wait_for_signal(),
       entry_return_to_nest(),
-      entry_charging(),
       m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_saa(saa) {}
@@ -189,13 +187,6 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, return_to_nest) {
 
 }
 
-HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, charging) {
-  if (current_state() != last_state()) {
-    ER_DEBUG("Executing ST_CHARGING");
-  }
-
-
-}
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
   m_saa->actuation()->leds_set_color(utils::color::kWHITE);
@@ -213,9 +204,7 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_return_to_nest) {
   m_saa->actuation()->leds_set_color(utils::color::kRED);
 }
-HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_charging) {
-  m_saa->actuation()->leds_set_color(utils::color::kYELLOW);
-}
+
 
 /*******************************************************************************
  * Collision Metrics

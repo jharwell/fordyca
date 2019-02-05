@@ -1,5 +1,5 @@
 /**
- * @file energy_metrics_opt.hpp
+ * @file energy_opt_metrics.hpp
  *
  * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
- #ifndef INCLUDE_METRICS_ENERGY_METRICS_OPT_HPP_
- #define INCLUDE_METRICS_ENERGY_METRICS_OPT_HPP_
+ #ifndef INCLUDE_METRICS_energy_opt_metrics_HPP_
+ #define INCLUDE_METRICS_energy_opt_metrics_HPP_
 
  /*******************************************************************************
   * Includes
@@ -36,7 +36,7 @@
   ******************************************************************************/
 
  /**
-  * @class energy_metrics_opt
+  * @class energy_opt_metrics
   * @ingroup metrics energy
   *
   * @brief Defines the metrics to be collected from robots about the energy and
@@ -63,4 +63,4 @@
 
   NS_END(energy, metrics, fordyca);
 
-  #endif /* INCLUDE_FORDYCA_METRICS_ENERGY_METRICS_OPT_HPP_ */
+  #endif /* INCLUDE_FORDYCA_METRICS_ENERGY_OPT_METRICS_HPP_ */
