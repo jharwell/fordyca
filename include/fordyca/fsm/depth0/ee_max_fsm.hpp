@@ -109,7 +109,6 @@ class ee_max_fsm : public base_foraging_fsm,
 
   HFSM_STATE_DECLARE(ee_max_fsm, start, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(ee_max_fsm, foraging);
-  HFSM_STATE_DECLARE_ND(ee_max_fsm, retreating);
   HFSM_STATE_DECLARE_ND(ee_max_fsm, charging);
 
 

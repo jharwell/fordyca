@@ -66,6 +66,15 @@ HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
     internal_event(ST_FORAGING);
     return controller::foraging_signal::HANDLED;
   }
+  if (state_machine::event_type::CHILD == data->type()) {
+    if (controller::foraging_signal::LEFT_NEST == data->signal()) {
+      internal_event(ST_FORAGING);
+      return controller::foraging_signal::HANDLED;
+    } else if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
+      internal_event(ST_CHARGING);
+      return controller::foraging_signal::HANDLED;
+    }
+  }
   ER_FATAL_SENTINEL("Unhandled signal");
   return controller::foraging_signal::HANDLED;
 }
@@ -85,13 +94,6 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
     taskable_fsm.task_execute();
   }
 
-}
-
-HFSM_STATE_DEFINE_ND(ee_max_fsm, retreating) {
-  if(m_sensing->in_nest()) {
-    // update threshold values?
-    internal_event(ST_CHARGING);
-  }
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
