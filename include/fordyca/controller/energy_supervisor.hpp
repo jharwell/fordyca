@@ -1,7 +1,7 @@
 /**
- * @file energy_selector.hpp
+ * @file energy_supervisor.hpp
  *
- * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
+ * @copyright 2019 Anthony Chen/John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
- #ifndef INCLUDE_FORDYCA_CONTROLLER_ENERGY_SELECTOR_HPP_
- #define INCLUDE_FORDYCA_CONTROLLER_ENERGY_SELECTOR_HPP_
+ #ifndef INCLUDE_FORDYCA_CONTROLLER_ENERGY_SUPERVISOR_HPP_
+ #define INCLUDE_FORDYCA_CONTROLLER_ENERGY_SUPERVISOR_HPP_
 
  /*******************************************************************************
   * Includes
@@ -40,20 +40,20 @@
   * Class Definitions
   ******************************************************************************/
  /**
-  * @class energy_selector
+  * @class energy_supervisor
   * @ingroup controller depth0
   *
   * @brief Select the energy thresholds and capacity that a robot knows about,
   * for use in energy FSM.
   */
- class ee_selector : public rcppsw::er::client<ee_selector> {
+ class energy_supervisorr : public rcppsw::er::client<energy_supervisor> {
  public:
-  explicit energy_selector(const ee_decision_matrix* sel_matrix);
+  explicit energy_supervisor(const ee_decision_matrix* sel_matrix);
 
-  ~energy_selector(void) override = default;
+  ~energy_supervisor(void) override = default;
 
-  energy_selector& operator=(const energy_selector& other) = delete;
-  energy_selector(const energy_selector& other) = delete;
+  energy_supervisor& operator=(const energy_supervisor& other) = delete;
+  energy_supervisor(const energy_supervisor& other) = delete;
 
   float getLowerThres(void);
   float getHigherThres(void);

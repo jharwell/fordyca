@@ -1,7 +1,7 @@
 /**
  * @file actuation_subsystem.hpp
  *
- * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
+ * @copyright 2019 Anthony Chen/John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
  #include "fordyca/params/energy_params.hpp"
- #include "fordyca/fsm/depth0/ee_max_fsm.hpp"
+ #include "fordyca/fsm/ee_max_fsm.hpp"
 
  /*******************************************************************************
   * Namespaces
@@ -44,7 +44,8 @@
   * @class energy_subsystem
   * @ingroup controller
   *
-  * @brief Handles the energy usage of the robot.
+  * @brief Handles the battery energy allocation and usage for each robot.
+  * Determines how much energy will be allocated to
   *
   *
   */
@@ -67,7 +68,8 @@
     void energy_adapt(int k_robots, int f_success);
 
     const controller::ee_decision_matrix* const           mc_matrix;
-    std::unique_ptr<fsm::depth0::ee_max_fsm>              e_fsm;
+    std::unique_ptr<fsm::ee_max_fsm>                      e_fsm;
+    std::shared_ptr<sensing_subsystem>                    m_sensing;
     int                                                   w[3];
     int                                                   wC[3];
     float                                                 deltaE;
@@ -78,7 +80,7 @@
     bool                                                  is_new_thresh;
     bool                                                  is_EEE;
     int                                                   tau;
-    int                                                   maxTau;                                      
+    int                                                   maxTau;
     std::string                                           EEE_method;
 
  }

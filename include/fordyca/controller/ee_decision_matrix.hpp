@@ -1,21 +1,21 @@
 /**
  * @file ee_decision_matrix.hpp
  *
- * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
+ * @copyright 2019 Anthony Chen/John Harwell, All rights reserved.
  *
- * This file is part of RCPPSW.
+ * This file is part of FORDYCA.
  *
- * RCPPSW is free software: you can redistribute it and/or modify it under the
+ * FORDYCA is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
+ * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * RCPPSW.  If not, see <http://www.gnu.org/licenses/
+ * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
 #ifndef INCLUDE_FORDYCA_CONTROLLER_EE_DECISION_MATRIX_HPP_
@@ -38,22 +38,16 @@
 NS_START(fordyca);
 NS_START(controller);
 
-/*
-namespace rmath = rcppsw::math;
-using block_sel_variant =
-    boost::variant<double, rmath::vector2d, std::vector<int>>;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_sel_matrix
+ * @class ee_decision_matrix
  * @ingroup controller
  *
- * @brief A dictionary of information needed by robots using various utility
- * functions to calculate the best:
+ * @brief Energy Efficieny Decision Matrix holds the threshold values for the
+ * robot to use the appropriate amount of energy.
  *
- * - block (of whatever type)
  *
  * This class may be separated into those components in the future if it makes
  * sense. For now, it is cleaner to have all three uses be in the same class.
@@ -64,7 +58,7 @@ class ee_decision_matrix {
     float e_lowerT;
     float e_higherT;
 
-    explicit block_sel_matrix();
+    explicit ee_decision_matrix();
 
     void setData(float eLow, float eHigh);
 
@@ -73,4 +67,4 @@ class ee_decision_matrix {
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BLOCK_SEL_MATRIX_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_EE_DECISION_MATRIX_HPP_ */

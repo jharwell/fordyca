@@ -1,7 +1,7 @@
 /**
  * @file ee_max_fsm.hpp
  *
- * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
+ * @copyright 2019 Anthony Chen/John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_DEPTH0_EE_MAX_FSM_HPP_
-#define INCLUDE_FORDYCA_FSM_DEPTH0_EE_MAX_FSM_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_EE_MAX_FSM_HPP_
+#define INCLUDE_FORDYCA_FSM_EE_MAX_FSM_HPP_
 
 /*******************************************************************************
  * Includes
@@ -43,7 +43,7 @@ namespace visitor = rcppsw::patterns::visitor;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 namespace ta = rcppsw:task_allocation;
 
-NS_START(fsm, depth0);
+NS_START(fsm);
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
@@ -131,6 +131,6 @@ class ee_max_fsm : public base_foraging_fsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
 };
 
-NS_END(depth0, controller, fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_DEPTH0_ee_max_FSM_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_EE_MAX_FSM_HPP_ */

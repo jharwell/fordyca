@@ -46,7 +46,10 @@ energy_subsystem::energy_subsystem(
       ehigh_thres(params->ehigh),
       capacity(params->capacity),
       EEE_method(params->EEE),
+      m_sensing(saa->sensing()),
       is_successful_pickup(0),
+      tau(10),
+      maxTau(10),
       is_new_thresh(true),
       is_EEE(false),
       mc_matrix(),
@@ -62,13 +65,27 @@ void energy_subsystem::reset(void) {  }
 void energy_check(void)  { }
 
 void energy_subsystem::endgame(int k_robots) {
-  switch(EEE_method) {
-    case "Well-informed":
-        break;
-    case "Ill-informed":
-        break;
-    case "Null-informed":
-        break;
+  if(EEE_method == "Well-informed") {
+      if(tau > 0) {
+        tau = tau - 1;
+      } else {
+        m_sensing->battery()->setCharge(ehigh_thres);
+        maxTau = maxTau + 10;
+        tau = maxTau;
+      }
+  } else if(EEE_method == "Ill-informed") {
+      if(tau > 0) {
+        tau = tau - 1;
+      } else {
+        m_sensing->battery()->setCharge(ehigh_thres);
+        maxTau = maxTau + 10;
+        tau = maxTau;
+        elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
+                                + ((!is_successful_pickup)*w2) + (k_robots*w3);
+        mc_matrix->setData(elow_thres, ehigh_thres);
+      }
+  } else if(EEE_method == "Null-informed") {
+      m_sensing->battery()->setCharge(0.0);
   }
 }
 
@@ -94,8 +111,10 @@ void energy_subsystem::energy_adapt(int k_robots) {
         ehigh_thres = 1;
 
       if((ehigh_thres - elow_thres) == 1) {
-
+        is_EEE = true;
       }
+
+      m_sensing->battery()->setCharge(ehigh_thres);
 
       mc_matrix->setData(elow_thres, ehigh_thres);
 

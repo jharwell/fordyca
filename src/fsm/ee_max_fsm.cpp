@@ -1,7 +1,7 @@
 /**
  * @file ee_max_fsm.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 Anthony Chen/John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/depth0/ee_max_fsm.hpp"
+#include "fordyca/fsm/ee_max_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, fsm, depth0);
+NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace ta = rcppsw:task_allocation;
 
@@ -80,7 +80,7 @@ HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
-  controller::ee_selector selector(mc_matrix);
+  controller::energy_supervisor selector(mc_matrix);
   float low_energy = selector.getLowerThres();
   double current_energy = m_sensing->battery()->readings().available_charge;
   if (current_energy <= low_energy) {
@@ -97,7 +97,7 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
-  controller::ee_selector selector(mc_matrix);
+  controller::energy_supervisor selector(mc_matrix);
   float charged_energy = selector.getHigherThres();
   double current_energy = m_sensing->battery()->readings().available_charge;
   if (current_energy == charged_energy) {
@@ -106,96 +106,5 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
   }
 }
 
-/*
-HFSM_STATE_DEFINE_ND(ee_max_fsm, acquire_block) {
-  if (m_explore_fsm.task_finished()) {
-    internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
-  } else {
-    m_explore_fsm.task_execute();
-  }
-  return controller::foraging_signal::HANDLED;
-}
 
-HFSM_STATE_DEFINE(ee_max_fsm, wait_for_block_pickup, state_machine::event_data) {
-  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
-    m_explore_fsm.task_reset();
-    ER_INFO("Block pickup signal received");
-    internal_event(ST_RETURN_TO_NEST);
-    // Tony: robot will also enter this state when battery is low handled individually by robot
-  } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
-    m_explore_fsm.task_reset();
-    internal_event(ST_ACQUIRE_BLOCK);
-  }
-  return controller::foraging_signal::HANDLED;
-}
-
-HFSM_STATE_DEFINE(ee_max_fsm, wait_for_block_drop, state_machine::event_data) {
-  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
-    m_explore_fsm.task_reset();
-    ER_INFO("Block drop signal received");
-    internal_event(ST_LEAVING_NEST);
-  }
-  return controller::foraging_signal::HANDLED;
-
-  FSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
-    if (m_explore_fsm.task_finished()) {
-      internal_event(ST_CHARGING);
-    }
-    // Tony: robot will handle next when to exit nest aka charged, time spent, and P-val allowed
-  }
-}
-*/
-
-/*******************************************************************************
- * Metrics
- ******************************************************************************/
-/*
-bool ee_max_fsm::is_exploring_for_goal(void) const {
-  return current_state() == ST_ACQUIRE_BLOCK;
-} /* is_exploring_for_goal()
-
-bool ee_max_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::kBlock == acquisition_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-  } else if (transport_goal_type::kNest == block_transport_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
-  }
-  return false;
-} /* goal_acquired() */
-
-/*******************************************************************************
- * General Member Functions
- ******************************************************************************/
-
-/*
-void ee_max_fsm::init(void) {
-  base_foraging_fsm::init();
-  m_explore_fsm.init();
-} /* init()
-
-void ee_max_fsm::run(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
-} /* run()
-
-bool ee_max_fsm::block_detected(void) const {
-  return saa_subsystem()->sensing()->block_detected();
-} /* block_detected()
-
-transport_goal_type ee_max_fsm::block_transport_goal(void) const {
-  if (ST_RETURN_TO_NEST == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::kNest;
-  }
-  return transport_goal_type::kNone;
-} /* block_transport_goal()
-
-acquisition_goal_type ee_max_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acquisition_goal_type::kBlock;
-  }
-  return acquisition_goal_type::kNone;
-} /* block_transport_goal() */
-
-NS_END(depth0, fsm, fordyca);
+NS_END(fsm, fordyca);

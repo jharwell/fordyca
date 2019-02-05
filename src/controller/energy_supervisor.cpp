@@ -1,5 +1,5 @@
 /**
- * @file energy_selector.cpp
+ * @file energy_supervisor.cpp
  *
  * @copyright 2019 Anthony Chen/John Harwell, All rights reserved.
  *
@@ -22,7 +22,7 @@
  /*******************************************************************************
   * Includes
   ******************************************************************************/
- #include "fordyca/controller/energy_selector.hpp"
+ #include "fordyca/controller/energy_supervisor.hpp"
 
  /*******************************************************************************
   * Namespaces
@@ -33,18 +33,18 @@
  /*******************************************************************************
   * Constructors/Destructor
   ******************************************************************************/
- energy_selector::energy_selector(const ee_decision_matrix* const sel_matrix)
-     : ER_CLIENT_INIT("fordyca.controller.depth0.energy_selector"),
+ energy_supervisor::energy_supervisor(const ee_decision_matrix* const sel_matrix)
+     : ER_CLIENT_INIT("fordyca.controller.depth0.energy_supervisor"),
        mc_matrix(sel_matrix) {}
 
 /*******************************************************************************
  * Member Functions
 ******************************************************************************/
-float energy_selector::getLowerThres(void) {
+float energy_supervisor::getLowerThres(void) {
   return mc_matrix->e_lowerT;
 }
 
-float energy_selector::getHigherThres(void) {
+float energy_supervisor::getHigherThres(void) {
   return mc_matrix->e_higherT;
 }
 
