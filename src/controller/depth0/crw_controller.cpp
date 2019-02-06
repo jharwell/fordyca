@@ -76,7 +76,7 @@ void crw_controller::ControlStep(void) {
 
   // call subsystem and also check to update.
   m_energy->energy_adapt(m_fsm->get_k_collision());
-  m_fsm->run();
+  m_energy->run_fsm();
   ndc_pop();
 } /* ControlStep() */
 

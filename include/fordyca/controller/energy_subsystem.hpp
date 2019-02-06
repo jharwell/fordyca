@@ -56,10 +56,7 @@
                      controller::saa_subsystem* saa);
     virtual ~energy_subsystem(void) = default;
 
-    virtual void reset(void) {}
-    void success_pickup(int success) { is_successful_pickup = 1;}
-
-    void update(void);
+    void run_fsm(void) {  e_fsm.run(); }
 
   private:
     /**
@@ -76,7 +73,7 @@
     void energy_adapt(int k_robots, int f_success);
 
     const controller::ee_decision_matrix* const           mc_matrix;
-    fsm::ee_max_fsm                                       e_fsm;  
+    fsm::ee_max_fsm                                       e_fsm;
     std::shared_ptr<sensing_subsystem>                    m_sensing;
     int                                                   w[3];
     int                                                   wC[3];

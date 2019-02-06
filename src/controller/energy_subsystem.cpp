@@ -48,8 +48,8 @@ energy_subsystem::energy_subsystem(
       EEE_method(params->EEE),
       m_sensing(saa->sensing()),
       is_successful_pickup(0),
-      tau(10),
-      maxTau(10),
+      tau(0),
+      maxTau(100),
       is_new_thresh(true),
       is_EEE(false),
       mc_matrix(),
@@ -63,24 +63,14 @@ energy_subsystem::~energy_subsystem(void) = default;
 
 void energy_subsystem::endgame(int k_robots) {
   if(EEE_method == "Well-informed") {
-      if(tau > 0) {
-        tau = tau - 1;
-      } else {
-        m_sensing->battery()->setCharge(ehigh_thres);
-        maxTau = maxTau + 10;
-        tau = maxTau;
-      }
+      m_sensing->battery()->setCharge(ehigh_thres);
+      maxTau = maxTau + 50;
+      tau = maxTau;
   } else if(EEE_method == "Ill-informed") {
-      if(tau > 0) {
-        tau = tau - 1;
-      } else {
-        m_sensing->battery()->setCharge(ehigh_thres);
-        maxTau = maxTau + 10;
-        tau = maxTau;
-        elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
-                                + ((!is_successful_pickup)*w2) + (k_robots*w3);
-        mc_matrix->setData(elow_thres, ehigh_thres);
-      }
+      m_sensing->battery()->setCharge(ehigh_thres);
+      elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
+                              + ((!is_successful_pickup)*w2) + (k_robots*w3);
+      mc_matrix->setData(elow_thres, ehigh_thres);
   } else if(EEE_method == "Null-informed") {
       m_sensing->battery()->setCharge(0.0);
   }
@@ -88,43 +78,49 @@ void energy_subsystem::endgame(int k_robots) {
 
 
 void energy_subsystem::energy_adapt(int k_robots) {
-  if(is_EEE) {
-    endgame(k_robots);
-  } else {
+  if(e_fsm->current_state() == energy_fsm::ST_CHARGING && is_new_thresh) {
+    if(tau < maxTau) {
+      tau = tau + 1;
+    } else {
+      if(is_EEE) {
+        endgame(k_robots);
+        maxTau = maxTau + 50;
+      } else {
+        /* updated based on three criteria:
+            How early if achieved a successful pickup
+            If there was a failed pickup
+            If encountered any robots.
+        */
+        elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
+                                + ((!is_successful_pickup)*w2) + (k_robots*w3);
 
-    if(e_fsm->current_state() == energy_fsm::ST_CHARGING && is_new_thresh) {
-      /* updated based on three criteria:
-          How early if achieved a successful pickup
-          If there was a failed pickup
-          If encountered any robots.
-      */
-      elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
-                              + ((!is_successful_pickup)*w2) + (k_robots*w3);
+        capacity = capacity - (is_successful_pickup * max(0, (energy_init - deltaE))*w1C)
+                            + ((!is_successful_pickup)*w2C) + (k_robots*w3C);
 
-      capacity = capacity - (is_successful_pickup * max(0, (energy_init - deltaE))*w1C)
-                          + ((!is_successful_pickup)*w2C) + (k_robots*w3C);
+        if(elow_thres < 0)
+          elow_thres = 0;
 
-      if(elow_thres < 0)
-        elow_thres = 0;
+        ehigh_thres = elow_thres + capacity;
 
-      ehigh_thres = elow_thres + capacity;
+        if(ehigh_thres > 1)
+          ehigh_thres = 1;
 
-      if(ehigh_thres > 1)
-        ehigh_thres = 1;
+        if((ehigh_thres - elow_thres) == 1) {
+          is_EEE = true;
+        }
 
-      if((ehigh_thres - elow_thres) == 1) {
-        is_EEE = true;
+        m_sensing->battery()->setCharge(ehigh_thres);
+
+        mc_matrix->setData(elow_thres, ehigh_thres);
+
+        is_successful_pickup = 0;
+        is_new_thresh = false;
       }
 
-      m_sensing->battery()->setCharge(ehigh_thres);
-
-      mc_matrix->setData(elow_thres, ehigh_thres);
-
-      is_successful_pickup = 0;
-      is_new_thresh = false;
-    } else if (e_fsm->current_state() == energy_fsm::ST_FORAGING) {
-      is_new_thresh = true;
+      tau = 0;
     }
+  } else if (e_fsm->current_state() == energy_fsm::ST_FORAGING) {
+    is_new_thresh = true;
   }
 }
 

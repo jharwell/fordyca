@@ -106,5 +106,13 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
   }
 }
 
+/*******************************************************************************
+ * General Member Functions
+ ******************************************************************************/
+
+ void ee_max_fsm::run(void) {
+   inject_event(controller::foraging_signal::FSM_RUN,
+                state_machine::event_type::NORMAL);
+ } /* run() */
 
 NS_END(fsm, fordyca);
