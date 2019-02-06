@@ -47,8 +47,8 @@ using arena_layer_stack = std::tuple<cell2D, bool>;
  */
 class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
  public:
-  using view = rcppsw::ds::grid_view<ds::cell2D>;
-  using const_view = rcppsw::ds::const_grid_view<ds::cell2D>;
+  using view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
+  using const_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
 
   constexpr static uint kCell = 0;
   constexpr static uint kRobotOccupancy = 1;

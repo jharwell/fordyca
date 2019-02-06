@@ -28,13 +28,11 @@
 #include <vector>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
-namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
@@ -48,8 +46,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * Metrics are written out every timestep.
  */
 class temporal_variance_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<temporal_variance_metrics_collector> {
+    : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

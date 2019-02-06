@@ -27,7 +27,6 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
@@ -36,7 +35,6 @@
 NS_START(fordyca, metrics);
 
 namespace collectible_metrics { namespace fsm { class movement_metrics; } }
-namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(fsm);
 
@@ -51,8 +49,7 @@ NS_START(fsm);
  *
  * Metrics are written out every timestep.
  */
-class movement_metrics_collector : public rcppsw::metrics::base_metrics_collector,
-                                   public visitor::visitable_any<movement_metrics_collector> {
+class movement_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

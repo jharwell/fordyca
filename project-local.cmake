@@ -1,8 +1,8 @@
 ################################################################################
 # Configuration Options                                                        #
 ################################################################################
-set(WITH_FOOTBOOT_LEDS "YES" CACHE STRING "Enable footbot robots to control their LEDS via actuators")
-set(WITH_FOOTBOOT_RAB "YES" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
+set(WITH_FOOTBOT_LEDS "YES" CACHE STRING "Enable footbot robots to control their LEDS via actuators")
+set(WITH_FOOTBOT_RAB "YES" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
 
 define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_LEDS"
   BRIEF_DOCS "Enable footbot robots to control their LEDS"
