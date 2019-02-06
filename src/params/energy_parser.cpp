@@ -32,43 +32,43 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char energys_parser::kXMLRoot[];
+constexpr char energy_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void energy_parser::parse(const ticpp::Element& node) {
-  ticpp::Element enode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element enode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
-  XML_PARSE_PARAM(enode, m_params, elow);
-  XML_PARSE_PARAM(enode, m_params, ehigh);
-  XML_PARSE_PARAM(enode, m_params, capacity);
-  XML_PARSE_PARAM(enode, m_params, weight1);
-  XML_PARSE_PARAM(enode, m_params, weight2);
-  XML_PARSE_PARAM(enode, m_params, weight3);
-  XML_PARSE_PARAM(enode, m_params, weight1C);
-  XML_PARSE_PARAM(enode, m_params, weight2C);
-  XML_PARSE_PARAM(enode, m_params, weight3C);
-  XML_PARSE_PARAM(enode, m_params, EEE);
+  XML_PARSE_ATTR(enode, m_params, elow);
+  XML_PARSE_ATTR(enode, m_params, ehigh);
+  XML_PARSE_ATTR(enode, m_params, capacity);
+  XML_PARSE_ATTR(enode, m_params, weight1);
+  XML_PARSE_ATTR(enode, m_params, weight2);
+  XML_PARSE_ATTR(enode, m_params, weight3);
+  XML_PARSE_ATTR(enode, m_params, weight1C);
+  XML_PARSE_ATTR(enode, m_params, weight2C);
+  XML_PARSE_ATTR(enode, m_params, weight3C);
+  XML_PARSE_ATTR(enode, m_params, EEE);
 } /* parse() */
 
-void grid_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_PARAM_STR(m_params, elow) << std::endl
-         << XML_PARAM_STR(m_params, ehigh) << std::endl
-         << XML_PARAM_STR(m_params, capacity) << std::endl
-         << XML_PARAM_STR(m_params, weight1) << std::endl
-         << XML_PARAM_STR(m_params, weight2) << std::endl
-         << XML_PARAM_STR(m_params, weight3) << std::endl
-         << XML_PARAM_STR(m_params, weight1C) << std::endl
-         << XML_PARAM_STR(m_params, weight2C) << std::endl
-         << XML_PARAM_STR(m_params, weight3C) << std::endl
-         << XML_PARAM_STR(m_params, EEE) << std::endl
+void energy_parser::show(std::ostream& stream) const {
+  stream << build_header() << XML_ATTR_STR(m_params, elow) << std::endl
+         << XML_ATTR_STR(m_params, ehigh) << std::endl
+         << XML_ATTR_STR(m_params, capacity) << std::endl
+         << XML_ATTR_STR(m_params, weight1) << std::endl
+         << XML_ATTR_STR(m_params, weight2) << std::endl
+         << XML_ATTR_STR(m_params, weight3) << std::endl
+         << XML_ATTR_STR(m_params, weight1C) << std::endl
+         << XML_ATTR_STR(m_params, weight2C) << std::endl
+         << XML_ATTR_STR(m_params, weight3C) << std::endl
+         << XML_ATTR_STR(m_params, EEE) << std::endl
          << build_footer();
 } /* show() */
 
-__rcsw_pure bool grid_parser::validate(void) const {
+__rcsw_pure bool energy_parser::validate(void) const {
   CHECK(m_params->elow > 0.0);
   CHECK(m_params->ehigh > 0.0);
   CHECK(m_params->capacity > 0.0);

@@ -47,8 +47,8 @@ NS_START(fordyca, params);
 
 class energy_parser : public rcppsw::params::xml_param_parser {
  public:
-   energy_parser(const std::shared_ptr<rcppsw::er::server>& server, uint level)
-       : xml_param_parser(server, level) {}
+   explicit energy_parser(uint level)
+       : xml_param_parser(level) {}
 
    static constexpr char kXMLRoot[] = "energy";
 
@@ -62,9 +62,10 @@ class energy_parser : public rcppsw::params::xml_param_parser {
    }
 
  private:
-  std::shared_ptr<rcppsw::params::energy_params> parse_results_impl(void) const override {
-    return m_params;
-  }
+   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+       void) const override {
+     return m_params;
+   }
 
   std::shared_ptr<energy_params> m_params{nullptr};
 };

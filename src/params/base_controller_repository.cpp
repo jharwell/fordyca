@@ -25,10 +25,13 @@
 #include "fordyca/params/actuation_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/sensing_parser.hpp"
+#include "fordyca/params/energy_parser.hpp"
+#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace ct = rcppsw::control;
 NS_START(fordyca, params);
 
 /*******************************************************************************

@@ -1,7 +1,7 @@
 /**
  * @file occupancy_grid_params.hpp
  *
- * @copyright 2018 Anthony Chen/John Harwell, All rights reserved.
+ * @copyright 2019 Anthony Chen/John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -27,6 +27,11 @@
  #include <argos3/core/utility/math/vector2.h>
  #include "rcppsw/params/base_params.hpp"
  /*******************************************************************************
+  * Namespaces
+  ******************************************************************************/
+ NS_START(fordyca, params);
+
+ /*******************************************************************************
   * Structure Definitions
   ******************************************************************************/
  /**
@@ -45,7 +50,7 @@
     float weight3C{-1};
     std::string EEE{""};
 
-  }
+  };
 
   NS_END(params, fordyca);
 
