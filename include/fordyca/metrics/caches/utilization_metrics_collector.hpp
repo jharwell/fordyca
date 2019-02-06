@@ -28,14 +28,13 @@
 #include <string>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -48,9 +47,7 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * Metrics are output at the specified interval.
  */
-class utilization_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<utilization_metrics_collector> {
+class utilization_metrics_collector : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
@@ -81,13 +78,8 @@ class utilization_metrics_collector
   /* clang-format off */
   struct stats   m_stats{};
 
-  /**
-   * IDs of the caches that had events in the current interval, for use in
-   * averaging statistics.
-   */
-  std::set<int>  m_int_cache_ids{};
-
-  std::set<int>  m_cum_cache_ids{};
+  uint  m_int_cache_count{0};
+  uint  m_cum_cache_count{0};
   /* clang-format on */
 };
 

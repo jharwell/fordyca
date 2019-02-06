@@ -38,7 +38,7 @@ constexpr char dynamic_cache_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void dynamic_cache_parser::parse(const ticpp::Element& node) {
-  ticpp::Element cnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element cnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 

@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/controller/base_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces

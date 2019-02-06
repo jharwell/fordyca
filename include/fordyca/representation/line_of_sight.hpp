@@ -67,7 +67,7 @@ class base_cache;
  */
 class line_of_sight : public rcppsw::er::client<line_of_sight> {
  public:
-  using grid_view = rcppsw::ds::grid_view<ds::cell2D>;
+  using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
 
   line_of_sight(const grid_view& c_view, rmath::vector2u center)
       : ER_CLIENT_INIT("fordyca.representation.line_of_sight"),

@@ -69,58 +69,61 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
    * the count of all caches that are involved in the events that we collect
    * metrics on and use that to average the cumulative counts that we get.
    */
-  line += (!m_int_cache_ids.empty())
+  line += (m_int_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.int_blocks) /
-                               (m_int_cache_ids.size() * interval()))
+                               (m_int_cache_count * interval()))
               : "0";
   line += separator();
 
-  line += (!m_cum_cache_ids.empty())
+  line += (m_cum_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                               (m_cum_cache_ids.size() * (timestep() + 1)))
+                               (m_cum_cache_count * (timestep() + 1)))
               : "0";
   line += separator();
 
-  line += (!m_int_cache_ids.empty())
+  line += (m_int_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.int_pickups) /
-                               (m_int_cache_ids.size() * interval()))
+                               (m_int_cache_count * interval()))
               : "0";
   line += separator();
-  line += (!m_cum_cache_ids.empty())
+  line += (m_cum_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.cum_pickups) /
-                               (m_cum_cache_ids.size() * (timestep() + 1)))
+                               (m_cum_cache_count * (timestep() + 1)))
               : "0";
   line += separator();
 
-  line += (!m_int_cache_ids.empty())
+  line += (m_int_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.int_drops) /
-                               (m_int_cache_ids.size() * interval()))
+                               (m_int_cache_count * interval()))
               : "0";
   line += separator();
 
-  line += (!m_cum_cache_ids.empty())
+  line += (m_cum_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.cum_drops) /
-                               (m_cum_cache_ids.size() * (timestep() + 1)))
+                               (m_cum_cache_count * (timestep() + 1)))
               : "0";
   line += separator();
 
-  line += std::to_string(m_int_cache_ids.size()) + separator();
-  line += std::to_string(m_cum_cache_ids.size()) + separator();
+  line += std::to_string(m_int_cache_count) + separator();
+  line += std::to_string(m_cum_cache_count) + separator();
   return true;
 } /* csv_line_build() */
 
 void utilization_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const utilization_metrics&>(metrics);
-  m_stats.int_blocks += m.n_blocks();
-  m_int_cache_ids.insert(m.cache_id());
   m_stats.int_pickups += m.total_block_pickups();
   m_stats.int_drops += m.total_block_drops();
+  m_stats.int_blocks += m.n_blocks();
 
-  m_stats.cum_blocks += m.n_blocks();
-  m_cum_cache_ids.insert(m.cache_id());
   m_stats.cum_pickups += m.total_block_pickups();
   m_stats.cum_drops += m.total_block_drops();
+  m_stats.cum_blocks += m.n_blocks();
+
+  if (m.n_blocks() > 0) {
+    ++m_int_cache_count;
+    ++m_cum_cache_count;
+  }
 } /* collect() */
 
 void utilization_metrics_collector::reset_after_interval(void) {
@@ -128,7 +131,7 @@ void utilization_metrics_collector::reset_after_interval(void) {
   m_stats.int_pickups = 0;
   m_stats.int_drops = 0;
   m_stats.int_blocks = 0;
-  m_int_cache_ids.clear();
+  m_int_cache_count = 0;
 } /* reset_after_interval() */
 
 NS_END(caches, metrics, fordyca);
