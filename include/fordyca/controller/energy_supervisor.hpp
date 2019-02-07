@@ -46,7 +46,7 @@
   * @brief Select the energy thresholds and capacity that a robot knows about,
   * for use in energy FSM.
   */
- class energy_supervisorr : public rcppsw::er::client<energy_supervisor> {
+ class energy_supervisor : public rcppsw::er::client<energy_supervisor> {
  public:
   explicit energy_supervisor(const ee_decision_matrix* sel_matrix);
 
@@ -67,3 +67,7 @@
   const ee_decision_matrix* const mc_matrix;
   /* clang-format on */
 };
+
+NS_END(fordyca, controller);
+
+#endif /* INCLUDE_FORDYCA_CONTROLLER_ENERGY_SUPERVISOR_HPP_ */

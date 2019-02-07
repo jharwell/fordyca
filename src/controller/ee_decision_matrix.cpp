@@ -32,14 +32,14 @@
  /*******************************************************************************
   * Constructors/Destructors
   ******************************************************************************/
-  ee_decision_matrix:ee_decision_matrix()
+  ee_decision_matrix::ee_decision_matrix()
       : e_lowerT(0.0),
         e_higherT(0.0) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-  ee_decision_matrix::setData(float eLow, float eHigh) {
+  void ee_decision_matrix::setData(float eLow, float eHigh) {
     e_lowerT = eLow;
     e_higherT = eHigh;
   }

@@ -26,12 +26,11 @@
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/sensing_parser.hpp"
 #include "fordyca/params/energy_parser.hpp"
-#include "rcppsw/control/waveform_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace ct = rcppsw::control;
+
 NS_START(fordyca, params);
 
 /*******************************************************************************
@@ -46,10 +45,6 @@ base_controller_repository::base_controller_repository(void) {
                                                   sensing_parser::kHeader1);
   register_parser<energy_parser, energy_params>(energy_parser::kXMLRoot,
                                                 energy_parser::kHeader1);
-  register_parser<ct::waveform_xml_parser>(std::string("block_carry_") +
-                                               ct::waveform_xml_parser::kXMLRoot,
-                                           ct::waveform_xml_parser::kHeader1);
-
 }
 
 NS_END(params, fordyca);

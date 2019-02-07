@@ -98,6 +98,11 @@ class sensing_subsystem {
     return m_sensors.battery;
   }
 
+  /* Added this to wrap around a set charge function in Argos. Needed non const - Tony*/
+  hal::sensors::battery_sensor& battery(void) {
+    return m_sensors.battery;
+  }
+
   /**
    * @brief If \c TRUE, a block has *possibly* been detected.
    *

@@ -22,7 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/energy_subsystem.hpp"
-#include "fordyca/params/perception/energy_params.hpp"
+#include "fordyca/controller/ee_decision_matrix.hpp"
+#include "fordyca/params/energy_params.hpp"
 
 #include <algorithm>
 
@@ -30,7 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace energy_fsm = fsm::depth0::ee_max_fsm;
+namespace fsm {class ee_max_fsm; }
 
 NS_START(controller);
 
@@ -38,7 +39,7 @@ NS_START(controller);
  * Constructors/Destructor
  ******************************************************************************/
 energy_subsystem::energy_subsystem(
-    const struct params::energy_params* const params, ta:taskable* task, controller::saa_subsystem* saa)
+    const struct params::energy_params* const params, const ta::taskable* task, controller::saa_subsystem* saa)
     : ER_CLIENT_INIT("fordyca.controller.energy"),
       w{params->weight1, params->weight2, params->weight3},
       wC{params->weight1C, params->weight2C, params->weight3C},
@@ -55,7 +56,6 @@ energy_subsystem::energy_subsystem(
       mc_matrix(),
       e_fsm(task, mc_matrix, saa) {}
 
-energy_subsystem::~energy_subsystem(void) = default;
 
 /*******************************************************************************
  * Member Functions
@@ -63,22 +63,24 @@ energy_subsystem::~energy_subsystem(void) = default;
 
 void energy_subsystem::endgame(int k_robots) {
   if(EEE_method == "Well-informed") {
-      m_sensing->battery()->setCharge(ehigh_thres);
+      m_sensing->battery().setCharge(ehigh_thres);
       maxTau = maxTau + 50;
       tau = maxTau;
   } else if(EEE_method == "Ill-informed") {
-      m_sensing->battery()->setCharge(ehigh_thres);
-      elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
-                              + ((!is_successful_pickup)*w2) + (k_robots*w3);
+      deltaE = ehigh_thres - m_sensing->battery().readings().available_charge;
+      double remaining = ehigh_thres - deltaE;
+      elow_thres = elow_thres - (is_successful_pickup * std::max(0.0, (remaining))*(w[1]))
+                              + ((!is_successful_pickup)*(w[2])) + (k_robots*(w[3]));
+      m_sensing->battery().setCharge(ehigh_thres);
       mc_matrix->setData(elow_thres, ehigh_thres);
   } else if(EEE_method == "Null-informed") {
-      m_sensing->battery()->setCharge(0.0);
+      m_sensing->battery().setCharge(0.0);
   }
 }
 
 
 void energy_subsystem::energy_adapt(int k_robots) {
-  if(e_fsm->current_state() == energy_fsm::ST_CHARGING && is_new_thresh) {
+  if(e_fsm->current_state() == ee_max_fsm::ST_CHARGING && is_new_thresh) {
     if(tau < maxTau) {
       tau = tau + 1;
     } else {
@@ -91,11 +93,14 @@ void energy_subsystem::energy_adapt(int k_robots) {
             If there was a failed pickup
             If encountered any robots.
         */
-        elow_thres = elow_thres - (is_successful_pickup * max(0, (energy_init - deltaE))*w1)
-                                + ((!is_successful_pickup)*w2) + (k_robots*w3);
+        deltaE = ehigh_thres - m_sensing->battery()->readings().available_charge;
+        double remaining = ehigh_thres - deltaE;
 
-        capacity = capacity - (is_successful_pickup * max(0, (energy_init - deltaE))*w1C)
-                            + ((!is_successful_pickup)*w2C) + (k_robots*w3C);
+        elow_thres = elow_thres - (is_successful_pickup * std::max(0.0, (remaining))*(w[1]))
+                                + ((!is_successful_pickup)*(w[2])) + (k_robots*(w[3]));
+
+        capacity = capacity - (is_successful_pickup * std::max(0.0, (remaining))*(wC[1]))
+                            + ((!is_successful_pickup)*(wC[2])) + (k_robots*(wC[3]));
 
         if(elow_thres < 0)
           elow_thres = 0;
@@ -119,7 +124,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
 
       tau = 0;
     }
-  } else if (e_fsm->current_state() == energy_fsm::ST_FORAGING) {
+  } else if (e_fsm->current_state() == ee_max_fsm::ST_FORAGING) {
     is_new_thresh = true;
   }
 }

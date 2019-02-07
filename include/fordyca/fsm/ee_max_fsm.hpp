@@ -30,6 +30,7 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 
 
 /*******************************************************************************
@@ -39,8 +40,9 @@ NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
-namespace controller { class sensing_subsystem; class actuation_subsystem;}
-namespace ta = rcppsw:task_allocation;
+namespace controller { class sensing_subsystem; class actuation_subsystem;
+                       class ee_decision_matrix; }
+namespace ta = rcppsw::task_allocation;
 
 NS_START(fsm);
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
@@ -63,24 +65,20 @@ class ee_max_fsm : public base_foraging_fsm,
                                public block_transporter,
                                public visitor::visitable_any<ee_max_fsm> {
  public:
-  explicit ee_max_fsm(ta::taskable* task, const controller::ee_decision_matrix* matrix,
+  explicit ee_max_fsm(const ta::taskable* task, const controller::ee_decision_matrix* matrix,
                       controller::saa_subsystem* saa);
 
   ee_max_fsm(const ee_max_fsm& fsm) = delete;
   ee_max_fsm& operator=(const ee_max_fsm& fsm) = delete;
 
-  /* collision metrics */
-  FSM_WRAPPER_DECLAREC(bool, in_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, entered_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(bool, exited_collision_avoidance);
-  FSM_WRAPPER_DECLAREC(uint, collision_avoidance_duration);
-
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;
   bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override { return false; }
+  bool is_vectoring_to_goal(void) const override;
   bool goal_acquired(void) const override;
 
+  /* block transportation */
+  transport_goal_type block_transport_goal(void) const override;
   /**
    * @brief (Re)-initialize the FSM.
    */
@@ -124,7 +122,6 @@ class ee_max_fsm : public base_foraging_fsm,
   // clang-format off
   ta::taskable* taskable_fsm;
   const controller::ee_decision_matrix* const mc_matrix;
-  std::shared_ptr<sensing_subsystem>          m_sensing;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
