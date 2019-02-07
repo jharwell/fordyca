@@ -32,6 +32,7 @@
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include <argos3/core/simulator/simulator.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
+#include <argos3/plugins/simulator/entities/battery_equipped_entity.h>
 
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
@@ -125,7 +126,10 @@ void depth0_loop_functions::controller_configure(
 void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto controller = static_cast<controller::depth0::depth0_controller*>(
       &robot.GetControllableEntity().GetController());
-
+  if (controller.energy_subsystem()->get_should_charge()) {
+    robot.GetBatterySensorEquippedEntity().SetAvailableCharge(controller.energy_subsystem()->desired_charge());
+    controller.energy_subsystem()->set_should_charge(false);
+  }
   /*
    * This is the one place in the depth0 event handling code where we need to
    * know *ALL* of the controllers that are in the depth, and we can't/don't use

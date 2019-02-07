@@ -59,6 +59,11 @@
 
     void run_fsm(void) {  e_fsm.run(); }
 
+    void set_should_charge(bool set) { should_charge = set;  }
+    bool get_should_charge(void) { return should_charge; }
+
+    float desired_charge(void) { return ehigh_thres; }
+
   private:
     /**
      * @brief How the robot will perform and allocate or not allocate energy for foraging
@@ -87,6 +92,7 @@
     bool                                                  is_EEE;
     controller::ee_decision_matrix*                       mc_matrix;
     fsm::ee_max_fsm                                       e_fsm;
+    bool                                                  should_charge;
     float                                                 deltaE;
 
  };

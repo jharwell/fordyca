@@ -54,7 +54,8 @@ energy_subsystem::energy_subsystem(
       is_new_thresh(true),
       is_EEE(false),
       mc_matrix(),
-      e_fsm(task, mc_matrix, saa) {}
+      e_fsm(task, mc_matrix, saa),
+      should_charge(false) {}
 
 
 /*******************************************************************************
@@ -63,7 +64,7 @@ energy_subsystem::energy_subsystem(
 
 void energy_subsystem::endgame(int k_robots) {
   if(EEE_method == "Well-informed") {
-      m_sensing->battery().setCharge(ehigh_thres);
+      set_should_charge(true);
       maxTau = maxTau + 50;
       tau = maxTau;
   } else if(EEE_method == "Ill-informed") {
@@ -71,16 +72,16 @@ void energy_subsystem::endgame(int k_robots) {
       double remaining = ehigh_thres - deltaE;
       elow_thres = elow_thres - (is_successful_pickup * std::max(0.0, (remaining))*(w[1]))
                               + ((!is_successful_pickup)*(w[2])) + (k_robots*(w[3]));
-      m_sensing->battery().setCharge(ehigh_thres);
+      set_should_charge(true);
       mc_matrix->setData(elow_thres, ehigh_thres);
   } else if(EEE_method == "Null-informed") {
-      m_sensing->battery().setCharge(0.0);
+      set_should_charge(true);
   }
 }
 
 
 void energy_subsystem::energy_adapt(int k_robots) {
-  if(e_fsm->current_state() == ee_max_fsm::ST_CHARGING && is_new_thresh) {
+  if(e_fsm.current_state() == ee_max_fsm::ST_CHARGING && is_new_thresh) {
     if(tau < maxTau) {
       tau = tau + 1;
     } else {
@@ -93,7 +94,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
             If there was a failed pickup
             If encountered any robots.
         */
-        deltaE = ehigh_thres - m_sensing->battery()->readings().available_charge;
+        deltaE = ehigh_thres - m_sensing->battery().readings().available_charge;
         double remaining = ehigh_thres - deltaE;
 
         elow_thres = elow_thres - (is_successful_pickup * std::max(0.0, (remaining))*(w[1]))
@@ -114,7 +115,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
           is_EEE = true;
         }
 
-        m_sensing->battery()->setCharge(ehigh_thres);
+        set_should_charge(true);
 
         mc_matrix->setData(elow_thres, ehigh_thres);
 
@@ -124,7 +125,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
 
       tau = 0;
     }
-  } else if (e_fsm->current_state() == ee_max_fsm::ST_FORAGING) {
+  } else if (e_fsm.current_state() == ee_max_fsm::ST_FORAGING) {
     is_new_thresh = true;
   }
 }
