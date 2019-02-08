@@ -82,13 +82,17 @@ class crw_fsm : public base_foraging_fsm,
   bool goal_acquired(void) const override;
 
   /* taskable overrides */
-  void task_execute(void) override;
+  void task_execute(void) override {
+    run();
+  }
   void task_start(const task_allocation::taskable_argument*) override {}
   bool task_finished(void) const override {
     // return ST_FINISHED == current_state();
+    return false;
   }
   bool task_running(void) const override {
     // return ST_ACQUIRE_GOAL == current_state();
+    return true;
   }
   void task_reset(void) override { init(); }
 
@@ -151,7 +155,7 @@ class crw_fsm : public base_foraging_fsm,
   return (&mc_state_map[index]);
   }
 
-  int k_collisions;
+  mutable int k_collisions;
 
   /* clang-format off */
   explore_for_goal_fsm m_explore_fsm;

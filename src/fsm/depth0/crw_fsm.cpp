@@ -38,7 +38,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
-      k_collisions(0);
+      k_collisions(0),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       entry_transport_to_nest(),
@@ -47,6 +47,7 @@ crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
+      HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       m_explore_fsm(saa,
                     std::make_unique<controller::random_explore_behavior>(saa),
                     std::bind(&crw_fsm::block_detected, this)),

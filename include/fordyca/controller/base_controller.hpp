@@ -208,6 +208,7 @@ class base_controller : public argos::CCI_Controller,
 
   const class energy_subsystem* energy_subsystem(void) const { return m_energy.get();}
 
+
  private:
   void output_init(const struct params::output_params* params);
   void saa_init(const params::actuation_params*, const params::sensing_params*);

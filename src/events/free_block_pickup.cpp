@@ -110,7 +110,7 @@ void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(m_block);
   controller.free_pickup_event(true);
-  controller.m_energy->success_pickup();
+  controller.esubsystem()->success_pickup();
 
   ER_INFO("Picked up block%d", m_block->id());
   controller.ndc_pop();

@@ -72,6 +72,8 @@
 
     void set_task(ta::taskable* task) { e_fsm.set_taskable(task); }
 
+    void success_pickup(void) { is_successful_pickup = 1; }
+
   private:
     /**
      * @brief How the robot will perform and allocate or not allocate energy for foraging

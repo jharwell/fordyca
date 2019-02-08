@@ -60,10 +60,8 @@ using transport_goal_type = block_transporter::goal_type;
  * each robot takes into consideration the battery left while foraging
  */
 class ee_max_fsm : public base_foraging_fsm,
-                               public er::client<ee_max_fsm>,
-                               public metrics::fsm::goal_acquisition_metrics,
-                               public block_transporter,
-                               public visitor::visitable_any<ee_max_fsm> {
+                               public er::client<ee_max_fsm>
+                   {
  public:
   explicit ee_max_fsm(const controller::ee_decision_matrix* matrix,
                       controller::saa_subsystem* saa);
@@ -71,20 +69,7 @@ class ee_max_fsm : public base_foraging_fsm,
   ee_max_fsm(const ee_max_fsm& fsm) = delete;
   ee_max_fsm& operator=(const ee_max_fsm& fsm) = delete;
 
-  /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
-
-  /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
-  /**
-   * @brief (Re)-initialize the FSM.
-   */
-  void init(void) override;
-
-  /**
+    /**
    * @brief Run the FSM in its current state, without injecting an event.
    */
   void run(void);
@@ -124,6 +109,7 @@ class ee_max_fsm : public base_foraging_fsm,
   // clang-format off
   ta::taskable* taskable_fsm;
   const controller::ee_decision_matrix* const mc_matrix;
+  controller::saa_subsystem* saa;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

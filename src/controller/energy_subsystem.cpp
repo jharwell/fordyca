@@ -78,6 +78,8 @@ void energy_subsystem::endgame(int k_robots) {
   } else if(EEE_method == "Null-informed") {
       set_should_charge(true);
   }
+
+  is_successful_pickup = 0;
 }
 
 
@@ -120,10 +122,9 @@ void energy_subsystem::energy_adapt(int k_robots) {
 
         mc_matrix->setData(elow_thres, ehigh_thres);
 
-        is_successful_pickup = 0;
-        is_new_thresh = false;
       }
-
+      is_successful_pickup = 0;
+      is_new_thresh = false;
       tau = 0;
     }
   } else if (e_fsm.current_state() == fsm::ee_max_fsm::ST_FORAGING) {

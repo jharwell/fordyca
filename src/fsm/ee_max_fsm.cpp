@@ -25,13 +25,14 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
+#include "fordyca/controller/energy_supervisor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 namespace state_machine = rcppsw::patterns::state_machine;
-namespace ta = rcppsw:task_allocation;
+namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -44,9 +45,9 @@ ee_max_fsm::ee_max_fsm(const controller::ee_decision_matrix* matrix,
       mc_matrix(matrix),
       saa(saa),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
+      HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(foraging, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(retreating, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(charging, hfsm::top_state()),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&foraging),
@@ -81,16 +82,16 @@ HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
 HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
   controller::energy_supervisor selector(mc_matrix);
   float low_energy = selector.getLowerThres();
-  double current_energy = saa->sensing()->battery()->readings().available_charge;
+  double current_energy = saa->sensing()->battery().readings().available_charge;
   if (current_energy <= low_energy) {
     internal_event(ST_RETREATING);
   } else {
-    if(taskable_fsm.task_finished()) {
-      taskable_fsm.task_reset();
-      taskable_fsm.task_start();
+    if(taskable_fsm->task_finished()) {
+      taskable_fsm->task_reset();
+      taskable_fsm->task_start(nullptr);
     }
 
-    taskable_fsm.task_execute();
+    taskable_fsm->task_execute();
   }
 
 }
@@ -98,10 +99,9 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
   controller::energy_supervisor selector(mc_matrix);
   float charged_energy = selector.getHigherThres();
-  double current_energy = saa->sensing()->battery()->readings().available_charge;
+  double current_energy = saa->sensing()->battery().readings().available_charge;
   if (current_energy == charged_energy) {
     internal_event(ST_FORAGING);
-    return;
   }
 }
 
