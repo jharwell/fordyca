@@ -57,7 +57,7 @@
     /**
      * @brief Return the number of robots in the nest
      */
-    virtual int is_charging(void);
+    virtual int is_charging(void) const = 0;
 
   };
 

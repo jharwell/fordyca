@@ -42,7 +42,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  ******************************************************************************/
 collector::collector(const struct ta::task_allocation_params* const params,
                      std::unique_ptr<ta::taskable> mechanism)
-    : collector{params, kCollectorName, std::move(mechanism)} {}
+    : collector(params, kCollectorName, std::move(mechanism)) {}
 
 collector::collector(const struct ta::task_allocation_params* const params,
                      const std::string& name,

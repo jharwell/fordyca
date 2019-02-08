@@ -27,14 +27,14 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, energy);
-namespace visitor = rcppsw::patterns::visitor;
+
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -47,8 +47,7 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * Metrics are written out at the specified collection interval.
  */
-class energy_metrics_collector : public rcppsw::metrics::base_metrics_collector,
-                                    public visitor::visitable_any<transport_metrics_collector> {
+class energy_metrics_collector : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
@@ -83,7 +82,7 @@ class energy_metrics_collector : public rcppsw::metrics::base_metrics_collector,
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  struct stats m_stats;
+  struct stats m_stats {};
 };
 
 NS_END(energy, metrics, fordyca);

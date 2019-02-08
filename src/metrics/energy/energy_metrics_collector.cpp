@@ -20,8 +20,8 @@
  /*******************************************************************************
   * Includes
   ******************************************************************************/
- #include "fordyca/metrics/blocks/energy_metrics_collector.hpp"
- #include "fordyca/metrics/blocks/energy_metrics.hpp"
+ #include "fordyca/metrics/energy/energy_metrics_collector.hpp"
+ #include "fordyca/metrics/energy/energy_opt_metrics.hpp"
 
  /*******************************************************************************
   * Namespaces
@@ -31,10 +31,9 @@
  /*******************************************************************************
   * Constructors/Destructor
   ******************************************************************************/
- energy_metrics_collector::energy_metrics_collector(
-     const std::string& ofname,
-     uint interval)
-     : base_metrics_collector(ofname, interval), m_stats() {}
+ energy_metrics_collector::energy_metrics_collector(const std::string& ofname,
+                                                    uint interval)
+     : base_metrics_collector(ofname, interval) {}
 
  /*******************************************************************************
   * Member Functions
@@ -49,7 +48,7 @@
     // clang-format on
   } /* csv_header_build() */
 
-  void transport_metrics_collector::reset(void) {
+  void energy_metrics_collector::reset(void) {
     base_metrics_collector::reset();
     reset_after_interval();
   } /* reset() */
@@ -63,8 +62,8 @@
       line += std::to_string(m_stats.cum_robots_at_nest /
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
-      line += std::to_string(m_stats.cum_transport_time /
-                             static_cast<double>(m_stats.cum_transporters)) +
+      line += std::to_string(m_stats.cum_energy /
+                             static_cast<double>(m_stats.cum_robots)) +
               separator();
     } else {
       line += "0" + separator() + "0" + separator();
@@ -72,16 +71,16 @@
     return true;
   } /* csv_line_build() */
 
-  void transport_metrics_collector::collect(
+  void energy_metrics_collector::collect(
       const rcppsw::metrics::base_metrics& metrics) {
-    auto& m = dynamic_cast<const transport_metrics&>(metrics);
+    auto& m = dynamic_cast<const energy_metrics&>(metrics);
     ++m_stats.cum_robots;
     m_stats.cum_energy += m.energy_level();
     m_stats.cum_robots_at_nest += m.is_charging();
   } /* collect() */
 
-  void transport_metrics_collector::reset_after_interval(void) {
+  void energy_metrics_collector::reset_after_interval(void) {
     m_stats = {0, 0, 0};
   } /* reset_after_interval() */
 
-  NS_END(blocks, metrics, fordyca);
+  NS_END(energy, metrics, fordyca);
