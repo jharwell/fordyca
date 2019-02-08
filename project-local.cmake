@@ -17,15 +17,16 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_RAB"
 set(${target}_CHECK_LANGUAGE "CXX")
 
 if(BUILD_ON_MSI)
-  set(ARGOS_INSTALL_PREFIX /home/gini/shared/swarm)
+  set(LOCAL_INSTALL_PREFIX /home/gini/shared/swarm)
 else()
-  set(ARGOS_INSTALL_PREFIX /opt/data/local)
+  # Qt (not reliably available on MSI)
+  set(CMAKE_AUTOMOC ON)
+  find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
+  set(CMAKE_AUTOMOC OFF)
+
+  set(LOCAL_INSTALL_PREFIX /opt/data/local)
 endif()
 
-# Qt
-set(CMAKE_AUTOMOC ON)
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
-set(CMAKE_AUTOMOC OFF)
 
 # RCPPSW
 add_subdirectory(ext/rcppsw)
@@ -39,7 +40,7 @@ set(${target}_INCLUDE_DIRS
   /usr/include/eigen3)
 set(${target}_SYS_INCLUDE_DIRS
   ${rcppsw_SYS_INCLUDE_DIRS}
-  ${ARGOS_INSTALL_PREFIX}/include
+  ${LOCAL_INSTALL_PREFIX}/include
     ${NLOPT_INCLUDE_DIRS})
 
 ################################################################################
@@ -57,21 +58,44 @@ set(${target}_LIBRARIES
   argos3plugin_simulator_genericrobot
   argos3plugin_simulator_qtopengl
   stdc++fs
-  Qt5::Widgets
-  Qt5::Core
-  Qt5::Gui)
+  rt)
 
 # Define link search dirs
 set(${target}_LIBRARY_DIRS
   /usr/lib/argos3
   /usr/local/lib/argos3
-  ${ARGOS_INSTALL_PREFIX}/lib/argos3
+  ${LOCAL_INSTALL_PREFIX}/lib/argos3
   ${rcppsw_LIBRARY_DIRS})
-link_directories(${${target}_LIBRARY_DIRS})
+
+# Qt not reliably available on MSI
+if (NOT BUILD_ON_MSI)
+  set(${target}_LIBRARIES ${${target}_LIBRARIES}
+    Qt5::Widgets
+    Qt5::Core
+    Qt5::Gui)
+endif()
+
 
 # Force failures at build time rather than runtime
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 
+if (BUILD_ON_MSI)
+  # For nlopt
+  set(${target}_LIBRARY_DIRS ${${target}_LIBRARY_DIRS}
+    ${LOCAL_INSTALL_PREFIX}/lib
+    ${LOCAL_INSTALL_PREFIX}/lib64)
+
+  # Because Qt not reliably available
+    list(REMOVE_ITEM ${target}_ROOT_SRC
+    ${${target}_SRC_PATH}/support/block_carry_visualizer.cpp
+    ${${target}_SRC_PATH}/support/los_visualizer.cpp
+    ${${target}_SRC_PATH}/support/task_visualizer.cpp
+    ${${target}_SRC_PATH}/support/depth0/depth0_qt_user_functions.cpp
+    ${${target}_SRC_PATH}/support/depth1/depth1_qt_user_functions.cpp
+    ${${target}_SRC_PATH}/support/depth2/depth2_qt_user_functions.cpp)
+endif()
+
+link_directories(${${target}_LIBRARY_DIRS})
 add_library(${target} SHARED ${${target}_ROOT_SRC})
 add_dependencies(${target} rcsw rcppsw)
 
@@ -100,7 +124,9 @@ if (WITH_FOOTBOT_RAB)
 endif()
 
 if (BUILD_ON_MSI)
-  target_compile_options(${target} PUBLIC -Wno-missing-include-dirs)
+  target_compile_options(${target} PUBLIC
+    -Wno-missing-include-dirs
+    -fno-new-inheriting-ctors)
 endif()
 
 ################################################################################

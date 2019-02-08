@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/crw_controller_repository.hpp"
+#include "fordyca/params/base_controller_repository.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +41,7 @@ NS_START(fordyca, params, depth0);
  * @brief Collection of all parameter parsers and parse results needed by
  * \ref dpo_controller.
  */
-class dpo_controller_repository: public crw_controller_repository {
+class dpo_controller_repository: public base_controller_repository {
  public:
   dpo_controller_repository(void);
 };

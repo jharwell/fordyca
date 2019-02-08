@@ -1,11 +1,12 @@
 #!/bin/bash
 #
-# This script clones and builds the entire project from scratch. Intended for
-# use on MSI. You need to source the build environment setup file before
-# running this script.
+# This script clones the entire project from scratch. Intended for use on
+# MSI. You need to source the build environment setup file before running this
+# script. This MUST be run from a login node, because you need internet access
+# (duh).
 #
-# $1 - The directory to clone and build everything in. Can be relative to
-#      current dir, or be specified using and absolute path.
+# $1 - The directory to clone everything into. Can be relative to current dir,
+#      or be specified using and absolute path.
 #
 mkdir $1 && cd $1
 git clone https://github.com/swarm-robotics/rcppsw.git
@@ -22,8 +23,6 @@ mkdir -p ext
 ln -s ../../rcppsw ext/
 
 mkdir build && cd build
-cmake -DBUILD_ON_MSI=yes -DCMAKE_BUILD_TYPE=OPT ..
-make -j 8
 
 cd ..
 git clone https://github.com/swarm-robotics/sierra.git
