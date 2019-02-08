@@ -122,8 +122,19 @@ After successful compilation, follow these steps to run a foraging scenario:
 ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
 access to that directory as part of the gini group.
 
-1. In `/home/gini/shared/swarm`, source the build/run environment setup
-   script:
+1. On an MSI login node, run the bash script to clone the project (this is a
+   one-time step):
+
+        fordyca-clone-all.sh /path/to/project/root
+
+   The 1st argument is the path (relative or absolute) to the location where you
+   want the project repos to live (they will all be cloned into that level).
+
+   If you need to checkout a particular branch in the repo you can do that after
+   running the script.
+
+2. On an MSI cluster node (*NOT* a login node), source the build/run
+   environment setup script:
 
         . /home/gini/shared/swarm/bin/build-env-setup.sh
 
@@ -131,15 +142,15 @@ access to that directory as part of the gini group.
    and modify it (in *your* home directory somewhere) so your shell understands
    the syntax.
 
-2. Run the bash script to clone and build the project:
+3. On an MSI cluster node (*NOT* a login node), run the bash script to build the
+   project (note that you may want to tweak the cmake defines in the script, or
+   use your own script, depending on what types of experiments you are
+   running). If you are not sure if you need to do this, ask!
 
-        clone-and-build-clean.sh /path/to/project/root
+        /home/gini/shared/swarm/bin/fordyca-build-default.sh /path/to/project/root
 
    The 1st argument is the path (relative or absolute) to the location where you
-   want the project repos to live (they will all be cloned into that level).
-
-   If you need to checkout a particular branch in the repo you can do that after
-   running the script and then re-running make.
+   cloned the project repos.
 
 # Troubleshooting
 

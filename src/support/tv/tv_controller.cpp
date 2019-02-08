@@ -196,7 +196,9 @@ double tv_controller::env_cache_usage(void) const {
 } /* env_cache_usage() */
 
 void tv_controller::register_controller(int robot_id) {
-  m_motion_throttling.emplace(robot_id, &mc_motion_throttle_params);
+  m_motion_throttling.emplace(std::piecewise_construct,
+                              std::forward_as_tuple(robot_id),
+                              std::forward_as_tuple(&mc_motion_throttle_params));
 } /* register_controller() */
 
 void tv_controller::update(void) {

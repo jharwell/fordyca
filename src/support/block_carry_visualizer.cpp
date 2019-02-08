@@ -27,6 +27,7 @@
 #include <argos3/core/utility/math/quaternion.h>
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
+
 #include "fordyca/representation/base_block.hpp"
 #include "fordyca/representation/cube_block.hpp"
 #include "fordyca/representation/ramp_block.hpp"
