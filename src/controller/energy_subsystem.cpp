@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/energy_subsystem.hpp"
 #include "fordyca/controller/ee_decision_matrix.hpp"
+#include "fordyca/fsm/ee_max_fsm.hpp"
 #include "fordyca/params/energy_params.hpp"
 
 #include <algorithm>
@@ -39,7 +40,7 @@ NS_START(controller);
  * Constructors/Destructor
  ******************************************************************************/
 energy_subsystem::energy_subsystem(
-    const struct params::energy_params* const params, const ta::taskable* task, controller::saa_subsystem* saa)
+    const struct params::energy_params* const params, controller::saa_subsystem* saa)
     : ER_CLIENT_INIT("fordyca.controller.energy"),
       w{params->weight1, params->weight2, params->weight3},
       wC{params->weight1C, params->weight2C, params->weight3C},
@@ -54,8 +55,8 @@ energy_subsystem::energy_subsystem(
       is_new_thresh(true),
       is_EEE(false),
       mc_matrix(),
-      e_fsm(task, mc_matrix, saa),
-      should_charge(false) {}
+      should_charge(false),
+      e_fsm(mc_matrix, saa) {}
 
 
 /*******************************************************************************
@@ -81,7 +82,7 @@ void energy_subsystem::endgame(int k_robots) {
 
 
 void energy_subsystem::energy_adapt(int k_robots) {
-  if(e_fsm.current_state() == ee_max_fsm::ST_CHARGING && is_new_thresh) {
+  if(e_fsm.current_state() == fsm::ee_max_fsm::ST_CHARGING && is_new_thresh) {
     if(tau < maxTau) {
       tau = tau + 1;
     } else {
@@ -125,9 +126,10 @@ void energy_subsystem::energy_adapt(int k_robots) {
 
       tau = 0;
     }
-  } else if (e_fsm.current_state() == ee_max_fsm::ST_FORAGING) {
+  } else if (e_fsm.current_state() == fsm::ee_max_fsm::ST_FORAGING) {
     is_new_thresh = true;
   }
+
 }
 
 NS_END(controller, fordyca);

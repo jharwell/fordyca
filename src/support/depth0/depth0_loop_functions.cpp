@@ -126,9 +126,9 @@ void depth0_loop_functions::controller_configure(
 void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   auto controller = static_cast<controller::depth0::depth0_controller*>(
       &robot.GetControllableEntity().GetController());
-  if (controller.energy_subsystem()->get_should_charge()) {
-    robot.GetBatterySensorEquippedEntity().SetAvailableCharge(controller.energy_subsystem()->desired_charge());
-    controller.energy_subsystem()->set_should_charge(false);
+  if (controller->esubsystem()->get_should_charge()) {
+    robot.GetBatterySensorEquippedEntity().SetAvailableCharge(controller->esubsystem()->desired_charge());
+    controller->esubsystem()->set_should_charge(false);
   }
   /*
    * This is the one place in the depth0 event handling code where we need to

@@ -53,8 +53,7 @@
   */
  class energy_subsystem : public er::client<energy_subsystem>{
   public:
-    energy_subsystem(const params::energy_params* params, const ta::taskable* task,
-                     controller::saa_subsystem* saa);
+    energy_subsystem(const params::energy_params* params, controller::saa_subsystem* saa);
     virtual ~energy_subsystem(void) = default;
 
     void run_fsm(void) {  e_fsm.run(); }
@@ -64,13 +63,6 @@
 
     float desired_charge(void) { return ehigh_thres; }
 
-  private:
-    /**
-     * @brief How the robot will perform and allocate or not allocate energy for foraging
-     * when maximum battery potential has reached.
-     */
-    void endgame(int k_robots);
-
     /**
      * @brief How the robot will update the energy thresholds and capacity for deciding
      * how much energy to allocate next time it starts foraging. It decides this based on
@@ -78,8 +70,18 @@
      */
     void energy_adapt(int k_robots);
 
-    float                                                   w[3];
-    float                                                   wC[3];
+    void set_task(ta::taskable* task) { e_fsm.set_taskable(task); }
+
+  private:
+    /**
+     * @brief How the robot will perform and allocate or not allocate energy for foraging
+     * when maximum battery potential has reached.
+     */
+    void endgame(int k_robots);
+
+
+    float                                                 w[3];
+    float                                                  wC[3];
     float                                                 elow_thres;
     float                                                 ehigh_thres;
     float                                                 capacity;
@@ -91,8 +93,8 @@
     bool                                                  is_new_thresh;
     bool                                                  is_EEE;
     controller::ee_decision_matrix*                       mc_matrix;
-    fsm::ee_max_fsm                                       e_fsm;
     bool                                                  should_charge;
+    fsm::ee_max_fsm                                       e_fsm;
     float                                                 deltaE;
 
  };

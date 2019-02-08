@@ -194,11 +194,19 @@ class base_controller : public argos::CCI_Controller,
    */
   void ndc_pop(void) { ER_NDC_POP(); }
 
+  class energy_subsystem* esubsystem(void) { return energy_subsystem(); }
+
  protected:
   class saa_subsystem* saa_subsystem(void) {
     return m_saa.get();
   }
   const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
+
+  class energy_subsystem* energy_subsystem(void) {
+    return m_energy.get();
+  }
+
+  const class energy_subsystem* energy_subsystem(void) const { return m_energy.get();}
 
  private:
   void output_init(const struct params::output_params* params);
@@ -209,6 +217,7 @@ class base_controller : public argos::CCI_Controller,
   bool                                        m_display_id{false};
   std::shared_ptr<representation::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;
+  std::unique_ptr<controller::energy_subsystem> m_energy;
   /* clang-format on */
 };
 

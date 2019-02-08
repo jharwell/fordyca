@@ -36,10 +36,12 @@
 #include <fstream>
 
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/energy_subsystem.hpp"
 #include "fordyca/params/actuation_params.hpp"
 #include "fordyca/params/base_controller_repository.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
+#include "fordyca/params/energy_params.hpp"
 #include "fordyca/support/tv/tv_controller.hpp"
 
 /*******************************************************************************
@@ -103,6 +105,10 @@ void base_controller::Init(ticpp::Element& node) {
   /* initialize sensing and actuation (SAA) subsystem */
   saa_init(param_repo.parse_results<params::actuation_params>(),
            param_repo.parse_results<params::sensing_params>());
+
+  m_energy = rcppsw::make_unique<controller::energy_subsystem>(
+            param_repo.parse_results<params::energy_params>(), m_saa.get());
+
   ndc_pop();
 } /* Init() */
 

@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/depth0_controller.hpp"
+#include "fordyca/controller/energy_subsystem.hpp"
 #include "rcppsw/patterns/state_machine/base_fsm.hpp"
 
 /*******************************************************************************
@@ -84,7 +85,6 @@ class crw_controller : public depth0_controller,
  private:
   /* clang-format off */
   std::unique_ptr<fsm::depth0::crw_fsm> m_fsm;
-  std::unique_ptr<energy_subsystem> m_energy;
   /* clang-format on */
 };
 

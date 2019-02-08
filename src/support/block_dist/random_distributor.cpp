@@ -62,7 +62,7 @@ bool random_distributor::distribute_blocks(ds::block_vector& blocks,
           loc.y() + m_grid.shape()[1]);
 
   return std::all_of(blocks.begin(), blocks.end(), [&](auto& b) {
-    return distribute_block(b, entities);
+    return this->distribute_block(b, entities);
   });
 } /* distribute_blocks() */
 

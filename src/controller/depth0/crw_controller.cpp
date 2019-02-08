@@ -53,7 +53,7 @@ void crw_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
   m_fsm = rcppsw::make_unique<fsm::depth0::crw_fsm>(
       base_controller::saa_subsystem());
-  m_energy = rcppsw::make_unique<energy_subsystem>(m_fsm, base_controller::saa_subsystem());
+  energy_subsystem()->set_task(m_fsm.get());
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -75,8 +75,8 @@ void crw_controller::ControlStep(void) {
   }
 
   // call subsystem and also check to update.
-  m_energy->energy_adapt(m_fsm->get_k_collision());
-  m_energy->run_fsm();
+  energy_subsystem()->energy_adapt(m_fsm->get_k_collision());
+  energy_subsystem()->run_fsm();
   ndc_pop();
 } /* ControlStep() */
 

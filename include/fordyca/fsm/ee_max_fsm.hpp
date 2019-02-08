@@ -65,7 +65,7 @@ class ee_max_fsm : public base_foraging_fsm,
                                public block_transporter,
                                public visitor::visitable_any<ee_max_fsm> {
  public:
-  explicit ee_max_fsm(const ta::taskable* task, const controller::ee_decision_matrix* matrix,
+  explicit ee_max_fsm(const controller::ee_decision_matrix* matrix,
                       controller::saa_subsystem* saa);
 
   ee_max_fsm(const ee_max_fsm& fsm) = delete;
@@ -89,8 +89,6 @@ class ee_max_fsm : public base_foraging_fsm,
    */
   void run(void);
 
- private:
-
   enum fsm_states {
     ST_START, /* Initial state */
     ST_FORAGING,
@@ -98,6 +96,10 @@ class ee_max_fsm : public base_foraging_fsm,
     ST_CHARGING,
     ST_MAX_STATES,
   };
+
+  void set_taskable(ta::taskable* task) { taskable_fsm = task; }
+
+ private:
 
   /* ee_max fsm states */
   HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,

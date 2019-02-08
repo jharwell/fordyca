@@ -38,10 +38,9 @@ namespace ta = rcppsw:task_allocation;
  ******************************************************************************/
 
 // get pointer to taskable object (crw_fsm)
-ee_max_fsm::ee_max_fsm(const ta::taskable* const task, const controller::ee_decision_matrix* matrix,
+ee_max_fsm::ee_max_fsm(const controller::ee_decision_matrix* matrix,
                         controller::saa_subsystem* const saa)
     : base_foraging_fsm(saa, ST_MAX_STATES),
-      ta::taskable* taskable_fsm(task),
       mc_matrix(matrix),
       saa(saa),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),

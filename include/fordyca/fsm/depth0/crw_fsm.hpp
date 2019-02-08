@@ -38,7 +38,7 @@ NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw:task_allocation;
+namespace task_allocation = rcppsw::task_allocation;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
@@ -62,7 +62,7 @@ class crw_fsm : public base_foraging_fsm,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
                                public visitor::visitable_any<crw_fsm>,
-                               public task_allocation::taskable<crw_fsm>  {
+                               public task_allocation::taskable  {
  public:
   explicit crw_fsm(controller::saa_subsystem* saa);
 
@@ -83,7 +83,7 @@ class crw_fsm : public base_foraging_fsm,
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const ta::taskable_argument*) override {}
+  void task_start(const task_allocation::taskable_argument*) override {}
   bool task_finished(void) const override {
     // return ST_FINISHED == current_state();
   }
