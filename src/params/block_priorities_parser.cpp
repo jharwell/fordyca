@@ -38,7 +38,7 @@ constexpr char block_priorities_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void block_priorities_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 

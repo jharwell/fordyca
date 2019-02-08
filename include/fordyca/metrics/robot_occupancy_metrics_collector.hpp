@@ -29,14 +29,12 @@
 
 #include "rcppsw/ds/grid2D.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
 namespace rmath = rcppsw::math;
-namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
@@ -47,15 +45,14 @@ namespace visitor = rcppsw::patterns::visitor;
  *
  * @brief Collector for \ref robot_occupancy_metrics.
  *
- * Robot_Occupancy metrics are somewhat unusual, because they output a large 2D array into
- * a .csv each time they are written out. As such, at the specified collection
- * interval the are written out, capturing the state of the robot_occupancy for in terms
- * of an accumulated desired quantity (i.e. metrics are always written out as
- * cumulative averages).
+ * Robot_Occupancy metrics are somewhat unusual, because they output a large 2D
+ * array into a .csv each time they are written out. As such, at the specified
+ * collection interval the are written out, capturing the state of the
+ * robot_occupancy for in terms of an accumulated desired quantity (i.e. metrics
+ * are always written out as cumulative averages).
  */
 class robot_occupancy_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<robot_occupancy_metrics_collector> {
+    : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

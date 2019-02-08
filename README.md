@@ -98,7 +98,11 @@ After successful compilation, follow these steps to run a foraging scenario:
 1. Set the `ARGOS_PLUGIN_PATH` variable to contain the path to the
    `libfordyca.so` file. On bash, that is:
 
-        export ARGOS_PLUGIN_PATH=/path/to/fordyca/build/lib
+        export ARGOS_PLUGIN_PATH=/path/to/where/argos/lib/dir:/path/to/fordyca/build/lib
+
+   Note that you need BOTH of these terms in the path, because this defines the
+   ENTIRE search space for argos to look for libraries (including its own core
+   libraries).
 
 2. Unless you disable event reporting, you will need to set the path to the
    log4cxx configuration file. On bash that is:
@@ -118,8 +122,19 @@ After successful compilation, follow these steps to run a foraging scenario:
 ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
 access to that directory as part of the gini group.
 
-1. In `/home/gini/shared/swarm`, source the build/run environment setup
-   script:
+1. On an MSI login node, run the bash script to clone the project (this is a
+   one-time step):
+
+        fordyca-clone-all.sh /path/to/project/root
+
+   The 1st argument is the path (relative or absolute) to the location where you
+   want the project repos to live (they will all be cloned into that level).
+
+   If you need to checkout a particular branch in the repo you can do that after
+   running the script.
+
+2. On an MSI cluster node (*NOT* a login node), source the build/run
+   environment setup script:
 
         . /home/gini/shared/swarm/bin/build-env-setup.sh
 
@@ -127,15 +142,15 @@ access to that directory as part of the gini group.
    and modify it (in *your* home directory somewhere) so your shell understands
    the syntax.
 
-2. Run the bash script to clone and build the project:
+3. On an MSI cluster node (*NOT* a login node), run the bash script to build the
+   project (note that you may want to tweak the cmake defines in the script, or
+   use your own script, depending on what types of experiments you are
+   running). If you are not sure if you need to do this, ask!
 
-        clone-and-build-clean.sh /path/to/project/root
+        /home/gini/shared/swarm/bin/fordyca-build-default.sh /path/to/project/root
 
    The 1st argument is the path (relative or absolute) to the location where you
-   want the project repos to live (they will all be cloned into that level).
-
-   If you need to checkout a particular branch in the repo you can do that after
-   running the script and then re-running make.
+   cloned the project repos.
 
 # Troubleshooting
 
@@ -165,10 +180,9 @@ access to that directory as part of the gini group.
 
   3. Make sure you have the necessary environment variables set correctly.
 
-  4. If you get a `std::bad_cast` exception (or something similar), then verify
-     that the name of [controller, loop functions, qt user functions], are
-     correct, per the table above.
-
+  4. If you get a `std::bad_cast`, `boost::get`, or similar exception, then
+     verify that the name of [controller, loop functions, qt user functions],
+     are correct, per the table above.
 
 # Contributing
 

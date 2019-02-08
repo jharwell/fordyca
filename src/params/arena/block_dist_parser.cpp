@@ -38,7 +38,7 @@ constexpr char block_dist_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void block_dist_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = get_node(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_powerlaw.parse(bnode);
   m_manifest.parse(bnode);
   m_params =
