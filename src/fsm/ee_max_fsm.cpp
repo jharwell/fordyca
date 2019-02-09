@@ -83,7 +83,9 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
   controller::energy_supervisor selector(mc_matrix);
   float low_energy = selector.getLowerThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
+  std::cout << "FSM:\tRobot is Foraging........" << std::endl;
   if (current_energy <= low_energy) {
+    std::cout << "FSM:\tRobot enters Retreating from Foraging State" << std::endl;
     internal_event(ST_RETREATING);
   } else {
     if(taskable_fsm->task_finished()) {
@@ -100,7 +102,9 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
   controller::energy_supervisor selector(mc_matrix);
   float charged_energy = selector.getHigherThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
+  std::cout << "FSM:\tRobot is Charging........" << std::endl;
   if (current_energy == charged_energy) {
+    std::cout << "FSM:\tRobot enters Foraging from Charging State" << std::endl;
     internal_event(ST_FORAGING);
   }
 }

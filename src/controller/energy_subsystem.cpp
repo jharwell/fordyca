@@ -54,7 +54,7 @@ energy_subsystem::energy_subsystem(
       maxTau(100),
       is_new_thresh(true),
       is_EEE(false),
-      mc_matrix(),
+      mc_matrix(new controller::ee_decision_matrix(params)),
       should_charge(false),
       e_fsm(mc_matrix, saa) {}
 
@@ -89,6 +89,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
       tau = tau + 1;
     } else {
       if(is_EEE) {
+        std::cout << "SUBSYSTEM:\tRobot is entering EEE" << std::endl;
         endgame(k_robots);
         maxTau = maxTau + 50;
       } else {
@@ -117,6 +118,9 @@ void energy_subsystem::energy_adapt(int k_robots) {
         if((ehigh_thres - elow_thres) == 1) {
           is_EEE = true;
         }
+
+        std::cout << "SUBSYSTEM:\tLower Energy Threshold: " << elow_thres << std::endl;
+        std::cout << "SUBSYSTEM:\tUpper Energy Threshold: " << ehigh_thres << std::endl;
 
         set_should_charge(true);
 

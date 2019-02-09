@@ -30,8 +30,16 @@
         <range_and_bearing implementation="medium" medium="rab" />
       </sensors>
       <params>
-        <energy max_energy="100.0"
-                threshold="20.0">
+        <energy elow="0.1"
+                ehigh="0.5"
+                capacity="0.4"
+                weight1="0.1"
+                weight2="0.1"
+                weight3="0.05"
+                weight1C="0.1"
+                weight2C="0.1"
+                weight3C="0.05"
+                EEE="Null-informed">
         </energy>
         <output>
           <sim output_root="output"

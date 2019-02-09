@@ -32,9 +32,9 @@
  /*******************************************************************************
   * Constructors/Destructors
   ******************************************************************************/
-  ee_decision_matrix::ee_decision_matrix()
-      : e_lowerT(0.0),
-        e_higherT(0.0) {}
+  ee_decision_matrix::ee_decision_matrix(const struct params::energy_params* const params)
+      : e_lowerT(params->elow),
+        e_higherT(params->ehigh) {}
 
 /*******************************************************************************
  * Member Functions

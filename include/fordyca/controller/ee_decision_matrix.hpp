@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/params/energy_params.hpp"
+
 #include <boost/variant.hpp>
 #include <map>
 #include <string>
@@ -58,7 +60,7 @@ class ee_decision_matrix {
     float e_lowerT;
     float e_higherT;
 
-    explicit ee_decision_matrix();
+    explicit ee_decision_matrix(const struct params::energy_params* const params);
 
     void setData(float eLow, float eHigh);
 
