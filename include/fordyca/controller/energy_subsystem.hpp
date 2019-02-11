@@ -74,6 +74,9 @@
 
     void success_pickup(void) { is_successful_pickup = 1; }
 
+    void has_block(void) { e_fsm.got_block(); }
+    void drop_block(void) { e_fsm.set_block(); }
+
   private:
     /**
      * @brief How the robot will perform and allocate or not allocate energy for foraging

@@ -93,6 +93,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
 HFSM_STATE_DEFINE(base_foraging_fsm,
                   transport_to_nest,
                   state_machine::event_data) {
+  ER_INFO("FSM:\tRobot is Retreating......");
   ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
             "ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),

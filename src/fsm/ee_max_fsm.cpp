@@ -44,6 +44,7 @@ ee_max_fsm::ee_max_fsm(const controller::ee_decision_matrix* matrix,
     : base_foraging_fsm(saa, ST_MAX_STATES),
       mc_matrix(matrix),
       saa(saa),
+      has_block(false),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -83,14 +84,19 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
   controller::energy_supervisor selector(mc_matrix);
   float low_energy = selector.getLowerThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
-  std::cout << "FSM:\tRobot is Foraging........" << std::endl;
+  ER_INFO("FSM:\tRobot is Foraging........ENERGY: %f", current_energy);
   if (current_energy <= low_energy) {
-    std::cout << "FSM:\tRobot enters Retreating from Foraging State" << std::endl;
+    ER_INFO("FSM:\tRobot enters Retreating from Foraging State");
     internal_event(ST_RETREATING);
   } else {
     if(taskable_fsm->task_finished()) {
       taskable_fsm->task_reset();
       taskable_fsm->task_start(nullptr);
+    }
+
+    if(has_block) {
+      ER_INFO("FSM:\tRobot enters Retreating(Block) from Foraging State");
+      internal_event(ST_RETREATING);
     }
 
     taskable_fsm->task_execute();
@@ -99,12 +105,13 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
 }
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
+  saa->actuation()->differential_drive().stop();
   controller::energy_supervisor selector(mc_matrix);
   float charged_energy = selector.getHigherThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
-  std::cout << "FSM:\tRobot is Charging........" << std::endl;
-  if (current_energy == charged_energy) {
-    std::cout << "FSM:\tRobot enters Foraging from Charging State" << std::endl;
+  ER_INFO("FSM:\tRobot is Charging........CHARGE: %f", current_energy);
+  if (current_energy >= charged_energy && !(has_block)) {
+    ER_INFO("FSM:\tRobot enters Foraging from Charging State");
     internal_event(ST_FORAGING);
   }
 }

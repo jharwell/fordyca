@@ -71,13 +71,20 @@ void energy_subsystem::endgame(int k_robots) {
   } else if(EEE_method == "Ill-informed") {
       deltaE = ehigh_thres - m_sensing->battery().readings().available_charge;
       double remaining = ehigh_thres - deltaE;
-      elow_thres = elow_thres - (is_successful_pickup * std::max(0.0, (remaining))*(w[1]))
-                              + ((!is_successful_pickup)*(w[2])) + (k_robots*(w[3]));
+      ER_INFO("SUBSYSTEM:\tRemaining: %f", remaining);
+      elow_thres = elow_thres - (std::max(0.0, (remaining))*(w[0]))
+                              + ((!is_successful_pickup)*(w[1])) + (k_robots*(w[2]));
       set_should_charge(true);
       mc_matrix->setData(elow_thres, ehigh_thres);
   } else if(EEE_method == "Null-informed") {
-      set_should_charge(true);
+      set_should_charge(false);
   }
+
+  ER_INFO("SUBSYSTEM:\tSuccessful Pickup: %d", is_successful_pickup);
+  ER_INFO("SUBSYSTEM:\tRobots: %d", k_robots);
+  ER_INFO("SUBSYSTEM:\tLower Energy Threshold: %f", elow_thres);
+  ER_INFO("SUBSYSTEM:\tUpper Energy Threshold: %f", ehigh_thres);
+  ER_INFO("SUBSYSTEM:\tCapacity: %f", capacity);
 
   is_successful_pickup = 0;
 }
@@ -89,7 +96,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
       tau = tau + 1;
     } else {
       if(is_EEE) {
-        std::cout << "SUBSYSTEM:\tRobot is entering EEE" << std::endl;
+        ER_INFO("SUBSYSTEM:\tRobot is entering EEE: %s", EEE_method);
         endgame(k_robots);
         maxTau = maxTau + 50;
       } else {
@@ -98,31 +105,50 @@ void energy_subsystem::energy_adapt(int k_robots) {
             If there was a failed pickup
             If encountered any robots.
         */
+        ER_INFO("SUBSYSTEM 0:\tLower Energy Threshold: %f", elow_thres);
+        ER_INFO("SUBSYSTEM 0:\tUpper Energy Threshold: %f", ehigh_thres);
+        ER_INFO("SUBSYSTEM 0:\tCapacity: %f", capacity);
         deltaE = ehigh_thres - m_sensing->battery().readings().available_charge;
         double remaining = ehigh_thres - deltaE;
+        ER_INFO("SUBSYSTEM:\tSuccessful Pickup: %d", is_successful_pickup);
+        ER_INFO("SUBSYSTEM:\tRemaining: %f", remaining);
+        ER_INFO("SUBSYSTEM:\tRobots: %d", k_robots);
+        ER_INFO("SUBSYSTEM:\tWeights: %f, %f, %f", w[0], w[1], w[2]);
+        ER_INFO("SUBSYSTEM:\tWeights C: %f, %f, %f", wC[0], wC[1], wC[2]);
+        elow_thres = elow_thres - (std::max(0.0, (remaining))*(w[0]))
+                                + ((!is_successful_pickup)*(w[1])) + (k_robots*(w[2]));
 
-        elow_thres = elow_thres - (is_successful_pickup * std::max(0.0, (remaining))*(w[1]))
-                                + ((!is_successful_pickup)*(w[2])) + (k_robots*(w[3]));
+        capacity = capacity - (is_successful_pickup * std::max(0.0, (remaining))*(wC[0]))
+                            + ((!is_successful_pickup)*(wC[1])) + (k_robots*(wC[2]));
 
-        capacity = capacity - (is_successful_pickup * std::max(0.0, (remaining))*(wC[1]))
-                            + ((!is_successful_pickup)*(wC[2])) + (k_robots*(wC[3]));
+        ER_INFO("SUBSYSTEM 1:\tLower Energy Threshold: %f", elow_thres);
+        ER_INFO("SUBSYSTEM 1:\tCapacity: %f", capacity);
 
         if(elow_thres < 0)
-          elow_thres = 0;
+          elow_thres = 0.1;
 
         ehigh_thres = elow_thres + capacity;
 
         if(ehigh_thres > 1)
           ehigh_thres = 1;
 
+        if(capacity > 1)
+          capacity = 1;
+
+        if(elow_thres > ehigh_thres)
+          elow_thres = ehigh_thres - capacity;
+
         if((ehigh_thres - elow_thres) == 1) {
           is_EEE = true;
         }
 
-        std::cout << "SUBSYSTEM:\tLower Energy Threshold: " << elow_thres << std::endl;
-        std::cout << "SUBSYSTEM:\tUpper Energy Threshold: " << ehigh_thres << std::endl;
+        ER_INFO("SUBSYSTEM 2:\tLower Energy Threshold: %f", elow_thres);
+        ER_INFO("SUBSYSTEM:\tUpper Energy Threshold: %f", ehigh_thres);
+        ER_INFO("SUBSYSTEM 2:\tCapacity: %f", capacity);
 
         set_should_charge(true);
+
+        ER_INFO("SUBSYSTEM:\tEnergy Level: %f", m_sensing->battery().readings().available_charge);
 
         mc_matrix->setData(elow_thres, ehigh_thres);
 

@@ -72,12 +72,14 @@ void nest_block_drop::visit(controller::depth0::crw_controller& controller) {
   controller.fsm()->accept(*this);
   controller.block(nullptr);
   controller.free_drop_event(true);
+  controller.esubsystem()->drop_block();
 
   ER_INFO("Dropped block%d in nest", m_block->id());
   controller.ndc_pop();
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
+  ER_INFO("DROPPING THE BLOCK................")
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
                    state_machine::event_type::NORMAL);
 } /* visit() */

@@ -111,6 +111,7 @@ void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.block(m_block);
   controller.free_pickup_event(true);
   controller.esubsystem()->success_pickup();
+  controller.esubsystem()->has_block();
 
   ER_INFO("Picked up block%d", m_block->id());
   controller.ndc_pop();

@@ -31,6 +31,17 @@
         <battery implementation="default" />
       </sensors>
       <params>
+        <energy elow="0.1"
+                ehigh="0.5"
+                capacity="0.4"
+                weight1="0.1"
+                weight2="0.1"
+                weight3="0.05"
+                weight1C="0.1"
+                weight2C="0.1"
+                weight3C="0.05"
+                EEE="Null-informed">
+        </energy>
         <output>
           <sim output_root="output"
                output_dir="__current_date__"
@@ -355,28 +366,28 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl autoplay="true"> -->
-  <!--      <frame_grabbing directory="frames" -->
-  <!--                      base_name="frame_" -->
-  <!--                      format="png" -->
-  <!--                      quality="100" /> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="6,3,6" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--       <placement idx="1" -->
-  <!--                  position="6,0,5" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth0_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl autoplay="true">
+       <frame_grabbing directory="frames"
+                       base_name="frame_"
+                       format="png"
+                       quality="100" />
+      <camera>
+        <placement idx="0"
+                   position="6,3,6"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+        <placement idx="1"
+                   position="6,0,5"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth0_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>
