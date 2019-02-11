@@ -41,7 +41,8 @@
               weight1C="0.2"
               weight2C="0.1"
               weight3C="0.005"
-              EEE="Null-informed">
+              EEE="Null-informed"
+              activated="true">
       </energy>
       <output>
         <sim output_root="output"

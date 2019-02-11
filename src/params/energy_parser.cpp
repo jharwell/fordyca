@@ -52,6 +52,7 @@ void energy_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(enode, m_params, weight2C);
   XML_PARSE_ATTR(enode, m_params, weight3C);
   XML_PARSE_ATTR(enode, m_params, EEE);
+  XML_PARSE_ATTR(enode, m_params, activated);
 } /* parse() */
 
 void energy_parser::show(std::ostream& stream) const {
@@ -65,6 +66,7 @@ void energy_parser::show(std::ostream& stream) const {
          << XML_ATTR_STR(m_params, weight2C) << std::endl
          << XML_ATTR_STR(m_params, weight3C) << std::endl
          << XML_ATTR_STR(m_params, EEE) << std::endl
+         << XML_ATTR_STR(m_params, activated) << std::endl
          << build_footer();
 } /* show() */
 

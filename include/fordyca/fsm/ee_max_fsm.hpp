@@ -84,8 +84,6 @@ class ee_max_fsm : public base_foraging_fsm,
 
   void set_taskable(ta::taskable* task) { taskable_fsm = task; }
 
-  void got_block(void) { has_block = true; }
-  void set_block(void) { has_block = false;}
 
  private:
 
@@ -95,7 +93,7 @@ class ee_max_fsm : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
 
   HFSM_STATE_DECLARE(ee_max_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE_ND(ee_max_fsm, foraging);
+  HFSM_STATE_DECLARE(ee_max_fsm, foraging, state_machine::event_data);
   HFSM_STATE_DECLARE_ND(ee_max_fsm, charging);
 
 
@@ -113,7 +111,6 @@ class ee_max_fsm : public base_foraging_fsm,
   ta::taskable* taskable_fsm;
   const controller::ee_decision_matrix* const mc_matrix;
   controller::saa_subsystem* saa;
-  bool has_block;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

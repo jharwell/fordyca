@@ -49,6 +49,7 @@
     float weight2C{-1};
     float weight3C{-1};
     std::string EEE{""};
+    bool activated{false};
 
   };
 

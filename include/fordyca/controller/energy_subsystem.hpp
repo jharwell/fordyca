@@ -74,8 +74,9 @@
 
     void success_pickup(void) { is_successful_pickup = 1; }
 
-    void has_block(void) { e_fsm.got_block(); }
-    void drop_block(void) { e_fsm.set_block(); }
+    bool is_activated(void) { return activate; }
+
+    fsm::ee_max_fsm& fsm(void) { return e_fsm; }
 
   private:
     /**
@@ -99,6 +100,7 @@
     bool                                                  is_EEE;
     controller::ee_decision_matrix*                       mc_matrix;
     bool                                                  should_charge;
+    bool                                                  activate;
     fsm::ee_max_fsm                                       e_fsm;
     float                                                 deltaE;
 

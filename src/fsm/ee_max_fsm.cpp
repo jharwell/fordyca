@@ -44,7 +44,6 @@ ee_max_fsm::ee_max_fsm(const controller::ee_decision_matrix* matrix,
     : base_foraging_fsm(saa, ST_MAX_STATES),
       mc_matrix(matrix),
       saa(saa),
-      has_block(false),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -80,7 +79,14 @@ HFSM_STATE_DEFINE(ee_max_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
+HFSM_STATE_DEFINE(ee_max_fsm, foraging, state_machine::event_data) {
+  if (state_machine::event_type::NORMAL == data->type()) {
+    if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+      ER_INFO("HIT SIGNAL RECEPTION");
+      internal_event(ST_CHARGING);
+      return controller::foraging_signal::HANDLED;
+    }
+  }
   controller::energy_supervisor selector(mc_matrix);
   float low_energy = selector.getLowerThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
@@ -94,10 +100,6 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, foraging) {
       taskable_fsm->task_start(nullptr);
     }
 
-    if(has_block) {
-      ER_INFO("FSM:\tRobot enters Retreating(Block) from Foraging State");
-      internal_event(ST_RETREATING);
-    }
 
     taskable_fsm->task_execute();
   }
@@ -110,7 +112,7 @@ HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
   float charged_energy = selector.getHigherThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
   ER_INFO("FSM:\tRobot is Charging........CHARGE: %f", current_energy);
-  if (current_energy >= charged_energy && !(has_block)) {
+  if (current_energy == charged_energy) {
     ER_INFO("FSM:\tRobot enters Foraging from Charging State");
     internal_event(ST_FORAGING);
   }

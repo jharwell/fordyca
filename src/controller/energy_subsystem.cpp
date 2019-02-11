@@ -56,6 +56,7 @@ energy_subsystem::energy_subsystem(
       is_EEE(false),
       mc_matrix(new controller::ee_decision_matrix(params)),
       should_charge(false),
+      activate(params->activated),
       e_fsm(mc_matrix, saa) {}
 
 

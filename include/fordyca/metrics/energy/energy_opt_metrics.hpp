@@ -53,6 +53,10 @@
      * @brief Return the average energy level
      */
     virtual double energy_level(void) const = 0;
+    /**
+     * @brief Return the average energy consumed
+     */
+    virtual double E_consumed(void) const = 0;
 
     /**
      * @brief Return the number of robots in the nest
