@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/metrics/energy/energy_metrics_collector.hpp"
+#include "fordyca/metrics/energy/energy_opt_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/world_model_metrics_collector.hpp"
@@ -63,6 +65,10 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
       "perception::world_model",
       metrics_path() + "/" + mparams->perception_world_model_fname,
       mparams->collect_interval);
+  register_collector<metrics::energy::energy_metrics_collector>(
+      "energy::efficiency",
+      metrics_path() + "/energy_metrics.csv",
+      mparams->collect_interval);
   reset_all();
 }
 
@@ -82,16 +88,20 @@ void depth0_metrics_aggregator::collect_from_controller(
       dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller);
   auto manip_m =
       dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+  auto energy_m =
+      dynamic_cast<const metrics::energy::energy_opt_metrics*>(controller->esubsystem());
 
   ER_ASSERT(mov_m, "FSM does not provide movement metrics");
   ER_ASSERT(block_acq_m, "FSM does not provide block acquisition metrics");
   ER_ASSERT(collision_m, "FSM does not provide collision metrics");
   ER_ASSERT(manip_m, "FSM does not provide block manipulation metrics");
+  ER_ASSERT(energy_m, "FSM does not provide energy metrics")
 
   collect("fsm::movement", *mov_m);
   collect("fsm::collision", *collision_m);
   collect("blocks::acquisition", *block_acq_m);
   collect("blocks::manipulation", *manip_m);
+  collect("energy::efficiency", *energy_m);
 
   /*
    * Only MDPO provides these.

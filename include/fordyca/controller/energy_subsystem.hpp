@@ -26,6 +26,7 @@
  ******************************************************************************/
  #include "fordyca/params/energy_params.hpp"
  #include "fordyca/fsm/ee_max_fsm.hpp"
+ #include "fordyca/metrics/energy/energy_opt_metrics.hpp"
 
  /*******************************************************************************
   * Namespaces
@@ -37,6 +38,7 @@
  namespace utils = rcppsw::utils;
  namespace ta = rcppsw::task_allocation;
  namespace er = rcppsw::er;
+ namespace metrics = fordyca::metrics;
 
  /*******************************************************************************
   * Class Definitions
@@ -51,7 +53,8 @@
   *
   *
   */
- class energy_subsystem : public er::client<energy_subsystem>{
+ class energy_subsystem : public er::client<energy_subsystem>,
+                          public metrics::energy::energy_opt_metrics {
   public:
     energy_subsystem(const params::energy_params* params, controller::saa_subsystem* saa);
     virtual ~energy_subsystem(void) = default;
@@ -77,6 +80,12 @@
     bool is_activated(void) { return activate; }
 
     fsm::ee_max_fsm& fsm(void) { return e_fsm; }
+
+    double energy_level(void) const override { return m_sensing->battery().readings().available_charge;}
+
+    double E_consumed(void) const override { return deltaE; }
+
+    int resources(void) const override { return is_successful_pickup; }
 
   private:
     /**

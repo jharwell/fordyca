@@ -195,6 +195,7 @@ class base_controller : public argos::CCI_Controller,
   void ndc_pop(void) { ER_NDC_POP(); }
 
   class energy_subsystem* esubsystem(void) { return energy_subsystem(); }
+  const class energy_subsystem* esubsystem(void) const { return energy_subsystem(); }
 
  protected:
   class saa_subsystem* saa_subsystem(void) {

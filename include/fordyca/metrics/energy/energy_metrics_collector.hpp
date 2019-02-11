@@ -72,17 +72,16 @@ class energy_metrics_collector : public rcppsw::metrics::base_metrics_collector 
      */
     double cum_energy;
 
-    /**
-     * @brief Total # robots entered nest
-     */
-    uint cum_robots_at_nest;
+    double cum_deltaE;
+
+    int cum_resources;
 
   };
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
 
-  struct stats m_stats {};
+  struct stats m_stats;
 };
 
 NS_END(energy, metrics, fordyca);

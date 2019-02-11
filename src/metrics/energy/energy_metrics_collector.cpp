@@ -44,7 +44,9 @@
     return base_metrics_collector::csv_header_build(header) +
         "n_robots" + separator() +
         "avg_energy_level" + separator() +
-        "avg_robots_at_nest" + separator();
+        "avg_deltaE" + separator() +
+        "avg_E" + separator() +
+        "efficiency" + separator();
     // clang-format on
   } /* csv_header_build() */
 
@@ -59,28 +61,37 @@
     }
     line += std::to_string(m_stats.cum_robots) + separator();
     if (m_stats.cum_robots > 0) {
-      line += std::to_string(m_stats.cum_robots_at_nest /
-                             static_cast<double>(m_stats.cum_robots)) +
-              separator();
       line += std::to_string(m_stats.cum_energy /
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
+      line += std::to_string(m_stats.cum_deltaE /
+                             static_cast<double>(m_stats.cum_robots)) +
+              separator();
+      line += std::to_string((m_stats.cum_energy + m_stats.cum_deltaE)/
+                             static_cast<double>(m_stats.cum_robots)) +
+              separator();
+      line += std::to_string((m_stats.cum_energy + m_stats.cum_deltaE)/
+                             static_cast<double>(m_stats.cum_resources))  +
+              separator();
     } else {
-      line += "0" + separator() + "0" + separator();
+      line += "0" + separator() + "0" + separator() + "0" + separator() +
+              "0" + separator();
     }
     return true;
   } /* csv_line_build() */
 
   void energy_metrics_collector::collect(
       const rcppsw::metrics::base_metrics& metrics) {
-    auto& m = dynamic_cast<const energy_metrics&>(metrics);
+    auto& m = dynamic_cast<const energy_opt_metrics&>(metrics);
     ++m_stats.cum_robots;
     m_stats.cum_energy += m.energy_level();
-    m_stats.cum_robots_at_nest += m.is_charging();
+    m_stats.cum_deltaE += m.E_consumed();
+    m_stats.cum_resources += m.resources();
+
   } /* collect() */
 
   void energy_metrics_collector::reset_after_interval(void) {
-    m_stats = {0, 0, 0};
+    m_stats = {0, 0, 0, 0};
   } /* reset_after_interval() */
 
   NS_END(energy, metrics, fordyca);

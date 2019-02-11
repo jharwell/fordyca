@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
- #ifndef INCLUDE_METRICS_energy_opt_metrics_HPP_
- #define INCLUDE_METRICS_energy_opt_metrics_HPP_
+ #ifndef INCLUDE_METRICS_ENERGY_OPT_METRICS_HPP_
+ #define INCLUDE_METRICS_ENERGY_OPT_METRICS_HPP_
 
  /*******************************************************************************
   * Includes
@@ -45,9 +45,9 @@
   *
   * Metrics are collected every timestep
   */
-  class energy_metrics : virtual public rcppsw::metrics::base_metrics {
+  class energy_opt_metrics : virtual public rcppsw::metrics::base_metrics {
    public:
-    energy_metrics(void) = default;
+    energy_opt_metrics(void) = default;
 
     /**
      * @brief Return the average energy level
@@ -57,11 +57,13 @@
      * @brief Return the average energy consumed
      */
     virtual double E_consumed(void) const = 0;
-
     /**
-     * @brief Return the number of robots in the nest
+     * @brief Return the average energy consumed
      */
-    virtual int is_charging(void) const = 0;
+    virtual int resources(void) const = 0;
+
+
+
 
   };
 
