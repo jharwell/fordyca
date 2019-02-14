@@ -18,6 +18,7 @@ To see what's new, take a look at the [release notes](docs/release-notes.md).
 
    - Qt5 (`qtbase5-dev` on ubuntu)
    - NLopt (`libnlopt-dev` on ubuntu)
+   - ccache (`ccache` on ubuntu)
 
 2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
    for the project.

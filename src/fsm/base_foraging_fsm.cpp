@@ -119,6 +119,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   }
 
   m_saa->steering_force().phototaxis();
+
   rmath::vector2d obs = m_saa->sensing()->find_closest_obstacle();
   if (m_saa->sensing()->threatening_obstacle_exists()) {
     collision_avoidance_tracking_begin();
