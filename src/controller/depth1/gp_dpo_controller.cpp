@@ -33,7 +33,7 @@
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/cache_sel_matrix_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"

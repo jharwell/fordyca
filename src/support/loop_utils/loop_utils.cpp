@@ -1,7 +1,7 @@
 /**
  * @file loop_utils.cpp
  *
- * @copyright 201c John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -68,8 +68,8 @@ __rcsw_pure int robot_on_cache(argos::CFootBotEntity& robot,
 }
 
 __rcsw_const bool block_drop_overlap_with_cache(
-    const std::shared_ptr<representation::base_block>& block,
-    const std::shared_ptr<representation::arena_cache>& cache,
+    const std::shared_ptr<repr::base_block>& block,
+    const std::shared_ptr<repr::arena_cache>& cache,
     const rmath::vector2d& drop_loc) {
   return cache->xspan(cache->real_loc()).overlaps_with(block->xspan(drop_loc)) &&
          cache->yspan(cache->real_loc()).overlaps_with(block->yspan(drop_loc));
@@ -77,7 +77,7 @@ __rcsw_const bool block_drop_overlap_with_cache(
 
 __rcsw_pure bool block_drop_near_arena_boundary(
     const ds::arena_map& map,
-    const std::shared_ptr<representation::base_block>& block,
+    const std::shared_ptr<repr::base_block>& block,
     const rmath::vector2d& drop_loc) {
   return (drop_loc.x() <= block->xsize() * 2 ||
           drop_loc.x() >= map.xrsize() - block->xsize() * 2 ||
@@ -86,8 +86,8 @@ __rcsw_pure bool block_drop_near_arena_boundary(
 } /* block_drop_overlap_with_nest() */
 
 __rcsw_pure bool block_drop_overlap_with_nest(
-    const std::shared_ptr<representation::base_block>& block,
-    const representation::nest& nest,
+    const std::shared_ptr<repr::base_block>& block,
+    const repr::nest& nest,
     const rmath::vector2d& drop_loc) {
   return nest.xspan(nest.real_loc()).overlaps_with(block->xspan(drop_loc)) &&
          nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
@@ -115,17 +115,14 @@ proximity_status_t new_cache_cache_proximity(const controller::base_controller& 
   return {-1, rmath::vector2d()};
 } /* new_cache_cache_proximity() */
 
-placement_status_t placement_conflict(
-    const rmath::vector2d& rloc,
-    const rmath::vector2d& dims,
-    const representation::multicell_entity* const entity) {
-  auto movable =
-      dynamic_cast<const representation::movable_cell_entity*>(entity);
-  auto immovable =
-      dynamic_cast<const representation::immovable_cell_entity*>(entity);
+placement_status_t placement_conflict(const rmath::vector2d& rloc,
+                                      const rmath::vector2d& dims,
+                                      const repr::multicell_entity* const entity) {
+  auto movable = dynamic_cast<const repr::movable_cell_entity*>(entity);
+  auto immovable = dynamic_cast<const repr::immovable_cell_entity*>(entity);
 
-  auto loc_xspan = representation::multicell_entity::xspan(rloc, dims.x());
-  auto loc_yspan = representation::multicell_entity::yspan(rloc, dims.y());
+  auto loc_xspan = repr::multicell_entity::xspan(rloc, dims.x());
+  auto loc_yspan = repr::multicell_entity::yspan(rloc, dims.y());
   placement_status_t status;
   if (nullptr != movable) {
     auto ent_xspan = entity->xspan(movable->real_loc());
@@ -140,5 +137,14 @@ placement_status_t placement_conflict(
   }
   return status;
 } /* placement_conflict() */
+
+std::unique_ptr<repr::line_of_sight> compute_robot_los(
+    ds::arena_map& map,
+    uint los_grid_size,
+    const rmath::vector2d& pos) {
+  rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution());
+  return rcppsw::make_unique<repr::line_of_sight>(
+      map.subgrid(position.x(), position.y(), los_grid_size), position);
+} /* compute_robot_los */
 
 NS_END(loop_utils, support, fordyca);

@@ -33,12 +33,12 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class arena_cache;
 }
 NS_START(ds);
 
-using cache_vector_type = std::shared_ptr<representation::arena_cache>;
+using cache_vector_type = std::shared_ptr<repr::arena_cache>;
 
 /*******************************************************************************
  * Type Definitions

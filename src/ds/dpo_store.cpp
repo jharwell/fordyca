@@ -25,8 +25,8 @@
 #include <boost/range/adaptor/map.hpp>
 
 #include "fordyca/params/perception/pheromone_params.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +46,7 @@ dpo_store::dpo_store(const params::perception::pheromone_params* const params)
  * Member Functions
  ******************************************************************************/
 dpo_store::update_res_t dpo_store::cache_update(
-    const dp_entity<representation::base_cache>& cache) {
+    const dp_entity<repr::base_cache>& cache) {
   update_res_t res = {.status = true,
                       .reason = kNoChange,
                       .old_loc = rmath::vector2u()};
@@ -65,8 +65,7 @@ dpo_store::update_res_t dpo_store::cache_update(
   return res;
 } /* cache_update() */
 
-bool dpo_store::cache_remove(
-    const std::shared_ptr<representation::base_cache>& victim) {
+bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
   auto range = m_caches.values_range();
 
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
@@ -84,22 +83,20 @@ bool dpo_store::cache_remove(
 } /* cache_remove() */
 
 dpo_store::update_res_t dpo_store::block_update(
-    const dp_entity<representation::base_block>& block_in) {
+    const dp_entity<repr::base_block>& block_in) {
   auto range = m_blocks.values_range();
 
-  auto it1 =
-      std::find_if(range.begin(),
-                   range.end(),
-                   [&block_in](const dp_entity<representation::base_block>& b) {
-                     return b.ent()->idcmp(*block_in.ent());
-                   });
-  auto it2 =
-      std::find_if(range.begin(),
-                   range.end(),
-                   [&block_in](const dp_entity<representation::base_block>& b) {
-                     return b.ent()->loccmp(*block_in.ent()) &&
-                            !b.ent()->idcmp(*block_in.ent());
-                   });
+  auto it1 = std::find_if(range.begin(),
+                          range.end(),
+                          [&block_in](const dp_entity<repr::base_block>& b) {
+                            return b.ent()->idcmp(*block_in.ent());
+                          });
+  auto it2 = std::find_if(range.begin(),
+                          range.end(),
+                          [&block_in](const dp_entity<repr::base_block>& b) {
+                            return b.ent()->loccmp(*block_in.ent()) &&
+                                   !b.ent()->idcmp(*block_in.ent());
+                          });
 
   /*
    * A different block is currently tracked where the new block was seen, and
@@ -170,8 +167,7 @@ dpo_store::update_res_t dpo_store::block_update(
   return {false, kNoChange, rmath::vector2u()};
 } /* block_update() */
 
-bool dpo_store::block_remove(
-    const std::shared_ptr<representation::base_block>& victim) {
+bool dpo_store::block_remove(const std::shared_ptr<repr::base_block>& victim) {
   auto range = m_blocks.values_range();
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
     return b.ent()->idcmp(*victim);
@@ -197,22 +193,21 @@ void dpo_store::clear_all(void) {
 } /* clear_all() */
 
 __rcsw_pure bool dpo_store::contains(
-    const std::shared_ptr<representation::base_block>& block) const {
+    const std::shared_ptr<repr::base_block>& block) const {
   return m_blocks.contains(block->id());
 } /* contains() */
 
-bool dpo_store::contains(
-    const std::shared_ptr<representation::base_cache>& cache) const {
+bool dpo_store::contains(const std::shared_ptr<repr::base_cache>& cache) const {
   return m_caches.contains(cache->discrete_loc());
 } /* contains() */
 
 __rcsw_pure const dp_block_map::value_type* dpo_store::find(
-    const std::shared_ptr<representation::base_block>& block) const {
+    const std::shared_ptr<repr::base_block>& block) const {
   return m_blocks.find(block->id());
 } /* find() */
 
 const dp_cache_map::value_type* dpo_store::find(
-    const std::shared_ptr<representation::base_cache>& cache) const {
+    const std::shared_ptr<repr::base_cache>& cache) const {
   return m_caches.find(cache->discrete_loc());
 } /* find() */
 

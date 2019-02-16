@@ -29,22 +29,22 @@
 
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/utilization_metrics.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class arena_cache
- * @ingroup representation
+ * @ingroup repr
  *
- * @brief A representation of an ACTUAL cache within the arena. This differs
+ * @brief A repr of an ACTUAL cache within the arena. This differs
  * from \ref perceived_cache objects because they handle cache penalties and can
  * collect metrics about their usage.
  */
@@ -81,6 +81,6 @@ class arena_cache
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRSENTATION_ARENA_CACHE_HPP_ */

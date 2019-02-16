@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/dp_cache_map.hpp"
 #include <numeric>
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

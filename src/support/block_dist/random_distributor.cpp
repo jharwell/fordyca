@@ -26,9 +26,9 @@
 
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/immovable_cell_entity.hpp"
-#include "fordyca/representation/multicell_entity.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/immovable_cell_entity.hpp"
+#include "fordyca/repr/multicell_entity.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
@@ -66,9 +66,8 @@ bool random_distributor::distribute_blocks(ds::block_vector& blocks,
   });
 } /* distribute_blocks() */
 
-bool random_distributor::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
-    ds::const_entity_list& entities) {
+bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& block,
+                                          ds::const_entity_list& entities) {
   ds::cell2D* cell = nullptr;
   coord_search_res_t res = avail_coord_search(entities, block->dims());
   if (!res.status) {
@@ -113,15 +112,15 @@ bool random_distributor::distribute_block(
 } /* distribute_block() */
 
 __rcsw_pure bool random_distributor::verify_block_dist(
-    const representation::base_block* const block,
+    const repr::base_block* const block,
     const ds::const_entity_list& entities,
     __rcsw_unused const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
-  ER_CHECK(representation::base_block::kOutOfSightDLoc != block->discrete_loc(),
+  ER_CHECK(repr::base_block::kOutOfSightDLoc != block->discrete_loc(),
            "Block%d discrete coordinates still out of sight after "
            "distribution",
            block->id());
-  ER_CHECK(representation::base_block::kOutOfSightRLoc != block->real_loc(),
+  ER_CHECK(repr::base_block::kOutOfSightRLoc != block->real_loc(),
            "Block%d real coordinates still out of sight after distribution",
            block->id());
 

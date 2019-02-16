@@ -30,7 +30,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 namespace rswarm = rcppsw::swarm;
 
@@ -39,9 +39,9 @@ namespace rswarm = rcppsw::swarm;
  ******************************************************************************/
 /**
  * @struct dp_entity
- * @ingroup representation
+ * @ingroup repr
  *
- * @brief A representation of a Decaying Pheromone (DP) entity in the arena,
+ * @brief A repr of a Decaying Pheromone (DP) entity in the arena,
  * which has a pheromone density/relevance associated with it.
  *
  * When performing equality tests between instances, only the underlying entity
@@ -83,6 +83,6 @@ class dp_entity {
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRSENTATION_DP_ENTITY_HPP_ */

@@ -27,8 +27,8 @@
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/random_explore_behavior.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

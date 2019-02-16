@@ -27,7 +27,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces

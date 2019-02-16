@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class base_block;
 }
 namespace controller { namespace depth2 {
@@ -62,8 +62,8 @@ class block_found : public rcppsw::er::client<block_found>,
                                        ds::dpo_store,
                                        ds::dpo_semantic_map> {
  public:
-  explicit block_found(std::unique_ptr<representation::base_block> block);
-  explicit block_found(const std::shared_ptr<representation::base_block>& block);
+  explicit block_found(std::unique_ptr<repr::base_block> block);
+  explicit block_found(const std::shared_ptr<repr::base_block>& block);
   ~block_found(void) override = default;
 
   block_found(const block_found& op) = delete;
@@ -82,7 +82,7 @@ class block_found : public rcppsw::er::client<block_found>,
 
  private:
   /* clang-format off */
-  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };
 

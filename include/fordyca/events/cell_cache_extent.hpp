@@ -32,10 +32,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace rmath = rcppsw::math;
-namespace representation {
+namespace repr {
 class arena_map;
 class base_cache;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class arena_map;
@@ -60,7 +60,7 @@ class cell_cache_extent : public cell_op,
                           public visitor::can_visit<ds::arena_map> {
  public:
   cell_cache_extent(const rmath::vector2u& coord,
-                    const std::shared_ptr<representation::base_cache> cache);
+                    const std::shared_ptr<repr::base_cache> cache);
 
   /* depth1 foraging */
   void visit(ds::cell2D& cell) override;
@@ -69,7 +69,7 @@ class cell_cache_extent : public cell_op,
 
  private:
   /* clang-format off */
-  std::shared_ptr<representation::base_cache> m_cache;
+  std::shared_ptr<repr::base_cache> m_cache;
   /* clang-format on */
 };
 

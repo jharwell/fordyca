@@ -98,8 +98,7 @@ class nest_block_drop
                                 tasks::depth0::generalist,
                                 tasks::depth1::collector> {
  public:
-  nest_block_drop(std::shared_ptr<representation::base_block> block,
-                  uint timestep);
+  nest_block_drop(std::shared_ptr<repr::base_block> block, uint timestep);
   ~nest_block_drop(void) override = default;
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -109,7 +108,7 @@ class nest_block_drop
   void visit(ds::arena_map& map) override;
 
   /* Depth0 DPO/MDPO foraging */
-  void visit(representation::base_block& block) override;
+  void visit(repr::base_block& block) override;
   void visit(fsm::depth0::crw_fsm& fsm) override;
   void visit(controller::depth0::crw_controller& controller) override;
   void visit(controller::depth0::dpo_controller& controller) override;
@@ -130,14 +129,12 @@ class nest_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  std::shared_ptr<representation::base_block> block(void) const {
-    return m_block;
-  }
+  std::shared_ptr<repr::base_block> block(void) const { return m_block; }
 
  private:
   /* clang-format off */
   uint                                        m_timestep;
-  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };
 

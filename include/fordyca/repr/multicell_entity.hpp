@@ -26,14 +26,14 @@
  ******************************************************************************/
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/representation/base_cell_entity.hpp"
+#include "fordyca/repr/base_cell_entity.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/math/range.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
@@ -41,7 +41,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class multicell_entity
- * @ingroup representation
+ * @ingroup repr
  *
  * @brief Representation of an entity in the arena that can span multiple cells.
  *
@@ -123,6 +123,6 @@ class multicell_entity : public base_cell_entity {
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_MULTICELL_ENTITY_HPP_ */

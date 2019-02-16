@@ -30,8 +30,8 @@
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,7 +63,7 @@ void mdpo_perception_subsystem::update() {
 void mdpo_perception_subsystem::reset(void) { m_map->reset(); }
 
 void mdpo_perception_subsystem::process_los(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
            c_los->abs_lr().to_str().c_str(),
@@ -75,7 +75,7 @@ void mdpo_perception_subsystem::process_los(
 } /* process_los() */
 
 void mdpo_perception_subsystem::process_los_blocks(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -90,7 +90,7 @@ void mdpo_perception_subsystem::process_los_blocks(
    * If the robot thinks that a cell contains a block, because the cell had one
    * the last time it passed nearby, but when coming near the cell a second time
    * the cell does not contain a block, then someone else picked up the block
-   * between then and now, and it needs to update its internal representation
+   * between then and now, and it needs to update its internal repr
    * accordingly.
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
@@ -140,7 +140,7 @@ void mdpo_perception_subsystem::process_los_blocks(
 } /* process_los_blocks() */
 
 void mdpo_perception_subsystem::process_los_caches(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -155,7 +155,7 @@ void mdpo_perception_subsystem::process_los_caches(
    * If the robot thinks that a cell contains a cache, because the cell had one
    * the last time it passed nearby, but when coming near the cell a second time
    * the cell does not contain a cache, then the cache was depleted between then
-   * and now, and it needs to update its internal representation accordingly.
+   * and now, and it needs to update its internal repr accordingly.
    */
   for (uint i = 0; i < c_los->xsize(); ++i) {
     for (uint j = 0; j < c_los->ysize(); ++j) {
@@ -218,7 +218,7 @@ void mdpo_perception_subsystem::process_los_caches(
 } /* process_los_caches() */
 
 void mdpo_perception_subsystem::processed_los_verify(
-    const representation::line_of_sight* const c_los) const {
+    const repr::line_of_sight* const c_los) const {
   /*
    * Verify that for each cell that contained a block in the LOS, the
    * corresponding cell in the map also contains the same block.
@@ -264,7 +264,7 @@ void mdpo_perception_subsystem::processed_los_verify(
 } /* processed_los_verify() */
 
 void mdpo_perception_subsystem::update_cell_stats(
-    const representation::line_of_sight* const los) {
+    const repr::line_of_sight* const los) {
   for (uint i = 0; i < los->xsize(); ++i) {
     for (uint j = 0; j < los->ysize(); ++j) {
       rmath::vector2u d = los->cell(i, j).loc();

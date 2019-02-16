@@ -40,11 +40,11 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class arena_cache;
 class base_block;
 class multicell_entity;
-} // namespace representation
+} // namespace repr
 NS_START(support);
 namespace er = rcppsw::er;
 namespace rmath = rcppsw::math;
@@ -113,7 +113,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * they are (possibly) modified by this function in a way that callers
    * probably do not want.
    */
-  std::unique_ptr<representation::arena_cache> create_single_cache(
+  std::unique_ptr<repr::arena_cache> create_single_cache(
       ds::block_list blocks,
       const rmath::vector2d& center);
 
@@ -144,10 +144,9 @@ class base_cache_creator : public er::client<base_cache_creator> {
   deconflict_res_t deconflict_loc_boundaries(double cache_dim,
                                              const rmath::vector2u& center) const;
 
-  deconflict_res_t deconflict_loc_entity(
-      const representation::multicell_entity* ent,
-      const rmath::vector2d& ent_loc,
-      const rmath::vector2u& center) const;
+  deconflict_res_t deconflict_loc_entity(const repr::multicell_entity* ent,
+                                         const rmath::vector2d& ent_loc,
+                                         const rmath::vector2u& center) const;
 
  private:
   /* clang-format off */

@@ -45,9 +45,9 @@ class grp_mdpo_controller;
 }
 } // namespace controller
 
-namespace representation {
+namespace repr {
 class arena_cache;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class dpo_semantic_map;
@@ -89,10 +89,10 @@ class cache_block_drop
                                 tasks::depth2::cache_transferer,
                                 fsm::block_to_goal_fsm,
                                 ds::dpo_semantic_map,
-                                representation::arena_cache> {
+                                repr::arena_cache> {
  public:
-  cache_block_drop(const std::shared_ptr<representation::base_block>& block,
-                   const std::shared_ptr<representation::arena_cache>& cache,
+  cache_block_drop(const std::shared_ptr<repr::base_block>& block,
+                   const std::shared_ptr<repr::arena_cache>& cache,
                    double resolution);
   ~cache_block_drop(void) override = default;
 
@@ -104,8 +104,8 @@ class cache_block_drop
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(ds::arena_map& map) override;
   void visit(ds::dpo_semantic_map& map) override;
-  void visit(representation::base_block& block) override;
-  void visit(representation::arena_cache& cache) override;
+  void visit(repr::base_block& block) override;
+  void visit(repr::arena_cache& cache) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(tasks::depth1::harvester& task) override;
   void visit(controller::depth1::gp_dpo_controller& controller) override;
@@ -118,8 +118,8 @@ class cache_block_drop
  private:
   /* clang-format off */
   double                                       m_resolution;
-  std::shared_ptr<representation::base_block>  m_block;
-  std::shared_ptr<representation::arena_cache> m_cache;
+  std::shared_ptr<repr::base_block>  m_block;
+  std::shared_ptr<repr::arena_cache> m_cache;
   /* clang-format on */
 };
 

@@ -25,7 +25,7 @@
 #include <algorithm>
 
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +48,7 @@ cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
  * Member Functions
  ******************************************************************************/
 bool cluster_distributor::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
+    std::shared_ptr<repr::base_block>& block,
     ds::const_entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
     ER_DEBUG("Could not distribute block%d: Cluster capacity (%u) reached",

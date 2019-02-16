@@ -24,8 +24,8 @@
 #include "fordyca/controller/block_selector.hpp"
 
 #include "fordyca/math/block_utility.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cube_block.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/cube_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,7 +60,7 @@ ds::dp_block_map::value_type block_selector::calc_best(
      * undoubtedly have to change in the future.
      */
     double priority =
-        (dynamic_cast<const representation::cube_block*>(b.ent()))
+        (dynamic_cast<const repr::cube_block*>(b.ent()))
             ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
             : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =
@@ -93,9 +93,8 @@ ds::dp_block_map::value_type block_selector::calc_best(
   return best;
 } /* calc_best() */
 
-bool block_selector::block_is_excluded(
-    const rmath::vector2d& position,
-    const representation::base_block* const block) const {
+bool block_selector::block_is_excluded(const rmath::vector2d& position,
+                                       const repr::base_block* const block) const {
   double block_dim = std::min(block->xspan(block->real_loc()).span(),
                               block->yspan(block->real_loc()).span());
   if ((position - block->real_loc()).length() <= block_dim) {

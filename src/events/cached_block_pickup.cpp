@@ -35,8 +35,8 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
@@ -48,14 +48,14 @@
 NS_START(fordyca, events);
 using ds::arena_grid;
 using ds::occupancy_grid;
-using representation::base_cache;
+using repr::base_cache;
 namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cached_block_pickup::cached_block_pickup(
-    const std::shared_ptr<representation::arena_cache>& cache,
+    const std::shared_ptr<repr::arena_cache>& cache,
     uint robot_index,
     uint timestep)
     : cell_op(cache->discrete_loc()),
@@ -91,7 +91,7 @@ void cached_block_pickup::visit(ds::cell2D& cell) {
   cell.fsm().accept(*this);
 } /* visit() */
 
-void cached_block_pickup::visit(representation::arena_cache& cache) {
+void cached_block_pickup::visit(repr::arena_cache& cache) {
   cache.block_remove(m_pickup_block);
   cache.has_block_pickup();
 } /* visit() */
@@ -244,7 +244,7 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
   }
 } /* visit() */
 
-void cached_block_pickup::visit(representation::base_block& block) {
+void cached_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
   block.add_transporter(m_robot_index);
   block.first_pickup_time(m_timestep);

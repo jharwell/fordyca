@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Static Members
@@ -66,4 +66,4 @@ std::unique_ptr<base_cache> base_cache::clone(void) const {
       xsize(), m_resolution, real_loc(), blocks(), id());
 } /* clone() */
 
-NS_END(fordyca, representation);
+NS_END(fordyca, repr);

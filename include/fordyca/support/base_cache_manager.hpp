@@ -34,10 +34,10 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_block;
 class arena_cache;
-} // namespace representation
+} // namespace repr
 namespace ds {
 class arena_grid;
 }

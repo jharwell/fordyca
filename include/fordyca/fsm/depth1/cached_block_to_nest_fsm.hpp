@@ -42,9 +42,9 @@ class sensing_subsystem;
 }
 class actuation_subsystem;
 } // namespace controller
-namespace representation {
+namespace repr {
 class block;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class dpo_store;

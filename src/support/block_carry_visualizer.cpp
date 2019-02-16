@@ -28,9 +28,9 @@
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
 
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cube_block.hpp"
-#include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/cube_block.hpp"
+#include "fordyca/repr/ramp_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,16 +40,16 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_carry_visualizer::draw(const representation::base_block* const block,
+void block_carry_visualizer::draw(const repr::base_block* const block,
                                   uint id_len) {
-  if (nullptr != dynamic_cast<const representation::cube_block*>(block)) {
+  if (nullptr != dynamic_cast<const repr::cube_block*>(block)) {
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
                   argos::CVector3(block->xsize(), block->xsize(), block->xsize()),
                   argos::CColor(block->color().red(),
                                 block->color().green(),
                                 block->color().blue()));
-  } else if (nullptr != dynamic_cast<const representation::ramp_block*>(block)) {
+  } else if (nullptr != dynamic_cast<const repr::ramp_block*>(block)) {
     /*
      * Ramp blocks are 2X as long in X as in Y. Z height is the same as X (not
      * currently used/handled in the simulation; only for visualization

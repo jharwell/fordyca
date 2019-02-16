@@ -49,7 +49,7 @@ namespace depth2 {
 class grp_mdpo_controller;
 }
 } // namespace controller
-namespace representation {
+namespace repr {
 class arena_cache;
 }
 namespace tasks {
@@ -88,9 +88,9 @@ class cached_block_pickup
                                 tasks::depth1::collector,
                                 tasks::depth2::cache_transferer,
                                 tasks::depth2::cache_collector,
-                                representation::arena_cache> {
+                                repr::arena_cache> {
  public:
-  cached_block_pickup(const std::shared_ptr<representation::arena_cache>& cache,
+  cached_block_pickup(const std::shared_ptr<repr::arena_cache>& cache,
                       uint robot_index,
                       uint timestep);
   ~cached_block_pickup(void) override = default;
@@ -104,8 +104,8 @@ class cached_block_pickup
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(ds::dpo_semantic_map& map) override;
   void visit(ds::dpo_store& store) override;
-  void visit(representation::base_block& block) override;
-  void visit(representation::arena_cache& cache) override;
+  void visit(repr::base_block& block) override;
+  void visit(repr::arena_cache& cache) override;
   void visit(tasks::depth1::collector& task) override;
   void visit(fsm::block_to_goal_fsm& fsm) override;
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
@@ -121,18 +121,18 @@ class cached_block_pickup
   /* clang-format off */
   uint                                         m_robot_index;
   uint                                         m_timestep;
-  std::shared_ptr<representation::arena_cache> m_real_cache;
+  std::shared_ptr<repr::arena_cache> m_real_cache;
 
   /**
    * @brief The block that will be picked up by the robot.
    */
-  std::shared_ptr<representation::base_block>  m_pickup_block{nullptr};
+  std::shared_ptr<repr::base_block>  m_pickup_block{nullptr};
 
   /**
    * @brief The block that is left over when a cache devolves into a single
    * block, that needs to be sent to the cell that the cache used to live on.
    */
-  std::shared_ptr<representation::base_block>  m_orphan_block{nullptr};
+  std::shared_ptr<repr::base_block>  m_orphan_block{nullptr};
   /* clang-format on */
 };
 

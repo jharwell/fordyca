@@ -24,9 +24,9 @@
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/block_cluster.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/block_cluster.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
 /*******************************************************************************

@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/nest.hpp"
+#include "fordyca/repr/nest.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -75,4 +75,4 @@ nest::light_list nest::init_rect(void) const {
       new argos::CLightEntity("nest_light2", loc3, argos::CColor::YELLOW, 100.0)};
 } /* init_rect() */
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);

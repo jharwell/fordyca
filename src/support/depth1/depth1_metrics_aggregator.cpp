@@ -43,7 +43,7 @@
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -116,7 +116,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void depth1_metrics_aggregator::collect_from_cache(
-    const representation::arena_cache* const cache) {
+    const repr::arena_cache* const cache) {
   auto util_m = dynamic_cast<const metrics::caches::utilization_metrics*>(cache);
   auto loc_m = dynamic_cast<const metrics::caches::location_metrics*>(cache);
   collect("caches::utilization", *util_m);

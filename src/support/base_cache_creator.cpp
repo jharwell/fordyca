@@ -27,7 +27,7 @@
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
@@ -48,7 +48,7 @@ base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_cache(
+std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
     ds::block_list blocks,
     const rmath::vector2d& center) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
@@ -100,16 +100,15 @@ std::unique_ptr<representation::arena_cache> base_cache_creator::create_single_c
     m_grid->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
   } /* for(block..) */
 
-  std::string s =
-      std::accumulate(blocks.begin(),
-                      blocks.end(),
-                      std::string(),
-                      [&](const std::string& a,
-                          const std::shared_ptr<representation::base_block>& b) {
-                        return a + "b" + std::to_string(b->id()) + ",";
-                      });
+  std::string s = std::accumulate(
+      blocks.begin(),
+      blocks.end(),
+      std::string(),
+      [&](const std::string& a, const std::shared_ptr<repr::base_block>& b) {
+        return a + "b" + std::to_string(b->id()) + ",";
+      });
   ds::block_vector block_vec(blocks.begin(), blocks.end());
-  auto ret = rcppsw::make_unique<representation::arena_cache>(
+  auto ret = rcppsw::make_unique<repr::arena_cache>(
       m_cache_dim, m_grid->resolution(), center, block_vec, -1);
   ER_INFO("Create cache%d@%s/%s, xspan=%s,yspan=%s with %zu blocks [%s]",
           ret->id(),
@@ -157,7 +156,7 @@ base_cache_creator::deconflict_res_t base_cache_creator::deconflict_loc_boundari
 } /* deconflict_loc_boundaries() */
 
 base_cache_creator::deconflict_res_t base_cache_creator::deconflict_loc_entity(
-    const representation::multicell_entity* ent,
+    const repr::multicell_entity* ent,
     const rmath::vector2d& ent_loc,
     const rmath::vector2u& center) const {
   std::uniform_real_distribution<double> xrnd(-1.0, 1.0);

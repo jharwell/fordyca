@@ -26,8 +26,8 @@
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,7 @@ void dpo_perception_subsystem::update(void) {
 void dpo_perception_subsystem::reset(void) { m_store->clear_all(); }
 
 void dpo_perception_subsystem::process_los(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
            c_los->abs_lr().to_str().c_str(),
@@ -68,7 +68,7 @@ void dpo_perception_subsystem::process_los(
 } /* process_los() */
 
 void dpo_perception_subsystem::process_los_caches(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   ds::cache_list los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
@@ -102,7 +102,7 @@ void dpo_perception_subsystem::process_los_caches(
 } /* process_los_caches() */
 
 void dpo_perception_subsystem::process_los_blocks(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -141,7 +141,7 @@ void dpo_perception_subsystem::process_los_blocks(
 } /* process_los() */
 
 void dpo_perception_subsystem::los_tracking_sync(
-    const representation::line_of_sight* const c_los,
+    const repr::line_of_sight* const c_los,
     const ds::cache_list& los_caches) {
   /*
    * If the location of one of the caches we are tracking is in our LOS, then
@@ -150,11 +150,10 @@ void dpo_perception_subsystem::los_tracking_sync(
    */
   for (auto& cache : m_store->caches().values_range()) {
     if (c_los->contains_loc(cache.ent()->discrete_loc())) {
-      auto it = std::find_if(los_caches.begin(),
-                             los_caches.end(),
-                             [&](const auto& c) {
-        return c->loccmp(*cache.ent_obj());
-      });
+      auto it =
+          std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
+            return c->loccmp(*cache.ent_obj());
+          });
 
       if (los_caches.end() == it) {
         m_store->cache_remove(cache.ent_obj());
@@ -167,7 +166,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 } /* los_tracking_sync() */
 
 void dpo_perception_subsystem::los_tracking_sync(
-    const representation::line_of_sight* const c_los,
+    const repr::line_of_sight* const c_los,
     const ds::block_list& blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
@@ -199,7 +198,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 } /* los_tracking_sync() */
 
 void dpo_perception_subsystem::processed_los_verify(
-    const representation::line_of_sight* const c_los) const {
+    const repr::line_of_sight* const c_los) const {
   /*
    * Verify that for each cell that contained a block in the LOS, that the block
    * is also contained in the store after processing.

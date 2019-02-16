@@ -84,13 +84,13 @@ class dpo_controller : public crw_controller,
   /**
    * @brief Set the robot's current line of sight (LOS).
    */
-  void los(std::unique_ptr<representation::line_of_sight> new_los);
+  void los(std::unique_ptr<repr::line_of_sight> new_los);
   double los_dim(void) const;
 
   /**
    * @brief Get the current LOS for the robot.
    */
-  const representation::line_of_sight* los(void) const;
+  const repr::line_of_sight* los(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a

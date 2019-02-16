@@ -31,7 +31,7 @@
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 
 /*******************************************************************************
@@ -42,7 +42,7 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_proximity::cache_proximity(std::shared_ptr<representation::base_cache> cache)
+cache_proximity::cache_proximity(std::shared_ptr<repr::base_cache> cache)
     : ER_CLIENT_INIT("fordyca.events.cache_proximity"), m_cache(cache) {}
 
 /*******************************************************************************

@@ -30,7 +30,7 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 
 /*******************************************************************************
@@ -41,8 +41,7 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_proximity::block_proximity(
-    const std::shared_ptr<representation::base_block>& block)
+block_proximity::block_proximity(const std::shared_ptr<repr::base_block>& block)
     : ER_CLIENT_INIT("fordyca.events.block_proximity"), m_block(block) {}
 
 /*******************************************************************************

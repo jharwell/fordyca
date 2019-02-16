@@ -35,11 +35,11 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_cache;
 class base_block;
 class base_cell_entity;
-} // namespace representation
+} // namespace repr
 
 NS_START(ds);
 
@@ -54,7 +54,7 @@ namespace rmath = rcppsw::math;
  * @class cell2D
  * @ingroup ds
  *
- * @brief Base representation of a cell on a 2D grid. A combination of FSM +
+ * @brief Base repr of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref cell_entity the cell contains, if any.
  */
 class cell2D : public visitor::visitable_any<cell2D>,
@@ -92,10 +92,10 @@ class cell2D : public visitor::visitable_any<cell2D>,
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<representation::base_cell_entity>& entity) {
+  void entity(const std::shared_ptr<repr::base_cell_entity>& entity) {
     m_entity = entity;
   }
-  const std::shared_ptr<representation::base_cell_entity>& entity(void) const {
+  const std::shared_ptr<repr::base_cell_entity>& entity(void) const {
     return m_entity;
   }
 
@@ -108,8 +108,8 @@ class cell2D : public visitor::visitable_any<cell2D>,
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<representation::base_block> block(void) const;
-  std::shared_ptr<representation::base_block> block(void);
+  std::shared_ptr<repr::base_block> block(void) const;
+  std::shared_ptr<repr::base_block> block(void);
 
   /**
    * @brief Get the cache entity associated with this cell.
@@ -117,13 +117,13 @@ class cell2D : public visitor::visitable_any<cell2D>,
    * Will be NULL unless it contains a cache, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<representation::base_cache> cache(void) const;
-  std::shared_ptr<representation::base_cache> cache(void);
+  std::shared_ptr<repr::base_cache> cache(void) const;
+  std::shared_ptr<repr::base_cache> cache(void);
 
  private:
   /* clang-format off */
   std::string                                       m_robot_id{""};
-  std::shared_ptr<representation::base_cell_entity> m_entity{nullptr};
+  std::shared_ptr<repr::base_cell_entity> m_entity{nullptr};
   rmath::vector2u                             m_loc;
   /* clang-format on */
 };

@@ -28,7 +28,7 @@
 #include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces

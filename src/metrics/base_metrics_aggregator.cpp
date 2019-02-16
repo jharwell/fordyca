@@ -121,7 +121,7 @@ void base_metrics_aggregator::collect_from_loop(
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(
-    const representation::base_block* const block) {
+    const repr::base_block* const block) {
   collect("blocks::transport", *block);
 } /* collect_from_block() */
 

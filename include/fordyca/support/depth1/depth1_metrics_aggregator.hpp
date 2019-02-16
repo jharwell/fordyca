@@ -45,7 +45,7 @@ namespace ta = rcppsw::task_allocation;
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class gp_mdpo_controller; }}
-namespace representation { class arena_cache; }
+namespace repr { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);
 namespace er = rcppsw::er;
@@ -163,7 +163,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    * @brief Collect utilization metrics from a cache in the arena.
    */
   void collect_from_cache(
-      const representation::arena_cache* cache);
+      const repr::arena_cache* cache);
 
   /**
    * @brief Collect lifecycle metrics across all caches in the arena.

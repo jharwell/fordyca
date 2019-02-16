@@ -35,7 +35,7 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -52,10 +52,9 @@ namespace rfsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(
-    std::shared_ptr<representation::base_block> block,
-    uint robot_index,
-    uint timestep)
+free_block_pickup::free_block_pickup(std::shared_ptr<repr::base_block> block,
+                                     uint robot_index,
+                                     uint timestep)
     : cell_op(block->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
       m_timestep(timestep),
@@ -96,7 +95,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
 /*******************************************************************************
  * CRW Foraging
  ******************************************************************************/
-void free_block_pickup::visit(representation::base_block& block) {
+void free_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
   block.add_transporter(m_robot_index);
   block.first_pickup_time(m_timestep);

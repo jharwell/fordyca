@@ -94,8 +94,8 @@ class free_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                     tv::block_op_src::kSrcFreePickup,
-                                     timestep);
+                                      tv::block_op_src::kSrcFreePickup,
+                                      timestep);
     }
   }
 
@@ -163,7 +163,7 @@ class free_block_pickup_interactor
     ER_ASSERT(it != m_map->blocks().end(),
               "Block%d from penalty does not exist",
               penalty.id());
-    ER_ASSERT((*it)->real_loc() != representation::base_block::kOutOfSightRLoc,
+    ER_ASSERT((*it)->real_loc() != repr::base_block::kOutOfSightRLoc,
               "Attempt to pick up out of sight block%d",
               (*it)->id());
     /*

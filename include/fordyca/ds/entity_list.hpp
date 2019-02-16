@@ -31,13 +31,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class multicell_entity;
-} // namespace representation
+} // namespace repr
 NS_START(ds);
 
-using entity_list_type = representation::multicell_entity*;
-using const_entity_list_type = const representation::multicell_entity*;
+using entity_list_type = repr::multicell_entity*;
+using const_entity_list_type = const repr::multicell_entity*;
 
 /*******************************************************************************
  * Type Definitions

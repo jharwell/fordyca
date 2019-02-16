@@ -26,7 +26,7 @@
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

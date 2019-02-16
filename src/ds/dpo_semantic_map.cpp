@@ -24,7 +24,7 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,7 +47,7 @@ dpo_semantic_map::dpo_semantic_map(
  * Member Functions
  ******************************************************************************/
 bool dpo_semantic_map::cache_remove(
-    const std::shared_ptr<representation::base_cache>& victim) {
+    const std::shared_ptr<repr::base_cache>& victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
              victim->discrete_loc().to_str().c_str());
@@ -59,7 +59,7 @@ bool dpo_semantic_map::cache_remove(
 } /* cache_remove() */
 
 bool dpo_semantic_map::block_remove(
-    const std::shared_ptr<representation::base_block>& victim) {
+    const std::shared_ptr<repr::base_block>& victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->discrete_loc().to_str().c_str());

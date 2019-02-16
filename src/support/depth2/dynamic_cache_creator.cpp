@@ -25,8 +25,8 @@
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
@@ -92,7 +92,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
        * creation, which can happen otherwise.
        */
       if (kInvalidCacheCenter != center) {
-        auto cache_p = std::shared_ptr<representation::arena_cache>(
+        auto cache_p = std::shared_ptr<repr::arena_cache>(
             create_single_cache(cache_i_blocks, rmath::ivec2dvec(center)));
         created_caches.push_back(cache_p);
       }

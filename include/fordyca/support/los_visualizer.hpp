@@ -36,7 +36,7 @@ class CQTOpenGLUserFunctions;
 
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class line_of_sight;
 }
 
@@ -66,8 +66,7 @@ class los_visualizer : public rcppsw::er::client<los_visualizer> {
    * @param block The LOS to visualize.
    * @param grid_resolution The grid resolution for the arena.
    */
-  void draw(const representation::line_of_sight* const los,
-            double grid_resolution);
+  void draw(const repr::line_of_sight* const los, double grid_resolution);
 
   /* clang-format off */
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};

@@ -28,7 +28,7 @@
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
 
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void los_visualizer::draw(const representation::line_of_sight* const los,
+void los_visualizer::draw(const repr::line_of_sight* const los,
                           double grid_resolution) {
   /* has not been populated yet on first timestep */
   if (nullptr == los) {

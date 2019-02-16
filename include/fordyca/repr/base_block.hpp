@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
-#include "fordyca/representation/movable_cell_entity.hpp"
-#include "fordyca/representation/multicell_entity.hpp"
+#include "fordyca/repr/movable_cell_entity.hpp"
+#include "fordyca/repr/multicell_entity.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/patterns/visitor/visitable.hpp"
@@ -34,7 +34,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 namespace prototype = rcppsw::patterns::prototype;
 namespace ut = rcppsw::utils;
 
@@ -44,7 +44,7 @@ namespace ut = rcppsw::utils;
 
 /**
  * @class base_block
- * @ingroup representation
+ * @ingroup repr
  *
  * @brief Base class for representing blocks (i.e. things that robots carry
  * within the arena). Blocks have both real (where they actually live in the
@@ -198,6 +198,6 @@ class base_block : public multicell_entity,
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRSENTATION_BASE_BLOCK_HPP_ */

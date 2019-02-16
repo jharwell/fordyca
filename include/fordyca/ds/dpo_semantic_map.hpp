@@ -130,8 +130,8 @@ class dpo_semantic_map : public er::client<dpo_semantic_map>,
 
   double grid_resolution(void) const { return decoratee().resolution(); }
 
-  bool cache_remove(const std::shared_ptr<representation::base_cache>& victim);
-  bool block_remove(const std::shared_ptr<representation::base_block>& victim);
+  bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
+  bool block_remove(const std::shared_ptr<repr::base_block>& victim);
 
   const dpo_store* store(void) const { return &m_store; }
   dpo_store* store(void) { return &m_store; }

@@ -30,14 +30,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class base_cell_entity
- * @ingroup representation
+ * @ingroup repr
  *
  * @brief A base class from which objects that are able to occupy a cell (or
  * cells) within a 2D grid derive.
@@ -96,6 +96,6 @@ class base_cell_entity {
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_BASE_CELL_ENTITY_HPP_ */

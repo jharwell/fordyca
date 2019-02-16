@@ -31,14 +31,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class block_cluster
- * @ingroup representation
+ * @ingroup repr
  *
  * @brief Represents a cluster of blocks in the arena as an entity for use
  * during block distribution and dynamic cache creation. A cluster is defined
@@ -51,7 +51,7 @@ NS_START(fordyca, representation);
 class block_cluster : public rcppsw::er::client<block_cluster> {
  public:
   block_cluster(const ds::arena_grid::const_view& view, uint capacity)
-      : ER_CLIENT_INIT("fordyca.representation.block_cluster"),
+      : ER_CLIENT_INIT("fordyca.repr.block_cluster"),
         m_view(view),
         m_capacity(capacity) {}
 
@@ -67,6 +67,6 @@ class block_cluster : public rcppsw::er::client<block_cluster> {
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_BLOCK_CLUSTER_HPP_ */

@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
@@ -67,4 +67,4 @@ __rcsw_pure double base_block::initial_wait_time(void) const {
   return m_first_pickup_time - m_dist_time;
 } /* initial_wait_time() */
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);

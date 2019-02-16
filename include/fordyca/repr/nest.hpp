@@ -27,20 +27,20 @@
 #include <argos3/plugins/simulator/entities/light_entity.h>
 #include <list>
 
-#include "fordyca/representation/immovable_cell_entity.hpp"
-#include "fordyca/representation/multicell_entity.hpp"
+#include "fordyca/repr/immovable_cell_entity.hpp"
+#include "fordyca/repr/multicell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class nest
- * @ingroup representation
+ * @ingroup repr
  *
  * @brief Class representing the nest in the arena, which is move multi-cellular
  * and immobile.
@@ -85,6 +85,6 @@ class nest : public multicell_entity, public immovable_cell_entity {
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_NEST_HPP_ */

@@ -33,7 +33,7 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces

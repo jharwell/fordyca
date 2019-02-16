@@ -70,7 +70,7 @@ class base_distributor {
    * @return \c TRUE if the block distribution was successful, \c FALSE
    * otherwise.
    */
-  virtual bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  virtual bool distribute_block(std::shared_ptr<repr::base_block>& block,
                                 ds::const_entity_list& entities) = 0;
 
   virtual ds::const_block_cluster_list block_clusters(void) const = 0;
@@ -85,7 +85,7 @@ class base_distributor {
                                  ds::const_entity_list& entities) {
     return std::all_of(blocks.begin(),
                        blocks.end(),
-                       [&](std::shared_ptr<representation::base_block>& b) {
+                       [&](std::shared_ptr<repr::base_block>& b) {
                          return distribute_block(b, entities);
                        });
   }

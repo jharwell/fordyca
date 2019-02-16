@@ -33,9 +33,9 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace representation {
+namespace repr {
 class base_block;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class arena_map;
@@ -55,11 +55,10 @@ NS_START(events);
  * @brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).
  */
-class block_pickup_event
-    : public visitor::visit_set<ds::arena_map,
-                                ds::dpo_semantic_map,
-                                ds::dpo_store,
-                                representation::base_block> {};
+class block_pickup_event : public visitor::visit_set<ds::arena_map,
+                                                     ds::dpo_semantic_map,
+                                                     ds::dpo_store,
+                                                     repr::base_block> {};
 
 NS_END(events, fordyca);
 

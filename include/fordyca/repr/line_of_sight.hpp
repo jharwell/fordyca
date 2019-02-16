@@ -43,7 +43,7 @@ class cell2D;
 }
 namespace rmath = rcppsw::math;
 
-NS_START(representation);
+NS_START(repr);
 class base_block;
 class base_cache;
 
@@ -52,9 +52,9 @@ class base_cache;
  ******************************************************************************/
 /**
  * @class line_of_sight
- * @ingroup representation
+ * @ingroup repr
  *
- * @brief A representation of the robot's current line-of-sight. The robot is
+ * @brief A repr of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in
  * the per-timestep updates to this object.
  *
@@ -70,7 +70,7 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
   using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
 
   line_of_sight(const grid_view& c_view, rmath::vector2u center)
-      : ER_CLIENT_INIT("fordyca.representation.line_of_sight"),
+      : ER_CLIENT_INIT("fordyca.repr.line_of_sight"),
         m_center(std::move(center)),
         m_view(c_view),
         m_caches() {}
@@ -137,6 +137,6 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRESENTATION_LINE_OF_SIGHT_HPP_ */

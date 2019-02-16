@@ -26,25 +26,25 @@
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
 using ds::occupancy_grid;
-using representation::base_cache;
+using repr::base_cache;
 namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
+cache_found::cache_found(std::unique_ptr<repr::base_cache> cache)
     : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
 
-cache_found::cache_found(const std::shared_ptr<representation::base_cache>& cache)
+cache_found::cache_found(const std::shared_ptr<repr::base_cache>& cache)
     : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
@@ -156,7 +156,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<const std::shared_ptr<representation::base_block>*> rms;
+  std::list<const std::shared_ptr<repr::base_block>*> rms;
   for (auto&& b : map.blocks().values_range()) {
     if (m_cache->contains_point(b.ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",

@@ -102,7 +102,7 @@ class free_block_pickup
                                 tasks::depth2::cache_starter,
                                 tasks::depth2::cache_finisher> {
  public:
-  free_block_pickup(std::shared_ptr<representation::base_block> block,
+  free_block_pickup(std::shared_ptr<repr::base_block> block,
                     uint robot_index,
                     uint timestep);
   ~free_block_pickup(void) override = default;
@@ -114,7 +114,7 @@ class free_block_pickup
   void visit(ds::arena_map& map) override;
   void visit(ds::cell2D& cell) override;
   void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(representation::base_block& block) override;
+  void visit(repr::base_block& block) override;
   void visit(controller::depth0::crw_controller& controller) override;
   void visit(fsm::depth0::crw_fsm& fsm) override;
 
@@ -142,7 +142,7 @@ class free_block_pickup
   /* clang-format off */
   uint                                        m_timestep;
   uint                                        m_robot_index;
-  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };
 

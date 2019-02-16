@@ -33,7 +33,7 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
@@ -50,10 +50,9 @@ namespace rfsm = rcppsw::patterns::state_machine;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_drop::free_block_drop(
-    const std::shared_ptr<representation::base_block>& block,
-    const rmath::vector2u& coord,
-    double resolution)
+free_block_drop::free_block_drop(const std::shared_ptr<repr::base_block>& block,
+                                 const rmath::vector2u& coord,
+                                 double resolution)
     : cell_op(coord),
       ER_CLIENT_INIT("fordyca.events.free_block_drop"),
       m_resolution(resolution),
@@ -72,7 +71,7 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void free_block_drop::visit(representation::base_block& block) {
+void free_block_drop::visit(repr::base_block& block) {
   block.reset_robot_id();
 
   block.real_loc(rmath::uvec2dvec(cell_op::coord(), m_resolution));
@@ -98,8 +97,7 @@ void free_block_drop::visit(ds::arena_map& map) {
    */
   if (cell.state_has_cache()) {
     cache_block_drop op(m_block,
-                        std::static_pointer_cast<representation::arena_cache>(
-                            cell.cache()),
+                        std::static_pointer_cast<repr::arena_cache>(cell.cache()),
                         m_resolution);
     map.accept(op);
   } else if (cell.state_has_block()) {

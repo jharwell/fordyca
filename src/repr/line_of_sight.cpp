@@ -21,14 +21,14 @@
 /*******************************************************************************
  * Includes
  *****************************************************************************/
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Member Functions
@@ -58,9 +58,10 @@ ds::cache_list line_of_sight::caches(void) const {
       const ds::cell2D& cell = m_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = cell.cache();
-        ER_ASSERT(nullptr != cache,
-                  "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
-                  cell.loc().to_str().c_str());
+        ER_ASSERT(
+            nullptr != cache,
+            "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
+            cell.loc().to_str().c_str());
         ER_ASSERT(cache->n_blocks() >= base_cache::kMinBlocks,
                   "Cache%d@%s has too few blocks (%zu < %zu)",
                   cache->id(),
@@ -126,4 +127,4 @@ rmath::vector2u line_of_sight::abs_ur(void) const {
   return cell(xsize() - 1, ysize() - 1).loc();
 } /* abs_ur() */
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);

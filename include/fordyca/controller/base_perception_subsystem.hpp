@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -56,7 +56,7 @@ class base_perception_subsystem {
   virtual void reset(void) {}
 
   /**
-   * @brief Update the internal data structure/representation of the
+   * @brief Update the internal data structure/repr of the
    * environment/arena, after the LOS has been updated.
    */
   virtual void update(void) = 0;
@@ -74,18 +74,16 @@ class base_perception_subsystem {
    *
    * @param los The new los
    */
-  void los(std::unique_ptr<representation::line_of_sight> los) {
-    m_los = std::move(los);
-  }
+  void los(std::unique_ptr<repr::line_of_sight> los) { m_los = std::move(los); }
 
   /**
    * @brief Get the robot's current line-of-sight (LOS)
    */
-  const representation::line_of_sight* los(void) const { return m_los.get(); }
+  const repr::line_of_sight* los(void) const { return m_los.get(); }
 
  private:
   /* clang-format off */
-  std::unique_ptr<representation::line_of_sight> m_los{nullptr};
+  std::unique_ptr<repr::line_of_sight> m_los{nullptr};
   /* clang-format on */
 };
 

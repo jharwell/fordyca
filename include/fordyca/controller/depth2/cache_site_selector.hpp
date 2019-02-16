@@ -57,12 +57,12 @@ NS_START(depth2);
 class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
  public:
   struct cache_constraint_data {
-    const representation::base_cache* mc_cache{nullptr};
+    const repr::base_cache* mc_cache{nullptr};
     cache_site_selector*        selector{nullptr};
     double                      cache_prox_dist{0.0};
   };
   struct block_constraint_data {
-    const representation::base_block* mc_block{nullptr};
+    const repr::base_block* mc_block{nullptr};
     cache_site_selector*        selector{nullptr};
     double                      block_prox_dist{0.0};
   };

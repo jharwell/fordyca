@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -47,4 +47,4 @@ void arena_cache::reset_metrics(void) {
   m_penalty_count = 0;
 } /* reset_metrics() */
 
-NS_END(fordyca, representation);
+NS_END(fordyca, repr);

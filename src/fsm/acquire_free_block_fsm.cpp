@@ -28,7 +28,7 @@
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces

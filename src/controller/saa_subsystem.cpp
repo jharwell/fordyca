@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces

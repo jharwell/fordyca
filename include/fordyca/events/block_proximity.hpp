@@ -35,7 +35,7 @@ namespace controller { namespace depth2 {
 class grp_dpo_controller;
 class grp_mdpo_controller;
 }} // namespace controller::depth2
-namespace representation {
+namespace repr {
 class base_block;
 }
 namespace fsm {
@@ -65,8 +65,7 @@ class block_proximity
                                 tasks::depth2::cache_starter>,
       public rcppsw::er::client<block_proximity> {
  public:
-  explicit block_proximity(
-      const std::shared_ptr<representation::base_block>& block);
+  explicit block_proximity(const std::shared_ptr<repr::base_block>& block);
   ~block_proximity(void) override = default;
 
   block_proximity(const block_proximity& op) = delete;
@@ -80,7 +79,7 @@ class block_proximity
 
  private:
   /* clang-format off */
-  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };
 

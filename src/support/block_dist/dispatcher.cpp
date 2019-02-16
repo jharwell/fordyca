@@ -135,9 +135,8 @@ bool dispatcher::initialize(void) {
   return true;
 } /* initialize() */
 
-bool dispatcher::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
-    ds::const_entity_list& entities) {
+bool dispatcher::distribute_block(std::shared_ptr<repr::base_block>& block,
+                                  ds::const_entity_list& entities) {
   return m_dist->distribute_block(block, entities);
 } /* distribute_block() */
 

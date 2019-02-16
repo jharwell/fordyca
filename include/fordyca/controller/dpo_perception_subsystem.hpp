@@ -52,7 +52,7 @@ NS_START(controller);
  * @ingroup controller
  *
  * @brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
- * into a useful internal representation: a \ref dpo_store.
+ * into a useful internal repr: a \ref dpo_store.
  */
 class dpo_perception_subsystem
     : public rcppsw::er::client<dpo_perception_subsystem>,
@@ -86,14 +86,14 @@ class dpo_perception_subsystem
    *
    * @param c_los The LOS to process.
    */
-  void process_los(const representation::line_of_sight* const c_los);
+  void process_los(const repr::line_of_sight* const c_los);
 
-  void process_los_blocks(const representation::line_of_sight* const c_los);
-  void process_los_caches(const representation::line_of_sight* const c_los);
+  void process_los_blocks(const repr::line_of_sight* const c_los);
+  void process_los_caches(const repr::line_of_sight* const c_los);
 
-  void los_tracking_sync(const representation::line_of_sight* const c_los,
+  void los_tracking_sync(const repr::line_of_sight* const c_los,
                          const ds::cache_list& los_caches);
-  void los_tracking_sync(const representation::line_of_sight* const c_los,
+  void los_tracking_sync(const repr::line_of_sight* const c_los,
                          const ds::block_list& los_blocks);
 
   /**
@@ -102,8 +102,7 @@ class dpo_perception_subsystem
    *
    * @param c_los Current LOS.
    */
-  void processed_los_verify(
-      const representation::line_of_sight* const c_los) const;
+  void processed_los_verify(const repr::line_of_sight* const c_los) const;
 
  private:
   /* clang-format off */

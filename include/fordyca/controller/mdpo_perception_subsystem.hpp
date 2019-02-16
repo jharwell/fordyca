@@ -30,7 +30,7 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
@@ -55,7 +55,7 @@ NS_START(controller);
  * @ingroup controller
  *
  * @brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
- * into a useful internal representation: a \ref dpo_semantic_map.
+ * into a useful internal repr: a \ref dpo_semantic_map.
  */
 class mdpo_perception_subsystem
     : public rcppsw::er::client<mdpo_perception_subsystem>,
@@ -100,9 +100,9 @@ class mdpo_perception_subsystem
    *
    * @param c_los The LOS to process.
    */
-  void process_los(const representation::line_of_sight* const c_los);
-  void process_los_blocks(const representation::line_of_sight* const c_los);
-  void process_los_caches(const representation::line_of_sight* const c_los);
+  void process_los(const repr::line_of_sight* const c_los);
+  void process_los_blocks(const repr::line_of_sight* const c_los);
+  void process_los_caches(const repr::line_of_sight* const c_los);
 
   /**
    * @brief The processing of the current LOS after processing (i.e. does the
@@ -110,8 +110,7 @@ class mdpo_perception_subsystem
    *
    * @param c_los Current LOS.
    */
-  void processed_los_verify(
-      const representation::line_of_sight* const c_los) const;
+  void processed_los_verify(const repr::line_of_sight* const c_los) const;
 
  private:
   /**
@@ -120,11 +119,11 @@ class mdpo_perception_subsystem
    *
    * @param los The current LOS
    */
-  void update_cell_stats(const representation::line_of_sight* const los);
+  void update_cell_stats(const repr::line_of_sight* const los);
 
   /* clang-format off */
   std::vector<uint>                              m_cell_stats;
-  std::unique_ptr<representation::line_of_sight> m_los;
+  std::unique_ptr<repr::line_of_sight> m_los;
   std::unique_ptr<ds::dpo_semantic_map>          m_map;
   /* clang-format on */
 };

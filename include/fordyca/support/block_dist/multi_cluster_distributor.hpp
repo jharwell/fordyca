@@ -28,7 +28,7 @@
 
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
-#include "fordyca/representation/block_cluster.hpp"
+#include "fordyca/repr/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +55,7 @@ class multi_cluster_distributor : public base_distributor,
 
   multi_cluster_distributor& operator=(const multi_cluster_distributor& s) = delete;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
   ds::const_block_cluster_list block_clusters(void) const override;
 

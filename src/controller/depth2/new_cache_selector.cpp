@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -90,7 +90,7 @@ ds::dp_block_map::value_type new_cache_selector::operator()(
 bool new_cache_selector::new_cache_is_excluded(
     const ds::dp_cache_map& existing_caches,
     const ds::dp_block_map& blocks,
-    const representation::base_block* const new_cache) const {
+    const repr::base_block* const new_cache) const {
   double cache_prox =
       boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second);
   double cluster_prox =

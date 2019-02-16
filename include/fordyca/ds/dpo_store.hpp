@@ -61,7 +61,7 @@ class dpo_store : public er::client<dpo_store>,
                   public visitor::visitable_any<dpo_store> {
  public:
   template <typename T>
-  using dp_entity = representation::dp_entity<T>;
+  using dp_entity = repr::dp_entity<T>;
 
   enum update_status {
     kNoChange,
@@ -120,14 +120,14 @@ class dpo_store : public er::client<dpo_store>,
 
   void clear_all(void);
 
-  bool contains(const std::shared_ptr<representation::base_block>& block) const;
-  bool contains(const std::shared_ptr<representation::base_cache>& cache) const;
+  bool contains(const std::shared_ptr<repr::base_block>& block) const;
+  bool contains(const std::shared_ptr<repr::base_cache>& cache) const;
 
   const dp_block_map::value_type* find(
-      const std::shared_ptr<representation::base_block>& block) const;
+      const std::shared_ptr<repr::base_block>& block) const;
 
   const dp_cache_map::value_type* find(
-      const std::shared_ptr<representation::base_cache>& cache) const;
+      const std::shared_ptr<repr::base_cache>& cache) const;
 
   /**
    * @brief Update the known caches set with the new cache.
@@ -137,7 +137,7 @@ class dpo_store : public er::client<dpo_store>,
    *
    * @param cache Cache to add.
    */
-  update_res_t cache_update(const dp_entity<representation::base_cache>& cache);
+  update_res_t cache_update(const dp_entity<repr::base_cache>& cache);
 
   /*
    * @brief Update the known blocks set with the new block.
@@ -149,12 +149,12 @@ class dpo_store : public er::client<dpo_store>,
    *
    * @return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(const dp_entity<representation::base_block>& block);
+  update_res_t block_update(const dp_entity<repr::base_block>& block);
 
   /**
    * @brief Remove a cache from the set of of known caches.
    */
-  bool cache_remove(const std::shared_ptr<representation::base_cache>& victim);
+  bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
 
   /*
    * @brief Remove a block from the set of known blocks. If the victim is not
@@ -162,7 +162,7 @@ class dpo_store : public er::client<dpo_store>,
    *
    * @return \c TRUE if a block was removed, \c FALSE otherwise.
    */
-  bool block_remove(const std::shared_ptr<representation::base_block>& victim);
+  bool block_remove(const std::shared_ptr<repr::base_block>& victim);
 
  private:
   /*

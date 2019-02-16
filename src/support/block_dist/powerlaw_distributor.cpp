@@ -29,7 +29,7 @@
 
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,7 @@ powerlaw_distributor::powerlaw_distributor(
  * Member Functions
  ******************************************************************************/
 bool powerlaw_distributor::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
+    std::shared_ptr<repr::base_block>& block,
     ds::const_entity_list& entities) {
   /*
    * If we get here than either all clusters of the specified capacity are

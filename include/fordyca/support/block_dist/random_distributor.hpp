@@ -38,10 +38,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class multicell_entity;
 class cell2D;
-} // namespace representation
+} // namespace repr
 
 NS_START(support, block_dist);
 namespace er = rcppsw::er;
@@ -74,7 +74,7 @@ class random_distributor : public base_distributor,
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities) override;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
   ds::const_block_cluster_list block_clusters(void) const override {
     return ds::const_block_cluster_list();
@@ -100,7 +100,7 @@ class random_distributor : public base_distributor,
    */
   coord_search_res_t avail_coord_search(const ds::const_entity_list& entities,
                                          const rmath::vector2d& block_dim);
-  bool verify_block_dist(const representation::base_block* block,
+  bool verify_block_dist(const repr::base_block* block,
                          const ds::const_entity_list& entities,
                          const ds::cell2D* cell);
 

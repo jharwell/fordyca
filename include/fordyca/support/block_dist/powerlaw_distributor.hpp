@@ -40,9 +40,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class block;
-} // namespace representation
+} // namespace repr
 
 namespace params { namespace arena { struct block_dist_params; }}
 
@@ -73,7 +73,7 @@ class powerlaw_distributor : public base_distributor,
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
 
   ds::const_block_cluster_list block_clusters(void) const override;

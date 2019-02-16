@@ -41,7 +41,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace ds { class arena_grid; }
-namespace representation {
+namespace repr {
 class base_block;
 class arena_cache;
 }

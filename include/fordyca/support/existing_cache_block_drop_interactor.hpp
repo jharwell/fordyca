@@ -88,8 +88,8 @@ class existing_cache_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                     tv::cache_op_src::kSrcExistingCacheDrop,
-                                     timestep);
+                                      tv::cache_op_src::kSrcExistingCacheDrop,
+                                      timestep);
     }
   }
 

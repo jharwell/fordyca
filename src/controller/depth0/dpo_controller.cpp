@@ -34,7 +34,7 @@
 #include "fordyca/params/depth0/dpo_controller_repository.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,10 +67,10 @@ void dpo_controller::perception(
   m_perception = std::move(perception);
 }
 
-__rcsw_pure const representation::line_of_sight* dpo_controller::los(void) const {
+__rcsw_pure const repr::line_of_sight* dpo_controller::los(void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get())->los();
 }
-void dpo_controller::los(std::unique_ptr<representation::line_of_sight> new_los) {
+void dpo_controller::los(std::unique_ptr<repr::line_of_sight> new_los) {
   m_perception->los(std::move(new_los));
 }
 

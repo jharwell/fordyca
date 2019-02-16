@@ -89,8 +89,8 @@ class cached_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                     tv::cache_op_src::kSrcExistingCachePickup,
-                                     timestep);
+                                      tv::cache_op_src::kSrcExistingCachePickup,
+                                      timestep);
     }
   }
 

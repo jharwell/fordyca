@@ -31,13 +31,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class block_cluster;
-} // namespace representation
+} // namespace repr
 NS_START(ds);
 
-using block_cluster_list_type = representation::block_cluster*;
-using const_block_cluster_list_type = const representation::block_cluster*;
+using block_cluster_list_type = repr::block_cluster*;
+using const_block_cluster_list_type = const repr::block_cluster*;
 
 /*******************************************************************************
  * Type Definitions

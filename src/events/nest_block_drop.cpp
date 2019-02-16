@@ -31,7 +31,7 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -44,7 +44,7 @@ NS_START(fordyca, events);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-nest_block_drop::nest_block_drop(std::shared_ptr<representation::base_block> block,
+nest_block_drop::nest_block_drop(std::shared_ptr<repr::base_block> block,
                                  uint timestep)
     : ER_CLIENT_INIT("fordyca.events.nest_block_drop"),
       m_timestep(timestep),
@@ -62,7 +62,7 @@ void nest_block_drop::visit(ds::arena_map& map) {
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(representation::base_block& block) {
+void nest_block_drop::visit(repr::base_block& block) {
   block.reset_metrics();
   block.distribution_time(m_timestep);
 } /* visit() */

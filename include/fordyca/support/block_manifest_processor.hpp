@@ -36,7 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace rmath = rcppsw::math;
-namespace representation {
+namespace repr {
 class base_block;
 }
 NS_START(support);
@@ -46,9 +46,7 @@ namespace factory = rcppsw::patterns::factory;
  * Class Definitions
  ******************************************************************************/
 class block_manifest_processor
-    : private factory::sharing_factory<representation::base_block,
-                                       const rmath::vector2d&,
-                                       int> {
+    : private factory::sharing_factory<repr::base_block, const rmath::vector2d&, int> {
  public:
   explicit block_manifest_processor(const params::arena::block_manifest* const m);
 

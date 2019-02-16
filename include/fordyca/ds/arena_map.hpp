@@ -30,9 +30,9 @@
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/nest.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
 
 #include "rcppsw/er/client.hpp"
@@ -47,7 +47,7 @@ namespace params { namespace arena {
 struct arena_map_params;
 }} // namespace params::arena
 
-namespace representation {
+namespace repr {
 class arena_cache;
 }
 namespace support {
@@ -133,7 +133,7 @@ class arena_map : public er::client<arena_map>,
    *
    * @param victim The cache to remove.
    */
-  void cache_remove(const std::shared_ptr<representation::arena_cache>& victim);
+  void cache_remove(const std::shared_ptr<repr::arena_cache>& victim);
 
   /**
    * @brief Clear the cells that a cache covers while in the arena that are in
@@ -142,8 +142,7 @@ class arena_map : public er::client<arena_map>,
    *
    * @param victim The cache about to be deleted.
    */
-  void cache_extent_clear(
-      const std::shared_ptr<representation::arena_cache>& victim);
+  void cache_extent_clear(const std::shared_ptr<repr::arena_cache>& victim);
 
   template <int Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(
@@ -181,8 +180,7 @@ class arena_map : public er::client<arena_map>,
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_single_block(
-      std::shared_ptr<representation::base_block>& block);
+  bool distribute_single_block(std::shared_ptr<repr::base_block>& block);
 
   RCPPSW_DECORATE_FUNC(xdsize, const);
   RCPPSW_DECORATE_FUNC(ydsize, const);
@@ -232,11 +230,13 @@ class arena_map : public er::client<arena_map>,
    *
    * @return The subgrid.
    */
-  rcppsw::ds::base_grid2D<cell2D>::grid_view subgrid(size_t x, size_t y, size_t radius) {
+  rcppsw::ds::base_grid2D<cell2D>::grid_view subgrid(size_t x,
+                                                     size_t y,
+                                                     size_t radius) {
     return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
   double grid_resolution(void) const { return decoratee().resolution(); }
-  const representation::nest& nest(void) const { return m_nest; }
+  const repr::nest& nest(void) const { return m_nest; }
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
   }
@@ -263,7 +263,7 @@ class arena_map : public er::client<arena_map>,
   uint                            m_caches_removed{0};
   block_vector                    m_blocks;
   cache_vector                    m_caches;
-  representation::nest            m_nest;
+  repr::nest            m_nest;
   support::block_dist::dispatcher m_block_dispatcher;
   /* clang-format on */
 };

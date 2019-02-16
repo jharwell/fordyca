@@ -32,8 +32,8 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
@@ -49,8 +49,8 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
-    const std::shared_ptr<representation::base_block>& block,
-    const std::shared_ptr<representation::arena_cache>& cache,
+    const std::shared_ptr<repr::base_block>& block,
+    const std::shared_ptr<repr::arena_cache>& cache,
     double resolution)
     : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
@@ -97,14 +97,14 @@ void cache_block_drop::visit(ds::dpo_semantic_map& map) {
   map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
 } /* visit() */
 
-void cache_block_drop::visit(representation::base_block& block) {
+void cache_block_drop::visit(repr::base_block& block) {
   events::free_block_drop e(m_block, /* OK because we only have 1 block */
                             rmath::vector2u(cell_op::x(), cell_op::y()),
                             m_resolution);
   block.accept(e);
 } /* visit() */
 
-void cache_block_drop::visit(representation::arena_cache& cache) {
+void cache_block_drop::visit(repr::arena_cache& cache) {
   cache.block_add(m_block);
   cache.has_block_drop();
 } /* visit() */

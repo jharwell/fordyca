@@ -24,13 +24,13 @@
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using representation::base_cache;
+using repr::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -64,7 +64,7 @@ ds::cache_vector static_cache_creator::create_all(
   } /* for(i..) */
 
   auto cache = create_single_cache(starter_blocks, m_center);
-  auto cache_p = std::shared_ptr<representation::arena_cache>(std::move(cache));
+  auto cache_p = std::shared_ptr<repr::arena_cache>(std::move(cache));
   caches.push_back(cache_p);
   return caches;
 } /* create() */

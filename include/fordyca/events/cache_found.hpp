@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class base_cache;
 }
 
@@ -64,8 +64,8 @@ class cache_found : public cell_op,
                                        ds::dpo_semantic_map>,
                     public rcppsw::er::client<cache_found> {
  public:
-  explicit cache_found(std::unique_ptr<representation::base_cache> cache);
-  explicit cache_found(const std::shared_ptr<representation::base_cache>& cache);
+  explicit cache_found(std::unique_ptr<repr::base_cache> cache);
+  explicit cache_found(const std::shared_ptr<repr::base_cache>& cache);
   ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
@@ -83,7 +83,7 @@ class cache_found : public cell_op,
   void visit(controller::depth2::grp_mdpo_controller& controller) override;
 
  private:
-  std::shared_ptr<representation::base_cache> m_cache;
+  std::shared_ptr<repr::base_cache> m_cache;
 };
 
 NS_END(events, fordyca);

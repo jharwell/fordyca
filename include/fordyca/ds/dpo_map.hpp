@@ -27,7 +27,7 @@
 #include <boost/range/adaptor/map.hpp>
 #include <map>
 
-#include "fordyca/representation/dp_entity.hpp"
+#include "fordyca/repr/dp_entity.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -49,7 +49,7 @@ NS_START(fordyca, ds);
 template <typename key_type, typename obj_type>
 class dpo_map {
  public:
-  using value_type = typename representation::dp_entity<obj_type>;
+  using value_type = typename repr::dp_entity<obj_type>;
   using map_type = std::map<key_type, value_type>;
 
   template <typename T, typename Adaptor>

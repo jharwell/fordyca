@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/cache_vector.hpp"
 #include <numeric>
-#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

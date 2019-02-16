@@ -41,10 +41,10 @@ namespace support { namespace tv {
 class tv_controller;
 }} // namespace support::tv
 
-namespace representation {
+namespace repr {
 class base_block;
 class line_of_sight;
-} // namespace representation
+} // namespace repr
 namespace params {
 struct output_params;
 struct sensing_params;
@@ -130,14 +130,12 @@ class base_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<representation::base_block> block(void) const {
-    return m_block;
-  }
+  std::shared_ptr<repr::base_block> block(void) const { return m_block; }
 
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(const std::shared_ptr<representation::base_block>& block) {
+  void block(const std::shared_ptr<repr::base_block>& block) {
     m_block = block;
   }
 
@@ -207,7 +205,7 @@ class base_controller : public argos::CCI_Controller,
   /* clang-format off */
   const support::tv::tv_controller*           m_tv_controller{nullptr};
   bool                                        m_display_id{false};
-  std::shared_ptr<representation::base_block> m_block{nullptr};
+  std::shared_ptr<repr::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;
   /* clang-format on */
 };

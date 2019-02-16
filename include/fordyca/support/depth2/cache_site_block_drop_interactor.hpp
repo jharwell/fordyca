@@ -32,6 +32,7 @@
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces

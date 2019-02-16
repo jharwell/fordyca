@@ -38,10 +38,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class base_block;
 class multicell_entity;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class arena_grid;
@@ -97,7 +97,7 @@ class dispatcher {
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities);
 
   /**

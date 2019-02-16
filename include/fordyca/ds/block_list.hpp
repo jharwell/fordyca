@@ -33,13 +33,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_block;
 }
 NS_START(ds);
 
-using block_list_type = std::shared_ptr<representation::base_block>;
-using const_block_list_type = std::shared_ptr<const representation::base_block>;
+using block_list_type = std::shared_ptr<repr::base_block>;
+using const_block_list_type = std::shared_ptr<const repr::base_block>;
 
 /*******************************************************************************
  * Class Definitions

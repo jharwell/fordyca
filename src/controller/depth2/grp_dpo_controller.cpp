@@ -33,7 +33,7 @@
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/sensing_params.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"

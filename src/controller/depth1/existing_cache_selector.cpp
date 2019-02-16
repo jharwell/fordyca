@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth1/existing_cache_selector.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -91,7 +91,7 @@ ds::dp_cache_map::value_type existing_cache_selector::calc_best(
 
 bool existing_cache_selector::cache_is_excluded(
     const rmath::vector2d& position,
-    const representation::base_cache* const cache) const {
+    const repr::base_cache* const cache) const {
   /**
    * If a robot is currently IN a cache, and wants to pick up from/drop
    * into a cache, it should generally ignored the cache it is currently in,

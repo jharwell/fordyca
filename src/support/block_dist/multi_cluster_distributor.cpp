@@ -25,7 +25,7 @@
 #include <random>
 
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +50,7 @@ multi_cluster_distributor::multi_cluster_distributor(
  * Member Functions
  ******************************************************************************/
 bool multi_cluster_distributor::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
+    std::shared_ptr<repr::base_block>& block,
     ds::const_entity_list& entities) {
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
     uint idx = std::rand() % m_dists.size();

@@ -26,8 +26,8 @@
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
@@ -40,12 +40,12 @@ namespace rswarm = rcppsw::swarm;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(std::unique_ptr<representation::base_block> block)
+block_found::block_found(std::unique_ptr<repr::base_block> block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
       cell_op(block->discrete_loc()),
       m_block(std::move(block)) {}
 
-block_found::block_found(const std::shared_ptr<representation::base_block>& block)
+block_found::block_found(const std::shared_ptr<repr::base_block>& block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
       cell_op(block->discrete_loc()),
       m_block(block) {}

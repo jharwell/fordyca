@@ -32,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_cache;
 }
 namespace controller { namespace depth2 {
@@ -68,7 +68,7 @@ class cache_proximity
                                 tasks::depth2::cache_finisher,
                                 fsm::block_to_goal_fsm> {
  public:
-  explicit cache_proximity(std::shared_ptr<representation::base_cache> cache);
+  explicit cache_proximity(std::shared_ptr<repr::base_cache> cache);
   ~cache_proximity(void) override = default;
 
   cache_proximity(const cache_proximity& op) = delete;
@@ -82,7 +82,7 @@ class cache_proximity
 
  private:
   /* clang-format off */
-  std::shared_ptr<representation::base_cache> m_cache;
+  std::shared_ptr<repr::base_cache> m_cache;
   /* clang-format on */
 };
 

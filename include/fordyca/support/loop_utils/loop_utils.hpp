@@ -30,9 +30,7 @@
  ******************************************************************************/
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <utility>
-
-#include "fordyca/ds/arena_map.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
@@ -42,7 +40,14 @@ NS_START(fordyca);
 namespace controller {
 class base_controller;
 }
-
+namespace repr {
+class arena_cache;
+class nest;
+class multicell_entity;
+class line_of_sight;
+class base_block;
+}
+namespace ds { class arena_map; }
 NS_START(support, loop_utils);
 namespace rmath = rcppsw::math;
 
@@ -90,17 +95,17 @@ int robot_id(argos::CFootBotEntity& robot);
 int robot_id(const controller::base_controller& controller);
 
 bool block_drop_overlap_with_cache(
-    const std::shared_ptr<representation::base_block>& block,
-    const std::shared_ptr<representation::arena_cache>& cache,
+    const std::shared_ptr<repr::base_block>& block,
+    const std::shared_ptr<repr::arena_cache>& cache,
     const rmath::vector2d& drop_loc);
 
 bool block_drop_near_arena_boundary(
     const ds::arena_map& map,
-    const std::shared_ptr<representation::base_block>& block,
+    const std::shared_ptr<repr::base_block>& block,
     const rmath::vector2d& drop_loc);
 bool block_drop_overlap_with_nest(
-    const std::shared_ptr<representation::base_block>& block,
-    const representation::nest& nest,
+    const std::shared_ptr<repr::base_block>& block,
+    const repr::nest& nest,
     const rmath::vector2d& drop_loc);
 
 /**
@@ -157,6 +162,17 @@ proximity_status_t new_cache_cache_proximity(
     const ds::arena_map& map,
     double proximity_dist);
 
+
+/**
+ * @brief Compute the line of sight for a given robot.
+ *
+ * Needed to eliminate header dependencies in this file.
+ */
+std::unique_ptr<repr::line_of_sight> compute_robot_los(
+    ds::arena_map& map,
+    uint los_grid_size,
+    const rmath::vector2d& pos);
+
 /**
  * @brief Set the LOS of a robot in the arena.
  *
@@ -179,14 +195,11 @@ void set_robot_los(argos::CFootBotEntity& robot,
               .GetOriginAnchor()
               .Position.GetY());
 
-  rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution());
   auto& controller =
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-  std::unique_ptr<representation::line_of_sight> new_los =
-      rcppsw::make_unique<representation::line_of_sight>(
-          map.subgrid(position.x(), position.y(), los_grid_size), position);
-  controller.los(std::move(new_los));
+  controller.los(std::move(compute_robot_los(map, los_grid_size, pos)));
 }
+
 
 /**
  * @brief Determine if an entity of the specified dimensions, placed at the
@@ -195,7 +208,7 @@ void set_robot_los(argos::CFootBotEntity& robot,
  */
 placement_status_t placement_conflict(const rmath::vector2d& rloc,
                                       const rmath::vector2d& dims,
-                                      const representation::multicell_entity* const entity);
+                                      const repr::multicell_entity* const entity);
 
 NS_END(loop_utils, support, fordyca);
 

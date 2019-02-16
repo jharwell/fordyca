@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/block_list.hpp"
 #include <numeric>
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces

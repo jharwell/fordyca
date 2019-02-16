@@ -89,7 +89,7 @@ class free_block_drop
    * @param coord The discrete coordinates of the cell to drop the block in.
    * @param resolution The resolution of the arena map.
    */
-  free_block_drop(const std::shared_ptr<representation::base_block>& block,
+  free_block_drop(const std::shared_ptr<repr::base_block>& block,
                   const rmath::vector2u& coord,
                   double resolution);
   ~free_block_drop(void) override = default;
@@ -99,7 +99,7 @@ class free_block_drop
 
   /* depth0 foraging */
   void visit(ds::cell2D& cell) override;
-  void visit(representation::base_block& block) override;
+  void visit(repr::base_block& block) override;
   void visit(fsm::cell2D_fsm& fsm) override;
   void visit(ds::arena_map& map) override;
 
@@ -117,14 +117,12 @@ class free_block_drop
   /**
    * @brief Get the handle on the block that has been dropped.
    */
-  std::shared_ptr<representation::base_block> block(void) const {
-    return m_block;
-  }
+  std::shared_ptr<repr::base_block> block(void) const { return m_block; }
 
  private:
   /* clang-format off */
   double                                      m_resolution;
-  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };
 

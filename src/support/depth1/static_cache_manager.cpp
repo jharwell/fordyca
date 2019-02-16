@@ -25,8 +25,8 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 
 /*******************************************************************************
@@ -73,7 +73,7 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
   } /* for(b..) */
 
   bool ret = true;
-  if (to_use.size() < representation::base_cache::kMinBlocks) {
+  if (to_use.size() < repr::base_cache::kMinBlocks) {
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
@@ -98,14 +98,14 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
-    ER_ASSERT(to_use.size() - count < representation::base_cache::kMinBlocks,
+    ER_ASSERT(to_use.size() - count < repr::base_cache::kMinBlocks,
               "For new cache @%s/%s: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
               mc_cache_loc.to_str().c_str(),
               dcenter.to_str().c_str(),
               to_use.size() - count,
               to_use.size(),
-              representation::base_cache::kMinBlocks);
+              repr::base_cache::kMinBlocks);
     ret = false;
   }
   if (to_use.size() < mc_cache_params.static_.size) {
@@ -138,11 +138,10 @@ base_cache_manager::creation_res_t static_cache_manager::create_conditional(
 base_cache_manager::creation_res_t static_cache_manager::create(
     ds::block_vector& blocks) {
   ER_DEBUG("(Re)-Creating static cache");
-  ER_ASSERT(mc_cache_params.static_.size >=
-                representation::base_cache::kMinBlocks,
+  ER_ASSERT(mc_cache_params.static_.size >= repr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
             mc_cache_params.static_.size,
-            representation::base_cache::kMinBlocks);
+            repr::base_cache::kMinBlocks);
 
   support::depth1::static_cache_creator creator(arena_grid(),
                                                 mc_cache_loc,

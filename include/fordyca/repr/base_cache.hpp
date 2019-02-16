@@ -29,15 +29,15 @@
 #include <vector>
 
 #include "fordyca/ds/block_vector.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/immovable_cell_entity.hpp"
-#include "fordyca/representation/multicell_entity.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/immovable_cell_entity.hpp"
+#include "fordyca/repr/multicell_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 namespace prototype = rcppsw::patterns::prototype;
 namespace rmath = rcppsw::math;
 
@@ -46,7 +46,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class base_cache
- * @ingroup representation
+ * @ingroup repr
  *
  * @brief Base class for representating a cache within the arena. Caches do not
  * have state, and if/when a cache becomes empty, it needs to be deleted by an
@@ -168,6 +168,6 @@ class base_cache : public multicell_entity,
   /* clang-format on */
 };
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);
 
 #endif /* INCLUDE_FORDYCA_REPRSENTATION_BASE_CACHE_HPP_ */

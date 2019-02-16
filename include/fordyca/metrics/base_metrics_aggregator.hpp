@@ -46,7 +46,7 @@ struct metrics_params;
 namespace support {
 class base_loop_functions;
 }
-namespace representation {
+namespace repr {
 class base_block;
 }
 namespace ds {
@@ -79,7 +79,7 @@ class base_metrics_aggregator
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.
    */
-  void collect_from_block(const representation::base_block* block);
+  void collect_from_block(const repr::base_block* block);
 
   /**
    * @brief Collect metrics from the arena each timestep.

@@ -41,7 +41,7 @@
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"

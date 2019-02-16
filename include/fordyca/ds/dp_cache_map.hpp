@@ -34,7 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_cache;
 }
 NS_START(ds);
@@ -46,7 +46,7 @@ namespace rmath = rcppsw::math;
 /**
  * @class dp_cache_map
  * @ingroup ds
- * @brief The cache map is a representation of the robot's perception of caches
+ * @brief The cache map is a repr of the robot's perception of caches
  * in the arena. It uses the locations of caches as keys, as caches are
  * immovable during simulation. Using cache IDs as keys for insertion/removal
  * would result in incorrect behavior, as a cache with ID 0 that has been
@@ -54,10 +54,9 @@ namespace rmath = rcppsw::math;
  * during LOS process (it would be inserted into the map, but the old version
  * would not be removed, as they would be considered different objects).
  */
-class dp_cache_map
-    : public dpo_map<rmath::vector2u, representation::base_cache> {
+class dp_cache_map : public dpo_map<rmath::vector2u, repr::base_cache> {
  public:
-  using dpo_map<rmath::vector2u, representation::base_cache>::dpo_map;
+  using dpo_map<rmath::vector2u, repr::base_cache>::dpo_map;
 
   /**
    * @brief Build a string from the list of DP caches that a robot is tracking

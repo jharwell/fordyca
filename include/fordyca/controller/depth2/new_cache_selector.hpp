@@ -74,7 +74,7 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
  private:
   bool new_cache_is_excluded(const ds::dp_cache_map& existing_caches,
                              const ds::dp_block_map& blocks,
-                             const representation::base_block* const new_cache) const;
+                             const repr::base_block* const new_cache) const;
 
   /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;

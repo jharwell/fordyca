@@ -35,7 +35,7 @@ NS_START(fordyca);
 namespace controller {
 class cache_sel_matrix;
 }
-namespace representation {
+namespace repr {
 class cache;
 }
 namespace ds {

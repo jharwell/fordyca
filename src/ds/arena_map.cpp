@@ -26,9 +26,9 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/cube_block.hpp"
-#include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/cube_block.hpp"
+#include "fordyca/repr/ramp_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
 
@@ -95,8 +95,7 @@ __rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
   return -1;
 } /* robot_on_cache() */
 
-bool arena_map::distribute_single_block(
-    std::shared_ptr<representation::base_block>& block) {
+bool arena_map::distribute_single_block(std::shared_ptr<repr::base_block>& block) {
   ds::const_entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
@@ -140,8 +139,7 @@ void arena_map::distribute_all_blocks(void) {
   }   /* for(i..) */
 } /* distribute_all_blocks() */
 
-void arena_map::cache_remove(
-    const std::shared_ptr<representation::arena_cache>& victim) {
+void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim) {
   size_t before = caches().size();
   __rcsw_unused int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
@@ -149,7 +147,7 @@ void arena_map::cache_remove(
 } /* cache_remove() */
 
 void arena_map::cache_extent_clear(
-    const std::shared_ptr<representation::arena_cache>& victim) {
+    const std::shared_ptr<repr::arena_cache>& victim) {
   auto xspan = victim->xspan(victim->real_loc());
   auto yspan = victim->yspan(victim->real_loc());
 

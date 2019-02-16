@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/block_cluster.hpp"
+#include "fordyca/repr/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, representation);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Member Functions
@@ -54,4 +54,4 @@ __rcsw_pure ds::const_block_list block_cluster::blocks(void) const {
   return ret;
 } /* blocks() */
 
-NS_END(representation, fordyca);
+NS_END(repr, fordyca);

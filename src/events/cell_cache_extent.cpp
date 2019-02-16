@@ -34,9 +34,8 @@ using ds::arena_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell_cache_extent::cell_cache_extent(
-    const rmath::vector2u& coord,
-    std::shared_ptr<representation::base_cache> cache)
+cell_cache_extent::cell_cache_extent(const rmath::vector2u& coord,
+                                     std::shared_ptr<repr::base_cache> cache)
     : cell_op(coord), m_cache(cache) {}
 
 /*******************************************************************************
