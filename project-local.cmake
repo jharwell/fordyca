@@ -3,12 +3,16 @@
 ################################################################################
 set(WITH_FOOTBOT_LEDS "YES" CACHE STRING "Enable footbot robots to control their LEDS via actuators")
 set(WITH_FOOTBOT_RAB "YES" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
+set(WITH_FOOTBOT_BATTERY "YES" CACHE STRING "Enable footbot robots to use the battery.")
 
 define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_LEDS"
   BRIEF_DOCS "Enable footbot robots to control their LEDS"
   FULL_DOCS "Default=yes.")
 define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_RAB"
   BRIEF_DOCS "Enable footbot robots to use the RAB medium"
+  FULL_DOCS "Default=yes.")
+define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
+  BRIEF_DOCS "Enable footbot robots to use the battery"
   FULL_DOCS "Default=yes.")
 
 ################################################################################
@@ -121,6 +125,9 @@ endif()
 
 if (WITH_FOOTBOT_RAB)
   target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_RAB)
+endif()
+if (WITH_FOOTBOT_BATTERY)
+  target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_BATTERY)
 endif()
 
 if (BUILD_ON_MSI)

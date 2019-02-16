@@ -122,13 +122,14 @@ void base_controller::saa_init(const params::actuation_params* const actuation_p
           GetActuator<argos::CCI_LEDsActuator>("leds")),
 #else
       .leds = hal::actuators::led_actuator(nullptr),
-#endif
+#endif /* FORDYCA_WITH_ROBOT_LEDS */
+
 #ifdef FORDYCA_WITH_ROBOT_RAB
       .wifi = hal::actuators::wifi_actuator(
           GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")),
 #else
       .wifi = hal::actuators::wifi_actuator(nullptr)
-#endif
+#endif /* FORDYCA_WITH_ROBOT_RAB */
   };
   struct sensing_subsystem::sensor_list slist = {
 #ifdef FORDYCA_WITH_ROBOT_RAB
@@ -136,7 +137,7 @@ void base_controller::saa_init(const params::actuation_params* const actuation_p
           GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
 #else
       .rabs = hal::sensors::rab_wifi_sensor(nullptr),
-#endif
+#endif /* FORDYCA_WITH_ROBOT_RAB */
       .proximity = hal::sensors::proximity_sensor(
           GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
       .light = hal::sensors::light_sensor(
@@ -144,12 +145,12 @@ void base_controller::saa_init(const params::actuation_params* const actuation_p
       .ground = hal::sensors::ground_sensor(
           GetSensor<argos::CCI_FootBotMotorGroundSensor>(
               "footbot_motor_ground")),
-#ifdef FORDYCA_WITH_ROBOT_RAB
+#ifdef FORDYCA_WITH_ROBOT_BATTERY
       .battery = hal::sensors::battery_sensor(
           GetSensor<argos::CCI_BatterySensor>("battery")),
 #else
       .battery = hal::sensors::battery_sensor(nullptr),
-#endif
+#endif /* FORDYCA_WITH_ROBOT_BATTERY */
   };
   m_saa = rcppsw::make_unique<controller::saa_subsystem>(
       actuation_p, sensing_p, &alist, &slist);
