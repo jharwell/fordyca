@@ -159,7 +159,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
         ehigh_thres = 1.0;
         elow_thres = 0.0;
         capacity = 1.0;
-
+        deltaE = ehigh_thres - m_sensing->battery().readings().available_charge;
         ER_INFO("SUBSYSTEM:\tLower Energy Threshold: %f", elow_thres);
         ER_INFO("SUBSYSTEM:\tUpper Energy Threshold: %f", ehigh_thres);
         ER_INFO("SUBSYSTEM:\tCapacity: %f", capacity);
@@ -167,7 +167,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
         set_should_charge(true);
 
         mc_matrix->setData(elow_thres, ehigh_thres);
-        
+
       }
       is_successful_pickup = 0;
       is_new_thresh = false;

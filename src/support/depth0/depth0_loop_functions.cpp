@@ -39,6 +39,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/energy/energy_metrics_collector.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -130,6 +131,16 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     robot.GetBatterySensorEquippedEntity().SetAvailableCharge(controller->esubsystem()->desired_charge());
     controller->esubsystem()->set_should_charge(false);
   }
+
+  auto& collector = static_cast<metrics::energy::energy_metrics_collector&>(
+      *(*m_metrics_agg)["energy::efficiency"]);
+
+  int n_resources = collector.num_blocks_collected(); //[]?
+
+  if(n_resources > 100) {
+    arena_map()->distribute_blocks(false);
+  }
+
   /*
    * This is the one place in the depth0 event handling code where we need to
    * know *ALL* of the controllers that are in the depth, and we can't/don't use

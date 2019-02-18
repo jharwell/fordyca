@@ -258,6 +258,8 @@ class arena_map : public er::client<arena_map>,
    */
   bool initialize(support::base_loop_functions* loop);
 
+  void distribute_blocks(bool db) { m_distribute = db;}
+
  private:
   /* clang-format off */
   uint                            m_caches_removed{0};
@@ -265,6 +267,7 @@ class arena_map : public er::client<arena_map>,
   cache_vector                    m_caches;
   representation::nest            m_nest;
   support::block_dist::dispatcher m_block_dispatcher;
+  bool                            m_distribute;
   /* clang-format on */
 };
 

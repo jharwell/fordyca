@@ -70,8 +70,8 @@
       line += std::to_string((m_stats.cum_energy + m_stats.cum_deltaE)/
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
-      line += std::to_string((m_stats.cum_energy + m_stats.cum_deltaE)/
-                             static_cast<double>(m_stats.cum_resources))  +
+      line += std::to_string(static_cast<double>(m_stats.cum_resources)/
+                            (m_stats.cum_energy + m_stats.cum_deltaE)) +
               separator();
     } else {
       line += "0" + separator() + "0" + separator() + "0" + separator() +

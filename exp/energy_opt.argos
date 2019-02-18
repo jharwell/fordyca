@@ -42,7 +42,7 @@
               weight2C="0.1"
               weight3C="0.005"
               EEE="Null-informed"
-              activated="true">
+              activated="false">
       </energy>
       <output>
         <sim output_root="output"
@@ -317,7 +317,7 @@
   <distribute>
     <position method="uniform" min="1,1,0" max="10,5,0" />
     <orientation method="uniform" min="0,0,0" max="360,0,0" />
-    <entity quantity="1" max_trials="1000">
+    <entity quantity="2" max_trials="1000">
       <foot-bot id="fb">
         <controller config="ffc" />
         <battery model= "time_motion"/>
@@ -368,7 +368,7 @@
 <!-- ****************** -->
 <!-- * Visualization * -->
 <!-- ****************** -->
-<visualization>
+<!-- <visualization>
   <qt-opengl autoplay="true">
      <frame_grabbing directory="frames"
                      base_name="frame_"
@@ -390,6 +390,6 @@
     </camera>
     <user_functions label="depth0_qt_user_functions" />
   </qt-opengl>
-</visualization>
+</visualization> -->
 
 </argos-configuration>

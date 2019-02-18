@@ -49,7 +49,8 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
                    .create_blocks()),
       m_caches(),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
-      m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()) {
+      m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()),
+      m_distribute(true) {
   ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
           xrsize(),
           yrsize(),
@@ -97,47 +98,51 @@ __rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
 
 bool arena_map::distribute_single_block(
     std::shared_ptr<representation::base_block>& block) {
-  ds::const_entity_list entities;
-  for (auto& cache : m_caches) {
-    entities.push_back(cache.get());
-  } /* for(&cache..) */
-  for (auto& b : m_blocks) {
-    if (b != block) {
-      entities.push_back(b.get());
-    }
-  } /* for(&b..) */
-  entities.push_back(&m_nest);
-  return m_block_dispatcher.distribute_block(block, entities);
+  if(m_distribute) {
+    ds::const_entity_list entities;
+    for (auto& cache : m_caches) {
+      entities.push_back(cache.get());
+    } /* for(&cache..) */
+    for (auto& b : m_blocks) {
+      if (b != block) {
+        entities.push_back(b.get());
+      }
+    } /* for(&b..) */
+    entities.push_back(&m_nest);
+    return m_block_dispatcher.distribute_block(block, entities);
+  }
 } /* disribute_single_block() */
 
 void arena_map::distribute_all_blocks(void) {
-  // Reset all the cells to clear old references to blocks
-  decoratee().reset();
+  if(m_distribute) {
+    // Reset all the cells to clear old references to blocks
+    decoratee().reset();
 
-  /* distribute blocks */
-  ds::const_entity_list entities;
-  for (auto& cache : m_caches) {
-    entities.push_back(cache.get());
-  } /* for(&cache..) */
-  entities.push_back(&m_nest);
-  bool b = m_block_dispatcher.distribute_blocks(m_blocks, entities);
-  ER_ASSERT(b, "Unable to perform initial block distribution");
+    /* distribute blocks */
+    ds::const_entity_list entities;
+    for (auto& cache : m_caches) {
+      entities.push_back(cache.get());
+    } /* for(&cache..) */
+    entities.push_back(&m_nest);
+    bool b = m_block_dispatcher.distribute_blocks(m_blocks, entities);
+    ER_ASSERT(b, "Unable to perform initial block distribution");
 
-  /*
-   * Once all blocks have been distributed, and (possibly) all caches have been
-   * created via block consolidation, then all cells that do not have blocks or
-   * caches are empty.
-   */
-  for (size_t i = 0; i < xdsize(); ++i) {
-    for (size_t j = 0; j < ydsize(); ++j) {
-      cell2D& cell = decoratee().access<arena_grid::kCell>(i, j);
-      if (!cell.state_has_block() && !cell.state_has_cache() &&
-          !cell.state_in_cache_extent()) {
-        events::cell_empty op(cell.loc());
-        cell.accept(op);
-      }
-    } /* for(j..) */
-  }   /* for(i..) */
+    /*
+     * Once all blocks have been distributed, and (possibly) all caches have been
+     * created via block consolidation, then all cells that do not have blocks or
+     * caches are empty.
+     */
+    for (size_t i = 0; i < xdsize(); ++i) {
+      for (size_t j = 0; j < ydsize(); ++j) {
+        cell2D& cell = decoratee().access<arena_grid::kCell>(i, j);
+        if (!cell.state_has_block() && !cell.state_has_cache() &&
+            !cell.state_in_cache_extent()) {
+          events::cell_empty op(cell.loc());
+          cell.accept(op);
+        }
+      } /* for(j..) */
+    }   /* for(i..) */
+  }
 } /* distribute_all_blocks() */
 
 void arena_map::cache_remove(
