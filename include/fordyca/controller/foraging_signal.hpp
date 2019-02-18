@@ -30,7 +30,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Class Definitions
@@ -42,13 +42,13 @@ namespace state_machine = rcppsw::patterns::state_machine;
  * @brief Signals that sub-states can return in order to notify their super
  * states that a condition that they do not know how to handle has arisen.
  */
-class foraging_signal : public state_machine::event_signal {
+class foraging_signal : public rfsm::event_signal {
  public:
   enum type {
     /**
      * The signal sent to FSMs during nominal operation.
      */
-    FSM_RUN = state_machine::event_signal::EXTERNAL_SIGNALS,
+    FSM_RUN = rfsm::event_signal::EXTERNAL_SIGNALS,
     BLOCK_PICKUP,       /// A robot has picked up a block
     BLOCK_DROP,         /// A robot has dropped a block in {cache, nest, arena}
     LEFT_NEST,          /// A robot has left the nest

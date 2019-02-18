@@ -37,7 +37,6 @@
 NS_START(fordyca, fsm);
 
 namespace visitor = rcppsw::patterns::visitor;
-namespace rfsm = rcppsw::patterns::state_machine;
 namespace er = rcppsw::er;
 namespace ta = rcppsw::task_allocation;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;

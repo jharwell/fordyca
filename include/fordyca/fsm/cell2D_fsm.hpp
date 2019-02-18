@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 namespace visitor = rcppsw::patterns::visitor;
 namespace er = rcppsw::er;
 
@@ -50,7 +50,7 @@ namespace er = rcppsw::er;
  * block, has a cache, or unknown, etc.).
  *
  */
-class cell2D_fsm : public state_machine::simple_fsm,
+class cell2D_fsm : public rfsm::simple_fsm,
                    public visitor::visitable_any<cell2D_fsm>,
                    public er::client<cell2D_fsm> {
  public:
@@ -87,7 +87,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
   size_t block_count(void) const { return m_block_count; }
 
  private:
-  struct block_data : public state_machine::event_data {
+  struct block_data : public rfsm::event_data {
     explicit block_data(bool pickup_) : pickup(pickup_) {}
     bool pickup;
   };

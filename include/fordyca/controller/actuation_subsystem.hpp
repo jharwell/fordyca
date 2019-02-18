@@ -42,7 +42,7 @@ class tv_controller;
 
 NS_START(controller);
 
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 namespace hal = rcppsw::robotics::hal;
 namespace utils = rcppsw::utils;
 

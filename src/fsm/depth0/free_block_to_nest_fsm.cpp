@@ -29,7 +29,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -67,13 +67,13 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rfsm::event_data) {
   /* first time running FSM */
-  if (state_machine::event_type::NORMAL == data->type()) {
+  if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
     return controller::foraging_signal::HANDLED;
   }
-  if (state_machine::event_type::CHILD == data->type()) {
+  if (rfsm::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
       internal_event(ST_WAIT_FOR_DROP);
       return controller::foraging_signal::HANDLED;
@@ -93,7 +93,7 @@ HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
 }
 HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_pickup,
-                  state_machine::event_data) {
+                  rfsm::event_data) {
   /**
    * It is possible that robots can be waiting indefinitely for a block
    * pickup signal that will never come once a block has been acquired if they
@@ -115,7 +115,7 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
 }
 HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_drop,
-                  state_machine::event_data) {
+                  rfsm::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ST_FINISHED);
@@ -196,7 +196,7 @@ void free_block_to_nest_fsm::init(void) {
 
 void free_block_to_nest_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+               rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 transport_goal_type free_block_to_nest_fsm::block_transport_goal(void) const {

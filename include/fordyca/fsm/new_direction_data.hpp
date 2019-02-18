@@ -31,7 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
@@ -44,7 +44,7 @@ namespace rmath = rcppsw::math;
  * @brief Structure containing randomness to inject into robot motion by having
  * them change their direction.
  */
-struct new_direction_data : public state_machine::event_data {
+struct new_direction_data : public rfsm::event_data {
   explicit new_direction_data(const rmath::radians& dir_) : dir(dir_) {}
 
   rmath::radians dir;

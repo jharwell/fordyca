@@ -85,7 +85,7 @@ void block_proximity::visit(tasks::depth2::cache_starter& task) {
 
 void block_proximity::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_PROXIMITY,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 NS_END(events, fordyca);

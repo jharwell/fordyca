@@ -103,12 +103,12 @@ class dpo_fsm : public base_foraging_fsm,
  private:
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
-                     state_machine::event_data);
+                     rfsm::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
   /* foraging states */
-  HFSM_STATE_DECLARE(dpo_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, state_machine::event_data);
+  HFSM_STATE_DECLARE(dpo_fsm, start, rfsm::event_data);
+  HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, rfsm::event_data);
 
   /**
    * @brief Defines the state map for the FSM.

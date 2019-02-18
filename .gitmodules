@@ -1,3 +1,4 @@
 [submodule "cmake"]
 	path = cmake
 	url = https://github.com/swarm-robotics/libra.git
+	branch = master

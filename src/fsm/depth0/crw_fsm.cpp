@@ -30,7 +30,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -72,13 +72,13 @@ crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(crw_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(crw_fsm, start, rfsm::event_data) {
   /* first time running FSM */
-  if (state_machine::event_type::NORMAL == data->type()) {
+  if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
     return controller::foraging_signal::HANDLED;
   }
-  if (state_machine::event_type::CHILD == data->type()) {
+  if (rfsm::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::LEFT_NEST == data->signal()) {
       m_explore_fsm.task_start(nullptr);
       internal_event(ST_ACQUIRE_BLOCK);
@@ -101,7 +101,7 @@ HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, state_machine::event_data) {
+HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rfsm::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
@@ -113,7 +113,7 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, state_machine::event_data) {
+HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rfsm::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block drop signal received");
@@ -178,7 +178,7 @@ void crw_fsm::init(void) {
 
 void crw_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+               rfsm::event_type::NORMAL);
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {

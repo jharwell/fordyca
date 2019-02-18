@@ -30,7 +30,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth1);
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -72,11 +72,11 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, state_machine::event_data) {
-  if (state_machine::event_type::NORMAL == data->type()) {
+HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, rfsm::event_data) {
+  if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
     return controller::foraging_signal::HANDLED;
-  } else if (state_machine::event_type::CHILD == data->type()) {
+  } else if (rfsm::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
       internal_event(ST_WAIT_FOR_DROP);
       return controller::foraging_signal::HANDLED;
@@ -100,7 +100,7 @@ HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, acquire_block) {
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_pickup,
-                  state_machine::event_data) {
+                  rfsm::event_data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_TRANSPORT_TO_NEST);
@@ -113,7 +113,7 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_drop,
-                  state_machine::event_data) {
+                  rfsm::event_data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_FINISHED);
@@ -208,7 +208,7 @@ void cached_block_to_nest_fsm::init(void) {
 
 void cached_block_to_nest_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+               rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 NS_END(depth1, fsm, fordyca);
