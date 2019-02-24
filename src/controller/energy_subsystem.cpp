@@ -66,18 +66,30 @@ energy_subsystem::energy_subsystem(
 
 void energy_subsystem::endgame(int k_robots) {
   if(EEE_method == "Well-informed") {
+      ER_INFO("ENTERED WELL-INFORMED");
       set_should_charge(true);
       maxTau = maxTau + 50;
       tau = maxTau;
   } else if(EEE_method == "Ill-informed") {
+      ER_INFO("ENTERED ILL-INFORMED");
       deltaE = ehigh_thres - m_sensing->battery().readings().available_charge;
       double remaining = ehigh_thres - deltaE;
       ER_INFO("SUBSYSTEM:\tRemaining: %f", remaining);
       elow_thres = elow_thres - (std::max(0.0, (remaining))*(w[0]))
                               + ((!is_successful_pickup)*(w[1])) + (k_robots*(w[2]));
-      set_should_charge(true);
+      if(elow_thres < 0)
+        elow_thres = 0;
+
+      if(elow_thres >= 1.0)
+        set_should_charge(false);
+      else {
+        set_should_charge(true);
+      }
+      maxTau = maxTau + 50;
+      tau = maxTau;
       mc_matrix->setData(elow_thres, ehigh_thres);
   } else if(EEE_method == "Null-informed") {
+      ER_INFO("ENTERED NULL-INFORMED");
       set_should_charge(false);
   }
 
@@ -92,15 +104,15 @@ void energy_subsystem::endgame(int k_robots) {
 
 
 void energy_subsystem::energy_adapt(int k_robots) {
+  ER_INFO("TAU:\t\t%d", tau);
   if(e_fsm.current_state() == fsm::ee_max_fsm::ST_CHARGING && is_new_thresh) {
     if(tau < maxTau) {
       tau = tau + 1;
     } else {
       if(activate) {
-        if(is_EEE) {
+        if(true) {
           ER_INFO("SUBSYSTEM:\tRobot is entering EEE: %s", EEE_method);
           endgame(k_robots);
-          maxTau = maxTau + 50;
         } else {
           /* updated based on three criteria:
               How early if achieved a successful pickup
@@ -140,7 +152,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
           if(elow_thres > ehigh_thres)
             elow_thres = ehigh_thres - capacity;
 
-          if((ehigh_thres - elow_thres) == 1) {
+          if(ehigh_thres == 1) {
             is_EEE = true;
           }
 

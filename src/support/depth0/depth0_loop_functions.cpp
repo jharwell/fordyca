@@ -40,6 +40,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/energy/energy_metrics_collector.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
@@ -103,6 +104,7 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot.GetControllableEntity().GetController());
+    robot.GetBatterySensorEquippedEntity().SetAvailableCharge(controller.esubsystem()->desired_charge());
     controller_configure(&controller);
   } /* for(entity..) */
   ER_INFO("Initialization finished");
@@ -132,13 +134,16 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     controller->esubsystem()->set_should_charge(false);
   }
 
-  auto& collector = static_cast<metrics::energy::energy_metrics_collector&>(
-      *(*m_metrics_agg)["energy::efficiency"]);
+  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+      *(*m_metrics_agg)["blocks::transport"]);
 
-  int n_resources = collector.num_blocks_collected(); //[]?
+  int n_resources = collector.num_blocks_collected(); //[]
+  ER_INFO("Num Blocks Collected: %d", n_resources)
 
-  if(n_resources > 100) {
+  if(n_resources > 99) {
     arena_map()->distribute_blocks(false);
+  } else {
+    arena_map()->distribute_blocks(true);
   }
 
   /*

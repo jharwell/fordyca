@@ -45,6 +45,7 @@
         "n_robots" + separator() +
         "avg_energy_level" + separator() +
         "avg_deltaE" + separator() +
+        "cum_deltaE" + separator() +
         "avg_E" + separator() +
         "efficiency" + separator();
     // clang-format on
@@ -67,6 +68,8 @@
       line += std::to_string(m_stats.cum_deltaE /
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
+      line += std::to_string(m_stats.cum_deltaE) +
+              separator();
       line += std::to_string((m_stats.cum_energy + m_stats.cum_deltaE)/
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
@@ -75,7 +78,7 @@
               separator();
     } else {
       line += "0" + separator() + "0" + separator() + "0" + separator() +
-              "0" + separator();
+              "0" + separator() + "0" + separator();
     }
     return true;
   } /* csv_line_build() */

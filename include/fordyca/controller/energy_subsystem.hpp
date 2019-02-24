@@ -81,11 +81,18 @@
 
     fsm::ee_max_fsm& fsm(void) { return e_fsm; }
 
+    /* Metrics */
     double energy_level(void) const override { return m_sensing->battery().readings().available_charge;}
-
-    double E_consumed(void) const override { return deltaE; }
-
-    int resources(void) const override { return is_successful_pickup; }
+    double E_consumed(void) const override {
+      if(deltaE < 0) {
+        return (1.0 - energy_level());
+      } else {
+        return deltaE;
+      }
+    }
+    int resources(void) const override {
+      return is_successful_pickup;
+    }
 
   private:
     /**
@@ -109,7 +116,7 @@
     bool                                                  is_EEE;
     controller::ee_decision_matrix*                       mc_matrix;
     bool                                                  should_charge;
-    bool                                                  activate;
+    bool                                                  activate; 
     fsm::ee_max_fsm                                       e_fsm;
     float                                                 deltaE;
 
