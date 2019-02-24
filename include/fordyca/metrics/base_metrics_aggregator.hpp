@@ -79,7 +79,7 @@ class base_metrics_aggregator
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.
    */
-  void collect_from_block(const representation::base_block* block);
+  virtual void collect_from_block(const representation::base_block* block);
 
   /**
    * @brief Collect metrics from the arena each timestep.

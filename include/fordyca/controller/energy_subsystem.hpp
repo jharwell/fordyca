@@ -101,6 +101,8 @@
      */
     void endgame(int k_robots);
 
+    bool labella(void);
+
 
     float                                                 w[3];
     float                                                  wC[3];
@@ -116,7 +118,12 @@
     bool                                                  is_EEE;
     controller::ee_decision_matrix*                       mc_matrix;
     bool                                                  should_charge;
-    bool                                                  activate; 
+    bool                                                  activate;
+    bool                                                  isLabella;
+    uint                                                  succ;
+    uint                                                  fail;
+    bool                                                  is_new_labella;
+    float                                                 P1;
     fsm::ee_max_fsm                                       e_fsm;
     float                                                 deltaE;
 

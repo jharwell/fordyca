@@ -21,6 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/metrics/base_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/metrics/energy/energy_metrics_collector.hpp"
 #include "fordyca/metrics/energy/energy_opt_metrics.hpp"
@@ -111,5 +112,12 @@ void depth0_metrics_aggregator::collect_from_controller(
     collect("perception::world_model", *worldm_m);
   }
 } /* collect_from_controller() */
+
+void depth0_metrics_aggregator::collect_from_block(
+    const representation::base_block* const block) {
+    base_metrics_aggregator::collect_from_block(block);
+    //collectBlock("energy::efficiency", *block);
+
+}
 
 NS_END(depth0, support, fordyca);

@@ -74,7 +74,9 @@
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
       line += std::to_string(static_cast<double>(m_stats.cum_resources)/
-                            (m_stats.cum_energy + m_stats.cum_deltaE)) +
+                            ((m_stats.cum_energy)/
+                             (static_cast<double>(m_stats.cum_robots)) +
+                             m_stats.cum_deltaE)) +
               separator();
     } else {
       line += "0" + separator() + "0" + separator() + "0" + separator() +
@@ -89,7 +91,13 @@
     ++m_stats.cum_robots;
     m_stats.cum_energy += m.energy_level();
     m_stats.cum_deltaE += m.E_consumed();
-    m_stats.cum_resources += m.resources();
+
+  } /* collect() */
+
+  void energy_metrics_collector::collectBlock(
+      const rcppsw::metrics::base_metrics& metrics) {
+    auto& m = dynamic_cast<const energy_opt_metrics&>(metrics);
+    ++m_stats.cum_resources;
 
   } /* collect() */
 

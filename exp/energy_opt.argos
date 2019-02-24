@@ -7,7 +7,7 @@
 <!-- ************************* -->
 <framework>
   <system threads="4" />
-  <experiment length="100000"
+  <experiment length="10000000"
               ticks_per_second="5"
               random_seed="123" />
 </framework>
@@ -42,7 +42,8 @@
               weight2C="0.1"
               weight3C="0.005"
               EEE="Ill-informed"
-              activated="true">
+              activated="true"
+              labella="true">
       </energy>
       <output>
         <sim output_root="output"

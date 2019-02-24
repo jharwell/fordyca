@@ -58,6 +58,7 @@ class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
    */
   template<class T>
   void collect_from_controller(const T* controller);
+  void collect_from_block(const representation::base_block* block) override;
 };
 
 NS_END(depth0, support, fordyca);
