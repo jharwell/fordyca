@@ -103,6 +103,8 @@
 
     bool labella(void);
 
+    void liu(int k_robots);
+
 
     float                                                 w[3];
     float                                                  wC[3];
@@ -124,6 +126,11 @@
     uint                                                  fail;
     bool                                                  is_new_labella;
     float                                                 P1;
+    bool                                                  isLiu;
+    uint                                                  Ps;
+    uint                                                  Pf;
+    bool                                                  is_new_liu;
+    uint                                                  Ts;
     fsm::ee_max_fsm                                       e_fsm;
     float                                                 deltaE;
 

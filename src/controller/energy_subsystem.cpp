@@ -65,6 +65,11 @@ energy_subsystem::energy_subsystem(
       fail(0),
       is_new_labella(true),
       P1(0.033),
+      isLiu(params->liu),
+      Ps(0),
+      Pf(0),
+      is_new_liu(true),
+      Ts(20000),
       e_fsm(mc_matrix, saa) {}
 
 
@@ -135,8 +140,6 @@ bool energy_subsystem::labella(void) {
       is_new_labella = false;
     }
 
-    srand(time(NULL));
-
     double guess = (double) rand()/ RAND_MAX;
     ER_INFO("guess:\t %f", guess);
     if (guess <= P1) {
@@ -154,13 +157,38 @@ bool energy_subsystem::labella(void) {
   ER_INFO("succ:\t %d", succ);
 }
 
+void energy_subsystem::liu(int k_robots) {
+  if(isLiu) {
+    if(is_new_liu) {
+      is_new_liu = false;
+      if(is_successful_pickup == 1) {
+        Ps = Ps + 1;
+      } else {
+        Pf = Pf + 1;
+      }
+
+      Ts = Ts - 500*k_robots + 1000*Ps - 2000*Pf;
+      if(Ts < 2000) {
+        Ts = 2000;
+      }
+      if(Ts > 20000) {
+        Ts = 20000;
+      }
+
+      mc_matrix->setForageTime(Ts);
+
+    }
+  }
+}
+
 
 void energy_subsystem::energy_adapt(int k_robots) {
-  ER_INFO("TAU:\t\t%d", tau);
   if(e_fsm.current_state() == fsm::ee_max_fsm::ST_CHARGING && is_new_thresh) {
     if(tau < maxTau) {
       tau = tau + 1;
     } else {
+      // if liu
+      liu(k_robots);
       // if labella
       if(labella()) {
         if(activate) {
@@ -173,20 +201,13 @@ void energy_subsystem::energy_adapt(int k_robots) {
                 If there was a failed pickup
                 If encountered any robots.
             */
-            ER_INFO("SUBSYSTEM 0:\tLower Energy Threshold: %f", elow_thres);
-            ER_INFO("SUBSYSTEM 0:\tUpper Energy Threshold: %f", ehigh_thres);
-            ER_INFO("SUBSYSTEM 0:\tCapacity: %f", capacity);
             deltaE = ehigh_thres - m_sensing->battery().readings().available_charge;
             double remaining = ehigh_thres - deltaE;
-            ER_INFO("SUBSYSTEM:\tSuccessful Pickup: %d", is_successful_pickup);
             elow_thres = elow_thres - (std::max(0.0, (remaining))*(w[0]))
                                     + ((!is_successful_pickup)*(w[1])) + (k_robots*(w[2]));
 
             capacity = capacity - (is_successful_pickup * std::max(0.0, (remaining))*(wC[0]))
                                 + ((!is_successful_pickup)*(wC[1])) + (k_robots*(wC[2]));
-
-            ER_INFO("SUBSYSTEM 1:\tLower Energy Threshold: %f", elow_thres);
-            ER_INFO("SUBSYSTEM 1:\tCapacity: %f", capacity);
 
             if(elow_thres < 0)
               elow_thres = 0.1;
@@ -232,6 +253,7 @@ void energy_subsystem::energy_adapt(int k_robots) {
   } else if (e_fsm.current_state() == fsm::ee_max_fsm::ST_FORAGING) {
     is_new_thresh = true;
     is_new_labella = true;
+    is_new_liu = true;
   }
 
 }

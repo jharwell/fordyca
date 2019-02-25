@@ -29,6 +29,8 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/representation/base_block.hpp"
 
+#include <stdlib.h>     /* srand, rand */
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -56,6 +58,7 @@ void crw_controller::Init(ticpp::Element& node) {
   energy_subsystem()->set_task(m_fsm.get());
   ER_INFO("Initialization finished");
   ndc_pop();
+  srand(time(NULL));
 } /* Init() */
 
 void crw_controller::Reset(void) {

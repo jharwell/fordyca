@@ -57,6 +57,8 @@
 
   float getLowerThres(void);
   float getHigherThres(void);
+  bool getLiuFlag(void);
+  uint getForageTime(void);
 
  private:
 

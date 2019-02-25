@@ -138,8 +138,7 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       *(*m_metrics_agg)["blocks::transport"]);
 
   int n_resources = collector.num_blocks_collected(); //[]
-  ER_INFO("Num Blocks Collected: %d", n_resources)
-
+  ER_INFO("Num Resources: %d", n_resources);
   if(n_resources > 99) {
     arena_map()->distribute_blocks(false);
   } else {

@@ -51,6 +51,7 @@
     std::string EEE{""};
     bool activated{false};
     bool labella{false};
+    bool liu{false};
 
   };
 

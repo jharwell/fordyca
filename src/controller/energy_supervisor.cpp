@@ -48,4 +48,12 @@ float energy_supervisor::getHigherThres(void) {
   return mc_matrix->e_higherT;
 }
 
+bool energy_supervisor::getLiuFlag(void) {
+  return mc_matrix->liu;
+}
+
+uint energy_supervisor::getForageTime(void) {
+  return mc_matrix->Th;
+}
+
 NS_END(controller, fordyca);

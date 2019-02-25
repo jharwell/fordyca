@@ -44,6 +44,7 @@ ee_max_fsm::ee_max_fsm(const controller::ee_decision_matrix* matrix,
     : base_foraging_fsm(saa, ST_MAX_STATES),
       mc_matrix(matrix),
       saa(saa),
+      iteration(0),
       ER_CLIENT_INIT("fordyca.fsm.depth0.ee_max"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -90,9 +91,21 @@ HFSM_STATE_DEFINE(ee_max_fsm, foraging, state_machine::event_data) {
   controller::energy_supervisor selector(mc_matrix);
   float low_energy = selector.getLowerThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
-  ER_INFO("FSM:\tRobot is Foraging........ENERGY: %f", current_energy);
+  uint forageTime = selector.getForageTime();
+  bool isLiu = selector.getLiuFlag();
+  // ER_INFO("LIU:\t%d", isLiu);
+  // ER_INFO("Iteration:\t%d", iteration);
+  // ER_INFO("forageTime:\t%d", forageTime);
+  if (isLiu) {
+    if (iteration >= forageTime) {
+      internal_event(ST_RETREATING);
+    } else {
+      iteration = iteration + 1;
+    }
+  }
+  // ER_INFO("FSM:\tRobot is Foraging........ENERGY: %f", current_energy);
   if (current_energy <= low_energy) {
-    ER_INFO("FSM:\tRobot enters Retreating from Foraging State");
+    // ER_INFO("FSM:\tRobot enters Retreating from Foraging State");
     internal_event(ST_RETREATING);
   } else {
     if(taskable_fsm->task_finished()) {
@@ -108,12 +121,13 @@ HFSM_STATE_DEFINE(ee_max_fsm, foraging, state_machine::event_data) {
 
 HFSM_STATE_DEFINE_ND(ee_max_fsm, charging) {
   saa->actuation()->differential_drive().stop();
+  iteration = 0;
   controller::energy_supervisor selector(mc_matrix);
   float charged_energy = selector.getHigherThres();
   double current_energy = saa->sensing()->battery().readings().available_charge;
-  ER_INFO("FSM:\tRobot is Charging........CHARGE: %f", current_energy);
+  // ER_INFO("FSM:\tRobot is Charging........CHARGE: %f", current_energy);
   if (current_energy == charged_energy) {
-    ER_INFO("FSM:\tRobot enters Foraging from Charging State");
+    // ER_INFO("FSM:\tRobot enters Foraging from Charging State");
     internal_event(ST_FORAGING);
   }
 }

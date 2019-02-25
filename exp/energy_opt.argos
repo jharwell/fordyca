@@ -7,7 +7,7 @@
 <!-- ************************* -->
 <framework>
   <system threads="4" />
-  <experiment length="10000000"
+  <experiment length="100000"
               ticks_per_second="5"
               random_seed="123" />
 </framework>
@@ -33,17 +33,18 @@
     <params>
       <energy
               elow="0.3"
-              ehigh="0.6"
-              capacity="0.3"
+              ehigh="0.8"
+              capacity="0.5"
               weight1="0.3"
               weight2="0.1"
               weight3="0.005"
               weight1C="0.2"
               weight2C="0.1"
               weight3C="0.005"
-              EEE="Ill-informed"
+              EEE="Null-informed"
               activated="true"
-              labella="true">
+              labella="false"
+              liu="true">
       </energy>
       <output>
         <sim output_root="output"
@@ -318,7 +319,7 @@
   <distribute>
     <position method="uniform" min="1,1,0" max="10,5,0" />
     <orientation method="uniform" min="0,0,0" max="360,0,0" />
-    <entity quantity="1" max_trials="1000">
+    <entity quantity="32" max_trials="1000">
       <foot-bot id="fb">
         <controller config="ffc" />
         <battery model= "time_motion"/>
@@ -369,7 +370,7 @@
 <!-- ****************** -->
 <!-- * Visualization * -->
 <!-- ****************** -->
-<visualization>
+<!-- <visualization>
   <qt-opengl autoplay="true">
      <frame_grabbing directory="frames"
                      base_name="frame_"
@@ -391,6 +392,6 @@
     </camera>
     <user_functions label="depth0_qt_user_functions" />
   </qt-opengl>
-</visualization>
+</visualization> -->
 
 </argos-configuration>

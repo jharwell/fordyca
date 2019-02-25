@@ -34,7 +34,9 @@
   ******************************************************************************/
   ee_decision_matrix::ee_decision_matrix(const struct params::energy_params* const params)
       : e_lowerT(params->elow),
-        e_higherT(params->ehigh) {}
+        e_higherT(params->ehigh),
+        liu(params->liu),
+        Th(20000) {}
 
 /*******************************************************************************
  * Member Functions
@@ -42,6 +44,10 @@
   void ee_decision_matrix::setData(float eLow, float eHigh) {
     e_lowerT = eLow;
     e_higherT = eHigh;
+  }
+
+  void ee_decision_matrix::setForageTime(uint newTh) {
+    Th = newTh;
   }
 
 

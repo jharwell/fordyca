@@ -59,10 +59,13 @@ class ee_decision_matrix {
   public:
     float e_lowerT;
     float e_higherT;
+    bool liu;
+    uint Th;
 
     explicit ee_decision_matrix(const struct params::energy_params* const params);
 
     void setData(float eLow, float eHigh);
+    void setForageTime(uint newTh);
 
 
 };

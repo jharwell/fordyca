@@ -111,6 +111,7 @@ class ee_max_fsm : public base_foraging_fsm,
   ta::taskable* taskable_fsm;
   const controller::ee_decision_matrix* const mc_matrix;
   controller::saa_subsystem* saa;
+  uint iteration;
   // clang-format on
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
