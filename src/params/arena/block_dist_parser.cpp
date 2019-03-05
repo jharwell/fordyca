@@ -41,25 +41,20 @@ void block_dist_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
   m_powerlaw.parse(bnode);
   m_manifest.parse(bnode);
+  m_redist_governor.parse(bnode);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_ATTR(bnode, m_params, arena_resolution);
   XML_PARSE_ATTR(bnode, m_params, dist_type);
   m_params->powerlaw = *m_powerlaw.parse_results();
   m_params->manifest = *m_manifest.parse_results();
+  m_params->redist_governor = *m_redist_governor.parse_results();
 } /* parse() */
-
-void block_dist_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, dist_type) << std::endl
-         << XML_ATTR_STR(m_params, arena_resolution) << std::endl
-         << XML_ATTR_STR(m_params, dist_type) << std::endl
-         << m_powerlaw << build_footer();
-} /* show() */
 
 bool block_dist_parser::validate(void) const {
   CHECK(true == m_powerlaw.validate());
   CHECK(true == m_manifest.validate());
-  CHECK("" != m_params->dist_type);
+  CHECK(true == m_redist_governor.validate());
   return true;
 
 error:

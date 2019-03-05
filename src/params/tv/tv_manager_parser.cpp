@@ -1,5 +1,5 @@
 /**
- * @file tv_controller_parser.cpp
+ * @file tv_manager_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/tv/tv_controller_parser.hpp"
+#include "fordyca/params/tv/tv_manager_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,12 +31,12 @@ NS_START(fordyca, params, tv);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char tv_controller_parser::kXMLRoot[];
+constexpr char tv_manager_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void tv_controller_parser::parse(const ticpp::Element& node) {
+void tv_manager_parser::parse(const ticpp::Element& node) {
   /* No temporal variance configured */
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
@@ -75,7 +75,7 @@ void tv_controller_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_pure bool tv_controller_parser::validate(void) const {
+__rcsw_pure bool tv_manager_parser::validate(void) const {
   return m_block_manip.validate() && m_block_carry.validate() &&
          m_cache_usage.validate();
 } /* validate() */

@@ -55,9 +55,8 @@ template void depth0_metrics_aggregator::collect_from_controller(
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
     const struct params::metrics_params* const mparams,
-    const rswc::convergence_params* const cparams,
     const std::string& output_root)
-    : base_metrics_aggregator(mparams, cparams, output_root),
+    : base_metrics_aggregator(mparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
   register_collector<metrics::world_model_metrics_collector>(
       "perception::world_model",

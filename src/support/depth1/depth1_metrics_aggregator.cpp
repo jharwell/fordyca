@@ -61,9 +61,8 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
     const params::metrics_params* const mparams,
-    const rswc::convergence_params* const cparams,
     const std::string& output_root)
-    : depth0_metrics_aggregator(mparams, cparams, output_root),
+    : depth0_metrics_aggregator(mparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acquisition",

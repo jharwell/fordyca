@@ -1,5 +1,5 @@
 /**
- * @file tv_controller.cpp
+ * @file tv_manager.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -30,7 +30,7 @@
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -40,7 +40,7 @@
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include "fordyca/params/tv/tv_controller_params.hpp"
+#include "fordyca/params/tv/tv_manager_params.hpp"
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 
@@ -52,10 +52,10 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-tv_controller::tv_controller(const params::tv::tv_controller_params* params,
+tv_manager::tv_manager(const params::tv::tv_manager_params* params,
                              const support::base_loop_functions* const lf,
                              ds::arena_map* const map)
-    : ER_CLIENT_INIT("fordyca.support.tv.tv_controller"),
+    : ER_CLIENT_INIT("fordyca.support.tv.tv_manager"),
       mc_lf(lf),
       mc_motion_throttle_params(params->block_carry_throttle) {
   m_fb_pickup.emplace(
@@ -161,7 +161,7 @@ tv_controller::tv_controller(const params::tv::tv_controller_params* params,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double tv_controller::swarm_motion_throttle(void) const {
+double tv_manager::swarm_motion_throttle(void) const {
   double accum = 0.0;
   auto& robots = const_cast<support::base_loop_functions*>(mc_lf)
                      ->GetSpace()
@@ -176,7 +176,7 @@ double tv_controller::swarm_motion_throttle(void) const {
   return accum / robots.size();
 } /* swarm_motion_throttle() */
 
-double tv_controller::env_block_manipulation(void) const {
+double tv_manager::env_block_manipulation(void) const {
   uint timestep = const_cast<support::base_loop_functions*>(mc_lf)
                       ->GetSpace()
                       .GetSimulationClock();
@@ -186,7 +186,7 @@ double tv_controller::env_block_manipulation(void) const {
       ->timestep_penalty(timestep);
 } /* env_block_manipulation() */
 
-double tv_controller::env_cache_usage(void) const {
+double tv_manager::env_cache_usage(void) const {
   uint timestep = const_cast<support::base_loop_functions*>(mc_lf)
                       ->GetSpace()
                       .GetSimulationClock();
@@ -195,13 +195,13 @@ double tv_controller::env_cache_usage(void) const {
       ->timestep_penalty(timestep);
 } /* env_cache_usage() */
 
-void tv_controller::register_controller(int robot_id) {
+void tv_manager::register_controller(int robot_id) {
   m_motion_throttling.emplace(std::piecewise_construct,
                               std::forward_as_tuple(robot_id),
                               std::forward_as_tuple(&mc_motion_throttle_params));
 } /* register_controller() */
 
-void tv_controller::update(void) {
+void tv_manager::update(void) {
   auto& robots = const_cast<support::base_loop_functions*>(mc_lf)
                      ->GetSpace()
                      .GetEntitiesByType("foot-bot");

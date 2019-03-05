@@ -44,9 +44,10 @@
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
@@ -90,10 +91,9 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   auto* arenap = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
       *params()->parse_results<const struct params::output_params>();
-  auto* conv = params()->parse_results<rswc::convergence_params>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(
-      &output.metrics, conv, output_root());
+      &output.metrics, output_root());
 
   /* initialize cache handling and create initial cache */
   auto* cachep = params()->parse_results<params::caches::caches_params>();
@@ -103,10 +103,10 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   m_interactors = rcppsw::make_unique<interactor_map>();
   m_interactors->emplace(
       typeid(controller::depth1::gp_dpo_controller),
-      gp_dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+      gp_dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
   m_interactors->emplace(
       typeid(controller::depth1::gp_mdpo_controller),
-      gp_mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+      gp_mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
 
   /* initialize oracles */
   oracle_init();
@@ -261,8 +261,14 @@ argos::CColor depth1_loop_functions::GetFloorColor(
 
 void depth1_loop_functions::PreStep() {
   ndc_push();
-
   base_loop_functions::PreStep();
+
+  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+      *(*m_metrics_agg)["blocks::transport"]);
+  arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
+                                         collector.cum_collected(),
+                                         conv_calculator()->converged());
+
   /* Get metrics from caches */
   for (auto& c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c.get());

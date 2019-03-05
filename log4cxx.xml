@@ -34,7 +34,7 @@
   <category name="fordyca.fsm.depth0" >
     <priority value ="all" />
   </category>
-  <category name="fordyca.loop.support.block_dist" >
+  <category name="fordyca.support.block_dist" >
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.dynamic_cache_creator" >

@@ -29,6 +29,7 @@
 #include "fordyca/params/arena/block_dist_params.hpp"
 #include "fordyca/params/arena/powerlaw_dist_parser.hpp"
 #include "fordyca/params/arena/block_manifest_parser.hpp"
+#include "fordyca/params/arena/block_redist_governor_parser.hpp"
 
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
@@ -53,16 +54,16 @@ class block_dist_parser : public rcppsw::params::xml_param_parser {
   explicit block_dist_parser(uint level)
       : xml_param_parser(level),
         m_manifest(level + 1),
-        m_powerlaw(level + 1) {}
+        m_powerlaw(level + 1),
+        m_redist_governor(level + 1) {}
 
   /**
-   * @brief The root tag that all block distribution parameters should lie under in the
-   * XML tree.
+   * @brief The root tag that all block distribution parameters should lie under
+   * in the XML tree.
    */
   static constexpr char kXMLRoot[] = "distribution";
 
   void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
@@ -79,6 +80,7 @@ class block_dist_parser : public rcppsw::params::xml_param_parser {
   /* clang-format off */
   block_manifest_parser              m_manifest;
   powerlaw_dist_parser               m_powerlaw;
+  block_redist_governor_parser       m_redist_governor;
   std::shared_ptr<block_dist_params> m_params{nullptr};
   /* clang-format on */
 };

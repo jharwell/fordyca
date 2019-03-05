@@ -64,22 +64,22 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
   robot_arena_interactor(ds::arena_map* const map,
                          depth0::depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor,
-                         tv::tv_controller* const tv_controller,
+                         tv::tv_manager* const tv_manager,
                          dynamic_cache_manager* const cache_manager)
       : ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
-        m_tv_controller(tv_controller),
-        m_free_pickup_interactor(map, floor, tv_controller),
-        m_nest_drop_interactor(map, metrics_agg, floor, tv_controller),
+        m_tv_manager(tv_manager),
+        m_free_pickup_interactor(map, floor, tv_manager),
+        m_nest_drop_interactor(map, metrics_agg, floor, tv_manager),
         m_task_abort_interactor(map, floor),
-        m_cached_pickup_interactor(map, floor, tv_controller),
-        m_existing_cache_drop_interactor(map, tv_controller),
+        m_cached_pickup_interactor(map, floor, tv_manager),
+        m_existing_cache_drop_interactor(map, tv_manager),
         m_cache_site_drop_interactor(map,
                                      floor,
-                                     tv_controller,
+                                     tv_manager,
                                      cache_manager),
         m_new_cache_drop_interactor(map,
                                     floor,
-                                    tv_controller,
+                                    tv_manager,
                                     cache_manager) {}
 
   /**
@@ -107,7 +107,7 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
    */
   bool operator()(T& controller, uint timestep) {
     if (m_task_abort_interactor(controller,
-                                m_tv_controller->template all_penalty_handlers<T>())) {
+                                m_tv_manager->template all_penalty_handlers<T>())) {
       return false;
     }
 
@@ -126,7 +126,7 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
 
  private:
   /* clang-format off */
-  tv::tv_controller* const                m_tv_controller;
+  tv::tv_manager* const                m_tv_manager;
 
   free_block_pickup_interactor<T>         m_free_pickup_interactor;
   nest_block_drop_interactor<T>           m_nest_drop_interactor;

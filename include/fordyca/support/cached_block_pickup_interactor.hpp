@@ -31,7 +31,7 @@
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,11 +55,11 @@ class cached_block_pickup_interactor
  public:
   cached_block_pickup_interactor(ds::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
-                                 tv::tv_controller* tv_controller)
+                                 tv::tv_manager* tv_manager)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
-        m_penalty_handler(tv_controller->penalty_handler<T>(
+        m_penalty_handler(tv_manager->penalty_handler<T>(
             tv::cache_op_src::kSrcExistingCachePickup)) {}
 
   /**

@@ -32,7 +32,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,11 +59,11 @@ class free_block_pickup_interactor
  public:
   free_block_pickup_interactor(ds::arena_map* const map,
                                argos::CFloorEntity* const floor,
-                               tv::tv_controller* tv_controller)
+                               tv::tv_manager* tv_manager)
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
         m_floor(floor),
         m_map(map),
-        m_penalty_handler(tv_controller->penalty_handler<T>(
+        m_penalty_handler(tv_manager->penalty_handler<T>(
             tv::block_op_src::kSrcFreePickup)) {}
 
   /**

@@ -44,7 +44,6 @@
 #include "fordyca/support/depth2/robot_arena_interactor.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
 
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
@@ -79,10 +78,9 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
 
   params::output_params output =
       *params()->parse_results<const struct params::output_params>();
-  auto* conv = params()->parse_results<rswc::convergence_params>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(
-      &output.metrics, conv, output_root());
+      &output.metrics, output_root());
 
   /* initialize cache handling */
   auto* cachep = params()->parse_results<params::caches::caches_params>();
@@ -94,13 +92,13 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
                          grp_dpo_itype(arena_map(),
                                        m_metrics_agg.get(),
                                        floor(),
-                                       tv_controller(),
+                                       tv_manager(),
                                        m_cache_manager.get()));
   m_interactors->emplace(typeid(controller::depth2::grp_mdpo_controller),
                          grp_mdpo_itype(arena_map(),
                                         m_metrics_agg.get(),
                                         floor(),
-                                        tv_controller(),
+                                        tv_manager(),
                                         m_cache_manager.get()));
 
   /* configure robots */

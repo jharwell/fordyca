@@ -18,26 +18,37 @@ This is the main entry point for getting started on the project.
    - NLopt (`libnlopt-dev` on ubuntu)
    - ccache (`ccache` on ubuntu)
 
-2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
-   for the project.
+2. Install ARGoS (homepage http://www.argos-sim.info/index.php), the simulator
+   for the project. You can install it in one of three ways:
 
-   *IMPORTANT!* If you use one of the pre-packaged versions of ARGoS, then you
-   _MUST_ also use gcc/g++ version < 6.0 (anything 5.4 is known to work) on
-   linux. This is because those packages were compiled with gcc/g++ 5.4, and
-   therefore the core ARGoS libraries that fordyca uses are ABI incompatible
-   with anything compiled with gcc >= 6.0. In addition, when installing ARGoS
-   from a .deb you will likely not have all dependencies met (dpkg does not
-   check them like apt does), so you need to run:
+   - Use one of the pre-packaged/binary versions of ARGoS from the website (not
+     recommended). If you do choose this route then you _MUST_ also use gcc/g++
+     version < 6.0 (anything 5.4 is known to work) on linux. This is because
+     those packages were compiled with gcc/g++ 5.4, and therefore the core ARGoS
+     libraries that fordyca uses are ABI incompatible with anything compiled
+     with gcc >= 6.0. In addition, when installing ARGoS from a .deb you will
+     likely not have all dependencies met (dpkg does not check them like apt
+     does), so you need to run:
 
         sudo apt install -f
 
-   After installing the .deb with dpkg to fix installation issues.
+      After installing the .deb with dpkg to fix installation issues.
 
-   If you are compiling ARGoS from source you can use whatever compiler/compiler
-   version you like, so long as it supports C++14.
+    - Build upstream ARGoS (https://github.com/ilpincy/argos3) from source. If
+      using this method you can use whatever compiler/compiler version you like,
+      so long as it supports C++14. This method is generally OK, though you will
+      not get some of the tweaks/improvements to ARGoS that I have made that
+      have not made their way into the main ARGoS repository yet.
 
-3. Verify that you can run the simple foraging example that comes
-   packaged on the ARGoS website.
+    - Build the organization's downstream ARGoS
+      (https://github.com/swarm-robotics/argos3) from source. If
+      using this method you can use whatever compiler/compiler version you like,
+      so long as it supports C++14. This method is recommended, as you will
+      always have the most up-to-date ARGoS functionality (origin+my changes).
+
+3. Verify that you can build an run the ARGoS examples
+   (https://github.com/ilpincy/argos3-examples), especially the foraging
+   example, which is what the project was originally based on
 
 4. This project uses the build scaffolding provided by
    [libra](https://github.com/swarm-robotics/libra). Please look at the platform
@@ -74,20 +85,21 @@ This is the main entry point for getting started on the project.
 
 # Configuring Simulations
 
-For parameter configuration see [parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
+For parameter configuration see
+[parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
 
 ## Controller Configuration
 
 
-| Controller Name        | Status   | Required loop/QT user functions | Notes                                                                                                                                               |
-|------------------------|----------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| crw                    | Usable   | depth0                          | CRW = Correlated Random Walk                                                                                                                        |
-| dpo                    | Usable   | depth0                          | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                                          |
-| mdpo                   | Usable   | depth0                          | MDPO = Mapped Decaying Pheromone Object.Like DPO, but also manages a mapped extent of the arena and tracks relevance of individual cells within it. |
-| greedy\_partitioning   | Usable   | depth1                          | Requires static caches to also be enabled.                                                                                                          |
-| oracular\_partitioning | Usable   | depth1                          | Requires static caches and the oracle to be enabled.                                                                                                |
-| greedy\_recpart        | Unstable | depth2                          | Requires dynamic caches to also be enabled.                                                                                                         |
-| oracular\_recpart      | Unstable | depth2                          | Requires dynamic caches and the oracle to be enabled.                                                                                               |
+| Controller | Status   | Loop functions | Notes                                                                                                                                |
+|------------|----------|----------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| crw        | Stable   | depth0         | CRW = Correlated Random Walk.                                                                                                        |
+| dpo        | Stable   | depth0         | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                           |
+| mdpo       | Stable   | depth0         | MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena tracking relevance of individual cells within it.          |
+| gp\_dpo    | Stable   | depth1         | Greedy task partitioning + DPO. Requires static caches to also be enabled.                                                           |
+| ogp\_dpo   | Stable   | depth1         | Greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.            |
+| grp\_dpo   | Unstable | depth2         | Recursive greedy task partitioning + DPO. Requires dynamic caches to be enabled.                                                     |
+| ogrp_dpo   | Unstable | depth2         | Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled. |
 
 # Running On Your Laptop
 
@@ -102,7 +114,7 @@ After successful compilation, follow these steps to run a foraging scenario:
    ENTIRE search space for argos to look for libraries (including its own core
    libraries).
 
-2. Unless you disable event reporting, you will need to set the path to the
+2. Unless you compile out event reporting, you will need to set the path to the
    log4cxx configuration file. On bash that is:
 
         export LOG4CXX_CONFIGURATION=/path/to/fordyca/log4cxx.xml
@@ -112,43 +124,14 @@ After successful compilation, follow these steps to run a foraging scenario:
         argos3 -c exp/demo.argos
 
    This should pop up a nice GUI from which you can start the experiment (it
-   runs depth0 stateful foraging by default). If no GUI appears, verify that the
+   runs depth0 dpo foraging by default). If no GUI appears, verify that the
    `<visualization>` subtree of the file is not commented out.
 
 # Running on MSI
 
-ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
-access to that directory as part of the gini group.
-
-1. On an MSI login node, run the bash script to clone the project (this is a
-   one-time step):
-
-        fordyca-clone-all.sh /path/to/project/root
-
-   The 1st argument is the path (relative or absolute) to the location where you
-   want the project repos to live (they will all be cloned into that level).
-
-   If you need to checkout a particular branch in the repo you can do that after
-   running the script.
-
-2. On an MSI cluster node (*NOT* a login node), source the build/run
-   environment setup script:
-
-        . /home/gini/shared/swarm/bin/build-env-setup.sh
-
-   If you use a different shell than bash, you will have to look at the script
-   and modify it (in *your* home directory somewhere) so your shell understands
-   the syntax.
-
-3. On an MSI cluster node (*NOT* a login node), run the bash script to build the
-   project (note that you may want to tweak the cmake defines in the script, or
-   use your own script, depending on what types of experiments you are
-   running). If you are not sure if you need to do this, ask!
-
-        /home/gini/shared/swarm/bin/fordyca-build-default.sh /path/to/project/root
-
-   The 1st argument is the path (relative or absolute) to the location where you
-   cloned the project repos.
+Head over to [sierra](https://github.com/swarm-robotics-sierra.git), and follow
+the MSI setup instructions over there. Don't try to run on MSI without it. Just
+don't.
 
 # Troubleshooting
 
@@ -160,7 +143,7 @@ access to that directory as part of the gini group.
      pull`.
 
   2. Updating the `fordyca`, `rcppsw` cmake submodules by running `git submodule
-     update` in the root of each repository.
+     update --recursive --remote` in the root of each repository.
 
 
   If the problem perists, open an issue.

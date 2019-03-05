@@ -45,8 +45,9 @@
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
+#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,23 +78,22 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
   auto* arena = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
       *params()->parse_results<params::output_params>();
-  auto* conv = params()->parse_results<rswc::convergence_params>();
   output.metrics.arena_grid = arena->grid;
 
   m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(
-      &output.metrics, conv, output_root());
+      &output.metrics, output_root());
 
   /* intitialize robot interactions with environment */
   m_interactors = rcppsw::make_unique<interactor_map>();
   m_interactors->emplace(
       typeid(controller::depth0::crw_controller),
-      crw_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+      crw_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
   m_interactors->emplace(
       typeid(controller::depth0::dpo_controller),
-      dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+      dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
   m_interactors->emplace(
       typeid(controller::depth0::mdpo_controller),
-      mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
+      mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -208,8 +208,14 @@ __rcsw_pure argos::CColor depth0_loop_functions::GetFloorColor(
 
 void depth0_loop_functions::PreStep(void) {
   ndc_push();
-
   base_loop_functions::PreStep();
+
+  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+      *(*m_metrics_agg)["blocks::transport"]);
+  arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
+                                         collector.cum_collected(),
+                                         conv_calculator()->converged());
+
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);

@@ -28,7 +28,7 @@
 #include <list>
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 #include "rcppsw/task_allocation/logical_task.hpp"
 
 /*******************************************************************************

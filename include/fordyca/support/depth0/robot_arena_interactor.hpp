@@ -53,10 +53,10 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
   robot_arena_interactor(ds::arena_map* const map,
                          depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor,
-                         tv::tv_controller* const tv_controller)
+                         tv::tv_manager* const tv_manager)
       : ER_CLIENT_INIT("fordyca.support.depth0.robot_arena_interactor"),
-        m_free_pickup_interactor(map, floor, tv_controller),
-        m_nest_drop_interactor(map, metrics_agg, floor, tv_controller) {}
+        m_free_pickup_interactor(map, floor, tv_manager),
+        m_nest_drop_interactor(map, metrics_agg, floor, tv_manager) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,

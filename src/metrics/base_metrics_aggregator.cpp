@@ -40,10 +40,11 @@
 #include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 #include "fordyca/params/metrics_params.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
+#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +58,6 @@ namespace rmetrics = rcppsw::metrics;
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
     const params::metrics_params* const mparams,
-    const rswc::convergence_params* const cparams,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
       collector_group(),
@@ -102,8 +102,7 @@ base_metrics_aggregator::base_metrics_aggregator(
   register_collector<rmetrics::swarm::convergence_metrics_collector>(
       "swarm::convergence",
       metrics_path() + "/" + mparams->swarm_convergence_fname,
-      mparams->collect_interval,
-      cparams);
+      mparams->collect_interval);
 
   register_collector<metrics::temporal_variance_metrics_collector>(
       "loop::temporal_variance",
@@ -116,8 +115,8 @@ base_metrics_aggregator::base_metrics_aggregator(
  ******************************************************************************/
 void base_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
-  collect("swarm::convergence", *loop);
-  collect("loop::temporal_variance", *loop->tv_controller());
+  collect("swarm::convergence", *loop->conv_calculator());
+  collect("loop::temporal_variance", *loop->tv_manager());
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(

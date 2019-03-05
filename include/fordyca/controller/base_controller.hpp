@@ -38,7 +38,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace support { namespace tv {
-class tv_controller;
+class tv_manager;
 }} // namespace support::tv
 
 namespace repr {
@@ -139,7 +139,7 @@ class base_controller : public argos::CCI_Controller,
     m_block = block;
   }
 
-  void tv_init(const support::tv::tv_controller* tv_controller);
+  void tv_init(const support::tv::tv_manager* tv_manager);
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
@@ -203,7 +203,7 @@ class base_controller : public argos::CCI_Controller,
   void saa_init(const params::actuation_params*, const params::sensing_params*);
 
   /* clang-format off */
-  const support::tv::tv_controller*           m_tv_controller{nullptr};
+  const support::tv::tv_manager*           m_tv_manager{nullptr};
   bool                                        m_display_id{false};
   std::shared_ptr<repr::base_block> m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem>  m_saa;

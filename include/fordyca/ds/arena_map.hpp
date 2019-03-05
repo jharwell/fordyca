@@ -34,6 +34,7 @@
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
+#include "fordyca/support/block_dist/redist_governor.hpp"
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
@@ -240,6 +241,9 @@ class arena_map : public er::client<arena_map>,
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
   }
+  support::block_dist::redist_governor* redist_governor(void)  {
+    return &m_redist_governor;
+  }
 
   /**
    * @brief The amount of padding to add to the arena map so that LOS
@@ -260,11 +264,12 @@ class arena_map : public er::client<arena_map>,
 
  private:
   /* clang-format off */
-  uint                            m_caches_removed{0};
-  block_vector                    m_blocks;
-  cache_vector                    m_caches;
-  repr::nest            m_nest;
-  support::block_dist::dispatcher m_block_dispatcher;
+  uint                                 m_caches_removed{0};
+  block_vector                         m_blocks;
+  cache_vector                         m_caches;
+  repr::nest                           m_nest;
+  support::block_dist::dispatcher      m_block_dispatcher;
+  support::block_dist::redist_governor m_redist_governor;
   /* clang-format on */
 };
 

@@ -49,7 +49,8 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
                    .create_blocks()),
       m_caches(),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
-      m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()) {
+      m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()),
+      m_redist_governor(&params->blocks.dist.redist_governor) {
   ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
           xrsize(),
           yrsize(),
@@ -96,10 +97,22 @@ __rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
 } /* robot_on_cache() */
 
 bool arena_map::distribute_single_block(std::shared_ptr<repr::base_block>& block) {
+
+  /* return TRUE because the distribution of nothing is ALWAYS successful */
+  if (!m_redist_governor.dist_status()) {
+    return true;
+  }
+  /* Entities that need to be avoided during block distribution are:
+   *
+   * - All existing caches
+   * - All existing blocks
+   * - Nest
+   */
   ds::const_entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
+
   for (auto& b : m_blocks) {
     if (b != block) {
       entities.push_back(b.get());

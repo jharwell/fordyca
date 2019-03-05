@@ -31,17 +31,25 @@
 
 #include "fordyca/params/loop_function_repository.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/metrics/swarm/convergence_metrics.hpp"
+#include "rcppsw/math/vector2.hpp"
+#include "rcppsw/math/radians.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace rcppsw { namespace swarm { namespace convergence {
+struct convergence_params;
+class convergence_calculator;
+}}} // namespace rcppsw::swarm::convergence
+
+namespace rswc = rcppsw::swarm::convergence;
+
 NS_START(fordyca);
 
 namespace params {
 struct output_params;
 namespace tv {
-struct tv_controller_params;
+struct tv_manager_params;
 }
 } // namespace params
 namespace ds {
@@ -50,10 +58,10 @@ class arena_map;
 NS_START(support);
 
 namespace tv {
-class tv_controller;
+class tv_manager;
 }
 namespace rmath = rcppsw::math;
-namespace rmetrics = rcppsw::metrics;
+namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
  * Classes
@@ -71,10 +79,11 @@ namespace rmetrics = rcppsw::metrics;
  * the \ref argos::CLoopFunctions class.
  */
 class base_loop_functions : public argos::CLoopFunctions,
-                            public rmetrics::swarm::convergence_metrics,
                             public rcppsw::er::client<base_loop_functions> {
  public:
   base_loop_functions(void);
+  ~base_loop_functions(void) override;
+
   base_loop_functions(const base_loop_functions& s) = delete;
   base_loop_functions& operator=(const base_loop_functions& s) = delete;
 
@@ -83,17 +92,15 @@ class base_loop_functions : public argos::CLoopFunctions,
   void Reset(void) override;
   void PreStep(void) override;
 
-  /* convergence metrics */
-  std::vector<double> robot_nearest_neighbors(void) const override;
-  std::vector<rmath::radians> robot_headings(void) const override;
-  std::vector<rmath::vector2d> robot_positions(void) const override;
-
   void ndc_push(void) {
     ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
   }
   void ndc_pop(void) { ER_NDC_POP(); }
-  const tv::tv_controller* tv_controller(void) const {
-    return m_tv_controller.get();
+  const tv::tv_manager* tv_manager(void) const {
+    return m_tv_manager.get();
+  }
+  const rswc::convergence_calculator* conv_calculator(void) const {
+    return m_conv_calc.get();
   }
 
  protected:
@@ -102,12 +109,14 @@ class base_loop_functions : public argos::CLoopFunctions,
   const params::loop_function_repository* params(void) const {
     return &m_params;
   }
-  tv::tv_controller* tv_controller(void) { return m_tv_controller.get(); }
+  tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
 
   params::loop_function_repository* params(void) { return &m_params; }
   const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
   ds::arena_map* arena_map(void) { return m_arena_map.get(); }
-
+  rswc::convergence_calculator* conv_calculator(void) {
+    return m_conv_calc.get();
+  }
  private:
   /**
    * @brief Initialize logging for all support/loop function code.
@@ -115,16 +124,39 @@ class base_loop_functions : public argos::CLoopFunctions,
    * @param output Parsed output parameters.
    */
   void output_init(const struct params::output_params* const output);
+
+  /**
+   * @brief Initialize the arena contents.
+   *
+   * @param repo Repository of parsed parameters.
+   */
   void arena_map_init(const params::loop_function_repository* repo);
-  void tv_init(const params::tv::tv_controller_params* tvp);
+
+  /**
+   * @brief Initialize temporal variance handling.
+   *
+   * @param tvp Parsed TV parameters.
+   */
+  void tv_init(const params::tv::tv_manager_params* tvp);
+
+  /**
+   * @brief Initialize convergence calculations.
+   *
+   * @param params Parsed convergence parameters.
+   */
+  void convergence_init(const rswc::convergence_params* const params);
+
+  std::vector<double> calc_robot_nn(uint n_threads) const;
+  std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;
+  std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
 
   /* clang-format off */
-  uint                               m_loop_threads{0};
-  argos::CFloorEntity*               m_floor{nullptr};
-  std::string                        m_output_root{""};
-  params::loop_function_repository   m_params{};
-  std::unique_ptr<ds::arena_map>     m_arena_map;
-  std::unique_ptr<tv::tv_controller> m_tv_controller;
+  argos::CFloorEntity*                          m_floor{nullptr};
+  std::string                                   m_output_root{""};
+  params::loop_function_repository              m_params{};
+  std::unique_ptr<ds::arena_map>                m_arena_map;
+  std::unique_ptr<tv::tv_manager>               m_tv_manager;
+  std::unique_ptr<rswc::convergence_calculator> m_conv_calc;
   /* clang-format on */
 };
 

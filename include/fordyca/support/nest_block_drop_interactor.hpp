@@ -31,7 +31,7 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,13 +60,13 @@ class nest_block_drop_interactor
   nest_block_drop_interactor(ds::arena_map* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
                              argos::CFloorEntity* const floor,
-                             tv::tv_controller* tv_controller)
+                             tv::tv_manager* tv_manager)
       : ER_CLIENT_INIT("fordyca.support.nest_block_drop_interactor"),
         m_floor(floor),
         m_metrics_agg(metrics_agg),
         m_map(map),
         m_penalty_handler(
-            tv_controller->penalty_handler<T>(tv::block_op_src::kSrcNestDrop)) {
+            tv_manager->penalty_handler<T>(tv::block_op_src::kSrcNestDrop)) {
   }
 
   /**

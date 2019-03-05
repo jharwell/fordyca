@@ -1,5 +1,5 @@
 /**
- * @file tv_controller.hpp
+ * @file tv_manager.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -82,7 +82,7 @@ class grp_dpo_controller;
 class grp_mdpo_controller;
 }
 }
-namespace params { namespace tv { struct tv_controller_params; }}
+namespace params { namespace tv { struct tv_manager_params; }}
 namespace ds { class arena_map; }
 NS_START(support);
 
@@ -94,13 +94,13 @@ NS_START(tv);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class tv_controller
+ * @class tv_manager
  * @ingroup support tv
  * @brief Orchestrates all application of temporal variance to robot interations
  * with the environment/robotic mechanical functioning.
  */
 
-class tv_controller : public rcppsw::er::client<tv_controller>,
+class tv_manager : public rcppsw::er::client<tv_manager>,
                       public metrics::temporal_variance_metrics {
  public:
   template<typename T>
@@ -109,12 +109,12 @@ class tv_controller : public rcppsw::er::client<tv_controller>,
   template<typename T>
   using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
 
-  tv_controller(const params::tv::tv_controller_params* params,
+  tv_manager(const params::tv::tv_manager_params* params,
                 const support::base_loop_functions* const lf,
                 ds::arena_map* const map);
 
-  tv_controller(const tv_controller& other) = delete;
-  const tv_controller& operator=(const tv_controller& other) = delete;
+  tv_manager(const tv_manager& other) = delete;
+  const tv_manager& operator=(const tv_manager& other) = delete;
 
   /* temporal variance metrics */
   double swarm_motion_throttle(void) const override;
@@ -172,13 +172,13 @@ class tv_controller : public rcppsw::er::client<tv_controller>,
   template<typename T>
   const block_op_penalty_handler<T>* penalty_handler(
       const block_op_src& src) const {
-    return const_cast<tv_controller*>(this)->penalty_handler<T>(src);
+    return const_cast<tv_manager*>(this)->penalty_handler<T>(src);
   }
 
   template<typename T>
   const cache_op_penalty_handler<T>* penalty_handler(
       const cache_op_src& src) const {
-    return const_cast<tv_controller*>(this)->penalty_handler<T>(src);
+    return const_cast<tv_manager*>(this)->penalty_handler<T>(src);
   }
 
   /*

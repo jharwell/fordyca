@@ -1,7 +1,7 @@
 /**
- * @file dist_params.hpp
+ * @file block_redist_governor_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,16 +18,18 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_REDIST_GOVERNOR_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_REDIST_GOVERNOR_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/params/arena/powerlaw_dist_params.hpp"
-#include "fordyca/params/arena/block_manifest.hpp"
+
 #include "fordyca/params/arena/block_redist_governor_params.hpp"
+
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,38 +37,43 @@
 NS_START(fordyca, params, arena);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct block_dist_params
+ * @class block_redist_governor_parser
  * @ingroup params arena
+ *
+ * @brief Parses XML parameters related to block redistribution by the \ref
+ * block_redist_governor.
  */
-struct block_dist_params : public rcppsw::params::base_params {
-  block_manifest manifest{};
+class block_redist_governor_parser : public rcppsw::params::xml_param_parser {
+ public:
+  explicit block_redist_governor_parser(uint level) : xml_param_parser(level) {}
 
   /**
-   * @brief Resolution of the arena the blocks are being distributed into.
+   * @brief The root tag that all block redistribution parameters should lie
+   * under in the XML tree.
    */
-  double arena_resolution{0.0};
+  static constexpr char kXMLRoot[] = "redist_governor";
 
-  /**
-   * @brief Type of block distribution being performed.
-   */
-  std::string dist_type{""};
+  void parse(const ticpp::Element& node) override;
 
-  /**
-   * @brief Parameters for powerlaw block distribution (only used if powerlaw is
-   * the distribution type).
-   */
-  struct powerlaw_dist_params powerlaw{};
+  std::string xml_root(void) const override { return kXMLRoot; }
+  std::shared_ptr<block_redist_governor_params> parse_results(void) const {
+    return m_params;
+  }
 
-  /**
-   * @brief Parameters for defining the limits of block distribution: Under what
-   * conditions will blocks be redistributed after collection?
-   */
-  struct block_redist_governor_params redist_governor{};
+ private:
+  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+      void) const override {
+    return m_params;
+  }
+
+  /* clang-format off */
+  std::shared_ptr<block_redist_governor_params> m_params{nullptr};
+  /* clang-format on */
 };
 
 NS_END(arena, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_DIST_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_ARENA_BLOCK_REDIST_GOVERNOR_PARSER_HPP_ */

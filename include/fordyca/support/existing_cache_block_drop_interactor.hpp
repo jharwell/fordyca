@@ -30,7 +30,7 @@
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
@@ -55,10 +55,10 @@ class existing_cache_block_drop_interactor
     : public er::client<existing_cache_block_drop_interactor<T>> {
  public:
   existing_cache_block_drop_interactor(ds::arena_map* const map_in,
-                                       tv::tv_controller* tv_controller)
+                                       tv::tv_manager* tv_manager)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
-        m_penalty_handler(tv_controller->penalty_handler<T>(
+        m_penalty_handler(tv_manager->penalty_handler<T>(
             tv::cache_op_src::kSrcExistingCacheDrop)) {}
 
   /**

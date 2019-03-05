@@ -50,7 +50,6 @@ class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
                                   public er::client<depth0_metrics_aggregator> {
  public:
   depth0_metrics_aggregator(const params::metrics_params* mparams,
-                            const rswc::convergence_params * cparams,
                             const std::string& output_root);
 
   /*

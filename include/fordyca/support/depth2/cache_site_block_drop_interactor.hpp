@@ -31,7 +31,7 @@
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/ds/arena_map.hpp"
 
 /*******************************************************************************
@@ -55,13 +55,13 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
  public:
   cache_site_block_drop_interactor(ds::arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
-                                   tv::tv_controller* tv_controller,
+                                   tv::tv_manager* tv_manager,
                                    dynamic_cache_manager* const cache_manager)
       : ER_CLIENT_INIT("fordyca.support.depth2.cache_site_block_drop_interactor"),
         m_floor(floor_in),
         m_map(map_in),
         m_cache_manager(cache_manager),
-        m_penalty_handler(tv_controller->template penalty_handler<T>(
+        m_penalty_handler(tv_manager->template penalty_handler<T>(
             tv::block_op_src::kSrcCacheSiteDrop)) {}
 
   /**
@@ -121,7 +121,7 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
   }
 
  private:
-  using penalty_status = typename tv::tv_controller::filter_status<T>;
+  using penalty_status = typename tv::tv_manager::filter_status<T>;
 
   void block_proximity_notify(T& controller,
                               const loop_utils::proximity_status_t& status) {

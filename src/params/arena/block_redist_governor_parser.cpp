@@ -1,5 +1,5 @@
 /**
- * @file tv_controller_params.hpp
+ * @file block_redist_governor_parser.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,35 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "rcppsw/params/base_params.hpp"
-#include "rcppsw/control/waveform_params.hpp"
+#include "fordyca/params/arena/block_redist_governor_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, tv);
-namespace rct = rcppsw::control;
+NS_START(fordyca, params, arena);
 
 /*******************************************************************************
- * Structure Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * @struct tv_controller_params
- * @ingroup params tv
- */
-struct tv_controller_params : public rcppsw::params::base_params {
-  rct::waveform_params block_manipulation_penalty{};
-  rct::waveform_params block_carry_throttle{};
-  rct::waveform_params cache_usage_penalty{};
-};
+constexpr char block_redist_governor_parser::kXMLRoot[];
 
-NS_END(tv, params, fordyca);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void block_redist_governor_parser::parse(const ticpp::Element& node) {
+  ticpp::Element lnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_ */
+  /*
+   * Needs to be populated always so we get the null trigger when the governor
+   * is disabled.
+   */
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    XML_PARSE_ATTR_DFLT(lnode, m_params, timestep, 0U);
+    XML_PARSE_ATTR_DFLT(lnode, m_params, block_count, 0U);
+    XML_PARSE_ATTR(lnode, m_params, trigger);
+    XML_PARSE_ATTR(lnode, m_params, recurrence_policy);
+  }
+} /* parse() */
+
+NS_END(arena, params, fordyca);

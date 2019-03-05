@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <mdpo_controller id="ffc"
+    <crw_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -150,7 +150,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </mdpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -191,13 +191,15 @@
           task_distribution_fname="task-distribution.csv"
           perception_world_model_fname="perception-world-model.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
-          swarm_convergence_fname="swarm-convpergence.csv"
+          swarm_convergence_fname="swarm-convergence.csv"
           loop_temporal_variance_fname="loop-temporal-variance.csv"
           collect_interval="1000">
           </metrics>
     </output>
     <convergence
-        n_threads="0">
+        n_threads="0"
+        epsilon="0.1"
+        epsilon_delta="1000">
       <positional_entropy
           enable="true"
           horizon="0:13.41"
@@ -249,13 +251,18 @@
         <distribution
             arena_resolution="0.2"
             dist_type="single_source">
+          <redist_governor
+              trigger="Null"
+              recurrence_policy="multi"
+              timestep="500"
+              block_count="2"/>
           <powerlaw
               pwr_min="0"
               pwr_max="3"
               n_clusters="15"
               />
           <manifest
-              n_cube="25"
+              n_cube="5"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -280,6 +287,7 @@
                    />
   </loop_functions>
 
+  <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
   <arena size="12, 6, 2" center="6,3,1">
@@ -304,7 +312,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="64" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

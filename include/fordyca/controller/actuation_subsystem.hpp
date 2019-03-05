@@ -37,7 +37,7 @@
 NS_START(fordyca);
 
 namespace support { namespace tv {
-class tv_controller;
+class tv_manager;
 }} // namespace support::tv
 
 NS_START(controller);

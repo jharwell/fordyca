@@ -59,7 +59,9 @@ class transport_metrics_collector : public rmetrics::base_metrics_collector {
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
- private:
+  uint cum_collected(void) const { return m_stats.cum_collected; }
+
+  private:
   struct stats {
     /**
      * @brief  Total # blocks collected in interval.

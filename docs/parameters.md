@@ -10,9 +10,9 @@ The following root XML tags are defined:
 
 - `output` - Paramaters for simulation outputs across all runs.
 
-- `occupancy_grid` - Parameters pertaining to a robotas discretization of the
-                     continuous world into a grid, and the objects it tracks
-                     within the grid.
+- `perception` - Parameters pertaining to a robots discretization of the
+                 continuous world into a grid, and/or the objects it tracks
+                 within it.
 
 - `task_executive` - Parameters pertaining to the task executive (the entitity
                      responsible for managing/running tasks after they have been
@@ -44,7 +44,7 @@ The following root XML tags are defined:
                  `__current_date__` here, the simulation will get a unique
                  output directory in the form YYYY-MM-DD:HH-MM.
 
-### `occupancy_grid`
+### `perception`
 
 #### `pheromone`
 
@@ -226,11 +226,6 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 ### `actuation`
 
-#### `block_carry_throttle`
-
-- `waveform` - Parameters defining the waveform of throttling. Can be no
-  throttling.
-
 #### `steering2D`
 
 ##### `avoidance_force`
@@ -283,20 +278,23 @@ The following root XML tags are defined:
 
 - `output` - Parameters relating to logging simulation metrics/results.
 
+- `convergence` - Parameters relating to computing swarm convergence.
+
 - `arena_map` - Parameters relating to discretization of the arena.
 
 - `oracle` - Parameters related to the all knowing oracle, which allows
              robots/swarms to make decisions based on perfect information, to
              provide an upper bound on performance.
 
+- `temporal_variance` - Parameters relating to the various types of temporal
+                        waveforms that can be applied to swarm/environmental
+                        state during simulation.
+
 - `caches` - Parameters related to the use of caches in the arena.
 
 ### `output`
 
 #### `sim`
-
-- `sim_log_fname` - The name of the simulation log output file in
-                    `output_root`/`output_dir`.
 
 - `output_root` - The root output directory in which the directories of
                   different simulation runs will be placed.
@@ -308,17 +306,57 @@ The following root XML tags are defined:
 
 #### `metrics`
 
-- `output_dir` - Name of directory within the output directory for the
-  simulation run that metrics will be placed in.
+- `output_dir` - Name of directory within the output root that metrics will be
+                 placed in.
 
 - `collect_interval` - The timestep interval after which statistics will be
                        reset. Gathering statistics on a single timestep of a
                        long simulation is generally not useful; hence this
                        field.
 
-### oracle
+### `convergence`
 
-- `enabled` - Is the oracle enabled or not? Only affects `oracular_controllers`.
+- `n_threads` - How many threads will be used for convergence calculations
+                during loop functions.
+
+- `epsilon` - Threshold < 1.0 that a convergence measure will be considered
+              to have converged when its normalized value is above.
+
+- `epsilon_delta` - # of timesteps the swarm must maintain its normalized
+                    convergence measure score of >= `epsilon` in order to be
+                    considered converged.
+
+#### `positional_entropy`
+
+A measure of convergence using robot positions, Shannon's entropy definition,
+and Balch2000's social entropy measure.
+
+- `enable` - If this measure is enabled or not. Very expensive to compute in
+             large swarms.
+
+- `horizon` - A `min:max` pair of distances specifying the min and max spatail
+              cluster size that will be used to compute the entropy of robot
+              positions.
+
+- `horizon_delta` - Step size for traversing the horizon from min to max.
+
+#### `interactivity`
+
+A measure of convergence using nearest neighbor distances.
+
+- `enable` - If this measure is enabled or not. Relatively cheap to compute in
+             large swarms.
+
+#### `angular_order`
+
+A measure of convergence using congruence of robot orientations.
+
+- `enable` - If this measure is enabled or not. Relatively cheap to compute in
+             large swarms.
+
+### `oracle`
+
+- `enabled` - Is the oracle enabled or not? Only affects oracular controllers.
 
 - `task_exec_est` - If the oracle is enabled, then this will inject perfect
                     estimates of task execution time based on the performance of
@@ -331,6 +369,27 @@ The following root XML tags are defined:
                          performs task allocation.
 
 
+### `temporal_variance`
+
+#### `blocks`
+
+##### `manipulation_penalty`
+
+- `waveform` - Parameters defining the waveform of block manipulation penalty
+               (picking up/dropping that does not involve caches).
+
+##### `carry_throttle`
+
+- `waveform` - Parameters defining the waveform of block carry penalty
+               (how much slower robots move when carrying a block).
+
+#### `caches`
+
+##### `usage_penalty`
+
+- `waveform` - Parameters defining the waveform of cache usage penalty (picking
+               up/dropping).
+
 ### `arena_map`
 
 #### `grid`
@@ -342,11 +401,6 @@ The following root XML tags are defined:
 - `size` - The size of the arena.
 
 #### `blocks`
-
-##### `manipulation_penalty`
-
-- `waveform` - Parameters defining the waveform of block manipulation penalty
-  (picking up, dropping that does not involve caches).
 
 ##### `distribution`
 
@@ -430,7 +484,9 @@ The following root XML tags are defined:
 - `min_blocks` - The minimum # of blocks that need to within `min_dist` from
                  each other to trigger dynamic cache creation.
 
-- `usage_penalty` - Waveform params again.
+- `robot_drop_only` - If TRUE, then caches will only be created by intential
+                      robot block drops rather than drops due to abort/block
+                      distribution after collection.
 
 ### `visualization`
 
