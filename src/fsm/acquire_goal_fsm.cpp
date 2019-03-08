@@ -83,7 +83,7 @@ HFSM_STATE_DEFINE_ND(acquire_goal_fsm, fsm_acquire_goal) {
   if (acquire_goal()) {
     internal_event(ST_FINISHED);
   }
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 
 HFSM_EXIT_DEFINE(acquire_goal_fsm, exit_fsm_acquire_goal) {
@@ -95,7 +95,7 @@ HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
     ER_DEBUG("Executing ST_FINISHED");
   }
 
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 
 /*******************************************************************************
@@ -230,7 +230,7 @@ bool acquire_goal_fsm::acquire_known_goal(void) {
 
 void acquire_goal_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+               rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

@@ -29,7 +29,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -53,13 +53,13 @@ dpo_fsm::dpo_fsm(const controller::block_sel_matrix* const sel_matrix,
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(dpo_fsm, start, rfsm::event_data) {
   /* first time running FSM */
-  if (state_machine::event_type::NORMAL == data->type()) {
+  if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_BLOCK_TO_NEST);
     return controller::foraging_signal::HANDLED;
   }
-  if (state_machine::event_type::CHILD == data->type()) {
+  if (rfsm::event_type::CHILD == data->type()) {
     if (controller::foraging_signal::LEFT_NEST == data->signal()) {
       internal_event(ST_BLOCK_TO_NEST);
       return controller::foraging_signal::HANDLED;
@@ -69,11 +69,11 @@ HFSM_STATE_DEFINE(dpo_fsm, start, state_machine::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, state_machine::event_data) {
+HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rfsm::event_data) {
   if (nullptr != data &&
       controller::foraging_signal::FSM_RUN != data->signal() &&
-      state_machine::event_signal::IGNORED != data->signal()) {
-    m_block_fsm.inject_event(data->signal(), state_machine::event_type::NORMAL);
+      rfsm::event_signal::IGNORED != data->signal()) {
+    m_block_fsm.inject_event(data->signal(), rfsm::event_type::NORMAL);
     return controller::foraging_signal::HANDLED;
   }
   if (m_block_fsm.task_finished()) {
@@ -136,7 +136,7 @@ void dpo_fsm::init(void) {
 
 void dpo_fsm::run(void) {
   inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+               rfsm::event_type::NORMAL);
 } /* run() */
 
 NS_END(depth0, fsm, fordyca);

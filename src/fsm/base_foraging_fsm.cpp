@@ -32,7 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 namespace utils = rcppsw::utils;
 using controller::steering_force_type;
 
@@ -41,7 +41,7 @@ using controller::steering_force_type;
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
                                      uint8_t max_states)
-    : state_machine::hfsm(max_states),
+    : rfsm::hfsm(max_states),
       ER_CLIENT_INIT("fordyca.fsm.base_foraging"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
@@ -57,8 +57,8 @@ base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
+HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data) {
+  ER_ASSERT(rfsm::event_type::NORMAL == data->type(),
             "ST_LEAVING_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
             "ST_LEAVING_NEST should never pickup blocks...");
@@ -88,12 +88,12 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, state_machine::event_data) {
   if (!m_saa->sensing()->in_nest()) {
     return controller::foraging_signal::LEFT_NEST;
   }
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 HFSM_STATE_DEFINE(base_foraging_fsm,
                   transport_to_nest,
-                  state_machine::event_data) {
-  ER_ASSERT(state_machine::event_type::NORMAL == data->type(),
+                  rfsm::event_data) {
+  ER_ASSERT(rfsm::event_type::NORMAL == data->type(),
             "ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
             "ST_TRANSPORT_TO_NEST should never pickup blocks...");
@@ -137,10 +137,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   }
 
   m_saa->apply_steering_force(std::make_pair(true, false));
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, state_machine::event_data) {
+HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data) {
   rmath::radians current_dir = m_saa->sensing()->heading_angle();
 
   /*

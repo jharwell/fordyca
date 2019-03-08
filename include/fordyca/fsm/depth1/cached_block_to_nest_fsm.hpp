@@ -170,24 +170,24 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm,
                      transport_to_nest,
-                     state_machine::event_data);
+                     rfsm::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm,
                      leaving_nest,
-                     state_machine::event_data);
+                     rfsm::event_data);
 
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* foraging states */
-  HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, rfsm::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_pickup,
-                     state_machine::event_data);
+                     rfsm::event_data);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_drop,
-                     state_machine::event_data);
+                     rfsm::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 
   /**

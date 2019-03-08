@@ -26,12 +26,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
+namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cell2D_fsm::cell2D_fsm(void)
-    : state_machine::simple_fsm(ST_MAX_STATES, ST_UNKNOWN),
+    : rfsm::simple_fsm(ST_MAX_STATES, ST_UNKNOWN),
       ER_CLIENT_INIT("fordyca.fsm.cell2D_fsm"),
       state_unknown(),
       state_empty(),
@@ -72,7 +73,7 @@ void cell2D_fsm::event_block_drop(void) {
       ST_HAS_BLOCK,                       /* empty */
       ST_HAS_CACHE,                       /* has block */
       ST_HAS_CACHE,                       /* has cache */
-      state_machine::event_signal::FATAL, /* cache extent */
+      rfsm::event_signal::FATAL, /* cache extent */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
@@ -81,11 +82,11 @@ void cell2D_fsm::event_block_drop(void) {
 
 void cell2D_fsm::event_block_pickup(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
-      state_machine::event_signal::FATAL, /* unknown */
-      state_machine::event_signal::FATAL, /* empty */
+      rfsm::event_signal::FATAL, /* unknown */
+      rfsm::event_signal::FATAL, /* empty */
       ST_EMPTY,                           /* has block */
       ST_HAS_CACHE,                       /* has cache */
-      state_machine::event_signal::FATAL, /* cache extent */
+      rfsm::event_signal::FATAL, /* cache extent */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
@@ -101,8 +102,8 @@ void cell2D_fsm::event_cache_extent(void) {
          * creating a new cache, so we can let it slide here.
          */
       ST_CACHE_EXTENT,                    /* has block */
-      state_machine::event_signal::FATAL, /* has cache */
-      state_machine::event_signal::FATAL, /* cache extent */
+      rfsm::event_signal::FATAL, /* has cache */
+      rfsm::event_signal::FATAL, /* cache extent */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()], nullptr);
@@ -115,20 +116,20 @@ FSM_STATE_DEFINE_ND(cell2D_fsm, state_unknown) {
   if (ST_UNKNOWN != last_state()) {
     m_block_count = 0;
   }
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE_ND(cell2D_fsm, state_empty) {
   if (ST_EMPTY != last_state()) {
     m_block_count = 0;
   }
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 
 FSM_STATE_DEFINE_ND(cell2D_fsm, state_block) {
   if (ST_HAS_BLOCK != last_state()) {
     m_block_count = 1;
   }
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 
 FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
@@ -146,18 +147,18 @@ FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
   if (1 == m_block_count) {
     internal_event(ST_HAS_BLOCK);
   }
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 FSM_STATE_DEFINE_ND(cell2D_fsm, state_cache_extent) {
   if (ST_CACHE_EXTENT != last_state()) {
     m_block_count = 0;
   }
-  return state_machine::event_signal::HANDLED;
+  return rfsm::event_signal::HANDLED;
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cell2D_fsm::init(void) { state_machine::simple_fsm::init(); } /* init() */
+void cell2D_fsm::init(void) { rfsm::simple_fsm::init(); } /* init() */
 
 NS_END(fsm, fordyca);

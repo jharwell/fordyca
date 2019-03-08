@@ -41,7 +41,7 @@ class saa_subsystem;
 class sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
-namespace state_machine = rcppsw::patterns::state_machine;
+namespace rfsm = rcppsw::patterns::state_machine;
 namespace er = rcppsw::er;
 namespace rmath = rcppsw::math;
 
@@ -60,7 +60,7 @@ NS_START(fsm);
  * This class cannot be instantiated on its own, as does not define an FSM
  * per-se.
  */
-class base_foraging_fsm : public state_machine::hfsm,
+class base_foraging_fsm : public rfsm::hfsm,
                           public er::client<base_foraging_fsm>,
                           public metrics::fsm::collision_metrics {
  public:
@@ -135,7 +135,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    */
   HFSM_STATE_DECLARE(base_foraging_fsm,
                      transport_to_nest,
-                     state_machine::event_data);
+                     rfsm::event_data);
 
   /**
    * @brief Robots entering this state will leave the nest (they are assumed to
@@ -148,7 +148,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    * \ref foraging_signal::LEFT_NEST signal is returned to the
    * parent state.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, rfsm::event_data);
 
   /**
    * @brief Robots entering this state will randomly change their exploration
@@ -156,7 +156,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    * state. Once the direction change has been accomplished, the robot will
    * transition back to its previous state.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, new_direction, state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, new_direction, rfsm::event_data);
 
   /**
    * @brief A simple entry state for returning to nest, used to set LED colors

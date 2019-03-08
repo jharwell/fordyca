@@ -155,7 +155,7 @@ void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller)
 
 void cache_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   state_machine::event_type::NORMAL);
+                   rfsm::event_type::NORMAL);
 } /* visit() */
 
 void cache_block_drop::visit(tasks::depth1::harvester& task) {

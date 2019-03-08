@@ -103,7 +103,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
       /*
        * If we are currently spinning in place (hard turn), we have 0 linear
        * velocity, and that does not play well with the arrival force
-       * calculations. To fix this, and a bit of wander force.
+       * calculations. To fix this, add a bit of wander force.
        */
       if (saa_subsystem()->linear_velocity().length() <= 0.1) {
         saa_subsystem()->steering_force().wander();
@@ -129,7 +129,21 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
     ER_DEBUG("Executing ST_COLLISION_RECOVERY");
   }
 
-  if (++m_state.m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
+  /*
+   * Even though we are recovering from our last collision, and there are
+   * hopefully no obstacles nearby, we still need to check if another obstacle
+   * threatens. Failure to do this can lead to situations where a robot is
+   * "recovering" and moving directly towards a wall, and if the wall is
+   * currently just out of range of their proximity sensor upon entering this
+   * state, then *occasionally* the robot will end up moving inside of the wall,
+   * and somehow the physics engine bounceback does not handle that correctly
+   * (or maybe that is how it is supposed to work; idk). This causes an
+   * exception and ARGoS crashes. See #519.
+   */
+  if (sensors()->threatening_obstacle_exists()) {
+    m_state.m_collision_rec_count = 0;
+    internal_event(ST_COLLISION_AVOIDANCE);
+  } else if (++m_state.m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
     m_state.m_collision_rec_count = 0;
     internal_event(ST_VECTOR);
   }
@@ -173,7 +187,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(vector_fsm, arrived, struct goal_data) {
+FSM_STATE_DEFINE(vector_fsm, arrived, __rcsw_unused struct goal_data) {
   if (ST_ARRIVED != last_state()) {
     ER_DEBUG("Executing ST_ARRIVED: target=%s, tol=%f",
              data->loc.to_str().c_str(),

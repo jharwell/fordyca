@@ -2,8 +2,6 @@
 
 This is the main entry point for getting started on the project.
 
-To see what's new, take a look at the [release notes](docs/release-notes.md).
-
 # Papers
 
 1. J. Harwell and M. Gini, "Broadening applicability of swarm-robotic foraging
@@ -42,9 +40,8 @@ To see what's new, take a look at the [release notes](docs/release-notes.md).
    packaged on the ARGoS website.
 
 4. This project uses the build scaffolding provided by
-   [cmake-config](https://github.com/jharwell/cmake-config). Please
-   look at the platform requirements for that project and install any
-   needed packages/libraries.
+   [libra](https://github.com/swarm-robotics/libra). Please look at the platform
+   requirements for that project and install any needed packages/libraries.
 
 5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
    C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
@@ -61,7 +58,7 @@ To see what's new, take a look at the [release notes](docs/release-notes.md).
 
         git checkout devel
 
-2. Pull in the cmake project scaffolding:
+2. Pull in the build scaffolding:
 
         git submodule update --init --recursive --remote
 

@@ -33,7 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace state_machine = rcppsw::patterns::state_machine;
 namespace task_allocation = rcppsw::task_allocation;
 
 NS_START(fsm);
