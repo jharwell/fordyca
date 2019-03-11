@@ -53,7 +53,9 @@ bool multi_cluster_distributor::distribute_block(
     std::shared_ptr<repr::base_block>& block,
     ds::const_entity_list& entities) {
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
-    uint idx = std::rand() % m_dists.size();
+    std::uniform_int_distribution<> rng_dist(0, m_dists.size());
+
+    uint idx = rng_dist(m_reng);
     cluster_distributor& dist = m_dists[idx];
     const auto* clust = dist.block_clusters().front(); /* only 1 */
     if (clust->capacity() == clust->block_count()) {

@@ -127,8 +127,8 @@ base_cache_manager::creation_res_t static_cache_manager::create_conditional(
     uint n_collectors) {
   math::cache_respawn_probability p(
       mc_cache_params.static_.respawn_scale_factor);
-  if (p.calc(n_harvesters, n_collectors) >=
-      static_cast<double>(std::rand()) / RAND_MAX) {
+  std::uniform_real_distribution<> dist(0.0, 1.0);
+  if (p.calc(n_harvesters, n_collectors) >= dist(m_reng)) {
     return create(blocks);
   } else {
     return creation_res_t{false, ds::cache_vector()};

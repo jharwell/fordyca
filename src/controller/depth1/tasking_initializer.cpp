@@ -114,7 +114,7 @@ void tasking_initializer::depth1_exec_est_init(
     const params::depth1::controller_repository& param_repo,
     const tasking_map& map) {
   auto* task_params = param_repo.parse_results<ta::task_allocation_params>();
-  if (task_params->exec_est.seed_enabled) {
+  if (!task_params->exec_est.seed_enabled) {
     /*
      * Generalist is not partitionable in depth 0 initialization, so this has
      * not been done.
@@ -122,7 +122,16 @@ void tasking_initializer::depth1_exec_est_init(
     auto harvester = map.find("harvester")->second;
     auto collector = map.find("collector")->second;
     auto generalist = map.find("generalist")->second;
-    if (0 == std::rand() % 2) {
+
+    /*
+     * As part of seeding exec estimates, we set the last executed subtask for a
+     * TAB. It's OK to declare/use here as local variables as this code only
+     * runs during initialization.
+     */
+    std::default_random_engine eng;
+    std::uniform_int_distribution<> dist(0, 1);
+
+    if (0 == dist(eng)) {
       m_graph->root_tab()->last_subtask(harvester);
     } else {
       m_graph->root_tab()->last_subtask(collector);

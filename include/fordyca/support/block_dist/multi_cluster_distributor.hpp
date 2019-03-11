@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include <random>
 
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
@@ -62,6 +63,7 @@ class multi_cluster_distributor : public base_distributor,
  private:
   /* clang-format off */
   std::vector<cluster_distributor> m_dists{};
+  std::default_random_engine       m_reng{};
   /* clang-format on */
 };
 

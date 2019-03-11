@@ -29,6 +29,7 @@
 #include <functional>
 #include <vector>
 #include <nlopt.hpp>
+#include <random>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -155,9 +156,10 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
                    const ds::dp_block_map& known_blocks) const;
 
   /* clang-format off */
-  const controller::cache_sel_matrix* const mc_matrix;
+  const controller::cache_sel_matrix* const              mc_matrix;
   nlopt::opt     m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
-  constraint_set m_constraints{};
+  constraint_set                                         m_constraints{};
+  std::default_random_engine                             m_reng{};
   /* clang-format on */
 };
 

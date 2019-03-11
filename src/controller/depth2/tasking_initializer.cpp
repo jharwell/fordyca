@@ -134,10 +134,16 @@ void tasking_initializer::depth2_exec_est_init(
   auto cache_collector = map.find("cache_collector")->second;
   if (task_params->exec_est.seed_enabled) {
     /*
+     * As part of seeding exec estimates, we set the last executed subtask for a
+     * TAB. It's OK to declare/use here as local variables as this code only
+     * runs during initialization.
+     *
      * Collector, harvester not partitionable in depth 1 initialization, so they
      * have only been initialized as atomic tasks.
      */
-    if (0 == std::rand() % 2) {
+    std::default_random_engine eng;
+    std::uniform_int_distribution<> dist(0, 1);
+    if (0 == dist(eng)) {
       graph()
           ->tab_child(graph()->root_tab(), graph()->root_tab()->child1())
           ->last_subtask(cache_starter);
