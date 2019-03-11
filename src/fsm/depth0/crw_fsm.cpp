@@ -72,7 +72,7 @@ crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(crw_fsm, start, rfsm::event_data) {
+HFSM_STATE_DEFINE(crw_fsm, start, rfsm::event_data* data) {
   /* first time running FSM */
   if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
@@ -101,7 +101,7 @@ HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rfsm::event_data) {
+HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rfsm::event_data* data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
@@ -113,7 +113,7 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rfsm::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rfsm::event_data) {
+HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rfsm::event_data* data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block drop signal received");

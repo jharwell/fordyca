@@ -149,7 +149,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
   }
   return controller::foraging_signal::HANDLED;
 }
-FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data) {
+FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data* data) {
   if (ST_VECTOR != last_state()) {
     ER_DEBUG("Executing ST_VECTOR");
   }
@@ -187,7 +187,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(vector_fsm, arrived, __rcsw_unused struct goal_data) {
+FSM_STATE_DEFINE(vector_fsm, arrived, __rcsw_unused struct goal_data* data) {
   if (ST_ARRIVED != last_state()) {
     ER_DEBUG("Executing ST_ARRIVED: target=%s, tol=%f",
              data->loc.to_str().c_str(),

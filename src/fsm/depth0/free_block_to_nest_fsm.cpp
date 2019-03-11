@@ -67,7 +67,7 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rfsm::event_data) {
+HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rfsm::event_data* data) {
   /* first time running FSM */
   if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
@@ -93,7 +93,7 @@ HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
 }
 HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_pickup,
-                  rfsm::event_data) {
+                  rfsm::event_data* data) {
   /**
    * It is possible that robots can be waiting indefinitely for a block
    * pickup signal that will never come once a block has been acquired if they
@@ -115,7 +115,7 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
 }
 HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_drop,
-                  rfsm::event_data) {
+                  rfsm::event_data* data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ST_FINISHED);

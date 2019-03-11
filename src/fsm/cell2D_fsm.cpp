@@ -132,7 +132,7 @@ FSM_STATE_DEFINE_ND(cell2D_fsm, state_block) {
   return rfsm::event_signal::HANDLED;
 }
 
-FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data) {
+FSM_STATE_DEFINE(cell2D_fsm, state_cache, struct block_data* data) {
   if (ST_HAS_CACHE != last_state()) {
     ER_ASSERT(
         1 == m_block_count, "Incorrect block count: %u vs %u", m_block_count, 1);

@@ -53,7 +53,7 @@ dpo_fsm::dpo_fsm(const controller::block_sel_matrix* const sel_matrix,
   hfsm::change_parent(ST_LEAVING_NEST, &start);
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, start, rfsm::event_data) {
+HFSM_STATE_DEFINE(dpo_fsm, start, rfsm::event_data* data) {
   /* first time running FSM */
   if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_BLOCK_TO_NEST);
@@ -69,7 +69,7 @@ HFSM_STATE_DEFINE(dpo_fsm, start, rfsm::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rfsm::event_data) {
+HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rfsm::event_data* data) {
   if (nullptr != data &&
       controller::foraging_signal::FSM_RUN != data->signal() &&
       rfsm::event_signal::IGNORED != data->signal()) {

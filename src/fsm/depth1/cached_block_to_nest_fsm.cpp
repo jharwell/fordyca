@@ -72,7 +72,7 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, rfsm::event_data) {
+HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, rfsm::event_data* data) {
   if (rfsm::event_type::NORMAL == data->type()) {
     internal_event(ST_ACQUIRE_BLOCK);
     return controller::foraging_signal::HANDLED;
@@ -100,7 +100,7 @@ HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, acquire_block) {
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_pickup,
-                  rfsm::event_data) {
+                  rfsm::event_data *data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_TRANSPORT_TO_NEST);
@@ -113,7 +113,7 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_drop,
-                  rfsm::event_data) {
+                  rfsm::event_data *data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_FINISHED);

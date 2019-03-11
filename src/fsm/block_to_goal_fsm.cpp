@@ -60,7 +60,9 @@ block_to_goal_fsm::block_to_goal_fsm(acquire_goal_fsm* const goal_fsm,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(block_to_goal_fsm, start, rfsm::event_data) {
+HFSM_STATE_DEFINE(block_to_goal_fsm,
+                  start,
+                  rfsm::event_data*data) {
   if (rfsm::event_type::NORMAL == data->type()) {
     if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal() ||
         controller::foraging_signal::ACQUIRE_CACHED_BLOCK == data->signal()) {
@@ -93,7 +95,9 @@ HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_goal_fsm, wait_for_block_pickup, rfsm::event_data) {
+HFSM_STATE_DEFINE(block_to_goal_fsm,
+                  wait_for_block_pickup,
+                  rfsm::event_data* data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     ER_DEBUG("Block pickup signal received");
     m_block_fsm->task_reset();
@@ -119,7 +123,9 @@ HFSM_STATE_DEFINE(block_to_goal_fsm, wait_for_block_pickup, rfsm::event_data) {
   return controller::foraging_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(block_to_goal_fsm, wait_for_block_drop, rfsm::event_data) {
+HFSM_STATE_DEFINE(block_to_goal_fsm,
+                  wait_for_block_drop,
+                  rfsm::event_data* data) {
   saa_subsystem()->actuation()->differential_drive().stop();
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     ER_DEBUG("Block drop signal received");
