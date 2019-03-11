@@ -66,6 +66,8 @@ class temporal_penalty_handler
    * @brief Initialize the penalty handler.
    *
    * @param params Parameters for penalty waveform generation.
+   * @param name The name of the handler, for differentiating handler instancces
+   * in logging statements.
    */
   explicit temporal_penalty_handler(const rct::waveform_params* const params,
                                     const std::string& name)
@@ -98,8 +100,8 @@ class temporal_penalty_handler
    * @brief Determine if a robot has satisfied the \ref temporal_penalty
    * it is currently serving yet.
    *
-   * @param robot The robot to check. If the robot is not currently serving a
-   * penalty, \c FALSE will be returned.
+   * @param controller The robot to check. If the robot is not currently serving
+   * a penalty, \c FALSE will be returned.
    * @param timestep The current timestep.
    *
    * @return \c TRUE If the robot is currently waiting AND it has satisfied its

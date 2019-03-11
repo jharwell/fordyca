@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_UNICELL_ENTITY_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_UNICELL_ENTITY_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_UNICELL_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPR_UNICELL_ENTITY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -45,4 +45,4 @@ using unicell_entity = multicell_entity;
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_UNICELL_ENTITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_UNICELL_ENTITY_HPP_ */

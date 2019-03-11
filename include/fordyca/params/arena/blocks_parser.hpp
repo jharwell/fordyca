@@ -42,8 +42,8 @@ NS_START(fordyca, params, arena);
  * @class blocks_parser
  * @ingroup params arena
  *
- * @brief Parses XML parameters related to \ref block objects into
- * \ref blocks_params in the arena.
+ * @brief Parses XML parameters related to blocks in the arena into \ref
+ * blocks_params.
  */
 class blocks_parser : public rcppsw::params::xml_param_parser {
  public:

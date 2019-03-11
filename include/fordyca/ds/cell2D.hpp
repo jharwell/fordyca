@@ -55,7 +55,7 @@ namespace rmath = rcppsw::math;
  * @ingroup ds
  *
  * @brief Base repr of a cell on a 2D grid. A combination of FSM +
- * handle to whatever \ref cell_entity the cell contains, if any.
+ * handle to whatever \ref base_cell_entity the cell contains, if any.
  */
 class cell2D : public visitor::visitable_any<cell2D>,
                public decorator::decorator<fsm::cell2D_fsm> {
@@ -122,9 +122,9 @@ class cell2D : public visitor::visitable_any<cell2D>,
 
  private:
   /* clang-format off */
-  std::string                                       m_robot_id{""};
+  std::string                             m_robot_id{""};
   std::shared_ptr<repr::base_cell_entity> m_entity{nullptr};
-  rmath::vector2u                             m_loc;
+  rmath::vector2u                         m_loc;
   /* clang-format on */
 };
 

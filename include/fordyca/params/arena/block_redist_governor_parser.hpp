@@ -44,7 +44,7 @@ NS_START(fordyca, params, arena);
  * @ingroup params arena
  *
  * @brief Parses XML parameters related to block redistribution by the \ref
- * block_redist_governor.
+ * redist_governor.
  */
 class block_redist_governor_parser : public rcppsw::params::xml_param_parser {
  public:

@@ -1,5 +1,5 @@
 /**
- * @file controller_interactor_mapper.hpp
+ * @file depth2/controller_interactor_mapper.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -53,9 +53,10 @@ using grp_mdpo_itype = depth2::robot_arena_interactor<controller::depth2::grp_md
 /**
  * @class controller_interactor_mapper
  * @ingroup support depth2
- * @brief Helper class to map the typeid of a \ref controller::base_controller
- * to a \ref depth2::robot_arena_interactor to correctly handle robot-arena
- * interactions for that type.
+ *
+ * @brief Helper class to map the typeid of a \ref base_controller to a \ref
+ * depth2::robot_arena_interactor to correctly handle robot-arena interactions
+ * for that type.
  */
 
 class controller_interactor_mapper : public depth1::controller_interactor_mapper {

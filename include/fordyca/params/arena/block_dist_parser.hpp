@@ -1,5 +1,5 @@
 /**
- * @file dist_parser.hpp
+ * @file block_dist_parser.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *

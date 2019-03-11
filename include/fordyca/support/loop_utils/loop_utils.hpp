@@ -71,6 +71,7 @@ struct placement_status_t {
  * @brief Check if a robot is on top of a block. If, so return the block index.
  *
  * @param robot The robot to check.
+ * @param map \ref arena_map reference.
  *
  * @return The block index, or -1 if the robot is not on top of a block.
  */
@@ -82,6 +83,7 @@ int robot_on_block(const controller::base_controller& controller,
  * @brief Check if a robot is on top of a cache. If, so return the cache index.
  *
  * @param robot The robot to check.
+ * @param map \ref arena_map reference.
  *
  * @return The cache index, or -1 if the robot is not on top of a cache.
  */

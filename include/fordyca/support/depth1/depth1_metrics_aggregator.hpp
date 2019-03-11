@@ -58,7 +58,7 @@ namespace er = rcppsw::er;
  * @ingroup support depth1
  *
  * @brief Aggregates and metrics collection for depth1 foraging. That
- * includes everything from \ref stateful_metrics_aggregator, and also:
+ * includes everything from \ref depth0_metrics_aggregator, and also:
  *
  * - FSM cache acquisition metrics
  * - Cache utilization metrics

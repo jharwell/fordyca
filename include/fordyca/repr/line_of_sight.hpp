@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_LINE_OF_SIGHT_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_LINE_OF_SIGHT_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_LINE_OF_SIGHT_HPP_
+#define INCLUDE_FORDYCA_REPR_LINE_OF_SIGHT_HPP_
 
 /*******************************************************************************
  * Includes
@@ -139,4 +139,4 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_LINE_OF_SIGHT_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_LINE_OF_SIGHT_HPP_ */

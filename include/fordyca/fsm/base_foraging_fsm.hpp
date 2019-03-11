@@ -127,7 +127,7 @@ class base_foraging_fsm : public rfsm::hfsm,
    * @brief Robots entering this state will return to the nest.
    *
    * This state MUST have a parent state defined that is not
-   * \ref task_allocation::hfsm::top_state().
+   * \ref rcppsw::patterns::state_machine::hfsm::top_state().
    *
    * Upon return to the nest, a \ref foraging_signal::BLOCK_DROP
    * signal will be returned to the parent state. No robot should return to the
@@ -142,7 +142,7 @@ class base_foraging_fsm : public rfsm::hfsm,
    * already be in the nest when this state is entered).
    *
    * This state MUST have a parent state defined that is not \ref
-   * \ref task_allocation.hfsm::top_state().
+   * rcppsw::patterns::state_machine::hfsm::top_state().
    *
    * When the robot has actually left the nest, according to sensor readings, a
    * \ref foraging_signal::LEFT_NEST signal is returned to the

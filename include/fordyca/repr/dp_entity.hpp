@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_DP_ENTITY_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_DP_ENTITY_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_DP_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPR_DP_ENTITY_HPP_
 
 /*******************************************************************************
  * Includes

@@ -65,8 +65,6 @@ class dpo_perception_subsystem
   /**
    * @brief Update the robot's perception of the environment, passing it its
    * current line of sight.
-   *
-   * @param los The current line of sight.
    */
   void update(void) override;
 

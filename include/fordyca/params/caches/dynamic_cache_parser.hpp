@@ -42,7 +42,8 @@ NS_START(fordyca, params, caches);
  * @class dynamic_cache_parser
  * @ingroup params caches
  *
- * @brief Parses XML parameters for relating to cache into \ref cache_params.
+ * @brief Parses XML parameters for relating to dynamic caches into \ref
+ * dynamic_cache_params.
  */
 class dynamic_cache_parser: public rcppsw::params::xml_param_parser {
  public:

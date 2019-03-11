@@ -82,17 +82,14 @@ class cache_op_penalty_handler
 
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
-   * trying to drop/pickup a block. If so, create a \ref cache_op_penalty object
+   * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
    *
    * @param robot The robot to check.
    * @param src The penalty source (i.e. what event caused this penalty to be
    *            applied).
    * @param timestep The current timestep.
-   *
-   * @return \c TRUE if a penalty has been initialized for a robot, and they
-   * should begin waiting, and \c FALSE otherwise, along with the reason why.
-   */
+  */
   filter_status penalty_init(T& controller, cache_op_src src, uint timestep) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has

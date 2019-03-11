@@ -63,7 +63,7 @@ class los_visualizer : public rcppsw::er::client<los_visualizer> {
   /**
    * @brief Draw visualizations related to block LOS:
    *
-   * @param block The LOS to visualize.
+   * @param los The LOS to visualize.
    * @param grid_resolution The grid resolution for the arena.
    */
   void draw(const repr::line_of_sight* const los, double grid_resolution);

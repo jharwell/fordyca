@@ -1,5 +1,5 @@
 /**
- * @file controller_interactor_mapper.hpp
+ * @file depth1/controller_interactor_mapper.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *

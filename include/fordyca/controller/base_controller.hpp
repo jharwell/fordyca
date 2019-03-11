@@ -183,7 +183,7 @@ class base_controller : public argos::CCI_Controller,
 
   /**
    * @brief Convenience function to add footbot ID+timestep to messages during
-   * \ref ControlStep().
+   * the control step.
    */
   void ndc_pusht(void);
 

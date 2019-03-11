@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_ARENA_CACHE_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_ARENA_CACHE_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_ARENA_CACHE_HPP_
+#define INCLUDE_FORDYCA_REPR_ARENA_CACHE_HPP_
 
 /*******************************************************************************
  * Includes
@@ -44,9 +44,9 @@ NS_START(fordyca, repr);
  * @class arena_cache
  * @ingroup repr
  *
- * @brief A repr of an ACTUAL cache within the arena. This differs
- * from \ref perceived_cache objects because they handle cache penalties and can
- * collect metrics about their usage.
+ * @brief A repr of an ACTUAL cache within the arena. This differs from \ref
+ * dp_entity caches because they handle cache penalties and can collect metrics
+ * about their usage.
  */
 class arena_cache
     : public base_cache,

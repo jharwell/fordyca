@@ -42,8 +42,8 @@ NS_START(fordyca, params);
  * @class block_priorities_parser
  * @ingroup params
  *
- * @brief Parses XML parameters related to \ref block priorties
- * \ref block_priority_params.
+ * @brief Parses XML parameters related to block priorties into \ref
+ * block_priority_params.
  */
 class block_priorities_parser : public rcppsw::params::xml_param_parser {
  public:

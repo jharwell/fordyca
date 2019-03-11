@@ -58,22 +58,22 @@ class goal_acquisition_metrics : public virtual rcppsw::metrics::base_metrics {
    * @brief Return the type of acquisition that is currently being
    * performed.
    *
-   * @return The acquisition type, or \ref kNone if no acquisition is currently
-   * in progress.
+   * @return The acquisition type, or \ref goal_type::kNone if no acquisition is
+   * currently in progress.
    */
   virtual goal_type acquisition_goal(void) const = 0;
 
   /**
-   * @brief Output only defined if \ref goal_type() is not \ref kNone. If
-   * \c TRUE, then the robot is currently exploring for its goal (i.e. it does
-   * not know where it is).
+   * @brief Output only defined if \ref goal_type() is not \ref
+   * goal_type::kNone. If \c TRUE, then the robot is currently exploring for its
+   * goal (i.e. it does not know where it is).
    */
   virtual bool is_exploring_for_goal(void) const = 0;
 
   /**
-   * @brief Output only defined if \ref goal_type() is not \ref kNone. If
-   * \c TRUE, then the robot is vectoring towards its goal (i.e. it knows where
-   * it is).
+   * @brief Output only defined if \ref goal_type() is not \ref
+   * goal_type::kNone. If \c TRUE, then the robot is vectoring towards its goal
+   * (i.e. it knows where it is).
    */
   virtual bool is_vectoring_to_goal(void) const = 0;
 

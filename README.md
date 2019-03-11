@@ -10,78 +10,19 @@ This is the main entry point for getting started on the project.
    Australia, 2018, pp. 116-122.
    [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8376280&isnumber=8376259)
 
-# Pre-cloning Setup
+# Setup
 
-1. Install development packages for the project:
+Download `scripts/bootstrap.sh` BEFORE cloning this repo, and run it:
 
-   - Qt5 (`qtbase5-dev` on ubuntu)
-   - NLopt (`libnlopt-dev` on ubuntu)
-   - ccache (`ccache` on ubuntu)
+    ./bootstrap.sh /path/to/project/root YES /usr/local 4
 
-2. Install ARGoS (homepage http://www.argos-sim.info/index.php), the simulator
-   for the project. You can install it in one of three ways:
-
-   - Use one of the pre-packaged/binary versions of ARGoS from the website (not
-     recommended). If you do choose this route then you _MUST_ also use gcc/g++
-     version < 6.0 (anything 5.4 is known to work) on linux. This is because
-     those packages were compiled with gcc/g++ 5.4, and therefore the core ARGoS
-     libraries that fordyca uses are ABI incompatible with anything compiled
-     with gcc >= 6.0. In addition, when installing ARGoS from a .deb you will
-     likely not have all dependencies met (dpkg does not check them like apt
-     does), so you need to run:
-
-        sudo apt install -f
-
-      After installing the .deb with dpkg to fix installation issues.
-
-    - Build upstream ARGoS (https://github.com/ilpincy/argos3) from source. If
-      using this method you can use whatever compiler/compiler version you like,
-      so long as it supports C++14. This method is generally OK, though you will
-      not get some of the tweaks/improvements to ARGoS that I have made that
-      have not made their way into the main ARGoS repository yet.
-
-    - Build the organization's downstream ARGoS
-      (https://github.com/swarm-robotics/argos3) from source. If
-      using this method you can use whatever compiler/compiler version you like,
-      so long as it supports C++14. This method is recommended, as you will
-      always have the most up-to-date ARGoS functionality (origin+my changes).
-
-3. Verify that you can build an run the ARGoS examples
-   (https://github.com/ilpincy/argos3-examples), especially the foraging
-   example, which is what the project was originally based on
-
-4. This project uses the build scaffolding provided by
-   [libra](https://github.com/swarm-robotics/libra). Please look at the platform
-   requirements for that project and install any needed packages/libraries.
-
-5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
-   C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
-
-        mkdir ext
-        ln -s /path/to/rcppsw ext/rcppsw
-
-   Follow all pre/post-cloning instructions found in README for the rcppsw repo.
-
-# Post-cloning setup
-
-1. Check out the development branch, as that has not only the latest semi-stable
-   release, but also the most up-to-date documentation, including this README.
-
-        git checkout devel
-
-2. Pull in the build scaffolding:
-
-        git submodule update --init --recursive --remote
-
-3. Build via:
-
-        mkdir build && cd build
-        cmake ..
-        make
-
-   To build the documentation, do the following from the build directory:
-
-        make documentation
+1st arg is the root directory for the project (all repos will be clone/built in
+here), 2nd arg is `YES` if you want to install ARGoS system wide (you probably
+do) and `NO` otherwise, 3rd arg is the location ARGoS should be installed into,
+and 4th arg is the \# of cores to use when building ARGos/FORDYCA (should be set
+to \# cores on your machine). It assumes you have sudo privileges on the machine
+you want to install the project on. If you do not, you will have to build a
+*lot* more stuff from source manually.
 
 # Configuring Simulations
 

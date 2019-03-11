@@ -81,8 +81,8 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - Block selection matrix (\ref block_selection_matrix)
-   * - Cache selection matrix (\ref cache_selection_matrix)
+   * - Block selection matrix (\ref block_sol_matrix)
+   * - Cache selection matrix (\ref cache_sel_matrix)
    * - Task executive (\ref ta::bi_tdgraph_executive)
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    *

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPRESENTATION_NEST_HPP_
-#define INCLUDE_FORDYCA_REPRESENTATION_NEST_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_NEST_HPP_
+#define INCLUDE_FORDYCA_REPR_NEST_HPP_
 
 /*******************************************************************************
  * Includes
@@ -87,4 +87,4 @@ class nest : public multicell_entity, public immovable_cell_entity {
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRESENTATION_NEST_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_NEST_HPP_ */

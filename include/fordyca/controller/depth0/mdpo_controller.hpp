@@ -50,7 +50,7 @@ NS_START(depth0);
  * @ingroup controller depth0
  *
  * @brief A foraging controller that remembers what it has seen for a period of
- * time (knowledge is modeling/decays as \ref pheromone_density objects). It
+ * time (knowledge is modeled by pheromone density and decays as such). It
  * models the state of the environment (empty, unknown, contains object, etc.)
  * AND the objects within the environment.
  *
@@ -88,7 +88,7 @@ class mdpo_controller : public dpo_controller,
    * want to use any of the following parts of this class's functionality as-is:
    *
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
-   * - Block selection matrix (\ref block_selection_matrix)
+   * - Block selection matrix (\ref block_sel_matrix)
    */
   void shared_init(const params::depth0::mdpo_controller_repository& param_repo);
 

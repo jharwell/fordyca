@@ -154,8 +154,8 @@ class gp_dpo_controller : public depth0::dpo_controller,
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - Block selection matrix (\ref block_selection_matrix)
-   * - Cache selection matrix (\ref cache_selection_matrix)
+   * - Block selection matrix (\ref block_sel_matrix)
+   * - Cache selection matrix (\ref cache_sel_matrix)
    * - Task executive (\ref ta::bi_tdgraph_executive)
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    *

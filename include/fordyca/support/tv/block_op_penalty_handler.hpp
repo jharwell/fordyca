@@ -78,7 +78,7 @@ class block_op_penalty_handler
 
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
-   * trying to drop/pickup a block. If so, create a \ref block_op_penalty object
+   * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
    *
    * @param robot The robot to check.
@@ -87,9 +87,6 @@ class block_op_penalty_handler
    * @param timestep The current timestep.
    * @param cache_prox_dist The minimum distance that the cache site needs to
    *                        be from all caches in the arena.n
-   *
-   * @return \ref kStatusOK if a penalty has been initialized for a robot, a
-   * non-zero code if it has not indicating why.
    */
   filter_status penalty_init(T& controller,
                              block_op_src src,

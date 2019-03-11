@@ -1,5 +1,5 @@
 /**
- * @file foraging_task.hpp
+ * @file depth2/foraging_task.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *

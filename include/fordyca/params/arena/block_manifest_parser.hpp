@@ -1,5 +1,5 @@
 /**
- * @file manifest_parser.hpp
+ * @file block_manifest_parser.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *

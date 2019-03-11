@@ -1,5 +1,5 @@
 /**
- * @file cache_acquisition_metrics_collector.hpp
+ * @file goal_acquisition_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *

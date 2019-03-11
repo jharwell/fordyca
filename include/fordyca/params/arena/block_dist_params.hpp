@@ -1,5 +1,5 @@
 /**
- * @file dist_params.hpp
+ * @file block_dist_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *

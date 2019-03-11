@@ -1,5 +1,5 @@
 /**
- * @file robot_arena_interactor.hpp
+ * @file depth1/robot_arena_interactor.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *

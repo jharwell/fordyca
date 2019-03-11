@@ -54,7 +54,7 @@ NS_START(depth0);
  * @ingroup controller depth0
  *
  * @brief A foraging controller that remembers what it has seen for a period of
- * time (knowledge is modeling/decays as \ref pheromone_density objects).
+ * time (knowledge is modeled by pheromone density and decays as such).
  */
 class dpo_controller : public crw_controller,
                        public er::client<dpo_controller>,
@@ -152,7 +152,7 @@ class dpo_controller : public crw_controller,
    * as-is:
    *
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
-   * - Block selection matrix (\ref block_selection_matrix)
+   * - Block selection matrix (\ref block_sel_matrix)
    */
   void shared_init(const params::depth0::dpo_controller_repository& param_repo);
 

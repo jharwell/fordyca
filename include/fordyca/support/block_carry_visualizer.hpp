@@ -70,8 +70,8 @@ class block_carry_visualizer
    * - The block ID
    *
    * @param block The block to draw.
-   * @param id_len The length of the robot ID. Used to ensure block ID does not
-   * overlap with robot ID, if both visualizations are enabled.
+   * @param robot_id Used to ensure block ID does not overlap with robot ID, if
+   * both visualizations are enabled.
    */
   void draw(const repr::base_block* block, uint robot_id);
 

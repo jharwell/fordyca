@@ -47,7 +47,7 @@ namespace er = rcppsw::er;
  * @class existing_cache_block_drop_interactor
  * @ingroup support
  *
- * @brief Handles a robot's (possible) \ref cached_block_drop event for existing
+ * @brief Handles a robot's (possible) \ref cache_block_drop event for existing
  * caches on a given timestep.
  */
 template <typename T>
