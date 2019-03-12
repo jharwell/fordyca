@@ -38,8 +38,6 @@ constexpr char block_redist_governor_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void block_redist_governor_parser::parse(const ticpp::Element& node) {
-  ticpp::Element lnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
-
   /*
    * Needs to be populated always so we get the null trigger when the governor
    * is disabled.
@@ -48,10 +46,13 @@ void block_redist_governor_parser::parse(const ticpp::Element& node) {
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element lnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
     XML_PARSE_ATTR_DFLT(lnode, m_params, timestep, 0U);
     XML_PARSE_ATTR_DFLT(lnode, m_params, block_count, 0U);
     XML_PARSE_ATTR(lnode, m_params, trigger);
     XML_PARSE_ATTR(lnode, m_params, recurrence_policy);
+  } else {
+    m_params->trigger = "Null";
   }
 } /* parse() */
 

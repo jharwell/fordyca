@@ -127,7 +127,7 @@ void base_loop_functions::convergence_init(
 
 void base_loop_functions::PreStep(void) {
   m_tv_manager->update();
-  m_conv_calc->update(GetSpace().GetSimulationClock());
+  m_conv_calc->update();
 } /* PreStep() */
 
 void base_loop_functions::tv_init(
@@ -174,7 +174,7 @@ void base_loop_functions::Reset(void) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-std::vector<double> base_loop_functions::calc_robot_nn(uint n_threads) const {
+std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
   std::vector<rmath::vector2d> v;
   auto& robots =
       const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
@@ -227,8 +227,7 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint n_threads) const {
   return res;
 } /* calc_robot_nn() */
 
-std::vector<rmath::radians> base_loop_functions::calc_robot_headings(
-    uint n_threads) const {
+std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const {
   std::vector<rmath::radians> v;
   auto& robots =
       const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
@@ -243,8 +242,7 @@ std::vector<rmath::radians> base_loop_functions::calc_robot_headings(
   return v;
 } /* calc_robot_headings() */
 
-std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
-uint n_threads) const {
+std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(uint) const {
   std::vector<rmath::vector2d> v;
   auto& robots =
       const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(

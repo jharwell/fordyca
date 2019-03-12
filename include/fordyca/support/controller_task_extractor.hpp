@@ -1,7 +1,7 @@
 /**
- * @file output_params.hpp
+ * @file controller_task_extractor.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_OUTPUT_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_OUTPUT_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_CONTROLLER_TASK_EXTRACTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_CONTROLLER_TASK_EXTRACTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/params/metrics_params.hpp"
-#include "rcppsw/params/base_params.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
- * @struct output_params
- * @ingroup params
+ * @struct controller_task_extractor
+ * @ingroup support
+ *
+ * @brief Given a controller of type T, extract the ID of its current task. This
+ * is used in computing task distribution entropy in depth1, depth2 in
+ * conjunction with boost::variant.
  */
-struct output_params : public rcppsw::params::base_params {
-  std::string output_root{};
-  std::string output_dir{};
-  struct metrics_params metrics{};
+template<class T>
+struct controller_task_extractor {
+  using controller_type = T;
+
+  controller_task_extractor(void) = default;
+
+  int operator()(const controller_type* const c) const {
+    return c->current_task_id();
+  }
 };
 
-NS_END(params, fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_OUTPUT_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_CONTROLLER_TASK_EXTRACTOR_HPP_ */

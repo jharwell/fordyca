@@ -122,7 +122,7 @@ class cell2D : public visitor::visitable_any<cell2D>,
 
  private:
   /* clang-format off */
-  std::string                             m_robot_id{""};
+  std::string                             m_robot_id{};
   std::shared_ptr<repr::base_cell_entity> m_entity{nullptr};
   rmath::vector2u                         m_loc;
   /* clang-format on */

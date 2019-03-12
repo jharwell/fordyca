@@ -77,7 +77,6 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
 
  private:
   using interactor_map = rcppsw::ds::type_map<gp_dpo_itype, gp_mdpo_itype>;
-
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
@@ -95,6 +94,8 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   uint n_free_blocks(void) const;
 
   void cache_handling_init(const struct params::caches::caches_params *cachep);
+
+  std::vector<int> calc_robot_tasks(uint) const;
 
   /**
    * @brief Configure a robot controller after initialization:

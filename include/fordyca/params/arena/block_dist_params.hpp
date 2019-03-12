@@ -52,7 +52,7 @@ struct block_dist_params : public rcppsw::params::base_params {
   /**
    * @brief Type of block distribution being performed.
    */
-  std::string dist_type{""};
+  std::string dist_type{};
 
   /**
    * @brief Parameters for powerlaw block distribution (only used if powerlaw is

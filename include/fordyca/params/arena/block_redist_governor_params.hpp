@@ -42,8 +42,8 @@ NS_START(fordyca, params, arena);
 struct block_redist_governor_params : public rcppsw::params::base_params {
   uint        timestep{0};
   uint        block_count{0};
-  std::string trigger{"Null"};
-  std::string recurrence_policy{""};
+  std::string trigger{};
+  std::string recurrence_policy{};
 };
 
 NS_END(arena, params, fordyca);

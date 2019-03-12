@@ -54,7 +54,7 @@ class movable_cell_entity {
   /**
    * @brief Initialize a movable entity with an initial location in the arena.
    */
-  movable_cell_entity(void) : movable_cell_entity{{0.0, 0.0}, 0.0} {}
+  movable_cell_entity(void) = default;
 
   virtual ~movable_cell_entity(void) = default;
 
@@ -74,8 +74,8 @@ class movable_cell_entity {
 
  private:
   /* clang-format off */
-  rmath::vector2d       m_real_loc;
-  rmath::vector2u m_discrete_loc;
+  rmath::vector2d m_real_loc{};
+  rmath::vector2u m_discrete_loc{};
   /* clang-format on */
 };
 

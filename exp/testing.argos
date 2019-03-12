@@ -204,6 +204,7 @@
           enable="true"
           horizon="0:13.41"
           horizon_delta="1.34"/>
+      <task_dist_entropy enable="true"/>
       <interactivity enable="true"/>
       <angular_order enable="true"/>
     </convergence>

@@ -117,6 +117,13 @@ class base_loop_functions : public argos::CLoopFunctions,
   rswc::convergence_calculator* conv_calculator(void) {
     return m_conv_calc.get();
   }
+  /**
+   * @brief Initialize convergence calculations.
+   *
+   * @param params Parsed convergence parameters.
+   */
+  void convergence_init(const rswc::convergence_params* const params);
+
  private:
   /**
    * @brief Initialize logging for all support/loop function code.
@@ -139,20 +146,13 @@ class base_loop_functions : public argos::CLoopFunctions,
    */
   void tv_init(const params::tv::tv_manager_params* tvp);
 
-  /**
-   * @brief Initialize convergence calculations.
-   *
-   * @param params Parsed convergence parameters.
-   */
-  void convergence_init(const rswc::convergence_params* const params);
-
   std::vector<double> calc_robot_nn(uint n_threads) const;
   std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;
   std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
 
   /* clang-format off */
   argos::CFloorEntity*                          m_floor{nullptr};
-  std::string                                   m_output_root{""};
+  std::string                                   m_output_root{};
   params::loop_function_repository              m_params{};
   std::unique_ptr<ds::arena_map>                m_arena_map;
   std::unique_ptr<tv::tv_manager>               m_tv_manager;

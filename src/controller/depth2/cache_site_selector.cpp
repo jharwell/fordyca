@@ -64,7 +64,7 @@ rmath::vector2d cache_site_selector::calc_best(
     nlopt::result res = m_alg.optimize(point, max_utility);
     ER_ASSERT(res >= 1, "NLopt failed with code %d", res);
     ER_INFO("NLopt return code: %d", res);
-  } catch (std::runtime_error) {
+  } catch (std::runtime_error&) {
     ER_WARN("NLopt failed");
     return site;
   }

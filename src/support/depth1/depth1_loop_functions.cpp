@@ -45,8 +45,9 @@
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
+#include "fordyca/support/controller_task_extractor.hpp"
 
+#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
@@ -65,6 +66,119 @@ template void depth1_loop_functions::controller_configure(
     controller::depth1::gp_dpo_controller& controller);
 template void depth1_loop_functions::controller_configure(
     controller::depth1::gp_mdpo_controller& controller);
+
+/*******************************************************************************
+ * Struct Definitions
+ ******************************************************************************/
+/**
+ * @struct controller_configurer
+ * @ingroup support depth1
+ *
+ * @brief Configure a depth1 controller during initialization.
+ */
+template<class T>
+struct controller_configurer {
+  using controller_type = T;
+
+  controller_configurer(const params::loop_function_repository* const p,
+                        tasking_oracle* const t,
+                        depth1_metrics_aggregator* const agg)
+      : mc_params(p),
+        m_tasking_oracle(t),
+        m_agg(agg) {}
+
+  void operator()(controller_type* const c) const {
+    /*
+     * If NULL, then visualization has been disabled.
+     */
+    auto* vparams = mc_params->parse_results<struct params::visualization_params>();
+    if (nullptr != vparams) {
+      c->display_task(vparams->robot_task);
+    }
+
+    auto* oraclep = mc_params->parse_results<params::oracle_params>();
+    if (oraclep->enabled) {
+      auto oracular =
+          dynamic_cast<controller::depth1::ogp_mdpo_controller*>(c);
+      oracular->executive()->task_finish_notify(
+          std::bind(&tasking_oracle::task_finish_cb,
+                    m_tasking_oracle,
+                    std::placeholders::_1));
+      oracular->executive()->task_abort_notify(
+          std::bind(&tasking_oracle::task_abort_cb,
+                    m_tasking_oracle,
+                    std::placeholders::_1));
+      oracular->tasking_oracle(m_tasking_oracle);
+    }
+    c->executive()->task_finish_notify(
+        std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
+                  m_agg,
+                  std::placeholders::_1));
+    c->executive()->task_abort_notify(
+        std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
+                  m_agg,
+                  std::placeholders::_1));
+    c->executive()->task_alloc_notify(
+        std::bind(&depth1_metrics_aggregator::task_alloc_cb,
+                  m_agg,
+                  std::placeholders::_1,
+                  std::placeholders::_2));
+  }
+
+  const params::loop_function_repository* const mc_params;
+   tasking_oracle * const                       m_tasking_oracle;
+  depth1_metrics_aggregator* const              m_agg;
+};
+
+/**
+ * @struct controller_task_extractor_mapper
+ * @ingroup support depth1
+ *
+ * @brief Map a controller instance to the task extraction action run during
+ * convergence calculations.
+ */
+struct controller_task_extractor_mapper : public boost::static_visitor<int> {
+  controller_task_extractor_mapper(const controller::base_controller* const c)
+      : mc_controller(c) {}
+
+  using gp_dpo_extractor = controller_task_extractor<controller::depth1::gp_dpo_controller>;
+  using gp_mdpo_extractor = controller_task_extractor<controller::depth1::gp_mdpo_controller>;
+
+  int operator()(const gp_dpo_extractor& extractor) const {
+    return extractor(dynamic_cast<const gp_dpo_extractor::controller_type*>(
+        mc_controller));
+  }
+  int operator()(const gp_mdpo_extractor& extractor) const {
+    return extractor(dynamic_cast<const gp_mdpo_extractor::controller_type*>(
+        mc_controller));
+  }
+  const controller::base_controller * const mc_controller;
+};
+
+/**
+ * @struct controller_configurer_mapper
+ * @ingroup support depth1
+ *
+ * @brief Map a particular controller instance to the configuration action run
+ * during initialization.
+ */
+struct controller_configurer_mapper : public boost::static_visitor<void> {
+  controller_configurer_mapper(controller::base_controller* const c)
+      : mc_controller(c) {}
+
+  using gp_dpo_configurer = controller_configurer<controller::depth1::gp_dpo_controller>;
+  using gp_mdpo_configurer = controller_configurer<controller::depth1::gp_mdpo_controller>;
+
+  void operator()(const gp_dpo_configurer& extractor) const {
+    extractor(dynamic_cast<gp_dpo_configurer::controller_type*>(
+        mc_controller));
+  }
+  void operator()(const gp_mdpo_configurer& extractor) const {
+    extractor(dynamic_cast<gp_mdpo_configurer::controller_type*>(
+        mc_controller));
+  }
+  controller::base_controller * const mc_controller;
+};
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -99,6 +213,15 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   auto* cachep = params()->parse_results<params::caches::caches_params>();
   cache_handling_init(cachep);
 
+  /*
+   * Initialize convergence calculations to include task distribution (not
+   * included by default).
+   */
+  conv_calculator()->task_dist_init(
+      std::bind(&depth1_loop_functions::calc_robot_tasks,
+                this,
+                std::placeholders::_1));
+
   /* intitialize robot interactions with environment */
   m_interactors = rcppsw::make_unique<interactor_map>();
   m_interactors->emplace(
@@ -111,15 +234,32 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   /* initialize oracles */
   oracle_init();
 
-  /* configure robots */
+  /*
+   * Configure robots by mapping the controller type into a templated configurer
+   *  in order to be able to configure the current controller using if/else
+   *  statements dependent on controller typenames.
+   */
+  rcppsw::ds::type_map<controller_configurer<controller::depth1::gp_dpo_controller>,
+                       controller_configurer<controller::depth1::gp_mdpo_controller>> map;
+  map.emplace(typeid(controller::depth1::gp_dpo_controller),
+              controller_configurer<controller::depth1::gp_dpo_controller>(
+                  params(),
+                  m_tasking_oracle.get(),
+                  m_metrics_agg.get()));
+  map.emplace(typeid(controller::depth1::gp_mdpo_controller),
+              controller_configurer<controller::depth1::gp_mdpo_controller>(
+                  params(),
+                  m_tasking_oracle.get(),
+                  m_metrics_agg.get()));
+
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto gp_dpo = dynamic_cast<controller::depth1::gp_dpo_controller*>(
+    auto base = dynamic_cast<controller::base_controller*>(
         &robot.GetControllableEntity().GetController());
-    auto gp_mdpo = dynamic_cast<controller::depth1::gp_mdpo_controller*>(
-        &robot.GetControllableEntity().GetController());
-    controller_configure((nullptr != gp_mdpo) ? *gp_mdpo : *gp_dpo);
+
+    boost::apply_visitor(controller_configurer_mapper(base),
+                         map.at(base->type_index()));
   } /* for(&entity..) */
 
   ER_INFO("Initialization finished");
@@ -302,9 +442,38 @@ void depth1_loop_functions::Reset() {
   ndc_pop();
 }
 
+std::vector<int> depth1_loop_functions::calc_robot_tasks(
+    uint) const {
+  std::vector<int> v;
+  auto& robots =
+      const_cast<depth1_loop_functions*>(this)->GetSpace().GetEntitiesByType(
+          "foot-bot");
+
+  /*
+   * We map the controller type into a templated task extractor in order to be
+   * able to extract the ID of the robot's current task without using if/else
+   * statements dependent on the current controller types.
+   */
+  rcppsw::ds::type_map<controller_task_extractor<controller::depth1::gp_dpo_controller>,
+                       controller_task_extractor<controller::depth1::gp_mdpo_controller>> map;
+  map.emplace(typeid(controller::depth1::gp_dpo_controller),
+              controller_task_extractor<controller::depth1::gp_dpo_controller>());
+  map.emplace(typeid(controller::depth1::gp_mdpo_controller),
+              controller_task_extractor<controller::depth1::gp_mdpo_controller>());
+
+  for (auto& entity_pair : robots) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto base = dynamic_cast<controller::base_controller*>(
+        &robot->GetControllableEntity().GetController());
+    v.push_back(boost::apply_visitor(controller_task_extractor_mapper(base),
+                                     map.at(base->type_index())));
+  } /* for(&entity..) */
+  return v;
+} /* depth1_robot_positions() */
+
 std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
   /*
-   * Homogeneous swarm, so we can just take the first robot to get a handle on
+ pp  * Homogeneous swarm, so we can just take the first robot to get a handle on
    * the task IDs for the tasks we are interested in. We also assume that all
    * controllers in depth1 are derived from the DPO controller.
    */
@@ -321,7 +490,7 @@ std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
       *(*m_metrics_agg)["tasks::distribution"]);
 
   /*
-   * These are interval counts, which means they are likely much greater than
+p   * These are interval counts, which means they are likely much greater than
    * the current actual # of harvesters/collectors in the swarm, so we have to
    * correct for that.
    */

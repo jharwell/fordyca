@@ -1,5 +1,10 @@
 # FORDYCA (FOraging Robots use DYnamic CAches)
 
+<a href="https://scan.coverity.com/projects/swarm-robotics-fordyca">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/15212/badge.svg"/>
+</a>
+
 This is the main entry point for getting started on the project.
 
 # Papers

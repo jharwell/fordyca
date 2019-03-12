@@ -161,8 +161,11 @@ int gp_dpo_controller::current_task_depth(void) const {
 } /* current_task_depth() */
 
 int gp_dpo_controller::current_task_id(void) const {
-  return executive()->graph()->vertex_id(
-      dynamic_cast<const ta::polled_task*>(current_task()));
+  auto task = dynamic_cast<const ta::polled_task*>(current_task());
+  if (nullptr != task) {
+    return executive()->graph()->vertex_id(task);
+  }
+  return -1;
 } /* current_task_id() */
 
 int gp_dpo_controller::task_id(const std::string& task_name) const {

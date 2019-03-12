@@ -237,7 +237,10 @@ void depth0_loop_functions::Reset(void) {
 } /* Reset() */
 
 void depth0_loop_functions::pre_step_final(void) {
-  m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
+  /* Not a clean way to do this in the convergence metrics collector... */
+  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock())) {
+    conv_calculator()->reset_metrics();
+  }
   m_metrics_agg->timestep_inc_all();
   m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();

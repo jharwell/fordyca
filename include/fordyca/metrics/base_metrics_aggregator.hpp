@@ -87,7 +87,7 @@ class base_metrics_aggregator
   static constexpr uint kPOS_ENTROPY_ITER = 10;
 
   /* clang-format off */
-  std::string m_metrics_path{""};
+  std::string m_metrics_path;
   /* clang-format on */
 };
 
