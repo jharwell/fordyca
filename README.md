@@ -108,5 +108,5 @@ don't.
 
 # Contributing
 
-For contributing to `fordyca`, see
-[CONTRIBUTING](https://github.com/swarm-robotics/rcppsw/blob/master/docs/CONTRIBUTING.md).
+For contributing to `FORDYCA`, see
+[CONTRIBUTING](https://github.com/swarm-robotics/rcppsw/tree/devel/docs/CONTRIBUTING.md).

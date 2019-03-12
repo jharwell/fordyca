@@ -17,7 +17,7 @@
 
 mkdir -p $1 && cd $1
 
-fordyca_pkgs=(qtbase5-dev libnlopt-dev)
+fordyca_pkgs=(qtbase5-dev libnlopt-dev npm)
 rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache)
 libra_pkgs=(graphviz doxygen cppcheck cmake make gcc-7 libclang-6.0-dev
            clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)
@@ -59,6 +59,7 @@ git clone https://github.com/swarm-robotics/fordyca.git
 cd fordyca
 git checkout devel
 git submodule update --init --recursive --remote
+npm install
 ln -s $1/rcppsw ext/rcppsw
 
 # Build fordyca and documentation
