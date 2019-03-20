@@ -490,7 +490,7 @@ std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
       *(*m_metrics_agg)["tasks::distribution"]);
 
   /*
-p   * These are interval counts, which means they are likely much greater than
+   * These are interval counts, which means they are likely much greater than
    * the current actual # of harvesters/collectors in the swarm, so we have to
    * correct for that.
    */
