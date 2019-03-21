@@ -21,6 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <boost/range/adaptor/map.hpp>
+
 /*
  * This is needed because without it boost instantiates static assertions that
  * verify that every possible handler<controller> instantiation is valid, which
@@ -141,15 +143,9 @@ struct controller_task_extractor_mapper : public boost::static_visitor<int> {
   controller_task_extractor_mapper(const controller::base_controller* const c)
       : mc_controller(c) {}
 
-  using gp_dpo_extractor = controller_task_extractor<controller::depth1::gp_dpo_controller>;
-  using gp_mdpo_extractor = controller_task_extractor<controller::depth1::gp_mdpo_controller>;
-
-  int operator()(const gp_dpo_extractor& extractor) const {
-    return extractor(dynamic_cast<const gp_dpo_extractor::controller_type*>(
-        mc_controller));
-  }
-  int operator()(const gp_mdpo_extractor& extractor) const {
-    return extractor(dynamic_cast<const gp_mdpo_extractor::controller_type*>(
+  template<typename T>
+  int operator()(const controller_task_extractor<T>& extractor) const {
+    return extractor(dynamic_cast<const typename controller_task_extractor<T>::controller_type*>(
         mc_controller));
   }
   const controller::base_controller * const mc_controller;
@@ -196,11 +192,18 @@ depth1_loop_functions::~depth1_loop_functions(void) = default;
  * Member Functions
  ******************************************************************************/
 void depth1_loop_functions::Init(ticpp::Element& node) {
-  depth0::depth0_loop_functions::Init(node);
-
   ndc_push();
   ER_INFO("Initializing...");
 
+  shared_init(node);
+  private_init();
+
+  ER_INFO("Initialization finished");
+  ndc_pop();
+} /* Init() */
+
+void depth1_loop_functions::shared_init(ticpp::Element& node) {
+  depth0_loop_functions::shared_init(node);
   /* initialize stat collecting */
   auto* arenap = params()->parse_results<params::arena::arena_map_params>();
   params::output_params output =
@@ -209,7 +212,13 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(
       &output.metrics, output_root());
 
-  /* initialize cache handling and create initial cache */
+
+  /* initialize oracles */
+  oracle_init();
+} /* shared_init() */
+
+void depth1_loop_functions::private_init(void) {
+    /* initialize cache handling and create initial cache */
   auto* cachep = params()->parse_results<params::caches::caches_params>();
   cache_handling_init(cachep);
 
@@ -230,9 +239,6 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
   m_interactors->emplace(
       typeid(controller::depth1::gp_mdpo_controller),
       gp_mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
-
-  /* initialize oracles */
-  oracle_init();
 
   /*
    * Configure robots by mapping the controller type into a templated configurer
@@ -257,14 +263,10 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto base = dynamic_cast<controller::base_controller*>(
         &robot.GetControllableEntity().GetController());
-
-    boost::apply_visitor(controller_configurer_mapper(base),
-                         map.at(base->type_index()));
-  } /* for(&entity..) */
-
-  ER_INFO("Initialization finished");
-  ndc_pop();
-}
+      boost::apply_visitor(controller_configurer_mapper(base),
+                           map.at(base->type_index()));
+  } /* for(entity_pair..) */
+} /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
   auto* oraclep = params()->parse_results<params::oracle_params>();
@@ -469,11 +471,11 @@ std::vector<int> depth1_loop_functions::calc_robot_tasks(
                                      map.at(base->type_index())));
   } /* for(&entity..) */
   return v;
-} /* depth1_robot_positions() */
+} /* calc_robot_tasks() */
 
 std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
   /*
- pp  * Homogeneous swarm, so we can just take the first robot to get a handle on
+   * Homogeneous swarm, so we can just take the first robot to get a handle on
    * the task IDs for the tasks we are interested in. We also assume that all
    * controllers in depth1 are derived from the DPO controller.
    */

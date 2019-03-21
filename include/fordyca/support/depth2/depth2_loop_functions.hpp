@@ -58,6 +58,14 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void PreStep() override;
   void Reset(void) override;
 
+  /**
+   * @brief Initialize depth2 support to be shared with derived classes
+   *
+   * - All depth1 shared initialization
+   * - Depth2 metric collection
+   */
+  void shared_init(ticpp::Element& node);
+
  private:
   using interactor_map = rcppsw::ds::type_map<grp_dpo_itype, grp_mdpo_itype>;
   /**
@@ -71,6 +79,17 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
    * @return \c TRUE if one or more caches were creation, \c FALSE otherwise.
    */
   bool cache_creation_handle(bool on_drop);
+
+  void private_init(void);
+
+  /**
+   * @brief Calculate robot task array for convergence calculations.
+   *
+   * Cannot use depth1 version as the binary layout of the controllers is not
+   * guaranteed to be the same, AND the task mappers will throw key errors if
+   * you try it.
+   */
+  std::vector<int> calc_robot_tasks(uint) const;
 
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);

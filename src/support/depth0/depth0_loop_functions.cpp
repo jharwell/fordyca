@@ -70,9 +70,16 @@ depth0_loop_functions::~depth0_loop_functions(void) = default;
  * Member Functions
  ******************************************************************************/
 void depth0_loop_functions::Init(ticpp::Element& node) {
-  base_loop_functions::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
+  shared_init(node);
+  private_init();
+  ER_INFO("Initialization finished");
+  ndc_pop();
+} /* Init() */
+
+void depth0_loop_functions::shared_init(ticpp::Element& node) {
+  base_loop_functions::Init(node);
 
   /* initialize output and metrics collection */
   auto* arena = params()->parse_results<params::arena::arena_map_params>();
@@ -82,7 +89,9 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
 
   m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(
       &output.metrics, output_root());
+} /* shared_init() */
 
+void depth0_loop_functions::private_init(void) {
   /* intitialize robot interactions with environment */
   m_interactors = rcppsw::make_unique<interactor_map>();
   m_interactors->emplace(
@@ -103,9 +112,8 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
         robot.GetControllableEntity().GetController());
     controller_configure(&controller);
   } /* for(entity..) */
-  ER_INFO("Initialization finished");
-  ndc_pop();
-}
+} /* private_init() */
+
 
 void depth0_loop_functions::controller_configure(
     controller::base_controller* const c) {

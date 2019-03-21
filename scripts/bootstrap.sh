@@ -17,7 +17,7 @@
 
 mkdir -p $1 && cd $1
 
-fordyca_pkgs=(qtbase5-dev libnlopt-dev npm libfreeimageplus-dev freeglut3-dev libeigen3-dev)
+fordyca_pkgs=(qtbase5-dev libceres-dev npm libfreeimageplus-dev freeglut3-dev libeigen3-dev)
 rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache pip3)
 libra_pkgs=(graphviz doxygen cppcheck cmake make gcc-7 libclang-6.0-dev
            clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)

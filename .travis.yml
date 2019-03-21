@@ -21,4 +21,3 @@ before_script:
 
 script:
   - cd build && cmake -DBUILD_FOR_TRAVIS=YES .. && make -j2
-  - make clean && ccache -C

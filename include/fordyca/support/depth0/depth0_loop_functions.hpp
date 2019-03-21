@@ -72,8 +72,15 @@ class depth0_loop_functions : public base_loop_functions,
     auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
     controller.tick(GetSpace().GetSimulationClock());
   }
+  /**
+   * @brief Initialize depth0 support to be shared with derived classes:
+   *
+   * - Depth0 metric collection
+   */
+  void shared_init(ticpp::Element& node);
 
  private:
+  void private_init(void);
   using interactor_map = rcppsw::ds::type_map<crw_itype,
                                               dpo_itype,
                                               mdpo_itype>;

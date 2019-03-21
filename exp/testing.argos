@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="ffc"
+    <grp_dpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -150,7 +150,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </crw_controller>
+    </grp_dpo_controller>
 
   </controllers>
 
@@ -158,7 +158,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth0_loop_functions">
+                  label="depth2_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"

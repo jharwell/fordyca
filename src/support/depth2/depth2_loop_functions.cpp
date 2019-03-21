@@ -43,15 +43,40 @@
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/depth2/robot_arena_interactor.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
+#include "fordyca/support/controller_task_extractor.hpp"
 
 #include "rcppsw/task_allocation/bi_tdgraph.hpp"
 #include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ds/type_map.hpp"
+#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
 using ds::arena_grid;
+
+/*******************************************************************************
+ * Struct Definitions
+ ******************************************************************************/
+/**
+ * @struct controller_task_extractor_mapper
+ * @ingroup support depth2
+ *
+ * @brief Map a controller instance to the task extraction action run during
+ * convergence calculations.
+ */
+struct controller_task_extractor_mapper : public boost::static_visitor<int> {
+  controller_task_extractor_mapper(const controller::base_controller* const c)
+      : mc_controller(c) {}
+
+  template<typename T>
+  int operator()(const controller_task_extractor<T>& extractor) const {
+    return extractor(dynamic_cast<const typename controller_task_extractor<T>::controller_type*>(
+        mc_controller));
+  }
+  const controller::base_controller * const mc_controller;
+};
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -68,10 +93,18 @@ depth2_loop_functions::~depth2_loop_functions(void) = default;
  * Member Functions
  ******************************************************************************/
 void depth2_loop_functions::Init(ticpp::Element& node) {
-  depth1::depth1_loop_functions::Init(node);
-
   ndc_push();
   ER_INFO("Initializing...");
+
+  shared_init(node);
+  private_init();
+
+  ER_INFO("Initialization finished");
+  ndc_pop();
+} /* Init() */
+
+void depth2_loop_functions::shared_init(ticpp::Element& node) {
+  depth1_loop_functions::shared_init(node);
 
   /* initialize stat collecting */
   auto* arenap = params()->parse_results<params::arena::arena_map_params>();
@@ -81,10 +114,21 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(
       &output.metrics, output_root());
+} /* shared_init() */
 
+void depth2_loop_functions::private_init(void) {
   /* initialize cache handling */
   auto* cachep = params()->parse_results<params::caches::caches_params>();
   cache_handling_init(cachep);
+
+  /*
+   * Initialize convergence calculations to include task distribution (not
+   * included by default).
+   */
+  conv_calculator()->task_dist_init(
+      std::bind(&depth2_loop_functions::calc_robot_tasks,
+                this,
+                std::placeholders::_1));
 
   /* intitialize robot interactions with environment */
   m_interactors = rcppsw::make_unique<interactor_map>();
@@ -105,16 +149,14 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::depth2::grp_mdpo_controller&>(
+    auto& controller = dynamic_cast<controller::depth2::grp_dpo_controller&>(
         robot.GetControllableEntity().GetController());
     controller_configure(controller);
   } /* for(&entity..) */
-  ER_INFO("Initialization finished");
-  ndc_pop();
-}
+} /* private_init() */
 
 void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::depth2::grp_mdpo_controller*>(
+  auto controller = dynamic_cast<controller::depth2::grp_dpo_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
@@ -154,7 +196,6 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
    *
    * If said interaction results in a block being dropped in a new cache, then
    * we need to re-run dynamic cache creation.
-   *
    */
   if (boost::apply_visitor(controller_interactor_mapper(
                                controller, GetSpace().GetSimulationClock()),
@@ -170,7 +211,7 @@ void depth2_loop_functions::controller_configure(controller::base_controller& c)
   /*
    * If NULL, then visualization has been disabled.
    */
-  auto& greedy = dynamic_cast<controller::depth2::grp_mdpo_controller&>(c);
+  auto& greedy = dynamic_cast<controller::depth2::grp_dpo_controller&>(c);
   auto* vparams = params()->parse_results<struct params::visualization_params>();
   if (nullptr != vparams) {
     greedy.display_task(vparams->robot_task);
@@ -278,6 +319,34 @@ void depth2_loop_functions::Reset(void) {
   cache_creation_handle(false);
   ndc_pop();
 }
+
+std::vector<int> depth2_loop_functions::calc_robot_tasks(uint) const {
+  std::vector<int> v;
+  auto& robots =
+      const_cast<depth2_loop_functions*>(this)->GetSpace().GetEntitiesByType(
+          "foot-bot");
+
+  /*
+   * We map the controller type into a templated task extractor in order to be
+   * able to extract the ID of the robot's current task without using if/else
+   * statements dependent on the current controller types.
+   */
+  rcppsw::ds::type_map<controller_task_extractor<controller::depth2::grp_dpo_controller>,
+                       controller_task_extractor<controller::depth2::grp_mdpo_controller>> map;
+  map.emplace(typeid(controller::depth2::grp_dpo_controller),
+              controller_task_extractor<controller::depth2::grp_dpo_controller>());
+  map.emplace(typeid(controller::depth2::grp_mdpo_controller),
+              controller_task_extractor<controller::depth2::grp_mdpo_controller>());
+
+  for (auto& entity_pair : robots) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto base = dynamic_cast<controller::base_controller*>(
+        &robot->GetControllableEntity().GetController());
+    v.push_back(boost::apply_visitor(controller_task_extractor_mapper(base),
+                                     map.at(base->type_index())));
+  } /* for(&entity..) */
+  return v;
+} /* calc_robot_tasks() */
 
 bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
   auto* cachep = params()->parse_results<params::caches::caches_params>();

@@ -101,7 +101,7 @@ NS_START(tv);
  */
 
 class tv_manager : public rcppsw::er::client<tv_manager>,
-                      public metrics::temporal_variance_metrics {
+                   public metrics::temporal_variance_metrics {
  public:
   template<typename T>
   using filter_status = typename block_op_filter<T>::filter_status;
@@ -133,11 +133,9 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
       case block_op_src::kSrcFreePickup:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_fb_pickup.at(typeid(T))).get();
-        break;
       case block_op_src::kSrcNestDrop:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_nest_drop.at(typeid(T))).get();
-        break;
       case block_op_src::kSrcNewCacheDrop:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_new_cache.at(typeid(T))).get();
@@ -252,6 +250,15 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
   void update(void);
 
  private:
+  void nest_drop_init(const params::tv::tv_manager_params* params,
+                      ds::arena_map* const map);
+  void fb_pickup_init(const params::tv::tv_manager_params* params,
+                      ds::arena_map* const map);
+  void existing_cache_init(const params::tv::tv_manager_params* params,
+                           ds::arena_map* const map);
+  void cache_site_init(const params::tv::tv_manager_params* params,
+                       ds::arena_map* const map);
+
   using block_variant = boost::variant<BLOCK_HANDLERS>;
   using existing_cache_variant = boost::variant<EXISTING_CACHE_HANDLERS>;
   using fb_drop_variant = boost::variant<FREE_BLOCK_DROP_HANDLERS>;

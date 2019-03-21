@@ -75,8 +75,20 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
     return m_tasking_oracle.get();
   }
 
+  /**
+   * @brief Initialize depth1 support to be shared with derived classes:
+   *
+   * - All depth0 shared initialization
+   * - Depth1 metric collection
+   * - Enable task distribution entropy calculations
+   * - Tasking oracle
+   */
+  void shared_init(ticpp::Element& node);
+
  private:
   using interactor_map = rcppsw::ds::type_map<gp_dpo_itype, gp_mdpo_itype>;
+
+  void private_init(void);
   void pre_step_final(void) override;
   void pre_step_iter(argos::CFootBotEntity& robot);
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
