@@ -35,8 +35,8 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
+#include "rcppsw/swarm/convergence/convergence_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -117,9 +117,7 @@ void base_loop_functions::convergence_init(
       std::bind(&base_loop_functions::calc_robot_headings,
                 this,
                 std::placeholders::_1),
-      std::bind(&base_loop_functions::calc_robot_nn,
-                this,
-                std::placeholders::_1),
+      std::bind(&base_loop_functions::calc_robot_nn, this, std::placeholders::_1),
       std::bind(&base_loop_functions::calc_robot_positions,
                 this,
                 std::placeholders::_1));
@@ -130,10 +128,8 @@ void base_loop_functions::PreStep(void) {
   m_conv_calc->update();
 } /* PreStep() */
 
-void base_loop_functions::tv_init(
-    const params::tv::tv_manager_params* const tvp) {
-  m_tv_manager =
-      rcppsw::make_unique<tv::tv_manager>(tvp, this, arena_map());
+void base_loop_functions::tv_init(const params::tv::tv_manager_params* const tvp) {
+  m_tv_manager = rcppsw::make_unique<tv::tv_manager>(tvp, this, arena_map());
 
   for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(pair.second);
@@ -242,7 +238,8 @@ std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const
   return v;
 } /* calc_robot_headings() */
 
-std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(uint) const {
+std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
+    uint) const {
   std::vector<rmath::vector2d> v;
   auto& robots =
       const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(

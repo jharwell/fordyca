@@ -63,7 +63,6 @@ class multi_cluster_distributor : public base_distributor,
  private:
   /* clang-format off */
   std::vector<cluster_distributor> m_dists{};
-  std::default_random_engine       m_reng{};
   /* clang-format on */
 };
 

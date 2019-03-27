@@ -105,9 +105,8 @@ class random_distributor : public base_distributor,
                          const ds::cell2D* cell);
 
   /* clang-format off */
-  double                     m_resolution;
-  std::default_random_engine m_rng{std::random_device {}()};
-  ds::arena_grid::view       m_grid;
+  double               m_resolution;
+  ds::arena_grid::view m_grid;
   /* clang-format on */
 };
 

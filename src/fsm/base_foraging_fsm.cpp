@@ -57,9 +57,7 @@ base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(base_foraging_fsm,
-                  leaving_nest,
-                  rfsm::event_data* data) {
+HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
   ER_ASSERT(rfsm::event_type::NORMAL == data->type(),
             "ST_LEAVING_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
@@ -92,9 +90,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   }
   return rfsm::event_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(base_foraging_fsm,
-                  transport_to_nest,
-                  rfsm::event_data* data) {
+HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) {
   ER_ASSERT(rfsm::event_type::NORMAL == data->type(),
             "ST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
@@ -142,9 +138,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm,
   return rfsm::event_signal::HANDLED;
 }
 
-HFSM_STATE_DEFINE(base_foraging_fsm,
-                  new_direction,
-                  rfsm::event_data* data) {
+HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data* data) {
   rmath::radians current_dir = m_saa->sensing()->heading_angle();
 
   /*

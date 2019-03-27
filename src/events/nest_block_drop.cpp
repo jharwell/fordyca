@@ -39,7 +39,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -56,8 +56,18 @@ nest_block_drop::nest_block_drop(std::shared_ptr<repr::base_block> block,
 void nest_block_drop::visit(ds::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(), "Undefined robot index");
   map.distribute_single_block(m_block);
-  m_block->accept(*this);
+  visit(*m_block);
 } /* visit() */
+
+void nest_block_drop::dispatch_nest_interactor(
+    tasks::base_foraging_task* const task) {
+  __rcsw_unused auto* polled = dynamic_cast<ta::polled_task*>(task);
+  auto interactor = dynamic_cast<events::nest_interactor*>(task);
+  ER_ASSERT(nullptr != interactor,
+            "Non nest-interactor task %s causing nest block drop",
+            polled->name().c_str());
+  interactor->accept(*this);
+} /* dispatch_nest_interactor() */
 
 /*******************************************************************************
  * Depth0 Foraging
@@ -69,9 +79,9 @@ void nest_block_drop::visit(repr::base_block& block) {
 
 void nest_block_drop::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
-  controller.fsm()->accept(*this);
+  visit(*controller.fsm());
   controller.block(nullptr);
-  controller.free_drop_event(true);
+  controller.block_manip_collator()->free_drop_event(true);
 
   ER_INFO("Dropped block%d in nest", m_block->id());
   controller.ndc_pop();
@@ -85,9 +95,9 @@ void nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
 void nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_push();
 
-  controller.fsm()->accept(*this);
+  visit(*controller.fsm());
   controller.block(nullptr);
-  controller.free_drop_event(true);
+  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
 
   controller.ndc_pop();
@@ -101,9 +111,9 @@ void nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
 void nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_push();
 
-  controller.fsm()->accept(*this);
+  visit(*controller.fsm());
   controller.block(nullptr);
-  controller.free_drop_event(true);
+  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
 
   controller.ndc_pop();
@@ -116,14 +126,8 @@ void nest_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);
-  auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
-  __rcsw_unused auto* polled =
-      dynamic_cast<ta::polled_task*>(controller.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non nest-interactor task %s causing nest block drop",
-            polled->name().c_str());
-  task->accept(*this);
-  controller.free_drop_event(true);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
 
   controller.ndc_pop();
@@ -133,27 +137,19 @@ void nest_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) 
   controller.ndc_push();
 
   controller.block(nullptr);
-  auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
-  __rcsw_unused auto* polled =
-      dynamic_cast<ta::polled_task*>(controller.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non nest-interactor task %s causing nest block drop",
-            polled->name().c_str());
-  task->accept(*this);
-  controller.free_drop_event(true);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
 
   controller.ndc_pop();
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())
-      ->accept(*this);
+  visit(*static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
 
 void nest_block_drop::visit(tasks::depth1::collector& task) {
-  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
-      ->accept(*this);
+  visit(*static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
@@ -173,17 +169,11 @@ void nest_block_drop::visit(controller::depth2::grp_mdpo_controller& controller)
   controller.ndc_push();
 
   controller.block(nullptr);
-  __rcsw_unused auto* polled =
-      dynamic_cast<ta::polled_task*>(controller.current_task());
-  auto task = dynamic_cast<events::nest_interactor*>(controller.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non nest-interactor task %s causing nest block drop",
-            polled->name().c_str());
-  task->accept(*this);
-  controller.free_drop_event(true);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_block->id());
 
   controller.ndc_pop();
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

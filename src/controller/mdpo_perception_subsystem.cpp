@@ -107,8 +107,8 @@ void mdpo_perception_subsystem::process_los_blocks(
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
-        events::cell_empty e(d);
-        m_map->accept(e);
+        events::cell_empty_visitor e(d);
+        e.visit(*m_map);
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -134,8 +134,8 @@ void mdpo_perception_subsystem::process_los_blocks(
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id());
     }
-    events::block_found op(block->clone());
-    m_map->accept(op);
+    events::block_found_visitor op(block->clone());
+    op.visit(*m_map);
   } /* for(block..) */
 } /* process_los_blocks() */
 
@@ -212,8 +212,8 @@ void mdpo_perception_subsystem::process_los_caches(
      *
      * Cloning is definitely necessary here.
      */
-    events::cache_found op(cache->clone());
-    map()->accept(op);
+    events::cache_found_visitor op(cache->clone());
+    op.visit(*m_map);
   } /* for(cache..) */
 } /* process_los_caches() */
 

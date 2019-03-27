@@ -28,7 +28,6 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
@@ -51,7 +50,6 @@ class dpo_store;
 } // namespace ds
 
 namespace task_allocation = rcppsw::task_allocation;
-namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(fsm, depth1);
 
@@ -75,8 +73,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
                                  er::client<cached_block_to_nest_fsm>,
                                  public metrics::fsm::goal_acquisition_metrics,
                                  public block_transporter,
-                                 public task_allocation::taskable,
-                                 public visitor::visitable_any<cached_block_to_nest_fsm> {
+                                 public task_allocation::taskable {
  public:
   cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
                            controller::saa_subsystem* saa,

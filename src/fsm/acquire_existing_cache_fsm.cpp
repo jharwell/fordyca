@@ -54,7 +54,8 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                     this)),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
-      mc_store(store) {}
+      mc_store(store),
+      m_rd(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
 /*******************************************************************************
  * Member Functions

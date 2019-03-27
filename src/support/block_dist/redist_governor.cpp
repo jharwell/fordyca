@@ -60,24 +60,26 @@ void redist_governor::update(uint timestep,
    * Can only be tripped once, so if already tripped avoid printing
    * diagnostic multiple times.
    */
-  if (kTriggerTime == mc_params.trigger &&
-      timestep >= mc_params.timestep && m_dist_status) {
-    ER_INFO("Redistribution disabled by trigger '%s': t=%u,n_blocks=%u,convergence=%d",
-            kTriggerTime,
-            timestep,
-            blocks_collected,
-            convergence_status);
+  if (kTriggerTime == mc_params.trigger && timestep >= mc_params.timestep &&
+      m_dist_status) {
+    ER_INFO(
+        "Redistribution disabled by trigger '%s': "
+        "t=%u,n_blocks=%u,convergence=%d",
+        kTriggerTime,
+        timestep,
+        blocks_collected,
+        convergence_status);
     m_dist_status = false;
     return;
   }
   if (kTriggerBlockCount == mc_params.trigger &&
       blocks_collected >= mc_params.block_count && m_dist_status) {
-      ER_INFO("Redistribution disabled by '%s': t=%u,n_blocks=%u,convergence=%d",
-              kTriggerBlockCount,
-              timestep,
-              blocks_collected,
-              convergence_status);
-      m_dist_status = false;
+    ER_INFO("Redistribution disabled by '%s': t=%u,n_blocks=%u,convergence=%d",
+            kTriggerBlockCount,
+            timestep,
+            blocks_collected,
+            convergence_status);
+    m_dist_status = false;
     return;
   }
   if (kTriggerConvergence == mc_params.trigger) {
@@ -93,12 +95,13 @@ void redist_governor::update(uint timestep,
       return;
     }
     m_dist_status = !convergence_status;
-    ER_INFO("Redistribution=%d triggered by '%s': t=%u,n_blocks=%u,convergence=%d",
-            m_dist_status,
-            kTriggerConvergence,
-            timestep,
-            blocks_collected,
-            convergence_status);
+    ER_INFO(
+        "Redistribution=%d triggered by '%s': t=%u,n_blocks=%u,convergence=%d",
+        m_dist_status,
+        kTriggerConvergence,
+        timestep,
+        blocks_collected,
+        convergence_status);
     return;
   }
   ER_FATAL_SENTINEL("Bad trigger type '%s'", mc_params.trigger.c_str());

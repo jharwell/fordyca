@@ -19,7 +19,7 @@ mkdir -p $1 && cd $1
 
 fordyca_pkgs=(qtbase5-dev libceres-dev npm libfreeimageplus-dev freeglut3-dev libeigen3-dev)
 rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache pip3)
-libra_pkgs=(graphviz doxygen cppcheck cmake make gcc-7 libclang-6.0-dev
+libra_pkgs=(npm graphviz doxygen cppcheck cmake make gcc-7 libclang-6.0-dev
            clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)
 
 python_pkgs=(cpplint)
@@ -44,7 +44,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 	  ../src
 make -j $4
 make doc
-if [ "$YES" == "$2" ]; then
+if [ "$YES" = "$2" ]; then
     sudo make install;
 else
     make install;
@@ -65,6 +65,8 @@ cd fordyca
 git checkout devel
 git submodule update --init --recursive --remote
 npm install
+
+rm -rf ext/rcppsw
 ln -s $1/rcppsw ext/rcppsw
 
 # Build fordyca and documentation

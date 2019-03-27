@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <boost/optional.hpp>
 #include <list>
 #include <random>
 #include <utility>
@@ -133,28 +134,13 @@ class base_cache_creator : public er::client<base_cache_creator> {
   bool creation_sanity_checks(const ds::cache_vector& new_caches,
                               const ds::block_list& free_blocks) const;
 
-  /**
-   * @brief Given the size of the cache-to-be and its tentative location in the
-   * arena, return a new location that guarantees that the cache will not
-   * overlap arena boundaries.
-   *
-   * This function is provided for derived classes to use when they implement
-   * \ref create_all().
-   */
-  deconflict_res_t deconflict_loc_boundaries(double cache_dim,
-                                             const rmath::vector2u& center) const;
-
-  deconflict_res_t deconflict_loc_entity(const repr::multicell_entity* ent,
-                                         const rmath::vector2d& ent_loc,
-                                         const rmath::vector2u& center) const;
-
  private:
   /* clang-format off */
   double                             m_cache_dim;
   ds::arena_grid*                    m_grid;
-  mutable std::default_random_engine m_rng{};
+  mutable std::default_random_engine m_rng;
   /* clang-format on */
 };
-NS_END(fordyca, depth1);
+NS_END(support, fordyca);
 
 #endif // INCLUDE_FORDYCA_SUPPORT_BASE_CACHE_CREATOR_HPP_

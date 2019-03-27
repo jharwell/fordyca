@@ -113,9 +113,7 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
   }
   return controller::foraging_signal::HANDLED;
 }
-HFSM_STATE_DEFINE(free_block_to_nest_fsm,
-                  wait_for_drop,
-                  rfsm::event_data* data) {
+HFSM_STATE_DEFINE(free_block_to_nest_fsm, wait_for_drop, rfsm::event_data* data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ST_FINISHED);
@@ -195,8 +193,7 @@ void free_block_to_nest_fsm::init(void) {
 } /* init() */
 
 void free_block_to_nest_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 transport_goal_type free_block_to_nest_fsm::block_transport_goal(void) const {

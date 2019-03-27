@@ -29,7 +29,6 @@
 #include "fordyca/ds/dpo_map.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -40,7 +39,6 @@ struct pheromone_params;
 }} // namespace params::perception
 NS_START(ds);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace er = rcppsw::er;
 namespace rmath = rcppsw::math;
 
@@ -57,8 +55,7 @@ namespace rmath = rcppsw::math;
  * an entity are encountered (e.g. the real version has vanished and the tracked
  * version is out of date).
  */
-class dpo_store : public er::client<dpo_store>,
-                  public visitor::visitable_any<dpo_store> {
+class dpo_store : public er::client<dpo_store> {
  public:
   template <typename T>
   using dp_entity = repr::dp_entity<T>;

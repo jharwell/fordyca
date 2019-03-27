@@ -59,38 +59,6 @@ class dynamic_cache_creator : public base_cache_creator,
                               double cache_dim) override;
 
  private:
-  static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 10;
-
-  /**
-   * @brief Sentinel value to return if no valid cache center can be found for a
-   * set of candidate blocks using the specified # of attempts.
-   */
-  static const rmath::vector2i kInvalidCacheCenter;
-
-  /**
-   * @brief Calculate the center of the new cache that will be constructed from
-   * the specified blocks.
-   *
-   * Ideally that will be just the average of the x and y coordinates of all the
-   * constituent blocks. However, it is possible that placing a cache at that
-   * location will cause it to overlap with other caches, and so corrections may
-   * be necessary. We also need to deconflict the new cache location from
-   * existing blocks in the arena, as it is possible that blocks that are too
-   * far away to be considered part of our new cache will overlap it if it moves
-   * around to deconflict with existing caches.
-   *
-   * @param candidate_blocks The list of blocks to create a new cache from.
-   * @param existing_caches Vector of existing caches in the arena.
-   * @param nc_blocks List of free (non-candidate) blocks in the arena that are
-   *                  NOT going to be part of the new cache.
-   *
-   * @return Coordinates of the new cache.
-   */
-  rmath::vector2i calc_center(const ds::block_list& cache_i_blocks,
-                              const ds::block_list& nc_blocks,
-                              const ds::cache_vector& existing_caches,
-                              double cache_dim) const;
-
   /**
    * @brief Calculate the blocks to be used in the creation of a single new
    * cache.
@@ -100,8 +68,6 @@ class dynamic_cache_creator : public base_cache_creator,
    * @param candidates The total list of all blocks available for cache creation
    *                    when the creator was called.
    * @param anchor_index Our current index within the candidate vector
-   *
-   * @return
    */
   ds::block_list cache_i_blocks_calc(const ds::block_list& used_blocks,
                                      const ds::block_vector& candidates,
@@ -129,8 +95,8 @@ class dynamic_cache_creator : public base_cache_creator,
                                          const ds::cache_vector& created_caches) const;
 
   /* clang-format off */
-  double                             m_min_dist;
-  uint                               m_min_blocks;
+  double m_min_dist;
+  uint   m_min_blocks;
   /* clang-format on */
 };
 

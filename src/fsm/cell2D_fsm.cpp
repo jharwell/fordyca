@@ -69,10 +69,10 @@ void cell2D_fsm::event_empty(void) {
 
 void cell2D_fsm::event_block_drop(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
-      ST_HAS_BLOCK,                       /* unknown */
-      ST_HAS_BLOCK,                       /* empty */
-      ST_HAS_CACHE,                       /* has block */
-      ST_HAS_CACHE,                       /* has cache */
+      ST_HAS_BLOCK,              /* unknown */
+      ST_HAS_BLOCK,              /* empty */
+      ST_HAS_CACHE,              /* has block */
+      ST_HAS_CACHE,              /* has cache */
       rfsm::event_signal::FATAL, /* cache extent */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
@@ -84,8 +84,8 @@ void cell2D_fsm::event_block_pickup(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
       rfsm::event_signal::FATAL, /* unknown */
       rfsm::event_signal::FATAL, /* empty */
-      ST_EMPTY,                           /* has block */
-      ST_HAS_CACHE,                       /* has cache */
+      ST_EMPTY,                  /* has block */
+      ST_HAS_CACHE,              /* has cache */
       rfsm::event_signal::FATAL, /* cache extent */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
@@ -101,7 +101,7 @@ void cell2D_fsm::event_cache_extent(void) {
          * This is technically bad, but the arena map fixes it right after
          * creating a new cache, so we can let it slide here.
          */
-      ST_CACHE_EXTENT,                    /* has block */
+      ST_CACHE_EXTENT,           /* has block */
       rfsm::event_signal::FATAL, /* has cache */
       rfsm::event_signal::FATAL, /* cache extent */
   };

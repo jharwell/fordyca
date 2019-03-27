@@ -31,6 +31,7 @@
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
+#include "fordyca/ds/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -139,8 +140,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     ER_ASSERT(m_map->caches().end() != it,
               "FATAL: Cache%d does not exist?",
               status.entity_id);
-    events::cache_proximity prox(*it);
-    controller.visitor::template visitable_any<T>::accept(prox);
+    events::cache_proximity_visitor prox_op(*it);
+    prox_op.visit(controller);
   }
 
   /**
@@ -187,8 +188,8 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
       ER_ASSERT(m_map->caches().end() != it,
                 "FATAL: Cache%d does not exist?",
                 status.entity_id);
-      events::cache_proximity prox(*it);
-      controller.visitor::template visitable_any<T>::accept(prox);
+      events::cache_proximity_visitor prox_op(*it);
+      prox_op.visit(controller);
       return false;
     } else {
       perform_new_cache_block_drop(controller, p);
@@ -205,13 +206,13 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
    */
   void perform_new_cache_block_drop(T& controller,
                                     const tv::temporal_penalty<T>& penalty) {
-    events::free_block_drop drop_op(m_map->blocks()[penalty.id()],
-                                    rmath::dvec2uvec(controller.position(),
-                                                     m_map->grid_resolution()),
-                                    m_map->grid_resolution());
+    events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
+                                            rmath::dvec2uvec(controller.position(),
+                                                             m_map->grid_resolution()),
+                                            m_map->grid_resolution());
 
-    m_map->accept(drop_op);
-    controller.visitor::template visitable_any<T>::accept(drop_op);
+    drop_op.visit(controller);
+    drop_op.visit(*m_map);
     m_floor->SetChanged();
   }
 

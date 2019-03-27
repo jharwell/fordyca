@@ -51,8 +51,8 @@ bool dpo_semantic_map::cache_remove(
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
              victim->discrete_loc().to_str().c_str());
-    events::cell_empty op(victim->discrete_loc());
-    decoratee().access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
+    events::cell_empty_visitor op(victim->discrete_loc());
+    op.visit(decoratee().access<occupancy_grid::kCell>(victim->discrete_loc()));
     return true;
   }
   return false;
@@ -63,8 +63,8 @@ bool dpo_semantic_map::block_remove(
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->discrete_loc().to_str().c_str());
-    events::cell_empty op(victim->discrete_loc());
-    access<occupancy_grid::kCell>(victim->discrete_loc()).accept(op);
+    events::cell_empty_visitor op(victim->discrete_loc());
+    op.visit(access<occupancy_grid::kCell>(victim->discrete_loc()));
     return true;
   }
   return false;
@@ -74,7 +74,7 @@ void dpo_semantic_map::decay_all(void) {
   decoratee().update();
   m_store.decay_all();
 
-  for (auto&& b : m_store.blocks().values_range()) {
+  for (auto& b : m_store.blocks().values_range()) {
     const rmath::vector2u& loc = b.ent()->discrete_loc();
     rswarm::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);

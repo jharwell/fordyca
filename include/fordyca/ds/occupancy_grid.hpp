@@ -37,10 +37,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace events {
-class cell_unknown;
-class cell_empty;
-} // namespace events
 namespace params { namespace perception {
 struct perception_params;
 }} // namespace params::perception
@@ -60,9 +56,6 @@ using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
  * decisions in how they execute their tasks.
  */
 class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
-                       public visitor::accept_set<occupancy_grid,
-                                                  events::cell_unknown,
-                                                  events::cell_empty>,
                        public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
   /**

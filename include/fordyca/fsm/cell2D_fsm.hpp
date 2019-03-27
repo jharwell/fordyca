@@ -27,7 +27,6 @@
 #include <string>
 
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcsw/common/common.h"
 
 /*******************************************************************************
@@ -36,7 +35,6 @@
 NS_START(fordyca, fsm);
 
 namespace rfsm = rcppsw::patterns::state_machine;
-namespace visitor = rcppsw::patterns::visitor;
 namespace er = rcppsw::er;
 
 /*******************************************************************************
@@ -50,9 +48,7 @@ namespace er = rcppsw::er;
  * block, has a cache, or unknown, etc.).
  *
  */
-class cell2D_fsm : public rfsm::simple_fsm,
-                   public visitor::visitable_any<cell2D_fsm>,
-                   public er::client<cell2D_fsm> {
+class cell2D_fsm : public rfsm::simple_fsm, public er::client<cell2D_fsm> {
  public:
   enum state {
     ST_UNKNOWN,

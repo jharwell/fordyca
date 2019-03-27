@@ -79,13 +79,14 @@ void depth0_metrics_aggregator::collect_from_controller(
   auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
   auto block_acq_m =
       dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(controller);
-  auto manip_m =
-      dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+  auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(
+      controller->block_manip_collator());
 
   ER_ASSERT(mov_m, "FSM does not provide movement metrics");
-  ER_ASSERT(block_acq_m, "FSM does not provide block acquisition metrics");
-  ER_ASSERT(collision_m, "FSM does not provide collision metrics");
-  ER_ASSERT(manip_m, "FSM does not provide block manipulation metrics");
+  ER_ASSERT(block_acq_m,
+            "Controller does not provide block acquisition metrics");
+  ER_ASSERT(collision_m, "Controller does not provide collision metrics");
+  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
 
   collect("fsm::movement", *mov_m);
   collect("fsm::collision", *collision_m);

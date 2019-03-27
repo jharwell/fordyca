@@ -31,7 +31,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::occupancy_grid;
 using repr::base_cache;
 namespace rswarm = rcppsw::swarm;
@@ -96,7 +96,7 @@ void cache_found::visit(ds::dpo_store& store) {
  ******************************************************************************/
 void cache_found::visit(ds::cell2D& cell) {
   cell.entity(m_cache);
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
   ER_ASSERT(cell.state_has_cache(),
             "Cell does not have cache after cache found event");
 } /* visit() */
@@ -167,8 +167,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    events::cell_empty op((*b)->discrete_loc());
-    map.access<occupancy_grid::kCell>((*b)->discrete_loc()).accept(op);
+    events::cell_empty_visitor op((*b)->discrete_loc());
+    op.visit(map.access<occupancy_grid::kCell>((*b)->discrete_loc()));
     map.block_remove(*b);
   } /* for(&&b..) */
 
@@ -196,7 +196,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   if (map.pheromone_repeat_deposit()) {
     density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
   } else {
-    /*
+    /*p
      * Seeing a new cache on empty square or one that used to contain a block.
      */
     if (!cell.state_has_cache()) {
@@ -207,7 +207,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
     }
   }
   map.cache_update(ds::dp_cache_map::value_type(m_cache, density));
-  cell.accept(*this);
+  visit(cell);
 } /* visit() */
 
 /*******************************************************************************
@@ -216,9 +216,9 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
 void cache_found::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
 
-  c.mdpo_perception()->map()->accept(*this);
+  visit(*c.mdpo_perception()->map());
 
   c.ndc_pop();
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

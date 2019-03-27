@@ -41,11 +41,17 @@ namespace ds {
 class arena_map;
 } // namespace ds
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+struct cell_cache_extent_visit_set {
+  using inherited = cell_op_visit_set::value;
+  using defined = visitor::precise_visit_set<ds::arena_map>;
+  using value = boost::mpl::joint_view<inherited::type, defined::type>;
+};
+
 /**
  * @class cell_cache_extent
  * @ingroup events
@@ -56,21 +62,36 @@ NS_START(events);
  * state in order to avoid corner cases when picking up from/dropping in a cache
  * (See #432).
  */
-class cell_cache_extent : public cell_op,
-                          public visitor::can_visit<ds::arena_map> {
+class cell_cache_extent : public cell_op {
  public:
   cell_cache_extent(const rmath::vector2u& coord,
                     const std::shared_ptr<repr::base_cache> cache);
 
   /* depth1 foraging */
-  void visit(ds::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::arena_map& map) override;
+  void visit(ds::cell2D& cell);
+  void visit(fsm::cell2D_fsm& fsm);
+  void visit(ds::arena_map& map);
 
  private:
   /* clang-format off */
   std::shared_ptr<repr::base_cache> m_cache;
   /* clang-format on */
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cell_cache_extent_visitor_impl =
+    visitor::precise_visitor<detail::cell_cache_extent,
+                             detail::cell_cache_extent_visit_set::value>;
+
+NS_END(detail);
+
+class cell_cache_extent_visitor : public detail::cell_cache_extent_visitor_impl {
+  using detail::cell_cache_extent_visitor_impl::cell_cache_extent_visitor_impl;
 };
 
 NS_END(events, fordyca);

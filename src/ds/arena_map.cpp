@@ -97,7 +97,6 @@ __rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
 } /* robot_on_cache() */
 
 bool arena_map::distribute_single_block(std::shared_ptr<repr::base_block>& block) {
-
   /* return TRUE because the distribution of nothing is ALWAYS successful */
   if (!m_redist_governor.dist_status()) {
     return true;
@@ -145,8 +144,8 @@ void arena_map::distribute_all_blocks(void) {
       cell2D& cell = decoratee().access<arena_grid::kCell>(i, j);
       if (!cell.state_has_block() && !cell.state_has_cache() &&
           !cell.state_in_cache_extent()) {
-        events::cell_empty op(cell.loc());
-        cell.accept(op);
+        events::cell_empty_visitor op(cell.loc());
+        op.visit(cell);
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -191,8 +190,8 @@ void arena_map::cache_extent_clear(
                   i,
                   j,
                   cell.fsm().current_state());
-        events::cell_empty e(c);
-        cell.accept(e);
+        events::cell_empty_visitor e(c);
+        e.visit(cell);
       }
     } /* for(j..) */
   }   /* for(i..) */

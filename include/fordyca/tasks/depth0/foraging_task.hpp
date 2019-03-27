@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <boost/variant.hpp>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
@@ -41,6 +42,7 @@ NS_START(fordyca);
 namespace visitor = rcppsw::patterns::visitor;
 
 NS_START(tasks, depth0);
+class generalist;
 
 /*******************************************************************************
  * Structure Definitions
@@ -62,6 +64,8 @@ class foraging_task
       public events::free_block_interactor,
       public ta::polled_task {
  public:
+  using variant_type = boost::variant<generalist*>;
+
   static constexpr char kGeneralistName[] = "Generalist";
 
   foraging_task(const std::string& name,

@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_pickup_event.hpp"
+#include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -34,6 +34,9 @@
 NS_START(fordyca);
 
 namespace visitor = rcppsw::patterns::visitor;
+namespace controller {
+class cache_sel_matrix;
+}
 namespace fsm {
 class block_to_goal_fsm;
 namespace depth1 {
@@ -46,13 +49,15 @@ class gp_dpo_controller;
 class gp_mdpo_controller;
 } // namespace depth1
 namespace depth2 {
+class grp_dpo_controller;
 class grp_mdpo_controller;
-}
+} // namespace depth2
 } // namespace controller
 namespace repr {
 class arena_cache;
 }
 namespace tasks {
+class base_foraging_task;
 namespace depth1 {
 class collector;
 }
@@ -62,33 +67,42 @@ class cache_collector;
 } // namespace depth2
 } // namespace tasks
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+struct cached_block_pickup_visit_set {
+  using inherited = boost::mpl::joint_view<detail::cell_op_visit_set::value,
+                                           block_pickup_base_visit_set::value>;
+  using defined = visitor::precise_visit_set<
+      /* depth1 */
+      controller::depth1::gp_dpo_controller,
+      controller::depth1::gp_mdpo_controller,
+      fsm::block_to_goal_fsm,
+      fsm::depth1::cached_block_to_nest_fsm,
+      tasks::depth1::collector,
+      /* depth2 */
+      controller::depth2::grp_dpo_controller,
+      controller::depth2::grp_mdpo_controller,
+      tasks::depth2::cache_transferer,
+      tasks::depth2::cache_collector,
+      repr::arena_cache>;
+
+  using value = boost::mpl::joint_view<inherited, defined>;
+};
+
 /*
  * @class cached_block_pickup
- * @ingroup events
+ * @ingroup events detail
  *
  * @brief Created whenever a robpot picks up a block from a cache.
  *
  * The cache usage penalty, if there is one, is assessed prior to this event
  * being created, at a higher level.
  */
-class cached_block_pickup
-    : public cell_op,
-      public rcppsw::er::client<cached_block_pickup>,
-      public block_pickup_event,
-      public visitor::visit_set<controller::depth1::gp_dpo_controller,
-                                controller::depth1::gp_mdpo_controller,
-                                controller::depth2::grp_mdpo_controller,
-                                fsm::block_to_goal_fsm,
-                                fsm::depth1::cached_block_to_nest_fsm,
-                                tasks::depth1::collector,
-                                tasks::depth2::cache_transferer,
-                                tasks::depth2::cache_collector,
-                                repr::arena_cache> {
+class cached_block_pickup : public rcppsw::er::client<cached_block_pickup>,
+                            public cell_op {
  public:
   cached_block_pickup(const std::shared_ptr<repr::arena_cache>& cache,
                       uint robot_index,
@@ -99,25 +113,30 @@ class cached_block_pickup
   cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
 
   /* depth1 foraging */
-  void visit(ds::arena_map& map) override;
-  void visit(ds::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::dpo_semantic_map& map) override;
-  void visit(ds::dpo_store& store) override;
-  void visit(repr::base_block& block) override;
-  void visit(repr::arena_cache& cache) override;
-  void visit(tasks::depth1::collector& task) override;
-  void visit(fsm::block_to_goal_fsm& fsm) override;
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
-  void visit(controller::depth1::gp_dpo_controller& controller) override;
-  void visit(controller::depth1::gp_mdpo_controller& controller) override;
+  void visit(ds::arena_map& map);
+  void visit(ds::cell2D& cell);
+  void visit(fsm::cell2D_fsm& fsm);
+  void visit(ds::dpo_semantic_map& map);
+  void visit(ds::dpo_store& store);
+  void visit(repr::base_block& block);
+  void visit(repr::arena_cache& cache);
+  void visit(tasks::depth1::collector& task);
+  void visit(fsm::block_to_goal_fsm& fsm);
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
+  void visit(controller::depth1::gp_dpo_controller& controller);
+  void visit(controller::depth1::gp_mdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_mdpo_controller& controller) override;
-  void visit(tasks::depth2::cache_transferer& task) override;
-  void visit(tasks::depth2::cache_collector& task) override;
+  void visit(controller::depth2::grp_dpo_controller& controller);
+  void visit(controller::depth2::grp_mdpo_controller& controller);
+  void visit(tasks::depth2::cache_transferer& task);
+  void visit(tasks::depth2::cache_collector& task);
 
  private:
+  void dispatch_d1_cache_interactor(tasks::base_foraging_task* task);
+  bool dispatch_d2_cache_interactor(tasks::base_foraging_task* task,
+                                    controller::cache_sel_matrix* csel_matrix);
+
   /* clang-format off */
   uint                                         m_robot_index;
   uint                                         m_timestep;
@@ -134,6 +153,23 @@ class cached_block_pickup
    */
   std::shared_ptr<repr::base_block>  m_orphan_block{nullptr};
   /* clang-format on */
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cached_block_pickup_visitor_impl =
+    visitor::precise_visitor<detail::cached_block_pickup,
+                             detail::cached_block_pickup_visit_set::value>;
+
+NS_END(detail);
+
+class cached_block_pickup_visitor
+    : public detail::cached_block_pickup_visitor_impl {
+  using detail::cached_block_pickup_visitor_impl::cached_block_pickup_visitor_impl;
 };
 
 NS_END(events, fordyca);

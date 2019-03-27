@@ -52,8 +52,7 @@ NS_START(controller, depth1);
  * for use in task allocation.
  */
 class ogp_mdpo_controller : public gp_mdpo_controller,
-                           public er::client<ogp_mdpo_controller>,
-                           public visitor::visitable_any<ogp_mdpo_controller> {
+                            public er::client<ogp_mdpo_controller> {
  public:
   ogp_mdpo_controller(void)
       : ER_CLIENT_INIT("fordyca.controller.depth1.ogp_mdpo") {}

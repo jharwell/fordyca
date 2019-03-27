@@ -43,7 +43,8 @@ base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
                                        double cache_dim)
     : ER_CLIENT_INIT("fordyca.support.base_cache_creator"),
       m_cache_dim(cache_dim),
-      m_grid(grid) {}
+      m_grid(grid),
+      m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
 /*******************************************************************************
  * Member Functions
@@ -91,13 +92,13 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
    * cache extent, and all blocks be deposited in a single cell.
    */
   for (auto& block : blocks) {
-    events::cell_empty op(block->discrete_loc());
-    m_grid->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
+    events::cell_empty_visitor op(block->discrete_loc());
+    op.visit(m_grid->access<arena_grid::kCell>(op.x(), op.y()));
   } /* for(block..) */
 
   for (auto& block : blocks) {
-    events::free_block_drop op(block, d, m_grid->resolution());
-    m_grid->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
+    events::free_block_drop_visitor op(block, d, m_grid->resolution());
+    op.visit(m_grid->access<arena_grid::kCell>(op.x(), op.y()));
   } /* for(block..) */
 
   std::string s = std::accumulate(
@@ -120,100 +121,6 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
           s.c_str());
   return ret;
 } /* create_single_cache() */
-
-base_cache_creator::deconflict_res_t base_cache_creator::deconflict_loc_boundaries(
-    double cache_dim,
-    const rmath::vector2u& center) const {
-  /*
-   * We need to be sure the center of the new cache is not near the arena
-   * boundaries, in order to avoid all sorts of weird corner cases.
-   */
-  double x_max = grid()->xrsize() - cache_dim * 2;
-  double x_min = cache_dim * 2;
-  double y_max = grid()->yrsize() - cache_dim * 2;
-  double y_min = cache_dim * 2;
-
-  bool conflict = false;
-  rmath::vector2u new_center = center;
-  if (center.x() > x_max || center.x() < x_min) {
-    new_center.x(
-        std::max(x_min, std::min(x_max, static_cast<double>(center.x()))));
-    conflict = true;
-    ER_TRACE("Adjust center=%s -> %s for arena boundaries X",
-             center.to_str().c_str(),
-             new_center.to_str().c_str());
-  }
-
-  if (center.y() > y_max || center.y() < y_min) {
-    new_center.y(
-        std::max(y_min, std::min(y_max, static_cast<double>(center.y()))));
-    conflict = true;
-    ER_TRACE("Adjust center=%s -> %s for arena boundaries Y",
-             center.to_str().c_str(),
-             new_center.to_str().c_str());
-  }
-  return deconflict_res_t{conflict, new_center};
-} /* deconflict_loc_boundaries() */
-
-base_cache_creator::deconflict_res_t base_cache_creator::deconflict_loc_entity(
-    const repr::multicell_entity* ent,
-    const rmath::vector2d& ent_loc,
-    const rmath::vector2u& center) const {
-  std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
-  std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
-  rmath::vector2d center_r = rmath::uvec2dvec(center, m_grid->resolution());
-
-  auto exc_xspan = ent->xspan(ent_loc);
-  auto exc_yspan = ent->yspan(ent_loc);
-  auto newc_xspan = ent->xspan(center_r);
-  auto newc_yspan = ent->yspan(center_r);
-
-  auto status = loop_utils::placement_conflict(center_r, ent->dims(), ent);
-  rmath::vector2u new_center = center;
-
-  ER_TRACE("xspan=%s ent%d@%s [xspan=%s center=%s]",
-           newc_xspan.to_str().c_str(),
-           ent->id(),
-           ent_loc.to_str().c_str(),
-           exc_xspan.to_str().c_str(),
-           center.to_str().c_str());
-  ER_TRACE("yspan=%s ent%d@%s [yspan=%s center=%s]",
-           newc_yspan.to_str().c_str(),
-           ent->id(),
-           ent_loc.to_str().c_str(),
-           exc_yspan.to_str().c_str(),
-           center.to_str().c_str());
-
-  /*
-   * We move the cache by units of the grid size when we discover a conflict in
-   * X or Y, in order to preserve having the block location be on an even
-   * multiple of the grid size, which makes handling creation much easier.
-   */
-  double x_delta = std::copysign(m_grid->resolution(), xrnd(m_rng));
-  double y_delta = std::copysign(m_grid->resolution(), yrnd(m_rng));
-
-  if (status.x_conflict) {
-    ER_TRACE("xspan=%s overlap ent%d@%s [xspan=%s center=%s], x_delta=%f",
-             newc_xspan.to_str().c_str(),
-             ent->id(),
-             ent_loc.to_str().c_str(),
-             exc_xspan.to_str().c_str(),
-             center.to_str().c_str(),
-             x_delta);
-    new_center.x(new_center.x() + x_delta);
-  }
-  if (status.y_conflict) {
-    ER_TRACE("yspan=%s overlap ent%d@%s [yspan=%s center=%s], y_delta=%f",
-             newc_yspan.to_str().c_str(),
-             ent->id(),
-             ent_loc.to_str().c_str(),
-             exc_yspan.to_str().c_str(),
-             center.to_str().c_str(),
-             y_delta);
-    new_center.y(new_center.y() + y_delta);
-  }
-  return deconflict_res_t{status.x_conflict && status.y_conflict, new_center};
-} /* deconflict_ent() */
 
 void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
   /*
@@ -247,8 +154,8 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
                     "Cell@(%u, %u) already in CACHE_EXTENT",
                     i,
                     j);
-          events::cell_cache_extent e(c, cache);
-          cell.accept(e);
+          events::cell_cache_extent_visitor e(c, cache);
+          e.visit(cell);
         }
       } /* for(j..) */
     }   /* for(i..) */

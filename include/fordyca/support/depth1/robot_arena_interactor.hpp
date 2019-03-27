@@ -92,6 +92,13 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
   void operator()(T& controller, uint timestep) {
     if (m_task_abort_interactor(controller,
                                 m_tv_manager->template all_penalty_handlers<T>())) {
+      /*
+       * This needs to be here, rather than in each robot's control step
+       * function, in order to avoid triggering erroneous handling of an aborted
+       * task in the loop functions when the executive has not aborted the newly
+       * allocated task. See #532.
+       */
+      controller.task_aborted(false);
       return;
     }
 

@@ -96,8 +96,8 @@ void dpo_perception_subsystem::process_los_caches(
      *
      * Cloning is definitely necessary here.
      */
-    events::cache_found op(cache->clone());
-    m_store->accept(op);
+    events::cache_found_visitor op(cache->clone());
+    op.visit(*m_store);
   } /* for(cache..) */
 } /* process_los_caches() */
 
@@ -135,8 +135,8 @@ void dpo_perception_subsystem::process_los_blocks(
                block->real_loc().to_str().c_str(),
                block->discrete_loc().to_str().c_str());
     }
-    events::block_found op(block->clone());
-    m_store->accept(op);
+    events::block_found_visitor op(block->clone());
+    op.visit(*m_store);
   } /* for(block..) */
 } /* process_los() */
 

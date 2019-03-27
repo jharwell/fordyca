@@ -71,36 +71,36 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
    */
   line += (m_int_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.int_blocks) /
-                               (m_int_cache_count * interval()))
+                               m_int_cache_count)
               : "0";
   line += separator();
 
   line += (m_cum_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                               (m_cum_cache_count * (timestep() + 1)))
+                               m_cum_cache_count)
               : "0";
   line += separator();
 
   line += (m_int_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.int_pickups) /
-                               (m_int_cache_count * interval()))
+                               m_int_cache_count)
               : "0";
   line += separator();
   line += (m_cum_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.cum_pickups) /
-                               (m_cum_cache_count * (timestep() + 1)))
+                               m_cum_cache_count)
               : "0";
   line += separator();
 
   line += (m_int_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.int_drops) /
-                               (m_int_cache_count * interval()))
+                               m_int_cache_count)
               : "0";
   line += separator();
 
   line += (m_cum_cache_count > 0)
               ? std::to_string(static_cast<double>(m_stats.cum_drops) /
-                               (m_cum_cache_count * (timestep() + 1)))
+                               m_cum_cache_count)
               : "0";
   line += separator();
 

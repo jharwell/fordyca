@@ -60,9 +60,7 @@ block_to_goal_fsm::block_to_goal_fsm(acquire_goal_fsm* const goal_fsm,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(block_to_goal_fsm,
-                  start,
-                  rfsm::event_data*data) {
+HFSM_STATE_DEFINE(block_to_goal_fsm, start, rfsm::event_data* data) {
   if (rfsm::event_type::NORMAL == data->type()) {
     if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal() ||
         controller::foraging_signal::ACQUIRE_CACHED_BLOCK == data->signal()) {

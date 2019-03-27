@@ -69,14 +69,13 @@ NS_START(depth1);
  * @class gp_dpo_controller
  * @ingroup controller depth1
  *
- * @brief A Greedy Partitioning (GP) controller that switches between \ref generalist,
- * \ref harvester, and \ref collector tasks, according to dynamic changes in the
- * environment and/or execution/interface times of the tasks, and uses a DPO
- * data store for tracking arena state and object relavance.
+ * @brief A Greedy Partitioning (GP) controller that switches between \ref
+ * generalist, \ref harvester, and \ref collector tasks, according to dynamic
+ * changes in the environment and/or execution/interface times of the tasks, and
+ * uses a DPO data store for tracking arena state and object relavance.
  */
 class gp_dpo_controller : public depth0::dpo_controller,
                           public er::client<gp_dpo_controller>,
-                          public visitor::visitable_any<gp_dpo_controller>,
                           public rcppsw::metrics::tasks::bi_tdgraph_metrics {
  public:
   using dpo_controller::perception;
@@ -146,9 +145,9 @@ class gp_dpo_controller : public depth0::dpo_controller,
     return m_cache_sel_matrix.get();
   }
 
- protected:
   void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
 
+ protected:
   /**
    * @brief Initialization that derived classes may also need to perform, if
    * they want to use any of the following parts of this class's functionality
@@ -179,6 +178,8 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void task_abort_cb(const ta::polled_task*);
 
  private:
+  void private_init(const params::depth1::controller_repository& param_repo);
+
   /* clang-format off */
   bool                                      m_display_task{false};
   bool                                      m_task_aborted{false};

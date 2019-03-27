@@ -58,13 +58,13 @@ __rcsw_pure double generalist::current_time(void) const {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void generalist::accept(events::nest_block_drop& visitor) {
+void generalist::accept(events::detail::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::free_block_pickup& visitor) {
+void generalist::accept(events::detail::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::block_vanished& visitor) {
+void generalist::accept(events::detail::block_vanished& visitor) {
   visitor.visit(*this);
 }
 

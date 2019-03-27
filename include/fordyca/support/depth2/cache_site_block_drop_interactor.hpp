@@ -131,8 +131,9 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
             status.entity_id,
             status.distance.length(),
             m_cache_manager->block_proximity_dist());
-    events::block_proximity prox(m_map->blocks()[status.entity_id]->clone());
-    controller.visitor::template visitable_any<T>::accept(prox);
+    events::block_proximity_visitor prox_op(
+        m_map->blocks()[status.entity_id]->clone());
+    prox_op.visit(controller);
   }
 
   /**
@@ -174,14 +175,14 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
    */
   void perform_cache_site_block_drop(T& controller,
                                      const tv::temporal_penalty<T>& penalty) {
-    events::free_block_drop drop_op(m_map->blocks()[penalty.id()],
+    events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
                                     rmath::dvec2uvec(controller.position(),
                                                      m_map->grid_resolution()),
                                     m_map->grid_resolution());
 
-    /* Update arena map state due to a free block drop */
-    m_map->accept(drop_op);
-    controller.visitor::template visitable_any<T>::accept(drop_op);
+    drop_op.visit(*m_map);
+    drop_op.visit(controller);
+
     m_floor->SetChanged();
   }
 

@@ -84,7 +84,7 @@ class acquire_existing_cache_fsm
   const bool                                mc_is_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;
-  std::default_random_engine                m_rd{};
+  std::default_random_engine                m_rd;
   /* clang-format on */
 };
 

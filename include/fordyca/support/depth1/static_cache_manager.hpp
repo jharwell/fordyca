@@ -103,7 +103,7 @@ class static_cache_manager : public base_cache_manager,
   /* clang-format off */
   const params::caches::caches_params mc_cache_params;
   const rmath::vector2d               mc_cache_loc;
-  std::default_random_engine          m_reng{};
+  std::default_random_engine          m_reng;
   /* clang-format on */
 };
 

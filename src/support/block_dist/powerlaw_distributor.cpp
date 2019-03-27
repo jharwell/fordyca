@@ -94,8 +94,8 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
     std::uniform_int_distribution<int> ygen(
         clust_sizes[i] / 2 + 1, grid->ydsize() - clust_sizes[i] / 2 - 1);
 
-    uint x = xgen(m_rng);
-    uint y = ygen(m_rng);
+    uint x = xgen(rng());
+    uint y = ygen(rng());
     uint x_max = x + std::sqrt(clust_sizes[i]);
     uint y_max = y + clust_sizes[i] / (x_max - x);
 
@@ -166,7 +166,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::
   std::vector<uint> clust_sizes;
   for (uint i = 0; i < n_clusters; ++i) {
     /* can't have a cluster of size 0 */
-    uint index = static_cast<uint>(std::max(1.0, m_pwrdist(m_rng)));
+    uint index = static_cast<uint>(std::max(1.0, m_pwrdist(rng())));
     ER_DEBUG("Cluster%u size=%d", i, index);
     clust_sizes.push_back(index);
   } /* for(i..) */

@@ -135,8 +135,7 @@ void dpo_fsm::init(void) {
 } /* init() */
 
 void dpo_fsm::run(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
 } /* run() */
 
 NS_END(depth0, fsm, fordyca);

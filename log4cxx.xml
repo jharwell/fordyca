@@ -40,6 +40,9 @@
   <category name="fordyca.support.depth2.dynamic_cache_creator" >
     <priority value ="trace" />
   </category>
+    <category name="fordyca.support.depth2.cache_center_calculator" >
+    <priority value ="trace" />
+  </category>
   <category name="fordyca.support.base_cache_creator" >
     <priority value ="trace" />
   </category>

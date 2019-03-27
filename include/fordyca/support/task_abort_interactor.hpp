@@ -158,17 +158,17 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
             *m_map, controller.block(), controller.position())) {
       conflict = true;
     }
-    events::free_block_drop drop_op(controller.block(),
-                                    rmath::dvec2uvec(controller.position(),
-                                                     m_map->grid_resolution()),
-                                    m_map->grid_resolution());
+    events::free_block_drop_visitor drop_op(
+        controller.block(),
+        rmath::dvec2uvec(controller.position(), m_map->grid_resolution()),
+        m_map->grid_resolution());
     if (!conflict) {
-      controller.visitor::template visitable_any<T>::accept(drop_op);
-      m_map->accept(drop_op);
+      drop_op.visit(controller);
+      drop_op.visit(*m_map);
     } else {
       auto b = controller.block();
       m_map->distribute_single_block(b);
-      controller.visitor::template visitable_any<T>::accept(drop_op);
+      drop_op.visit(controller);
     }
     m_floor->SetChanged();
   }

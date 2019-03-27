@@ -40,14 +40,22 @@ class dpo_semantic_map;
 } // namespace ds
 
 namespace rmath = rcppsw::math;
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+struct cell_empty_visit_set {
+  using inherited = cell_op_visit_set::value;
+  using defined = visitor::precise_visit_set<ds::arena_map,
+                                             ds::occupancy_grid,
+                                             ds::dpo_semantic_map>;
+  using value = boost::mpl::joint_view<inherited::type, defined::type>;
+};
+
 /**
  * @class cell_empty
- * @ingroup events
+ * @ingroup events detail
  *
  * @brief Created whenever a cell needs to go from some other state to being
  * empty.
@@ -56,23 +64,32 @@ NS_START(events);
  * square that the block was on is now  (probably) empty. It might not be if in
  * the same timestep a new cache is created on that same cell.
  */
-class cell_empty : public cell_op,
-                   public visitor::can_visit<ds::arena_map>,
-                   public visitor::can_visit<ds::occupancy_grid>,
-                   public visitor::can_visit<ds::dpo_semantic_map>,
-                   public rcppsw::er::client<cell_empty> {
+class cell_empty : public cell_op, public rcppsw::er::client<cell_empty> {
  public:
   explicit cell_empty(const rmath::vector2u& coord)
       : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_empty") {}
 
-  /* stateless foraging */
-  void visit(ds::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::arena_map& map) override;
+  void visit(ds::cell2D& cell);
+  void visit(fsm::cell2D_fsm& fsm);
+  void visit(ds::arena_map& map);
+  void visit(ds::occupancy_grid& grid);
+  void visit(ds::dpo_semantic_map& map);
+};
 
-  /* stateful foraging */
-  void visit(ds::occupancy_grid& grid) override;
-  void visit(ds::dpo_semantic_map& map) override;
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cell_empty_visitor_impl =
+    visitor::precise_visitor<detail::cell_empty,
+                             detail::cell_empty_visit_set::value>;
+
+NS_END(detail);
+
+class cell_empty_visitor : public detail::cell_empty_visitor_impl {
+  using detail::cell_empty_visitor_impl::cell_empty_visitor_impl;
 };
 
 NS_END(events, fordyca);

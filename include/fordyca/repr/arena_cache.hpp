@@ -30,7 +30,6 @@
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/utilization_metrics.hpp"
 #include "fordyca/repr/base_cache.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,11 +47,9 @@ NS_START(fordyca, repr);
  * dp_entity caches because they handle cache penalties and can collect metrics
  * about their usage.
  */
-class arena_cache
-    : public base_cache,
-      public metrics::caches::utilization_metrics,
-      public metrics::caches::location_metrics,
-      public rcppsw::patterns::visitor::visitable_any<arena_cache> {
+class arena_cache : public base_cache,
+                    public metrics::caches::utilization_metrics,
+                    public metrics::caches::location_metrics {
  public:
   arena_cache(double dimension,
               double resolution,

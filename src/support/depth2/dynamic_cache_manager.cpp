@@ -109,7 +109,7 @@ base_cache_manager::block_calc_res_t dynamic_cache_manager::calc_blocks_for_crea
   bool ret = true;
   if (to_use.size() < mc_cache_params.dynamic.min_blocks) {
     /*
-     * Cannot use std::accumulate for these, because that doesn't work with
+     * @todo Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
      * set of blocks into an int).
      */

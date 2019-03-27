@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
@@ -57,8 +56,7 @@ NS_START(depth0);
  * time (knowledge is modeled by pheromone density and decays as such).
  */
 class dpo_controller : public crw_controller,
-                       public er::client<dpo_controller>,
-                       public visitor::visitable_any<dpo_controller> {
+                       public er::client<dpo_controller> {
  public:
   dpo_controller(void);
   ~dpo_controller(void) override;

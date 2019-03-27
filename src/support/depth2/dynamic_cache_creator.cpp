@@ -27,17 +27,13 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/base_block.hpp"
+#include "fordyca/support/depth2/cache_center_calculator.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-
-/*******************************************************************************
- * Class Constants
- ******************************************************************************/
-const rmath::vector2i dynamic_cache_creator::kInvalidCacheCenter{-1, -1};
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -60,7 +56,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
     double cache_dim) {
   ds::cache_vector created_caches;
 
-  ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free blocks=[%s] (%zu)",
+  ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
            m_min_dist,
            m_min_blocks,
            rcppsw::to_string(candidate_blocks).c_str(),
@@ -82,18 +78,16 @@ ds::cache_vector dynamic_cache_creator::create_all(
       ds::block_list b_avoid =
           avoidance_blocks_calc(candidate_blocks, used_blocks, cache_i_blocks);
 
-      rmath::vector2i center =
-          calc_center(cache_i_blocks, b_avoid, c_avoid, cache_dim);
-
-      /*
-       * We convert to discrete and then back to real coordinates so that our
-       * cache's real location is always on an even multiple of the grid size,
-       * which keeps asserts about cache extent from triggering right after
-       * creation, which can happen otherwise.
-       */
-      if (kInvalidCacheCenter != center) {
+      if (auto center = cache_center_calculator(grid(), cache_dim)(
+              cache_i_blocks, b_avoid, c_avoid)) {
+        /*
+         * We convert to discrete and then back to real coordinates so that our
+         * cache's real location is always on an even multiple of the grid size,
+         * which keeps asserts about cache extent from triggering right after
+         * creation, which can happen otherwise.
+         */
         auto cache_p = std::shared_ptr<repr::arena_cache>(
-            create_single_cache(cache_i_blocks, rmath::ivec2dvec(center)));
+            create_single_cache(cache_i_blocks, rmath::uvec2dvec(center.get())));
         created_caches.push_back(cache_p);
       }
 
@@ -184,97 +178,5 @@ ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
   } /* for(i..) */
   return src_blocks;
 } /* cache_i_blocks_calc() */
-
-rmath::vector2i dynamic_cache_creator::calc_center(
-    const ds::block_list& cache_i_blocks,
-    const ds::block_list& nc_blocks,
-    const ds::cache_vector& existing_caches,
-    double cache_dim) const {
-  double sumx = std::accumulate(cache_i_blocks.begin(),
-                                cache_i_blocks.end(),
-                                0.0,
-                                [](double sum, const auto& b) {
-                                  return sum + b->real_loc().x();
-                                });
-  double sumy = std::accumulate(cache_i_blocks.begin(),
-                                cache_i_blocks.end(),
-                                0.0,
-                                [](double sum, const auto& b) {
-                                  return sum + b->real_loc().y();
-                                });
-
-  rmath::vector2u center(sumx / cache_i_blocks.size(),
-                         sumy / cache_i_blocks.size());
-  ER_DEBUG("Guess center=%s", center.to_str().c_str());
-
-  /*
-   * This needs to be done even if there are no other known caches, because the
-   * guessed center might still be too close to the arena boundaries.
-   */
-  center = deconflict_loc_boundaries(cache_dim, center).loc;
-
-  /* If no existing caches, no possibility for conflict */
-  if (existing_caches.empty()) {
-    return rmath::vector2i(center.x(), center.y());
-  }
-  ER_DEBUG("Deconflict caches=[%s]", rcppsw::to_string(existing_caches).c_str());
-
-  /*
-   * Every time we find an overlap we have to re-test all of the caches we've
-   * already verified won't overlap with our new cache, because the move we
-   * just made in x or y might have just caused an overlap. Similarly for
-   * blocks.
-   */
-  uint i = 0;
-  while (i++ < kOVERLAP_SEARCH_MAX_TRIES) {
-    bool conflict = false;
-    for (size_t j = 0; j < existing_caches.size(); ++j) {
-      deconflict_res_t r = deconflict_loc_boundaries(cache_dim, center);
-      if (r.status) {
-        conflict = true;
-        center = r.loc;
-      }
-      r = deconflict_loc_entity(existing_caches[j].get(),
-                                existing_caches[j]->real_loc(),
-                                center);
-      if (r.status) {
-        conflict = true;
-        center = r.loc;
-      }
-    } /* for(j..) */
-
-    for (auto& b : nc_blocks) {
-      deconflict_res_t r = deconflict_loc_boundaries(cache_dim, center);
-      if (r.status) {
-        conflict = true;
-        center = r.loc;
-      }
-      r = deconflict_loc_entity(b.get(), b->real_loc(), center);
-      if (r.status) {
-        conflict = true;
-        center = r.loc;
-      }
-    } /* for(j..) */
-
-    if (!conflict) {
-      break;
-    }
-  } /* for(&b..) */
-
-  /*
-   * We have a set # of tries to fiddle with the new cache center, and if we
-   * can't find anything conflict free in that many, bail out.
-   */
-  if (i >= kOVERLAP_SEARCH_MAX_TRIES) {
-    ER_WARN(
-        "No conflict-free center found in %u tries: caches=[%s],blocks=[%s]",
-        kOVERLAP_SEARCH_MAX_TRIES,
-        rcppsw::to_string(existing_caches).c_str(),
-        rcppsw::to_string(cache_i_blocks).c_str());
-    return kInvalidCacheCenter;
-  }
-
-  return rmath::vector2i(center.x(), center.y());
-} /* calc_center() */
 
 NS_END(depth2, support, fordyca);

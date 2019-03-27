@@ -90,8 +90,8 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
   ER_ASSERT(!cell->state_in_cache_extent(),
             "Destination cell part of cache extent");
 
-  events::free_block_drop op(block, res.abs, m_resolution);
-  cell->accept(op);
+  events::free_block_drop_visitor op(block, res.abs, m_resolution);
+  op.visit(*cell);
   if (verify_block_dist(block.get(), entities, cell)) {
     ER_DEBUG("Block%d,ptr=%p distributed@%s/%s",
              block->id(),
@@ -172,8 +172,8 @@ random_distributor::coord_search_res_t random_distributor::avail_coord_search(
    */
   do {
     rmath::vector2u loc = (*m_grid.origin()).loc();
-    uint x = area_xrange.span() > 0 ? xdist(m_rng) : m_grid.index_bases()[0];
-    uint y = area_xrange.span() > 0 ? ydist(m_rng) : m_grid.index_bases()[1];
+    uint x = area_xrange.span() > 0 ? xdist(rng()) : m_grid.index_bases()[0];
+    uint y = area_xrange.span() > 0 ? ydist(rng()) : m_grid.index_bases()[1];
     rel = {x, y};
     abs = {rel.x() + loc.x(), rel.y() + loc.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {

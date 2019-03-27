@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -33,7 +34,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::occupancy_grid;
 namespace rswarm = rcppsw::swarm;
 
@@ -109,7 +110,7 @@ void block_found::visit(ds::dpo_store& store) {
  ******************************************************************************/
 void block_found::visit(ds::cell2D& cell) {
   cell.entity(m_block);
-  cell.fsm().accept(*this);
+  this->visit(cell.fsm());
 } /* visit() */
 
 void block_found::visit(fsm::cell2D_fsm& fsm) {
@@ -185,8 +186,8 @@ void block_found::visit(ds::dpo_semantic_map& map) {
                m_block->id(),
                res.old_loc.to_str().c_str(),
                m_block->discrete_loc().to_str().c_str());
-      events::cell_empty op(res.old_loc);
-      map.access<occupancy_grid::kCell>(res.old_loc).accept(op);
+      events::cell_empty_visitor op(res.old_loc);
+      op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {
       ER_ASSERT(ds::dpo_store::update_status::kNewBlockAdded == res.reason,
                 "Bad reason for DPO store update: %d",
@@ -198,7 +199,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
      * host cell has been updated and the block updated in the store, so we are
      * good to update the NEW host cell to point to the block.
      */
-    cell.accept(*this);
+    visit(cell);
   }
   ER_ASSERT(cell.state_has_block(),
             "Cell@%s not in HAS_BLOCK",
@@ -216,9 +217,17 @@ void block_found::visit(ds::dpo_semantic_map& map) {
 void block_found::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
 
-  c.mdpo_perception()->map()->accept(*this);
+  visit(*c.mdpo_perception()->map());
 
   c.ndc_pop();
 } /* visit() */
 
-NS_END(events, fordyca);
+void block_found::visit(controller::depth2::grp_dpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
+
+  c.ndc_pop();
+} /* visit() */
+
+NS_END(detail, events, fordyca);

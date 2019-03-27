@@ -53,10 +53,10 @@ class generalist : public foraging_task {
              std::unique_ptr<ta::taskable> mechanism);
 
   /* event handling */
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::free_block_drop&) override {}
-  void accept(events::nest_block_drop& visitor) override;
-  void accept(events::block_vanished& visitor) override;
+  void accept(events::detail::free_block_pickup& v) override;
+  void accept(events::detail::free_block_drop&) override {}
+  void accept(events::detail::nest_block_drop& v) override;
+  void accept(events::detail::block_vanished& v) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLAREC(bool, goal_acquired);

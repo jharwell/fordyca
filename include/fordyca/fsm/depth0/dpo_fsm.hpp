@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
@@ -37,7 +36,6 @@
 NS_START(fordyca);
 
 namespace ds { class dpo_store; }
-namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
 NS_START(fsm, depth0);
@@ -63,8 +61,7 @@ using transport_goal_type = block_transporter::goal_type;
 class dpo_fsm : public base_foraging_fsm,
                      er::client<dpo_fsm>,
                      public metrics::fsm::goal_acquisition_metrics,
-                     public block_transporter,
-                     public visitor::visitable_any<depth0::dpo_fsm> {
+                     public block_transporter {
  public:
   dpo_fsm(const controller::block_sel_matrix* sel_matrix,
                controller::saa_subsystem* saa,

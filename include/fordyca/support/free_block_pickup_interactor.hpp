@@ -63,8 +63,8 @@ class free_block_pickup_interactor
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
         m_floor(floor),
         m_map(map),
-        m_penalty_handler(tv_manager->penalty_handler<T>(
-            tv::block_op_src::kSrcFreePickup)) {}
+        m_penalty_handler(
+            tv_manager->penalty_handler<T>(tv::block_op_src::kSrcFreePickup)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -137,8 +137,8 @@ class free_block_pickup_interactor
       ER_WARN("%s cannot pickup block%d: No such block",
               controller.GetId().c_str(),
               m_penalty_handler->find(controller)->id());
-      events::block_vanished vanished(p.id());
-      controller.visitor::template visitable_any<T>::accept(vanished);
+      events::block_vanished_visitor vanished_op(p.id());
+      vanished_op.visit(controller);
     } else {
       perform_free_block_pickup(controller, p, timestep);
       m_floor->SetChanged();
@@ -171,13 +171,12 @@ class free_block_pickup_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.penalty_served(penalty.penalty());
-    events::free_block_pickup pickup_op(*it,
-                                        loop_utils::robot_id(controller),
-                                        timestep);
+    controller.block_manip_collator()->penalty_served(penalty.penalty());
+    events::free_block_pickup_visitor pickup_op(
+        *it, loop_utils::robot_id(controller), timestep);
 
-    controller.visitor::template visitable_any<T>::accept(pickup_op);
-    m_map->accept(pickup_op);
+    pickup_op.visit(controller);
+    pickup_op.visit(*m_map);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();

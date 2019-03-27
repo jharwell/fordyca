@@ -29,7 +29,6 @@
 #include "fordyca/repr/multicell_entity.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,7 +53,6 @@ namespace ut = rcppsw::utils;
 class base_block : public multicell_entity,
                    public movable_cell_entity,
                    public metrics::blocks::transport_metrics,
-                   public rcppsw::patterns::visitor::visitable_any<base_block>,
                    public prototype::clonable<base_block> {
  public:
   /**

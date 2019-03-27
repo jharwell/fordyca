@@ -115,46 +115,48 @@ void tasking_initializer::depth1_exec_est_init(
     const tasking_map& map) {
   auto* task_params = param_repo.parse_results<ta::task_allocation_params>();
   if (!task_params->exec_est.seed_enabled) {
-    /*
-     * Generalist is not partitionable in depth 0 initialization, so this has
-     * not been done.
-     */
-    auto harvester = map.find("harvester")->second;
-    auto collector = map.find("collector")->second;
-    auto generalist = map.find("generalist")->second;
-
-    /*
-     * As part of seeding exec estimates, we set the last executed subtask for a
-     * TAB. It's OK to declare/use here as local variables as this code only
-     * runs during initialization.
-     */
-    std::default_random_engine eng;
-    std::uniform_int_distribution<> dist(0, 1);
-
-    if (0 == dist(eng)) {
-      m_graph->root_tab()->last_subtask(harvester);
-    } else {
-      m_graph->root_tab()->last_subtask(collector);
-    }
-
-    rmath::rangeu g_bounds =
-        task_params->exec_est.ranges.find("generalist")->second;
-
-    rmath::rangeu h_bounds =
-        task_params->exec_est.ranges.find("harvester")->second;
-    rmath::rangeu c_bounds =
-        task_params->exec_est.ranges.find("collector")->second;
-    ER_INFO("Seeding exec estimate for tasks: '%s'=%s '%s'=%s '%s'=%s",
-            generalist->name().c_str(),
-            g_bounds.to_str().c_str(),
-            harvester->name().c_str(),
-            h_bounds.to_str().c_str(),
-            collector->name().c_str(),
-            c_bounds.to_str().c_str());
-    static_cast<ta::polled_task*>(generalist)->exec_estimate_init(g_bounds);
-    static_cast<ta::polled_task*>(harvester)->exec_estimate_init(h_bounds);
-    static_cast<ta::polled_task*>(collector)->exec_estimate_init(c_bounds);
+    return;
   }
+  /*
+   * Generalist is not partitionable in depth 0 initialization, so this has
+   * not been done.
+   */
+  auto harvester = map.find("harvester")->second;
+  auto collector = map.find("collector")->second;
+  auto generalist = map.find("generalist")->second;
+
+  /*
+   * As part of seeding exec estimates, we set the last executed subtask for a
+   * TAB. It's OK to declare/use here as local variables as this code only
+   * runs during initialization.
+   */
+  std::default_random_engine eng(
+      std::chrono::system_clock::now().time_since_epoch().count());
+  std::uniform_int_distribution<> dist(0, 1);
+
+  if (0 == dist(eng)) {
+    m_graph->root_tab()->last_subtask(harvester);
+  } else {
+    m_graph->root_tab()->last_subtask(collector);
+  }
+
+  rmath::rangeu g_bounds =
+      task_params->exec_est.ranges.find("generalist")->second;
+
+  rmath::rangeu h_bounds =
+      task_params->exec_est.ranges.find("harvester")->second;
+  rmath::rangeu c_bounds =
+      task_params->exec_est.ranges.find("collector")->second;
+  ER_INFO("Seeding exec estimate for tasks: '%s'=%s '%s'=%s '%s'=%s",
+          generalist->name().c_str(),
+          g_bounds.to_str().c_str(),
+          harvester->name().c_str(),
+          h_bounds.to_str().c_str(),
+          collector->name().c_str(),
+          c_bounds.to_str().c_str());
+  static_cast<ta::polled_task*>(generalist)->exec_estimate_init(g_bounds);
+  static_cast<ta::polled_task*>(harvester)->exec_estimate_init(h_bounds);
+  static_cast<ta::polled_task*>(collector)->exec_estimate_init(c_bounds);
 } /* depth1_exec_est_init() */
 
 std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(

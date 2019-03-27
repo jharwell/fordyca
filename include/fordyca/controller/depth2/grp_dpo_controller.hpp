@@ -58,8 +58,7 @@ NS_START(controller, depth2);
  * using a DPO data store for tracking arena state and object relevance.
  */
 class grp_dpo_controller : public depth1::gp_dpo_controller,
-                            public er::client<grp_dpo_controller>,
-                            public visitor::visitable_any<grp_dpo_controller> {
+                           public er::client<grp_dpo_controller> {
  public:
   grp_dpo_controller(void);
   ~grp_dpo_controller(void) override = default;
@@ -71,11 +70,11 @@ class grp_dpo_controller : public depth1::gp_dpo_controller,
   void bsel_exception_added(bool b) { m_bsel_exception_added = b; }
   void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
-  void shared_init(const params::depth2::controller_repository& param_repo);
-
  private:
   void task_alloc_cb(const ta::polled_task* const task,
                      const ta::bi_tab* const);
+  void private_init(const params::depth2::controller_repository& param_repo);
+
 
   /* clang-format off */
   /**

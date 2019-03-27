@@ -28,6 +28,7 @@
 #include <string>
 #include <typeindex>
 
+#include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "rcppsw/er/client.hpp"
@@ -162,6 +163,13 @@ class base_controller : public argos::CCI_Controller,
    */
   void tick(uint tick);
 
+  const class block_manip_collator* block_manip_collator(void) const {
+    return &m_block_manip;
+  }
+  class block_manip_collator* block_manip_collator(void) {
+    return &m_block_manip;
+  }
+
   /**
    * @brief Set the current location of the robot.
    *
@@ -203,10 +211,11 @@ class base_controller : public argos::CCI_Controller,
   void saa_init(const params::actuation_params*, const params::sensing_params*);
 
   /* clang-format off */
-  const support::tv::tv_manager*           m_tv_manager{nullptr};
-  bool                                        m_display_id{false};
-  std::shared_ptr<repr::base_block> m_block{nullptr};
-  std::unique_ptr<controller::saa_subsystem>  m_saa;
+  const support::tv::tv_manager*             m_tv_manager{nullptr};
+  bool                                       m_display_id{false};
+  std::shared_ptr<repr::base_block>          m_block{nullptr};
+  std::unique_ptr<controller::saa_subsystem> m_saa;
+  class block_manip_collator                 m_block_manip{};
   /* clang-format on */
 };
 

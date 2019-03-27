@@ -46,8 +46,7 @@ NS_START(depth2);
  * using a Mapped DPO data store for tracking arena state and object relevance.
  */
 class grp_mdpo_controller : public depth2::grp_dpo_controller,
-                            public er::client<grp_mdpo_controller>,
-                            public visitor::visitable_any<grp_mdpo_controller> {
+                            public er::client<grp_mdpo_controller> {
  public:
   grp_mdpo_controller(void);
   ~grp_mdpo_controller(void) override = default;

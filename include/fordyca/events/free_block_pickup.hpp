@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_pickup_event.hpp"
+#include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -54,11 +54,13 @@ class gp_dpo_controller;
 class gp_mdpo_controller;
 } // namespace depth1
 namespace depth2 {
+class grp_dpo_controller;
 class grp_mdpo_controller;
-}
+} // namespace depth2
 } // namespace controller
 
 namespace tasks {
+class base_foraging_task;
 namespace depth0 {
 class generalist;
 }
@@ -71,36 +73,47 @@ class cache_finisher;
 } // namespace depth2
 } // namespace tasks
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+struct free_block_pickup_visit_set {
+  using inherited = boost::mpl::joint_view<block_pickup_base_visit_set::value,
+                                           cell_op_visit_set::value>;
+
+  using defined = visitor::precise_visit_set<
+      /* depth0 */
+      controller::depth0::crw_controller,
+      controller::depth0::dpo_controller,
+      controller::depth0::mdpo_controller,
+      fsm::depth0::crw_fsm,
+      fsm::depth0::dpo_fsm,
+      fsm::depth0::free_block_to_nest_fsm,
+      fsm::block_to_goal_fsm,
+      /* depth1 */
+      controller::depth1::gp_dpo_controller,
+      controller::depth1::gp_mdpo_controller,
+      tasks::depth0::generalist,
+      tasks::depth1::harvester,
+      /* depth2 */
+      controller::depth2::grp_dpo_controller,
+      controller::depth2::grp_mdpo_controller,
+      tasks::depth2::cache_starter,
+      tasks::depth2::cache_finisher>;
+
+  using value = boost::mpl::joint_view<inherited::type, defined::type>;
+};
+
 /**
  * @class free_block_pickup
- * @ingroup events
+ * @ingroup events detail
  *
  * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
  */
-class free_block_pickup
-    : public cell_op,
-      public rcppsw::er::client<free_block_pickup>,
-      public block_pickup_event,
-      public visitor::visit_set<controller::depth0::crw_controller,
-                                controller::depth0::dpo_controller,
-                                controller::depth0::mdpo_controller,
-                                controller::depth1::gp_dpo_controller,
-                                controller::depth1::gp_mdpo_controller,
-                                controller::depth2::grp_mdpo_controller,
-                                fsm::depth0::crw_fsm,
-                                fsm::depth0::dpo_fsm,
-                                fsm::depth0::free_block_to_nest_fsm,
-                                fsm::block_to_goal_fsm,
-                                tasks::depth0::generalist,
-                                tasks::depth1::harvester,
-                                tasks::depth2::cache_starter,
-                                tasks::depth2::cache_finisher> {
+class free_block_pickup : public rcppsw::er::client<free_block_pickup>,
+                          public cell_op {
  public:
   free_block_pickup(std::shared_ptr<repr::base_block> block,
                     uint robot_index,
@@ -111,39 +124,58 @@ class free_block_pickup
   free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
   /* CRW foraging */
-  void visit(ds::arena_map& map) override;
-  void visit(ds::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(repr::base_block& block) override;
-  void visit(controller::depth0::crw_controller& controller) override;
-  void visit(fsm::depth0::crw_fsm& fsm) override;
+  void visit(ds::arena_map& map);
+  void visit(ds::cell2D& cell);
+  void visit(fsm::cell2D_fsm& fsm);
+  void visit(repr::base_block& block);
+  void visit(controller::depth0::crw_controller& controller);
+  void visit(fsm::depth0::crw_fsm& fsm);
 
   /* Depth0 DPO/MDPO foraging */
-  void visit(ds::dpo_store& store) override;
-  void visit(ds::dpo_semantic_map& map) override;
-  void visit(fsm::depth0::dpo_fsm& fsm) override;
-  void visit(controller::depth0::dpo_controller& controller) override;
-  void visit(controller::depth0::mdpo_controller& controller) override;
+  void visit(ds::dpo_store& store);
+  void visit(ds::dpo_semantic_map& map);
+  void visit(fsm::depth0::dpo_fsm& fsm);
+  void visit(controller::depth0::dpo_controller& controller);
+  void visit(controller::depth0::mdpo_controller& controller);
 
   /* depth1 DPO/MDPO foraging */
-  void visit(fsm::depth0::free_block_to_nest_fsm& fsm) override;
-  void visit(controller::depth1::gp_dpo_controller& controller) override;
-  void visit(controller::depth1::gp_mdpo_controller& controller) override;
-  void visit(fsm::block_to_goal_fsm& fsm) override;
-  void visit(tasks::depth0::generalist& task) override;
-  void visit(tasks::depth1::harvester& task) override;
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
+  void visit(controller::depth1::gp_dpo_controller& controller);
+  void visit(controller::depth1::gp_mdpo_controller& controller);
+  void visit(fsm::block_to_goal_fsm& fsm);
+  void visit(tasks::depth0::generalist& task);
+  void visit(tasks::depth1::harvester& task);
 
   /* depth2 DPO/MDPO foraging */
-  void visit(controller::depth2::grp_mdpo_controller& controller) override;
-  void visit(tasks::depth2::cache_starter& task) override;
-  void visit(tasks::depth2::cache_finisher& task) override;
+  void visit(controller::depth2::grp_dpo_controller& controller);
+  void visit(controller::depth2::grp_mdpo_controller& controller);
+  void visit(tasks::depth2::cache_starter& task);
+  void visit(tasks::depth2::cache_finisher& task);
 
  private:
+  void dispatch_free_block_interactor(tasks::base_foraging_task* task);
+
   /* clang-format off */
-  uint                                        m_timestep;
-  uint                                        m_robot_index;
+  uint                              m_timestep;
+  uint                              m_robot_index;
   std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using free_block_pickup_visitor_impl =
+    visitor::precise_visitor<detail::free_block_pickup,
+                             detail::free_block_pickup_visit_set::value>;
+
+NS_END(detail);
+
+class free_block_pickup_visitor : public detail::free_block_pickup_visitor_impl {
+  using detail::free_block_pickup_visitor_impl::free_block_pickup_visitor_impl;
 };
 
 NS_END(events, fordyca);

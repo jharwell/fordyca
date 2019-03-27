@@ -120,8 +120,8 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
              j,
              kEPSILON,
              m_robot_id.c_str());
-    events::cell_unknown op(cell.loc());
-    this->accept(op);
+    events::cell_unknown_visitor op(cell.loc());
+    op.visit(*this);
     density.reset();
   }
 } /* cell_state_update() */

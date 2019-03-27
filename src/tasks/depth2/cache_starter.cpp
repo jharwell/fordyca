@@ -121,16 +121,16 @@ TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_starter::accept(events::free_block_drop& visitor) {
+void cache_starter::accept(events::detail::free_block_drop& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::free_block_pickup& visitor) {
+void cache_starter::accept(events::detail::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::block_vanished& visitor) {
+void cache_starter::accept(events::detail::block_vanished& visitor) {
   visitor.visit(*this);
 }
-void cache_starter::accept(events::block_proximity& visitor) {
+void cache_starter::accept(events::detail::block_proximity& visitor) {
   visitor.visit(*this);
 }
 

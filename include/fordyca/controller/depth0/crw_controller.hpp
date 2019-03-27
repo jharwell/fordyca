@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/depth0/depth0_controller.hpp"
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
+
 #include "rcppsw/patterns/state_machine/base_fsm.hpp"
 
 /*******************************************************************************
@@ -33,7 +34,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth0 { class crw_fsm; }}
 
 NS_START(controller);
@@ -51,9 +51,9 @@ NS_START(depth0);
  * @brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.
  */
-class crw_controller : public depth0_controller,
-                       public er::client<crw_controller>,
-                       public visitor::visitable_any<crw_controller> {
+class crw_controller : public base_controller,
+                       public fsm::block_transporter,
+                       public er::client<crw_controller> {
  public:
   crw_controller(void);
   ~crw_controller(void) override;
@@ -78,6 +78,7 @@ class crw_controller : public depth0_controller,
 
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }
+
 
  private:
   /* clang-format off */

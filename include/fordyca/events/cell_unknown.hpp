@@ -42,14 +42,20 @@ namespace fsm {
 class perceived_cell2D_fsm;
 }
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+struct cell_unknown_visit_set {
+  using inherited = cell_op_visit_set::value;
+  using defined = visitor::precise_visit_set<ds::occupancy_grid>;
+  using value = boost::mpl::joint_view<inherited::type, defined::type>;
+};
+
 /**
  * @class cell_unknown
- * @ingroup events
+ * @ingroup events detail
  *
  * @brief Created whenever a cell within an occupancy grid needs to go into an
  * unknown state.
@@ -59,17 +65,30 @@ NS_START(events);
  * 1. After its relevance expires.
  * 2. Before the robot sees it for the first time (ala Fog of War).
  */
-class cell_unknown : public cell_op,
-                     public visitor::can_visit<ds::occupancy_grid>,
-                     public rcppsw::er::client<cell_unknown> {
+class cell_unknown : public cell_op, public rcppsw::er::client<cell_unknown> {
  public:
   explicit cell_unknown(const rmath::vector2u& coord)
       : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_unknown") {}
 
-  /* stateful foraging */
-  void visit(ds::cell2D& cell) override;
-  void visit(ds::occupancy_grid& grid) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
+  void visit(ds::cell2D& cell);
+  void visit(ds::occupancy_grid& grid);
+  void visit(fsm::cell2D_fsm& fsm);
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cell_unknown_visitor_impl =
+    visitor::precise_visitor<detail::cell_unknown,
+                             detail::cell_unknown_visit_set::value>;
+
+NS_END(detail);
+
+class cell_unknown_visitor : public detail::cell_unknown_visitor_impl {
+  using detail::cell_unknown_visitor_impl::cell_unknown_visitor_impl;
 };
 
 NS_END(events, fordyca);

@@ -66,8 +66,7 @@ class nest_block_drop_interactor
         m_metrics_agg(metrics_agg),
         m_map(map),
         m_penalty_handler(
-            tv_manager->penalty_handler<T>(tv::block_op_src::kSrcNestDrop)) {
-  }
+            tv_manager->penalty_handler<T>(tv::block_op_src::kSrcNestDrop)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -143,15 +142,15 @@ class nest_block_drop_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.penalty_served(penalty.penalty());
+    controller.block_manip_collator()->penalty_served(penalty.penalty());
 
-    events::nest_block_drop drop_op(controller.block(), timestep);
+    events::nest_block_drop_visitor drop_op(controller.block(), timestep);
 
     /* Update arena map state due to a block nest drop */
-    m_map->accept(drop_op);
+    drop_op.visit(*m_map);
 
     /* Actually drop the block */
-    controller.visitor::template visitable_any<T>::accept(drop_op);
+    drop_op.visit(controller);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();

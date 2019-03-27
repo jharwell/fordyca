@@ -6,7 +6,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="4" />
+    <system threads="0" />
     <experiment length="5000"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -251,7 +251,7 @@
       <blocks>
         <distribution
             arena_resolution="0.2"
-            dist_type="single_source">
+            dist_type="dual_source">
           <redist_governor
               trigger="Null"
               recurrence_policy="multi"

@@ -44,7 +44,6 @@ struct perception_params;
 NS_START(ds);
 
 namespace decorator = rcppsw::patterns::decorator;
-namespace visitor = rcppsw::patterns::visitor;
 namespace er = rcppsw::er;
 
 /*******************************************************************************
@@ -68,8 +67,7 @@ namespace er = rcppsw::er;
  * what the robots need (as of 9/14/18 anyway).
  */
 class dpo_semantic_map : public er::client<dpo_semantic_map>,
-                         public decorator::decorator<occupancy_grid>,
-                         public visitor::visitable_any<dpo_semantic_map> {
+                         public decorator::decorator<occupancy_grid> {
  public:
   dpo_semantic_map(const params::perception::perception_params* c_params,
                    const std::string& robot_id);

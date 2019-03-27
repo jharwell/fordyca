@@ -95,15 +95,15 @@ void cache_transferer::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_transferer::accept(events::cache_block_drop& visitor) {
+void cache_transferer::accept(events::detail::cache_block_drop& visitor) {
   visitor.visit(*this);
 }
 
-void cache_transferer::accept(events::cached_block_pickup& visitor) {
+void cache_transferer::accept(events::detail::cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
 
-void cache_transferer::accept(events::cache_vanished& visitor) {
+void cache_transferer::accept(events::detail::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 

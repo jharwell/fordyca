@@ -83,9 +83,6 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics {
     m_cache_depleted = 0;
   }
 
-  void cache_created(void) { ++m_cache_created; }
-  void cache_depleted(void) { ++m_cache_depleted; }
-
  protected:
   const ds::arena_grid* arena_grid(void) const { return m_grid; }
   ds::arena_grid* arena_grid(void) { return m_grid; }

@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
@@ -133,8 +134,8 @@ class cached_block_pickup_interactor
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
-      events::cache_vanished vanished(p.id());
-      controller.visitor::template visitable_any<T>::accept(vanished);
+      events::cache_vanished_visitor vanished_op(p.id());
+      vanished_op.visit(controller);
     } else {
       perform_cached_block_pickup(controller, p, timestep);
       m_floor->SetChanged();
@@ -158,16 +159,15 @@ class cached_block_pickup_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cached_block_pickup pickup_op(*it,
-                                          loop_utils::robot_id(controller),
-                                          timestep);
+    events::cached_block_pickup_visitor pickup_op(
+        *it, loop_utils::robot_id(controller), timestep);
     (*it)->penalty_served(penalty.penalty());
 
     /*
      * Map must be called before controller for proper cache block decrement!
      */
-    m_map->accept(pickup_op);
-    controller.visitor::template visitable_any<T>::accept(pickup_op);
+    pickup_op.visit(*m_map);
+    pickup_op.visit(controller);
   }
 
  private:

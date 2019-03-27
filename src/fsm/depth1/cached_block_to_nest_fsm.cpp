@@ -100,7 +100,7 @@ HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, acquire_block) {
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_pickup,
-                  rfsm::event_data *data) {
+                  rfsm::event_data* data) {
   if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_TRANSPORT_TO_NEST);
@@ -113,7 +113,7 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_drop,
-                  rfsm::event_data *data) {
+                  rfsm::event_data* data) {
   if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ST_FINISHED);
@@ -207,8 +207,7 @@ void cached_block_to_nest_fsm::init(void) {
 } /* init() */
 
 void cached_block_to_nest_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 NS_END(depth1, fsm, fordyca);

@@ -42,7 +42,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::arena_grid;
 using ds::occupancy_grid;
 namespace rfsm = rcppsw::patterns::state_machine;
@@ -53,18 +53,51 @@ namespace rfsm = rcppsw::patterns::state_machine;
 free_block_drop::free_block_drop(const std::shared_ptr<repr::base_block>& block,
                                  const rmath::vector2u& coord,
                                  double resolution)
-    : cell_op(coord),
-      ER_CLIENT_INIT("fordyca.events.free_block_drop"),
+    : ER_CLIENT_INIT("fordyca.events.free_block_drop"),
+      cell_op(coord),
       m_resolution(resolution),
       m_block(block) {}
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+bool free_block_drop::dispatch_free_block_interactor(
+    tasks::base_foraging_task* const task,
+    controller::block_sel_matrix* const bsel_matrix) {
+  auto* polled = dynamic_cast<ta::polled_task*>(task);
+  auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
+  bool ret = false;
+
+  if (nullptr != interactor) {
+    /*
+     * If this is true then we know the current task must be a cache starter or
+     * a cache finisher, so we need to make a note of the block we are dropping
+     * so we don't just turn around and pick it up when we start our next task.
+     *
+     * If we are performing a free block drop because we have just aborted our
+     * task, then obviously no need to do that.
+     */
+    if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
+        !polled->task_aborted()) {
+      ER_INFO("Added block%d@%s to exception list,task='%s'",
+              m_block->id(),
+              m_block->real_loc().to_str().c_str(),
+              polled->name().c_str());
+      bsel_matrix->sel_exception_add(m_block->id());
+      ret = true;
+    }
+    interactor->accept(*this);
+  }
+  return ret;
+} /* dispatch_free_block_interactor() */
 
 /*******************************************************************************
  * Depth0
  ******************************************************************************/
 void free_block_drop::visit(ds::cell2D& cell) {
   cell.entity(m_block);
-  m_block->accept(*this);
-  cell.fsm().accept(*this);
+  visit(*m_block);
+  visit(cell.fsm());
 } /* visit() */
 
 void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
@@ -99,7 +132,7 @@ void free_block_drop::visit(ds::arena_map& map) {
     cache_block_drop op(m_block,
                         std::static_pointer_cast<repr::arena_cache>(cell.cache()),
                         m_resolution);
-    map.accept(op);
+    op.visit(map);
   } else if (cell.state_has_block()) {
     map.distribute_single_block(m_block);
   } else {
@@ -107,7 +140,7 @@ void free_block_drop::visit(ds::arena_map& map) {
      * Cell does not have a block/cache on it, so it is safe to drop the block
      * on it and change the cell state.
      */
-    cell.accept(*this);
+    visit(cell);
   }
 } /* visit() */
 
@@ -128,33 +161,22 @@ void free_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
 void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
-  auto* task =
-      dynamic_cast<events::free_block_interactor*>(controller.current_task());
-  if (nullptr != task) {
-    /*
-     * If this is true then we know the current task must be a cache starter or
-     * a cache finisher, so we need to make a note of the block we are dropping
-     * so we don't just turn around and pick it up when we start our next task.
-     *
-     * If we are performing a free block drop because we have just aborted our
-     * task, then obviously no need to do that.
-     */
-    if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
-        !polled->task_aborted()) {
-      ER_INFO("Added block%d@%s to exception list,task='%s'",
-              m_block->id(),
-              m_block->real_loc().to_str().c_str(),
-              polled->name().c_str());
-      controller.block_sel_matrix()->sel_exception_add(m_block->id());
-      controller.bsel_exception_added(true);
-    }
-    task->accept(*this);
+  if (dispatch_free_block_interactor(controller.current_task(),
+                                     controller.block_sel_matrix())) {
+    controller.bsel_exception_added(true);
   }
-  ER_INFO("Dropped block%d@%s,task='%s'",
-          m_block->id(),
-          m_block->real_loc().to_str().c_str(),
-          polled->name().c_str());
+  controller.block(nullptr);
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_drop::visit(controller::depth2::grp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_free_block_interactor(controller.current_task(),
+                                     controller.block_sel_matrix())) {
+    controller.bsel_exception_added(true);
+  }
   controller.block(nullptr);
 
   controller.ndc_pop();
@@ -162,15 +184,15 @@ void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller)
 
 void free_block_drop::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(cell_op::coord());
-  cell.accept(*this);
+  visit(cell);
 } /* visit() */
 
 void free_block_drop::visit(tasks::depth2::cache_starter& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 void free_block_drop::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 void free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
@@ -178,4 +200,4 @@ void free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
                    rfsm::event_type::NORMAL);
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

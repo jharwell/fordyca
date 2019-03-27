@@ -99,7 +99,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
   void collect_from_controller(const ControllerType* const controller) {
   auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
   auto manip_m =
-      dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+      dynamic_cast<const metrics::blocks::manipulation_metrics*>(
+          controller->block_manip_collator());
   auto movement_m =
       dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
 

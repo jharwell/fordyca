@@ -207,10 +207,11 @@ void set_robot_los(argos::CFootBotEntity& robot,
  * @brief Determine if an entity of the specified dimensions, placed at the
  * specified location (or that currently exists at the specified location), will
  * overlap the specified (different) entity (or does overlap it).
+ *
  */
-placement_status_t placement_conflict(const rmath::vector2d& rloc,
-                                      const rmath::vector2d& dims,
-                                      const repr::multicell_entity* const entity);
+placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
+                                      const rmath::vector2d& ent1_dims,
+                                      const repr::multicell_entity* const ent2);
 
 NS_END(loop_utils, support, fordyca);
 

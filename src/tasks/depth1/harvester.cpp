@@ -100,17 +100,17 @@ void harvester::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void harvester::accept(events::cache_block_drop& visitor) {
+void harvester::accept(events::detail::cache_block_drop& visitor) {
   visitor.visit(*this);
 }
-void harvester::accept(events::free_block_pickup& visitor) {
+void harvester::accept(events::detail::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void harvester::accept(events::cache_vanished& visitor) {
+void harvester::accept(events::detail::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 
-void harvester::accept(events::block_vanished& visitor) {
+void harvester::accept(events::detail::block_vanished& visitor) {
   visitor.visit(*this);
 }
 

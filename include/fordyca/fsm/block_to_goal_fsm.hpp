@@ -28,7 +28,6 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 
 /*******************************************************************************
@@ -36,7 +35,6 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace er = rcppsw::er;
 namespace ta = rcppsw::task_allocation;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
@@ -63,8 +61,7 @@ class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
                           public base_foraging_fsm,
                           public ta::taskable,
                           public metrics::fsm::goal_acquisition_metrics,
-                          public fsm::block_transporter,
-                          public visitor::visitable_any<block_to_goal_fsm> {
+                          public fsm::block_transporter {
  public:
   block_to_goal_fsm(acquire_goal_fsm* goal_fsm,
                     acquire_goal_fsm* block_fsm,

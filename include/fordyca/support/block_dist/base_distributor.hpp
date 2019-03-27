@@ -27,6 +27,8 @@
 #include <list>
 #include <algorithm>
 #include <vector>
+#include <random>
+#include <chrono>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/ds/block_vector.hpp"
@@ -55,7 +57,8 @@ class base_distributor {
    */
   static constexpr uint kMAX_DIST_TRIES = 100;
 
-  base_distributor(void) = default;
+  base_distributor(void) :
+      m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
   virtual ~base_distributor(void) = default;
 
   /**
@@ -89,6 +92,12 @@ class base_distributor {
                          return distribute_block(b, entities);
                        });
   }
+  std::default_random_engine& rng(void) { return m_rng; }
+
+ private:
+  /* clang-format off */
+  std::default_random_engine m_rng;
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

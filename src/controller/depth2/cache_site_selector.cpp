@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
-#include <random>
+#include <chrono>
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
@@ -40,12 +40,13 @@ using cselm = cache_sel_matrix;
 cache_site_selector::cache_site_selector(
     const controller::cache_sel_matrix* const matrix)
     : ER_CLIENT_INIT("fordyca.controller.depth2.cache_site_selector"),
-      mc_matrix(matrix) {}
+      mc_matrix(matrix),
+      m_reng(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rmath::vector2d cache_site_selector::calc_best(
+rmath::vector2d cache_site_selector::operator()(
     const ds::dp_cache_map& known_caches,
     const ds::dp_block_map& known_blocks,
     rmath::vector2d position) {
@@ -62,23 +63,22 @@ rmath::vector2d cache_site_selector::calc_best(
    */
   try {
     nlopt::result res = m_alg.optimize(point, max_utility);
+    ER_INFO("NLopt returned: '%s', max_utility=%f",
+            nlopt_ret_str(res).c_str(),
+            max_utility);
     ER_ASSERT(res >= 1, "NLopt failed with code %d", res);
-    ER_INFO("NLopt return code: %d", res);
   } catch (std::runtime_error&) {
-    ER_WARN("NLopt failed");
+    ER_FATAL_SENTINEL("NLopt failed");
     return site;
   }
   site.set(point[0], point[1]);
   ER_ASSERT(verify_site(site, known_caches, known_blocks),
             "Selected cache violates constraints");
 
-  ER_INFO("Selected cache site @(%f, %f), utility=%f",
-          point[0],
-          point[1],
-          max_utility);
+  ER_INFO("Selected cache site @(%f, %f)", point[0], point[1]);
 
   return site;
-} /* calc_best() */
+} /* operator()() */
 
 bool cache_site_selector::verify_site(const rmath::vector2d& site,
                                       const ds::dp_cache_map& known_caches,
@@ -203,6 +203,36 @@ void cache_site_selector::constraints_create(
                                   &std::get<2>(m_constraints)[0],
                                   kNEST_CONSTRAINT_TOL);
 } /* constraints_create() */
+
+std::string cache_site_selector::nlopt_ret_str(nlopt::result res) const {
+  switch (res) {
+    case nlopt::result::FAILURE:
+      return "FAILURE";
+    case nlopt::result::INVALID_ARGS:
+      return "INVALID_ARGS";
+    case nlopt::result::OUT_OF_MEMORY:
+      return "OUT_OF_MEMORY";
+    case nlopt::result::ROUNDOFF_LIMITED:
+      return "ROUNDOFF_LIMITED";
+    case nlopt::result::FORCED_STOP:
+      return "FORCED_STOP";
+    case nlopt::result::SUCCESS:
+      return "SUCCESS";
+    case nlopt::result::STOPVAL_REACHED:
+      return "STOPVAL_REACHED";
+    case nlopt::result::FTOL_REACHED:
+      return "FTOL_REACHED";
+    case nlopt::result::XTOL_REACHED:
+      return "XTOL_REACHED";
+    case nlopt::result::MAXEVAL_REACHED:
+      return "MAXEVAL_REACHED";
+    case nlopt::result::MAXTIME_REACHED:
+      return "MAXTIME_REACHED";
+      break;
+    default:
+      return "";
+  } /* switch() */
+} /* nlopt_ret_str() */
 
 /*******************************************************************************
  * Non-Member Functions

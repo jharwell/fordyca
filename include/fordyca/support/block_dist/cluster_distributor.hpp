@@ -63,7 +63,7 @@ class cluster_distributor : public base_distributor,
  private:
   /* clang-format off */
   repr::block_cluster m_clust;
-  random_distributor            m_dist;
+  random_distributor  m_dist;
   /* clang-format on */
 };
 

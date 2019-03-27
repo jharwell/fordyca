@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
@@ -59,8 +58,7 @@ NS_START(depth0);
  */
 class mdpo_controller : public dpo_controller,
                         public er::client<mdpo_controller>,
-                        public metrics::world_model_metrics,
-                        public visitor::visitable_any<mdpo_controller> {
+                        public metrics::world_model_metrics {
  public:
   mdpo_controller(void);
   ~mdpo_controller(void) override;

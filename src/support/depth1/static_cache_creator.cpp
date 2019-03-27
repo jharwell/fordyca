@@ -61,7 +61,7 @@ ds::cache_vector static_cache_creator::create_all(
   ds::block_list starter_blocks;
   for (auto& b : blocks) {
     starter_blocks.push_back(b);
-  } /* for(i..) */
+  } /* for(b..) */
 
   auto cache = create_single_cache(starter_blocks, m_center);
   auto cache_p = std::shared_ptr<repr::arena_cache>(std::move(cache));

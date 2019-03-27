@@ -1,5 +1,5 @@
 /**
- * @file block_pickup_event.hpp
+ * @file block_drop_base_visit_set.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_EVENT_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_EVENT_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_BASE_VISIT_SET_HPP_
+#define INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_BASE_VISIT_SET_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,34 +32,31 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace repr {
 class base_block;
 } // namespace repr
 
 namespace ds {
 class arena_map;
-class dpo_semantic_map;
-class dpo_store;
 } // namespace ds
+namespace visitor = rcppsw::patterns::visitor;
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_pickup_event
- * @ingroup events
+ * @struct block_drop_base_visit_set
+ * @ingroup events detail
  *
  * @brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).
  */
-class block_pickup_event : public visitor::visit_set<ds::arena_map,
-                                                     ds::dpo_semantic_map,
-                                                     ds::dpo_store,
-                                                     repr::base_block> {};
+struct block_drop_base_visit_set {
+  using value = visitor::precise_visit_set<ds::arena_map, repr::base_block>;
+};
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_EVENT_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_BASE_VISIT_SET_HPP_ */

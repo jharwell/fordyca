@@ -42,7 +42,7 @@ NS_START(fordyca, support);
  * is used in computing task distribution entropy in depth1, depth2 in
  * conjunction with boost::variant.
  */
-template<class T>
+template <class T>
 struct controller_task_extractor {
   using controller_type = T;
 

@@ -49,10 +49,6 @@ NS_START(fsm, depth2);
  * Each robot executing this FSM will compute the "best" site to start a new
  * cache at, and then acquire that location within the arena. Once this has been
  * done, it signals that it has completed its task.
- *
- * @bug There is not currently any handling for what needs to happen if the
- * robot arrives at its chosen site and there is already a cache there or there
- * is one very close by.
  */
 class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
                                public acquire_goal_fsm {

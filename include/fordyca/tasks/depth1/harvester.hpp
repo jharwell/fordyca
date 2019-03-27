@@ -28,7 +28,6 @@
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
 
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/abort_probability.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
 #include "rcppsw/er/client.hpp"
@@ -64,13 +63,13 @@ class harvester : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::free_block_drop&) override {}
-  void accept(events::block_vanished&) override;
+  void accept(events::detail::free_block_pickup& v) override;
+  void accept(events::detail::free_block_drop&) override {}
+  void accept(events::detail::block_vanished&) override;
 
-  void accept(events::cache_block_drop& visitor) override;
-  void accept(events::cached_block_pickup&) override {}
-  void accept(events::cache_vanished& visitor) override;
+  void accept(events::detail::cache_block_drop& v) override;
+  void accept(events::detail::cached_block_pickup&) override {}
+  void accept(events::detail::cache_vanished& v) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLAREC(bool, goal_acquired);

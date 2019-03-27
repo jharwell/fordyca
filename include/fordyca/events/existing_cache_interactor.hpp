@@ -31,9 +31,11 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 
+namespace detail {
 class cached_block_pickup;
 class cache_block_drop;
 class cache_vanished;
+} // namespace detail
 
 namespace visitor = rcppsw::patterns::visitor;
 
@@ -48,9 +50,9 @@ namespace visitor = rcppsw::patterns::visitor;
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor
-    : public visitor::polymorphic_accept_set<cache_block_drop,
-                                             cached_block_pickup,
-                                             cache_vanished> {};
+    : public visitor::polymorphic_accept_set<detail::cache_block_drop,
+                                             detail::cached_block_pickup,
+                                             detail::cache_vanished> {};
 
 NS_END(events, fordyca);
 

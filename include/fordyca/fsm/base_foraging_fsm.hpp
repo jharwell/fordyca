@@ -133,9 +133,7 @@ class base_foraging_fsm : public rfsm::hfsm,
    * signal will be returned to the parent state. No robot should return to the
    * nest unless it has a block (duh).
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm,
-                     transport_to_nest,
-                     rfsm::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, transport_to_nest, rfsm::event_data);
 
   /**
    * @brief Robots entering this state will leave the nest (they are assumed to

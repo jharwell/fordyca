@@ -55,7 +55,7 @@ bool multi_cluster_distributor::distribute_block(
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
     std::uniform_int_distribution<> rng_dist(0, m_dists.size());
 
-    uint idx = rng_dist(m_reng);
+    uint idx = rng_dist(rng());
     cluster_distributor& dist = m_dists[idx];
     const auto* clust = dist.block_clusters().front(); /* only 1 */
     if (clust->capacity() == clust->block_count()) {

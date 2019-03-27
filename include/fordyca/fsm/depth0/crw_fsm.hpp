@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
@@ -37,7 +36,6 @@
 NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
-namespace visitor = rcppsw::patterns::visitor;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
@@ -59,8 +57,7 @@ using transport_goal_type = block_transporter::goal_type;
 class crw_fsm : public base_foraging_fsm,
                                public er::client<crw_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
-                               public block_transporter,
-                               public visitor::visitable_any<crw_fsm> {
+                               public block_transporter {
  public:
   explicit crw_fsm(controller::saa_subsystem* saa);
 

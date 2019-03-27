@@ -102,13 +102,13 @@ void collector::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void collector::accept(events::cached_block_pickup& visitor) {
+void collector::accept(events::detail::cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::nest_block_drop& visitor) {
+void collector::accept(events::detail::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::cache_vanished& visitor) {
+void collector::accept(events::detail::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 

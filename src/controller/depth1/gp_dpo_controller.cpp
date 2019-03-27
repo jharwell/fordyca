@@ -66,7 +66,6 @@ void gp_dpo_controller::ControlStep(void) {
   }
 
   dpo_perception()->update();
-  m_task_aborted = false;
   executive()->run();
 
   ndc_pop();
@@ -86,6 +85,8 @@ void gp_dpo_controller::Init(ticpp::Element& node) {
   }
 
   shared_init(param_repo);
+  private_init(param_repo);
+
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -101,7 +102,10 @@ void gp_dpo_controller::shared_init(
   /* cache selection matrix */
   m_cache_sel_matrix =
       rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
+} /* shared_init() */
 
+void gp_dpo_controller::private_init(
+    const params::depth1::controller_repository& param_repo) {
   /* task executive */
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
@@ -109,7 +113,7 @@ void gp_dpo_controller::shared_init(
                                     perception())(param_repo);
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
-} /* shared_init() */
+} /* private_init() */
 
 void gp_dpo_controller::task_abort_cb(const ta::polled_task*) {
   m_task_aborted = true;

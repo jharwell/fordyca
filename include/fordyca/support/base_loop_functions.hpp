@@ -31,8 +31,8 @@
 
 #include "fordyca/params/loop_function_repository.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/math/radians.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -96,9 +96,7 @@ class base_loop_functions : public argos::CLoopFunctions,
     ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
   }
   void ndc_pop(void) { ER_NDC_POP(); }
-  const tv::tv_manager* tv_manager(void) const {
-    return m_tv_manager.get();
-  }
+  const tv::tv_manager* tv_manager(void) const { return m_tv_manager.get(); }
   const rswc::convergence_calculator* conv_calculator(void) const {
     return m_conv_calc.get();
   }

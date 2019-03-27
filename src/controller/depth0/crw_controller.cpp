@@ -38,9 +38,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 crw_controller::crw_controller(void)
-    : depth0_controller(),
-      ER_CLIENT_INIT("fordyca.controller.depth0.crw"),
-      m_fsm() {}
+    : ER_CLIENT_INIT("fordyca.controller.depth0.crw"), m_fsm() {}
 
 crw_controller::~crw_controller(void) = default;
 

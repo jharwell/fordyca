@@ -50,8 +50,7 @@ HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_explore) {
  * General Member Functions
  ******************************************************************************/
 void base_explore_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

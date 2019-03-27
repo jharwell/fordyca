@@ -15,17 +15,27 @@ This is the main entry point for getting started on the project.
 
 # Setup
 
-Download `scripts/bootstrap.sh` BEFORE cloning this repo, and run it:
+Download `scripts/bootstrap.sh` BEFORE cloning this repo, and run it, with the
+following arguments:
 
-    ./bootstrap.sh /path/to/project/root YES /usr/local 4
+- 1st arg: Is the root directory for the project (all repos will be clone/built in
+  here, which *must* be an absolute path).
+- 2nd arg is `YES` if you want to install ARGoS system wide (you probably do)
+  and `NO` otherwise.
+- 3rd arg is the location ARGoS should be installed into, and 4th arg is the \#
+  of cores to use when building ARGoS/FORDYCA (should be set to \# cores on your
+  machine).
 
-1st arg is the root directory for the project (all repos will be clone/built in
-here), 2nd arg is `YES` if you want to install ARGoS system wide (you probably
-do) and `NO` otherwise, 3rd arg is the location ARGoS should be installed into,
-and 4th arg is the \# of cores to use when building ARGos/FORDYCA (should be set
-to \# cores on your machine). It assumes you have sudo privileges on the machine
-you want to install the project on. If you do not, you will have to build a
-*lot* more stuff from source manually.
+For example:
+
+        ./bootstrap.sh $HOME/research YES /usr/local 2
+
+To build the code under `~/research` on a 2 core machine and install ARGoS
+system-wide.
+
+The script assumes you have sudo privileges on the machine you want to install
+the project on. If you do not, you will have to build a *lot* more stuff from
+source manually.
 
 # Configuring Simulations
 

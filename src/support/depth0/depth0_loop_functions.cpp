@@ -37,6 +37,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
@@ -45,7 +46,6 @@
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
-#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
@@ -87,8 +87,8 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
       *params()->parse_results<params::output_params>();
   output.metrics.arena_grid = arena->grid;
 
-  m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(
-      &output.metrics, output_root());
+  m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,
+                                                                 output_root());
 } /* shared_init() */
 
 void depth0_loop_functions::private_init(void) {
@@ -114,7 +114,6 @@ void depth0_loop_functions::private_init(void) {
   } /* for(entity..) */
 } /* private_init() */
 
-
 void depth0_loop_functions::controller_configure(
     controller::base_controller* const c) {
   auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(c);
@@ -131,7 +130,7 @@ void depth0_loop_functions::controller_configure(
 } /* controller_configure() */
 
 void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::depth0::depth0_controller*>(
+  auto controller = static_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -152,8 +151,7 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
     m_metrics_agg->collect_from_controller(crw);
   }
 
-  controller->free_pickup_event(false);
-  controller->free_drop_event(false);
+  controller->block_manip_collator()->reset();
 
   /* Send the robot its new line of sight */
   loop_utils::set_robot_pos<decltype(*controller)>(robot);

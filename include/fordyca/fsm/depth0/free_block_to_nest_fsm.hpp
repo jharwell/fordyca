@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcppsw/task_allocation/taskable.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
@@ -38,7 +37,6 @@
 NS_START(fordyca);
 
 namespace ds { class dpo_semantic_map; }
-namespace visitor = rcppsw::patterns::visitor;
 namespace task_allocation = rcppsw::task_allocation;
 
 NS_START(fsm, depth0);
@@ -59,8 +57,7 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
                                er::client<free_block_to_nest_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
-                               public task_allocation::taskable,
-                               public visitor::visitable_any<free_block_to_nest_fsm> {
+                               public task_allocation::taskable {
  public:
   free_block_to_nest_fsm(const controller::block_sel_matrix* sel_matrix,
                          controller::saa_subsystem* saa,

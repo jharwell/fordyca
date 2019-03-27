@@ -115,14 +115,14 @@ proximity_status_t new_cache_cache_proximity(const controller::base_controller& 
   return {-1, rmath::vector2d()};
 } /* new_cache_cache_proximity() */
 
-placement_status_t placement_conflict(const rmath::vector2d& rloc,
-                                      const rmath::vector2d& dims,
+placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
+                                      const rmath::vector2d& ent1_dims,
                                       const repr::multicell_entity* const entity) {
   auto movable = dynamic_cast<const repr::movable_cell_entity*>(entity);
   auto immovable = dynamic_cast<const repr::immovable_cell_entity*>(entity);
 
-  auto loc_xspan = repr::multicell_entity::xspan(rloc, dims.x());
-  auto loc_yspan = repr::multicell_entity::yspan(rloc, dims.y());
+  auto loc_xspan = repr::multicell_entity::xspan(ent1_loc, ent1_dims.x());
+  auto loc_yspan = repr::multicell_entity::yspan(ent1_loc, ent1_dims.y());
   placement_status_t status;
   if (nullptr != movable) {
     auto ent_xspan = entity->xspan(movable->real_loc());

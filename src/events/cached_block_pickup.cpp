@@ -25,6 +25,7 @@
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
@@ -45,7 +46,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::arena_grid;
 using ds::occupancy_grid;
 using repr::base_cache;
@@ -58,8 +59,8 @@ cached_block_pickup::cached_block_pickup(
     const std::shared_ptr<repr::arena_cache>& cache,
     uint robot_index,
     uint timestep)
-    : cell_op(cache->discrete_loc()),
-      ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
+    : ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
+      cell_op(cache->discrete_loc()),
       m_robot_index(robot_index),
       m_timestep(timestep),
       m_real_cache(cache) {
@@ -69,6 +70,52 @@ cached_block_pickup::cached_block_pickup(
   m_pickup_block = m_real_cache->oldest_block();
   ER_ASSERT(m_pickup_block, "No block in non-empty cache");
 }
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void cached_block_pickup::dispatch_d1_cache_interactor(
+    tasks::base_foraging_task* const task) {
+  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
+  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+  ER_ASSERT(
+      nullptr != task,
+      "Non existing cache interactor task '%s' causing cached block pickup",
+      task_name.c_str());
+  interactor->accept(*this);
+  ER_INFO("Picked up block%d from cache%d,task='%s'",
+          m_pickup_block->id(),
+          m_real_cache->id(),
+          task_name.c_str());
+} /* dispatch_d1_cache_interactor() */
+
+bool cached_block_pickup::dispatch_d2_cache_interactor(
+    tasks::base_foraging_task* task,
+    controller::cache_sel_matrix* csel_matrix) {
+  auto* polled = dynamic_cast<ta::polled_task*>(task);
+  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
+  bool ret = false;
+
+  ER_ASSERT(nullptr != interactor,
+            "Non existing cache interactor task %s causing cached block pickup",
+            polled->name().c_str());
+
+  if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
+    ER_INFO("Added cache%d@%s to drop exception list,task='%s'",
+            m_real_cache->id(),
+            m_real_cache->real_loc().to_str().c_str(),
+            polled->name().c_str());
+    csel_matrix->sel_exception_add(
+        {m_real_cache->id(), controller::cache_sel_exception::kDrop});
+    ret = true;
+  }
+  interactor->accept(*this);
+  ER_INFO("Picked up block%d from cache%d,task='%s'",
+          m_pickup_block->id(),
+          m_real_cache->id(),
+          polled->name().c_str());
+  return ret;
+} /* dispatch_d2_cache_interactor() */
 
 /*******************************************************************************
  * Depth1 Foraging
@@ -88,7 +135,7 @@ void cached_block_pickup::visit(ds::cell2D& cell) {
              cell_op::y(),
              m_orphan_block->id());
   }
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
 } /* visit() */
 
 void cached_block_pickup::visit(repr::arena_cache& cache) {
@@ -123,8 +170,8 @@ void cached_block_pickup::visit(ds::arena_map& map) {
    * is not a cache.
    */
   if (m_real_cache->n_blocks() > base_cache::kMinBlocks) {
-    m_real_cache->accept(*this);
-    cell.accept(*this);
+    visit(*m_real_cache);
+    visit(cell);
     ER_ASSERT(cell.state_has_cache(),
               "Cell@(%u, %u) with >= %zu blocks does not have cache",
               cell_op::x(),
@@ -142,9 +189,9 @@ void cached_block_pickup::visit(ds::arena_map& map) {
         m_real_cache->n_blocks());
 
   } else {
-    m_real_cache->accept(*this);
+    visit(*m_real_cache);
     m_orphan_block = m_real_cache->oldest_block();
-    cell.accept(*this);
+    visit(cell);
 
     ER_ASSERT(cell.state_has_block(),
               "cell@(%u, %u) with 1 block has cache",
@@ -161,7 +208,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
             cell_op::x(),
             cell_op::y());
   }
-  m_pickup_block->accept(*this);
+  visit(*m_pickup_block);
 } /* visit() */
 
 void cached_block_pickup::visit(ds::dpo_store& store) {
@@ -218,7 +265,7 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
     cell.cache()->block_remove(m_pickup_block);
-    cell.accept(*this);
+    visit(cell);
     ER_ASSERT(cell.state_has_cache(),
               "cell@%s with >= 2 blocks does not have cache",
               cell_op::coord().to_str().c_str());
@@ -257,23 +304,10 @@ void cached_block_pickup::visit(
     controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
-  controller.dpo_perception()->dpo_store()->accept(*this);
+  visit(*controller.dpo_perception()->dpo_store());
   controller.block(m_pickup_block);
-
-  auto* task = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
-
-  ER_ASSERT(
-      nullptr != task,
-      "Non existing cache interactor task '%s' causing cached block pickup",
-      task_name.c_str());
-  task->accept(*this);
-
-  ER_INFO("Picked up block%d from cache%d,task='%s'",
-          m_pickup_block->id(),
-          m_real_cache->id(),
-          task_name.c_str());
+  controller.block_manip_collator()->cache_pickup_event(true);
+  dispatch_d1_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
@@ -282,30 +316,16 @@ void cached_block_pickup::visit(
     controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  controller.mdpo_perception()->map()->accept(*this);
+  visit(*controller.mdpo_perception()->map());
   controller.block(m_pickup_block);
-
-  auto* task = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
-
-  ER_ASSERT(
-      nullptr != task,
-      "Non existing cache interactor task '%s' causing cached block pickup",
-      task_name.c_str());
-  task->accept(*this);
-
-  ER_INFO("Picked up block%d from cache%d,task='%s'",
-          m_pickup_block->id(),
-          m_real_cache->id(),
-          task_name.c_str());
+  controller.block_manip_collator()->cache_pickup_event(true);
+  dispatch_d1_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
 
 void cached_block_pickup::visit(tasks::depth1::collector& task) {
-  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
-      ->accept(*this);
+  visit(*static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
@@ -322,44 +342,40 @@ void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void cached_block_pickup::visit(
-    controller::depth2::grp_mdpo_controller& controller) {
+    controller::depth2::grp_dpo_controller& controller) {
   controller.ndc_push();
 
-  controller.mdpo_perception()->map()->accept(*this);
+  visit(*controller.dpo_perception()->dpo_store());
   controller.block(m_pickup_block);
+  controller.block_manip_collator()->cache_pickup_event(true);
 
-  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
-  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-
-  ER_ASSERT(nullptr != interactor,
-            "Non existing cache interactor task %s causing cached block pickup",
-            polled->name().c_str());
-
-  if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
-    ER_INFO("Added cache%d@%s to drop exception list,task='%s'",
-            m_real_cache->id(),
-            m_real_cache->real_loc().to_str().c_str(),
-            polled->name().c_str());
-    controller.cache_sel_matrix()->sel_exception_add(
-        {m_real_cache->id(), controller::cache_sel_exception::kDrop});
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
-  interactor->accept(*this);
-  ER_INFO("Picked up block%d from cache%d,task='%s'",
-          m_pickup_block->id(),
-          m_real_cache->id(),
-          polled->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
 
-void cached_block_pickup::visit(tasks::depth2::cache_transferer& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
-} /* visit() */
-void cached_block_pickup::visit(tasks::depth2::cache_collector& task) {
-  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
-      ->accept(*this);
+void cached_block_pickup::visit(
+    controller::depth2::grp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  controller.block(m_pickup_block);
+  controller.block_manip_collator()->cache_pickup_event(true);
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+  controller.ndc_pop();
 } /* visit() */
 
-NS_END(events, fordyca);
+void cached_block_pickup::visit(tasks::depth2::cache_transferer& task) {
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
+} /* visit() */
+void cached_block_pickup::visit(tasks::depth2::cache_collector& task) {
+  visit(*static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism()));
+} /* visit() */
+
+NS_END(detail, events, fordyca);

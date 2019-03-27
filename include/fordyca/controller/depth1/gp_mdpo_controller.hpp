@@ -55,7 +55,6 @@ NS_START(depth1);
  */
 class gp_mdpo_controller : public depth1::gp_dpo_controller,
                            public er::client<gp_mdpo_controller>,
-                           public visitor::visitable_any<gp_mdpo_controller>,
                            public metrics::world_model_metrics {
  public:
   gp_mdpo_controller(void);

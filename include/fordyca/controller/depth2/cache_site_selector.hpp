@@ -28,8 +28,9 @@
 #include <tuple>
 #include <functional>
 #include <vector>
-#include <nlopt.hpp>
 #include <random>
+#include <string>
+#include <nlopt.hpp>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -95,9 +96,9 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * @return The location of the best cache site, or (-1, -1) if no best cache
    * site could be found (can happen if NLopt mysteriously fails).
    */
-  rmath::vector2d calc_best(const ds::dp_cache_map& known_caches,
-                            const ds::dp_block_map& known_blocks,
-                            rmath::vector2d position);
+  rmath::vector2d operator()(const ds::dp_cache_map& known_caches,
+                             const ds::dp_block_map& known_blocks,
+                             rmath::vector2d position);
 
  private:
   /*
@@ -155,11 +156,13 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
                    const ds::dp_cache_map& known_caches,
                    const ds::dp_block_map& known_blocks) const;
 
+  std::string nlopt_ret_str(nlopt::result res) const;
+
   /* clang-format off */
   const controller::cache_sel_matrix* const              mc_matrix;
-  nlopt::opt     m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
+  nlopt::opt     m_alg{nlopt::algorithm::GN_ISRES, 2};
   constraint_set                                         m_constraints{};
-  std::default_random_engine                             m_reng{};
+  std::default_random_engine                             m_reng;
   /* clang-format on */
 };
 

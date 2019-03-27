@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TV_TV_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TV_TV_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_TV_MANAGER_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_TV_MANAGER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -279,4 +279,4 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
 
 NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_TV_TV_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_TV_MANAGER_HPP_ */

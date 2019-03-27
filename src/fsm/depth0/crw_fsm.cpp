@@ -177,8 +177,7 @@ void crw_fsm::init(void) {
 } /* init() */
 
 void crw_fsm::run(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {

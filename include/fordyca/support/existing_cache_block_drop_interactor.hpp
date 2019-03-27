@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
@@ -134,9 +135,8 @@ class existing_cache_block_drop_interactor
       ER_WARN("%s cannot drop in cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
-      events::cache_vanished vanished(p.id());
-
-      controller.visitor::template visitable_any<T>::accept(vanished);
+      events::cache_vanished_visitor vanished_op(p.id());
+      vanished_op.visit(controller);
     } else {
       perform_cache_block_drop(controller, p);
     }
@@ -158,14 +158,14 @@ class existing_cache_block_drop_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cache_block_drop drop_op(controller.block(),
-                                     *it,
-                                     m_map->grid_resolution());
+    events::cache_block_drop_visitor drop_op(controller.block(),
+                                             *it,
+                                             m_map->grid_resolution());
     (*it)->penalty_served(penalty.penalty());
 
     /* Update arena map state due to a cache drop */
-    m_map->accept(drop_op);
-    controller.visitor::template visitable_any<T>::accept(drop_op);
+    drop_op.visit(*m_map);
+    drop_op.visit(controller);
   }
 
   /* clang-format off */

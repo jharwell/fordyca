@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_pickup_event.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -43,30 +42,36 @@ class grp_mdpo_controller;
 namespace fsm {
 class block_to_goal_fsm;
 } // namespace fsm
-namespace tasks { namespace depth2 {
+namespace tasks {
+class base_foraging_task;
+namespace depth2 {
 class cache_finisher;
-}} // namespace tasks::depth2
+}
+} // namespace tasks
 
 namespace visitor = rcppsw::patterns::visitor;
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+struct cache_proximity_visit_set {
+  using value =
+      visitor::precise_visit_set<controller::depth2::grp_dpo_controller,
+                                 controller::depth2::grp_mdpo_controller,
+                                 tasks::depth2::cache_finisher,
+                                 fsm::block_to_goal_fsm>;
+};
+
 /*
  * @class cache_proximity
- * @ingroup events
+ * @ingroup events detail
  *
  * @brief Created whenever a robot is attempting to start a new cache, but an
  * existing cache unknown to the robot is too close.
  */
-class cache_proximity
-    : public rcppsw::er::client<cache_proximity>,
-      public visitor::visit_set<controller::depth2::grp_dpo_controller,
-                                controller::depth2::grp_mdpo_controller,
-                                tasks::depth2::cache_finisher,
-                                fsm::block_to_goal_fsm> {
+class cache_proximity : public rcppsw::er::client<cache_proximity> {
  public:
   explicit cache_proximity(std::shared_ptr<repr::base_cache> cache);
   ~cache_proximity(void) override = default;
@@ -75,15 +80,32 @@ class cache_proximity
   cache_proximity& operator=(const cache_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& c) override;
-  void visit(controller::depth2::grp_mdpo_controller& c) override;
-  void visit(tasks::depth2::cache_finisher& task) override;
-  void visit(fsm::block_to_goal_fsm& fsm) override;
+  void visit(controller::depth2::grp_dpo_controller& c);
+  void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(tasks::depth2::cache_finisher& task);
+  void visit(fsm::block_to_goal_fsm& fsm);
 
  private:
   /* clang-format off */
+  void dispatch_cache_finisher(tasks::base_foraging_task* task);
   std::shared_ptr<repr::base_cache> m_cache;
   /* clang-format on */
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cache_proximity_visitor_impl =
+    visitor::precise_visitor<detail::cache_proximity,
+                             detail::cache_proximity_visit_set::value>;
+
+NS_END(detail);
+
+class cache_proximity_visitor : public detail::cache_proximity_visitor_impl {
+  using detail::cache_proximity_visitor_impl::cache_proximity_visitor_impl;
 };
 
 NS_END(events, fordyca);

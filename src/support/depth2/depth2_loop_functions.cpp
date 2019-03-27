@@ -39,16 +39,16 @@
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
+#include "fordyca/support/controller_task_extractor.hpp"
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/depth2/robot_arena_interactor.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "fordyca/support/controller_task_extractor.hpp"
 
-#include "rcppsw/task_allocation/bi_tdgraph.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 #include "rcppsw/ds/type_map.hpp"
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph.hpp"
+#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,12 +70,13 @@ struct controller_task_extractor_mapper : public boost::static_visitor<int> {
   controller_task_extractor_mapper(const controller::base_controller* const c)
       : mc_controller(c) {}
 
-  template<typename T>
+  template <typename T>
   int operator()(const controller_task_extractor<T>& extractor) const {
-    return extractor(dynamic_cast<const typename controller_task_extractor<T>::controller_type*>(
-        mc_controller));
+    return extractor(
+        dynamic_cast<const typename controller_task_extractor<T>::controller_type*>(
+            mc_controller));
   }
-  const controller::base_controller * const mc_controller;
+  const controller::base_controller* const mc_controller;
 };
 
 /*******************************************************************************
@@ -112,8 +113,8 @@ void depth2_loop_functions::shared_init(ticpp::Element& node) {
   params::output_params output =
       *params()->parse_results<const struct params::output_params>();
   output.metrics.arena_grid = arenap->grid;
-  m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(
-      &output.metrics, output_root());
+  m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
+                                                                 output_root());
 } /* shared_init() */
 
 void depth2_loop_functions::private_init(void) {
@@ -125,10 +126,8 @@ void depth2_loop_functions::private_init(void) {
    * Initialize convergence calculations to include task distribution (not
    * included by default).
    */
-  conv_calculator()->task_dist_init(
-      std::bind(&depth2_loop_functions::calc_robot_tasks,
-                this,
-                std::placeholders::_1));
+  conv_calculator()->task_dist_init(std::bind(
+      &depth2_loop_functions::calc_robot_tasks, this, std::placeholders::_1));
 
   /* intitialize robot interactions with environment */
   m_interactors = rcppsw::make_unique<interactor_map>();
@@ -161,8 +160,7 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
 
   /* get stats from this robot before its state changes */
   m_metrics_agg->collect_from_controller(controller);
-  controller->free_pickup_event(false);
-  controller->free_drop_event(false);
+  controller->block_manip_collator()->reset();
 
   /* send the robot its view of the world: what it sees and where it is */
   loop_utils::set_robot_pos<decltype(*controller)>(robot);
@@ -303,7 +301,7 @@ void depth2_loop_functions::PreStep() {
 
   /* handle cache removal */
   if (arena_map()->caches_removed() > 0) {
-    m_cache_manager->cache_depleted();
+    m_cache_manager->caches_depleted(arena_map()->caches_removed());
     floor()->SetChanged();
     arena_map()->caches_removed_reset();
   }
@@ -315,6 +313,7 @@ void depth2_loop_functions::PreStep() {
 
 void depth2_loop_functions::Reset(void) {
   ndc_push();
+  base_loop_functions::Reset();
   m_metrics_agg->reset_all();
   cache_creation_handle(false);
   ndc_pop();
@@ -331,12 +330,16 @@ std::vector<int> depth2_loop_functions::calc_robot_tasks(uint) const {
    * able to extract the ID of the robot's current task without using if/else
    * statements dependent on the current controller types.
    */
-  rcppsw::ds::type_map<controller_task_extractor<controller::depth2::grp_dpo_controller>,
-                       controller_task_extractor<controller::depth2::grp_mdpo_controller>> map;
-  map.emplace(typeid(controller::depth2::grp_dpo_controller),
-              controller_task_extractor<controller::depth2::grp_dpo_controller>());
-  map.emplace(typeid(controller::depth2::grp_mdpo_controller),
-              controller_task_extractor<controller::depth2::grp_mdpo_controller>());
+  rcppsw::ds::type_map<
+      controller_task_extractor<controller::depth2::grp_dpo_controller>,
+      controller_task_extractor<controller::depth2::grp_mdpo_controller>>
+      map;
+  map.emplace(
+      typeid(controller::depth2::grp_dpo_controller),
+      controller_task_extractor<controller::depth2::grp_dpo_controller>());
+  map.emplace(
+      typeid(controller::depth2::grp_mdpo_controller),
+      controller_task_extractor<controller::depth2::grp_mdpo_controller>());
 
   for (auto& entity_pair : robots) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -364,6 +367,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
                               arena_map()->blocks());
   if (ret.status) {
     arena_map()->caches_add(ret.caches);
+    m_cache_manager->caches_created(ret.caches.size());
     floor()->SetChanged();
   }
   return ret.status;

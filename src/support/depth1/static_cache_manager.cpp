@@ -45,7 +45,8 @@ static_cache_manager::static_cache_manager(
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_manager"),
       mc_cache_params(*params),
-      mc_cache_loc(cache_loc) {}
+      mc_cache_loc(cache_loc),
+      m_reng(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
 /*******************************************************************************
  * Member Functions
@@ -171,13 +172,13 @@ base_cache_manager::creation_res_t static_cache_manager::create(
       if (!c->contains_block(b) &&
           c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
-        events::cell_empty empty(b->discrete_loc());
-        arena_grid()->access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
-        events::free_block_drop op(b,
-                                   rmath::dvec2uvec(c->real_loc(),
-                                                    arena_grid()->resolution()),
-                                   arena_grid()->resolution());
-        arena_grid()->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
+        events::cell_empty_visitor empty(b->discrete_loc());
+        empty.visit(arena_grid()->access<arena_grid::kCell>(b->discrete_loc()));
+        events::free_block_drop_visitor op(
+            b,
+            rmath::dvec2uvec(c->real_loc(), arena_grid()->resolution()),
+            arena_grid()->resolution());
+        op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());
       }

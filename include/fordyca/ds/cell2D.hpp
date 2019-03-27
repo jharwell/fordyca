@@ -29,7 +29,6 @@
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +42,6 @@ class base_cell_entity;
 
 NS_START(ds);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace decorator = rcppsw::patterns::decorator;
 namespace rmath = rcppsw::math;
 
@@ -57,8 +55,7 @@ namespace rmath = rcppsw::math;
  * @brief Base repr of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref base_cell_entity the cell contains, if any.
  */
-class cell2D : public visitor::visitable_any<cell2D>,
-               public decorator::decorator<fsm::cell2D_fsm> {
+class cell2D : public decorator::decorator<fsm::cell2D_fsm> {
  public:
   cell2D(void);
 

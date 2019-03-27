@@ -132,7 +132,6 @@ class powerlaw_distributor : public base_distributor,
   double                                         m_arena_resolution{0.0};
   uint                                           m_n_clusters{0};
   std::map<uint, std::list<cluster_distributor>> m_dist_map{};
-  std::default_random_engine                     m_rng {std::random_device {}()};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;
   /* clang-format on */
 };

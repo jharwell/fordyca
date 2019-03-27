@@ -132,57 +132,59 @@ void tasking_initializer::depth2_exec_est_init(
   auto cache_finisher = map.find("cache_finisher")->second;
   auto cache_transferer = map.find("cache_transferer")->second;
   auto cache_collector = map.find("cache_collector")->second;
-  if (task_params->exec_est.seed_enabled) {
-    /*
-     * As part of seeding exec estimates, we set the last executed subtask for a
-     * TAB. It's OK to declare/use here as local variables as this code only
-     * runs during initialization.
-     *
-     * Collector, harvester not partitionable in depth 1 initialization, so they
-     * have only been initialized as atomic tasks.
-     */
-    std::default_random_engine eng;
-    std::uniform_int_distribution<> dist(0, 1);
-    if (0 == dist(eng)) {
-      graph()
-          ->tab_child(graph()->root_tab(), graph()->root_tab()->child1())
-          ->last_subtask(cache_starter);
-      graph()
-          ->tab_child(graph()->root_tab(), graph()->root_tab()->child2())
-          ->last_subtask(cache_transferer);
-    } else {
-      graph()
-          ->tab_child(graph()->root_tab(), graph()->root_tab()->child1())
-          ->last_subtask(cache_finisher);
-      graph()
-          ->tab_child(graph()->root_tab(), graph()->root_tab()->child2())
-          ->last_subtask(cache_collector);
-    }
-    rmath::rangeu cs_bounds =
-        task_params->exec_est.ranges.find("cache_starter")->second;
-    rmath::rangeu cf_bounds =
-        task_params->exec_est.ranges.find("cache_finisher")->second;
-    rmath::rangeu ct_bounds =
-        task_params->exec_est.ranges.find("cache_transferer")->second;
-    rmath::rangeu cc_bounds =
-        task_params->exec_est.ranges.find("cache_collector")->second;
-
-    ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
-            cache_starter->name().c_str(),
-            cs_bounds.to_str().c_str(),
-            cache_finisher->name().c_str(),
-            cf_bounds.to_str().c_str());
-    cache_starter->exec_estimate_init(cs_bounds);
-    cache_finisher->exec_estimate_init(cf_bounds);
-
-    ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
-            cache_transferer->name().c_str(),
-            ct_bounds.to_str().c_str(),
-            cache_collector->name().c_str(),
-            cc_bounds.to_str().c_str());
-    cache_transferer->exec_estimate_init(ct_bounds);
-    cache_collector->exec_estimate_init(cc_bounds);
+  if (!task_params->exec_est.seed_enabled) {
+    return;
   }
+  /*
+   * As part of seeding exec estimates, we set the last executed subtask for a
+   * TAB. It's OK to declare/use here as local variables as this code only
+   * runs during initialization.
+   *
+   * Collector, harvester not partitionable in depth 1 initialization, so they
+   * have only been initialized as atomic tasks.
+   */
+  std::default_random_engine eng(
+      std::chrono::system_clock::now().time_since_epoch().count());
+  std::uniform_int_distribution<> dist(0, 1);
+  if (0 == dist(eng)) {
+    graph()
+        ->tab_child(graph()->root_tab(), graph()->root_tab()->child1())
+        ->last_subtask(cache_starter);
+    graph()
+        ->tab_child(graph()->root_tab(), graph()->root_tab()->child2())
+        ->last_subtask(cache_transferer);
+  } else {
+    graph()
+        ->tab_child(graph()->root_tab(), graph()->root_tab()->child1())
+        ->last_subtask(cache_finisher);
+    graph()
+        ->tab_child(graph()->root_tab(), graph()->root_tab()->child2())
+        ->last_subtask(cache_collector);
+  }
+  rmath::rangeu cs_bounds =
+      task_params->exec_est.ranges.find("cache_starter")->second;
+  rmath::rangeu cf_bounds =
+      task_params->exec_est.ranges.find("cache_finisher")->second;
+  rmath::rangeu ct_bounds =
+      task_params->exec_est.ranges.find("cache_transferer")->second;
+  rmath::rangeu cc_bounds =
+      task_params->exec_est.ranges.find("cache_collector")->second;
+
+  ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
+          cache_starter->name().c_str(),
+          cs_bounds.to_str().c_str(),
+          cache_finisher->name().c_str(),
+          cf_bounds.to_str().c_str());
+  cache_starter->exec_estimate_init(cs_bounds);
+  cache_finisher->exec_estimate_init(cf_bounds);
+
+  ER_INFO("Seeding exec estimate for tasks: '%s'=%s, '%s'=%s",
+          cache_transferer->name().c_str(),
+          ct_bounds.to_str().c_str(),
+          cache_collector->name().c_str(),
+          cc_bounds.to_str().c_str());
+  cache_transferer->exec_estimate_init(ct_bounds);
+  cache_collector->exec_estimate_init(cc_bounds);
 } /* depth2_exec_est_init() */
 
 std::unique_ptr<ta::bi_tdgraph_executive> tasking_initializer::operator()(

@@ -1,5 +1,5 @@
 /**
- * @file depth0_controller.hpp
+ * @file block_manip_collator.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,54 +18,66 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH0_DEPTH0_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH0_DEPTH0_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_BLOCK_MANIP_COLLATOR_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_BLOCK_MANIP_COLLATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth0);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class depth0_controller : public base_controller,
-                          public metrics::blocks::manipulation_metrics,
-                          public fsm::block_transporter {
+/**
+ * @class block_manip_collator
+ * @ingroup controller
+ *
+ * @brief Collates block manipulation metrics.
+ */
+class block_manip_collator : public metrics::blocks::manipulation_metrics {
  public:
-  depth0_controller(void) = default;
-  ~depth0_controller(void) override = default;
+  block_manip_collator(void) = default;
+  ~block_manip_collator(void) override = default;
 
   /* block manipulation metrics */
   bool free_pickup_event(void) const override { return m_free_pickup_event; }
   bool free_drop_event(void) const override { return m_free_drop_event; }
-  bool cache_pickup_event(void) const override { return false; }
-  bool cache_drop_event(void) const override { return false; }
-
-  /* block manipulation metrics */
+  bool cache_pickup_event(void) const override { return m_cache_pickup_event; }
+  bool cache_drop_event(void) const override { return m_cache_drop_event; }
   uint penalty_served(void) const override { return m_penalty; }
 
+  void penalty_served(uint penalty) { m_penalty = penalty; }
   void free_pickup_event(bool b) { m_free_pickup_event = b; }
   void free_drop_event(bool b) { m_free_drop_event = b; }
-  void penalty_served(uint penalty) { m_penalty = penalty; }
+  void cache_pickup_event(bool b) { m_cache_pickup_event = b; }
+  void cache_drop_event(bool b) { m_cache_drop_event = b; }
+
+  void reset(void) {
+    m_free_pickup_event = false;
+    m_free_drop_event = false;
+    m_cache_pickup_event = false;
+    m_cache_drop_event = false;
+  }
 
  private:
   /* clang-format off */
   uint m_penalty{false};
   bool m_free_pickup_event{false};
   bool m_free_drop_event{false};
+  bool m_cache_pickup_event{false};
+  bool m_cache_drop_event{false};
   /* clang-format on */
 };
 
-NS_END(depth0, controller, fordyca);
+NS_END(controller, fordyca);
 
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH0_DEPTH0_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_BLOCK_MANIP_COLLATOR_HPP_ */

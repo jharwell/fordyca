@@ -38,7 +38,6 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +56,6 @@ class base_loop_functions;
 NS_START(ds);
 
 class cell2D;
-namespace visitor = rcppsw::patterns::visitor;
 namespace decorator = rcppsw::patterns::decorator;
 namespace er = rcppsw::er;
 namespace rmath = rcppsw::math;
@@ -77,7 +75,6 @@ namespace rmath = rcppsw::math;
  */
 class arena_map : public er::client<arena_map>,
                   public metrics::robot_occupancy_metrics,
-                  public visitor::visitable_any<arena_map>,
                   public decorator::decorator<arena_grid> {
  public:
   explicit arena_map(const struct params::arena::arena_map_params* params);
@@ -241,7 +238,7 @@ class arena_map : public er::client<arena_map>,
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
   }
-  support::block_dist::redist_governor* redist_governor(void)  {
+  support::block_dist::redist_governor* redist_governor(void) {
     return &m_redist_governor;
   }
 
