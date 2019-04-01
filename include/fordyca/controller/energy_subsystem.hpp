@@ -57,7 +57,7 @@
                           public metrics::energy::energy_opt_metrics {
   public:
     energy_subsystem(const params::energy_params* params, controller::saa_subsystem* saa);
-    virtual ~energy_subsystem(void) = default;
+    ~energy_subsystem(void) override;
 
     void run_fsm(void) {  e_fsm.run(); }
 
@@ -82,11 +82,20 @@
     fsm::ee_max_fsm& fsm(void) { return e_fsm; }
 
     /* Metrics */
-    double energy_level(void) const override { return m_sensing->battery().readings().available_charge;}
+    double energy_level(void) const override {
+      if (m_sensing->battery().readings().available_charge > 1) {
+        ER_ASSERT(m_sensing->battery().readings().available_charge, "ERROR TOO MUCH ENERGY LEVEL?")
+      }
+      return m_sensing->battery().readings().available_charge;
+
+    }
     double E_consumed(void) const override {
       if(deltaE < 0) {
         return (1.0 - energy_level());
       } else {
+        if(deltaE > 1000) {
+          ER_ASSERT(deltaE, "ERROR USED TOO MUCH ENERGY?")
+        }
         return deltaE;
       }
     }

@@ -70,7 +70,10 @@ energy_subsystem::energy_subsystem(
       Pf(0),
       is_new_liu(true),
       Ts(20000),
-      e_fsm(mc_matrix, saa) {}
+      e_fsm(mc_matrix, saa),
+      deltaE(0) {}
+
+energy_subsystem::~energy_subsystem(void) = default;
 
 
 /*******************************************************************************

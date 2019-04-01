@@ -116,6 +116,7 @@ void depth0_metrics_aggregator::collect_from_controller(
 void depth0_metrics_aggregator::collect_from_block(
     const representation::base_block* const block) {
     base_metrics_aggregator::collect_from_block(block);
+    collect("energy::efficiency", *block);
     //collectBlock("energy::efficiency", *block);
 
 }

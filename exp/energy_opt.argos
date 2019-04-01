@@ -42,9 +42,9 @@
               weight2C="0.1"
               weight3C="0.005"
               EEE="Null-informed"
-              activated="true"
+              activated="false"
               labella="false"
-              liu="true">
+              liu="false">
       </energy>
       <output>
         <sim output_root="output"
@@ -319,7 +319,7 @@
   <distribute>
     <position method="uniform" min="1,1,0" max="10,5,0" />
     <orientation method="uniform" min="0,0,0" max="360,0,0" />
-    <entity quantity="32" max_trials="1000">
+    <entity quantity="4" max_trials="1000">
       <foot-bot id="fb">
         <controller config="ffc" />
         <battery model= "time_motion"/>

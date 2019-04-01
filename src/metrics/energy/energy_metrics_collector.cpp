@@ -33,7 +33,9 @@
   ******************************************************************************/
  energy_metrics_collector::energy_metrics_collector(const std::string& ofname,
                                                     uint interval)
-     : base_metrics_collector(ofname, interval) {}
+     : base_metrics_collector(ofname, interval),
+       collectedAll(false),
+       collectedAllendCycle(false) {}
 
  /*******************************************************************************
   * Member Functions
@@ -47,6 +49,7 @@
         "avg_deltaE" + separator() +
         "cum_deltaE" + separator() +
         "avg_E" + separator() +
+        "cum_resources" + separator() +
         "efficiency" + separator();
     // clang-format on
   } /* csv_header_build() */
@@ -68,29 +71,39 @@
       line += std::to_string(m_stats.cum_deltaE /
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
-      line += std::to_string(m_stats.cum_deltaE) +
+      line += std::to_string(m_stats.cum_deltaE/1000) +
               separator();
       line += std::to_string((m_stats.cum_energy + m_stats.cum_deltaE)/
                              static_cast<double>(m_stats.cum_robots)) +
               separator();
-      line += std::to_string(static_cast<double>(m_stats.cum_resources)/
-                            ((m_stats.cum_energy)/
-                             (static_cast<double>(m_stats.cum_robots)) +
-                             m_stats.cum_deltaE)) +
+      line += std::to_string(static_cast<double>(m_stats.cum_resources)) +
               separator();
+      line += std::to_string(static_cast<double>(m_stats.cum_resources)
+                              / ((m_stats.cum_energy + m_stats.cum_deltaE)/
+                              static_cast<double>(m_stats.cum_resources)));
     } else {
       line += "0" + separator() + "0" + separator() + "0" + separator() +
-              "0" + separator() + "0" + separator();
+              "0" + separator() + "0" + separator() + "0" + separator();
     }
     return true;
   } /* csv_line_build() */
 
   void energy_metrics_collector::collect(
       const rcppsw::metrics::base_metrics& metrics) {
-    auto& m = dynamic_cast<const energy_opt_metrics&>(metrics);
-    ++m_stats.cum_robots;
-    m_stats.cum_energy += m.energy_level();
-    m_stats.cum_deltaE += m.E_consumed();
+    const rcppsw::metrics::base_metrics* mptr = &metrics;
+    if (dynamic_cast<const energy_opt_metrics*>(mptr) != nullptr) {
+      auto& m = dynamic_cast<const energy_opt_metrics&>(metrics);
+      if(!collectedAllendCycle) {
+        ++m_stats.cum_robots;
+        m_stats.cum_energy += m.energy_level();
+        m_stats.cum_deltaE += m.E_consumed();
+      }
+    } else {
+      m_stats.cum_resources += 1;
+      if (m_stats.cum_resources == 125) {
+        collectedAll = true;
+      }
+    }
 
   } /* collect() */
 
@@ -102,7 +115,10 @@
   } /* collect() */
 
   void energy_metrics_collector::reset_after_interval(void) {
-    m_stats = {0, 0, 0, 0};
+    if(!collectedAll)
+      m_stats = {0, 0, m_stats.cum_deltaE, m_stats.cum_resources};
+    else
+      collectedAllendCycle = true;
   } /* reset_after_interval() */
 
   NS_END(energy, metrics, fordyca);

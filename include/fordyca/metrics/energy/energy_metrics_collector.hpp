@@ -83,6 +83,8 @@ class energy_metrics_collector : public rcppsw::metrics::base_metrics_collector 
 
   std::string csv_header_build(const std::string& header) override;
   bool csv_line_build(std::string& line) override;
+  bool collectedAll;
+  bool collectedAllendCycle;
 
   struct stats m_stats;
 };
