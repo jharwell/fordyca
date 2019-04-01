@@ -28,6 +28,7 @@
 
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/block_proximity.hpp"
+#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -117,6 +118,13 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
       ER_ASSERT(-1 != prox_status.entity_id,
                 "No block too close with BlockProximity return status");
       block_proximity_notify(controller, prox_status);
+    } else if (penalty_status::kStatusCacheProximity == status) {
+      auto prox_status = loop_utils::new_cache_cache_proximity(controller,
+                                                               *m_map,
+                                                               m_cache_manager->cache_proximity_dist());
+      ER_ASSERT(-1 != prox_status.entity_id,
+                "No cache too close with CacheProximity return status");
+      cache_proximity_notify(controller, prox_status);
     }
   }
 
@@ -125,14 +133,36 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
 
   void block_proximity_notify(T& controller,
                               const loop_utils::proximity_status_t& status) {
-    ER_WARN("%s cannot drop block in cache site %s: Block%d too close (%f <= %f)",
+    ER_WARN("%s@%s cannot drop block in cache site: Block%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position().to_str().c_str(),
             status.entity_id,
+            status.entity_loc.to_str().c_str(),
             status.distance.length(),
             m_cache_manager->block_proximity_dist());
-    events::block_proximity_visitor prox_op(
-        m_map->blocks()[status.entity_id]->clone());
+    events::block_proximity_visitor prox_op(m_map->blocks()[status.entity_id]);
+    prox_op.visit(controller);
+  }
+
+  void cache_proximity_notify(T& controller,
+                              const loop_utils::proximity_status_t& status) {
+    ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
+            controller.GetId().c_str(),
+            controller.position().to_str().c_str(),
+            status.entity_id,
+            status.entity_loc.to_str().c_str(),
+            status.distance.length(),
+            m_cache_manager->cache_proximity_dist());
+    /*
+     * Because caches can be dynamically created/destroyed, we cannot rely on
+     * the index position of cache i to be the same as its ID, so we need to
+     * search for the correct cache.
+     */
+    auto it =
+        std::find_if(m_map->caches().begin(),
+                     m_map->caches().end(),
+                     [&](const auto& c) { return c->id() == status.entity_id; });
+    events::cache_proximity_visitor prox_op(*it);
     prox_op.visit(controller);
   }
 

@@ -56,6 +56,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 struct proximity_status_t {
   int entity_id;
+  rmath::vector2d entity_loc;
   rmath::vector2d distance;
 };
 

@@ -121,10 +121,11 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
 
   void cache_proximity_notify(T& controller,
                               const loop_utils::proximity_status_t& status) {
-    ER_WARN("%s cannot drop block in new cache@%s: Cache%d too close (%f <= %f)",
+    ER_WARN("%s@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position().to_str().c_str(),
             status.entity_id,
+            status.entity_loc.to_str().c_str(),
             status.distance.length(),
             m_cache_manager->cache_proximity_dist());
     /*

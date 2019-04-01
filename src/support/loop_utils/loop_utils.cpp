@@ -98,10 +98,10 @@ proximity_status_t cache_site_block_proximity(const controller::base_controller&
                                               double block_prox_dist) {
   for (const auto& b : map.blocks()) {
     if ((b->real_loc() - c.position()).length() <= block_prox_dist) {
-      return {b->id(), b->real_loc() - c.position()};
+      return {b->id(), b->real_loc(), b->real_loc() - c.position()};
     }
   } /* for(&b..) */
-  return {-1, rmath::vector2d()};
+  return {-1, rmath::vector2d(), rmath::vector2d()};
 } /* cache_site_block_proximity() */
 
 proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,
@@ -109,10 +109,10 @@ proximity_status_t new_cache_cache_proximity(const controller::base_controller& 
                                              double proximity_dist) {
   for (const auto& cache : map.caches()) {
     if ((cache->real_loc() - c.position()).length() <= proximity_dist) {
-      return {cache->id(), cache->real_loc() - c.position()};
+      return {cache->id(), cache->real_loc(), cache->real_loc() - c.position()};
     }
   } /* for(&b..) */
-  return {-1, rmath::vector2d()};
+  return {-1, rmath::vector2d(), rmath::vector2d()};
 } /* new_cache_cache_proximity() */
 
 placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,

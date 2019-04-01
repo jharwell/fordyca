@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/events/block_proximity.hpp"
+#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
@@ -131,6 +132,9 @@ void cache_starter::accept(events::detail::block_vanished& visitor) {
   visitor.visit(*this);
 }
 void cache_starter::accept(events::detail::block_proximity& visitor) {
+  visitor.visit(*this);
+}
+void cache_starter::accept(events::detail::cache_proximity& visitor) {
   visitor.visit(*this);
 }
 

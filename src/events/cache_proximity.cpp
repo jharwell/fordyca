@@ -33,6 +33,7 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/repr/base_cache.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/tasks/depth2/cache_starter.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,14 +49,14 @@ cache_proximity::cache_proximity(std::shared_ptr<repr::base_cache> cache)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_proximity::dispatch_cache_finisher(
+void cache_proximity::dispatch_cache_interactor(
     tasks::base_foraging_task* const task) {
-  auto* finisher = dynamic_cast<tasks::depth2::cache_finisher*>(task);
-  ER_ASSERT(nullptr != finisher,
-            "Non cache finisher task '%s' received cache proximity event",
+  auto* interactor = dynamic_cast<events::dynamic_cache_interactor*>(task);
+  ER_ASSERT(nullptr != interactor,
+            "Non dynamic cache interactor task '%s' received cache proximity event",
             dynamic_cast<ta::logical_task*>(task)->name().c_str());
-  finisher->accept(*this);
-} /* dispatch_cache_finisher() */
+  interactor->accept(*this);
+} /* dispatch_cache_interactor() */
 
 /*******************************************************************************
  * Depth2 Foraging
@@ -68,7 +69,7 @@ void cache_proximity::visit(controller::depth2::grp_dpo_controller& c) {
   events::cache_found_visitor found(m_cache);
   found.visit(*c.dpo_perception()->dpo_store());
 
-  dispatch_cache_finisher(c.current_task());
+  dispatch_cache_interactor(c.current_task());
 
   c.ndc_pop();
 } /* visit() */
@@ -81,12 +82,16 @@ void cache_proximity::visit(controller::depth2::grp_mdpo_controller& c) {
   events::cache_found_visitor found(m_cache);
   found.visit(*c.mdpo_perception()->map());
 
-  dispatch_cache_finisher(c.current_task());
+  dispatch_cache_interactor(c.current_task());
 
   c.ndc_pop();
 } /* visit() */
 
 void cache_proximity::visit(tasks::depth2::cache_finisher& task) {
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
+} /* visit() */
+
+void cache_proximity::visit(tasks::depth2::cache_starter& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 

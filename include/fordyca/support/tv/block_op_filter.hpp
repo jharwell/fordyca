@@ -107,13 +107,14 @@ class block_op_filter : public er::client<block_op_filter<T>> {
       case kSrcNestDrop:
         return nest_drop_filter(controller);
       case kSrcCacheSiteDrop:
-        return cache_site_drop_filter(controller, block_prox_dist);
+        return cache_site_drop_filter(controller,
+                                      block_prox_dist,
+                                      cache_prox_dist);
       case kSrcNewCacheDrop:
         return new_cache_drop_filter(controller, cache_prox_dist);
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
     } /* switch() */
-    ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
     return filter_res_t{};
   }
 
@@ -153,14 +154,15 @@ class block_op_filter : public er::client<block_op_filter<T>> {
 
   /**
    * @brief Filter out spurious penalty initializations for cache site drop
-   * (i.e. controller not ready/not intending to drop a block), or another block
-   * is too close.
+   * (i.e. controller not ready/not intending to drop a block), or another
+   * block/cache is too close.
    *
    * @return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
   filter_res_t cache_site_drop_filter(const T& controller,
-                                      double block_prox_dist) const {
+                                      double block_prox_dist,
+                                      double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
           acquisition_goal_type::kCacheSite == controller.acquisition_goal() &&
           transport_goal_type::kCacheSite == controller.block_transport_goal())) {
@@ -172,6 +174,13 @@ class block_op_filter : public er::client<block_op_filter<T>> {
                        .entity_id;
     if (-1 != block_id) {
       return filter_res_t{true, kStatusBlockProximity};
+    }
+    int cache_id = loop_utils::new_cache_cache_proximity(controller,
+                                                         *m_map,
+                                                         cache_prox_dist)
+                   .entity_id;
+    if (-1 != cache_id) {
+      return filter_res_t{true, kStatusCacheProximity};
     }
     return filter_res_t{false, kStatusOK};
   }

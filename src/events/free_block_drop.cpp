@@ -95,9 +95,9 @@ bool free_block_drop::dispatch_free_block_interactor(
  * Depth0
  ******************************************************************************/
 void free_block_drop::visit(ds::cell2D& cell) {
-  cell.entity(m_block);
   visit(*m_block);
   visit(cell.fsm());
+  cell.entity(m_block);
 } /* visit() */
 
 void free_block_drop::visit(fsm::cell2D_fsm& fsm) {

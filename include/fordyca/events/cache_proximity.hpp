@@ -46,6 +46,7 @@ namespace tasks {
 class base_foraging_task;
 namespace depth2 {
 class cache_finisher;
+class cache_starter;
 }
 } // namespace tasks
 
@@ -61,6 +62,7 @@ struct cache_proximity_visit_set {
       visitor::precise_visit_set<controller::depth2::grp_dpo_controller,
                                  controller::depth2::grp_mdpo_controller,
                                  tasks::depth2::cache_finisher,
+                                 tasks::depth2::cache_starter,
                                  fsm::block_to_goal_fsm>;
 };
 
@@ -83,11 +85,12 @@ class cache_proximity : public rcppsw::er::client<cache_proximity> {
   void visit(controller::depth2::grp_dpo_controller& c);
   void visit(controller::depth2::grp_mdpo_controller& c);
   void visit(tasks::depth2::cache_finisher& task);
+  void visit(tasks::depth2::cache_starter& task);
   void visit(fsm::block_to_goal_fsm& fsm);
 
  private:
   /* clang-format off */
-  void dispatch_cache_finisher(tasks::base_foraging_task* task);
+  void dispatch_cache_interactor(tasks::base_foraging_task* task);
   std::shared_ptr<repr::base_cache> m_cache;
   /* clang-format on */
 };

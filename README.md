@@ -83,9 +83,10 @@ After successful compilation, follow these steps to run a foraging scenario:
 
 # Running on MSI
 
-Head over to [sierra](https://github.com/swarm-robotics-sierra.git), and follow
-the MSI setup instructions over there. Don't try to run on MSI without it. Just
-don't.
+Head over to
+[sierra](https://github.com/swarm-robotics/sierra/tree/devel/docs/README.md),
+and follow the MSI setup instructions over there. Don't try to run on MSI
+without it. Just don't.
 
 # Troubleshooting
 

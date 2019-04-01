@@ -48,8 +48,8 @@ namespace visitor = rcppsw::patterns::visitor;
  * interact with dynamic caches in FORDYCA.
  */
 class dynamic_cache_interactor
-    : public visitor::polymorphic_accept_set<detail::block_proximity>,
-      public visitor::polymorphic_accept_set<detail::cache_proximity> {};
+    : public visitor::polymorphic_accept_set<detail::block_proximity,
+                                             detail::cache_proximity> {};
 
 NS_END(events, fordyca);
 
