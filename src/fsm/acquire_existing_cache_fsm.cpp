@@ -22,8 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
-#include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/existing_cache_selector.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/fsm/cache_acquisition_validator.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
@@ -31,6 +32,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
+using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -51,7 +53,11 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                     this,
                     std::placeholders::_1),
           std::bind(&acquire_existing_cache_fsm::cache_exploration_term_cb,
-                    this)),
+                    this),
+          std::bind(&acquire_existing_cache_fsm::cache_acquisition_valid,
+                    this,
+                    std::placeholders::_1,
+                    std::placeholders::_2)),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
       mc_store(store),
@@ -60,24 +66,26 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool acquire_existing_cache_fsm::calc_acquisition_location(
-    rmath::vector2d* const loc) {
-  controller::depth1::existing_cache_selector selector(mc_is_pickup, mc_matrix);
-  auto best = selector.calc_best(mc_store->caches(),
-                                 saa_subsystem()->sensing()->position());
+boost::optional<acquire_existing_cache_fsm::acquisition_loc_type> acquire_existing_cache_fsm::calc_acquisition_location(void) {
+  controller::existing_cache_selector selector(mc_is_pickup,
+                                               mc_matrix,
+                                               &mc_store->caches());
+  auto best = selector(mc_store->caches(),
+                       saa_subsystem()->sensing()->position(),
+                       saa_subsystem()->sensing()->tick());
   /*
    * If this happens, all the caches we know of are too close for us to vector
    * to, or otherwise unsuitable.
    */
   if (nullptr == best.ent()) {
-    return false;
+    return boost::optional<acquisition_loc_type>();
   }
+
   ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
           best.ent()->id(),
           best.ent()->real_loc().to_str().c_str(),
           best.ent()->discrete_loc().to_str().c_str(),
           best.density().last_result());
-
   /*
    * Now that we have the location of the best cache, we need to pick a random
    * point inside it to vector to. This helps a LOT with maximimizing caches'
@@ -90,29 +98,28 @@ bool acquire_existing_cache_fsm::calc_acquisition_location(
   std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
   std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
 
-  *loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
+  rmath::vector2d loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
   ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
-          loc->to_str().c_str(),
+          loc.to_str().c_str(),
           best.ent()->id(),
           xrange.to_str().c_str(),
           yrange.to_str().c_str());
-  return true;
+  return boost::make_optional(std::make_pair(best.ent()->id(), loc));
 } /* calc_acquisition_location() */
 
 bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
   return saa_subsystem()->sensing()->cache_detected();
 } /* cache_exploration_term_cb() */
 
-acquire_goal_fsm::candidate_type acquire_existing_cache_fsm::existing_cache_select(
+boost::optional<acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::existing_cache_select(
     void) {
-  rmath::vector2d loc;
-  if (!calc_acquisition_location(&loc)) {
-    return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
-  } else {
-    return acquire_goal_fsm::candidate_type(true,
-                                            loc,
-                                            vector_fsm::kCACHE_ARRIVAL_TOL);
+  if (auto selection = calc_acquisition_location()) {
+    return boost::make_optional(
+        acquire_goal_fsm::candidate_type(selection.get().second,
+                                         vector_fsm::kCACHE_ARRIVAL_TOL,
+                                         selection.get().first));
   }
+  return boost::optional<acquire_goal_fsm::candidate_type>();
 } /* existing_cache_select() */
 
 __rcsw_pure bool acquire_existing_cache_fsm::candidates_exist(void) const {
@@ -121,9 +128,7 @@ __rcsw_pure bool acquire_existing_cache_fsm::candidates_exist(void) const {
 
 bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   if (explore_result) {
-    ER_ASSERT(saa_subsystem()->sensing()->cache_detected(),
-              "No cache detected after successful exploration?");
-    return true;
+    return m_by_exploration_ok;
   } else {
     if (saa_subsystem()->sensing()->cache_detected()) {
       return true;
@@ -137,5 +142,14 @@ __rcsw_const acquisition_goal_type
 acquire_existing_cache_fsm::acquisition_goal_internal(void) const {
   return acquisition_goal_type::kExistingCache;
 } /* acquisition_goal() */
+
+bool acquire_existing_cache_fsm::cache_acquisition_valid(
+    const rmath::vector2d& loc,
+    uint id) const {
+  return cache_acquisition_validator(&mc_store->caches(),
+                                     mc_matrix)(loc,
+                                                id,
+                                                saa_subsystem()->sensing()->tick());
+} /* cache_acquisition_valid() */
 
 NS_END(controller, fordyca);

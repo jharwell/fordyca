@@ -60,7 +60,7 @@
               </src_sigmoid_sel>
           </task_abort>
           <task_partition
-              always_partition="false"
+              always_partition="true"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -109,21 +109,24 @@
             </src_sigmoid_sel>
           </tab_sel>
         </task_allocation>
-        <block_selection_matrix
+        <block_sel_matrix
               nest="2.0, 3">
               <block_priorities
                   cube="1.0"
                   ramp="1.0"
                   />
-        </block_selection_matrix>
-        <cache_selection_matrix
+        </block_sel_matrix>
+        <cache_sel_matrix
             cache_prox_dist="1.6"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
             cluster_prox_dist="1.0"
             site_xrange="2:10"
-            site_yrange="2.5:3"
-            />
+            site_yrange="2.5:3">
+          <pickup_policy
+              policy="time"
+              timestep="20000"/>
+            </cache_sel_matrix>
         <sensing
             los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
@@ -251,7 +254,7 @@
       <blocks>
         <distribution
             arena_resolution="0.2"
-            dist_type="dual_source">
+            dist_type="random">
           <redist_governor
               trigger="Null"
               recurrence_policy="multi"

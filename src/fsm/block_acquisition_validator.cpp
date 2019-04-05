@@ -1,7 +1,7 @@
 /**
- * @file block_priorities_parser.cpp
+ * @file block_acquisition_validator.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,44 +21,35 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/block_priorities_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/fsm/block_acquisition_validator.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
- * Global Variables
+ * Constructors/Destructors
  ******************************************************************************/
-constexpr char block_priorities_parser::kXMLRoot[];
+block_acquisition_validator::block_acquisition_validator(
+    const ds::dp_block_map* map)
+    : ER_CLIENT_INIT("fordyca.fsm.block_acquisition_validator"),
+      mc_map(map) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_priorities_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-
-  XML_PARSE_ATTR(bnode, m_params, cube);
-  XML_PARSE_ATTR(bnode, m_params, ramp);
-} /* parse() */
-
-void block_priorities_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, cube) << std::endl
-         << XML_ATTR_STR(m_params, ramp) << std::endl
-         << build_footer();
-} /* show() */
-
-__rcsw_pure bool block_priorities_parser::validate(void) const {
-  CHECK(m_params->cube >= 1.0);
-  CHECK(m_params->ramp >= 1.0);
+bool block_acquisition_validator::operator()(const rmath::vector2d& loc,
+                                             uint id) const {
+  auto block = mc_map->find(id);
+  if (nullptr == block) {
+    ER_WARN("Acquisition of free block%d@%s invalid: no such block",
+            id,
+            loc.to_str().c_str());
+    return false;
+  }
   return true;
+} /* operator()() */
 
-error:
-  return false;
-} /* validate() */
-
-NS_END(params, fordyca);
+NS_END(fsm, fordyca);

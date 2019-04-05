@@ -1,7 +1,7 @@
 /**
- * @file block_sel_matrix_params.hpp
+ * @file block_acquisition_validator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,36 +18,47 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_BLOCK_ACQUISITION_VALIDATOR_HPP_
+#define INCLUDE_FORDYCA_FSM_BLOCK_ACQUISITION_VALIDATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/block_priority_params.hpp"
+#include "rcppsw/common/common.hpp"
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/params/base_params.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca);
+namespace ds {
+class dp_block_map;
+} /* namespace ds */
+
+NS_START(fsm);
 namespace rmath = rcppsw::math;
+using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-/**
- * @struct block_sel_matrix_params
- * @ingroup params
- *
- * @brief XML parameters for the \ref block_sel_matrix
- */
-struct block_sel_matrix_params : public rcppsw::params::base_params {
-  rmath::vector2d nest{};
-  struct block_priority_params priorities {};
+class block_acquisition_validator : public rcppsw::er::client<block_acquisition_validator> {
+ public:
+  block_acquisition_validator(const ds::dp_block_map* map);
+
+  block_acquisition_validator(const block_acquisition_validator& v) = delete;
+  block_acquisition_validator& operator=(const block_acquisition_validator& v) = delete;
+
+  bool operator()(const rmath::vector2d& loc, uint id) const;
+
+ private:
+  /* clang-format off */
+  const ds::dp_block_map* const mc_map;
+  /* clang-format on */
 };
 
-NS_END(params, fordyca);
+NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_BLOCK_ACQUISITION_VALIDATOR_HPP_ */

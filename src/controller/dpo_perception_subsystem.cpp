@@ -214,7 +214,8 @@ void dpo_perception_subsystem::processed_los_verify(
    * Verify that for each cell that contained a cache in the LOS:
    *
    * - The corresponding cache exists in the store.
-   * - The store and LOS versions of the cache have the same # of blocks
+   * - The store and LOS versions of the cache have the same # of blocks,
+   *   location, and ID.
    */
   for (auto& c1 : c_los->caches()) {
     auto exists = m_store->find(c1);
@@ -222,6 +223,17 @@ void dpo_perception_subsystem::processed_los_verify(
               "LOS Cache%d@%s does not exist in DPO store",
               c1->id(),
               c1->discrete_loc().to_str().c_str());
+    ER_ASSERT(c1->discrete_loc() == exists->ent()->discrete_loc(),
+              "LOS/DPO store disagree on cache%d location: %s/%s",
+              c1->id(),
+              c1->discrete_loc().to_str().c_str(),
+              exists->ent()->discrete_loc().to_str().c_str());
+    ER_ASSERT(c1->id() == exists->ent()->id(),
+              "DPO store contains cache%d@%s/LOS cache%d@%s",
+              c1->id(),
+              c1->discrete_loc().to_str().c_str(),
+              exists->ent()->id(),
+              exists->ent()->discrete_loc().to_str().c_str());
     ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
               "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
               c1->id(),

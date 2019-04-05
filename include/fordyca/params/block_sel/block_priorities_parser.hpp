@@ -1,5 +1,5 @@
 /**
- * @file cache_sel_matrix_parser.hpp
+ * @file block_priorities_parser.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,50 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_PRIORITIES_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_PRIORITIES_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/cache_sel_matrix_params.hpp"
+#include "fordyca/params/block_sel/block_priority_params.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, block_sel);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_sel_matrix_parser
- * @ingroup params
+ * @class block_priorities_parser
+ * @ingroup params block_sel
  *
- * @brief Parses XML parameters for the \ref cache_sel_matrix at the start
- * of simulation.
+ * @brief Parses XML parameters related to block priorties into \ref
+ * block_priority_params.
  */
-class cache_sel_matrix_parser : public rcppsw::params::xml_param_parser {
+class block_priorities_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit cache_sel_matrix_parser(uint level) : xml_param_parser(level) {}
+  explicit block_priorities_parser(uint level) : xml_param_parser(level) {}
 
   /**
-   * @brief The root tag that all cache sel matrix parameters should lie
-   * under in the XML tree.
+   * @brief The root tag that all block parameters should lie under in the
+   * XML tree.
    */
-  static constexpr char kXMLRoot[] = "cache_selection_matrix";
+  static constexpr char kXMLRoot[] = "block_priorities";
 
   void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
+  bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<cache_sel_matrix_params> parse_results(void) const {
+  std::shared_ptr<block_priority_params> parse_results(void) const {
     return m_params;
   }
-  bool validate(void) const override;
 
  private:
   std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
@@ -70,10 +70,10 @@ class cache_sel_matrix_parser : public rcppsw::params::xml_param_parser {
   }
 
   /* clang-format off */
-  std::shared_ptr<cache_sel_matrix_params> m_params{nullptr};
+  std::shared_ptr<block_priority_params> m_params{nullptr};
   /* clang-format on */
 };
 
-NS_END(params, fordyca);
+NS_END(block_sel, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_PRIORITIES_PARSER_HPP_ */

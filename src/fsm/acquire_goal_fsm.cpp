@@ -41,10 +41,11 @@ NS_START(fordyca, fsm);
 acquire_goal_fsm::acquire_goal_fsm(
     controller::saa_subsystem* saa,
     const acquisition_goal_ftype& acquisition_goal,
-    const goal_candidates_ftype& candidates_exist_cb,
+    const std::function<bool(void)>& candidates_exist_cb,
     const goal_select_ftype& goal_select,
     const std::function<bool(bool)>& goal_acquired_cb,
-    const std::function<bool(void)>& explore_term_cb)
+    const std::function<bool(void)>& explore_term_cb,
+    const goal_valid_ftype& goal_valid_cb)
     : base_foraging_fsm(saa, ST_MAX_STATES),
       ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -59,6 +60,7 @@ acquire_goal_fsm::acquire_goal_fsm(
       m_candidates_exist(candidates_exist_cb),
       m_goal_select(goal_select),
       m_goal_acquired_cb(goal_acquired_cb),
+      m_goal_valid_cb(goal_valid_cb),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
                                                nullptr,
@@ -202,23 +204,31 @@ bool acquire_goal_fsm::acquire_known_goal(void) {
      * If this happens, all the entities we know of are too close for us to
      * vector to, or there was some other issue with selecting one.
      */
-    if (false == std::get<0>(selection)) {
+    if (!selection) {
       return false;
     }
 
     m_explore_fsm.task_reset();
     m_vector_fsm.task_reset();
+    m_acq_id = -1;
 
     ER_INFO("Start acquiring goal@%s tol=%f",
-            std::get<1>(selection).to_str().c_str(),
-            std::get<2>(selection));
-    tasks::vector_argument v(std::get<2>(selection), std::get<1>(selection));
+            std::get<0>(selection.get()).to_str().c_str(),
+            std::get<1>(selection.get()));
+    tasks::vector_argument v(std::get<1>(selection.get()),
+                             std::get<0>(selection.get()));
+    m_acq_id = std::get<2>(selection.get());
     m_vector_fsm.task_start(&v);
   }
 
   /* we are vectoring */
   if (!m_vector_fsm.task_finished()) {
     m_vector_fsm.task_execute();
+    if (!m_goal_valid_cb(m_vector_fsm.target(),
+                        m_acq_id)) {
+      m_vector_fsm.task_reset();
+      return false;
+    }
   }
 
   if (m_vector_fsm.task_finished()) {

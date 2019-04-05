@@ -51,7 +51,8 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
                     std::placeholders::_1),
           std::bind([](void) noexcept {
             return false;
-          })), /* new caches never acquired via exploration */
+          }), /* new caches never acquired via exploration */
+      [](const rmath::vector2d&, uint) { return true; }),
       mc_matrix(matrix),
       mc_store(store) {}
 
@@ -62,7 +63,7 @@ __rcsw_pure bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
-acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const {
+boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_select(void) const {
   /* A "new" cache is the same as a single block  */
   auto best = controller::depth2::new_cache_selector(
       mc_matrix)(mc_store->blocks(), mc_store->caches(), sensors()->position());
@@ -72,16 +73,17 @@ acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const
    * vector to (too close or something similar).
    */
   if (nullptr == best.ent()) {
-    return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
+    return boost::optional<acquire_goal_fsm::candidate_type>();
   } else {
     ER_INFO("Select new cache%d@%s/%s, utility=%f for acquisition",
             best.ent()->id(),
             best.ent()->real_loc().to_str().c_str(),
             best.ent()->discrete_loc().to_str().c_str(),
             best.density().last_result());
-    return acquire_goal_fsm::candidate_type(true,
-                                            best.ent()->real_loc(),
-                                            vector_fsm::kCACHE_ARRIVAL_TOL);
+    return boost::make_optional(
+        acquire_goal_fsm::candidate_type(best.ent()->real_loc(),
+                                         vector_fsm::kCACHE_ARRIVAL_TOL,
+                                         best.ent()->id()));
   }
 } /* cache_select() */
 

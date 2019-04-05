@@ -1,5 +1,5 @@
 /**
- * @file dpo_controller_repository.cpp
+ * @file cache_sel_matrix_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,29 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SEL_CACHE_SEL_MATRIX_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHE_SEL_CACHE_SEL_MATRIX_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/dpo_controller_repository.hpp"
-#include "fordyca/params/block_sel/block_sel_matrix_parser.hpp"
-#include "fordyca/params/perception/perception_parser.hpp"
+#include <string>
+
+#include "rcppsw/math/range.hpp"
+#include "rcppsw/params/base_params.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params, cache_sel);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-dpo_controller_repository::dpo_controller_repository(void) {
-  register_parser<block_sel::block_sel_matrix_parser,
-                  block_sel::block_sel_matrix_params>(
-                      block_sel::block_sel_matrix_parser::kXMLRoot,
-                      block_sel::block_sel_matrix_parser::kHeader1);
-  register_parser<perception::perception_parser, perception::perception_params>(
-      perception::perception_parser::kXMLRoot,
-      perception::perception_parser::kHeader1);
-}
+/**
+ * @struct cache_sel_matrix_params
+ * @ingroup params cache_sel
+ *
+ * @brief XML parameters for the \ref cache_sel_matrix
+ */
+struct cache_sel_matrix_params : public rcppsw::params::base_params {
+  double cache_prox_dist{0.0};
+  double block_prox_dist{0.0};
+  double nest_prox_dist{0.0};
+  double cluster_prox_dist{0.0};
+  rcppsw::math::rangeu site_xrange{0, 0};
+  rcppsw::math::rangeu site_yrange{0, 0};
+  pickup_policy_params initial_pickup{};
+};
 
-NS_END(depth0, params, fordyca);
+NS_END(cache_sel, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SEL_CACHE_SEL_MATRIX_PARAMS_HPP_ */

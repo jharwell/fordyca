@@ -30,7 +30,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
+#include "fordyca/params/block_sel/block_sel_matrix_params.hpp"
 #include "fordyca/params/depth0/dpo_controller_repository.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/params/sensing_params.hpp"
@@ -129,7 +129,7 @@ void dpo_controller::shared_init(
   auto perception =
       param_repo.parse_results<params::perception::perception_params>();
   auto block_matrix =
-      param_repo.parse_results<params::block_sel_matrix_params>();
+      param_repo.parse_results<params::block_sel::block_sel_matrix_params>();
 
   /* DPO perception subsystem */
   m_perception = rcppsw::make_unique<dpo_perception_subsystem>(perception);
@@ -145,7 +145,7 @@ void dpo_controller::private_init(void) {
                                                 m_perception->dpo_store());
 } /* private_init() */
 
-dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
+__rcsw_pure dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
   return static_cast<dpo_perception_subsystem*>(m_perception.get());
 } /* dpo_perception() */
 

@@ -1,7 +1,7 @@
 /**
- * @file dpo_controller_repository.cpp
+ * @file pickup_policy_parser.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,26 +21,37 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/dpo_controller_repository.hpp"
-#include "fordyca/params/block_sel/block_sel_matrix_parser.hpp"
-#include "fordyca/params/perception/perception_parser.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params, cache_sel);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Global Variables
  ******************************************************************************/
-dpo_controller_repository::dpo_controller_repository(void) {
-  register_parser<block_sel::block_sel_matrix_parser,
-                  block_sel::block_sel_matrix_params>(
-                      block_sel::block_sel_matrix_parser::kXMLRoot,
-                      block_sel::block_sel_matrix_parser::kHeader1);
-  register_parser<perception::perception_parser, perception::perception_params>(
-      perception::perception_parser::kXMLRoot,
-      perception::perception_parser::kHeader1);
-}
+constexpr char pickup_policy_parser::kXMLRoot[];
 
-NS_END(depth0, params, fordyca);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void pickup_policy_parser::parse(const ticpp::Element& node) {
+  /*
+   * Needs to be populated always so we get the null trigger when the policy is
+   * disabled.
+   */
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_params->policy = "Null";
+
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element cnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+    XML_PARSE_ATTR(cnode, m_params, policy);
+    XML_PARSE_ATTR_DFLT(cnode, m_params, timestep, 0U);
+    XML_PARSE_ATTR_DFLT(cnode, m_params, cache_count, 0U);
+    XML_PARSE_ATTR_DFLT(cnode, m_params, cache_size, 0U);
+  }
+} /* parse() */
+
+NS_END(cache_sel, params, fordyca);

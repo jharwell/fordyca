@@ -25,6 +25,7 @@
 #include <chrono>
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
+
 #include "fordyca/math/cache_site_utility.hpp"
 #include "fordyca/repr/base_cache.hpp"
 

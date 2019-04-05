@@ -50,7 +50,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
           std::bind(&acquire_cache_site_fsm::site_acquired_cb,
                     this,
                     std::placeholders::_1),
-          std::bind(&acquire_cache_site_fsm::site_exploration_term_cb, this)),
+          std::bind(&acquire_cache_site_fsm::site_exploration_term_cb, this),
+          [](const rmath::vector2d&, uint) noexcept { return true; }),
       mc_matrix(matrix),
       mc_store(store) {}
 
@@ -80,20 +81,21 @@ __rcsw_const bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   return false;
 } /* site_exploration_term_cb() */
 
-acquire_goal_fsm::candidate_type acquire_cache_site_fsm::site_select(void) const {
+boost::optional<acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::site_select(void) const {
   auto best = controller::depth2::cache_site_selector(
       mc_matrix)(mc_store->caches(),
                  mc_store->blocks(),
                  saa_subsystem()->sensing()->position());
   if (best.x() < 0 || best.y() < 0) {
     ER_WARN("No cache site selected for acquisition--internal error?")
-    return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
+        return boost::optional<acquire_goal_fsm::candidate_type>();
   }
   ER_INFO("Select cache site@%s for acquisition", best.to_str().c_str());
 
-  return acquire_goal_fsm::candidate_type(true,
-                                          best,
-                                          vector_fsm::kCACHE_SITE_ARRIVAL_TOL);
+  return boost::make_optional(
+      acquire_goal_fsm::candidate_type(best,
+                                       vector_fsm::kCACHE_SITE_ARRIVAL_TOL,
+                                       -1));
 } /* site_select() */
 
 __rcsw_const acquisition_goal_type

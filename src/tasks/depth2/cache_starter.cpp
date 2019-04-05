@@ -82,8 +82,8 @@ void cache_starter::active_interface_update(int) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);
+      ER_TRACE("Interface start at timestep %f", current_time());
     }
-    ER_TRACE("Interface start at timestep %f", current_time());
   }
 } /* active_interface_update() */
 

@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <random>
+#include <boost/optional.hpp>
+
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -58,6 +60,12 @@ class acquire_existing_cache_fsm
     : public er::client<acquire_existing_cache_fsm>,
       public acquire_goal_fsm {
  public:
+  /**
+   * @param matrix The matrix of cache selection info.
+   * @param is_pickup Are we acquiring a cache for pickup or block drop?
+   * @param saa Handle to sensing/actuation subsystem.
+   * @param store Store of known objects in the arena.
+   */
   acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
                              bool is_pickup,
                              controller::saa_subsystem* saa,
@@ -68,19 +76,34 @@ class acquire_existing_cache_fsm
   acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) =
       delete;
 
+  void by_exploration_ok(bool b) { m_by_exploration_ok = b; }
+
  private:
+  using acquisition_loc_type = std::pair<int, rmath::vector2d>;
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
   acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type existing_cache_select(void);
+  boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const;
-  bool calc_acquisition_location(rmath::vector2d* loc);
+  boost::optional<acquisition_loc_type> calc_acquisition_location(void);
+  bool cache_acquisition_valid(const rmath::vector2d& loc,
+                               uint id) const;
 
   bool cache_acquired_cb(bool explore_result) const;
   bool cache_exploration_term_cb(void) const;
-
   /* clang-format off */
+
+  /**
+   * @brief Is it OK to acquire a cache via exploration? Usually you do not want
+   * this because:
+   *
+   * - The cache we just acquired might have been one that was excluded from the
+   *   list of eligible caches for acquisition.
+   * - We might not have meant the criteria for block pickup from this cache
+   *   yet.
+   */
+  bool                                      m_by_exploration_ok{false};
   const bool                                mc_is_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;

@@ -21,13 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/cache_sel_matrix_parser.hpp"
-#include "rcppsw/utils/line_parser.hpp"
+#include "fordyca/params/cache_sel/cache_sel_matrix_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, cache_sel);
 
 /*******************************************************************************
  * Global Variables
@@ -39,8 +38,12 @@ constexpr char cache_sel_matrix_parser::kXMLRoot[];
  ******************************************************************************/
 void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
   ticpp::Element cnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+
+  m_initial_pickup.parse(cnode);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+
+  m_params->initial_pickup = *m_initial_pickup.parse_results();
   XML_PARSE_ATTR(cnode, m_params, cache_prox_dist);
   XML_PARSE_ATTR(cnode, m_params, block_prox_dist);
   XML_PARSE_ATTR(cnode, m_params, nest_prox_dist);
@@ -49,19 +52,8 @@ void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(cnode, m_params, site_yrange);
 } /* parse() */
 
-void cache_sel_matrix_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, cache_prox_dist)
-         << std::endl
-         << XML_ATTR_STR(m_params, cache_prox_dist) << std::endl
-         << XML_ATTR_STR(m_params, block_prox_dist) << std::endl
-         << XML_ATTR_STR(m_params, nest_prox_dist) << std::endl
-         << XML_ATTR_STR(m_params, cluster_prox_dist) << std::endl
-         << XML_ATTR_STR(m_params, site_xrange) << std::endl
-         << XML_ATTR_STR(m_params, site_yrange) << std::endl
-         << build_footer();
-} /* show() */
-
 __rcsw_pure bool cache_sel_matrix_parser::validate(void) const {
+  CHECK(m_initial_pickup.validate());
   CHECK(m_params->cache_prox_dist > 0.0);
   CHECK(m_params->block_prox_dist > 0.0);
   CHECK(m_params->nest_prox_dist > 0.0);
@@ -72,4 +64,4 @@ error:
   return false;
 } /* validate() */
 
-NS_END(params, fordyca);
+NS_END(cache_sel, params, fordyca);

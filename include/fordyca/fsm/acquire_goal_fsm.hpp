@@ -27,6 +27,7 @@
 #include <functional>
 #include <list>
 #include <tuple>
+#include <boost/optional.hpp>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
@@ -62,10 +63,11 @@ class acquire_goal_fsm : public base_foraging_fsm,
                          public metrics::fsm::goal_acquisition_metrics,
                          public ta::taskable {
  public:
-  using candidate_type = std::tuple<bool, rmath::vector2d, double>;
-  using goal_select_ftype = std::function<candidate_type(void)>;
-  using goal_candidates_ftype = std::function<bool(void)>;
+  using candidate_type = std::tuple<rmath::vector2d, double, int>;
+  using goal_select_ftype = std::function<boost::optional<candidate_type>(void)>;
   using acquisition_goal_ftype = std::function<acquisition_goal_type(void)>;
+  using goal_valid_ftype = std::function<bool(const rmath::vector2d&,
+                                              uint)>;
 
   /**
    *
@@ -102,13 +104,19 @@ class acquire_goal_fsm : public base_foraging_fsm,
    *                        return \c TRUE if the goal has been detected/reached
    *                        and exploration should terminate, and \c FALSE
    *                        otherwise.
+   *
+   * @param goal_valid_cb Callback for verifying goal validity during
+   *                      vectoring/exploration. If for any reason the specific
+   *                      goal becomes invalid before the robot has acquired it,
+   *                      then it should return \c FALSE.
    */
   acquire_goal_fsm(controller::saa_subsystem* saa,
                    const acquisition_goal_ftype& acquisition_goal,
-                   const goal_candidates_ftype& candidates_exist_cb,
+                   const std::function<bool(void)>& candidates_exist_cb,
                    const goal_select_ftype& goal_select,
                    const std::function<bool(bool)>& goal_acquired_cb,
-                   const std::function<bool(void)>& explore_term_cb);
+                   const std::function<bool(void)>& explore_term_cb,
+                   const goal_valid_ftype& goal_valid_cb);
   ~acquire_goal_fsm(void) override = default;
 
   acquire_goal_fsm(const acquire_goal_fsm& fsm) = delete;
@@ -184,12 +192,14 @@ class acquire_goal_fsm : public base_foraging_fsm,
   }
 
   /* clang-format off */
+  int                       m_acq_id{-1};
   vector_fsm                m_vector_fsm;
   explore_for_goal_fsm      m_explore_fsm;
   acquisition_goal_ftype    m_acquisition_goal;
-  goal_candidates_ftype     m_candidates_exist;
+  std::function<bool(void)> m_candidates_exist;
   goal_select_ftype         m_goal_select;
   std::function<bool(bool)> m_goal_acquired_cb;
+  goal_valid_ftype          m_goal_valid_cb;
   /* clang-format on */
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);

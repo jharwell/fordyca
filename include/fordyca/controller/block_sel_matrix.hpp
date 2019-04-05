@@ -36,9 +36,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
+namespace params { namespace block_sel {
 struct block_sel_matrix_params;
-}
+}}
 NS_START(controller);
 namespace rmath = rcppsw::math;
 using block_sel_variant =
@@ -67,7 +67,8 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
   static constexpr char kRampPriority[] = "ramp_priority";
   static constexpr char kSelExceptions[] = "sel_exceptions";
 
-  explicit block_sel_matrix(const struct params::block_sel_matrix_params* params);
+  explicit block_sel_matrix(
+      const struct params::block_sel::block_sel_matrix_params* params);
 
   /**
    * @brief Add a block to the exception list, disqualifying it from being

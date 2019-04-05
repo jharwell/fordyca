@@ -21,15 +21,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1/existing_cache_selector.hpp"
+#include "fordyca/controller/existing_cache_selector.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/repr/base_cache.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
+#include "fordyca/fsm/cache_acquisition_validator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth1);
+NS_START(fordyca, controller);
 using cselm = cache_sel_matrix;
 
 /*******************************************************************************
@@ -37,22 +39,37 @@ using cselm = cache_sel_matrix;
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
     bool is_pickup,
-    const cache_sel_matrix* const matrix)
+    const cache_sel_matrix* const matrix,
+    const ds::dp_cache_map* cache_map)
     : ER_CLIENT_INIT("fordyca.controller.depth1.existing_cache_selector"),
-      m_is_pickup(is_pickup),
-      mc_matrix(matrix) {}
+      mc_matrix(matrix),
+      mc_cache_map(cache_map),
+      m_is_pickup(is_pickup) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::dp_cache_map::value_type existing_cache_selector::calc_best(
+ds::dp_cache_map::value_type existing_cache_selector::operator()(
     const ds::dp_cache_map& existing_caches,
-    const rmath::vector2d& position) {
+    const rmath::vector2d& position,
+    uint timestep) {
   ds::dp_cache_map::value_type best(nullptr, {});
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
   for (auto& c : existing_caches.values_range()) {
+    /*
+     * No picking up from caches is allowed until our cache acquisition policy
+     * has been satisfied.
+     */
+    bool acq_valid = fsm::cache_acquisition_validator(mc_cache_map, mc_matrix)(
+        c.ent()->real_loc(),
+        c.ent()->id(),
+        timestep);
+    if (m_is_pickup && !acq_valid) {
+      continue;
+    }
+
     if (cache_is_excluded(position, c.ent())) {
       continue;
     }
@@ -87,7 +104,7 @@ ds::dp_cache_map::value_type existing_cache_selector::calc_best(
   }
 
   return best;
-} /* calc_best() */
+} /* operator()() */
 
 bool existing_cache_selector::cache_is_excluded(
     const rmath::vector2d& position,
@@ -102,7 +119,7 @@ bool existing_cache_selector::cache_is_excluded(
    * the cache, even if they will then immediately return to it.
    */
   if (cache->contains_point(position)) {
-    ER_DEBUG("Ignoring cache%d@%s/%s in search: robot@%s inside it",
+    ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
              cache->id(),
              cache->real_loc().to_str().c_str(),
              cache->discrete_loc().to_str().c_str(),
@@ -128,7 +145,8 @@ bool existing_cache_selector::cache_is_excluded(
              cache->discrete_loc().to_str().c_str());
     return true;
   }
+
   return false;
 } /* cache_is_excluded() */
 
-NS_END(depth1, controller, fordyca);
+NS_END(controller, fordyca);

@@ -50,8 +50,8 @@ std::string utilization_metrics_collector::csv_header_build(
       "cum_avg_pickups" + separator() +
       "int_avg_drops"  + separator() +
       "cum_avg_drops"  + separator() +
-      "int_unique_caches" + separator() +
-      "cum_unique_caches" + separator();
+      "int_avg_caches" + separator() +
+      "cum_avg_caches" + separator();
   /* clang-format on */
 } /* csv_header_build() */
 
@@ -64,48 +64,26 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  /*
-   * Because the # of caches can change at any time in the arena, we need to use
-   * the count of all caches that are involved in the events that we collect
-   * metrics on and use that to average the cumulative counts that we get.
-   */
-  line += (m_int_cache_count > 0)
-              ? std::to_string(static_cast<double>(m_stats.int_blocks) /
-                               m_int_cache_count)
-              : "0";
-  line += separator();
+  line += std::to_string(static_cast<double>(m_stats.int_blocks) / interval()) +
+          separator();
 
-  line += (m_cum_cache_count > 0)
-              ? std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                               m_cum_cache_count)
-              : "0";
-  line += separator();
+  line += std::to_string(static_cast<double>(m_stats.cum_blocks) /
+                         (timestep() + 1)) + separator();
 
-  line += (m_int_cache_count > 0)
-              ? std::to_string(static_cast<double>(m_stats.int_pickups) /
-                               m_int_cache_count)
-              : "0";
-  line += separator();
-  line += (m_cum_cache_count > 0)
-              ? std::to_string(static_cast<double>(m_stats.cum_pickups) /
-                               m_cum_cache_count)
-              : "0";
-  line += separator();
+  line += std::to_string(static_cast<double>(m_stats.int_pickups) / interval()) +
+          separator();
+  line += std::to_string(static_cast<double>(m_stats.cum_pickups) /
+                         (timestep() + 1)) + separator();
 
-  line += (m_int_cache_count > 0)
-              ? std::to_string(static_cast<double>(m_stats.int_drops) /
-                               m_int_cache_count)
-              : "0";
-  line += separator();
+  line += std::to_string(static_cast<double>(m_stats.int_drops) / interval()) +
+          separator();
+  line += std::to_string(static_cast<double>(m_stats.cum_drops) /
+                         (timestep() + 1)) + separator();
 
-  line += (m_cum_cache_count > 0)
-              ? std::to_string(static_cast<double>(m_stats.cum_drops) /
-                               m_cum_cache_count)
-              : "0";
-  line += separator();
-
-  line += std::to_string(m_int_cache_count) + separator();
-  line += std::to_string(m_cum_cache_count) + separator();
+  line += std::to_string(static_cast<double>(m_int_cache_count) /
+                         interval()) + separator();
+  line += std::to_string(static_cast<double>(m_cum_cache_count) /
+                         (timestep() + 1)) + separator();
   return true;
 } /* csv_line_build() */
 
@@ -120,10 +98,8 @@ void utilization_metrics_collector::collect(
   m_stats.cum_drops += m.total_block_drops();
   m_stats.cum_blocks += m.n_blocks();
 
-  if (m.n_blocks() > 0) {
-    ++m_int_cache_count;
-    ++m_cum_cache_count;
-  }
+  ++m_int_cache_count;
+  ++m_cum_cache_count;
 } /* collect() */
 
 void utilization_metrics_collector::reset_after_interval(void) {

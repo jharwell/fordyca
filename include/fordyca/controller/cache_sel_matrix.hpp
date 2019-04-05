@@ -34,19 +34,23 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
+namespace params { namespace cache_sel {
 struct cache_sel_matrix_params;
-}
+}}
 NS_START(controller);
 namespace rmath = rcppsw::math;
 namespace er = rcppsw::er;
-using cache_sel_variant =
-    boost::variant<double, rmath::vector2d, rmath::rangeu, std::vector<int>>;
+using cache_sel_variant = boost::variant<double,
+                                         rmath::vector2d,
+                                         rmath::rangeu,
+                                         std::vector<int>,
+                                         params::cache_sel::pickup_policy_params>;
 
 /*******************************************************************************
  * Class Definitions
@@ -79,8 +83,18 @@ class cache_sel_matrix : public er::client<cache_sel_matrix>,
   static constexpr char kPickupExceptions[] = "pickup_exceptions";
   static constexpr char kDropExceptions[] = "drop_exceptions";
 
+  /**
+   * @brief The initial conditions that must be satisfied before a robot will be
+   * able to pickup from *ANY* cache.
+   */
+  static constexpr char kInitialPickupPolicy[] = "pickup_policy";
+  static constexpr char kInitialPickupPolicyNull[] = "Null";
+  static constexpr char kInitialPickupPolicyTime[] = "time";
+  static constexpr char kInitialPickupPolicyCacheCount[] = "cache_count";
+  static constexpr char kInitialPickupPolicyCacheSize[] = "cache_size";
+
   using std::map<std::string, cache_sel_variant>::find;
-  cache_sel_matrix(const struct params::cache_sel_matrix_params* params,
+  cache_sel_matrix(const struct params::cache_sel::cache_sel_matrix_params* params,
                    const rmath::vector2d& nest_loc);
   ~cache_sel_matrix(void) override = default;
 

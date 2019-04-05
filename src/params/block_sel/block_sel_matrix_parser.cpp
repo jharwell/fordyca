@@ -21,13 +21,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/block_sel_matrix_parser.hpp"
+#include "fordyca/params/block_sel/block_sel_matrix_parser.hpp"
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, block_sel);
 
 /*******************************************************************************
  * Global Variables
@@ -52,10 +52,4 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
   m_params->priorities = *m_priorities.parse_results();
 } /* parse() */
 
-void block_sel_matrix_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, nest) << std::endl
-         << m_priorities << std::endl
-         << build_footer();
-} /* show() */
-
-NS_END(params, fordyca);
+NS_END(block_sel, params, fordyca);

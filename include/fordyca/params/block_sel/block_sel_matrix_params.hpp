@@ -1,5 +1,5 @@
 /**
- * @file dpo_controller_repository.cpp
+ * @file block_sel_matrix_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,29 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_SEL_MATRIX_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_SEL_MATRIX_PARAMS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/dpo_controller_repository.hpp"
-#include "fordyca/params/block_sel/block_sel_matrix_parser.hpp"
-#include "fordyca/params/perception/perception_parser.hpp"
+#include "fordyca/params/block_sel/block_priority_params.hpp"
+#include "rcppsw/math/vector2.hpp"
+#include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params, block_sel);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Structure Definitions
  ******************************************************************************/
-dpo_controller_repository::dpo_controller_repository(void) {
-  register_parser<block_sel::block_sel_matrix_parser,
-                  block_sel::block_sel_matrix_params>(
-                      block_sel::block_sel_matrix_parser::kXMLRoot,
-                      block_sel::block_sel_matrix_parser::kHeader1);
-  register_parser<perception::perception_parser, perception::perception_params>(
-      perception::perception_parser::kXMLRoot,
-      perception::perception_parser::kHeader1);
-}
+/**
+ * @struct block_sel_matrix_params
+ * @ingroup params block_sel
+ *
+ * @brief XML parameters for the \ref block_sel_matrix
+ */
+struct block_sel_matrix_params : public rcppsw::params::base_params {
+  rmath::vector2d nest{};
+  struct block_priority_params priorities {};
+};
 
-NS_END(depth0, params, fordyca);
+NS_END(block_sel, params, fordyca);
+
+#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_SEL_MATRIX_PARAMS_HPP_ */

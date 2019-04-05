@@ -22,7 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/params/cache_sel_matrix_params.hpp"
+#include "fordyca/params/cache_sel/cache_sel_matrix_params.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,12 +42,17 @@ constexpr char cache_sel_matrix::kSiteXRange[];
 constexpr char cache_sel_matrix::kSiteYRange[];
 constexpr char cache_sel_matrix::kPickupExceptions[];
 constexpr char cache_sel_matrix::kDropExceptions[];
+constexpr char cache_sel_matrix::kInitialPickupPolicy[];
+constexpr char cache_sel_matrix::kInitialPickupPolicyTime[];
+constexpr char cache_sel_matrix::kInitialPickupPolicyNull[];
+constexpr char cache_sel_matrix::kInitialPickupPolicyCacheSize[];
+constexpr char cache_sel_matrix::kInitialPickupPolicyCacheCount[];
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 cache_sel_matrix::cache_sel_matrix(
-    const struct params::cache_sel_matrix_params* const params,
+    const struct params::cache_sel::cache_sel_matrix_params* const params,
     const rmath::vector2d& nest_loc)
     : ER_CLIENT_INIT("fordyca.controller.cache_sel_matrix") {
   this->insert(std::make_pair(kNestLoc, nest_loc));
@@ -58,6 +64,7 @@ cache_sel_matrix::cache_sel_matrix(
   this->insert(std::make_pair(kSiteYRange, params->site_yrange));
   this->insert(std::make_pair(kPickupExceptions, std::vector<int>()));
   this->insert(std::make_pair(kDropExceptions, std::vector<int>()));
+  this->insert(std::make_pair(kInitialPickupPolicy, params->initial_pickup));
 }
 
 /*******************************************************************************

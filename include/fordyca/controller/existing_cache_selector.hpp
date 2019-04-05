@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_EXISTING_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_EXISTING_CACHE_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -33,9 +33,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+NS_START(controller);
 class cache_sel_matrix;
-NS_START(depth1);
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
@@ -43,7 +43,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class existing_cache_selector
- * @ingroup controller depth1
+ * @ingroup controller
  *
  * @brief Selects from among known caches (which are presumed to still exist at
  * this point, although that may not be true as a robot's knowledge of the arena
@@ -51,8 +51,9 @@ namespace rmath = rcppsw::math;
  */
 class existing_cache_selector: public rcppsw::er::client<existing_cache_selector> {
  public:
-  explicit existing_cache_selector(bool is_pickup,
-                                   const cache_sel_matrix* matrix);
+  existing_cache_selector(bool is_pickup,
+                          const cache_sel_matrix* matrix,
+                          const ds::dp_cache_map* cache_map);
 
   ~existing_cache_selector(void) override = default;
   existing_cache_selector& operator=(const existing_cache_selector& other) = delete;
@@ -65,9 +66,10 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    *
    * @return The "best" existing cache.
    */
-  ds::dp_cache_map::value_type calc_best(
+  ds::dp_cache_map::value_type operator()(
       const ds::dp_cache_map& existing_caches,
-      const rmath::vector2d& position);
+      const rmath::vector2d& position,
+      uint timestep);
 
  private:
   /**
@@ -81,12 +83,14 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    */
   bool cache_is_excluded(const rmath::vector2d& position,
                          const repr::base_cache* const cache) const;
+
   /* clang-format off */
-  bool                          m_is_pickup;
   const cache_sel_matrix* const mc_matrix;
+  const ds::dp_cache_map* const mc_cache_map;
+  bool                          m_is_pickup;
   /* clang-format on */
 };
 
-NS_END(depth1, controller, fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_EXISTING_CACHE_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_ */

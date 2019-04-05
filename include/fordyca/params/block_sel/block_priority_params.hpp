@@ -1,5 +1,5 @@
 /**
- * @file cache_sel_matrix_params.hpp
+ * @file block_priority_params.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_PRIORITY_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_PRIORITY_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/math/range.hpp"
+#include <string>
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -36,20 +36,14 @@ NS_START(fordyca, params);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct cache_sel_matrix_params
- * @ingroup params
- *
- * @brief XML parameters for the \ref cache_sel_matrix
+ * @struct block_priority_params
+ * @ingroup params block_sel
  */
-struct cache_sel_matrix_params : public rcppsw::params::base_params {
-  double cache_prox_dist{0.0};
-  double block_prox_dist{0.0};
-  double nest_prox_dist{0.0};
-  double cluster_prox_dist{0.0};
-  rcppsw::math::rangeu site_xrange{0, 0};
-  rcppsw::math::rangeu site_yrange{0, 0};
+struct block_priority_params : public rcppsw::params::base_params {
+  int cube{-1};
+  int ramp{-1};
 };
 
 NS_END(params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SEL_MATRIX_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_BLOCK_PRIORITY_PARAMS_HPP_ */

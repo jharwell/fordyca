@@ -25,7 +25,6 @@
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
 #include "fordyca/params/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/repr/base_block.hpp"

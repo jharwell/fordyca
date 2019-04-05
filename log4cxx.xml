@@ -31,13 +31,16 @@
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.fsm.depth0" >
+    <category name="fordyca.fsm.cache_acquisition_validator" >
     <priority value ="all" />
   </category>
   <category name="fordyca.support.block_dist" >
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.dynamic_cache_creator" >
+    <priority value ="trace" />
+  </category>
+    <category name="fordyca.tasks.depth2.cache_starter" >
     <priority value ="trace" />
   </category>
     <category name="fordyca.support.depth2.cache_center_calculator" >

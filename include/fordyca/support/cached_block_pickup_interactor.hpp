@@ -117,7 +117,7 @@ class cached_block_pickup_interactor
      * same/successive/close together timesteps, then the first robot to serve
      * their penalty will get a block just fine. The second robot, however, may
      * not, depending on if the arena has decided to re-create the static cache
-     * yet.
+     * yet (for depth 1 simulations).
      *
      * This results in a \ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.

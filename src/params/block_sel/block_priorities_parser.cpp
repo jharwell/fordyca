@@ -1,5 +1,5 @@
 /**
- * @file dpo_controller_repository.cpp
+ * @file block_priorities_parser.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,26 +21,38 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/depth0/dpo_controller_repository.hpp"
-#include "fordyca/params/block_sel/block_sel_matrix_parser.hpp"
-#include "fordyca/params/perception/perception_parser.hpp"
+#include "fordyca/params/block_sel/block_priorities_parser.hpp"
+#include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params, depth0);
+NS_START(fordyca, params, block_sel);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Global Variables
  ******************************************************************************/
-dpo_controller_repository::dpo_controller_repository(void) {
-  register_parser<block_sel::block_sel_matrix_parser,
-                  block_sel::block_sel_matrix_params>(
-                      block_sel::block_sel_matrix_parser::kXMLRoot,
-                      block_sel::block_sel_matrix_parser::kHeader1);
-  register_parser<perception::perception_parser, perception::perception_params>(
-      perception::perception_parser::kXMLRoot,
-      perception::perception_parser::kHeader1);
-}
+constexpr char block_priorities_parser::kXMLRoot[];
 
-NS_END(depth0, params, fordyca);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void block_priorities_parser::parse(const ticpp::Element& node) {
+  ticpp::Element bnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+
+  XML_PARSE_ATTR(bnode, m_params, cube);
+  XML_PARSE_ATTR(bnode, m_params, ramp);
+} /* parse() */
+
+__rcsw_pure bool block_priorities_parser::validate(void) const {
+  CHECK(m_params->cube >= 1.0);
+  CHECK(m_params->ramp >= 1.0);
+  return true;
+
+error:
+  return false;
+} /* validate() */
+
+NS_END(block_sel, params, fordyca);

@@ -99,6 +99,9 @@ class vector_fsm : public base_foraging_fsm,
     return current_state() == ST_ARRIVED;
   }
 
+  const rmath::vector2d& target(void) const { return m_goal_data.loc; }
+
+
   /**
    * @brief Initialize/re-initialize the vector_fsm fsm. After arriving at a
    * goal, this function must be called before vectoring to a new goal will

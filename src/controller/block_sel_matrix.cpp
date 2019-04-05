@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
+#include "fordyca/params/block_sel/block_sel_matrix_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +41,7 @@ constexpr char block_sel_matrix::kSelExceptions[];
  * Constructors/Destructors
  ******************************************************************************/
 block_sel_matrix::block_sel_matrix(
-    const struct params::block_sel_matrix_params* params) {
+    const struct params::block_sel::block_sel_matrix_params* params) {
   this->insert(std::make_pair(kNestLoc, params->nest));
   this->insert(std::make_pair(kCubePriority, params->priorities.cube));
   this->insert(std::make_pair(kRampPriority, params->priorities.ramp));

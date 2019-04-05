@@ -1,7 +1,7 @@
 /**
- * @file block_sel_matrix_parser.hpp
+ * @file pickup_policy_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,49 +18,46 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_CACHE_SEL_PICKUP_POLICY_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_CACHE_SEL_PICKUP_POLICY_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/params/block_priorities_parser.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, params, cache_sel);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_sel_matrix_parser
+ * @class pickup_policy_parser
  * @ingroup params
  *
- * @brief Parses XML parameters for the \ref block_sel_matrix at the start
- * of simulation.
+ * @brief Parses XML parameters for \ref pickup_policy_params at the
+ * start of simulation.
  */
-class block_sel_matrix_parser : public rcppsw::params::xml_param_parser {
+class pickup_policy_parser : public rcppsw::params::xml_param_parser {
  public:
-  explicit block_sel_matrix_parser(uint level)
-      : xml_param_parser(level), m_priorities(level + 1) {}
+  explicit pickup_policy_parser(uint level) : xml_param_parser(level) {}
 
   /**
-   * @brief The root tag that all block sel matrix parameters should lie
+   * @brief The root tag that all cache sel matrix parameters should lie
    * under in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "block_selection_matrix";
+  static constexpr char kXMLRoot[] = "pickup_policy";
 
   void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<block_sel_matrix_params> parse_results(void) const {
+  std::shared_ptr<pickup_policy_params> parse_results(void) const {
     return m_params;
   }
 
@@ -71,12 +68,10 @@ class block_sel_matrix_parser : public rcppsw::params::xml_param_parser {
   }
 
   /* clang-format off */
-  std::shared_ptr<block_sel_matrix_params> m_params{nullptr};
-  block_priorities_parser                  m_priorities;
-
+  std::shared_ptr<pickup_policy_params> m_params{nullptr};
   /* clang-format on */
 };
 
-NS_END(params, fordyca);
+NS_END(cache_sel, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_BLOCK_SEL_MATRIX_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_CACHE_SEL_PICKUP_POLICY_PARSER_HPP_ */
