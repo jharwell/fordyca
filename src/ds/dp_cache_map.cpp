@@ -40,6 +40,7 @@ std::string dp_cache_map::to_str(void) const {
                          std::string(),
                          [&](const std::string& a, const auto& pair) {
                            return a + "c" + std::to_string(pair.ent()->id()) +
+                                  "@" + pair.ent()->discrete_loc().to_str() +
                                   ",";
                          });
 } /* to_str() */

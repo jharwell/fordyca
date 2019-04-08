@@ -50,7 +50,9 @@ dpo_store::update_res_t dpo_store::cache_update(
   update_res_t res = {.status = true,
                       .reason = kNoChange,
                       .old_loc = rmath::vector2u()};
-
+  ER_TRACE("Updating cache%d@%s",
+           cache.ent()->id(),
+           cache.ent()->discrete_loc().to_str().c_str());
   /*
    * If we are currently tracking the cache, we unconditionally remove it,
    * because the # blocks in the cache could have changed since we last saw
@@ -73,9 +75,9 @@ bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
   });
 
   if (it != range.end()) {
-    ER_TRACE("Removing cache%d@%s",
-             victim->id(),
-             victim->discrete_loc().to_str().c_str());
+    ER_INFO("Removing cache%d@%s",
+            it->ent()->id(),
+            it->ent()->discrete_loc().to_str().c_str());
     m_caches.obj_remove(it->ent()->discrete_loc());
     return true;
   }

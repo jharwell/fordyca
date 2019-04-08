@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <random>
 #include <boost/optional.hpp>
+#include <random>
 
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
@@ -87,8 +87,7 @@ class acquire_existing_cache_fsm
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const;
   boost::optional<acquisition_loc_type> calc_acquisition_location(void);
-  bool cache_acquisition_valid(const rmath::vector2d& loc,
-                               uint id) const;
+  bool cache_acquisition_valid(const rmath::vector2d& loc, uint id) const;
 
   bool cache_acquired_cb(bool explore_result) const;
   bool cache_exploration_term_cb(void) const;

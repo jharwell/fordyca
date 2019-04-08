@@ -30,11 +30,11 @@
 #include <vector>
 
 #include "fordyca/controller/cache_sel_exception.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,15 +42,16 @@
 NS_START(fordyca);
 namespace params { namespace cache_sel {
 struct cache_sel_matrix_params;
-}}
+}} // namespace params::cache_sel
 NS_START(controller);
 namespace rmath = rcppsw::math;
 namespace er = rcppsw::er;
-using cache_sel_variant = boost::variant<double,
-                                         rmath::vector2d,
-                                         rmath::rangeu,
-                                         std::vector<int>,
-                                         params::cache_sel::pickup_policy_params>;
+using cache_sel_variant =
+    boost::variant<double,
+                   rmath::vector2d,
+                   rmath::rangeu,
+                   std::vector<int>,
+                   params::cache_sel::pickup_policy_params>;
 
 /*******************************************************************************
  * Class Definitions

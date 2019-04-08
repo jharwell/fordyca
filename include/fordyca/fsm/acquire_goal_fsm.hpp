@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <boost/optional.hpp>
 #include <functional>
 #include <list>
 #include <tuple>
-#include <boost/optional.hpp>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
@@ -66,8 +66,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
   using candidate_type = std::tuple<rmath::vector2d, double, int>;
   using goal_select_ftype = std::function<boost::optional<candidate_type>(void)>;
   using acquisition_goal_ftype = std::function<acquisition_goal_type(void)>;
-  using goal_valid_ftype = std::function<bool(const rmath::vector2d&,
-                                              uint)>;
+  using goal_valid_ftype = std::function<bool(const rmath::vector2d&, uint)>;
 
   /**
    *

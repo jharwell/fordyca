@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <boost/range/adaptor/map.hpp>
 #include <map>
+#include <utility>
 
 #include "fordyca/repr/dp_entity.hpp"
 
@@ -93,11 +94,8 @@ class dpo_map {
    * version is replaced.
    */
   void obj_add(const std::pair<key_type, value_type>& obj) {
-    auto r = m_obj.insert(obj);
-    if (!r.second) {
-      m_obj.erase(r.first);
-      m_obj.insert(obj);
-    }
+    m_obj.erase(obj.first);
+    m_obj.insert(obj);
   }
 
   /**

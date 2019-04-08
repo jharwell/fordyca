@@ -52,9 +52,10 @@ cache_proximity::cache_proximity(std::shared_ptr<repr::base_cache> cache)
 void cache_proximity::dispatch_cache_interactor(
     tasks::base_foraging_task* const task) {
   auto* interactor = dynamic_cast<events::dynamic_cache_interactor*>(task);
-  ER_ASSERT(nullptr != interactor,
-            "Non dynamic cache interactor task '%s' received cache proximity event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  ER_ASSERT(
+      nullptr != interactor,
+      "Non dynamic cache interactor task '%s' received cache proximity event",
+      dynamic_cast<ta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_cache_interactor() */
 

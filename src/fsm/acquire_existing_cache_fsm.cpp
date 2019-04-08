@@ -24,8 +24,8 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/controller/existing_cache_selector.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/fsm/cache_acquisition_validator.hpp"
 #include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/cache_acquisition_validator.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
@@ -66,7 +66,8 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<acquire_existing_cache_fsm::acquisition_loc_type> acquire_existing_cache_fsm::calc_acquisition_location(void) {
+boost::optional<acquire_existing_cache_fsm::acquisition_loc_type>
+acquire_existing_cache_fsm::calc_acquisition_location(void) {
   controller::existing_cache_selector selector(mc_is_pickup,
                                                mc_matrix,
                                                &mc_store->caches());
@@ -111,8 +112,8 @@ bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
   return saa_subsystem()->sensing()->cache_detected();
 } /* cache_exploration_term_cb() */
 
-boost::optional<acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::existing_cache_select(
-    void) {
+boost::optional<acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
+    existing_cache_select(void) {
   if (auto selection = calc_acquisition_location()) {
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(selection.get().second,
@@ -146,10 +147,8 @@ acquire_existing_cache_fsm::acquisition_goal_internal(void) const {
 bool acquire_existing_cache_fsm::cache_acquisition_valid(
     const rmath::vector2d& loc,
     uint id) const {
-  return cache_acquisition_validator(&mc_store->caches(),
-                                     mc_matrix)(loc,
-                                                id,
-                                                saa_subsystem()->sensing()->tick());
+  return cache_acquisition_validator(&mc_store->caches(), mc_matrix)(
+      loc, id, saa_subsystem()->sensing()->tick());
 } /* cache_acquisition_valid() */
 
 NS_END(controller, fordyca);

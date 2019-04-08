@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/events/block_proximity.hpp"
-#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/block_vanished.hpp"
+#include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 

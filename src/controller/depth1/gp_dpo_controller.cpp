@@ -96,13 +96,14 @@ void gp_dpo_controller::shared_init(
   /* DPO perception subsystem, block selection matrix */
   dpo_controller::shared_init(param_repo);
 
-  auto* cache_mat = param_repo.parse_results<params::cache_sel::cache_sel_matrix_params>();
-  auto* block_mat = param_repo.parse_results<params::block_sel::block_sel_matrix_params>();
+  auto* cache_mat =
+      param_repo.parse_results<params::cache_sel::cache_sel_matrix_params>();
+  auto* block_mat =
+      param_repo.parse_results<params::block_sel::block_sel_matrix_params>();
 
   /* cache selection matrix */
   m_cache_sel_matrix =
-      rcppsw::make_unique<class cache_sel_matrix>(cache_mat,
-                                                  block_mat->nest);
+      rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
 } /* shared_init() */
 
 void gp_dpo_controller::private_init(

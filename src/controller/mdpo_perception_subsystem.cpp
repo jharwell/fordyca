@@ -24,6 +24,7 @@
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include <algorithm>
 
+#include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
@@ -56,7 +57,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
 void mdpo_perception_subsystem::update() {
   update_cell_stats(los());
   process_los(los());
-  processed_los_verify(los());
+  ER_ASSERT(los_proc_verify(los())(map()), "LOS verification failed");
   m_map->decay_all();
 } /* update() */
 
@@ -84,6 +85,8 @@ void mdpo_perception_subsystem::process_los_blocks(
   ds::block_list blocks = c_los->blocks();
   if (!blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
+    ER_DEBUG("Blocks in DPO store: [%s]",
+             rcppsw::to_string(m_map->store()->blocks()).c_str());
   }
 
   /*
@@ -149,6 +152,8 @@ void mdpo_perception_subsystem::process_los_caches(
   ds::cache_list los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
+    ER_DEBUG("Caches in DPO store: [%s]",
+             rcppsw::to_string(m_map->store()->caches()).c_str());
   }
 
   /*
@@ -216,52 +221,6 @@ void mdpo_perception_subsystem::process_los_caches(
     op.visit(*m_map);
   } /* for(cache..) */
 } /* process_los_caches() */
-
-void mdpo_perception_subsystem::processed_los_verify(
-    const repr::line_of_sight* const c_los) const {
-  /*
-   * Verify that for each cell that contained a block in the LOS, the
-   * corresponding cell in the map also contains the same block.
-   */
-  for (auto& block : c_los->blocks()) {
-    auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
-    ER_ASSERT(cell.state_has_block(),
-              "Cell@%s not in HAS_BLOCK state",
-              block->discrete_loc().to_str().c_str());
-    ER_ASSERT(cell.block()->id() == block->id(),
-              "Cell@%s has wrong block ID (%u vs %u)",
-              block->discrete_loc().to_str().c_str(),
-              block->id(),
-              cell.block()->id());
-  } /* for(&block..) */
-
-  /*
-   * Verify that for each cell in LOS that was empty or contained a block, that
-   * it matches the map version.
-   */
-  for (uint i = 0; i < c_los->xsize(); ++i) {
-    for (uint j = 0; j < c_los->ysize(); ++j) {
-      rmath::vector2u d = c_los->cell(i, j).loc();
-      auto& cell1 = c_los->cell(i, j);
-      auto& cell2 = m_map->access<occupancy_grid::kCell>(d);
-
-      if (cell1.state_has_block() || cell1.state_is_empty()) {
-        ER_ASSERT(cell1.fsm().current_state() == cell2.fsm().current_state(),
-                  "LOS/DPO map disagree on state of cell@%s: %d/%d",
-                  d.to_str().c_str(),
-                  cell1.fsm().current_state(),
-                  cell2.fsm().current_state());
-        if (cell1.state_has_block()) {
-          ER_ASSERT(cell1.block()->id() == cell2.block()->id(),
-                    "LOS/DPO map disagree on block id in cell@%s: %d/%d",
-                    d.to_str().c_str(),
-                    cell1.block()->id(),
-                    cell2.block()->id());
-        }
-      }
-    } /* for(j..) */
-  }   /* for(i..) */
-} /* processed_los_verify() */
 
 void mdpo_perception_subsystem::update_cell_stats(
     const repr::line_of_sight* const los) {

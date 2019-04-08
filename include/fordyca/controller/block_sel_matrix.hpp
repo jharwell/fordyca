@@ -38,7 +38,7 @@
 NS_START(fordyca);
 namespace params { namespace block_sel {
 struct block_sel_matrix_params;
-}}
+}} // namespace params::block_sel
 NS_START(controller);
 namespace rmath = rcppsw::math;
 using block_sel_variant =

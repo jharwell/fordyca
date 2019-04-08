@@ -105,15 +105,6 @@ class mdpo_perception_subsystem
   void process_los_caches(const repr::line_of_sight* const c_los);
 
   /**
-   * @brief The processing of the current LOS after processing (i.e. does the
-   * PAM now accurately reflect what was in the LOS)?
-   *
-   * @param c_los Current LOS.
-   */
-  void processed_los_verify(const repr::line_of_sight* const c_los) const;
-
- private:
-  /**
    * @brief Update the aggregate stats on inaccuracies in the robot's perceived
    * arena map for this timestep.
    *
@@ -122,9 +113,9 @@ class mdpo_perception_subsystem
   void update_cell_stats(const repr::line_of_sight* const los);
 
   /* clang-format off */
-  std::vector<uint>                              m_cell_stats;
-  std::unique_ptr<repr::line_of_sight> m_los;
-  std::unique_ptr<ds::dpo_semantic_map>          m_map;
+  std::vector<uint>                     m_cell_stats;
+  std::unique_ptr<repr::line_of_sight>  m_los;
+  std::unique_ptr<ds::dpo_semantic_map> m_map;
   /* clang-format on */
 };
 

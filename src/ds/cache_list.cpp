@@ -38,7 +38,8 @@ std::string cache_list::to_str(void) const {
                          this->end(),
                          std::string(),
                          [&](const std::string& a, const auto& c) {
-                           return a + "c" + std::to_string(c->id()) + ",";
+                           return a + "c" + std::to_string(c->id()) + "@" +
+                                  c->discrete_loc().to_str() + ",";
                          });
 } /* to_str() */
 
@@ -47,7 +48,8 @@ std::string const_cache_list::to_str(void) const {
                          this->end(),
                          std::string(),
                          [&](const std::string& a, const auto& c) {
-                           return a + "c" + std::to_string(c->id()) + ",";
+                           return a + "c" + std::to_string(c->id()) + "@" +
+                                  c->discrete_loc().to_str() + ",";
                          });
 } /* to_str() */
 

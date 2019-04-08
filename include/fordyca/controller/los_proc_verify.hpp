@@ -1,5 +1,5 @@
 /**
- * @file cache_acquisition_validator.hpp
+ * @file los_proc_verify.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,62 +18,55 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_CACHE_ACQUISITION_VALIDATOR_HPP_
-#define INCLUDE_FORDYCA_FSM_CACHE_ACQUISITION_VALIDATOR_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_LOS_PROC_VERIFY_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_LOS_PROC_VERIFY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
 namespace ds {
-class dp_cache_map;
-} /* namespace ds */
-
-namespace controller {
-class cache_sel_matrix;
-} /* namespace controller */
-
-NS_START(fsm);
-namespace rmath = rcppsw::math;
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+class dpo_store;
+class dpo_semantic_map;
+} // namespace ds
+namespace repr {
+class line_of_sight;
+} /* namespace repr */
+NS_START(controller);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_acquisition_validator
- * @ingroup fsm
+ * @class loc_proc_verify
+ * @ingroup controller
  *
- * @brief Determine if the acquisition of a cache at a specific location/with a
- * specific ID is currently valid, according to simulation parameters and
- * current simulation state.
+ * @brief Verifies that a LOS has been processed properly and that the contents
+ * of the LOS is now accurately reflected in a robots perception.
  */
-class cache_acquisition_validator
-    : public rcppsw::er::client<cache_acquisition_validator> {
+class los_proc_verify : public rcppsw::er::client<los_proc_verify> {
  public:
-  cache_acquisition_validator(const ds::dp_cache_map* map,
-                              const controller::cache_sel_matrix* csel_matrix);
+  explicit los_proc_verify(const repr::line_of_sight* const c_los)
+      : ER_CLIENT_INIT("fordyca.controller.los_proc_verify"), mc_los(c_los) {}
 
-  cache_acquisition_validator(const cache_acquisition_validator& v) = delete;
-  cache_acquisition_validator& operator=(const cache_acquisition_validator& v) =
-      delete;
+  los_proc_verify(const los_proc_verify& v) = delete;
+  los_proc_verify& operator=(const los_proc_verify& v) = delete;
 
-  bool operator()(const rmath::vector2d& loc, int id, uint timestep) const;
+  bool operator()(const ds::dpo_store* c_dpo) const;
+  bool operator()(const ds::dpo_semantic_map* c_map) const;
 
+ private:
   /* clang-format off */
-  const controller::cache_sel_matrix* const mc_csel_matrix;
-  const ds::dp_cache_map*      const        mc_map;
+  const repr::line_of_sight* const mc_los;
   /* clang-format on */
 };
 
-NS_END(fsm, fordyca);
+NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_CACHE_ACQUISITION_VALIDATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLLER_LOS_PROC_VERIFY_HPP_ */

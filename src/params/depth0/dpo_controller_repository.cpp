@@ -36,8 +36,8 @@ NS_START(fordyca, params, depth0);
 dpo_controller_repository::dpo_controller_repository(void) {
   register_parser<block_sel::block_sel_matrix_parser,
                   block_sel::block_sel_matrix_params>(
-                      block_sel::block_sel_matrix_parser::kXMLRoot,
-                      block_sel::block_sel_matrix_parser::kHeader1);
+      block_sel::block_sel_matrix_parser::kXMLRoot,
+      block_sel::block_sel_matrix_parser::kHeader1);
   register_parser<perception::perception_parser, perception::perception_params>(
       perception::perception_parser::kXMLRoot,
       perception::perception_parser::kHeader1);

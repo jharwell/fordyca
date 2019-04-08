@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <list>
 
-#include "rcppsw/math/vector2.hpp"
-#include "rcppsw/er/client.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,14 +49,16 @@ namespace rmath = rcppsw::math;
  * this point, although that may not be true as a robot's knowledge of the arena
  * is imperfect).
  */
-class existing_cache_selector: public rcppsw::er::client<existing_cache_selector> {
+class existing_cache_selector
+    : public rcppsw::er::client<existing_cache_selector> {
  public:
   existing_cache_selector(bool is_pickup,
                           const cache_sel_matrix* matrix,
                           const ds::dp_cache_map* cache_map);
 
   ~existing_cache_selector(void) override = default;
-  existing_cache_selector& operator=(const existing_cache_selector& other) = delete;
+  existing_cache_selector& operator=(const existing_cache_selector& other) =
+      delete;
   existing_cache_selector(const existing_cache_selector& other) = delete;
 
   /**
@@ -66,10 +68,9 @@ class existing_cache_selector: public rcppsw::er::client<existing_cache_selector
    *
    * @return The "best" existing cache.
    */
-  ds::dp_cache_map::value_type operator()(
-      const ds::dp_cache_map& existing_caches,
-      const rmath::vector2d& position,
-      uint timestep);
+  ds::dp_cache_map::value_type operator()(const ds::dp_cache_map& existing_caches,
+                                          const rmath::vector2d& position,
+                                          uint timestep);
 
  private:
   /**

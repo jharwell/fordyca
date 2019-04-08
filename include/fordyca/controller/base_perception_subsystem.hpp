@@ -61,8 +61,8 @@ class base_perception_subsystem {
    */
   virtual void update(void) = 0;
 
-  virtual const ds::dpo_store* dpo_store(void) const { return nullptr; }
-  virtual ds::dpo_store* dpo_store(void) { return nullptr; }
+  virtual const ds::dpo_store* dpo_store(void) const = 0;
+  virtual ds::dpo_store* dpo_store(void) = 0;
 
   /**
    * @brief Set the robots LOS for the next timestep.

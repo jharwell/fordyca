@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/cache_acquisition_validator.hpp"
+#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/params/cache_sel/pickup_policy_params.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
@@ -46,15 +46,19 @@ cache_acquisition_validator::cache_acquisition_validator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool cache_acquisition_validator::operator()(
-    const rmath::vector2d& loc,
-    int id,
-    uint timestep) const {
-
+bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
+                                             int id,
+                                             uint timestep) const {
+  /*
+   * We can't just lookup the cache by the location key we are passed directly,
+   * as it is for a point somewhere *inside* the cache, and thus probably not at
+   * the cache's host cell location. Instead we look up the cache by ID, and
+   * verify that the cache exists contains the point we are acquiring.
+   */
   auto range = mc_map->values_range();
-  auto it = std::find_if(range.begin(), range.end(),
-                         [&](const auto& c) {
-                           return c.ent()->id() == id; });
+  auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
+    return c.ent()->id() == id;
+  });
 
   if (range.end() == it) {
     ER_WARN("Cache%d near %s invalid for acquisition: no such cache",
@@ -77,11 +81,13 @@ bool cache_acquisition_validator::operator()(
     return false;
   } else if (cselm::kInitialPickupPolicyCacheSize == params.policy &&
              cache->n_blocks() < params.cache_size) {
-    ER_WARN("Existing cache%d@%s invalid for acquisition: too few blocks (%zu < %u)",
-            cache->id(),
-            cache->discrete_loc().to_str().c_str(),
-            cache->n_blocks(),
-            params.cache_size);
+    ER_WARN(
+        "Existing cache%d@%s invalid for acquisition: too few blocks (%zu < "
+        "%u)",
+        cache->id(),
+        cache->discrete_loc().to_str().c_str(),
+        cache->n_blocks(),
+        params.cache_size);
     return false;
   }
   return true;

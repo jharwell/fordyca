@@ -22,11 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
@@ -49,7 +49,7 @@ dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
  ******************************************************************************/
 void dpo_perception_subsystem::update(void) {
   process_los(los());
-  processed_los_verify(los());
+  ER_ASSERT(los_proc_verify(los())(dpo_store()), "LOS verification failed");
   m_store->decay_all();
 } /* update() */
 
@@ -72,6 +72,8 @@ void dpo_perception_subsystem::process_los_caches(
   ds::cache_list los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
+    ER_DEBUG("Caches in DPO store: [%s]",
+             rcppsw::to_string(m_store->caches()).c_str());
   }
 
   /* Fix our tracking of caches that no longer exist in our perception */
@@ -83,6 +85,12 @@ void dpo_perception_subsystem::process_los_caches(
               cache->id(),
               cache->real_loc().to_str().c_str(),
               cache->discrete_loc().to_str().c_str());
+    } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
+      ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
+              cache->id(),
+              cache->discrete_loc().to_str().c_str(),
+              cache->n_blocks(),
+              m_store->find(cache)->ent()->n_blocks());
     }
     /*
      * The cache we get a handle to is owned by the simulation, and we don't
@@ -111,6 +119,8 @@ void dpo_perception_subsystem::process_los_blocks(
   ds::block_list los_blocks = c_los->blocks();
   if (!los_blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
+    ER_DEBUG("Blocks in DPO store: [%s]",
+             rcppsw::to_string(m_store->blocks()).c_str());
   }
 
   /*
@@ -156,6 +166,9 @@ void dpo_perception_subsystem::los_tracking_sync(
           });
 
       if (los_caches.end() == it) {
+        ER_INFO("Remove tracked cache%d@%s: not in LOS caches",
+                cache.ent()->id(),
+                cache.ent()->discrete_loc().to_str().c_str());
         m_store->cache_remove(cache.ent_obj());
         ER_ASSERT(nullptr == m_store->find(cache.ent_obj()),
                   "Cache%d still exists in store after removal",
@@ -196,51 +209,5 @@ void dpo_perception_subsystem::los_tracking_sync(
     }
   } /* for(&&block..) */
 } /* los_tracking_sync() */
-
-void dpo_perception_subsystem::processed_los_verify(
-    const repr::line_of_sight* const c_los) const {
-  /*
-   * Verify that for each cell that contained a block in the LOS, that the block
-   * is also contained in the store after processing.
-   */
-  for (auto& block : c_los->blocks()) {
-    ER_ASSERT(m_store->contains(block),
-              "Store does not contain block%d@%s",
-              block->id(),
-              block->discrete_loc().to_str().c_str());
-  } /* for(&block..) */
-
-  /*
-   * Verify that for each cell that contained a cache in the LOS:
-   *
-   * - The corresponding cache exists in the store.
-   * - The store and LOS versions of the cache have the same # of blocks,
-   *   location, and ID.
-   */
-  for (auto& c1 : c_los->caches()) {
-    auto exists = m_store->find(c1);
-    ER_ASSERT(nullptr != exists,
-              "LOS Cache%d@%s does not exist in DPO store",
-              c1->id(),
-              c1->discrete_loc().to_str().c_str());
-    ER_ASSERT(c1->discrete_loc() == exists->ent()->discrete_loc(),
-              "LOS/DPO store disagree on cache%d location: %s/%s",
-              c1->id(),
-              c1->discrete_loc().to_str().c_str(),
-              exists->ent()->discrete_loc().to_str().c_str());
-    ER_ASSERT(c1->id() == exists->ent()->id(),
-              "DPO store contains cache%d@%s/LOS cache%d@%s",
-              c1->id(),
-              c1->discrete_loc().to_str().c_str(),
-              exists->ent()->id(),
-              exists->ent()->discrete_loc().to_str().c_str());
-    ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
-              "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
-              c1->id(),
-              c1->discrete_loc().to_str().c_str(),
-              c1->n_blocks(),
-              exists->ent()->n_blocks());
-  } /* for(c1..) */
-} /* processed_los_verify() */
 
 NS_END(controller, fordyca);

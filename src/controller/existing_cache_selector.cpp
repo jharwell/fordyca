@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/controller/existing_cache_selector.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/math/existing_cache_utility.hpp"
-#include "fordyca/repr/base_cache.hpp"
-#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 #include "fordyca/fsm/cache_acquisition_validator.hpp"
+#include "fordyca/math/existing_cache_utility.hpp"
+#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,9 +63,7 @@ ds::dp_cache_map::value_type existing_cache_selector::operator()(
      * has been satisfied.
      */
     bool acq_valid = fsm::cache_acquisition_validator(mc_cache_map, mc_matrix)(
-        c.ent()->real_loc(),
-        c.ent()->id(),
-        timestep);
+        c.ent()->real_loc(), c.ent()->id(), timestep);
     if (m_is_pickup && !acq_valid) {
       continue;
     }

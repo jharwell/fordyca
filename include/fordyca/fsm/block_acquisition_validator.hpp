@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -44,12 +44,14 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class block_acquisition_validator : public rcppsw::er::client<block_acquisition_validator> {
+class block_acquisition_validator
+    : public rcppsw::er::client<block_acquisition_validator> {
  public:
   block_acquisition_validator(const ds::dp_block_map* map);
 
   block_acquisition_validator(const block_acquisition_validator& v) = delete;
-  block_acquisition_validator& operator=(const block_acquisition_validator& v) = delete;
+  block_acquisition_validator& operator=(const block_acquisition_validator& v) =
+      delete;
 
   bool operator()(const rmath::vector2d& loc, uint id) const;
 

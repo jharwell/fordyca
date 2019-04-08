@@ -94,14 +94,6 @@ class dpo_perception_subsystem
   void los_tracking_sync(const repr::line_of_sight* const c_los,
                          const ds::block_list& los_blocks);
 
-  /**
-   * @brief The processing of the current LOS after processing (i.e. does the
-   * PAM now accurately reflect what was in the LOS)?
-   *
-   * @param c_los Current LOS.
-   */
-  void processed_los_verify(const repr::line_of_sight* const c_los) const;
-
  private:
   /* clang-format off */
   std::unique_ptr<ds::dpo_store>                 m_store;

@@ -47,7 +47,7 @@ class base_foraging_task;
 namespace depth2 {
 class cache_finisher;
 class cache_starter;
-}
+} // namespace depth2
 } // namespace tasks
 
 namespace visitor = rcppsw::patterns::visitor;

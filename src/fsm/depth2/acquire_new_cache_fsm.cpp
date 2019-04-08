@@ -52,7 +52,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
           std::bind([](void) noexcept {
             return false;
           }), /* new caches never acquired via exploration */
-      [](const rmath::vector2d&, uint) { return true; }),
+          [](const rmath::vector2d&, uint) { return true; }),
       mc_matrix(matrix),
       mc_store(store) {}
 
@@ -63,7 +63,8 @@ __rcsw_pure bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
-boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_select(void) const {
+boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_select(
+    void) const {
   /* A "new" cache is the same as a single block  */
   auto best = controller::depth2::new_cache_selector(
       mc_matrix)(mc_store->blocks(), mc_store->caches(), sensors()->position());

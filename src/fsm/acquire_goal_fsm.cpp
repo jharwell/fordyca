@@ -224,8 +224,7 @@ bool acquire_goal_fsm::acquire_known_goal(void) {
   /* we are vectoring */
   if (!m_vector_fsm.task_finished()) {
     m_vector_fsm.task_execute();
-    if (!m_goal_valid_cb(m_vector_fsm.target(),
-                        m_acq_id)) {
+    if (!m_goal_valid_cb(m_vector_fsm.target(), m_acq_id)) {
       m_vector_fsm.task_reset();
       return false;
     }

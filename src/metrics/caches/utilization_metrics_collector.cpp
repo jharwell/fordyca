@@ -68,22 +68,26 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
           separator();
 
   line += std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                         (timestep() + 1)) + separator();
+                         (timestep() + 1)) +
+          separator();
 
   line += std::to_string(static_cast<double>(m_stats.int_pickups) / interval()) +
           separator();
   line += std::to_string(static_cast<double>(m_stats.cum_pickups) /
-                         (timestep() + 1)) + separator();
+                         (timestep() + 1)) +
+          separator();
 
   line += std::to_string(static_cast<double>(m_stats.int_drops) / interval()) +
           separator();
-  line += std::to_string(static_cast<double>(m_stats.cum_drops) /
-                         (timestep() + 1)) + separator();
+  line +=
+      std::to_string(static_cast<double>(m_stats.cum_drops) / (timestep() + 1)) +
+      separator();
 
-  line += std::to_string(static_cast<double>(m_int_cache_count) /
-                         interval()) + separator();
-  line += std::to_string(static_cast<double>(m_cum_cache_count) /
-                         (timestep() + 1)) + separator();
+  line += std::to_string(static_cast<double>(m_int_cache_count) / interval()) +
+          separator();
+  line +=
+      std::to_string(static_cast<double>(m_cum_cache_count) / (timestep() + 1)) +
+      separator();
   return true;
 } /* csv_line_build() */
 

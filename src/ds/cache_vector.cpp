@@ -38,7 +38,8 @@ std::string cache_vector::to_str(void) const {
                          this->end(),
                          std::string(),
                          [&](const std::string& a, const auto& b) {
-                           return a + "c" + std::to_string(b->id()) + ",";
+                           return a + "c" + std::to_string(b->id()) + "@" +
+                                  b->discrete_loc().to_str() + ",";
                          });
 } /* to_string() */
 

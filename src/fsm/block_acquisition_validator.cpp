@@ -34,8 +34,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 block_acquisition_validator::block_acquisition_validator(
     const ds::dp_block_map* map)
-    : ER_CLIENT_INIT("fordyca.fsm.block_acquisition_validator"),
-      mc_map(map) {}
+    : ER_CLIENT_INIT("fordyca.fsm.block_acquisition_validator"), mc_map(map) {}
 
 /*******************************************************************************
  * Member Functions
