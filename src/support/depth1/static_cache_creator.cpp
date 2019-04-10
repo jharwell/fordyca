@@ -37,8 +37,8 @@ using repr::base_cache;
  ******************************************************************************/
 static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
                                            const rmath::vector2d& center,
-                                           double cache_size)
-    : base_cache_creator(grid, cache_size),
+                                           double cache_dim)
+    : base_cache_creator(grid, cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
       m_center(center) {}
 
@@ -48,7 +48,7 @@ static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
 ds::cache_vector static_cache_creator::create_all(
     const ds::cache_vector& existing_caches,
     ds::block_vector& blocks,
-    double) {
+    uint timestep) {
   ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
   ds::cache_vector caches;
 
@@ -63,9 +63,9 @@ ds::cache_vector static_cache_creator::create_all(
     starter_blocks.push_back(b);
   } /* for(b..) */
 
-  auto cache = create_single_cache(starter_blocks, m_center);
-  auto cache_p = std::shared_ptr<repr::arena_cache>(std::move(cache));
-  caches.push_back(cache_p);
+  std::shared_ptr<repr::arena_cache> cache =
+      create_single_cache(starter_blocks, m_center, timestep);
+  caches.push_back(cache);
   return caches;
 } /* create() */
 

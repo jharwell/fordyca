@@ -300,10 +300,8 @@ void depth2_loop_functions::PreStep() {
   } /* for(&entity..) */
 
   /* handle cache removal */
-  if (arena_map()->caches_removed() > 0) {
-    m_cache_manager->caches_depleted(arena_map()->caches_removed());
+  if (m_cache_manager->caches_depleted() > 0) {
     floor()->SetChanged();
-    arena_map()->caches_removed_reset();
   }
 
   pre_step_final();
@@ -364,10 +362,10 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
   auto ret =
       m_cache_manager->create(arena_map()->caches(),
                               arena_map()->block_distributor()->block_clusters(),
-                              arena_map()->blocks());
+                              arena_map()->blocks(),
+                              GetSpace().GetSimulationClock());
   if (ret.status) {
     arena_map()->caches_add(ret.caches);
-    m_cache_manager->caches_created(ret.caches.size());
     floor()->SetChanged();
   }
   return ret.status;

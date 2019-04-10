@@ -124,29 +124,28 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
 
 base_cache_manager::creation_res_t static_cache_manager::create_conditional(
     ds::block_vector& blocks,
+    uint timestep,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
       mc_cache_params.static_.respawn_scale_factor);
   std::uniform_real_distribution<> dist(0.0, 1.0);
   if (p.calc(n_harvesters, n_collectors) >= dist(m_reng)) {
-    return create(blocks);
+    return create(blocks, timestep);
   } else {
     return creation_res_t{false, ds::cache_vector()};
   }
 } /* create_conditional() */
 
 base_cache_manager::creation_res_t static_cache_manager::create(
-    ds::block_vector& blocks) {
+    ds::block_vector& blocks,
+    uint timestep) {
   ER_DEBUG("(Re)-Creating static cache");
   ER_ASSERT(mc_cache_params.static_.size >= repr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
             mc_cache_params.static_.size,
             repr::base_cache::kMinBlocks);
 
-  support::depth1::static_cache_creator creator(arena_grid(),
-                                                mc_cache_loc,
-                                                mc_cache_params.dimension);
   auto ret = calc_blocks_for_creation(blocks);
   if (!ret.status) {
     ER_WARN("Unable to create static cache @%s: Not enough free blocks",
@@ -154,11 +153,17 @@ base_cache_manager::creation_res_t static_cache_manager::create(
     return creation_res_t{false, ds::cache_vector()};
   }
   ds::cache_vector created;
+
+  support::depth1::static_cache_creator creator(arena_grid(),
+                                                mc_cache_loc,
+                                                mc_cache_params.dimension);
+
   /* no existing caches, so empty vector */
-  created = creator.create_all(ds::cache_vector(), ret.blocks, -1);
+  created = creator.create_all(ds::cache_vector(), ret.blocks, timestep);
   ER_ASSERT(1 == created.size(),
             "Wrong # caches after static create: %zu",
             created.size());
+  caches_created(1);
 
   /*
    * Any blocks that are under where the cache currently is (i.e. will be

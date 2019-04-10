@@ -45,10 +45,13 @@ namespace er = rcppsw::er;
 class dynamic_cache_creator : public base_cache_creator,
                               public er::client<dynamic_cache_creator> {
  public:
-  dynamic_cache_creator(ds::arena_grid* grid,
-                        double cache_dim,
-                        double min_dist,
-                        uint min_blocks);
+  struct params {
+    ds::arena_grid* grid;
+    double          cache_dim;
+    double          min_dist;
+    uint            min_blocks;
+  };
+  explicit dynamic_cache_creator(const struct params* p);
 
   /**
    * @brief Create new caches in the arena from blocks that are close enough
@@ -56,7 +59,7 @@ class dynamic_cache_creator : public base_cache_creator,
    */
   ds::cache_vector create_all(const ds::cache_vector& previous_caches,
                               ds::block_vector& candidate_blocks,
-                              double cache_dim) override;
+                              uint timestep) override;
 
  private:
   /**

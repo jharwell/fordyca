@@ -73,6 +73,7 @@ class dynamic_cache_manager : public base_cache_manager,
    * @param clusters The total block clusters in the arena, for use in
    * (possibly) disallowing cache creation within their boundaries, depending on
    * configuration.
+   * @param timestep The current timestep.
    *
    * @return \c TRUE iff at least 1 dynamic cache was actually
    * created. Non-fatal failures to create dynamic caches can occur if, for
@@ -80,7 +81,8 @@ class dynamic_cache_manager : public base_cache_manager,
    */
   creation_res_t create(const ds::cache_vector& existing_caches,
                          const ds::const_block_cluster_list& clusters,
-                         ds::block_vector& blocks);
+                        ds::block_vector& blocks,
+                        uint timestep);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches

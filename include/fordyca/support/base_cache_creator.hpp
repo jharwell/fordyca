@@ -67,6 +67,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * @param grid Reference to arena grid.
    * @param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
+   * @param timestep The current timestep.
    */
   base_cache_creator(ds::arena_grid* grid, double cache_dim);
 
@@ -80,16 +81,13 @@ class base_cache_creator : public er::client<base_cache_creator> {
    *                        avoiding overlaps during new cache creation.
    * @param candidate_blocks The vector of free blocks that may be used in cache
    *                         creation.
-   * @param cache_dim The dimensions of the caches to create. Possibly needed
-   *                  for deconflicting the new cache's location with arena
-   *                  boundaries in the cache where there are no existing
-   *                  caches that can be used to obtain cache dimensions
+   * @param timestep The current timestep.
    *
    * @return A vector of created caches.
    */
   virtual ds::cache_vector create_all(const ds::cache_vector& existing_caches,
                                       ds::block_vector& candidate_blocks,
-                                      double cache_dim) = 0;
+                                      uint timestep) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact
@@ -116,7 +114,8 @@ class base_cache_creator : public er::client<base_cache_creator> {
    */
   std::unique_ptr<repr::arena_cache> create_single_cache(
       ds::block_list blocks,
-      const rmath::vector2d& center);
+      const rmath::vector2d& center,
+      uint timestep);
 
   /**
    * @brief Basic sanity checks on newly created caches:
@@ -134,9 +133,11 @@ class base_cache_creator : public er::client<base_cache_creator> {
   bool creation_sanity_checks(const ds::cache_vector& new_caches,
                               const ds::block_list& free_blocks) const;
 
+  double cache_dim(void) const { return mc_cache_dim; }
+
  private:
   /* clang-format off */
-  double                             m_cache_dim;
+  double                             mc_cache_dim;
   ds::arena_grid*                    m_grid;
   mutable std::default_random_engine m_rng;
   /* clang-format on */

@@ -71,7 +71,7 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
         m_free_pickup_interactor(map, floor, tv_manager),
         m_nest_drop_interactor(map, metrics_agg, floor, tv_manager),
         m_task_abort_interactor(map, floor),
-        m_cached_pickup_interactor(map, floor, tv_manager),
+        m_cached_pickup_interactor(map, floor, tv_manager, cache_manager),
         m_existing_cache_drop_interactor(map, tv_manager),
         m_cache_site_drop_interactor(map,
                                      floor,

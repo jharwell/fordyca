@@ -83,15 +83,6 @@ class arena_map : public er::client<arena_map>,
   bool has_robot(uint i, uint j) const override;
 
   /**
-   * @brief Reset the # of caches that have been removed on a single timestep
-   * from the arena due to depletion.
-   */
-  void caches_removed_reset(void) { m_caches_removed = 0; }
-
-  void caches_removed(uint b) { m_caches_removed += b; }
-  uint caches_removed(void) const { return m_caches_removed; }
-
-  /**
    * @brief Get the list of all the blocks currently present in the arena.
    *
    * Some blocks may not be visible on the arena_map, as they are being carried
@@ -261,7 +252,6 @@ class arena_map : public er::client<arena_map>,
 
  private:
   /* clang-format off */
-  uint                                 m_caches_removed{0};
   block_vector                         m_blocks;
   cache_vector                         m_caches;
   repr::nest                           m_nest;

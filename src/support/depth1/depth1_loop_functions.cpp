@@ -229,12 +229,18 @@ void depth1_loop_functions::private_init(void) {
 
   /* intitialize robot interactions with environment */
   m_interactors = rcppsw::make_unique<interactor_map>();
-  m_interactors->emplace(
-      typeid(controller::depth1::gp_dpo_controller),
-      gp_dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
-  m_interactors->emplace(
-      typeid(controller::depth1::gp_mdpo_controller),
-      gp_mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_manager()));
+  m_interactors->emplace(typeid(controller::depth1::gp_dpo_controller),
+                         gp_dpo_itype(arena_map(),
+                                      m_metrics_agg.get(),
+                                      floor(),
+                                      tv_manager(),
+                                      m_cache_manager.get()));
+  m_interactors->emplace(typeid(controller::depth1::gp_mdpo_controller),
+                         gp_mdpo_itype(arena_map(),
+                                       m_metrics_agg.get(),
+                                       floor(),
+                                       tv_manager(),
+                                       m_cache_manager.get()));
 
   /*
    * Configure robots by mapping the controller type into a templated configurer
@@ -429,7 +435,8 @@ void depth1_loop_functions::Reset() {
   base_loop_functions::Reset();
   m_metrics_agg->reset_all();
 
-  auto ret = m_cache_manager->create(arena_map()->blocks());
+  auto ret = m_cache_manager->create(arena_map()->blocks(),
+                                     GetSpace().GetSimulationClock());
   if (ret.status) {
     arena_map()->caches_add(ret.caches);
     floor()->SetChanged();
@@ -502,7 +509,7 @@ std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
   return std::make_pair(n_harvesters, n_collectors);
 } /* d1_task_counts() */
 
-uint depth1_loop_functions::n_free_blocks(void) const {
+__rcsw_pure uint depth1_loop_functions::n_free_blocks(void) const {
   auto accum = [&](uint sum, const auto& b) {
     return sum + (-1 == b->robot_id());
   };
@@ -522,9 +529,11 @@ void depth1_loop_functions::pre_step_final(void) {
    */
   auto pair = d1_task_counts();
   if (arena_map()->caches().empty()) {
-    auto ret = m_cache_manager->create_conditional(arena_map()->blocks(),
-                                                   pair.first,
-                                                   pair.second);
+    auto ret =
+        m_cache_manager->create_conditional(arena_map()->blocks(),
+                                            GetSpace().GetSimulationClock(),
+                                            pair.first,
+                                            pair.second);
 
     if (ret.status) {
       arena_map()->caches_add(ret.caches);
@@ -534,7 +543,6 @@ void depth1_loop_functions::pre_step_final(void) {
                 "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
                 arena_map()->caches()[0]->n_blocks(),
                 cell.block_count());
-      m_cache_manager->caches_created(1);
       floor()->SetChanged();
     } else {
       ER_INFO(
@@ -546,10 +554,8 @@ void depth1_loop_functions::pre_step_final(void) {
     }
   }
 
-  if (arena_map()->caches_removed() > 0) {
-    m_cache_manager->caches_depleted(arena_map()->caches_removed());
+  if (m_cache_manager->caches_depleted() > 0) {
     floor()->SetChanged();
-    arena_map()->caches_removed_reset();
   }
 
   m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
@@ -573,7 +579,8 @@ void depth1_loop_functions::cache_handling_init(
         cachep, &arena_map()->decoratee(), cache_loc);
 
     /* return value ignored at this level (for now...) */
-    auto ret = m_cache_manager->create(arena_map()->blocks());
+    auto ret = m_cache_manager->create(arena_map()->blocks(),
+                                       GetSpace().GetSimulationClock());
     arena_map()->caches_add(ret.caches);
   }
 } /* cache_handling_init() */

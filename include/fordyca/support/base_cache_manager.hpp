@@ -74,23 +74,27 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics {
   base_cache_manager& operator=(const base_cache_manager& other) = delete;
 
   /* cache lifecycle metrics */
-  uint caches_created(void) const override { return m_cache_created; }
-  uint caches_depleted(void) const override { return m_cache_depleted; }
-  void caches_created(uint c) { m_cache_created += c; }
-  void caches_depleted(uint c) { m_cache_depleted += c; }
+  uint caches_created(void) const override { return m_caches_created; }
+  uint caches_depleted(void) const override { return m_depletion_ages.size(); }
+  std::vector<uint> cache_depletion_ages(void) const override {
+    return m_depletion_ages;
+  }
+
+  void cache_depleted(uint age) { m_depletion_ages.push_back(age); }
   void reset_metrics(void) override {
-    m_cache_created = 0;
-    m_cache_depleted = 0;
+    m_caches_created = 0;
+    m_depletion_ages.clear();
   }
 
  protected:
+  void caches_created(uint c) { m_caches_created += c; }
   const ds::arena_grid* arena_grid(void) const { return m_grid; }
   ds::arena_grid* arena_grid(void) { return m_grid; }
 
  private:
   /* clang-format off */
-  uint                   m_cache_created{0};
-  uint                   m_cache_depleted{0};
+  uint                   m_caches_created{0};
+  std::vector<uint>      m_depletion_ages{};
   ds::arena_grid * const m_grid;
   /* clang-format on */
 };

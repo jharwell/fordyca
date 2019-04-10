@@ -72,17 +72,19 @@ class static_cache_manager : public base_cache_manager,
    * @brief (Re)-create the static cache in the arena (depth 1 only).
    *
    * @param blocks The total block vector for the arena.
+   * @param timestep The current timestep.
    *
    * @return \c TRUE iff a static cache was actually created. Non-fatal failures
    * to create the static cache can occur if, for example, all blocks are
    * currently being carried by robots and there are not enough free blocks with
    * which to create a cache of the specified minimum size.
    */
-  creation_res_t create(ds::block_vector& blocks);
+  creation_res_t create(ds::block_vector& blocks, uint timestep);
 
   creation_res_t create_conditional(ds::block_vector& blocks,
-                                     uint n_harvesters,
-                                     uint n_collectors);
+                                    uint timestep,
+                                    uint n_harvesters,
+                                    uint n_collectors);
 
  private:
   /**

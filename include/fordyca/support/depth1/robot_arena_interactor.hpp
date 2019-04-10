@@ -30,6 +30,7 @@
 #include "fordyca/support/existing_cache_block_drop_interactor.hpp"
 #include "fordyca/support/free_block_pickup_interactor.hpp"
 #include "fordyca/support/nest_block_drop_interactor.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,13 +62,14 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
   robot_arena_interactor(ds::arena_map* const map,
                          depth0::depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor,
-                         tv::tv_manager* const tv_manager)
+                         tv::tv_manager* const tv_manager,
+                         base_cache_manager* cache_manager)
       : ER_CLIENT_INIT("fordyca.support.depth1.robot_arena_interactor"),
         m_tv_manager(tv_manager),
         m_free_pickup_interactor(map, floor, tv_manager),
         m_nest_drop_interactor(map, metrics_agg, floor, tv_manager),
         m_task_abort_interactor(map, floor),
-        m_cached_pickup_interactor(map, floor, tv_manager),
+        m_cached_pickup_interactor(map, floor, tv_manager, cache_manager),
         m_existing_cache_drop_interactor(map, tv_manager) {}
 
   /**

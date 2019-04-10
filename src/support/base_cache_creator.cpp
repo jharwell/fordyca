@@ -42,7 +42,7 @@ using ds::arena_grid;
 base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
                                        double cache_dim)
     : ER_CLIENT_INIT("fordyca.support.base_cache_creator"),
-      m_cache_dim(cache_dim),
+      mc_cache_dim(cache_dim),
       m_grid(grid),
       m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
@@ -51,7 +51,8 @@ base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
  ******************************************************************************/
 std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
     ds::block_list blocks,
-    const rmath::vector2d& center) {
+    const rmath::vector2d& center,
+    uint timestep) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
             center.to_str().c_str());
@@ -110,7 +111,8 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
       });
   ds::block_vector block_vec(blocks.begin(), blocks.end());
   auto ret = rcppsw::make_unique<repr::arena_cache>(
-      m_cache_dim, m_grid->resolution(), center, block_vec, -1);
+      mc_cache_dim, m_grid->resolution(), center, block_vec, -1);
+  ret->creation_ts(timestep);
   ER_INFO("Create cache%d@%s/%s, xspan=%s,yspan=%s with %zu blocks [%s]",
           ret->id(),
           ret->real_loc().to_str().c_str(),

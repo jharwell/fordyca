@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <vector>
+
 #include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
@@ -59,6 +61,12 @@ class lifecycle_metrics : public rcppsw::metrics::base_metrics {
    * this timestep.
    */
   virtual uint caches_depleted(void) const = 0;
+
+  /**
+   * @brief Should return the ages of the caches that were depleted this
+   * timestep (i.e. how many timesteps did they exist before being depleted?).
+   */
+  virtual std::vector<uint> cache_depletion_ages(void) const = 0;
 };
 
 NS_END(caches, metrics, fordyca);

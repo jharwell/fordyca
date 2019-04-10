@@ -70,9 +70,10 @@ class base_cache : public multicell_entity,
    * @param resolution The arena resolution.
    * @param center (X,Y) coordinates of the center of the cache.
    * @param blocks The initial block list for the cache.
+
    * @param id The ID to assign to the cache; -1 for a new cache, which
    * will generate a new ID, or any positive # to use the same ID as an existing
-   * cache (used when cloning a cache into a robot's perceived arena map).
+   * cache (used when cloning a cache into a robot's perception).
    */
   base_cache(double dimension,
              double resolution,
@@ -159,11 +160,16 @@ class base_cache : public multicell_entity,
 
   std::unique_ptr<base_cache> clone(void) const override;
 
+  uint creation_ts(void) const { return m_creation_ts; }
+  void creation_ts(uint creation_ts) { m_creation_ts = creation_ts; }
+
  private:
   /* clang-format off */
   static int       m_next_id;
 
-  double           m_resolution;
+  const double     mc_resolution;
+
+  uint             m_creation_ts{0};
   ds::block_vector m_blocks;
   /* clang-format on */
 };

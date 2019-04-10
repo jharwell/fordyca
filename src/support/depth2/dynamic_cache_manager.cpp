@@ -51,21 +51,24 @@ dynamic_cache_manager::dynamic_cache_manager(
 base_cache_manager::creation_res_t dynamic_cache_manager::create(
     const ds::cache_vector& existing_caches,
     const ds::const_block_cluster_list& clusters,
-    ds::block_vector& blocks) {
-  support::depth2::dynamic_cache_creator creator(
-      arena_grid(),
-      mc_cache_params.dimension,
-      mc_cache_params.dynamic.min_dist,
-      mc_cache_params.dynamic.min_blocks);
-
+    ds::block_vector& blocks,
+    uint timestep) {
   block_calc_res_t r =
       calc_blocks_for_creation(existing_caches, clusters, blocks);
   if (!r.status) {
     return creation_res_t{false, ds::cache_vector()};
   }
 
+  support::depth2::dynamic_cache_creator::params params = {
+      .grid = arena_grid(),
+      .cache_dim = mc_cache_params.dimension,
+      .min_dist = mc_cache_params.dynamic.min_dist,
+      .min_blocks = mc_cache_params.dynamic.min_blocks};
+  support::depth2::dynamic_cache_creator creator(&params);
+
   ds::cache_vector created =
-      creator.create_all(existing_caches, r.blocks, mc_cache_params.dimension);
+      creator.create_all(existing_caches, r.blocks, timestep);
+  caches_created(created.size());
 
   /*
    * Must be after fixing hidden blocks, otherwise the cache host cell will

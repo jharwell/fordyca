@@ -67,6 +67,9 @@ class cache_collector;
 } // namespace depth2
 } // namespace tasks
 
+namespace support {
+class base_cache_manager;
+} /* namespace support */
 NS_START(events, detail);
 
 /*******************************************************************************
@@ -82,6 +85,7 @@ struct cached_block_pickup_visit_set {
       fsm::block_to_goal_fsm,
       fsm::depth1::cached_block_to_nest_fsm,
       tasks::depth1::collector,
+      support::base_cache_manager,
       /* depth2 */
       controller::depth2::grp_dpo_controller,
       controller::depth2::grp_mdpo_controller,
@@ -125,6 +129,7 @@ class cached_block_pickup : public rcppsw::er::client<cached_block_pickup>,
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
   void visit(controller::depth1::gp_dpo_controller& controller);
   void visit(controller::depth1::gp_mdpo_controller& controller);
+  void visit(support::base_cache_manager& manager);
 
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& controller);
@@ -138,8 +143,8 @@ class cached_block_pickup : public rcppsw::er::client<cached_block_pickup>,
                                     controller::cache_sel_matrix* csel_matrix);
 
   /* clang-format off */
-  uint                                         m_robot_index;
-  uint                                         m_timestep;
+  const uint                         mc_robot_index;
+  const uint                         mc_timestep;
   std::shared_ptr<repr::arena_cache> m_real_cache;
 
   /**

@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <set>
 #include <string>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
@@ -64,8 +63,13 @@ class lifecycle_metrics_collector : public rmetrics::base_metrics_collector {
    * @brief All stats are cumulative within an interval.
    */
   struct stats {
-    uint n_created;
-    uint n_depleted;
+    uint int_created;
+    uint int_depleted;
+    uint int_depletion_sum;
+
+    uint cum_created;
+    uint cum_depleted;
+    uint cum_depletion_sum;
   };
 
   std::string csv_header_build(const std::string& header) override;

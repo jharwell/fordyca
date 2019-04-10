@@ -38,14 +38,11 @@ NS_START(fordyca, support, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dynamic_cache_creator::dynamic_cache_creator(ds::arena_grid* const grid,
-                                             double cache_dim,
-                                             double min_dist,
-                                             uint min_blocks)
-    : base_cache_creator(grid, cache_dim),
+dynamic_cache_creator::dynamic_cache_creator(const struct params* const p)
+    : base_cache_creator(p->grid, p->cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_creator"),
-      m_min_dist(min_dist),
-      m_min_blocks(min_blocks) {}
+      m_min_dist(p->min_dist),
+      m_min_blocks(p->min_blocks) {}
 
 /*******************************************************************************
  * Member Functions
@@ -53,7 +50,7 @@ dynamic_cache_creator::dynamic_cache_creator(ds::arena_grid* const grid,
 ds::cache_vector dynamic_cache_creator::create_all(
     const ds::cache_vector& previous_caches,
     ds::block_vector& candidate_blocks,
-    double cache_dim) {
+    uint timestep) {
   ds::cache_vector created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
@@ -78,7 +75,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
       ds::block_list b_avoid =
           avoidance_blocks_calc(candidate_blocks, used_blocks, cache_i_blocks);
 
-      if (auto center = cache_center_calculator(grid(), cache_dim)(
+      if (auto center = cache_center_calculator(grid(), cache_dim())(
               cache_i_blocks, b_avoid, c_avoid)) {
         /*
          * We convert to discrete and then back to real coordinates so that our
@@ -86,8 +83,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * which keeps asserts about cache extent from triggering right after
          * creation, which can happen otherwise.
          */
-        auto cache_p = std::shared_ptr<repr::arena_cache>(
-            create_single_cache(cache_i_blocks, rmath::uvec2dvec(center.get())));
+        auto cache_p = std::shared_ptr<repr::arena_cache>(create_single_cache(
+            cache_i_blocks, rmath::uvec2dvec(center.get()), timestep));
         created_caches.push_back(cache_p);
       }
 

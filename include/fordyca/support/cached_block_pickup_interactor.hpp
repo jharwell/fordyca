@@ -31,6 +31,7 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
@@ -56,12 +57,14 @@ class cached_block_pickup_interactor
  public:
   cached_block_pickup_interactor(ds::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
-                                 tv::tv_manager* tv_manager)
+                                 tv::tv_manager* tv_manager,
+                                 support::base_cache_manager* cache_manager)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
         m_penalty_handler(tv_manager->penalty_handler<T>(
-            tv::cache_op_src::kSrcExistingCachePickup)) {}
+            tv::cache_op_src::kSrcExistingCachePickup)),
+        m_cache_manager(cache_manager) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -164,8 +167,13 @@ class cached_block_pickup_interactor
     (*it)->penalty_served(penalty.penalty());
 
     /*
-     * Map must be called before controller for proper cache block decrement!
+     * Visitation order must be:
+     *
+     * static cache manager (update metrics)
+     * Map (actually remove the cache/ensure proper block decrement)
+     * Controller
      */
+    pickup_op.visit(*m_cache_manager);
     pickup_op.visit(*m_map);
     pickup_op.visit(controller);
   }
@@ -175,6 +183,7 @@ class cached_block_pickup_interactor
   argos::CFloorEntity* const             m_floor;
   ds::arena_map* const                   m_map;
   tv::cache_op_penalty_handler<T>* const m_penalty_handler;
+  base_cache_manager *                   m_cache_manager;
   /* clang-format on */
 };
 

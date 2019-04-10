@@ -38,6 +38,7 @@
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/base_block.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
@@ -61,8 +62,8 @@ cached_block_pickup::cached_block_pickup(
     uint timestep)
     : ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
       cell_op(cache->discrete_loc()),
-      m_robot_index(robot_index),
-      m_timestep(timestep),
+      mc_robot_index(robot_index),
+      mc_timestep(timestep),
       m_real_cache(cache) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
             "< %zu blocks in cache",
@@ -180,7 +181,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
     ER_INFO(
         "arena_map: fb%u: block%d from cache%d@(%u, %u),remaining=[%s] (%zu)",
-        m_robot_index,
+        mc_robot_index,
         m_pickup_block->id(),
         cache_id,
         cell_op::x(),
@@ -200,9 +201,8 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
     map.cache_extent_clear(m_real_cache);
     map.cache_remove(m_real_cache);
-    map.caches_removed(1);
     ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [depleted]",
-            m_robot_index,
+            mc_robot_index,
             m_pickup_block->id(),
             cache_id,
             cell_op::x(),
@@ -228,7 +228,7 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
   if (pcache->ent()->n_blocks() > base_cache::kMinBlocks) {
     pcache->ent_obj()->block_remove(m_pickup_block);
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
-            m_robot_index,
+            mc_robot_index,
             m_pickup_block->id(),
             pcache->ent()->id(),
             cell_op::coord().to_str().c_str(),
@@ -240,7 +240,7 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
     pcache->ent_obj()->block_remove(m_pickup_block);
     store.cache_remove(pcache->ent_obj());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
-            m_robot_index,
+            mc_robot_index,
             m_pickup_block->id(),
             id,
             cell_op::coord().to_str().c_str());
@@ -271,7 +271,7 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
               cell_op::coord().to_str().c_str());
 
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
-            m_robot_index,
+            mc_robot_index,
             m_pickup_block->id(),
             cell.cache()->id(),
             cell_op::coord().to_str().c_str(),
@@ -284,20 +284,26 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
 
     map.cache_remove(cell.cache());
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s [depleted]",
-            m_robot_index,
+            mc_robot_index,
             m_pickup_block->id(),
             id,
             cell_op::coord().to_str().c_str());
   }
 } /* visit() */
 
+void cached_block_pickup::visit(support::base_cache_manager& manager) {
+  if (m_real_cache->n_blocks() == base_cache::kMinBlocks) {
+    manager.cache_depleted(mc_timestep - m_real_cache->creation_ts());
+  }
+} /* visit() */
+
 void cached_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
-  block.add_transporter(m_robot_index);
-  block.first_pickup_time(m_timestep);
+  block.add_transporter(mc_robot_index);
+  block.first_pickup_time(mc_timestep);
 
   block.move_out_of_sight();
-  ER_INFO("Block%d is now carried by fb%u", block.id(), m_robot_index);
+  ER_INFO("Block%d is now carried by fb%u", block.id(), mc_robot_index);
 } /* visit() */
 
 void cached_block_pickup::visit(
