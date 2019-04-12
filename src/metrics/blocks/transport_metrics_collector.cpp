@@ -39,27 +39,30 @@ transport_metrics_collector::transport_metrics_collector(const std::string& ofna
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string transport_metrics_collector::csv_header_build(
-    const std::string& header) {
-  /* clang-format off */
-  return base_metrics_collector::csv_header_build(header) +
-      "cum_collected" + separator() +
-      "cum_ramp_collected" + separator() +
-      "cum_cube_collected" + separator() +
-      "int_avg_collected" + separator() +
-      "cum_avg_collected" + separator() +
-      "int_avg_cube_collected" + separator() +
-      "cum_avg_cube_collected" + separator() +
-      "int_avg_ramp_collected" + separator() +
-      "cum_avg_ramp_collected" + separator() +
-      "int_avg_transporters" + separator() +
-      "cum_avg_transporters" + separator() +
-      "int_avg_transport_time" + separator() +
-      "cum_avg_transport_time" + separator() +
-      "int_avg_initial_wait_time" + separator() +
-      "cum_avg_initial_wait_time" + separator();
-  /* clang-format on */
-} /* csv_header_build() */
+std::list<std::string> transport_metrics_collector::csv_header_cols(void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+    /* clang-format off */
+    "cum_collected",
+    "cum_ramp_collected",
+    "cum_cube_collected",
+    "int_avg_collected",
+    "cum_avg_collected",
+    "int_avg_cube_collected",
+    "cum_avg_cube_collected",
+    "int_avg_ramp_collected",
+    "cum_avg_ramp_collected",
+    "int_avg_transporters",
+    "cum_avg_transporters",
+    "int_avg_transport_time",
+    "cum_avg_transport_time",
+    "int_avg_initial_wait_time",
+    "cum_avg_initial_wait_time"
+    /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void transport_metrics_collector::reset(void) {
   base_metrics_collector::reset();

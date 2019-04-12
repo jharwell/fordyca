@@ -43,15 +43,14 @@ robot_occupancy_metrics_collector::robot_occupancy_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string robot_occupancy_metrics_collector::csv_header_build(
-    const std::string&) {
-  std::string line;
+std::list<std::string> robot_occupancy_metrics_collector::csv_header_cols(void) const {
+  std::list<std::string> cols;
   for (size_t j = 0; j < m_stats.ysize(); ++j) {
-    line += "y" + std::to_string(j) + separator();
+    cols.push_back("y" + std::to_string(j));
   } /* for(j..) */
 
-  return line;
-} /* csv_header_build() */
+  return cols;
+} /* csv_header_cols() */
 
 void robot_occupancy_metrics_collector::reset(void) {
   base_metrics_collector::reset();
@@ -65,7 +64,7 @@ bool robot_occupancy_metrics_collector::csv_line_build(std::string& line) {
   for (size_t i = 0; i < m_stats.xsize(); ++i) {
     for (size_t j = 0; j < m_stats.ysize(); ++j) {
       line +=
-          std::to_string(m_stats.access(i, j) / static_cast<double>(m_total)) +
+          std::to_string(m_stats.access(i, j) / static_cast<double>(m_total_robots)) +
           separator();
     } /* for(j..) */
     line += "\n";
@@ -78,7 +77,7 @@ void robot_occupancy_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const robot_occupancy_metrics&>(metrics);
 
-  ++m_total;
+  ++m_total_robots;
   for (size_t i = 0; i < m_stats.xsize(); ++i) {
     for (size_t j = 0; j < m_stats.ysize(); ++j) {
       m_stats.access(i, j) += m.has_robot(i, j);

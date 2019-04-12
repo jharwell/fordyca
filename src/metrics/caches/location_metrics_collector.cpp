@@ -43,14 +43,14 @@ location_metrics_collector::location_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string location_metrics_collector::csv_header_build(const std::string&) {
-  std::string line;
+std::list<std::string> location_metrics_collector::csv_header_cols(void) const {
+  std::list<std::string> cols;
   for (size_t j = 0; j < m_stats.ysize(); ++j) {
-    line += "y" + std::to_string(j) + separator();
+    cols.push_back("y" + std::to_string(j));
   } /* for(j..) */
 
-  return line;
-} /* csv_header_build() */
+  return cols;
+} /* csv_header_cols() */
 
 void location_metrics_collector::reset(void) {
   base_metrics_collector::reset();
@@ -63,9 +63,7 @@ bool location_metrics_collector::csv_line_build(std::string& line) {
   }
   for (size_t i = 0; i < m_stats.xsize(); ++i) {
     for (size_t j = 0; j < m_stats.ysize(); ++j) {
-      line +=
-          std::to_string(m_stats.access(i, j) / static_cast<double>(m_total)) +
-          separator();
+      line += csv_entry_domavg(m_stats.access(i, j), m_total);
     } /* for(j..) */
     line += "\n";
   } /* for(i..) */

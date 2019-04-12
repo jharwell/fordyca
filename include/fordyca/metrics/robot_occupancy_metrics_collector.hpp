@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
 #include "rcppsw/ds/grid2D.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
@@ -67,12 +67,12 @@ class robot_occupancy_metrics_collector
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
-  std::string csv_header_build(const std::string&) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
   rcppsw::ds::grid2D<uint> m_stats;
-  uint                     m_total{0};  // Total count of all robots across all timesteps
+  uint                     m_total_robots{0};
   /* clang-format on */
 };
 

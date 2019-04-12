@@ -71,11 +71,6 @@ class utilization_metrics : virtual public rcppsw::metrics::base_metrics {
    * block drop events.
    */
   virtual uint total_block_drops(void) const = 0;
-
-  /**
-   * @brief Get the ID of the cache for use in metric collection.
-   */
-  virtual int cache_id(void) const = 0;
 };
 
 NS_END(caches, metrics, fordyca);

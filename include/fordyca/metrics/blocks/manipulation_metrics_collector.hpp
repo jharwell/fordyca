@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
@@ -61,21 +61,24 @@ class manipulation_metrics_collector : public rmetrics::base_metrics_collector {
 
  private:
   struct stats {
-    uint free_pickup_events{0};
-    uint free_drop_events{0};
-    uint cum_free_pickup_penalty{0};
-    uint cum_free_drop_penalty{0};
+    uint int_free_pickup_events{0};
+    uint int_free_drop_events{0};
+    uint int_free_pickup_penalty{0};
+    uint int_free_drop_penalty{0};
 
-    uint cache_pickup_events{0};
-    uint cache_drop_events{0};
-    uint cum_cache_pickup_penalty{0};
-    uint cum_cache_drop_penalty{0};
+    uint int_cache_pickup_events{0};
+    uint int_cache_drop_events{0};
+    uint int_cache_pickup_penalty{0};
+    uint int_cache_drop_penalty{0};
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
+
   bool csv_line_build(std::string& line) override;
 
+  /* clang-format off */
   struct stats m_stats{};
+  /* clang-format on */
 };
 
 NS_END(blocks, metrics, fordyca);

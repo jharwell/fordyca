@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
@@ -104,10 +104,12 @@ class transport_metrics_collector : public rmetrics::base_metrics_collector {
     double cum_initial_wait_time{0.0};
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
+  /* clang-format off */
   struct stats m_stats{};
+  /* clang-format on */
 };
 
 NS_END(blocks, metrics, fordyca);

@@ -63,7 +63,6 @@ class arena_cache : public base_cache,
   uint total_block_pickups(void) const override { return m_block_pickups; }
   uint total_block_drops(void) const override { return m_block_drops; }
   void reset_metrics(void) override;
-  int cache_id(void) const override { return id(); }
   rmath::vector2u location(void) const override { return discrete_loc(); }
 
   void has_block_pickup(void) { m_block_pickups = 1; }

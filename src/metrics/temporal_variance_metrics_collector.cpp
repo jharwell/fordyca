@@ -39,15 +39,18 @@ temporal_variance_metrics_collector::temporal_variance_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string temporal_variance_metrics_collector::csv_header_build(
-    const std::string& header) {
-  /* clang-format off */
-  return base_metrics_collector::csv_header_build(header) +
-      "swarm_motion_throttle" + separator() +
-      "env_block_manip" + separator() +
-      "env_cache_usage" + separator();
+std::list<std::string> temporal_variance_metrics_collector::csv_header_cols(void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+    /* clang-format off */
+      "swarm_motion_throttle",
+      "env_block_manip",
+      "env_cache_usage"
   /* clang-format on */
-} /* csv_header_build() */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 bool temporal_variance_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_swarm_motion_throttle) + separator();

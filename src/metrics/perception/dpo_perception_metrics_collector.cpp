@@ -42,20 +42,23 @@ dpo_perception_metrics_collector::dpo_perception_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string dpo_perception_metrics_collector::csv_header_build(
-    const std::string& header) {
+std::list<std::string> dpo_perception_metrics_collector::csv_header_cols(void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
   /* clang-format off */
-  return base_metrics_collector::csv_header_build(header) +
-      "int_avg_known_blocks" + separator() +
-      "cum_avg_known_blocks" + separator() +
-      "int_avg_known_caches" + separator() +
-      "cum_avg_known_caches" + separator() +
-      "int_avg_block_pheromone_density" + separator() +
-      "cum_avg_block_pheromone_density" + separator() +
-      "int_avg_cache_pheromone_density" + separator() +
-      "cum_avg_cache_pheromone_density" + separator();
-  /* clang-format on */
-} /* csv_header_build() */
+      "int_avg_known_blocks",
+      "cum_avg_known_blocks",
+      "int_avg_known_caches",
+      "cum_avg_known_caches",
+      "int_avg_block_pheromone_density",
+      "cum_avg_block_pheromone_density",
+      "int_avg_cache_pheromone_density",
+      "cum_avg_cache_pheromone_density"
+      /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void dpo_perception_metrics_collector::reset(void) {
   base_metrics_collector::reset();
@@ -66,45 +69,19 @@ bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += (m_int_robot_count > 0) ?
-          std::to_string(m_int_known_blocks /
-                         static_cast<double>(m_int_robot_count)) : "0";
-  line += separator();
-  line += (m_cum_robot_count > 0) ?
-          std::to_string(m_cum_known_blocks /
-                         static_cast<double>(m_cum_robot_count)) : "0";
-  line += separator();
+  line += csv_entry_domavg(m_int_known_blocks, m_int_robot_count);
+  line += csv_entry_domavg(m_cum_known_blocks, m_cum_robot_count);
+  line += csv_entry_domavg(m_int_known_caches, m_int_robot_count);
+  line += csv_entry_domavg(m_cum_known_caches, m_cum_robot_count);
 
-  line += (m_int_robot_count > 0) ?
-          std::to_string(m_int_known_caches /
-                         static_cast<double>(m_int_robot_count)) : "0";
-  line += separator();
-  line += (m_cum_robot_count > 0) ?
-          std::to_string(m_cum_known_caches /
-                         static_cast<double>(m_cum_robot_count)) : "0";
-  line += separator();
-
-  line += (m_int_robot_count > 0) ?
-          std::to_string(m_int_block_density_sum.last_result() /
-                         m_int_robot_count) : "0";
-  line += separator();
-  line += (m_cum_robot_count > 0) ?
-          std::to_string(m_cum_block_density_sum.last_result() /
-                         m_cum_robot_count) : "0";
-  line += separator();
-  line += (m_int_robot_count > 0) ?
-          std::to_string(m_int_cache_density_sum.last_result() /
-                         m_int_robot_count) : "0";
-  line += separator();
-  line += (m_cum_robot_count > 0) ?
-          std::to_string(m_cum_cache_density_sum.last_result() /
-                         m_cum_robot_count) : "0";
-  printf("Density: %f/%u = %f\n",
-         m_cum_cache_density_sum.last_result(),
-         m_cum_robot_count,
-         m_cum_cache_density_sum.last_result() /
-         m_cum_robot_count);
-  line += separator();
+  line += csv_entry_domavg(m_int_block_density_sum.last_result(),
+                           m_int_robot_count);
+  line += csv_entry_domavg(m_cum_block_density_sum.last_result(),
+                           m_cum_robot_count);
+  line += csv_entry_domavg(m_int_cache_density_sum.last_result(),
+                           m_int_robot_count);
+  line += csv_entry_domavg(m_cum_cache_density_sum.last_result(),
+                           m_cum_robot_count);
   return true;
 } /* csv_line_build() */
 

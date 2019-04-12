@@ -39,12 +39,19 @@ movement_metrics_collector::movement_metrics_collector(const std::string& ofname
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string movement_metrics_collector::csv_header_build(
-    const std::string& header) {
-  return base_metrics_collector::csv_header_build(header) + "int_avg_distance" +
-         separator() + "cum_avg_distance" + separator() + "int_avg_velocity" +
-         separator() + "cum_avg_velocity" + separator();
-} /* csv_header_build() */
+std::list<std::string> movement_metrics_collector::csv_header_cols(void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+    /* clang-format off */
+    "int_avg_distance",
+    "cum_avg_distance",
+    "int_avg_velocity",
+    "cum_avg_velocity"
+    /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void movement_metrics_collector::reset(void) {
   base_metrics_collector::reset();
@@ -55,19 +62,11 @@ bool movement_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.int_distance /
-                         static_cast<double>(m_stats.int_robot_count)) +
-          separator();
-  line += std::to_string(m_stats.cum_distance /
-                         static_cast<double>(m_stats.cum_robot_count)) +
-          separator();
-  line += std::to_string(m_stats.int_velocity /
-                         static_cast<double>(m_stats.int_robot_count)) +
-          separator();
-  line += std::to_string(m_stats.cum_velocity /
-                         static_cast<double>(m_stats.cum_robot_count)) +
-          separator();
-  separator();
+  line += csv_entry_domavg(m_stats.int_distance, m_stats.int_robot_count);
+  line += csv_entry_domavg(m_stats.cum_distance, m_stats.cum_robot_count);
+
+  line += csv_entry_domavg(m_stats.int_velocity, m_stats.int_robot_count);
+  line += csv_entry_domavg(m_stats.cum_velocity, m_stats.cum_robot_count);
   return true;
 } /* csv_line_build() */
 

@@ -40,20 +40,23 @@ utilization_metrics_collector::utilization_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string utilization_metrics_collector::csv_header_build(
-    const std::string& header) {
-  /* clang-format off */
-  return base_metrics_collector::csv_header_build(header) +
-      "int_avg_blocks" + separator() +
-      "cum_avg_blocks" + separator() +
-      "int_avg_pickups" + separator() +
-      "cum_avg_pickups" + separator() +
-      "int_avg_drops"  + separator() +
-      "cum_avg_drops"  + separator() +
-      "int_avg_caches" + separator() +
-      "cum_avg_caches" + separator();
-  /* clang-format on */
-} /* csv_header_build() */
+std::list<std::string> utilization_metrics_collector::csv_header_cols(void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+    /* clang-format off */
+    "int_avg_blocks",
+    "cum_avg_blocks",
+    "int_avg_pickups",
+    "cum_avg_pickups",
+    "int_avg_drops" ,
+    "cum_avg_drops" ,
+    "int_avg_caches",
+    "cum_avg_caches"
+    /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void utilization_metrics_collector::reset(void) {
   base_metrics_collector::reset();
@@ -64,30 +67,14 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(static_cast<double>(m_stats.int_blocks) / interval()) +
-          separator();
-
-  line += std::to_string(static_cast<double>(m_stats.cum_blocks) /
-                         (timestep() + 1)) +
-          separator();
-
-  line += std::to_string(static_cast<double>(m_stats.int_pickups) / interval()) +
-          separator();
-  line += std::to_string(static_cast<double>(m_stats.cum_pickups) /
-                         (timestep() + 1)) +
-          separator();
-
-  line += std::to_string(static_cast<double>(m_stats.int_drops) / interval()) +
-          separator();
-  line +=
-      std::to_string(static_cast<double>(m_stats.cum_drops) / (timestep() + 1)) +
-      separator();
-
-  line += std::to_string(static_cast<double>(m_int_cache_count) / interval()) +
-          separator();
-  line +=
-      std::to_string(static_cast<double>(m_cum_cache_count) / (timestep() + 1)) +
-      separator();
+  line += csv_entry_domavg(m_stats.int_blocks, m_stats.int_cache_count);
+  line += csv_entry_domavg(m_stats.cum_blocks, m_stats.cum_cache_count);
+  line += csv_entry_domavg(m_stats.int_pickups, m_stats.int_cache_count);
+  line += csv_entry_domavg(m_stats.cum_pickups, m_stats.cum_cache_count);
+  line += csv_entry_domavg(m_stats.int_drops, m_stats.int_cache_count);
+  line += csv_entry_domavg(m_stats.cum_drops, m_stats.cum_cache_count);
+  line += csv_entry_intavg(m_stats.int_cache_count);
+  line += csv_entry_tsavg(m_stats.cum_cache_count);
   return true;
 } /* csv_line_build() */
 
@@ -102,8 +89,8 @@ void utilization_metrics_collector::collect(
   m_stats.cum_drops += m.total_block_drops();
   m_stats.cum_blocks += m.n_blocks();
 
-  ++m_int_cache_count;
-  ++m_cum_cache_count;
+  ++m_stats.int_cache_count;
+  ++m_stats.cum_cache_count;
 } /* collect() */
 
 void utilization_metrics_collector::reset_after_interval(void) {
@@ -111,7 +98,7 @@ void utilization_metrics_collector::reset_after_interval(void) {
   m_stats.int_pickups = 0;
   m_stats.int_drops = 0;
   m_stats.int_blocks = 0;
-  m_int_cache_count = 0;
+  m_stats.int_cache_count = 0;
 } /* reset_after_interval() */
 
 NS_END(caches, metrics, fordyca);

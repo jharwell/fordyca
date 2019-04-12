@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <vector>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
@@ -59,13 +60,19 @@ class mdpo_perception_metrics_collector
   void reset_after_interval(void) override;
 
  private:
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  std::vector<uint>   m_stats;
-  std::vector<double> m_known{};
-  std::vector<double> m_unknown{};
+  std::vector<uint> m_int_states;
+  double            m_int_known_percent{0.0};
+  double            m_int_unknown_percent{0.0};
+  uint              m_int_robots{0};
+
+  std::vector<uint> m_cum_states;
+  double            m_cum_known_percent{0.0};
+  double            m_cum_unknown_percent{0.0};
+  uint              m_cum_robots{0};
   /* clang-format on */
 };
 

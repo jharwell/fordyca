@@ -41,20 +41,23 @@ lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofna
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string lifecycle_metrics_collector::csv_header_build(
-    const std::string& header) {
-  /* clang-format off */
-  return base_metrics_collector::csv_header_build(header) +
-      "int_created" + separator() +
-      "int_depleted" + separator() +
-      "int_avg_created" + separator() +
-      "int_avg_depleted" + separator() +
-      "cum_avg_created" + separator() +
-      "cum_avg_depleted" + separator() +
-      "int_avg_depletion_age" + separator() +
-      "cum_avg_depletion_age" + separator();
-  /* clang-format on */
-} /* csv_header_build() */
+std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+    /* clang-format off */
+    "int_created",
+    "int_depleted",
+    "int_avg_created",
+    "int_avg_depleted",
+    "cum_avg_created",
+    "cum_avg_depleted",
+    "int_avg_depletion_age",
+    "cum_avg_depletion_age"
+    /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void lifecycle_metrics_collector::reset(void) {
   base_metrics_collector::reset();
@@ -67,26 +70,12 @@ bool lifecycle_metrics_collector::csv_line_build(std::string& line) {
   }
   line += std::to_string(m_stats.int_created) + separator();
   line += std::to_string(m_stats.int_depleted) + separator();
-  line += std::to_string(m_stats.int_created / static_cast<double>(interval())) +
-          separator();
-  line +=
-      std::to_string(m_stats.int_depleted / static_cast<double>(interval())) +
-      separator();
-  line +=
-      std::to_string(m_stats.cum_created / static_cast<double>(timestep() + 1)) +
-      separator();
-  line += std::to_string(m_stats.cum_depleted /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
-  line += (m_stats.int_depleted > 0) ?
-          std::to_string(m_stats.int_depletion_sum /
-                         static_cast<double>(m_stats.int_depleted)): "0";
-  line += separator();
-
-  line += (m_stats.cum_depleted > 0) ?
-          std::to_string(m_stats.cum_depletion_sum /
-                         static_cast<double>(m_stats.cum_depleted)): "0";
-  line += separator();
+  line += csv_entry_intavg(m_stats.int_created);
+  line += csv_entry_intavg(m_stats.int_depleted);
+  line += csv_entry_tsavg(m_stats.cum_created);
+  line += csv_entry_tsavg(m_stats.cum_depleted);
+  line += csv_entry_domavg(m_stats.int_depletion_sum, m_stats.int_depleted);
+  line += csv_entry_domavg(m_stats.cum_depletion_sum, m_stats.cum_depleted);
   return true;
 } /* csv_line_build() */
 

@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
@@ -64,15 +64,15 @@ class movement_metrics_collector : public rcppsw::metrics::base_metrics_collecto
  private:
   struct stats {
     double int_distance{0.0};
-    uint int_robot_count{0};
-    double cum_distance{0.0};
-
+    uint   int_robot_count{0};
     double int_velocity{0.0};
-    uint cum_robot_count{0};
+
+    double cum_distance{0.0};
+    uint   cum_robot_count{0};
     double cum_velocity{0.0};
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   struct stats m_stats{};

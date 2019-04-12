@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <list>
+
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
@@ -57,19 +59,21 @@ class goal_acquisition_metrics_collector : public rcppsw::metrics::base_metrics_
 
  private:
   struct stats {
-    uint n_exploring_for_goal;
-    uint n_vectoring_to_goal;
-    uint n_acquiring_goal;
+    uint n_int_exploring_for_goal;
+    uint n_int_vectoring_to_goal;
+    uint n_int_acquiring_goal;
 
     uint n_cum_exploring_for_goal;
     uint n_cum_vectoring_to_goal;
     uint n_cum_acquiring_goal;
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
+  /* clang-format off */
   struct stats m_stats;
+  /* clang-format on */
 };
 
 NS_END(fsm, metrics, fordyca);

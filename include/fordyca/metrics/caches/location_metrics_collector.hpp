@@ -18,14 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
 #include "rcppsw/ds/grid2D.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
@@ -68,7 +68,7 @@ class location_metrics_collector : public rmetrics::base_metrics_collector {
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
  private:
-  std::string csv_header_build(const std::string&) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
@@ -79,4 +79,4 @@ class location_metrics_collector : public rmetrics::base_metrics_collector {
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_ */

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
@@ -72,7 +73,8 @@ class lifecycle_metrics_collector : public rmetrics::base_metrics_collector {
     uint cum_depletion_sum;
   };
 
-  std::string csv_header_build(const std::string& header) override;
+
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
