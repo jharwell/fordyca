@@ -118,21 +118,6 @@ __rcsw_pure mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-/*******************************************************************************
- * World Model Metrics
- ******************************************************************************/
-uint mdpo_controller::cell_state_inaccuracies(uint state) const {
-  return mdpo_perception()->cell_state_inaccuracies(state);
-} /* cell_state_inaccuracies() */
-
-double mdpo_controller::known_percentage(void) const {
-  return mdpo_perception()->known_percentage();
-} /* known_percentage() */
-
-double mdpo_controller::unknown_percentage(void) const {
-  return mdpo_perception()->unknown_percentage();
-} /* unknown_percentage() */
-
 using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"

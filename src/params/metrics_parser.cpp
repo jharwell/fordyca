@@ -69,7 +69,9 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
     XML_PARSE_ATTR(mnode, m_params, output_dir);
 
-    XML_PARSE_ATTR(mnode, m_params, perception_world_model_fname);
+    XML_PARSE_ATTR(mnode, m_params, perception_mdpo_fname);
+    XML_PARSE_ATTR(mnode, m_params, perception_dpo_fname);
+
     XML_PARSE_ATTR(mnode, m_params, arena_robot_occupancy_fname);
     XML_PARSE_ATTR(mnode, m_params, swarm_convergence_fname);
     XML_PARSE_ATTR(mnode, m_params, loop_temporal_variance_fname);
@@ -77,38 +79,6 @@ void metrics_parser::parse(const ticpp::Element& node) {
     m_parsed = true;
   }
 } /* parse() */
-
-void metrics_parser::show(std::ostream& stream) const {
-  stream << build_header();
-  if (!m_parsed) {
-    stream << "<<  Not Parsed >>" << std::endl << build_footer();
-    return;
-  }
-
-  stream << XML_ATTR_STR(m_params, block_acquisition_fname) << std::endl
-         << XML_ATTR_STR(m_params, block_transport_fname) << std::endl
-         << XML_ATTR_STR(m_params, block_manipulation_fname) << std::endl
-         << XML_ATTR_STR(m_params, cache_acquisition_fname) << std::endl
-         << XML_ATTR_STR(m_params, cache_utilization_fname) << std::endl
-         << XML_ATTR_STR(m_params, cache_lifecycle_fname) << std::endl
-         << XML_ATTR_STR(m_params, cache_locations_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_execution_generalist_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_execution_collector_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_execution_harvester_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_tab_generalist_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_tab_harvester_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_tab_collector_fname) << std::endl
-         << XML_ATTR_STR(m_params, task_distribution_fname) << std::endl
-         << XML_ATTR_STR(m_params, fsm_collision_fname) << std::endl
-         << XML_ATTR_STR(m_params, fsm_movement_fname) << std::endl
-         << XML_ATTR_STR(m_params, swarm_convergence_fname) << std::endl
-         << XML_ATTR_STR(m_params, loop_temporal_variance_fname) << std::endl
-         << XML_ATTR_STR(m_params, arena_robot_occupancy_fname) << std::endl
-         << XML_ATTR_STR(m_params, perception_world_model_fname) << std::endl
-         << XML_ATTR_STR(m_params, output_dir) << std::endl
-         << XML_ATTR_STR(m_params, collect_interval) << std::endl
-         << build_footer();
-} /* show() */
 
 __rcsw_pure bool metrics_parser::validate(void) const {
   if (m_parsed) {

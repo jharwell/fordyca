@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/dpo_store.hpp"
 #include <boost/range/adaptor/map.hpp>
+#include <numeric>
 
 #include "fordyca/params/perception/pheromone_params.hpp"
 #include "fordyca/repr/base_block.hpp"
@@ -40,7 +41,7 @@ namespace rswarm = rcppsw::swarm;
 dpo_store::dpo_store(const params::perception::pheromone_params* const params)
     : ER_CLIENT_INIT("fordyca.ds.dpo_store"),
       mc_repeat_deposit(params->repeat_deposit),
-      mc_rho(params->rho) {}
+      mc_pheromone_rho(params->rho) {}
 
 /*******************************************************************************
  * Member Functions

@@ -24,8 +24,11 @@
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/world_model_metrics_collector.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/params/metrics_params.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
@@ -34,6 +37,10 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/repr/base_block.hpp"
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,9 +65,13 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
     const std::string& output_root)
     : base_metrics_aggregator(mparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
-  register_collector<metrics::world_model_metrics_collector>(
-      "perception::world_model",
-      metrics_path() + "/" + mparams->perception_world_model_fname,
+  register_collector<metrics::perception::mdpo_perception_metrics_collector>(
+      "perception::mdpo",
+      metrics_path() + "/" + mparams->perception_mdpo_fname,
+      mparams->collect_interval);
+  register_collector<metrics::perception::dpo_perception_metrics_collector>(
+      "perception::dpo",
+      metrics_path() + "/" + mparams->perception_dpo_fname,
       mparams->collect_interval);
   reset_all();
 }
@@ -94,11 +105,20 @@ void depth0_metrics_aggregator::collect_from_controller(
   collect("blocks::manipulation", *manip_m);
 
   /*
-   * Only MDPO provides these.
+   * Only controllers with MDPO perception provide these.
    */
-  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
-  if (nullptr != worldm_m) {
-    collect("perception::world_model", *worldm_m);
+  auto mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+      controller->perception());
+  if (nullptr != mdpo) {
+    collect("perception::mdpo", *mdpo);
+  }
+  /*
+   * Only controllers with DPO perception provide these.
+   */
+  auto dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+      controller->perception());
+  if (nullptr != dpo) {
+    collect("perception::dpo", *dpo);
   }
 } /* collect_from_controller() */
 

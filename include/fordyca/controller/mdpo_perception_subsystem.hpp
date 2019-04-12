@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
 
@@ -60,7 +60,7 @@ NS_START(controller);
 class mdpo_perception_subsystem
     : public rcppsw::er::client<mdpo_perception_subsystem>,
       public base_perception_subsystem,
-      public metrics::world_model_metrics {
+      public metrics::perception::mdpo_perception_metrics {
  public:
   mdpo_perception_subsystem(const params::perception::perception_params* params,
                             const std::string& id);

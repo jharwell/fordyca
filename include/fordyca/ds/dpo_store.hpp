@@ -106,7 +106,6 @@ class dpo_store : public er::client<dpo_store> {
   const ds::dp_cache_map& caches(void) const { return m_caches; }
 
   bool repeat_deposit(void) const { return mc_repeat_deposit; }
-  double rho(void) const { return mc_rho; }
 
   /**
    * @brief Update the densities of all objects in the store (i.e. decay
@@ -161,14 +160,16 @@ class dpo_store : public er::client<dpo_store> {
    */
   bool block_remove(const std::shared_ptr<repr::base_block>& victim);
 
+  double pheromone_rho(void) const { return mc_pheromone_rho; }
+
  private:
   /*
    * Sets are used for object storage because there is no concept of order
    * among the known blocks/caches.
    */
   /* clang-format off */
-  bool             mc_repeat_deposit;
-  double           mc_rho;
+  const bool       mc_repeat_deposit;
+  const double     mc_pheromone_rho;
   ds::dp_block_map m_blocks{};
   ds::dp_cache_map m_caches{};
   /* clang-format on */

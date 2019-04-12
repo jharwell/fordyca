@@ -52,9 +52,7 @@ class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
   depth0_metrics_aggregator(const params::metrics_params* mparams,
                             const std::string& output_root);
 
-  /*
-   * Collect metrics from a depth 0 controller.
-   */
+
   template<class T>
   void collect_from_controller(const T* controller);
 };

@@ -1,5 +1,5 @@
 /**
- * @file world_model_metrics_collector.hpp
+ * @file dpo_perception_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_PERCEPTION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_PERCEPTION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,31 +28,33 @@
 #include <vector>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, perception);
+namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class world_model_metrics_collector
+ * @class dpo_perception_metrics_collector
  * @ingroup metrics blocks
  *
- * @brief Collector for \ref world_model_metrics.
+ * @brief Collector for \ref dpo_perception_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
-class world_model_metrics_collector
+class dpo_perception_metrics_collector
     : public rcppsw::metrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
    */
-  world_model_metrics_collector(const std::string& ofname, uint interval);
+  dpo_perception_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void collect(const rcppsw::metrics::base_metrics& metrics) override;
@@ -63,12 +65,20 @@ class world_model_metrics_collector
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  std::vector<uint>   m_stats;
-  std::vector<double> m_known{};
-  std::vector<double> m_unknown{};
+  uint                      m_int_robot_count{0};
+  uint                      m_int_known_blocks{0};
+  uint                      m_int_known_caches{0};
+  rswarm::pheromone_density m_int_block_density_sum{};
+  rswarm::pheromone_density m_int_cache_density_sum{};
+
+  uint                      m_cum_robot_count{0};
+  uint                      m_cum_known_blocks{0};
+  uint                      m_cum_known_caches{0};
+  rswarm::pheromone_density m_cum_block_density_sum{};
+  rswarm::pheromone_density m_cum_cache_density_sum{};
   /* clang-format on */
 };
 
-NS_END(metrics, fordyca);
+NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_DPO_PERCEPTION_METRICS_COLLECTOR_HPP_ */

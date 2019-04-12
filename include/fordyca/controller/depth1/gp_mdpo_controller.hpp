@@ -27,7 +27,6 @@
 #include <string>
 
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,8 +53,7 @@ NS_START(depth1);
  * Cleaner to do it this way.
  */
 class gp_mdpo_controller : public depth1::gp_dpo_controller,
-                           public er::client<gp_mdpo_controller>,
-                           public metrics::world_model_metrics {
+                           public er::client<gp_mdpo_controller> {
  public:
   gp_mdpo_controller(void);
   ~gp_mdpo_controller(void) override;
@@ -63,11 +61,6 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
-
-  /* world model metrics */
-  uint cell_state_inaccuracies(uint state) const override;
-  double known_percentage(void) const override;
-  double unknown_percentage(void) const override;
 
   mdpo_perception_subsystem* mdpo_perception(void);
   const mdpo_perception_subsystem* mdpo_perception(void) const {

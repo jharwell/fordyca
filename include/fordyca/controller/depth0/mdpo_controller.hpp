@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,8 +56,7 @@ NS_START(depth0);
  * collection functions can be reused.
  */
 class mdpo_controller : public dpo_controller,
-                        public er::client<mdpo_controller>,
-                        public metrics::world_model_metrics {
+                        public er::client<mdpo_controller> {
  public:
   mdpo_controller(void);
   ~mdpo_controller(void) override;
@@ -70,11 +68,6 @@ class mdpo_controller : public dpo_controller,
   std::type_index type_index(void) const override {
     return std::type_index(typeid(*this));
   }
-
-  /* world model metrics */
-  uint cell_state_inaccuracies(uint state) const override;
-  double known_percentage(void) const override;
-  double unknown_percentage(void) const override;
 
   mdpo_perception_subsystem* mdpo_perception(void);
   const mdpo_perception_subsystem* mdpo_perception(void) const {

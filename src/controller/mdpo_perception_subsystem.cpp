@@ -249,7 +249,7 @@ ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
 } /* dpo_store() */
 
 /*******************************************************************************
- * World Model Metrics
+ * MDPO Perception Metrics
  ******************************************************************************/
 __rcsw_pure double mdpo_perception_subsystem::known_percentage(void) const {
   return m_map->known_cell_count() /

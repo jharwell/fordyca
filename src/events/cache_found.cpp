@@ -73,7 +73,7 @@ void cache_found::visit(ds::dpo_store& store) {
   } /* while(it..) */
 
   auto known = store.find(m_cache);
-  rswarm::pheromone_density density;
+  rswarm::pheromone_density density(store.pheromone_rho());
   if (nullptr != known) {
     density = known->density();
 

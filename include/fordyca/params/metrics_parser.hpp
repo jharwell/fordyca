@@ -60,7 +60,6 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
    */
   static constexpr char kXMLRoot[] = "metrics";
 
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 

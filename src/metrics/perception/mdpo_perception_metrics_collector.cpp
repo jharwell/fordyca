@@ -1,5 +1,5 @@
 /**
- * @file world_model_metrics_collector.cpp
+ * @file mdpo_perception_metrics_collector.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,21 +21,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/world_model_metrics_collector.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
 #include <numeric>
 
 #include "fordyca/fsm/cell2D_fsm.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, perception);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-world_model_metrics_collector::world_model_metrics_collector(
+mdpo_perception_metrics_collector::mdpo_perception_metrics_collector(
     const std::string& ofname,
     uint interval)
     : base_metrics_collector(ofname, interval),
@@ -44,7 +44,7 @@ world_model_metrics_collector::world_model_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string world_model_metrics_collector::csv_header_build(
+std::string mdpo_perception_metrics_collector::csv_header_build(
     const std::string& header) {
   /* clang-format off */
   return base_metrics_collector::csv_header_build(header) +
@@ -57,12 +57,12 @@ std::string world_model_metrics_collector::csv_header_build(
   /* clang-format on */
 } /* csv_header_build() */
 
-void world_model_metrics_collector::reset(void) {
+void mdpo_perception_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-bool world_model_metrics_collector::csv_line_build(std::string& line) {
+bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
@@ -83,9 +83,9 @@ bool world_model_metrics_collector::csv_line_build(std::string& line) {
   return true;
 } /* csv_line_build() */
 
-void world_model_metrics_collector::collect(
+void mdpo_perception_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const world_model_metrics&>(metrics);
+  auto& m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
   m_stats[fsm::cell2D_fsm::ST_EMPTY] +=
       m.cell_state_inaccuracies(fsm::cell2D_fsm::ST_EMPTY);
   m_stats[fsm::cell2D_fsm::ST_HAS_BLOCK] +=
@@ -97,10 +97,10 @@ void world_model_metrics_collector::collect(
   m_unknown.push_back(m.unknown_percentage());
 } /* collect() */
 
-void world_model_metrics_collector::reset_after_interval(void) {
+void mdpo_perception_metrics_collector::reset_after_interval(void) {
   m_stats.assign(m_stats.size(), 0);
   m_known.clear();
   m_unknown.clear();
 } /* reset_after_interval() */
 
-NS_END(metrics, fordyca);
+NS_END(perception, metrics, fordyca);

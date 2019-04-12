@@ -1,5 +1,5 @@
 /**
- * @file world_model_metrics.hpp
+ * @file mdpo_perception_metrics.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_PERCEPTION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_PERCEPTION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,24 +29,24 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, perception);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 
 /**
- * @class world_model_metrics
- * @ingroup metrics
+ * @class mdpo_perception_metrics
+ * @ingroup metrics perception
  *
- * @brief Defines the metrics to be collected from robots about their world
- * model.
+ * @brief Defines the metrics to be collected from robots about their mapped DPO
+ * world model.
  *
  * Metrics are collected every timestep.
  */
-class world_model_metrics : public virtual rcppsw::metrics::base_metrics {
+class mdpo_perception_metrics : public virtual rcppsw::metrics::base_metrics {
  public:
-  world_model_metrics(void) = default;
+  mdpo_perception_metrics(void) = default;
 
   /**
    * @brief Return the total # of times the robot's world model was inaccurate
@@ -74,6 +74,6 @@ class world_model_metrics : public virtual rcppsw::metrics::base_metrics {
   virtual double unknown_percentage(void) const = 0;
 };
 
-NS_END(metrics, fordyca);
+NS_END(perception, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_WORLD_MODEL_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_PERCEPTION_MDPO_PERCEPTION_METRICS_HPP_ */

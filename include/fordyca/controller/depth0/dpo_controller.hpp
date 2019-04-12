@@ -102,10 +102,10 @@ class dpo_controller : public crw_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  const base_perception_subsystem* perception(void) const {
+  const base_perception_subsystem* perception(void) const override {
     return m_perception.get();
   }
-  base_perception_subsystem* perception(void) { return m_perception.get(); }
+  base_perception_subsystem* perception(void) override { return m_perception.get(); }
 
   dpo_perception_subsystem* dpo_perception(void);
   const dpo_perception_subsystem* dpo_perception(void) const {

@@ -72,7 +72,7 @@ void block_found::visit(ds::dpo_store& store) {
     }
   } /* for(&&c..) */
 
-  rswarm::pheromone_density density;
+  rswarm::pheromone_density density(store.pheromone_rho());
   auto known = store.find(m_block);
   if (nullptr != known) {
     /*

@@ -29,6 +29,7 @@
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,11 +57,18 @@ NS_START(controller);
  */
 class dpo_perception_subsystem
     : public rcppsw::er::client<dpo_perception_subsystem>,
-      public base_perception_subsystem {
+      public base_perception_subsystem,
+      public metrics::perception::dpo_perception_metrics {
  public:
   explicit dpo_perception_subsystem(
       const struct params::perception::perception_params* params);
   ~dpo_perception_subsystem(void) override;
+
+    /* DPO perception metrics */
+  uint n_known_blocks(void) const override;
+  uint n_known_caches(void) const override;
+  rswarm::pheromone_density avg_block_density(void) const override;
+  rswarm::pheromone_density avg_cache_density(void) const override;
 
   /**
    * @brief Update the robot's perception of the environment, passing it its
@@ -96,7 +104,7 @@ class dpo_perception_subsystem
 
  private:
   /* clang-format off */
-  std::unique_ptr<ds::dpo_store>                 m_store;
+  std::unique_ptr<ds::dpo_store> m_store;
   /* clang-format on */
 };
 

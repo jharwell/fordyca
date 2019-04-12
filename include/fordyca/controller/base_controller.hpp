@@ -53,7 +53,7 @@ struct actuation_params;
 } // namespace params
 
 NS_START(controller);
-
+class base_perception_subsystem;
 class saa_subsystem;
 namespace rmath = rcppsw::math;
 namespace er = rcppsw::er;
@@ -91,6 +91,18 @@ class base_controller : public argos::CCI_Controller,
   /* movement metrics */
   double distance(void) const override;
   rmath::vector2d velocity(void) const override;
+
+  /**
+   * @brief By default controllers have no perception subsystem, and are
+   * basically blind centipedes.
+   */
+  virtual const base_perception_subsystem* perception(void) const { return nullptr; }
+
+  /**
+   * @brief By default controllers have no perception subsystem, and are
+   * basically blind centipedes.
+   */
+  virtual base_perception_subsystem* perception(void) { return nullptr; }
 
   /**
    * @brief Return the applied motion throttling for the robot. This is not

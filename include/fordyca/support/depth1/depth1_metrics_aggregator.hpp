@@ -26,14 +26,17 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
 #include "rcppsw/task_allocation/polled_task.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/base_controller.hpp"
+
 
 /*******************************************************************************
  * Namespaces
@@ -92,72 +95,29 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
 
   void task_alloc_cb(const ta::polled_task*, const ta::bi_tab* tab);
 
-  /**
+    /**
    * @brief Collect metrics from the depth1 controller.
    */
-  template<class ControllerType>
-  void collect_from_controller(const ControllerType* const controller) {
-  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
-  auto manip_m =
-      dynamic_cast<const metrics::blocks::manipulation_metrics*>(
-          controller->block_manip_collator());
-  auto movement_m =
-      dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
-
-  ER_ASSERT(movement_m, "Controller does not provide FSM movement metrics");
-
-  /* only MDPO controllers provide these */
-  if (nullptr != worldm_m) {
-    collect("perception::world_model", *worldm_m);
-  }
-
-  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
-
-  collect("fsm::movement", *movement_m);
-  collect("blocks::manipulation", *manip_m);
-
-
-  if (nullptr != controller->current_task()) {
-    auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
-        dynamic_cast<const ta::polled_task*>(controller->current_task())
-        ->mechanism());
-    auto block_acq_m =
-        dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-            dynamic_cast<const ta::polled_task*>(controller->current_task())
-                ->mechanism());
-    auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
-        controller);
-
-
-    ER_ASSERT(block_acq_m,
-              "Task does not provide FSM block acquisition metrics");
-    ER_ASSERT(collision_m, "FSM does not provide collision metrics");
-    ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
-
-    collect("fsm::collision", *collision_m);
-    collect_if(
-        "blocks::acquisition",
-        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-            controller->current_task()),
-        [&](const rcppsw::metrics::base_metrics& metrics) {
-          return acquisition_goal_type::kBlock ==
-                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                     metrics)
-                     .acquisition_goal();
-        });
-    collect_if(
-        "caches::acquisition",
-        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-            controller->current_task()),
-        [&](const rcppsw::metrics::base_metrics& metrics) {
-          return acquisition_goal_type::kExistingCache ==
-                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                     metrics)
-                     .acquisition_goal();
-        });
-    collect("tasks::distribution", *dist_m);
-  }
-}
+    template<class ControllerType>
+    void collect_from_controller(const ControllerType* const controller) {
+      collect_controller_common(controller);
+      /*
+       * Only controllers with MDPO perception provide these.
+       */
+      auto mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+          controller->perception());
+      if (nullptr != mdpo) {
+        collect("perception::mdpo", *mdpo);
+      }
+      /*
+       * Only controllers with DPO perception provide these.
+       */
+      auto dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+          controller->perception());
+      if (nullptr != dpo) {
+        collect("perception::dpo", *dpo);
+      }
+    }
 
   /**
    * @brief Collect utilization metrics from a cache in the arena.
@@ -170,6 +130,64 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    */
   void collect_from_cache_manager(
       const support::base_cache_manager* manager);
+
+ private:
+  template<typename ControllerType>
+  void collect_controller_common(const ControllerType* const controller) {
+    auto manip_m =
+        dynamic_cast<const metrics::blocks::manipulation_metrics*>(
+            controller->block_manip_collator());
+    auto movement_m =
+        dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
+
+    ER_ASSERT(movement_m, "Controller does not provide FSM movement metrics");
+    ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
+
+    collect("fsm::movement", *movement_m);
+    collect("blocks::manipulation", *manip_m);
+
+    if (nullptr != controller->current_task()) {
+      auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
+          dynamic_cast<const ta::polled_task*>(controller->current_task())
+          ->mechanism());
+      auto block_acq_m =
+          dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+              dynamic_cast<const ta::polled_task*>(controller->current_task())
+              ->mechanism());
+      auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
+          controller);
+
+
+      ER_ASSERT(block_acq_m,
+                "Task does not provide FSM block acquisition metrics");
+      ER_ASSERT(collision_m, "FSM does not provide collision metrics");
+      ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
+
+      collect("fsm::collision", *collision_m);
+      collect_if(
+          "blocks::acquisition",
+          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+              controller->current_task()),
+          [&](const rcppsw::metrics::base_metrics& metrics) {
+            return acquisition_goal_type::kBlock ==
+                dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                    metrics)
+                .acquisition_goal();
+          });
+      collect_if(
+          "caches::acquisition",
+          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+              controller->current_task()),
+          [&](const rcppsw::metrics::base_metrics& metrics) {
+            return acquisition_goal_type::kExistingCache ==
+                dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                    metrics)
+                .acquisition_goal();
+          });
+      collect("tasks::distribution", *dist_m);
+    }
+  } /* collect_controller_common() */
+
 };
 
 NS_END(depth1, support, fordyca);
