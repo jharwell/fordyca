@@ -77,7 +77,7 @@ class base_controller : public argos::CCI_Controller,
                         public rcppsw::er::client<base_controller> {
  public:
   base_controller(void);
-  ~base_controller(void) override = default;
+  ~base_controller(void) override;
 
   base_controller(const base_controller& other) = delete;
   base_controller& operator=(const base_controller& other) = delete;
@@ -96,7 +96,9 @@ class base_controller : public argos::CCI_Controller,
    * @brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
-  virtual const base_perception_subsystem* perception(void) const { return nullptr; }
+  virtual const base_perception_subsystem* perception(void) const {
+    return nullptr;
+  }
 
   /**
    * @brief By default controllers have no perception subsystem, and are
@@ -192,7 +194,9 @@ class base_controller : public argos::CCI_Controller,
    * the loop functions.
    */
   void position(const rmath::vector2d& loc);
+  void discrete_position(const rmath::vector2u& loc);
   const rmath::vector2d& position(void) const;
+  const rmath::vector2u& discrete_position(void) const;
   rmath::vector2d heading(void) const;
 
   /**
@@ -220,7 +224,8 @@ class base_controller : public argos::CCI_Controller,
 
  private:
   void output_init(const struct params::output_params* params);
-  void saa_init(const params::actuation_params*, const params::sensing_params*);
+  void saa_init(const params::actuation_params* actuation_p,
+                const params::sensing_params* sensing_p);
 
   /* clang-format off */
   const support::tv::tv_manager*             m_tv_manager{nullptr};

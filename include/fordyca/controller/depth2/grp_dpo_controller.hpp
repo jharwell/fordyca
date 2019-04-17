@@ -31,17 +31,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
+namespace rcppsw { namespace rta {
 class bi_tdgraph_executive;
 }}
 
 NS_START(fordyca);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
+namespace rvisitor = rcppsw::patterns::visitor;
+namespace rta = rcppsw::ta;
 
-namespace tasks { namespace depth2 {
-class foraging_task;
-}}
 namespace params { namespace depth2 { class controller_repository; }}
 NS_START(controller, depth2);
 
@@ -71,8 +68,8 @@ class grp_dpo_controller : public depth1::gp_dpo_controller,
   void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
  private:
-  void task_alloc_cb(const ta::polled_task* const task,
-                     const ta::bi_tab* const);
+  void task_alloc_cb(const rta::polled_task* task,
+                     const rta::bi_tab*);
   void private_init(const params::depth2::controller_repository& param_repo);
 
 

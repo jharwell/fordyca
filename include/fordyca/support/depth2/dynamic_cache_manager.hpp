@@ -62,7 +62,7 @@ class dynamic_cache_manager : public base_cache_manager,
                               public er::client<dynamic_cache_manager> {
  public:
   dynamic_cache_manager(const struct params::caches::caches_params* params,
-                        ds::arena_grid* const arena_grid);
+                        ds::arena_grid* arena_grid);
 
   /**
    * @brief Create caches in the arena as needed according to free block

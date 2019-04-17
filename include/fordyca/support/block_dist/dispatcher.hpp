@@ -65,11 +65,11 @@ class base_distributor;
  */
 class dispatcher {
  public:
-  static constexpr char kDIST_SINGLE_SRC[] = "single_source";
-  static constexpr char kDIST_RANDOM[] = "random";
-  static constexpr char kDIST_DUAL_SRC[] = "dual_source";
-  static constexpr char kDIST_QUAD_SRC[] = "quad_source";
-  static constexpr char kDIST_POWERLAW[] = "powerlaw";
+  static constexpr char kDistSingleSrc[] = "single_source";
+  static constexpr char kDistRandom[] = "random";
+  static constexpr char kDistDualSrc[] = "dual_source";
+  static constexpr char kDistQuadSrc[] = "quad_source";
+  static constexpr char kDistPowerlaw[] = "powerlaw";
 
   dispatcher(ds::arena_grid* grid,
              const params::arena::block_dist_params* params,

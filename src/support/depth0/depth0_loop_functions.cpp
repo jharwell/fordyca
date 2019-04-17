@@ -54,7 +54,61 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
 using ds::arena_grid;
-namespace rswc = rcppsw::swarm::convergence;
+
+/*******************************************************************************
+ * Struct Definitions
+ ******************************************************************************/
+/**
+ * @struct controller_metric_collector
+ * @ingroup support depth0
+ *
+ * @brief Collect metrics from a depth0 controller
+ */
+template <class T>
+struct controller_metric_collector {
+  using controller_type = T;
+
+  explicit controller_metric_collector(depth0_metrics_aggregator* const agg)
+      : m_agg(agg) {}
+
+  void operator()(const controller_type* const c) const {
+    m_agg->collect_from_controller(c);
+  }
+  depth0_metrics_aggregator* const m_agg;
+};
+
+/**
+ * @struct controller_metric_collector_mapper
+ * @ingroup support depth0
+ *
+ * @brief Map a particular controller instance to the configuration action run
+ * during initialization.
+ */
+struct controller_metric_collector_mapper : public boost::static_visitor<void> {
+  explicit controller_metric_collector_mapper(controller::base_controller* const c)
+      : mc_controller(c) {}
+
+  using crw_metric_collector =
+      controller_metric_collector<controller::depth0::crw_controller>;
+  using dpo_metric_collector =
+      controller_metric_collector<controller::depth0::dpo_controller>;
+  using mdpo_metric_collector =
+      controller_metric_collector<controller::depth0::mdpo_controller>;
+
+  void operator()(const crw_metric_collector& collector) const {
+    collector(dynamic_cast<const crw_metric_collector::controller_type*>(
+        mc_controller));
+  }
+  void operator()(const dpo_metric_collector& collector) const {
+    collector(dynamic_cast<const dpo_metric_collector::controller_type*>(
+        mc_controller));
+  }
+  void operator()(const mdpo_metric_collector& collector) const {
+    collector(dynamic_cast<const mdpo_metric_collector::controller_type*>(
+        mc_controller));
+  }
+  controller::base_controller* const mc_controller;
+};
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -134,28 +188,38 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       &robot.GetControllableEntity().GetController());
 
   /*
-   * This is the one place in the depth0 event handling code where we need to
-   * know *ALL* of the controllers that are in the depth, and we can't/don't use
-   * templates and/or inheritance to get what we need.
+   * Collect metrics robots by mapping the controller type into a templated
+   * collector in order to be able to gather them without using
+   * if/else statements dependent on controller typenames.
    */
-  auto* dpo = dynamic_cast<controller::depth0::dpo_controller*>(controller);
-  auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(controller);
-  auto* crw = dynamic_cast<controller::depth0::crw_controller*>(controller);
+  rcppsw::ds::type_map<
+      controller_metric_collector<controller::depth0::crw_controller>,
+      controller_metric_collector<controller::depth0::dpo_controller>,
+      controller_metric_collector<controller::depth0::mdpo_controller>>
+      map;
+  map.emplace(typeid(controller::depth0::crw_controller),
+              controller_metric_collector<controller::depth0::crw_controller>(
+                  m_metrics_agg.get()));
+  map.emplace(typeid(controller::depth0::dpo_controller),
+              controller_metric_collector<controller::depth0::dpo_controller>(
+                  m_metrics_agg.get()));
+  map.emplace(typeid(controller::depth0::mdpo_controller),
+              controller_metric_collector<controller::depth0::mdpo_controller>(
+                  m_metrics_agg.get()));
 
   /* collect metrics from robot before its state changes */
-  if (nullptr != mdpo) {
-    m_metrics_agg->collect_from_controller(mdpo);
-  } else if (nullptr != dpo) {
-    m_metrics_agg->collect_from_controller(dpo);
-  } else if (nullptr != crw) {
-    m_metrics_agg->collect_from_controller(crw);
-  }
+  boost::apply_visitor(controller_metric_collector_mapper(controller),
+                       map.at(controller->type_index()));
 
   controller->block_manip_collator()->reset();
 
   /* Send the robot its new line of sight */
-  loop_utils::set_robot_pos<decltype(*controller)>(robot);
+  loop_utils::set_robot_pos<decltype(*controller)>(
+      robot, arena_map()->grid_resolution());
   set_robot_tick<decltype(*controller)>(robot);
+
+  auto* dpo = dynamic_cast<controller::depth0::dpo_controller*>(controller);
+  auto* mdpo = dynamic_cast<controller::depth0::mdpo_controller*>(controller);
 
   if (nullptr != dpo || nullptr != mdpo) {
     ER_ASSERT(std::fmod(dpo->los_dim(), arena_map()->grid_resolution()) <=
@@ -182,9 +246,8 @@ void depth0_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
       controller_interactor_mapper(controller, GetSpace().GetSimulationClock()),
       m_interactors->at(controller->type_index()));
 
-  auto coord =
-      rmath::dvec2uvec(controller->position(), arena_map()->grid_resolution());
-  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
+  arena_map()->access<arena_grid::kRobotOccupancy>(
+      controller->discrete_position()) = true;
 } /* pre_step_iter() */
 
 __rcsw_pure argos::CColor depth0_loop_functions::GetFloorColor(

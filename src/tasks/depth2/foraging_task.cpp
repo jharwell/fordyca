@@ -24,7 +24,7 @@
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/task_allocation_params.hpp"
+#include "rcppsw/ta/task_alloc_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,8 +43,8 @@ constexpr char foraging_task::kCacheCollectorName[];
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const ta::task_allocation_params* params,
-                             std::unique_ptr<ta::taskable> mechanism)
+                             const rta::task_alloc_params* params,
+                             std::unique_ptr<rta::taskable> mechanism)
     : polled_task(name,
                   &params->abort,
                   &params->exec_est.ema,

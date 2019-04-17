@@ -50,21 +50,21 @@ class explore_for_goal_fsm : public base_explore_fsm,
                              public er::client<explore_for_goal_fsm> {
  public:
   enum fsm_states {
-    ST_START,
+    kST_START,
     /**
      * Roaming around looking for a goal.
      */
-    ST_EXPLORE,
+    kST_EXPLORE,
     /**
      * A goal has been acquired.
      */
-    ST_FINISHED,
-    ST_MAX_STATES
+    kST_FINISHED,
+    kST_MAX_STATES
   };
 
   explore_for_goal_fsm(controller::saa_subsystem* saa,
                        std::unique_ptr<controller::explore_behavior> behavior,
-                       std::function<bool(void)> goal_detect);
+                       const std::function<bool(void)>& goal_detect);
   ~explore_for_goal_fsm(void) override = default;
 
   /* collision metrics */
@@ -75,7 +75,7 @@ class explore_for_goal_fsm : public base_explore_fsm,
 
   /* taskable overrides */
   bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
+    return kST_FINISHED == current_state();
   }
   bool task_running(void) const override;
   void task_reset(void) override { init(); }
@@ -85,7 +85,9 @@ class explore_for_goal_fsm : public base_explore_fsm,
    * robot is either on top of it, or is otherwise near enough so that the next
    * stage of whatever it is currently doing can happen).
    */
-  void set_goal_detection(std::function<bool(void)> cb) { m_goal_detect = cb; }
+  void set_goal_detection(const std::function<bool(void)>& cb) {
+    m_goal_detect = cb;
+  }
 
  private:
   /* inherited states */
@@ -121,7 +123,7 @@ class explore_for_goal_fsm : public base_explore_fsm,
     return &mc_state_map[index];
   }
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
 
   /**
    * @brief The minimum # of timesteps that a robot must explore before goal

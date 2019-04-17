@@ -29,7 +29,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace kinematics = rcppsw::robotics::kinematics;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -37,10 +36,9 @@ namespace kinematics = rcppsw::robotics::kinematics;
 explore_for_goal_fsm::explore_for_goal_fsm(
     controller::saa_subsystem* const saa,
     std::unique_ptr<controller::explore_behavior> behavior,
-    std::function<bool(void)> goal_detect)
-    : base_explore_fsm(saa, ST_MAX_STATES),
+    const std::function<bool(void)>& goal_detect)
+    : base_explore_fsm(saa, kST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.explore_for_goal"),
-      entry_explore(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
@@ -52,27 +50,27 @@ explore_for_goal_fsm::explore_for_goal_fsm(
       m_goal_detect(goal_detect) {}
 
 HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, start) {
-  internal_event(ST_EXPLORE);
-  return controller::foraging_signal::HANDLED;
+  internal_event(kST_EXPLORE);
+  return controller::foraging_signal::kHANDLED;
 }
 
 __rcsw_const HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, explore) {
-  if (ST_EXPLORE != last_state()) {
-    ER_DEBUG("Executing ST_EXPLORE");
+  if (kST_EXPLORE != last_state()) {
+    ER_DEBUG("Executing kST_EXPLORE");
     m_explore_time = 0;
   }
 
   if (m_explore_time >= kMIN_EXPLORE_TIME && m_goal_detect()) {
-    internal_event(ST_FINISHED);
+    internal_event(kST_FINISHED);
   } else {
     m_explore_behavior->execute();
     ++m_explore_time;
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 /*******************************************************************************
@@ -103,7 +101,7 @@ FSM_OVERRIDE_DEF(uint,
  * General Member Functions
  ******************************************************************************/
 bool explore_for_goal_fsm::task_running(void) const {
-  return ST_START != current_state() && ST_FINISHED != current_state();
+  return kST_START != current_state() && kST_FINISHED != current_state();
 }
 
 NS_END(fsm, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file location_metrics_collector.hpp
+ * @file acquisition_loc_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_ACQUISITION_LOC_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_ACQUISITION_LOC_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -32,7 +32,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, caches);
+NS_START(fordyca, metrics, fsm);
 namespace rmath = rcppsw::math;
 namespace rmetrics = rcppsw::metrics;
 
@@ -40,27 +40,29 @@ namespace rmetrics = rcppsw::metrics;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class location_metrics_collector
- * @ingroup metrics caches
+ * @class acquisition_loc_metrics_collector
+ * @ingroup metrics fsm
  *
- * @brief Collector for \ref location_metrics.
+ * @brief Collector for \ref goal_acquisition_metrics goal locations, which is
+ * collected as a 2D array, and needs its own collector separate from the \ref
+ * goal_acquisition_metrics_collector (1 .csv per collector).
  */
-class location_metrics_collector : public grid2D_avg_metrics_collector {
+class acquisition_loc_metrics_collector : public grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
    * @param dims Dimensions of the arena.
    */
-  location_metrics_collector(const std::string& ofname,
-                             uint interval,
-                             const rmath::vector2u& dims) :
+  acquisition_loc_metrics_collector(const std::string& ofname,
+                                    uint interval,
+                                    const rmath::vector2u& dims) :
       grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
   uint collect_cell(const rcppsw::metrics::base_metrics& metrics,
                     const rmath::vector2u& coord) const override;
 };
 
-NS_END(caches, metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_ACQUISITION_LOC_METRICS_COLLECTOR_HPP_ */

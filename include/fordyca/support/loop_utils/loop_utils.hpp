@@ -55,14 +55,14 @@ namespace rmath = rcppsw::math;
  * Types
  ******************************************************************************/
 struct proximity_status_t {
-  int entity_id;
-  rmath::vector2d entity_loc;
-  rmath::vector2d distance;
+  int entity_id{-1};
+  rmath::vector2d entity_loc{};
+  rmath::vector2d distance{};
 };
 
 struct placement_status_t {
-  bool x_conflict;
-  bool y_conflict;
+  bool x_conflict{false};
+  bool y_conflict{false};
 };
 
 /*******************************************************************************
@@ -76,7 +76,7 @@ struct placement_status_t {
  *
  * @return The block index, or -1 if the robot is not on top of a block.
  */
-int robot_on_block(argos::CFootBotEntity& robot, const ds::arena_map& map);
+int robot_on_block(const argos::CFootBotEntity& robot, const ds::arena_map& map);
 int robot_on_block(const controller::base_controller& controller,
                    const ds::arena_map& map);
 
@@ -88,13 +88,13 @@ int robot_on_block(const controller::base_controller& controller,
  *
  * @return The cache index, or -1 if the robot is not on top of a cache.
  */
-int robot_on_cache(argos::CFootBotEntity& robot, const ds::arena_map& map);
+int robot_on_cache(const argos::CFootBotEntity& robot, const ds::arena_map& map);
 int robot_on_cache(const controller::base_controller& controller,
                    const ds::arena_map& map);
 /**
  * @brief Get the ID of the robot as an integer.
  */
-int robot_id(argos::CFootBotEntity& robot);
+int robot_id(const argos::CFootBotEntity& robot);
 int robot_id(const controller::base_controller& controller);
 
 bool block_drop_overlap_with_cache(
@@ -120,20 +120,19 @@ bool block_drop_overlap_with_nest(
  * by the robot.
  */
 template <typename T>
-void set_robot_pos(argos::CFootBotEntity& robot) {
-  rmath::vector2d pos;
-  pos.set(const_cast<argos::CFootBotEntity&>(robot)
-              .GetEmbodiedEntity()
-              .GetOriginAnchor()
-              .Position.GetX(),
-          const_cast<argos::CFootBotEntity&>(robot)
-              .GetEmbodiedEntity()
-              .GetOriginAnchor()
-              .Position.GetY());
+void set_robot_pos(argos::CFootBotEntity& robot, double grid_resolution) {
+  rmath::vector2d pos(robot.GetEmbodiedEntity()
+                      .GetOriginAnchor()
+                      .Position.GetX(),
+                      robot.GetEmbodiedEntity()
+                      .GetOriginAnchor()
+                      .Position.GetY());
+  rmath::vector2u dpos = rmath::dvec2uvec(pos, grid_resolution);
 
   auto& controller =
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   controller.position(pos);
+  controller.discrete_position(dpos);
 }
 
 /**
@@ -144,10 +143,9 @@ void set_robot_pos(argos::CFootBotEntity& robot) {
  * @return (block id of cache that is too close (-1 if none), distance to said
  *         block).
  */
-proximity_status_t cache_site_block_proximity(
-    const controller::base_controller& controller,
-    const ds::arena_map& map,
-    double block_prox_dist);
+proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
+                                              const ds::arena_map& map,
+                                              double block_prox_dist);
 
 /**
  * @brief Determine if creating a new cache centered at the robot's current
@@ -160,10 +158,9 @@ proximity_status_t cache_site_block_proximity(
  * @return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).
  */
-proximity_status_t new_cache_cache_proximity(
-    const controller::base_controller& controller,
-    const ds::arena_map& map,
-    double proximity_dist);
+proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,
+                                             const ds::arena_map& map,
+                                             double proximity_dist);
 
 
 /**
@@ -172,7 +169,7 @@ proximity_status_t new_cache_cache_proximity(
  * Needed to eliminate header dependencies in this file.
  */
 std::unique_ptr<repr::line_of_sight> compute_robot_los(
-    ds::arena_map& map,
+    const ds::arena_map& map,
     uint los_grid_size,
     const rmath::vector2d& pos);
 
@@ -189,14 +186,12 @@ void set_robot_los(argos::CFootBotEntity& robot,
                    uint los_grid_size,
                    ds::arena_map& map) {
   rmath::vector2d pos;
-  pos.set(const_cast<argos::CFootBotEntity&>(robot)
-              .GetEmbodiedEntity()
-              .GetOriginAnchor()
-              .Position.GetX(),
-          const_cast<argos::CFootBotEntity&>(robot)
-              .GetEmbodiedEntity()
-              .GetOriginAnchor()
-              .Position.GetY());
+  pos.set(robot.GetEmbodiedEntity()
+          .GetOriginAnchor()
+          .Position.GetX(),
+          robot.GetEmbodiedEntity()
+          .GetOriginAnchor()
+          .Position.GetY());
 
   auto& controller =
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
@@ -212,7 +207,7 @@ void set_robot_los(argos::CFootBotEntity& robot,
  */
 placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
                                       const rmath::vector2d& ent1_dims,
-                                      const repr::multicell_entity* const ent2);
+                                      const repr::multicell_entity* entity);
 
 NS_END(loop_utils, support, fordyca);
 

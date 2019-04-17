@@ -57,9 +57,7 @@ class grp_mdpo_controller : public depth2::grp_dpo_controller,
   void shared_init(const params::depth2::controller_repository& param_repo);
 
   mdpo_perception_subsystem* mdpo_perception(void);
-  const mdpo_perception_subsystem* mdpo_perception(void) const {
-    return const_cast<grp_mdpo_controller*>(this)->mdpo_perception();
-  }
+  const mdpo_perception_subsystem* mdpo_perception(void) const;
 };
 
 NS_END(depth2, controller, fordyca);

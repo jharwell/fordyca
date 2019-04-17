@@ -43,7 +43,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_proximity::cache_proximity(std::shared_ptr<repr::base_cache> cache)
+cache_proximity::cache_proximity(const std::shared_ptr<repr::base_cache>& cache)
     : ER_CLIENT_INIT("fordyca.events.cache_proximity"), m_cache(cache) {}
 
 /*******************************************************************************
@@ -55,7 +55,7 @@ void cache_proximity::dispatch_cache_interactor(
   ER_ASSERT(
       nullptr != interactor,
       "Non dynamic cache interactor task '%s' received cache proximity event",
-      dynamic_cast<ta::logical_task*>(task)->name().c_str());
+      dynamic_cast<rta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_cache_interactor() */
 
@@ -97,8 +97,8 @@ void cache_proximity::visit(tasks::depth2::cache_starter& task) {
 } /* visit() */
 
 void cache_proximity::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_PROXIMITY,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kCACHE_PROXIMITY,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 NS_END(detail, events, fordyca);

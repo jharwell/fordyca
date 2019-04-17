@@ -33,7 +33,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 namespace fsm {
 namespace depth0 {
@@ -82,7 +82,7 @@ struct free_block_pickup_visit_set {
   using inherited = boost::mpl::joint_view<block_pickup_base_visit_set::value,
                                            cell_op_visit_set::value>;
 
-  using defined = visitor::precise_visit_set<
+  using defined = rvisitor::precise_visit_set<
       /* depth0 */
       controller::depth0::crw_controller,
       controller::depth0::dpo_controller,
@@ -115,7 +115,7 @@ struct free_block_pickup_visit_set {
 class free_block_pickup : public rcppsw::er::client<free_block_pickup>,
                           public cell_op {
  public:
-  free_block_pickup(std::shared_ptr<repr::base_block> block,
+  free_block_pickup(const std::shared_ptr<repr::base_block>& block,
                     uint robot_index,
                     uint timestep);
   ~free_block_pickup(void) override = default;
@@ -169,7 +169,7 @@ class free_block_pickup : public rcppsw::er::client<free_block_pickup>,
  * compiler).
  */
 using free_block_pickup_visitor_impl =
-    visitor::precise_visitor<detail::free_block_pickup,
+    rvisitor::precise_visitor<detail::free_block_pickup,
                              detail::free_block_pickup_visit_set::value>;
 
 NS_END(detail);

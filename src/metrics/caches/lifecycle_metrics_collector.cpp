@@ -44,7 +44,7 @@ lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofna
 std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-    /* clang-format off */
+      /* clang-format off */
     "int_created",
     "int_depleted",
     "int_avg_created",
@@ -53,7 +53,7 @@ std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const 
     "cum_avg_depleted",
     "int_avg_depletion_age",
     "cum_avg_depletion_age"
-    /* clang-format on */
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -83,7 +83,7 @@ void lifecycle_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = static_cast<const lifecycle_metrics&>(metrics);
   auto ages = m.cache_depletion_ages();
-  auto sum = std::accumulate(ages.begin(), ages.end(), 0);
+  uint sum = std::accumulate(ages.begin(), ages.end(), 0U);
 
   m_stats.int_created += m.caches_created();
   m_stats.int_depleted += m.caches_depleted();

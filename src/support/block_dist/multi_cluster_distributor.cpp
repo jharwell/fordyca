@@ -31,7 +31,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -41,8 +40,8 @@ multi_cluster_distributor::multi_cluster_distributor(
     double arena_resolution,
     uint maxsize)
     : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster") {
-  for (size_t i = 0; i < grids.size(); ++i) {
-    m_dists.emplace_back(grids[i], arena_resolution, maxsize);
+  for (auto& g : grids) {
+    m_dists.emplace_back(g, arena_resolution, maxsize);
   } /* for(i..) */
 }
 

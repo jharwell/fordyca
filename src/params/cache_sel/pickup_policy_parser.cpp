@@ -46,7 +46,7 @@ void pickup_policy_parser::parse(const ticpp::Element& node) {
   m_params->policy = "Null";
 
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element cnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element cnode = node_get(node, kXMLRoot);
     XML_PARSE_ATTR(cnode, m_params, policy);
     XML_PARSE_ATTR_DFLT(cnode, m_params, timestep, 0U);
     XML_PARSE_ATTR_DFLT(cnode, m_params, cache_count, 0U);

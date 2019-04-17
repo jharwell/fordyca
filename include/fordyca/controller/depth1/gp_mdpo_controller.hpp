@@ -63,9 +63,7 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
   void ControlStep(void) override;
 
   mdpo_perception_subsystem* mdpo_perception(void);
-  const mdpo_perception_subsystem* mdpo_perception(void) const {
-    return const_cast<gp_mdpo_controller*>(this)->mdpo_perception();
-  }
+  const mdpo_perception_subsystem* mdpo_perception(void) const;
 
  protected:
   /**
@@ -75,7 +73,7 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
    *
    * - Block selection matrix (\ref block_sol_matrix)
    * - Cache selection matrix (\ref cache_sel_matrix)
-   * - Task executive (\ref ta::bi_tdgraph_executive)
+   * - Task executive (\ref rta::bi_tdgraph_executive)
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    *
    * @param param_repo Handle to parameter repository for this controller (after

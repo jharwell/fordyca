@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
-#include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics.hpp"
 
 /*******************************************************************************
@@ -31,58 +30,13 @@
 NS_START(fordyca, metrics);
 
 /*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-robot_occupancy_metrics_collector::robot_occupancy_metrics_collector(
-    const std::string& ofname,
-    uint interval,
-    const rmath::vector2u& dims)
-    : base_metrics_collector(ofname, interval, true),
-      m_stats(dims.x(), dims.y()) {}
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> robot_occupancy_metrics_collector::csv_header_cols(void) const {
-  std::list<std::string> cols;
-  for (size_t j = 0; j < m_stats.ysize(); ++j) {
-    cols.push_back("y" + std::to_string(j));
-  } /* for(j..) */
-
-  return cols;
-} /* csv_header_cols() */
-
-void robot_occupancy_metrics_collector::reset(void) {
-  base_metrics_collector::reset();
-  reset_after_interval();
-} /* reset() */
-
-bool robot_occupancy_metrics_collector::csv_line_build(std::string& line) {
-  if (!((timestep() + 1) % interval() == 0)) {
-    return false;
-  }
-  for (size_t i = 0; i < m_stats.xsize(); ++i) {
-    for (size_t j = 0; j < m_stats.ysize(); ++j) {
-      line +=
-          std::to_string(m_stats.access(i, j) / static_cast<double>(m_total_robots)) +
-          separator();
-    } /* for(j..) */
-    line += "\n";
-  } /* for(i..) */
-
-  return true;
-} /* csv_line_build() */
-
-void robot_occupancy_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+uint robot_occupancy_metrics_collector::collect_cell(
+    const rcppsw::metrics::base_metrics& metrics,
+    const rmath::vector2u& coord) const {
   auto& m = dynamic_cast<const robot_occupancy_metrics&>(metrics);
-
-  ++m_total_robots;
-  for (size_t i = 0; i < m_stats.xsize(); ++i) {
-    for (size_t j = 0; j < m_stats.ysize(); ++j) {
-      m_stats.access(i, j) += m.has_robot(i, j);
-    } /* for(j..) */
-  }   /* for(i..) */
-} /* collect() */
+  return static_cast<uint>(m.has_robot(coord));
+} /* collect_cell() */
 
 NS_END(metrics, fordyca);

@@ -37,7 +37,7 @@ class cache_block_drop;
 class cache_vanished;
 } // namespace detail
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Structure Definitions
@@ -50,7 +50,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor
-    : public visitor::polymorphic_accept_set<detail::cache_block_drop,
+    : public rvisitor::polymorphic_accept_set<detail::cache_block_drop,
                                              detail::cached_block_pickup,
                                              detail::cache_vanished> {};
 

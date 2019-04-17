@@ -36,7 +36,7 @@
 NS_START(fordyca);
 
 namespace ds { class dpo_store; }
-namespace task_allocation = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 NS_START(fsm, depth0);
 
@@ -66,6 +66,7 @@ class dpo_fsm : public base_foraging_fsm,
   dpo_fsm(const controller::block_sel_matrix* sel_matrix,
                controller::saa_subsystem* saa,
                ds::dpo_store* store);
+  ~dpo_fsm(void) override = default;
 
   /* collision metrics */
   FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
@@ -78,6 +79,7 @@ class dpo_fsm : public base_foraging_fsm,
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
   FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
 
   /* block transportation */
   FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
@@ -91,10 +93,10 @@ class dpo_fsm : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    ST_START,
-    ST_BLOCK_TO_NEST,     /* Find a block and bring it to the nest */
-    ST_LEAVING_NEST,      /* Block dropped in nest--time to go */
-    ST_MAX_STATES
+    kST_START,
+    kST_BLOCK_TO_NEST,     /* Find a block and bring it to the nest */
+    kST_LEAVING_NEST,      /* Block dropped in nest--time to go */
+    kST_MAX_STATES
   };
 
  private:
@@ -121,7 +123,7 @@ class dpo_fsm : public base_foraging_fsm,
   free_block_to_nest_fsm m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
 };
 
 NS_END(depth0, fsm, fordyca);

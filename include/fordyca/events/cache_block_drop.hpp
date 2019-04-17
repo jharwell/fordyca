@@ -34,7 +34,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 class cache_sel_matrix;
 namespace depth1 {
@@ -76,7 +76,7 @@ struct cache_block_drop_visit_set {
   using inherited = boost::mpl::joint_view<block_drop_base_visit_set::value,
                                            cell_op_visit_set::value>;
 
-  using defined = visitor::precise_visit_set<
+  using defined = rvisitor::precise_visit_set<
       /* depth1 */
       fsm::block_to_goal_fsm,
       ds::dpo_semantic_map,
@@ -148,7 +148,7 @@ class cache_block_drop : public rcppsw::er::client<cache_block_drop>,
  * compiler).
  */
 using cache_block_drop_visitor_impl =
-    visitor::precise_visitor<detail::cache_block_drop,
+    rvisitor::precise_visitor<detail::cache_block_drop,
                              detail::cache_block_drop_visit_set::value>;
 
 NS_END(detail);

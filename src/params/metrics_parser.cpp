@@ -37,7 +37,7 @@ constexpr char metrics_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void metrics_parser::parse(const ticpp::Element& node) {
-  ticpp::Element mnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element mnode = node_get(node, kXMLRoot);
 
   /* loop functions metrics not part of controller XML tree  */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {

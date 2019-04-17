@@ -68,12 +68,12 @@ class base_cache;
 class line_of_sight : public rcppsw::er::client<line_of_sight> {
  public:
   using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
+  using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
 
-  line_of_sight(const grid_view& c_view, rmath::vector2u center)
+  line_of_sight(const const_grid_view& c_view, const rmath::vector2u& center)
       : ER_CLIENT_INIT("fordyca.repr.line_of_sight"),
-        m_center(std::move(center)),
-        m_view(c_view),
-        m_caches() {}
+        mc_center(center),
+        mc_view(c_view) {}
 
   ds::block_list blocks(void) const;
   ds::cache_list caches(void) const;
@@ -83,7 +83,7 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
    *
    * @return The X dimension.
    */
-  size_t xsize(void) const { return m_view.shape()[0]; }
+  size_t xsize(void) const { return mc_view.shape()[0]; }
 
   rmath::vector2u abs_ll(void) const;
   rmath::vector2u abs_lr(void) const;
@@ -95,7 +95,7 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
    *
    * @return The Y dimension.
    */
-  grid_view::size_type ysize(void) const { return m_view.shape()[1]; }
+  grid_view::size_type ysize(void) const { return mc_view.shape()[1]; }
 
   /**
    * @brief Determine if the *ABSOLUTE* arena location is contained in the LOS.
@@ -107,7 +107,7 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
    *
    * @return # elements.
    */
-  grid_view::size_type size(void) const { return m_view.num_elements(); }
+  grid_view::size_type size(void) const { return mc_view.num_elements(); }
 
   /**
    * @brief Get the cell associated with a particular grid location within the
@@ -120,20 +120,19 @@ class line_of_sight : public rcppsw::er::client<line_of_sight> {
    * @return A reference to the cell.
    */
   const ds::cell2D& cell(uint i, uint j) const;
-  ds::cell2D& cell(uint i, uint j);
 
   /**
    * @brief Get the coordinates for the center of the LOS.
    *
    * @return The center coordinates (discrete version).
    */
-  const rmath::vector2u& center(void) const { return m_center; }
+  const rmath::vector2u& center(void) const { return mc_center; }
 
  private:
   /* clang-format off */
-  rmath::vector2u m_center;
-  grid_view       m_view;
-  ds::cache_list  m_caches;
+  const rmath::vector2u mc_center;
+  const const_grid_view mc_view;
+  ds::cache_list        m_caches{};
   /* clang-format on */
 };
 

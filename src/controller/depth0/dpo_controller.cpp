@@ -40,15 +40,12 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
-namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 dpo_controller::dpo_controller(void)
-    : crw_controller(),
-      ER_CLIENT_INIT("fordyca.controller.depth0.dpo"),
-      m_light_loc(),
+    : ER_CLIENT_INIT("fordyca.controller.depth0.dpo"),
       m_block_sel_matrix(),
       m_perception(),
       m_fsm() {}
@@ -149,11 +146,19 @@ __rcsw_pure dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
   return static_cast<dpo_perception_subsystem*>(m_perception.get());
 } /* dpo_perception() */
 
+__rcsw_pure const dpo_perception_subsystem* dpo_controller::dpo_perception(
+    void) const {
+  return static_cast<const dpo_perception_subsystem*>(m_perception.get());
+} /* dpo_perception() */
+
 void dpo_controller::Reset(void) {
   crw_controller::Reset();
   m_perception->reset();
 } /* Reset() */
 
+/*******************************************************************************
+ * FSM Metrics
+ ******************************************************************************/
 FSM_OVERRIDE_DEF(transport_goal_type,
                  dpo_controller,
                  block_transport_goal,
@@ -165,6 +170,8 @@ FSM_OVERRIDE_DEF(acquisition_goal_type,
                  acquisition_goal,
                  *m_fsm,
                  const);
+
+FSM_OVERRIDE_DEF(rmath::vector2u, dpo_controller, acquisition_loc, *m_fsm, const);
 
 FSM_OVERRIDE_DEF(bool, dpo_controller, goal_acquired, *m_fsm, const);
 FSM_OVERRIDE_DEF(bool, dpo_controller, is_exploring_for_goal, *m_fsm, const);

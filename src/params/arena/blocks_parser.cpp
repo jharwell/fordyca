@@ -38,7 +38,7 @@ constexpr char blocks_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void blocks_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bnode = node_get(node, kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 

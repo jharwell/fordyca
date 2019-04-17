@@ -24,12 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -52,7 +54,7 @@ class robot_occupancy_metrics : public virtual rcppsw::metrics::base_metrics {
    * @brief Should return \c TRUE iff there is currently a robot is the cell at
    * (i,j) in the robot_occupancy.
    */
-  virtual bool has_robot(uint i, uint j) const = 0;
+  virtual bool has_robot(const rmath::vector2u& coord) const = 0;
 };
 
 NS_END(metrics, fordyca);

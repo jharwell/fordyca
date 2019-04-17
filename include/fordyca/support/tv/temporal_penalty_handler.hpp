@@ -70,9 +70,9 @@ class temporal_penalty_handler
    * in logging statements.
    */
   explicit temporal_penalty_handler(const rct::waveform_params* const params,
-                                    const std::string& name)
+                                    std::string name)
       : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
-        mc_name(name),
+        mc_name(std::move(name)),
         m_penalty(rct::waveform_generator()(params->type, params)) {}
 
 
@@ -195,7 +195,7 @@ class temporal_penalty_handler
    * @param timestep The current timestep.
    */
   uint deconflict_penalty_finish(uint timestep) const {
-    uint penalty = static_cast<uint>(m_penalty->value(timestep));
+    auto penalty = static_cast<uint>(m_penalty->value(timestep));
     if (0 == penalty) {
       ++penalty;
     }

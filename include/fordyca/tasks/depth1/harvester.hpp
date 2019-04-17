@@ -28,14 +28,15 @@
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
 
-#include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/ta/abort_probability.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth1);
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Structure Definitions
@@ -52,8 +53,8 @@ class harvester : public foraging_task,
                   public events::free_block_interactor,
                   public rcppsw::er::client<harvester> {
  public:
-  harvester(const struct ta::task_allocation_params* params,
-            std::unique_ptr<ta::taskable> mechanism);
+  harvester(const struct rta::task_alloc_params* params,
+            std::unique_ptr<rta::taskable> mechanism);
   ~harvester(void) override = default;
 
   /*
@@ -63,19 +64,20 @@ class harvester : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::detail::free_block_pickup& v) override;
+  void accept(events::detail::free_block_pickup& visitor) override;
   void accept(events::detail::free_block_drop&) override {}
   void accept(events::detail::block_vanished&) override;
 
-  void accept(events::detail::cache_block_drop& v) override;
+  void accept(events::detail::cache_block_drop& visitor) override;
   void accept(events::detail::cached_block_pickup&) override {}
-  void accept(events::detail::cache_vanished& v) override;
+  void accept(events::detail::cache_vanished& visitor) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLAREC(bool, goal_acquired);
   TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
   TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
 
   /* block transportation */
   TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
@@ -84,7 +86,7 @@ class harvester : public foraging_task,
   bool task_at_interface(void) const override;
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const ta::taskable_argument*) override;
+  void task_start(const rta::taskable_argument*) override;
   double abort_prob_calc(void) override;
   double interface_time_calc(uint interface,
                              double start_time) override;

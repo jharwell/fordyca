@@ -108,7 +108,7 @@ class base_cache : public multicell_entity,
    * @brief \c TRUE iff the cache contains the specified block.
    */
   __rcsw_pure bool contains_block(
-      const std::shared_ptr<base_block> c_block) const {
+      const std::shared_ptr<base_block>& c_block) const {
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }

@@ -45,19 +45,30 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
       acquire_goal_fsm(
           saa,
-          std::bind(&acquire_existing_cache_fsm::acquisition_goal_internal,
-                    this),
-          std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
-          std::bind(&acquire_existing_cache_fsm::existing_cache_select, this),
-          std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
-                    this,
-                    std::placeholders::_1),
-          std::bind(&acquire_existing_cache_fsm::cache_exploration_term_cb,
-                    this),
-          std::bind(&acquire_existing_cache_fsm::cache_acquisition_valid,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2)),
+          acquire_goal_fsm::hook_list{
+              .acquisition_goal = std::bind(
+                  &acquire_existing_cache_fsm::acquisition_goal_internal,
+                  this),
+              .goal_select =
+                  std::bind(&acquire_existing_cache_fsm::existing_cache_select,
+                            this),
+              .candidates_exist =
+                  std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
+
+              .goal_acquired_cb =
+                  std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
+
+                            this,
+                            std::placeholders::_1),
+              .explore_term_cb = std::bind(
+                  &acquire_existing_cache_fsm::cache_exploration_term_cb,
+
+                  this),
+              .goal_valid_cb =
+                  std::bind(&acquire_existing_cache_fsm::cache_acquisition_valid,
+                            this,
+                            std::placeholders::_1,
+                            std::placeholders::_2)}),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
       mc_store(store),

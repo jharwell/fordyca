@@ -78,9 +78,9 @@ class dpo_store : public er::client<dpo_store> {
    */
 
   struct update_res_t {
-    bool status;
-    update_status reason;
-    rmath::vector2u old_loc;
+    bool status{false};
+    update_status reason{kNoChange};
+    rmath::vector2u old_loc{};
   };
 
   /**
@@ -145,7 +145,7 @@ class dpo_store : public er::client<dpo_store> {
    *
    * @return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(const dp_entity<repr::base_block>& block);
+  update_res_t block_update(const dp_entity<repr::base_block>& block_in);
 
   /**
    * @brief Remove a cache from the set of of known caches.

@@ -47,7 +47,7 @@
             update_interface_ests="true"
             tab_init_method="max_depth"
             />
-        <task_allocation>
+        <task_alloc>
           <task_abort>
             <src_sigmoid_sel
                 input_src="exec">
@@ -108,7 +108,7 @@
               </sigmoid_sel>
             </src_sigmoid_sel>
           </tab_sel>
-        </task_allocation>
+        </task_alloc>
         <block_sel_matrix
               nest="2.0, 3">
               <block_priorities
@@ -192,7 +192,8 @@
           task_tab_collector_fname="task-tab-collector.csv"
           task_tab_harvester_fname="task-tab-harvester.csv"
           task_distribution_fname="task-distribution.csv"
-          perception_world_model_fname="perception-world-model.csv"
+          perception_dpo_fname="perception-dpo.csv"
+          perception_mdpo_fname="perception-mdpo.csv"
           arena_robot_occupancy_fname="arena-robot-occupancy.csv"
           swarm_convergence_fname="swarm-convergence.csv"
           loop_temporal_variance_fname="loop-temporal-variance.csv"

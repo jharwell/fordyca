@@ -33,13 +33,13 @@
 namespace argos {
 class CQTOpenGLUserFunctions;
 }
-namespace rcppsw { namespace task_allocation {
+namespace rcppsw { namespace ta {
 class logical_task;
-}} // namespace rcppsw::task_allocation
+}} // namespace rcppsw::ta
 
 NS_START(fordyca, support);
 
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Classes
@@ -68,7 +68,7 @@ class task_visualizer : public rcppsw::er::client<task_visualizer> {
    *
    * @param current_task The current task the robot is executing.
    */
-  void draw(const ta::logical_task* const current_task);
+  void draw(const rta::logical_task* current_task);
 
   /* clang-format off */
   double                               m_text_vis_offset{0.0};

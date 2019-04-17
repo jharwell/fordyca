@@ -64,7 +64,7 @@ free_block_drop::free_block_drop(const std::shared_ptr<repr::base_block>& block,
 bool free_block_drop::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task,
     controller::block_sel_matrix* const bsel_matrix) {
-  auto* polled = dynamic_cast<ta::polled_task*>(task);
+  auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   bool ret = false;
 
@@ -196,8 +196,8 @@ void free_block_drop::visit(tasks::depth2::cache_finisher& task) {
 } /* visit() */
 
 void free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 NS_END(detail, events, fordyca);

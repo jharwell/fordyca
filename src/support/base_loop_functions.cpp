@@ -172,19 +172,15 @@ void base_loop_functions::Reset(void) {
  ******************************************************************************/
 std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots =
-      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     rmath::vector2d pos;
-    pos.set(const_cast<argos::CFootBotEntity&>(robot)
-                .GetEmbodiedEntity()
+    pos.set(robot.GetEmbodiedEntity()
                 .GetOriginAnchor()
                 .Position.GetX(),
-            const_cast<argos::CFootBotEntity&>(robot)
-                .GetEmbodiedEntity()
+            robot.GetEmbodiedEntity()
                 .GetOriginAnchor()
                 .Position.GetY());
     v.push_back(pos);
@@ -225,9 +221,7 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
 
 std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const {
   std::vector<rmath::radians> v;
-  auto& robots =
-      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -241,9 +235,7 @@ std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const
 std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
     uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots =
-      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);

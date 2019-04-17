@@ -38,7 +38,7 @@ constexpr char output_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void output_parser::parse(const ticpp::Element& node) {
-  ticpp::Element onode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element onode = node_get(node, kXMLRoot);
   std::vector<std::string> res, res2;
 
   m_params =

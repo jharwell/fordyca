@@ -38,15 +38,15 @@ __rcsw_pure int robot_on_block(const controller::base_controller& controller,
   return map.robot_on_block(controller.position());
 } /* robot_on_block() */
 
-__rcsw_pure int robot_on_block(argos::CFootBotEntity& robot,
+__rcsw_pure int robot_on_block(const argos::CFootBotEntity& robot,
                                const ds::arena_map& map) {
-  return robot_on_block(dynamic_cast<controller::base_controller&>(
-                            robot.GetControllableEntity().GetController()),
+  return robot_on_block(dynamic_cast<const controller::base_controller&>(
+      robot.GetControllableEntity().GetController()),
                         map);
 } /* robot_on_block() */
 
-int robot_id(argos::CFootBotEntity& robot) {
-  return robot_id(dynamic_cast<controller::base_controller&>(
+int robot_id(const argos::CFootBotEntity& robot) {
+  return robot_id(dynamic_cast<const controller::base_controller&>(
       robot.GetControllableEntity().GetController()));
 } /* robot_id() */
 
@@ -60,10 +60,10 @@ __rcsw_pure int robot_on_cache(const controller::base_controller& controller,
   return map.robot_on_cache(controller.position());
 } /* robot_on_cache() */
 
-__rcsw_pure int robot_on_cache(argos::CFootBotEntity& robot,
+__rcsw_pure int robot_on_cache(const argos::CFootBotEntity& robot,
                                const ds::arena_map& map) {
-  return robot_on_cache(dynamic_cast<controller::base_controller&>(
-                            robot.GetControllableEntity().GetController()),
+  return robot_on_cache(dynamic_cast<const controller::base_controller&>(
+      robot.GetControllableEntity().GetController()),
                         map);
 }
 
@@ -139,7 +139,7 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
 } /* placement_conflict() */
 
 std::unique_ptr<repr::line_of_sight> compute_robot_los(
-    ds::arena_map& map,
+    const ds::arena_map& map,
     uint los_grid_size,
     const rmath::vector2d& pos) {
   rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution());

@@ -34,7 +34,6 @@
 NS_START(fordyca, fsm);
 namespace rfsm = rcppsw::patterns::state_machine;
 namespace utils = rcppsw::utils;
-using controller::steering_force_type;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -46,11 +45,6 @@ base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
-      entry_transport_to_nest(),
-      entry_leaving_nest(),
-      entry_new_direction(),
-      entry_wait_for_signal(),
-      m_new_dir(),
       m_rng(argos::CRandom::CreateRNG("argos")),
       m_saa(saa) {}
 
@@ -58,15 +52,15 @@ base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
  * States
  ******************************************************************************/
 HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
-  ER_ASSERT(rfsm::event_type::NORMAL == data->type(),
-            "ST_LEAVING_NEST cannot handle child events");
-  ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
-            "ST_LEAVING_NEST should never pickup blocks...");
-  ER_ASSERT(controller::foraging_signal::BLOCK_DROP != data->signal(),
-            "ST_LEAVING_NEST should never drop blocks...");
+  ER_ASSERT(rfsm::event_type::kNORMAL == data->type(),
+            "kST_LEAVING_NEST cannot handle child events");
+  ER_ASSERT(controller::foraging_signal::kBLOCK_PICKUP != data->signal(),
+            "kST_LEAVING_NEST should never pickup blocks...");
+  ER_ASSERT(controller::foraging_signal::kBLOCK_DROP != data->signal(),
+            "kST_LEAVING_NEST should never drop blocks...");
 
   if (current_state() != last_state()) {
-    ER_DEBUG("Executing ST_LEAVING_NEST");
+    ER_DEBUG("Executing kST_LEAVING_NEST");
   }
   /*
    * We don't want to just apply anti-phototaxis force, because that will make
@@ -86,19 +80,19 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
   m_saa->apply_steering_force(std::make_pair(false, false));
 
   if (!m_saa->sensing()->in_nest()) {
-    return controller::foraging_signal::LEFT_NEST;
+    return controller::foraging_signal::kLEFT_NEST;
   }
-  return rfsm::event_signal::HANDLED;
+  return rfsm::event_signal::kHANDLED;
 }
 HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) {
-  ER_ASSERT(rfsm::event_type::NORMAL == data->type(),
-            "ST_TRANSPORT_TO_NEST cannot handle child events");
-  ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
-            "ST_TRANSPORT_TO_NEST should never pickup blocks...");
-  ER_ASSERT(controller::foraging_signal::BLOCK_PICKUP != data->signal(),
-            "ST_TRANSPORT_TO_NEST should never drop blocks");
+  ER_ASSERT(rfsm::event_type::kNORMAL == data->type(),
+            "kST_TRANSPORT_TO_NEST cannot handle child events");
+  ER_ASSERT(controller::foraging_signal::kBLOCK_PICKUP != data->signal(),
+            "kST_TRANSPORT_TO_NEST should never pickup blocks...");
+  ER_ASSERT(controller::foraging_signal::kBLOCK_PICKUP != data->signal(),
+            "kST_TRANSPORT_TO_NEST should never drop blocks");
   if (current_state() != last_state()) {
-    ER_DEBUG("Executing ST_TRANSPORT_TO_NEST");
+    ER_DEBUG("Executing kST_TRANSPORT_TO_NEST");
   }
 
   /*
@@ -109,10 +103,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) 
     if (m_nest_count++ < kNEST_COUNT_MAX_STEPS) {
       m_saa->steering_force().wander();
       m_saa->apply_steering_force(std::make_pair(false, false));
-      return controller::foraging_signal::HANDLED;
+      return controller::foraging_signal::kHANDLED;
     } else {
       m_nest_count = 0;
-      return controller::foraging_signal::ENTERED_NEST;
+      return controller::foraging_signal::kENTERED_NEST;
     }
   }
 
@@ -135,7 +129,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) 
   }
 
   m_saa->apply_steering_force(std::make_pair(true, false));
-  return rfsm::event_signal::HANDLED;
+  return rfsm::event_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data* data) {
@@ -173,7 +167,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data* data) {
     internal_event(previous_state());
   }
   ++m_new_dir_count;
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
@@ -250,7 +244,7 @@ rmath::vector2d base_foraging_fsm::randomize_vector_angle(
                                        argos::CRadians(1.0));
   argos::CVector2 tmp(vector.x(), vector.y());
   tmp.Rotate(m_rng->Uniform(range));
-  return rmath::vector2d(tmp.GetX(), tmp.GetY());
+  return {tmp.GetX(), tmp.GetY()};
 } /* randomize_vector_angle() */
 
 const std::shared_ptr<const controller::sensing_subsystem> base_foraging_fsm::sensors(

@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <list>
+#include <string>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 

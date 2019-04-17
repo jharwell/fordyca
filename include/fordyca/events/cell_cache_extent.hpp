@@ -33,7 +33,6 @@
 NS_START(fordyca);
 namespace rmath = rcppsw::math;
 namespace repr {
-class arena_map;
 class base_cache;
 } // namespace repr
 
@@ -48,7 +47,7 @@ NS_START(events, detail);
  ******************************************************************************/
 struct cell_cache_extent_visit_set {
   using inherited = cell_op_visit_set::value;
-  using defined = visitor::precise_visit_set<ds::arena_map>;
+  using defined = rvisitor::precise_visit_set<ds::arena_map>;
   using value = boost::mpl::joint_view<inherited::type, defined::type>;
 };
 
@@ -65,7 +64,7 @@ struct cell_cache_extent_visit_set {
 class cell_cache_extent : public cell_op {
  public:
   cell_cache_extent(const rmath::vector2u& coord,
-                    const std::shared_ptr<repr::base_cache> cache);
+                    const std::shared_ptr<repr::base_cache>& cache);
 
   /* depth1 foraging */
   void visit(ds::cell2D& cell);
@@ -85,7 +84,7 @@ class cell_cache_extent : public cell_op {
  * compiler).
  */
 using cell_cache_extent_visitor_impl =
-    visitor::precise_visitor<detail::cell_cache_extent,
+    rvisitor::precise_visitor<detail::cell_cache_extent,
                              detail::cell_cache_extent_visit_set::value>;
 
 NS_END(detail);

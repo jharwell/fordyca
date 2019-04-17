@@ -78,7 +78,7 @@ cached_block_pickup::cached_block_pickup(
 void cached_block_pickup::dispatch_d1_cache_interactor(
     tasks::base_foraging_task* const task) {
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
-  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
+  std::string task_name = dynamic_cast<rta::logical_task*>(task)->name();
   ER_ASSERT(
       nullptr != task,
       "Non existing cache interactor task '%s' causing cached block pickup",
@@ -93,7 +93,7 @@ void cached_block_pickup::dispatch_d1_cache_interactor(
 bool cached_block_pickup::dispatch_d2_cache_interactor(
     tasks::base_foraging_task* task,
     controller::cache_sel_matrix* csel_matrix) {
-  auto* polled = dynamic_cast<ta::polled_task*>(task);
+  auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
   bool ret = false;
 
@@ -335,13 +335,13 @@ void cached_block_pickup::visit(tasks::depth1::collector& task) {
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_PICKUP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_PICKUP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_PICKUP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 /*******************************************************************************

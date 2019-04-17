@@ -27,8 +27,8 @@
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,11 +65,11 @@ void ogp_mdpo_controller::oracle_init(void) {
       &ogp_mdpo_controller::task_finish_cb, this, std::placeholders::_1));
 } /* oracle_init() */
 
-void ogp_mdpo_controller::task_abort_cb(ta::polled_task* task) {
-  double oracle_est = boost::get<ta::time_estimate>(
+void ogp_mdpo_controller::task_abort_cb(rta::polled_task* task) {
+  double oracle_est = boost::get<rta::time_estimate>(
                           mc_tasking_oracle->ask("exec_est." + task->name()))
                           .last_result();
-  double old = task->task_exec_estimate().last_result();
+  __rcsw_unused double old = task->task_exec_estimate().last_result();
   task->exec_estimate_update(oracle_est);
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on abort: %f -> %f",
           task->name().c_str(),
@@ -78,11 +78,11 @@ void ogp_mdpo_controller::task_abort_cb(ta::polled_task* task) {
           task->task_exec_estimate().last_result());
 } /* task_abort_cb() */
 
-void ogp_mdpo_controller::task_finish_cb(ta::polled_task* task) {
-  double oracle_est = boost::get<ta::time_estimate>(
+void ogp_mdpo_controller::task_finish_cb(rta::polled_task* task) {
+  double oracle_est = boost::get<rta::time_estimate>(
                           mc_tasking_oracle->ask("exec_est." + task->name()))
                           .last_result();
-  double old = task->task_exec_estimate().last_result();
+  __rcsw_unused double old = task->task_exec_estimate().last_result();
   task->exec_estimate_update(oracle_est);
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on finish: %f -> %f",
           task->name().c_str(),
@@ -90,7 +90,7 @@ void ogp_mdpo_controller::task_finish_cb(ta::polled_task* task) {
           old,
           task->task_exec_estimate().last_result());
 
-  oracle_est = boost::get<ta::time_estimate>(
+  oracle_est = boost::get<rta::time_estimate>(
                    mc_tasking_oracle->ask("interface_est." + task->name()))
                    .last_result();
   old = task->task_interface_estimate(0).last_result();

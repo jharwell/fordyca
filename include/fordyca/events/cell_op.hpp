@@ -34,7 +34,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 namespace rmath = rcppsw::math;
 namespace ds {
 class cell2D;
@@ -87,7 +87,7 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cell_op_visitor = visitor::precise_visitor<detail::cell_op,
+using cell_op_visitor = rvisitor::precise_visitor<detail::cell_op,
                                                detail::cell_op_visit_set::value>;
 NS_END(events, fordyca);
 

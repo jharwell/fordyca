@@ -24,9 +24,9 @@
 #include "fordyca/support/tasking_oracle.hpp"
 #include <functional>
 
-#include "rcppsw/task_allocation/bi_tdgraph.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,9 +36,9 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-tasking_oracle::tasking_oracle(const ta::bi_tdgraph* const graph)
+tasking_oracle::tasking_oracle(const rta::bi_tdgraph* const graph)
     : ER_CLIENT_INIT("fordyca.support.tasking_oracle") {
-  graph->walk([&](const ta::polled_task* task) {
+  graph->walk([&](const rta::polled_task* task) {
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
     m_map.insert(
         {"interface_est." + task->name(), task->task_interface_estimate(0)});
@@ -53,15 +53,15 @@ tasking_oracle::mapped_type tasking_oracle::ask(const std::string& query) const 
   return m_map.find(query)->second;
 } /* ask() */
 
-void tasking_oracle::listener_add(ta::bi_tdgraph_executive* const executive) {
+void tasking_oracle::listener_add(rta::bi_tdgraph_executive* const executive) {
   executive->task_abort_notify(
       std::bind(&tasking_oracle::task_abort_cb, this, std::placeholders::_1));
   executive->task_finish_notify(
       std::bind(&tasking_oracle::task_finish_cb, this, std::placeholders::_1));
 } /* listener_add() */
 
-void tasking_oracle::task_finish_cb(const ta::polled_task* task) {
-  auto& est = boost::get<ta::time_estimate>(
+void tasking_oracle::task_finish_cb(const rta::polled_task* task) {
+  auto& est = boost::get<rta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
   __rcsw_unused double old = est.last_result();
   est.calc(task->task_exec_estimate());
@@ -71,7 +71,7 @@ void tasking_oracle::task_finish_cb(const ta::polled_task* task) {
            old,
            est.last_result());
 
-  est = boost::get<ta::time_estimate>(
+  est = boost::get<rta::time_estimate>(
       m_map.find("interface_est." + task->name())->second);
   old = est.last_result();
 
@@ -84,8 +84,8 @@ void tasking_oracle::task_finish_cb(const ta::polled_task* task) {
            est.last_result());
 } /* task_finish_cb() */
 
-void tasking_oracle::task_abort_cb(const ta::polled_task* task) {
-  auto& est = boost::get<ta::time_estimate>(
+void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
+  auto& est = boost::get<rta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
   __rcsw_unused double old = est.last_result();
   est.calc(task->task_exec_estimate());

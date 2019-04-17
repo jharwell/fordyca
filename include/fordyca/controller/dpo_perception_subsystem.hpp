@@ -27,9 +27,9 @@
 #include <string>
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +64,7 @@ class dpo_perception_subsystem
       const struct params::perception::perception_params* params);
   ~dpo_perception_subsystem(void) override;
 
-    /* DPO perception metrics */
+  /* DPO perception metrics */
   uint n_known_blocks(void) const override;
   uint n_known_caches(void) const override;
   rswarm::pheromone_density avg_block_density(void) const override;
@@ -92,15 +92,15 @@ class dpo_perception_subsystem
    *
    * @param c_los The LOS to process.
    */
-  void process_los(const repr::line_of_sight* const c_los);
+  void process_los(const repr::line_of_sight* c_los);
 
-  void process_los_blocks(const repr::line_of_sight* const c_los);
-  void process_los_caches(const repr::line_of_sight* const c_los);
+  void process_los_blocks(const repr::line_of_sight* c_los);
+  void process_los_caches(const repr::line_of_sight* c_los);
 
-  void los_tracking_sync(const repr::line_of_sight* const c_los,
+  void los_tracking_sync(const repr::line_of_sight* c_los,
                          const ds::cache_list& los_caches);
-  void los_tracking_sync(const repr::line_of_sight* const c_los,
-                         const ds::block_list& los_blocks);
+  void los_tracking_sync(const repr::line_of_sight* c_los,
+                         const ds::block_list& blocks);
 
  private:
   /* clang-format off */

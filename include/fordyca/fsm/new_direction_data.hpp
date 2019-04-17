@@ -45,7 +45,7 @@ namespace rmath = rcppsw::math;
  * them change their direction.
  */
 struct new_direction_data : public rfsm::event_data {
-  explicit new_direction_data(const rmath::radians& dir_) : dir(dir_) {}
+  explicit new_direction_data(const rmath::radians& dir_in) : dir(dir_in) {}
 
   rmath::radians dir;
 };

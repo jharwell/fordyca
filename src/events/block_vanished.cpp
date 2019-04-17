@@ -50,12 +50,12 @@ block_vanished::block_vanished(uint block_id)
 void block_vanished::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
   ER_INFO("Abort pickup executing task %s: block%d vanished",
-          dynamic_cast<ta::logical_task*>(task)->name().c_str(),
+          dynamic_cast<rta::logical_task*>(task)->name().c_str(),
           m_block_id);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
-  ER_ASSERT(nullptr != task,
+  ER_ASSERT(nullptr != interactor,
             "Non-free block interactor task %s triggered block vanished event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            dynamic_cast<rta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_free_block_interactor() */
 
@@ -90,13 +90,13 @@ void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::crw_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_VANISHED,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_VANISHED,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -128,13 +128,13 @@ void block_vanished::visit(tasks::depth1::harvester& task) {
 } /* visit() */
 
 void block_vanished::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_VANISHED,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_VANISHED,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 /*******************************************************************************

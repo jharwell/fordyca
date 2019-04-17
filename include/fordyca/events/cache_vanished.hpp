@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth1 {
 class gp_dpo_controller;
@@ -68,7 +68,7 @@ NS_START(events, detail);
  ******************************************************************************/
 struct cache_vanished_visit_set {
   using value =
-      visitor::precise_visit_set<controller::depth1::gp_dpo_controller,
+      rvisitor::precise_visit_set<controller::depth1::gp_dpo_controller,
                                  controller::depth1::gp_mdpo_controller,
                                  controller::depth2::grp_dpo_controller,
                                  controller::depth2::grp_mdpo_controller,
@@ -106,7 +106,7 @@ class cache_vanished : public rcppsw::er::client<cache_vanished> {
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& controller);
   void visit(controller::depth2::grp_mdpo_controller& controller);
-  void visit(tasks::depth2::cache_transferer& controller);
+  void visit(tasks::depth2::cache_transferer& task);
 
  private:
   /* clang-format off */
@@ -122,7 +122,7 @@ class cache_vanished : public rcppsw::er::client<cache_vanished> {
  * compiler).
  */
 using cache_vanished_visitor_impl =
-    visitor::precise_visitor<detail::cache_vanished,
+    rvisitor::precise_visitor<detail::cache_vanished,
                              detail::cache_vanished_visit_set::value>;
 
 NS_END(detail);

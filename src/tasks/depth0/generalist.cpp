@@ -37,8 +37,8 @@ NS_START(fordyca, tasks, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-generalist::generalist(const ta::task_allocation_params* const params,
-                       std::unique_ptr<ta::taskable> mechanism)
+generalist::generalist(const rta::task_alloc_params* const params,
+                       std::unique_ptr<rta::taskable> mechanism)
     : foraging_task(kGeneralistName, params, std::move(mechanism)) {}
 
 /*******************************************************************************
@@ -97,6 +97,12 @@ TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
 TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
                          generalist,
                          block_transport_goal,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         generalist,
+                         acquisition_loc,
                          static_cast<fsm::depth0::free_block_to_nest_fsm*>(
                              polled_task::mechanism()));
 

@@ -41,7 +41,7 @@ void perception_parser::parse(const ticpp::Element& node) {
    * Not all controllers use a perception subsystem
    */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element onode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element onode = node_get(node, kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 

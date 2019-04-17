@@ -54,6 +54,8 @@ namespace fs = std::experimental::filesystem;
 base_controller::base_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.base"), m_saa(nullptr) {}
 
+base_controller::~base_controller(void) = default;
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
@@ -68,9 +70,15 @@ bool base_controller::block_detected(void) const {
 void base_controller::position(const rmath::vector2d& loc) {
   m_saa->sensing()->position(loc);
 }
+void base_controller::discrete_position(const rmath::vector2u& loc) {
+  m_saa->sensing()->discrete_position(loc);
+}
 
 __rcsw_pure const rmath::vector2d& base_controller::position(void) const {
   return m_saa->sensing()->position();
+}
+__rcsw_pure const rmath::vector2u& base_controller::discrete_position(void) const {
+  return m_saa->sensing()->discrete_position();
 }
 
 __rcsw_pure rmath::vector2d base_controller::heading(void) const {
@@ -246,7 +254,7 @@ rmath::vector2d base_controller::velocity(void) const {
   if (saa_subsystem()->sensing()->tick() > 1) {
     return saa_subsystem()->linear_velocity();
   }
-  return rmath::vector2d(0, 0);
+  return {0, 0};
 } /* velocity() */
 
 NS_END(controller, fordyca);

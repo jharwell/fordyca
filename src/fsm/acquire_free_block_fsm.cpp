@@ -40,24 +40,33 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
-    const controller::block_sel_matrix* const sel_matrix,
+    const controller::block_sel_matrix* const matrix,
     controller::saa_subsystem* const saa,
     ds::dpo_store* const store)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
           saa,
-          std::bind(&acquire_free_block_fsm::acquisition_goal_internal, this),
-          std::bind(&acquire_free_block_fsm::candidates_exist, this),
-          std::bind(&acquire_free_block_fsm::block_select, this),
-          std::bind(&acquire_free_block_fsm::block_acquired_cb,
-                    this,
-                    std::placeholders::_1),
-          std::bind(&acquire_free_block_fsm::block_exploration_term_cb, this),
-          std::bind(&acquire_free_block_fsm::block_acquisition_valid,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2)),
-      mc_matrix(sel_matrix),
+          acquire_goal_fsm::hook_list{
+              .acquisition_goal =
+                  std::bind(&acquire_free_block_fsm::acquisition_goal_internal,
+                            this),
+              .goal_select =
+                  std::bind(&acquire_free_block_fsm::block_select, this),
+              .candidates_exist =
+                  std::bind(&acquire_free_block_fsm::candidates_exist, this),
+              .goal_acquired_cb =
+                  std::bind(&acquire_free_block_fsm::block_acquired_cb,
+                            this,
+                            std::placeholders::_1),
+              .explore_term_cb =
+                  std::bind(&acquire_free_block_fsm::block_exploration_term_cb,
+                            this),
+              .goal_valid_cb =
+                  std::bind(&acquire_free_block_fsm::block_acquisition_valid,
+                            this,
+                            std::placeholders::_1,
+                            std::placeholders::_2)}),
+      mc_matrix(matrix),
       mc_store(store) {}
 
 /*******************************************************************************

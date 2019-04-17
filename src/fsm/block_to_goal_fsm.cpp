@@ -37,8 +37,7 @@ block_to_goal_fsm::block_to_goal_fsm(acquire_goal_fsm* const goal_fsm,
                                      acquire_goal_fsm* const block_fsm,
                                      controller::saa_subsystem* saa)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
-      base_foraging_fsm(saa, ST_MAX_STATES),
-      entry_wait_for_signal(),
+      base_foraging_fsm(saa, kST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
@@ -61,46 +60,46 @@ block_to_goal_fsm::block_to_goal_fsm(acquire_goal_fsm* const goal_fsm,
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(block_to_goal_fsm, start, rfsm::event_data* data) {
-  if (rfsm::event_type::NORMAL == data->type()) {
-    if (controller::foraging_signal::ACQUIRE_FREE_BLOCK == data->signal() ||
-        controller::foraging_signal::ACQUIRE_CACHED_BLOCK == data->signal()) {
-      internal_event(ST_ACQUIRE_BLOCK);
-      return controller::foraging_signal::HANDLED;
+  if (rfsm::event_type::kNORMAL == data->type()) {
+    if (controller::foraging_signal::kACQUIRE_FREE_BLOCK == data->signal() ||
+        controller::foraging_signal::kACQUIRE_CACHED_BLOCK == data->signal()) {
+      internal_event(kST_ACQUIRE_BLOCK);
+      return controller::foraging_signal::kHANDLED;
     }
   } else {
     ER_FATAL_SENTINEL("Unhandled child signal %d", data->signal());
-    return controller::foraging_signal::UNHANDLED;
+    return controller::foraging_signal::kUNHANDLED;
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 HFSM_STATE_DEFINE_ND(block_to_goal_fsm, acquire_block) {
   if (m_block_fsm->task_finished()) {
-    internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
+    internal_event(kST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_block_fsm->task_execute();
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
   if (m_goal_fsm->task_finished()) {
     m_goal_fsm->task_reset();
     saa_subsystem()->actuation()->differential_drive().stop();
-    internal_event(ST_WAIT_FOR_BLOCK_DROP);
+    internal_event(kST_WAIT_FOR_BLOCK_DROP);
   } else {
     m_goal_fsm->task_execute();
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_pickup,
                   rfsm::event_data* data) {
-  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+  if (controller::foraging_signal::kBLOCK_PICKUP == data->signal()) {
     ER_DEBUG("Block pickup signal received");
     m_block_fsm->task_reset();
-    internal_event(ST_TRANSPORT_TO_GOAL);
-    return controller::foraging_signal::HANDLED;
+    internal_event(kST_TRANSPORT_TO_GOAL);
+    return controller::foraging_signal::kHANDLED;
   }
   /**
    * It is possible that robots can be waiting indefinitely for a block
@@ -113,43 +112,43 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
    * Similar things can happen for a cache to vanish while a robot is waiting to
    * pick up a block from it.
    */
-  if (controller::foraging_signal::BLOCK_VANISHED == data->signal() ||
-      controller::foraging_signal::CACHE_VANISHED == data->signal()) {
+  if (controller::foraging_signal::kBLOCK_VANISHED == data->signal() ||
+      controller::foraging_signal::kCACHE_VANISHED == data->signal()) {
     m_block_fsm->task_reset();
-    internal_event(ST_ACQUIRE_BLOCK);
+    internal_event(kST_ACQUIRE_BLOCK);
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_drop,
                   rfsm::event_data* data) {
   saa_subsystem()->actuation()->differential_drive().stop();
-  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+  if (controller::foraging_signal::kBLOCK_DROP == data->signal()) {
     ER_DEBUG("Block drop signal received");
-    internal_event(ST_FINISHED);
-  } else if (controller::foraging_signal::BLOCK_PROXIMITY == data->signal()) {
+    internal_event(kST_FINISHED);
+  } else if (controller::foraging_signal::kBLOCK_PROXIMITY == data->signal()) {
     ER_ASSERT(acquisition_goal_type::kCacheSite == acquisition_goal(),
               "Bad goal on block proximity");
     m_goal_fsm->task_reset();
-    internal_event(ST_TRANSPORT_TO_GOAL);
-  } else if (controller::foraging_signal::CACHE_VANISHED == data->signal()) {
+    internal_event(kST_TRANSPORT_TO_GOAL);
+  } else if (controller::foraging_signal::kCACHE_VANISHED == data->signal()) {
     ER_ASSERT(acquisition_goal_type::kExistingCache == acquisition_goal(),
               "Non-existing cache vanished? ");
     m_goal_fsm->task_reset();
-    internal_event(ST_TRANSPORT_TO_GOAL);
-  } else if (controller::foraging_signal::CACHE_PROXIMITY == data->signal()) {
+    internal_event(kST_TRANSPORT_TO_GOAL);
+  } else if (controller::foraging_signal::kCACHE_PROXIMITY == data->signal()) {
     ER_ASSERT(acquisition_goal_type::kNewCache == acquisition_goal() ||
                   acquisition_goal_type::kCacheSite == acquisition_goal(),
               "Bad goal on cache proxmity");
     m_goal_fsm->task_reset();
-    internal_event(ST_TRANSPORT_TO_GOAL);
+    internal_event(kST_TRANSPORT_TO_GOAL);
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 __rcsw_const HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 /*******************************************************************************
@@ -197,8 +196,8 @@ __rcsw_pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
 } /* is_vectoring_to_block */
 
 bool block_to_goal_fsm::goal_acquired(void) const {
-  return (ST_WAIT_FOR_BLOCK_PICKUP == current_state()) ||
-         (ST_WAIT_FOR_BLOCK_DROP == current_state());
+  return (kST_WAIT_FOR_BLOCK_PICKUP == current_state()) ||
+         (kST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
 acquisition_goal_type block_to_goal_fsm::acquisition_goal(void) const {
@@ -210,6 +209,10 @@ acquisition_goal_type block_to_goal_fsm::acquisition_goal(void) const {
   return acquisition_goal_type::kNone;
 } /* acquisition_goal() */
 
+rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {
+  return m_goal_fsm->acquisition_loc();
+} /* acquisition_loc() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
@@ -219,14 +222,14 @@ void block_to_goal_fsm::init(void) {
   m_block_fsm->task_reset();
 } /* init() */
 
-void block_to_goal_fsm::task_start(const ta::taskable_argument* const arg) {
+void block_to_goal_fsm::task_start(const rta::taskable_argument* const arg) {
   auto* a = dynamic_cast<const tasks::foraging_signal_argument*>(arg);
   ER_ASSERT(nullptr != a, "Bad argument passed");
-  inject_event(a->signal(), rfsm::event_type::NORMAL);
+  inject_event(a->signal(), rfsm::event_type::kNORMAL);
 }
 
 void block_to_goal_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

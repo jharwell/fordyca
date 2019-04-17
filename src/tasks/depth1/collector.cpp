@@ -40,22 +40,22 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-collector::collector(const struct ta::task_allocation_params* const params,
-                     std::unique_ptr<ta::taskable> mechanism)
+collector::collector(const struct rta::task_alloc_params* const params,
+                     std::unique_ptr<rta::taskable> mechanism)
     : collector(params, kCollectorName, std::move(mechanism)) {}
 
-collector::collector(const struct ta::task_allocation_params* const params,
+collector::collector(const struct rta::task_alloc_params* const params,
                      const std::string& name,
-                     std::unique_ptr<ta::taskable> mechanism)
+                     std::unique_ptr<rta::taskable> mechanism)
     : foraging_task(name, params, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.collector") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void collector::task_start(const ta::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
-  ta::polled_task::mechanism()->task_start(&a);
+void collector::task_start(const rta::taskable_argument* const) {
+  foraging_signal_argument a(controller::foraging_signal::kACQUIRE_CACHED_BLOCK);
+  rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
 __rcsw_pure double collector::abort_prob_calc(void) {
@@ -66,7 +66,7 @@ __rcsw_pure double collector::abort_prob_calc(void) {
    * tasks.
    */
   if (-1 == active_interface()) {
-    return ta::abort_probability::kMIN_ABORT_PROB;
+    return rta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }
@@ -141,6 +141,12 @@ TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
 TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
                          collector,
                          block_transport_goal,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         collector,
+                         acquisition_loc,
                          static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
                              polled_task::mechanism()));
 

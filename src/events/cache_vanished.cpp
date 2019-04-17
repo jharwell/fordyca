@@ -53,7 +53,7 @@ void cache_vanished::dispatch_cache_interactor(
   ER_ASSERT(
       nullptr != interactor,
       "Non existing cache interactor task %s received cache vanished event",
-      dynamic_cast<ta::logical_task*>(task)->name().c_str());
+      dynamic_cast<rta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_cache_interactor() */
 
@@ -85,13 +85,13 @@ void cache_vanished::visit(tasks::depth1::harvester& task) {
 } /* visit() */
 
 void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kCACHE_VANISHED,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kCACHE_VANISHED,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 /*******************************************************************************

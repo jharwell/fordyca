@@ -22,29 +22,29 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth2/controller_repository.hpp"
-#include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
+#include "rcppsw/ta/task_alloc_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth2);
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 controller_repository::controller_repository(void) {
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(
+      rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("cache_starter");
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(
+      rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("cache_finisher");
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(
+      rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("cache_transferer");
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(
+      rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("cache_collector");
 }
 

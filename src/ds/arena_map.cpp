@@ -47,7 +47,6 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
                 static_cast<uint>(params->grid.upper.y() + arena_padding())),
       m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
                    .create_blocks()),
-      m_caches(),
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
       m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()),
       m_redist_governor(&params->blocks.dist.redist_governor) {
@@ -169,10 +168,10 @@ void arena_map::cache_extent_clear(
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  uint xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
-  uint xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
-  uint ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
-  uint ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
+  auto xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
+  auto xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
+  auto ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
+  auto ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
 
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {
@@ -200,8 +199,8 @@ void arena_map::cache_extent_clear(
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-bool arena_map::has_robot(uint i, uint j) const {
-  return decoratee().access<arena_grid::kRobotOccupancy>(i, j);
+bool arena_map::has_robot(const rmath::vector2u& coord) const {
+  return decoratee().access<arena_grid::kRobotOccupancy>(coord);
 } /* has_robot() */
 
 NS_END(ds, fordyca);

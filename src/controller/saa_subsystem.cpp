@@ -28,7 +28,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace kinematics = rcppsw::robotics::kinematics;
 
 /*******************************************************************************
  * Constructors/Destructors

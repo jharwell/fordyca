@@ -27,15 +27,15 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/logical_task.hpp"
+#include "rcppsw/ta/abort_probability.hpp"
+#include "rcppsw/ta/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
+namespace rvisitor = rcppsw::patterns::visitor;
+namespace rta = rcppsw::ta;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 

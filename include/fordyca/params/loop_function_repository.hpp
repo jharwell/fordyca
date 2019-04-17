@@ -38,7 +38,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 class loop_function_repository : public rcppsw::params::xml_param_repository {
  public:
-  loop_function_repository(void);
+  loop_function_repository(void) noexcept;
 };
 
 NS_END(params, fordyca);
