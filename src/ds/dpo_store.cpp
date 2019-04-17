@@ -33,7 +33,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, ds);
-namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -69,16 +68,16 @@ dpo_store::update_res_t dpo_store::cache_update(
 } /* cache_update() */
 
 bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
-  auto range = m_caches.values_range();
+  auto range = m_caches.const_values_range();
 
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
     return c.ent()->idcmp(*victim);
   });
 
   if (it != range.end()) {
-    ER_INFO("Removing cache%d@%s",
-            it->ent()->id(),
-            it->ent()->discrete_loc().to_str().c_str());
+    ER_TRACE("Removing cache%d@%s",
+             it->ent()->id(),
+             it->ent()->discrete_loc().to_str().c_str());
     m_caches.obj_remove(it->ent()->discrete_loc());
     return true;
   }
@@ -87,7 +86,7 @@ bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
 
 dpo_store::update_res_t dpo_store::block_update(
     const dp_entity<repr::base_block>& block_in) {
-  auto range = m_blocks.values_range();
+  auto range = m_blocks.const_values_range();
 
   auto it1 = std::find_if(range.begin(),
                           range.end(),
@@ -149,14 +148,13 @@ dpo_store::update_res_t dpo_store::block_update(
      * Even if the block's location has not changed, if we have seen it again we
      * need to update its density.
      */
-    auto known = this->find(block_in.ent_obj());
+    dp_block_map::value_type* known = m_blocks.find(block_in.ent()->id());
     if (nullptr != known) {
+      known->density(block_in.density());
       ER_TRACE("Update density of known block%d@%s to %f",
                block_in.ent()->id(),
                block_in.ent()->discrete_loc().to_str().c_str(),
                block_in.density().last_result());
-      const_cast<decltype(m_blocks)::value_type*>(known)->density(
-          block_in.density());
     }
   } else { /* block is not known */
     ER_TRACE("Unknown incoming block%d", block_in.ent()->id());
@@ -171,7 +169,7 @@ dpo_store::update_res_t dpo_store::block_update(
 } /* block_update() */
 
 bool dpo_store::block_remove(const std::shared_ptr<repr::base_block>& victim) {
-  auto range = m_blocks.values_range();
+  auto range = m_blocks.const_values_range();
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
     return b.ent()->idcmp(*victim);
   });

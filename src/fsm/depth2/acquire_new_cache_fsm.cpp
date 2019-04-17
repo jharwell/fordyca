@@ -43,16 +43,23 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
           saa,
-          std::bind(&acquire_new_cache_fsm::acquisition_goal_internal, this),
-          std::bind(&acquire_new_cache_fsm::candidates_exist, this),
-          std::bind(&acquire_new_cache_fsm::cache_select, this),
-          std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
-                    this,
-                    std::placeholders::_1),
-          std::bind([](void) noexcept {
-            return false;
-          }), /* new caches never acquired via exploration */
-          [](const rmath::vector2d&, uint) { return true; }),
+          acquire_goal_fsm::hook_list{
+              .acquisition_goal =
+                  std::bind(&acquire_new_cache_fsm::acquisition_goal_internal,
+                            this),
+              .goal_select =
+                  std::bind(&acquire_new_cache_fsm::cache_select, this),
+              .candidates_exist =
+                  std::bind(&acquire_new_cache_fsm::candidates_exist, this),
+              .goal_acquired_cb =
+                  std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
+                            this,
+                            std::placeholders::_1),
+              .explore_term_cb = std::bind([](void) noexcept {
+                return false;
+              }), /* new caches never acquired via exploration */
+              .goal_valid_cb = [](const rmath::vector2d&,
+                                  uint) { return true; }}),
       mc_matrix(matrix),
       mc_store(store) {}
 
@@ -91,7 +98,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_s
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa_subsystem()->sensing()->position();
-  for (auto& b : mc_store->blocks().values_range()) {
+  for (auto& b : mc_store->blocks().const_values_range()) {
     if ((b.ent()->real_loc() - position).length() <=
         vector_fsm::kCACHE_ARRIVAL_TOL) {
       return true;

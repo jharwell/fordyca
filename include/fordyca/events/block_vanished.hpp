@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth0 {
 class crw_controller;
@@ -78,7 +78,7 @@ NS_START(events, detail);
  ******************************************************************************/
 struct block_vanished_visit_set {
   using value =
-      visitor::precise_visit_set<controller::depth0::crw_controller,
+      rvisitor::precise_visit_set<controller::depth0::crw_controller,
                                  controller::depth0::dpo_controller,
                                  controller::depth0::mdpo_controller,
                                  controller::depth1::gp_dpo_controller,
@@ -133,7 +133,7 @@ class block_vanished : public rcppsw::er::client<block_vanished> {
   void visit(tasks::depth2::cache_finisher& task);
 
  private:
-  void dispatch_free_block_interactor(tasks::base_foraging_task* const task);
+  void dispatch_free_block_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
   uint m_block_id;
@@ -147,7 +147,7 @@ class block_vanished : public rcppsw::er::client<block_vanished> {
  * compiler).
  */
 using block_vanished_visitor_impl =
-    visitor::precise_visitor<detail::block_vanished,
+    rvisitor::precise_visitor<detail::block_vanished,
                              detail::block_vanished_visit_set::value>;
 
 NS_END(detail);

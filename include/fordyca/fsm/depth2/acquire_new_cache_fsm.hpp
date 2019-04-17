@@ -53,7 +53,7 @@ class acquire_new_cache_fsm : public er::client<acquire_new_cache_fsm>,
                               public acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(const controller::cache_sel_matrix* matrix,
-                        controller::saa_subsystem* actuators,
+                        controller::saa_subsystem* saa,
                         ds::dpo_store* store);
   ~acquire_new_cache_fsm(void) override = default;
 

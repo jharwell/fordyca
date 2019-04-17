@@ -37,7 +37,7 @@ class free_block_pickup;
 class free_block_drop;
 } // namespace detail
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Structure Definitions
@@ -50,7 +50,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * interact with free blocks in FORDYCA.
  */
 class free_block_interactor
-    : public visitor::polymorphic_accept_set<detail::free_block_drop,
+    : public rvisitor::polymorphic_accept_set<detail::free_block_drop,
                                              detail::free_block_pickup,
                                              detail::block_vanished> {};
 

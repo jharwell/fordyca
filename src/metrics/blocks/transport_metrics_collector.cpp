@@ -42,7 +42,7 @@ transport_metrics_collector::transport_metrics_collector(const std::string& ofna
 std::list<std::string> transport_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-    /* clang-format off */
+      /* clang-format off */
     "cum_collected",
     "cum_ramp_collected",
     "cum_cube_collected",
@@ -58,7 +58,7 @@ std::list<std::string> transport_metrics_collector::csv_header_cols(void) const 
     "cum_avg_transport_time",
     "int_avg_initial_wait_time",
     "cum_avg_initial_wait_time"
-    /* clang-format on */
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;

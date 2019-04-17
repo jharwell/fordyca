@@ -129,7 +129,7 @@ class base_foraging_fsm : public rfsm::hfsm,
    * This state MUST have a parent state defined that is not
    * \ref rcppsw::patterns::state_machine::hfsm::top_state().
    *
-   * Upon return to the nest, a \ref foraging_signal::BLOCK_DROP
+   * Upon return to the nest, a \ref foraging_signal::kBLOCK_DROP
    * signal will be returned to the parent state. No robot should return to the
    * nest unless it has a block (duh).
    */
@@ -143,7 +143,7 @@ class base_foraging_fsm : public rfsm::hfsm,
    * rcppsw::patterns::state_machine::hfsm::top_state().
    *
    * When the robot has actually left the nest, according to sensor readings, a
-   * \ref foraging_signal::LEFT_NEST signal is returned to the
+   * \ref foraging_signal::kLEFT_NEST signal is returned to the
    * parent state.
    */
   HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, rfsm::event_data);
@@ -217,7 +217,7 @@ class base_foraging_fsm : public rfsm::hfsm,
   uint                             m_avoidance_start{0};
   uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
-  rmath::radians                   m_new_dir;
+  rmath::radians                   m_new_dir{};
   argos::CRandom::CRNG*            m_rng;
   controller::saa_subsystem* const m_saa;
   /* clang-format on */

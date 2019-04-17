@@ -120,7 +120,7 @@ class base_loop_functions : public argos::CLoopFunctions,
    *
    * @param params Parsed convergence parameters.
    */
-  void convergence_init(const rswc::convergence_params* const params);
+  void convergence_init(const rswc::convergence_params* params);
 
  private:
   /**
@@ -128,7 +128,7 @@ class base_loop_functions : public argos::CLoopFunctions,
    *
    * @param output Parsed output parameters.
    */
-  void output_init(const struct params::output_params* const output);
+  void output_init(const struct params::output_params* output);
 
   /**
    * @brief Initialize the arena contents.

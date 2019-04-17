@@ -28,7 +28,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +36,7 @@
 NS_START(fordyca, fsm);
 
 namespace er = rcppsw::er;
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
@@ -59,7 +59,7 @@ class acquire_free_block_fsm;
  */
 class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
                           public base_foraging_fsm,
-                          public ta::taskable,
+                          public rta::taskable,
                           public metrics::fsm::goal_acquisition_metrics,
                           public fsm::block_transporter {
  public:
@@ -73,26 +73,27 @@ class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const ta::taskable_argument* arg) override;
+  void task_start(const rta::taskable_argument* arg) override;
   bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
+    return kST_FINISHED == current_state();
   }
   bool task_running(void) const override {
-    return !(ST_FINISHED == current_state() || ST_START == current_state());
+    return !(kST_FINISHED == current_state() || kST_START == current_state());
   }
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
+  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
-  acquisition_goal_type acquisition_goal(void) const override;
+  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
+  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
 
   /**
    * @brief Reset the FSM
@@ -101,32 +102,32 @@ class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
 
  protected:
   enum fsm_states {
-    ST_START,
+    kST_START,
     /**
      * Superstate for acquiring a block (free or from a cache).
      */
-    ST_ACQUIRE_BLOCK,
+    kST_ACQUIRE_BLOCK,
 
     /**
      * A block has been acquired--wait for area to send the block pickup signal.
      */
-    ST_WAIT_FOR_BLOCK_PICKUP,
+    kST_WAIT_FOR_BLOCK_PICKUP,
 
     /**
      * We are transporting a carried block to our goal.
      */
-    ST_TRANSPORT_TO_GOAL,
+    kST_TRANSPORT_TO_GOAL,
 
     /**
      * We have acquired our goal--wait for arena to send the block drop signal.
      */
-    ST_WAIT_FOR_BLOCK_DROP,
+    kST_WAIT_FOR_BLOCK_DROP,
 
     /**
      * Block has been successfully dropped at our goal/in our goal.
      */
-    ST_FINISHED,
-    ST_MAX_STATES,
+    kST_FINISHED,
+    kST_MAX_STATES,
   };
 
   const acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
@@ -159,7 +160,7 @@ class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
   acquire_goal_fsm * const m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

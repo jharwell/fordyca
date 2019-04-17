@@ -34,10 +34,11 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
 
-namespace task_allocation = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
  * @class cache_starter
@@ -51,8 +52,8 @@ class cache_starter : public foraging_task,
                       public events::dynamic_cache_interactor,
                       public rcppsw::er::client<cache_starter> {
  public:
-  cache_starter(const struct ta::task_allocation_params* params,
-                std::unique_ptr<task_allocation::taskable> mechanism);
+  cache_starter(const struct rta::task_alloc_params* params,
+                std::unique_ptr<rta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -61,10 +62,10 @@ class cache_starter : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::detail::free_block_drop& v) override;
-  void accept(events::detail::free_block_pickup& v) override;
-  void accept(events::detail::block_vanished& v) override;
-  void accept(events::detail::block_proximity& v) override;
+  void accept(events::detail::free_block_drop& visitor) override;
+  void accept(events::detail::free_block_pickup& visitor) override;
+  void accept(events::detail::block_vanished& visitor) override;
+  void accept(events::detail::block_proximity& visitor) override;
   void accept(events::detail::cache_proximity&) override;
 
 
@@ -73,6 +74,7 @@ class cache_starter : public foraging_task,
   TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
   TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
 
   /* block transportation */
   TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
@@ -80,7 +82,7 @@ class cache_starter : public foraging_task,
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const task_allocation::taskable_argument*) override;
+  void task_start(const rta::taskable_argument*) override;
   double abort_prob_calc(void) override;
   double interface_time_calc(uint interface,
                              double start_time) override;

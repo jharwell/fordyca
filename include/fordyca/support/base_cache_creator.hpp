@@ -99,8 +99,8 @@ class base_cache_creator : public er::client<base_cache_creator> {
 
  protected:
   struct deconflict_res_t {
-    bool status;
-    rmath::vector2u loc;
+    bool status{false};
+    rmath::vector2u loc{};
   };
 
   const ds::arena_grid* grid(void) const { return m_grid; }
@@ -130,7 +130,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
    * otherwise.
    */
-  bool creation_sanity_checks(const ds::cache_vector& new_caches,
+  bool creation_sanity_checks(const ds::cache_vector& caches,
                               const ds::block_list& free_blocks) const;
 
   double cache_dim(void) const { return mc_cache_dim; }

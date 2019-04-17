@@ -33,7 +33,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 class cache_sel_matrix;
 }
@@ -78,7 +78,7 @@ NS_START(events, detail);
 struct cached_block_pickup_visit_set {
   using inherited = boost::mpl::joint_view<detail::cell_op_visit_set::value,
                                            block_pickup_base_visit_set::value>;
-  using defined = visitor::precise_visit_set<
+  using defined = rvisitor::precise_visit_set<
       /* depth1 */
       controller::depth1::gp_dpo_controller,
       controller::depth1::gp_mdpo_controller,
@@ -167,7 +167,7 @@ class cached_block_pickup : public rcppsw::er::client<cached_block_pickup>,
  * compiler).
  */
 using cached_block_pickup_visitor_impl =
-    visitor::precise_visitor<detail::cached_block_pickup,
+    rvisitor::precise_visitor<detail::cached_block_pickup,
                              detail::cached_block_pickup_visit_set::value>;
 
 NS_END(detail);

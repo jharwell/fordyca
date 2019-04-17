@@ -45,19 +45,19 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
  * FSM Metrics
  ******************************************************************************/
 acquisition_goal_type block_to_existing_cache_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+  if (kST_ACQUIRE_BLOCK == current_state() ||
+      kST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;
-  } else if (ST_TRANSPORT_TO_GOAL == current_state() ||
-             ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  } else if (kST_TRANSPORT_TO_GOAL == current_state() ||
+             kST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return acquisition_goal_type::kExistingCache;
   }
   return acquisition_goal_type::kNone;
 } /* acquisition_goal() */
 
 transport_goal_type block_to_existing_cache_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_GOAL == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (kST_TRANSPORT_TO_GOAL == current_state() ||
+      kST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::kExistingCache;
   }
   return transport_goal_type::kNone;
@@ -65,9 +65,9 @@ transport_goal_type block_to_existing_cache_fsm::block_transport_goal(void) cons
 
 bool block_to_existing_cache_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kBlock == acquisition_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+    return current_state() == kST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::kExistingCache == block_transport_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
+    return current_state() == kST_WAIT_FOR_BLOCK_DROP;
   }
   return false;
 } /* goal_acquired() */

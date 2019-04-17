@@ -28,7 +28,7 @@
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +39,7 @@ namespace ds {
 class dpo_store;
 }
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 NS_START(fsm);
 

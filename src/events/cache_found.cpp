@@ -63,7 +63,7 @@ void cache_found::visit(ds::dpo_store& store) {
    * a new cache there, we are tracking blocks that no longer exist in the
    * arena.
    */
-  for (auto&& b : store.blocks().values_range()) {
+  for (auto&& b : store.blocks().const_values_range()) {
     if (m_cache->contains_point(b.ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id(),
@@ -157,7 +157,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * tracking blocks that no longer exist in our perception.
    */
   std::list<const std::shared_ptr<repr::base_block>*> rms;
-  for (auto&& b : map.blocks().values_range()) {
+  for (auto&& b : map.blocks().const_values_range()) {
     if (m_cache->contains_point(b.ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id(),

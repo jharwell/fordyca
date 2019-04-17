@@ -33,7 +33,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/task_allocation/task_allocation_params.hpp"
+#include "rcppsw/ta/task_alloc_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,17 +44,17 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-harvester::harvester(const struct task_allocation::task_allocation_params* params,
-                     std::unique_ptr<task_allocation::taskable> mechanism)
+harvester::harvester(const struct rta::task_alloc_params* params,
+                     std::unique_ptr<rta::taskable> mechanism)
     : foraging_task(kHarvesterName, params, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.harvester") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void harvester::task_start(const task_allocation::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
-  task_allocation::polled_task::mechanism()->task_start(&a);
+void harvester::task_start(const rta::taskable_argument* const) {
+  foraging_signal_argument a(controller::foraging_signal::kACQUIRE_FREE_BLOCK);
+  rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
 __rcsw_pure double harvester::abort_prob_calc(void) {
@@ -65,7 +65,7 @@ __rcsw_pure double harvester::abort_prob_calc(void) {
    * if it cannot find a block anywhere. See #232.
    */
   if (-1 == active_interface()) {
-    return ta::abort_probability::kMIN_ABORT_PROB;
+    return rta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }
@@ -143,6 +143,12 @@ TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
 TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
                          harvester,
                          block_transport_goal,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         harvester,
+                         acquisition_loc,
                          static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
                              polled_task::mechanism()));
 

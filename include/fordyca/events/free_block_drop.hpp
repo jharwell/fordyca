@@ -34,7 +34,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 namespace rmath = rcppsw::math;
 namespace controller {
 class block_sel_matrix;
@@ -156,7 +156,7 @@ class free_block_drop : public rcppsw::er::client<free_block_drop>,
  * compiler).
  */
 using free_block_drop_visitor_impl =
-    visitor::precise_visitor<detail::free_block_drop,
+    rvisitor::precise_visitor<detail::free_block_drop,
                              detail::free_block_drop_visit_set::value>;
 
 NS_END(detail);

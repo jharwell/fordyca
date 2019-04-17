@@ -67,8 +67,8 @@ class saa_subsystem : public rcppsw::robotics::steering2D::boid,
 
   /* BOID interface */
   rmath::vector2d linear_velocity(void) const override {
-    return rmath::vector2d(m_actuation->differential_drive().current_speed(),
-                           m_sensing->heading().angle());
+    return {m_actuation->differential_drive().current_speed(),
+            m_sensing->heading().angle()};
   }
   double angular_velocity(void) const override {
     return (m_actuation->differential_drive().right_linspeed() -

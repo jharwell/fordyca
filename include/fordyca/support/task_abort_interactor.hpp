@@ -29,13 +29,13 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "rcppsw/task_allocation/logical_task.hpp"
+#include "rcppsw/ta/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 namespace er = rcppsw::er;
 
 /*******************************************************************************
@@ -95,7 +95,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     if (controller.is_carrying_block()) {
       ER_INFO("%s aborted task '%s' while carrying block%d",
               controller.GetId().c_str(),
-              dynamic_cast<ta::logical_task*>(controller.current_task())
+              dynamic_cast<rta::logical_task*>(controller.current_task())
                   ->name()
                   .c_str(),
               controller.block()->id());
@@ -103,7 +103,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     } else {
       ER_INFO("%s aborted task '%s' (no block)",
               controller.GetId().c_str(),
-              dynamic_cast<ta::logical_task*>(controller.current_task())
+              dynamic_cast<rta::logical_task*>(controller.current_task())
                   ->name()
                   .c_str());
     }
@@ -116,7 +116,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
         aborted = true;
         ER_INFO("%s aborted task '%s' while serving '%s' penalty",
                 controller.GetId().c_str(),
-                dynamic_cast<ta::logical_task*>(controller.current_task())
+                dynamic_cast<rta::logical_task*>(controller.current_task())
                     ->name()
                     .c_str(),
                 h->name().c_str());

@@ -33,7 +33,7 @@ NS_START(fordyca, events);
 namespace detail {
 class nest_block_drop;
 }
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Structure Definitions
@@ -46,7 +46,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * interact with the nest in FORDYCA.
  */
 class nest_interactor
-    : public visitor::polymorphic_accept_set<detail::nest_block_drop> {};
+    : public rvisitor::polymorphic_accept_set<detail::nest_block_drop> {};
 
 NS_END(tasks, fordyca);
 

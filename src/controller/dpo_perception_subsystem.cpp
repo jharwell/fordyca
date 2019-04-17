@@ -158,7 +158,7 @@ void dpo_perception_subsystem::los_tracking_sync(
    * the corresponding cache should also be in our LOS. If it is not, then our
    * tracked version is out of date and needs to be removed.
    */
-  for (auto& cache : m_store->caches().values_range()) {
+  for (auto& cache : m_store->caches().const_values_range()) {
     if (c_los->contains_loc(cache.ent()->discrete_loc())) {
       auto it =
           std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
@@ -190,7 +190,7 @@ void dpo_perception_subsystem::los_tracking_sync(
    * has moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  for (auto&& block : m_store->blocks().values_range()) {
+  for (auto&& block : m_store->blocks().const_values_range()) {
     if (c_los->contains_loc(block.ent()->discrete_loc())) {
       auto it = std::find_if(blocks.begin(), blocks.end(), [&](const auto& b) {
         return b->idcmp(*block.ent_obj());
@@ -222,7 +222,7 @@ uint dpo_perception_subsystem::n_known_caches(void) const {
 } /* n_known_caches() */
 
 rswarm::pheromone_density dpo_perception_subsystem::avg_block_density(void) const {
-  auto range = m_store->blocks().values_range();
+  auto range = m_store->blocks().const_values_range();
   if (m_store->blocks().empty()) {
     return rswarm::pheromone_density();
   }
@@ -235,7 +235,7 @@ rswarm::pheromone_density dpo_perception_subsystem::avg_block_density(void) cons
 } /* avg_block_density() */
 
 rswarm::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
-  auto range = m_store->caches().values_range();
+  auto range = m_store->caches().const_values_range();
   if (m_store->caches().empty()) {
     return rswarm::pheromone_density();
   }

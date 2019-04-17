@@ -42,12 +42,12 @@ movement_metrics_collector::movement_metrics_collector(const std::string& ofname
 std::list<std::string> movement_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-    /* clang-format off */
+      /* clang-format off */
     "int_avg_distance",
     "cum_avg_distance",
     "int_avg_velocity",
     "cum_avg_velocity"
-    /* clang-format on */
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;

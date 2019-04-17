@@ -44,7 +44,6 @@
 NS_START(fordyca, events, detail);
 using ds::arena_grid;
 using ds::occupancy_grid;
-using visitor::precise_visitor;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -68,14 +67,14 @@ void cache_block_drop::dispatch_d1_cache_interactor(
 
   ER_ASSERT(nullptr != interactor,
             "Non existing cache interactor task %s causing cached block drop",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+            dynamic_cast<rta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_d1_cache_interactor() */
 
 bool cache_block_drop::dispatch_d2_cache_interactor(
     tasks::base_foraging_task* task,
     controller::cache_sel_matrix* csel_matrix) {
-  auto* polled = dynamic_cast<ta::polled_task*>(task);
+  auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
   bool ret = false;
   ER_ASSERT(nullptr != interactor,
@@ -157,7 +156,7 @@ void cache_block_drop::visit(controller::depth1::gp_dpo_controller& controller) 
       "Dropped block%d in cache%d,task='%s'",
       m_block->id(),
       m_cache->id(),
-      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str());
+      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -174,14 +173,14 @@ void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller)
       "Dropped block%d in cache%d,task='%s'",
       m_block->id(),
       m_cache->id(),
-      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str());
+      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
 
 void cache_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void cache_block_drop::visit(tasks::depth1::harvester& task) {
@@ -204,7 +203,7 @@ void cache_block_drop::visit(controller::depth2::grp_dpo_controller& controller)
       "Dropped block%d in cache%d,task='%s'",
       m_block->id(),
       m_cache->id(),
-      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str());
+      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -223,7 +222,7 @@ void cache_block_drop::visit(controller::depth2::grp_mdpo_controller& controller
       "Dropped block%d in cache%d,task='%s'",
       m_block->id(),
       m_cache->id(),
-      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str());
+      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
 
   controller.ndc_pop();
 } /* visit() */

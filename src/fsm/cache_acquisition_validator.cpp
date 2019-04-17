@@ -55,7 +55,7 @@ bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
    * the cache's host cell location. Instead we look up the cache by ID, and
    * verify that the cache exists contains the point we are acquiring.
    */
-  auto range = mc_map->values_range();
+  auto range = mc_map->const_values_range();
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
     return c.ent()->id() == id;
   });

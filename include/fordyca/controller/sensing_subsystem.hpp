@@ -122,13 +122,20 @@ class sensing_subsystem {
    * faster/easier.
    */
   const rmath::vector2d& position(void) const { return m_position; }
+  const rmath::vector2u& discrete_position(void) const {
+    return m_discrete_position;
+  }
 
   /**
    * @brief Set the robot's current location.
    */
-  void position(rmath::vector2d position) {
+  void position(const rmath::vector2d& position) {
     m_prev_position = m_position;
     m_position = position;
+  }
+
+  void discrete_position(const rmath::vector2u& position) {
+    m_discrete_position = position;
   }
 
   /**
@@ -183,9 +190,10 @@ class sensing_subsystem {
   const double                                   mc_obstacle_delta;
   const double                                   mc_los_dim;
 
-  uint                                           m_tick;
-  rmath::vector2d                                m_position;
-  rmath::vector2d                                m_prev_position;
+  uint                                           m_tick{0};
+  rmath::vector2d                                m_position{};
+  rmath::vector2d                                m_prev_position{};
+  rmath::vector2u                                m_discrete_position{};
   struct sensor_list                             m_sensors;
   rmath::range<rmath::radians>                   m_fov;
   /* clang-format off */

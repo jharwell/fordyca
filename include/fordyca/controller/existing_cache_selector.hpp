@@ -83,7 +83,7 @@ class existing_cache_selector
    * @return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool cache_is_excluded(const rmath::vector2d& position,
-                         const repr::base_cache* const cache) const;
+                         const repr::base_cache* cache) const;
 
   /* clang-format off */
   const cache_sel_matrix* const mc_matrix;

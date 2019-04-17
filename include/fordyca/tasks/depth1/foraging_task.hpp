@@ -27,15 +27,15 @@
 #include <string>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
+namespace rcppsw { namespace ta { struct task_alloc_params; }}
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 NS_START(tasks, depth1);
 
@@ -53,19 +53,18 @@ NS_START(tasks, depth1);
  * of view as well as not having to fight with the compiler as much if you do it
  * this way.
  */
-class foraging_task
-    : public base_foraging_task,
-      public ta::polled_task {
+class foraging_task : public base_foraging_task,
+                      public rta::polled_task {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kHarvesterName[] = "Harvester";
 
   foraging_task(const std::string& name,
-                const struct ta::task_allocation_params *params,
-                std::unique_ptr<ta::taskable> mechanism);
+                const struct rta::task_alloc_params *params,
+                std::unique_ptr<rta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
-  static bool task_in_depth1(const polled_task* const task);
+  static bool task_in_depth1(const polled_task* task);
 
     /* task overrides */
   double current_time(void) const override;

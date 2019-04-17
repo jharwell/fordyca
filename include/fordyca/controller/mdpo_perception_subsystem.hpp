@@ -87,9 +87,7 @@ class mdpo_perception_subsystem
 
   const ds::dpo_semantic_map* map(void) const { return m_map.get(); }
   ds::dpo_semantic_map* map(void) { return m_map.get(); }
-  const ds::dpo_store* dpo_store(void) const override {
-    return const_cast<mdpo_perception_subsystem*>(this)->dpo_store();
-  }
+  const ds::dpo_store* dpo_store(void) const override;
   ds::dpo_store* dpo_store(void) override;
 
  private:
@@ -100,9 +98,9 @@ class mdpo_perception_subsystem
    *
    * @param c_los The LOS to process.
    */
-  void process_los(const repr::line_of_sight* const c_los);
-  void process_los_blocks(const repr::line_of_sight* const c_los);
-  void process_los_caches(const repr::line_of_sight* const c_los);
+  void process_los(const repr::line_of_sight* c_los);
+  void process_los_blocks(const repr::line_of_sight* c_los);
+  void process_los_caches(const repr::line_of_sight* c_los);
 
   /**
    * @brief Update the aggregate stats on inaccuracies in the robot's perceived
@@ -110,7 +108,7 @@ class mdpo_perception_subsystem
    *
    * @param los The current LOS
    */
-  void update_cell_stats(const repr::line_of_sight* const los);
+  void update_cell_stats(const repr::line_of_sight* c_los);
 
   /* clang-format off */
   std::vector<uint>                     m_cell_stats;

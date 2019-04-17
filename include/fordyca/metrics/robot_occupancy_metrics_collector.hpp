@@ -24,11 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <list>
+#include <string>
 
-#include "rcppsw/ds/grid2D.hpp"
-#include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "fordyca/metrics/grid2D_avg_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,18 +40,11 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class robot_occupancy_metrics_collector
- * @ingroup metrics blocks
+ * @ingroup metrics
  *
  * @brief Collector for \ref robot_occupancy_metrics.
- *
- * Robot_Occupancy metrics are somewhat unusual, because they output a large 2D
- * array into a .csv each time they are written out. As such, at the specified
- * collection interval the are written out, capturing the state of the
- * robot_occupancy for in terms of an accumulated desired quantity (i.e. metrics
- * are always written out as cumulative averages).
  */
-class robot_occupancy_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector {
+class robot_occupancy_metrics_collector : public grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
@@ -61,19 +53,11 @@ class robot_occupancy_metrics_collector
    */
   robot_occupancy_metrics_collector(const std::string& ofname,
                                     uint interval,
-                                    const rmath::vector2u& dims);
+                                    const rmath::vector2u& dims)
+      : grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
-
- private:
-  std::list<std::string> csv_header_cols(void) const override;
-  bool csv_line_build(std::string& line) override;
-
-  /* clang-format off */
-  rcppsw::ds::grid2D<uint> m_stats;
-  uint                     m_total_robots{0};
-  /* clang-format on */
+  uint collect_cell(const rcppsw::metrics::base_metrics& metrics,
+                    const rmath::vector2u& coord) const override;
 };
 
 NS_END(metrics, fordyca);

@@ -57,18 +57,18 @@ NS_START(support);
 class base_cache_manager : public metrics::caches::lifecycle_metrics {
  public:
   struct creation_res_t {
-    bool status;
-    ds::cache_vector caches;
+    bool status{false};
+    ds::cache_vector caches{};
   };
 
   struct block_calc_res_t {
-    bool status;
-    ds::block_vector blocks;
+    bool status{false};
+    ds::block_vector blocks{};
   };
 
   explicit base_cache_manager(ds::arena_grid* const arena_grid)
       : m_grid(arena_grid) {}
-  virtual ~base_cache_manager(void) = default;
+  ~base_cache_manager(void) override = default;
 
   base_cache_manager(const base_cache_manager& other) = delete;
   base_cache_manager& operator=(const base_cache_manager& other) = delete;

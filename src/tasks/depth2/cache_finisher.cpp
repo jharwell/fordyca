@@ -40,22 +40,22 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  * Constructors/Destructor
  ******************************************************************************/
 cache_finisher::cache_finisher(
-    const struct ta::task_allocation_params* params,
-    std::unique_ptr<task_allocation::taskable> mechanism)
+    const struct rta::task_alloc_params* params,
+    std::unique_ptr<rta::taskable> mechanism)
     : foraging_task(kCacheFinisherName, params, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.cache_finisher") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_finisher::task_start(const task_allocation::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::ACQUIRE_FREE_BLOCK);
-  task_allocation::polled_task::mechanism()->task_start(&a);
+void cache_finisher::task_start(const rta::taskable_argument* const) {
+  foraging_signal_argument a(controller::foraging_signal::kACQUIRE_FREE_BLOCK);
+  rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
 __rcsw_pure double cache_finisher::abort_prob_calc(void) {
   if (-1 == active_interface()) {
-    return ta::abort_probability::kMIN_ABORT_PROB;
+    return rta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }
@@ -115,6 +115,12 @@ TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
 TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
                          cache_finisher,
                          block_transport_goal,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         cache_finisher,
+                         acquisition_loc,
                          static_cast<fsm::depth2::block_to_new_cache_fsm*>(
                              polled_task::mechanism()));
 

@@ -40,7 +40,6 @@ NS_START(fordyca);
 
 namespace repr {
 class multicell_entity;
-class cell2D;
 } // namespace repr
 
 NS_START(support, block_dist);
@@ -82,9 +81,9 @@ class random_distributor : public base_distributor,
 
  private:
   struct coord_search_res_t {
-    bool            status;
-    rmath::vector2u rel;
-    rmath::vector2u abs;
+    bool            status{false};
+    rmath::vector2u rel{};
+    rmath::vector2u abs{};
   };
   /**
    * @brief The maxmimum # of times the distribution will be attempted before

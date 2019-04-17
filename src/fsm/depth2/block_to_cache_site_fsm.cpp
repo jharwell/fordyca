@@ -44,19 +44,19 @@ block_to_cache_site_fsm::block_to_cache_site_fsm(
  * FSM Metrics
  ******************************************************************************/
 acquisition_goal_type block_to_cache_site_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+  if (kST_ACQUIRE_BLOCK == current_state() ||
+      kST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;
-  } else if (ST_TRANSPORT_TO_GOAL == current_state() ||
-             ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  } else if (kST_TRANSPORT_TO_GOAL == current_state() ||
+             kST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return acquisition_goal_type::kCacheSite;
   }
   return acquisition_goal_type::kNone;
 } /* acquisition_goal() */
 
 transport_goal_type block_to_cache_site_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_GOAL == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (kST_TRANSPORT_TO_GOAL == current_state() ||
+      kST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::kCacheSite;
   }
   return transport_goal_type::kNone;

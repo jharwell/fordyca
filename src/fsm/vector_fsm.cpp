@@ -42,31 +42,25 @@ constexpr double vector_fsm::kCACHE_SITE_ARRIVAL_TOL;
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(controller::saa_subsystem* const saa)
-    : base_foraging_fsm(saa, ST_MAX_STATES),
+    : base_foraging_fsm(saa, kST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.vector"),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
-      entry_new_direction(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(vector, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(collision_avoidance, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(collision_recovery, hfsm::top_state()),
-      HFSM_CONSTRUCT_STATE(arrived, hfsm::top_state()),
-      entry_vector(),
-      entry_collision_avoidance(),
-      entry_collision_recovery(),
-      m_state(),
-      m_goal_data() {}
+      HFSM_CONSTRUCT_STATE(arrived, hfsm::top_state()) {}
 
 /*******************************************************************************
  * States
  ******************************************************************************/
 __rcsw_const FSM_STATE_DEFINE_ND(vector_fsm, start) {
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
-  if (ST_COLLISION_AVOIDANCE != last_state()) {
-    ER_DEBUG("Executing ST_COLLIISION_AVOIDANCE");
+  if (kST_COLLISION_AVOIDANCE != last_state()) {
+    ER_DEBUG("Executing kST_COLLIISION_AVOIDANCE");
   }
   /*
    * If we came from the NEW_DIRECTION_STATE, then we got there from this
@@ -74,13 +68,13 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
    * collision. As such, we need to go into collision recovery, and zoom in our
    * new direction away from whatever is causing the problem. See #243.
    */
-  if (ST_NEW_DIRECTION == previous_state()) {
+  if (kST_NEW_DIRECTION == previous_state()) {
     actuators()->differential_drive().set_wheel_speeds(
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
     collision_avoidance_tracking_end();
-    internal_event(ST_COLLISION_RECOVERY);
-    return controller::foraging_signal::HANDLED;
+    internal_event(kST_COLLISION_RECOVERY);
+    return controller::foraging_signal::kHANDLED;
   }
 
   if (sensors()->threatening_obstacle_exists()) {
@@ -91,7 +85,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
                m_state.last_collision_time,
                sensors()->tick());
       rmath::vector2d new_dir = randomize_vector_angle(rmath::vector2d::X);
-      internal_event(ST_NEW_DIRECTION,
+      internal_event(kST_NEW_DIRECTION,
                      rcppsw::make_unique<new_direction_data>(new_dir.angle()));
     } else {
       rmath::vector2d obs = sensors()->find_closest_obstacle();
@@ -119,14 +113,14 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
     collision_avoidance_tracking_end();
-    internal_event(ST_COLLISION_RECOVERY);
+    internal_event(kST_COLLISION_RECOVERY);
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
-  if (ST_COLLISION_RECOVERY != last_state()) {
-    ER_DEBUG("Executing ST_COLLISION_RECOVERY");
+  if (kST_COLLISION_RECOVERY != last_state()) {
+    ER_DEBUG("Executing kST_COLLISION_RECOVERY");
   }
 
   /*
@@ -142,16 +136,16 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
    */
   if (sensors()->threatening_obstacle_exists()) {
     m_state.m_collision_rec_count = 0;
-    internal_event(ST_COLLISION_AVOIDANCE);
+    internal_event(kST_COLLISION_AVOIDANCE);
   } else if (++m_state.m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
     m_state.m_collision_rec_count = 0;
-    internal_event(ST_VECTOR);
+    internal_event(kST_VECTOR);
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data* data) {
-  if (ST_VECTOR != last_state()) {
-    ER_DEBUG("Executing ST_VECTOR");
+  if (kST_VECTOR != last_state()) {
+    ER_DEBUG("Executing kST_VECTOR");
   }
 
   auto* goal = dynamic_cast<const struct goal_data*>(data);
@@ -164,7 +158,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data* data) {
 
   if ((m_goal_data.loc - sensors()->position()).length() <=
       m_goal_data.tolerance) {
-    internal_event(ST_ARRIVED,
+    internal_event(kST_ARRIVED,
                    rcppsw::make_unique<struct goal_data>(m_goal_data));
   }
 
@@ -178,74 +172,74 @@ FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data* data) {
    */
   if (sensors()->threatening_obstacle_exists() &&
       !saa_subsystem()->steering_force().within_slowing_radius()) {
-    internal_event(ST_COLLISION_AVOIDANCE);
+    internal_event(kST_COLLISION_AVOIDANCE);
   } else {
     saa_subsystem()->steering_force().seek_to(m_goal_data.loc);
     saa_subsystem()->actuation()->leds_set_color(utils::color::kBLUE);
     saa_subsystem()->apply_steering_force(std::make_pair(true, false));
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 FSM_STATE_DEFINE(vector_fsm, arrived, __rcsw_unused struct goal_data* data) {
-  if (ST_ARRIVED != last_state()) {
-    ER_DEBUG("Executing ST_ARRIVED: target=%s, tol=%f",
+  if (kST_ARRIVED != last_state()) {
+    ER_DEBUG("Executing kST_ARRIVED: target=%s, tol=%f",
              data->loc.to_str().c_str(),
              data->tolerance);
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
-  ER_DEBUG("Entering ST_VECTOR");
+  ER_DEBUG("Entering kST_VECTOR");
   actuators()->leds_set_color(utils::color::kBLUE);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
-  ER_DEBUG("Entering ST_COLLISION_AVOIDANCE");
+  ER_DEBUG("Entering kST_COLLISION_AVOIDANCE");
   actuators()->leds_set_color(utils::color::kRED);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
-  ER_DEBUG("Entering ST_COLLISION_RECOVERY");
+  ER_DEBUG("Entering kST_COLLISION_RECOVERY");
   actuators()->leds_set_color(utils::color::kYELLOW);
 }
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
 bool vector_fsm::in_collision_avoidance(void) const {
-  return ST_COLLISION_AVOIDANCE == current_state();
+  return kST_COLLISION_AVOIDANCE == current_state();
 } /* in_collision_avoidance() */
 
 bool vector_fsm::entered_collision_avoidance(void) const {
-  return ST_COLLISION_AVOIDANCE != last_state() && in_collision_avoidance();
+  return kST_COLLISION_AVOIDANCE != last_state() && in_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 bool vector_fsm::exited_collision_avoidance(void) const {
-  return ST_COLLISION_AVOIDANCE == last_state() && !in_collision_avoidance();
+  return kST_COLLISION_AVOIDANCE == last_state() && !in_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void vector_fsm::task_start(
-    const rcppsw::task_allocation::taskable_argument* const c_arg) {
+    const rta::taskable_argument* const c_arg) {
   static const uint8_t kTRANSITIONS[] = {
-      ST_VECTOR,                            /* start */
-      ST_VECTOR,                            /* vector */
-      controller::foraging_signal::IGNORED, /* collision avoidance */
-      controller::foraging_signal::IGNORED, /* collision recovery */
-      controller::foraging_signal::IGNORED, /* new direction */
-      controller::foraging_signal::IGNORED, /* arrived */
+      kST_VECTOR,                            /* start */
+      kST_VECTOR,                            /* vector */
+      controller::foraging_signal::kIGNORED, /* collision avoidance */
+      controller::foraging_signal::kIGNORED, /* collision recovery */
+      controller::foraging_signal::kIGNORED, /* new direction */
+      controller::foraging_signal::kIGNORED, /* arrived */
   };
   auto* const a = dynamic_cast<const tasks::vector_argument*>(c_arg);
   ER_ASSERT(nullptr != a, "bad argument passed");
-  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ST_MAX_STATES);
+  FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, kST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
                  rcppsw::make_unique<struct goal_data>(a->vector(),
                                                        a->tolerance()));
 } /* task_start() */
 
 void vector_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
 } /* task_execute() */
 
 void vector_fsm::init(void) {

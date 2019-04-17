@@ -33,7 +33,7 @@
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/base_controller.hpp"
 
@@ -41,10 +41,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
+namespace rcppsw { namespace ta {
 class bi_tab;
 }}
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class gp_mdpo_controller; }}
@@ -91,9 +91,9 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    * Solution: hook into the executive callback queue in order to correctly
    * capture statistics.
    */
-  void task_finish_or_abort_cb(const ta::polled_task* task);
+  void task_finish_or_abort_cb(const rta::polled_task* task);
 
-  void task_alloc_cb(const ta::polled_task*, const ta::bi_tab* tab);
+  void task_alloc_cb(const rta::polled_task*, const rta::bi_tab* tab);
 
     /**
    * @brief Collect metrics from the depth1 controller.
@@ -148,11 +148,11 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
 
     if (nullptr != controller->current_task()) {
       auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
-          dynamic_cast<const ta::polled_task*>(controller->current_task())
+          dynamic_cast<const rta::polled_task*>(controller->current_task())
           ->mechanism());
       auto block_acq_m =
           dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-              dynamic_cast<const ta::polled_task*>(controller->current_task())
+              dynamic_cast<const rta::polled_task*>(controller->current_task())
               ->mechanism());
       auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
           controller);

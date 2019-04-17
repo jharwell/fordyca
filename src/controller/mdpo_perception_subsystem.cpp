@@ -47,7 +47,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
     const params::perception::perception_params* const params,
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
-      m_cell_stats(fsm::cell2D_fsm::ST_MAX_STATES),
+      m_cell_stats(fsm::cell2D_fsm::kST_MAX_STATES),
       m_los(),
       m_map(rcppsw::make_unique<ds::dpo_semantic_map>(params, id)) {}
 
@@ -131,7 +131,7 @@ void mdpo_perception_subsystem::process_los_blocks(
                block->id(),
                block->real_loc().to_str().c_str(),
                block->discrete_loc().to_str().c_str());
-      auto range = m_map->blocks().values_range();
+      auto range = m_map->blocks().const_values_range();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
         return b.ent()->id() == cell.block()->id();
       });
@@ -223,28 +223,32 @@ void mdpo_perception_subsystem::process_los_caches(
 } /* process_los_caches() */
 
 void mdpo_perception_subsystem::update_cell_stats(
-    const repr::line_of_sight* const los) {
-  for (uint i = 0; i < los->xsize(); ++i) {
-    for (uint j = 0; j < los->ysize(); ++j) {
-      rmath::vector2u d = los->cell(i, j).loc();
-      if (los->cell(i, j).state_is_empty() &&
+    const repr::line_of_sight* const c_los) {
+  for (uint i = 0; i < c_los->xsize(); ++i) {
+    for (uint j = 0; j < c_los->ysize(); ++j) {
+      rmath::vector2u d = c_los->cell(i, j).loc();
+      if (c_los->cell(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
           !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
-        m_cell_stats[fsm::cell2D_fsm::ST_EMPTY]++;
-      } else if (los->cell(i, j).state_has_block() &&
+        m_cell_stats[fsm::cell2D_fsm::kST_EMPTY]++;
+      } else if (c_los->cell(i, j).state_has_block() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        m_cell_stats[fsm::cell2D_fsm::ST_HAS_BLOCK]++;
-      } else if (los->cell(i, j).state_has_cache() &&
+        m_cell_stats[fsm::cell2D_fsm::kST_HAS_BLOCK]++;
+      } else if (c_los->cell(i, j).state_has_cache() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
-        m_cell_stats[fsm::cell2D_fsm::ST_HAS_CACHE]++;
+        m_cell_stats[fsm::cell2D_fsm::kST_HAS_CACHE]++;
       }
     } /* for(j..) */
   }   /* for(i..) */
 } /* update_cell_stats() */
 
 ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
+  return m_map->store();
+} /* dpo_store() */
+
+const ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) const {
   return m_map->store();
 } /* dpo_store() */
 

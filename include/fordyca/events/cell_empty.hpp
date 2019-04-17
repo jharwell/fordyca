@@ -47,7 +47,7 @@ NS_START(events, detail);
  ******************************************************************************/
 struct cell_empty_visit_set {
   using inherited = cell_op_visit_set::value;
-  using defined = visitor::precise_visit_set<ds::arena_map,
+  using defined = rvisitor::precise_visit_set<ds::arena_map,
                                              ds::occupancy_grid,
                                              ds::dpo_semantic_map>;
   using value = boost::mpl::joint_view<inherited::type, defined::type>;
@@ -83,7 +83,7 @@ class cell_empty : public cell_op, public rcppsw::er::client<cell_empty> {
  * compiler).
  */
 using cell_empty_visitor_impl =
-    visitor::precise_visitor<detail::cell_empty,
+    rvisitor::precise_visitor<detail::cell_empty,
                              detail::cell_empty_visit_set::value>;
 
 NS_END(detail);

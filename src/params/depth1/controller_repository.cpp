@@ -23,14 +23,14 @@
  ******************************************************************************/
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/cache_sel/cache_sel_matrix_parser.hpp"
-#include "rcppsw/task_allocation/task_allocation_xml_parser.hpp"
-#include "rcppsw/task_allocation/task_executive_xml_parser.hpp"
+#include "rcppsw/ta/task_alloc_xml_parser.hpp"
+#include "rcppsw/ta/task_executive_xml_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -40,21 +40,21 @@ controller_repository::controller_repository(void) {
                   cache_sel::cache_sel_matrix_params>(
       cache_sel::cache_sel_matrix_parser::kXMLRoot,
       cache_sel::cache_sel_matrix_parser::kHeader1);
-  register_parser<ta::task_allocation_xml_parser, ta::task_allocation_params>(
-      ta::task_allocation_xml_parser::kXMLRoot,
+  register_parser<rta::task_alloc_xml_parser, rta::task_alloc_params>(
+      rta::task_alloc_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<ta::task_executive_xml_parser, ta::task_executive_params>(
-      ta::task_executive_xml_parser::kXMLRoot,
+  register_parser<rta::task_executive_xml_parser, rta::task_executive_params>(
+      rta::task_executive_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(
+      rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("generalist");
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(
+      rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("collector");
-  get_parser<ta::task_allocation_xml_parser>(
-      ta::task_allocation_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(
+      rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("harvester");
 }
 

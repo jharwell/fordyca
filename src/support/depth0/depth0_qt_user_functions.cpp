@@ -72,7 +72,7 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   }
 }
 
-using namespace argos;
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"

@@ -136,10 +136,10 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
 
     auto xspan = cache->xspan(cache->real_loc());
     auto yspan = cache->yspan(cache->real_loc());
-    uint xmin = static_cast<uint>(std::ceil(xspan.lb() / m_grid->resolution()));
-    uint xmax = static_cast<uint>(std::ceil(xspan.ub() / m_grid->resolution()));
-    uint ymin = static_cast<uint>(std::ceil(yspan.lb() / m_grid->resolution()));
-    uint ymax = static_cast<uint>(std::ceil(yspan.ub() / m_grid->resolution()));
+    auto xmin = static_cast<uint>(std::ceil(xspan.lb() / m_grid->resolution()));
+    auto xmax = static_cast<uint>(std::ceil(xspan.ub() / m_grid->resolution()));
+    auto ymin = static_cast<uint>(std::ceil(yspan.lb() / m_grid->resolution()));
+    auto ymax = static_cast<uint>(std::ceil(yspan.ub() / m_grid->resolution()));
 
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {

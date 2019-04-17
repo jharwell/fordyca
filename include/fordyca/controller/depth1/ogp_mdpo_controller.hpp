@@ -85,13 +85,13 @@ class ogp_mdpo_controller : public gp_mdpo_controller,
    * @brief Uses the \ref support::tasking_oracle to update the execution time
    * estimate for the task that was just aborted.
    */
-  void task_abort_cb(ta::polled_task* task);
+  void task_abort_cb(rta::polled_task* task);
 
   /**
    * @brief Uses the \ref support::tasking_oracle to update the execution time
    * estimate for the task that was just finished.
    */
-  void task_finish_cb(ta::polled_task* task);
+  void task_finish_cb(rta::polled_task* task);
 
   /* clang-format off */
   const support::tasking_oracle* mc_tasking_oracle{nullptr};

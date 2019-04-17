@@ -54,7 +54,7 @@ struct block_found_visit_set {
   using inherited = cell_op_visit_set::value;
 
   using defined =
-      visitor::precise_visit_set<controller::depth2::grp_dpo_controller,
+      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
                                  controller::depth2::grp_mdpo_controller,
                                  ds::dpo_store,
                                  ds::dpo_semantic_map>;
@@ -87,10 +87,12 @@ class block_found : public rcppsw::er::client<block_found>, public cell_op {
   void visit(ds::dpo_semantic_map& map);
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& controller);
-  void visit(controller::depth2::grp_mdpo_controller& controller);
+  void visit(controller::depth2::grp_dpo_controller& c);
+  void visit(controller::depth2::grp_mdpo_controller& c);
 
  private:
+  void pheromone_update(ds::dpo_semantic_map& map);
+
   /* clang-format off */
   std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
@@ -103,7 +105,7 @@ class block_found : public rcppsw::er::client<block_found>, public cell_op {
  * compiler).
  */
 using block_found_visitor_impl =
-    visitor::precise_visitor<detail::block_found,
+    rvisitor::precise_visitor<detail::block_found,
                              detail::block_found_visit_set::value>;
 
 NS_END(detail);

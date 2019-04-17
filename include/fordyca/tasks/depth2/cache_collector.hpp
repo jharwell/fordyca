@@ -44,8 +44,8 @@ NS_START(fordyca, tasks, depth2);
  */
 class cache_collector : public depth1::collector {
  public:
-  cache_collector(const struct ta::task_allocation_params* params,
-                  std::unique_ptr<ta::taskable> mechanism) :
+  cache_collector(const struct rta::task_alloc_params* params,
+                  std::unique_ptr<rta::taskable> mechanism) :
       collector(params,
                 depth2::foraging_task::kCacheCollectorName,
                 std::move(mechanism)) {}

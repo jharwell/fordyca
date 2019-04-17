@@ -32,25 +32,24 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
+namespace rcppsw { namespace ta {
 class bi_tdgraph_executive;
 class bi_tab;
 class executable_task;
 class polled_task;
 }}
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
+namespace rvisitor = rcppsw::patterns::visitor;
+namespace rta = rcppsw::ta;
 
 NS_START(fordyca);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
+namespace rvisitor = rcppsw::patterns::visitor;
+namespace rta = rcppsw::ta;
 
 namespace tasks {
 namespace depth0 { class generalist; }
 namespace depth1 {
 class harvester;
 class collector;
-class foraging_task;
 }
 }
 namespace params {
@@ -119,13 +118,13 @@ class gp_dpo_controller : public depth0::dpo_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  const ta::bi_tab* active_tab(void) const;
+  const rta::bi_tab* active_tab(void) const;
 
   /*
    * Public to setup metric collection from tasks.
    */
-  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+  const rta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  rta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
 
   /**
    * @brief Get whether or not a task has been aborted this timestep.
@@ -155,7 +154,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
    *
    * - Block selection matrix (\ref block_sel_matrix)
    * - Cache selection matrix (\ref cache_sel_matrix)
-   * - Task executive (\ref ta::bi_tdgraph_executive)
+   * - Task executive (\ref rta::bi_tdgraph_executive)
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    *
    * @param param_repo Handle to parameter repository for this controller (after
@@ -169,13 +168,13 @@ class gp_dpo_controller : public depth0::dpo_controller,
    * to reduce the amount of function overriding that would have to be performed
    * otherwise if derived controllers each had private executives.
    */
-  void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
+  void executive(std::unique_ptr<rta::bi_tdgraph_executive> executive);
 
   /**
    * @brief Callback for task abort. Task argument unused for now--only need to
    * know that a task WAS aborted. \see \ref task_aborted().
    */
-  void task_abort_cb(const ta::polled_task*);
+  void task_abort_cb(const rta::polled_task*);
 
  private:
   void private_init(const params::depth1::controller_repository& param_repo);
@@ -184,7 +183,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
   bool                                      m_display_task{false};
   bool                                      m_task_aborted{false};
   std::unique_ptr<class cache_sel_matrix>   m_cache_sel_matrix;
-  std::unique_ptr<ta::bi_tdgraph_executive> m_executive;
+  std::unique_ptr<rta::bi_tdgraph_executive> m_executive;
   /* clang-format on */
 };
 

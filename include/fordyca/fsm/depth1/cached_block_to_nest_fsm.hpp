@@ -28,19 +28,13 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-namespace depth1 {
-class sensing_subsystem;
-}
-class actuation_subsystem;
-} // namespace controller
 namespace repr {
 class block;
 } // namespace repr
@@ -49,7 +43,7 @@ namespace ds {
 class dpo_store;
 } // namespace ds
 
-namespace task_allocation = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 NS_START(fsm, depth1);
 
@@ -73,7 +67,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
                                  er::client<cached_block_to_nest_fsm>,
                                  public metrics::fsm::goal_acquisition_metrics,
                                  public block_transporter,
-                                 public task_allocation::taskable {
+                                 public rta::taskable {
  public:
   cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
                            controller::saa_subsystem* saa,
@@ -86,18 +80,18 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   /* taskable overrides */
   void task_execute(void) override;
   bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
+    return kST_FINISHED == current_state();
   }
 
   bool task_running(void) const override {
-    return !(ST_FINISHED == current_state() || ST_START == current_state());
+    return !(kST_FINISHED == current_state() || kST_START == current_state());
   }
 
   /**
    * @brief Reset the task FSM to a state where it can be started again.
    */
   void task_reset(void) override { init(); }
-  void task_start(const task_allocation::taskable_argument*) override {}
+  void task_start(const rta::taskable_argument*) override {}
 
   /* collision metrics */
   bool in_collision_avoidance(void) const override;
@@ -109,6 +103,8 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   bool goal_acquired(void) const override;
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+
   acquisition_goal_type acquisition_goal(void) const override;
 
   /* block transportation */
@@ -121,33 +117,33 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    ST_START,
+    kST_START,
     /**
      * Superstate for finding a cached block.
      */
-    ST_ACQUIRE_BLOCK,
+    kST_ACQUIRE_BLOCK,
 
     /**
      * @brief State robots wait in after acquiring a cache for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
-    ST_WAIT_FOR_PICKUP,
+    kST_WAIT_FOR_PICKUP,
 
-    ST_WAIT_FOR_DROP,
+    kST_WAIT_FOR_DROP,
 
     /**
      * Block found--bring it back to the nest.
      */
-    ST_TRANSPORT_TO_NEST,
+    kST_TRANSPORT_TO_NEST,
 
-    ST_LEAVING_NEST,
+    kST_LEAVING_NEST,
 
     /**
      * Block has been brought to the nest successfully.
      */
-    ST_FINISHED,
-    ST_MAX_STATES,
+    kST_FINISHED,
+    kST_MAX_STATES,
   };
 
  private:
@@ -200,7 +196,7 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
   /* clang-format off */
   acquire_existing_cache_fsm m_cache_fsm;
   /* clang-format on */
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
 };
 
 NS_END(depth1, fsm, fordyca);

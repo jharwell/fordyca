@@ -50,7 +50,7 @@ class cache_starter;
 } // namespace depth2
 } // namespace tasks
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 NS_START(events, detail);
 
@@ -59,7 +59,7 @@ NS_START(events, detail);
  ******************************************************************************/
 struct cache_proximity_visit_set {
   using value =
-      visitor::precise_visit_set<controller::depth2::grp_dpo_controller,
+      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
                                  controller::depth2::grp_mdpo_controller,
                                  tasks::depth2::cache_finisher,
                                  tasks::depth2::cache_starter,
@@ -75,7 +75,7 @@ struct cache_proximity_visit_set {
  */
 class cache_proximity : public rcppsw::er::client<cache_proximity> {
  public:
-  explicit cache_proximity(std::shared_ptr<repr::base_cache> cache);
+  explicit cache_proximity(const std::shared_ptr<repr::base_cache>& cache);
   ~cache_proximity(void) override = default;
 
   cache_proximity(const cache_proximity& op) = delete;
@@ -102,7 +102,7 @@ class cache_proximity : public rcppsw::er::client<cache_proximity> {
  * compiler).
  */
 using cache_proximity_visitor_impl =
-    visitor::precise_visitor<detail::cache_proximity,
+    rvisitor::precise_visitor<detail::cache_proximity,
                              detail::cache_proximity_visit_set::value>;
 
 NS_END(detail);

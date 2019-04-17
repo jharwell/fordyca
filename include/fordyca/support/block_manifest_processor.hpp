@@ -48,7 +48,7 @@ namespace factory = rcppsw::patterns::factory;
 class block_manifest_processor
     : private factory::sharing_factory<repr::base_block, const rmath::vector2d&, int> {
  public:
-  explicit block_manifest_processor(const params::arena::block_manifest* const m);
+  explicit block_manifest_processor(const params::arena::block_manifest* m);
 
   ds::block_vector create_blocks(void);
 

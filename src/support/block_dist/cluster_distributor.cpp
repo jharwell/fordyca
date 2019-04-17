@@ -31,7 +31,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -39,8 +38,7 @@ namespace er = rcppsw::er;
 cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
                                          double arena_resolution,
                                          uint capacity)
-    : base_distributor(),
-      ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
+    : ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
       m_clust(view, capacity),
       m_dist(view, arena_resolution) {}
 

@@ -41,7 +41,7 @@ namespace rswc = rcppsw::swarm::convergence;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-loop_function_repository::loop_function_repository(void) {
+loop_function_repository::loop_function_repository(void) noexcept {
   register_parser<output_parser, output_params>(
       output_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
   register_parser<arena::arena_map_parser, arena::arena_map_params>(

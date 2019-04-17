@@ -60,7 +60,6 @@ base_metrics_aggregator::base_metrics_aggregator(
     const params::metrics_params* const mparams,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
-      collector_group(),
       m_metrics_path(output_root + "/" + mparams->output_dir) {
   if (!fs::exists(m_metrics_path)) {
     fs::create_directories(m_metrics_path);

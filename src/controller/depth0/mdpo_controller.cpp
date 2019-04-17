@@ -33,13 +33,12 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller, depth0);
-namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_controller::mdpo_controller(void)
-    : dpo_controller(), ER_CLIENT_INIT("fordyca.controller.depth0.mdpo") {}
+    : ER_CLIENT_INIT("fordyca.controller.depth0.mdpo") {}
 
 mdpo_controller::~mdpo_controller(void) = default;
 
@@ -116,6 +115,12 @@ void mdpo_controller::private_init(void) {
 
 __rcsw_pure mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
+} /* perception() */
+
+__rcsw_pure const mdpo_perception_subsystem* mdpo_controller::mdpo_perception(
+    void) const {
+  return static_cast<const mdpo_perception_subsystem*>(
+      dpo_controller::perception());
 } /* perception() */
 
 using namespace argos; // NOLINT

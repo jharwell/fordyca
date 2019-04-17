@@ -77,10 +77,13 @@ class arena_map : public er::client<arena_map>,
                   public metrics::robot_occupancy_metrics,
                   public decorator::decorator<arena_grid> {
  public:
+  using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
+  using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
+
   explicit arena_map(const struct params::arena::arena_map_params* params);
 
   /* robot occupancy metrics */
-  bool has_robot(uint i, uint j) const override;
+  bool has_robot(const rmath::vector2u& coord) const override;
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -219,9 +222,11 @@ class arena_map : public er::client<arena_map>,
    *
    * @return The subgrid.
    */
-  rcppsw::ds::base_grid2D<cell2D>::grid_view subgrid(size_t x,
-                                                     size_t y,
-                                                     size_t radius) {
+  grid_view subgrid(size_t x, size_t y, size_t radius) {
+    return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
+  }
+
+  const_grid_view subgrid(size_t x, size_t y, size_t radius) const {
     return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
   double grid_resolution(void) const { return decoratee().resolution(); }
@@ -253,7 +258,7 @@ class arena_map : public er::client<arena_map>,
  private:
   /* clang-format off */
   block_vector                         m_blocks;
-  cache_vector                         m_caches;
+  cache_vector                         m_caches{};
   repr::nest                           m_nest;
   support::block_dist::dispatcher      m_block_dispatcher;
   support::block_dist::redist_governor m_redist_governor;

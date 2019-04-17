@@ -49,7 +49,7 @@ NS_START(events, detail);
  ******************************************************************************/
 struct cell_unknown_visit_set {
   using inherited = cell_op_visit_set::value;
-  using defined = visitor::precise_visit_set<ds::occupancy_grid>;
+  using defined = rvisitor::precise_visit_set<ds::occupancy_grid>;
   using value = boost::mpl::joint_view<inherited::type, defined::type>;
 };
 
@@ -82,7 +82,7 @@ class cell_unknown : public cell_op, public rcppsw::er::client<cell_unknown> {
  * compiler).
  */
 using cell_unknown_visitor_impl =
-    visitor::precise_visitor<detail::cell_unknown,
+    rvisitor::precise_visitor<detail::cell_unknown,
                              detail::cell_unknown_visit_set::value>;
 
 NS_END(detail);

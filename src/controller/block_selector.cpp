@@ -50,7 +50,7 @@ ds::dp_block_map::value_type block_selector::calc_best(
   ds::dp_block_map::value_type best{nullptr, {}};
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
-  for (const auto& b : blocks.values_range()) {
+  for (const auto& b : blocks.const_values_range()) {
     if (block_is_excluded(position, b.ent())) {
       continue;
     }
@@ -60,7 +60,7 @@ ds::dp_block_map::value_type block_selector::calc_best(
      * undoubtedly have to change in the future.
      */
     double priority =
-        (dynamic_cast<const repr::cube_block*>(b.ent()))
+        (nullptr != dynamic_cast<const repr::cube_block*>(b.ent()))
             ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
             : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =

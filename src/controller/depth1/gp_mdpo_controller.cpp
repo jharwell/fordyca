@@ -29,7 +29,7 @@
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
 
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -104,6 +104,12 @@ void gp_mdpo_controller::shared_init(
 
 __rcsw_pure mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
+} /* perception() */
+
+__rcsw_pure const mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(
+    void) const {
+  return static_cast<const mdpo_perception_subsystem*>(
+      dpo_controller::perception());
 } /* perception() */
 
 using namespace argos; // NOLINT

@@ -81,7 +81,7 @@ namespace depth2 {
 class grp_dpo_controller;
 class grp_mdpo_controller;
 }
-}
+} /* namespace controller */
 namespace params { namespace tv { struct tv_manager_params; }}
 namespace ds { class arena_map; }
 NS_START(support);
@@ -110,8 +110,8 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
   using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
 
   tv_manager(const params::tv::tv_manager_params* params,
-                const support::base_loop_functions* const lf,
-                ds::arena_map* const map);
+                const support::base_loop_functions* lf,
+                ds::arena_map* map);
 
   tv_manager(const tv_manager& other) = delete;
   const tv_manager& operator=(const tv_manager& other) = delete;
@@ -128,7 +128,7 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
    */
   template<class T>
   block_op_penalty_handler<T>* penalty_handler(
-      const block_op_src& src) {
+      const block_op_src& src) const {
     switch (src) {
       case block_op_src::kSrcFreePickup:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
@@ -154,7 +154,7 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
    * instance of this class used to generate the reference.
    */
   template<class T>
-  cache_op_penalty_handler<T>* penalty_handler(const cache_op_src& src) {
+  cache_op_penalty_handler<T>* penalty_handler(const cache_op_src& src) const {
     switch (src) {
       case cache_op_src::kSrcExistingCachePickup:
       case cache_op_src::kSrcExistingCacheDrop:
@@ -165,18 +165,6 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
         ER_FATAL_SENTINEL("Bad penalty source %d", src);
     } /* switch() */
     return nullptr;
-  }
-
-  template<typename T>
-  const block_op_penalty_handler<T>* penalty_handler(
-      const block_op_src& src) const {
-    return const_cast<tv_manager*>(this)->penalty_handler<T>(src);
-  }
-
-  template<typename T>
-  const cache_op_penalty_handler<T>* penalty_handler(
-      const cache_op_src& src) const {
-    return const_cast<tv_manager*>(this)->penalty_handler<T>(src);
   }
 
   /*
@@ -251,13 +239,13 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
 
  private:
   void nest_drop_init(const params::tv::tv_manager_params* params,
-                      ds::arena_map* const map);
+                      ds::arena_map* map);
   void fb_pickup_init(const params::tv::tv_manager_params* params,
-                      ds::arena_map* const map);
+                      ds::arena_map* map);
   void existing_cache_init(const params::tv::tv_manager_params* params,
-                           ds::arena_map* const map);
+                           ds::arena_map* map);
   void cache_site_init(const params::tv::tv_manager_params* params,
-                       ds::arena_map* const map);
+                       ds::arena_map* map);
 
   using block_variant = boost::variant<BLOCK_HANDLERS>;
   using existing_cache_variant = boost::variant<EXISTING_CACHE_HANDLERS>;

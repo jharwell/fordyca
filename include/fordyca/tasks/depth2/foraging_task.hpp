@@ -28,14 +28,14 @@
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
+namespace rcppsw { namespace ta { struct task_alloc_params; }}
 NS_START(fordyca, tasks, depth2);
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Structure Definitions
@@ -53,11 +53,11 @@ namespace visitor = rcppsw::patterns::visitor;
  */
 class foraging_task
     : public base_foraging_task,
-      public ta::polled_task {
+      public rta::polled_task {
  public:
   foraging_task(const std::string& name,
-                const ta::task_allocation_params *params,
-                std::unique_ptr<ta::taskable> mechanism);
+                const rta::task_alloc_params *params,
+                std::unique_ptr<rta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
   static constexpr char kCacheStarterName[] = "Cache Starter";
@@ -65,7 +65,7 @@ class foraging_task
   static constexpr char kCacheTransfererName[] = "Cache Transferer";
   static constexpr char kCacheCollectorName[] = "Cache Collector";
 
-  static bool task_in_depth2(const polled_task* const task);
+  static bool task_in_depth2(const polled_task* task);
 
   /* task overrides */
   double current_time(void) const override;

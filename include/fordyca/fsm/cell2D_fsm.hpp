@@ -51,12 +51,12 @@ namespace er = rcppsw::er;
 class cell2D_fsm : public rfsm::simple_fsm, public er::client<cell2D_fsm> {
  public:
   enum state {
-    ST_UNKNOWN,
-    ST_EMPTY,
-    ST_HAS_BLOCK,
-    ST_HAS_CACHE,
-    ST_CACHE_EXTENT,
-    ST_MAX_STATES
+    kST_UNKNOWN,
+    kST_EMPTY,
+    kST_HAS_BLOCK,
+    kST_HAS_CACHE,
+    kST_CACHE_EXTENT,
+    kST_MAX_STATES
   };
 
   cell2D_fsm(void);
@@ -65,13 +65,13 @@ class cell2D_fsm : public rfsm::simple_fsm, public er::client<cell2D_fsm> {
 
   void init(void) override;
 
-  bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
-  bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
-  bool state_has_cache(void) const { return current_state() == ST_HAS_CACHE; }
+  bool state_is_known(void) const { return current_state() != kST_UNKNOWN; }
+  bool state_has_block(void) const { return current_state() == kST_HAS_BLOCK; }
+  bool state_has_cache(void) const { return current_state() == kST_HAS_CACHE; }
   bool state_in_cache_extent(void) const {
-    return current_state() == ST_CACHE_EXTENT;
+    return current_state() == kST_CACHE_EXTENT;
   }
-  bool state_is_empty(void) const { return current_state() == ST_EMPTY; }
+  bool state_is_empty(void) const { return current_state() == kST_EMPTY; }
 
   /* events */
   void event_unknown(void);
@@ -84,7 +84,7 @@ class cell2D_fsm : public rfsm::simple_fsm, public er::client<cell2D_fsm> {
 
  private:
   struct block_data : public rfsm::event_data {
-    explicit block_data(bool pickup_) : pickup(pickup_) {}
+    explicit block_data(bool pickup_in) : pickup(pickup_in) {}
     bool pickup;
   };
 
@@ -102,7 +102,7 @@ class cell2D_fsm : public rfsm::simple_fsm, public er::client<cell2D_fsm> {
         FSM_STATE_MAP_ENTRY(&state_cache),
         FSM_STATE_MAP_ENTRY(&state_cache_extent),
     };
-    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
+    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, kST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
 

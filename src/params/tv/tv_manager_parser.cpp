@@ -42,34 +42,29 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
     return;
   }
 
-  ticpp::Element tvnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element tvnode = node_get(node, kXMLRoot);
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
   /* block temporal variance configured */
   if (nullptr != tvnode.FirstChild("blocks", false)) {
-    ticpp::Element bnode =
-        node_get(const_cast<ticpp::Element&>(tvnode), "blocks");
+    ticpp::Element bnode = node_get(tvnode, "blocks");
 
     if (nullptr != bnode.FirstChild("manipulation_penalty", false)) {
-      m_block_manip.parse(
-          node_get(const_cast<ticpp::Element&>(bnode), "manipulation_penalty"));
+      m_block_manip.parse(node_get(tvnode, "manipulation_penalty"));
       m_params->block_manipulation_penalty = *m_block_manip.parse_results();
     }
     if (nullptr != bnode.FirstChild("carry_throttle", false)) {
-      m_block_carry.parse(
-          node_get(const_cast<ticpp::Element&>(bnode), "carry_throttle"));
+      m_block_carry.parse(node_get(bnode, "carry_throttle"));
       m_params->block_carry_throttle = *m_block_carry.parse_results();
     }
   }
 
   /* cache temporal variance configured */
   if (nullptr != tvnode.FirstChild("caches", false)) {
-    ticpp::Element cnode =
-        node_get(const_cast<ticpp::Element&>(tvnode), "caches");
+    ticpp::Element cnode = node_get(tvnode, "caches");
     if (nullptr != cnode.FirstChild("usage_penalty", false)) {
-      m_cache_usage.parse(
-          node_get(const_cast<ticpp::Element&>(cnode), "usage_penalty"));
+      m_cache_usage.parse(node_get(cnode, "usage_penalty"));
       m_params->cache_usage_penalty = *m_cache_usage.parse_results();
     }
   }

@@ -26,14 +26,14 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace task_allocation = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 NS_START(fsm);
 
@@ -50,7 +50,7 @@ NS_START(fsm);
  * This class cannot be instantiated on its own.
  */
 class base_explore_fsm : public base_foraging_fsm,
-                         public task_allocation::taskable {
+                         public rta::taskable {
  public:
   base_explore_fsm(controller::saa_subsystem* saa, uint8_t max_states);
 
@@ -58,7 +58,7 @@ class base_explore_fsm : public base_foraging_fsm,
   base_explore_fsm& operator=(const base_explore_fsm& fsm) = delete;
 
   /* taskable overrides */
-  void task_start(const rcppsw::task_allocation::taskable_argument*) override {}
+  void task_start(const rta::taskable_argument*) override {}
   void task_execute(void) override;
 
   /**

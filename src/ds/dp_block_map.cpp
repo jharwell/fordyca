@@ -34,7 +34,7 @@ NS_START(fordyca, ds);
  * Member Functions
  ******************************************************************************/
 std::string dp_block_map::to_str(void) const {
-  auto range = values_range();
+  auto range = const_values_range();
   return std::accumulate(range.begin(),
                          range.end(),
                          std::string(),

@@ -70,7 +70,7 @@ class block_manip_collator : public metrics::blocks::manipulation_metrics {
 
  private:
   /* clang-format off */
-  uint m_penalty{false};
+  uint m_penalty{0};
   bool m_free_pickup_event{false};
   bool m_free_drop_event{false};
   bool m_cache_pickup_event{false};

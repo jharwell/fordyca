@@ -66,9 +66,9 @@ class base_metrics_aggregator
  public:
   base_metrics_aggregator(const params::metrics_params* mparams,
                           const std::string& output_root);
-  virtual ~base_metrics_aggregator(void) = default;
+  ~base_metrics_aggregator(void) override = default;
 
-  void collect_from_loop(const support::base_loop_functions* const loop);
+  void collect_from_loop(const support::base_loop_functions* loop);
 
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.

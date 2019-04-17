@@ -79,6 +79,12 @@ __rcsw_pure mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* mdpo_perception() */
 
+__rcsw_pure const mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(
+    void) const {
+  return static_cast<const mdpo_perception_subsystem*>(
+      dpo_controller::perception());
+} /* mdpo_perception() */
+
 using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"

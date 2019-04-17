@@ -39,8 +39,8 @@
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bi_tab.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tab.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/repr/arena_cache.hpp"
@@ -128,7 +128,7 @@ void depth1_metrics_aggregator::collect_from_cache_manager(
 } /* collect_from_cache() */
 
 void depth1_metrics_aggregator::task_finish_or_abort_cb(
-    const ta::polled_task* const task) {
+    const rta::polled_task* const task) {
   /*
    * Both depth1 and depth2 metrics aggregators are registered on the same
    * callback, so this function will be called for the depth2 task abort/finish
@@ -141,8 +141,8 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
           dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-void depth1_metrics_aggregator::task_alloc_cb(const ta::polled_task* const,
-                                              const ta::bi_tab* const tab) {
+void depth1_metrics_aggregator::task_alloc_cb(const rta::polled_task* const,
+                                              const rta::bi_tab* const tab) {
   /*
    * Depth [0,1,2] metrics aggregators are registered on the same executive,
    * so this function will be called for the task allocations for any depth,

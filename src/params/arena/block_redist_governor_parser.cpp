@@ -46,7 +46,7 @@ void block_redist_governor_parser::parse(const ticpp::Element& node) {
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
 
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element lnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element lnode = node_get(node, kXMLRoot);
     XML_PARSE_ATTR_DFLT(lnode, m_params, timestep, 0U);
     XML_PARSE_ATTR_DFLT(lnode, m_params, block_count, 0U);
     XML_PARSE_ATTR(lnode, m_params, trigger);
