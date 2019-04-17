@@ -44,7 +44,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-nest_block_drop::nest_block_drop(std::shared_ptr<repr::base_block> block,
+nest_block_drop::nest_block_drop(const std::shared_ptr<repr::base_block>& block,
                                  uint timestep)
     : ER_CLIENT_INIT("fordyca.events.nest_block_drop"),
       m_timestep(timestep),
@@ -61,7 +61,7 @@ void nest_block_drop::visit(ds::arena_map& map) {
 
 void nest_block_drop::dispatch_nest_interactor(
     tasks::base_foraging_task* const task) {
-  __rcsw_unused auto* polled = dynamic_cast<ta::polled_task*>(task);
+  __rcsw_unused auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto interactor = dynamic_cast<events::nest_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non nest-interactor task %s causing nest block drop",
@@ -88,8 +88,8 @@ void nest_block_drop::visit(controller::depth0::crw_controller& controller) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
@@ -104,8 +104,8 @@ void nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
@@ -153,13 +153,13 @@ void nest_block_drop::visit(tasks::depth1::collector& task) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   rfsm::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
+                   rfsm::event_type::kNORMAL);
 } /* visit() */
 
 /*******************************************************************************

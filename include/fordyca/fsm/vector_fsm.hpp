@@ -30,7 +30,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@
 NS_START(fordyca);
 
 namespace rfsm = rcppsw::patterns::state_machine;
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 NS_START(fsm);
 
@@ -62,7 +62,7 @@ NS_START(fsm);
  */
 class vector_fsm : public base_foraging_fsm,
                    public er::client<vector_fsm>,
-                   public ta::taskable {
+                   public rta::taskable {
  public:
   /**
    * @brief The tolerance within which a robot's location has to be in order to
@@ -90,13 +90,12 @@ class vector_fsm : public base_foraging_fsm,
   /* taskable overrides */
   void task_reset(void) override { init(); }
   bool task_running(void) const override {
-    return current_state() != ST_START && current_state() != ST_ARRIVED;
+    return current_state() != kST_START && current_state() != kST_ARRIVED;
   }
   void task_execute(void) override;
-  void task_start(
-      const rcppsw::task_allocation::taskable_argument* c_arg) override;
+  void task_start(const rta::taskable_argument* c_arg) override;
   bool task_finished(void) const override {
-    return current_state() == ST_ARRIVED;
+    return current_state() == kST_ARRIVED;
   }
 
   const rmath::vector2d& target(void) const { return m_goal_data.loc; }
@@ -115,16 +114,16 @@ class vector_fsm : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    ST_START,
+    kST_START,
     /**
      * Vectoring toward the target.
      */
-    ST_VECTOR,
+    kST_VECTOR,
 
     /**
      * Avoiding an obstacle nearby to the robot's current location.
      */
-    ST_COLLISION_AVOIDANCE,
+    kST_COLLISION_AVOIDANCE,
 
     /**
      * Recovering from frequent collision avoidance by driving AWAY from the
@@ -133,19 +132,19 @@ class vector_fsm : public base_foraging_fsm,
      * of time butting heads when they are traveling in opposite/spatially
      * conflicting directions.
      */
-    ST_COLLISION_RECOVERY,
+    kST_COLLISION_RECOVERY,
 
     /**
      * We have been colliding too frequently--time to change things up and
      * hopefully move away from the problem location.
      */
-    ST_NEW_DIRECTION,
+    kST_NEW_DIRECTION,
 
     /**
      * We have arrived at the specified location within tolerance.
      */
-    ST_ARRIVED,
-    ST_MAX_STATES
+    kST_ARRIVED,
+    kST_MAX_STATES
   };
 
  private:
@@ -154,12 +153,12 @@ class vector_fsm : public base_foraging_fsm,
    * to tell the FSM where to travel to next.
    */
   struct goal_data : public rfsm::event_data {
-    goal_data(rmath::vector2d loc_, double tolerance_)
-        : tolerance(tolerance_), loc(loc_) {}
-    goal_data(void) : loc() {}
+    goal_data(rmath::vector2d loc_in, double tol)
+        : tolerance(tol), loc(loc_in) {}
+    goal_data(void) = default;
 
     double tolerance{0.0};
-    rmath::vector2d loc;
+    rmath::vector2d loc{};
   };
 
   struct fsm_state {
@@ -231,8 +230,8 @@ class vector_fsm : public base_foraging_fsm,
   }
 
   /* clang-format off */
-  struct fsm_state m_state;
-  struct goal_data m_goal_data;
+  struct fsm_state m_state{};
+  struct goal_data m_goal_data{};
   /* clang-format on */
 };
 

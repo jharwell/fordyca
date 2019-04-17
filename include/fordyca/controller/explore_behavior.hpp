@@ -52,7 +52,7 @@ class explore_behavior : public rcppsw::er::client<explore_behavior>,
   explicit explore_behavior(controller::saa_subsystem* const saa)
       : ER_CLIENT_INIT("fordyca.controller.explore_behavior"), m_saa(saa) {}
 
-  virtual ~explore_behavior(void) = default;
+  ~explore_behavior(void) override = default;
 
   explore_behavior(const explore_behavior& fsm) = delete;
   explore_behavior& operator=(const explore_behavior& fsm) = delete;

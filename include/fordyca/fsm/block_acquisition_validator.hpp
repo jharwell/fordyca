@@ -47,7 +47,7 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 class block_acquisition_validator
     : public rcppsw::er::client<block_acquisition_validator> {
  public:
-  block_acquisition_validator(const ds::dp_block_map* map);
+  explicit block_acquisition_validator(const ds::dp_block_map* map);
 
   block_acquisition_validator(const block_acquisition_validator& v) = delete;
   block_acquisition_validator& operator=(const block_acquisition_validator& v) =

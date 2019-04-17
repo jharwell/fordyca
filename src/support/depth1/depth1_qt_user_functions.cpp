@@ -54,7 +54,7 @@ void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 
   if (controller.display_task()) {
     task_visualizer(this, 0.75)
-        .draw(dynamic_cast<ta::logical_task*>(controller.current_task()));
+        .draw(dynamic_cast<rta::logical_task*>(controller.current_task()));
   }
 }
 

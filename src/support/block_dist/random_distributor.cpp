@@ -35,7 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-namespace er = rcppsw::er;
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
@@ -43,8 +42,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 random_distributor::random_distributor(const ds::arena_grid::view& grid,
                                        double resolution)
-    : base_distributor(),
-      ER_CLIENT_INIT("fordyca.support.block_dist.random"),
+    : ER_CLIENT_INIT("fordyca.support.block_dist.random"),
       m_resolution(resolution),
       m_grid(grid) {}
 

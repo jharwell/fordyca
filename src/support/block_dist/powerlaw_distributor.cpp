@@ -37,7 +37,6 @@
 NS_START(fordyca, support, block_dist);
 using fordyca::ds::arena_grid;
 
-namespace er = rcppsw::er;
 namespace rmath = rcppsw::math;
 
 /*******************************************************************************
@@ -45,11 +44,9 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 powerlaw_distributor::powerlaw_distributor(
     const struct params::arena::block_dist_params* const params)
-    : base_distributor(),
-      ER_CLIENT_INIT("fordyca.support.block_dist.powerlaw"),
+    : ER_CLIENT_INIT("fordyca.support.block_dist.powerlaw"),
       m_arena_resolution(params->arena_resolution),
       m_n_clusters(params->powerlaw.n_clusters),
-      m_dist_map(),
       m_pwrdist(params->powerlaw.pwr_min, params->powerlaw.pwr_max, 2) {}
 
 /*******************************************************************************
@@ -65,26 +62,26 @@ bool powerlaw_distributor::distribute_block(
    *
    * So, change cluster size and try again.
    */
-  for (auto l = m_dist_map.begin(); l != m_dist_map.end(); ++l) {
-    for (auto& dist : l->second) {
+  for (auto& l : m_dist_map) {
+    for (auto& dist : l.second) {
       ER_INFO(
           "Attempting distribution: block%d -> cluster [capacity=%u,count=%zu]",
           block->id(),
-          l->first,
+          l.first,
           dist.block_clusters().front()->block_count());
 
       if (dist.distribute_block(block, entities)) {
         return true;
       }
-    } /* for(&d..) */
-  }   /* for(i..) */
+    } /* for(&dist..) */
+  }   /* for(l..) */
 
   ER_FATAL_SENTINEL("Unable to distribute block to any cluster");
   return false;
 } /* distribute_block() */
 
 powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_placements(
-    const ds::arena_grid* const grid,
+    ds::arena_grid* const grid,
     const std::vector<uint>& clust_sizes) {
   cluster_paramvec params;
 
@@ -104,9 +101,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
      * DO need to be able to modify their grid view. Here we do not need it, so
      * we have to cast.
      */
-    auto view =
-        const_cast<ds::arena_grid*>(grid)->layer<arena_grid::kCell>()->subgrid(
-            x, y, x_max, y_max);
+    auto view = grid->layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
     __rcsw_unused rmath::vector2u loc = (*view.origin()).loc();
     ER_TRACE("Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
              i,
@@ -159,7 +154,7 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
 } /* check_cluster_placements() */
 
 powerlaw_distributor::cluster_paramvec powerlaw_distributor::
-    compute_cluster_placements(const ds::arena_grid* const grid,
+    compute_cluster_placements(ds::arena_grid* const grid,
                                uint n_clusters) {
   ER_INFO("Computing cluster placements for %u clusters", n_clusters);
 
@@ -182,7 +177,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::
   return cluster_paramvec{};
 } /* compute_cluster_placements() */
 
-bool powerlaw_distributor::map_clusters(const ds::arena_grid* const grid) {
+bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
   cluster_paramvec params = compute_cluster_placements(grid, m_n_clusters);
   if (params.empty()) {
     ER_WARN("Unable to compute all cluster placements");
@@ -194,9 +189,9 @@ bool powerlaw_distributor::map_clusters(const ds::arena_grid* const grid) {
                                               bclustp.capacity,
                                               m_arena_resolution);
   } /* for(i..) */
-  for (auto it = m_dist_map.begin(); it != m_dist_map.end(); ++it) {
-    ER_INFO("Mapped %zu clusters of capacity %u", it->second.size(), it->first);
-    for (auto& dist : it->second) {
+  for (auto& it : m_dist_map) {
+    ER_INFO("Mapped %zu clusters of capacity %u", it.second.size(), it.first);
+    for (__rcsw_unused auto& dist : it.second) {
       ER_DEBUG(
           "Cluster with origin@%s: capacity=%u",
           dist.block_clusters().front()->view().origin()->loc().to_str().c_str(),
@@ -209,8 +204,8 @@ bool powerlaw_distributor::map_clusters(const ds::arena_grid* const grid) {
 ds::const_block_cluster_list powerlaw_distributor::block_clusters(void) const {
   ds::const_block_cluster_list ret;
 
-  for (auto l = m_dist_map.begin(); l != m_dist_map.end(); ++l) {
-    for (auto& dist : l->second) {
+  for (auto& l : m_dist_map) {
+    for (auto& dist : l.second) {
       auto bclusts = dist.block_clusters();
       ret.insert(ret.end(), bclusts.begin(), bclusts.end());
     } /* for(&d..) */

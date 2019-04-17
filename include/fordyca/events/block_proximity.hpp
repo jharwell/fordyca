@@ -48,7 +48,7 @@ namespace depth2 {
 class cache_starter;
 }
 } // namespace tasks
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 NS_START(events, detail);
 
@@ -57,7 +57,7 @@ NS_START(events, detail);
  ******************************************************************************/
 struct block_proximity_visit_set {
   using value =
-      visitor::precise_visit_set<controller::depth2::grp_dpo_controller,
+      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
                                  controller::depth2::grp_mdpo_controller,
                                  fsm::block_to_goal_fsm,
                                  tasks::depth2::cache_starter>;
@@ -79,9 +79,9 @@ class block_proximity : public rcppsw::er::client<block_proximity> {
   block_proximity& operator=(const block_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& controller);
-  void visit(controller::depth2::grp_mdpo_controller& controller);
-  void visit(fsm::block_to_goal_fsm& task);
+  void visit(controller::depth2::grp_dpo_controller& c);
+  void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth2::cache_starter& task);
 
  private:
@@ -99,7 +99,7 @@ class block_proximity : public rcppsw::er::client<block_proximity> {
  * compiler).
  */
 using block_proximity_visitor_impl =
-    visitor::precise_visitor<detail::block_proximity,
+    rvisitor::precise_visitor<detail::block_proximity,
                              detail::block_proximity_visit_set::value>;
 
 NS_END(detail);

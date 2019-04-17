@@ -51,7 +51,7 @@ ds::dp_block_map::value_type new_cache_selector::operator()(
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
-  for (auto& c : new_caches.values_range()) {
+  for (auto& c : new_caches.const_values_range()) {
     if (new_cache_is_excluded(existing_caches, new_caches, c.ent())) {
       continue;
     }
@@ -96,7 +96,7 @@ bool new_cache_selector::new_cache_is_excluded(
   double cluster_prox =
       boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
 
-  for (auto& ec : existing_caches.values_range()) {
+  for (auto& ec : existing_caches.const_values_range()) {
     double dist = (ec.ent()->real_loc() - new_cache->real_loc()).length();
     if (dist <= cache_prox) {
       ER_DEBUG(
@@ -123,7 +123,7 @@ bool new_cache_selector::new_cache_is_excluded(
    * So, we approximate a block distribution as a single block, and only choose
    * new caches that are sufficiently far from any potential clusters.
    */
-  for (auto& b : blocks.values_range()) {
+  for (auto& b : blocks.const_values_range()) {
     if (b.ent() == new_cache) {
       continue;
     }

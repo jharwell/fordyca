@@ -35,7 +35,7 @@ class block_proximity;
 class cache_proximity;
 } // namespace detail
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Structure Definitions
@@ -48,7 +48,7 @@ namespace visitor = rcppsw::patterns::visitor;
  * interact with dynamic caches in FORDYCA.
  */
 class dynamic_cache_interactor
-    : public visitor::polymorphic_accept_set<detail::block_proximity,
+    : public rvisitor::polymorphic_accept_set<detail::block_proximity,
                                              detail::cache_proximity> {};
 
 NS_END(events, fordyca);

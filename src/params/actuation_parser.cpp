@@ -37,7 +37,7 @@ constexpr char actuation_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void actuation_parser::parse(const ticpp::Element& node) {
-  ticpp::Element anode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element anode = node_get(node, kXMLRoot);
   m_differential_drive.parse(anode);
   m_steering.parse(anode);
 

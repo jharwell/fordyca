@@ -84,7 +84,7 @@ rmath::vector2d cache_site_selector::operator()(
 bool cache_site_selector::verify_site(const rmath::vector2d& site,
                                       const ds::dp_cache_map& known_caches,
                                       const ds::dp_block_map& known_blocks) const {
-  for (auto& c : known_caches.values_range()) {
+  for (auto& c : known_caches.const_values_range()) {
     ER_ASSERT((c.ent()->real_loc() - site).length() >=
                   std::get<0>(m_constraints)[0].cache_prox_dist,
               "Cache site@%s too close to cache%d (%f <= %f)",
@@ -94,7 +94,7 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
               std::get<0>(m_constraints)[0].cache_prox_dist);
   } /* for(&c..) */
 
-  for (auto& b : known_blocks.values_range()) {
+  for (auto& b : known_blocks.const_values_range()) {
     ER_ASSERT((b.ent()->real_loc() - site).length() >=
                   std::get<1>(m_constraints)[0].block_prox_dist,
               "Cache site@%s too close to block%d (%f <= %f)",
@@ -167,7 +167,7 @@ void cache_site_selector::constraints_create(
     const ds::dp_cache_map& known_caches,
     const ds::dp_block_map& known_blocks,
     const rmath::vector2d& nest_loc) {
-  for (auto& c : known_caches.values_range()) {
+  for (auto& c : known_caches.const_values_range()) {
     std::get<0>(m_constraints)
         .push_back({c.ent(),
                     this,
@@ -175,7 +175,7 @@ void cache_site_selector::constraints_create(
                         mc_matrix->find(cselm::kCacheProxDist)->second)});
   } /* for(&c..) */
 
-  for (auto& b : known_blocks.values_range()) {
+  for (auto& b : known_blocks.const_values_range()) {
     std::get<1>(m_constraints)
         .push_back({b.ent(),
                     this,
@@ -189,14 +189,14 @@ void cache_site_selector::constraints_create(
            this,
            boost::get<double>(mc_matrix->find(cselm::kNestProxDist)->second)});
 
-  for (size_t i = 0; i < std::get<0>(m_constraints).size(); ++i) {
+  for (auto& c : std::get<0>(m_constraints)) {
     m_alg.add_inequality_constraint(__cache_constraint_func,
-                                    &std::get<0>(m_constraints)[i],
+                                    &c,
                                     kCACHE_CONSTRAINT_TOL);
-  } /* for(i..) */
-  for (size_t i = 0; i < std::get<1>(m_constraints).size(); ++i) {
+  } /* for(c..) */
+  for (auto& c : std::get<1>(m_constraints)) {
     m_alg.add_inequality_constraint(__block_constraint_func,
-                                    &std::get<1>(m_constraints)[i],
+                                    &c,
                                     kBLOCK_CONSTRAINT_TOL);
   } /* for(i..) */
 
@@ -244,8 +244,7 @@ __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
-  cache_site_selector::cache_constraint_data* c =
-      reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
+  auto* c = reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
   double val = c->cache_prox_dist -
                (rmath::vector2d(x[0], x[1]) - c->mc_cache->real_loc()).length();
   return val;
@@ -257,8 +256,7 @@ __rcsw_pure double __nest_constraint_func(const std::vector<double>& x,
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
-  cache_site_selector::nest_constraint_data* c =
-      reinterpret_cast<cache_site_selector::nest_constraint_data*>(data);
+  auto* c = reinterpret_cast<cache_site_selector::nest_constraint_data*>(data);
   double val =
       c->nest_prox_dist - (rmath::vector2d(x[0], x[1]) - c->nest_loc).length();
   return val;
@@ -270,8 +268,7 @@ __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
-  cache_site_selector::block_constraint_data* b =
-      reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
+  auto* b = reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
   double val = b->block_prox_dist -
                (rmath::vector2d(x[0], x[1]) - b->mc_block->real_loc()).length();
   return val;
@@ -288,8 +285,7 @@ __rcsw_pure double __site_utility_func(const std::vector<double>& x,
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::min();
   }
-  cache_site_selector::site_utility_data* d =
-      reinterpret_cast<cache_site_selector::site_utility_data*>(data);
+  auto* d = reinterpret_cast<cache_site_selector::site_utility_data*>(data);
   rmath::vector2d point(x[0], x[1]);
   return math::cache_site_utility(d->position, d->nest_loc)(point);
 } /* __site_utility_func() */

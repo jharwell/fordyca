@@ -42,10 +42,11 @@ dpo_perception_metrics_collector::dpo_perception_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> dpo_perception_metrics_collector::csv_header_cols(void) const {
+std::list<std::string> dpo_perception_metrics_collector::csv_header_cols(
+    void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-  /* clang-format off */
+      /* clang-format off */
       "int_avg_known_blocks",
       "cum_avg_known_blocks",
       "int_avg_known_caches",

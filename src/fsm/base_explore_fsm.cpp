@@ -37,7 +37,7 @@ namespace utils = rcppsw::utils;
  ******************************************************************************/
 base_explore_fsm::base_explore_fsm(controller::saa_subsystem* const saa,
                                    uint8_t max_states)
-    : base_foraging_fsm(saa, max_states), entry_explore() {}
+    : base_foraging_fsm(saa, max_states) {}
 
 /*******************************************************************************
  * States
@@ -50,7 +50,7 @@ HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_explore) {
  * General Member Functions
  ******************************************************************************/
 void base_explore_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

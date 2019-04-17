@@ -33,8 +33,10 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
 
+namespace rmath = rcppsw::math;
+
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
  * @class cache_transferer
@@ -49,8 +51,8 @@ class cache_transferer : public foraging_task,
                          public events::existing_cache_interactor,
                          rcppsw::er::client<cache_transferer> {
  public:
-  cache_transferer(const struct ta::task_allocation_params* params,
-                   std::unique_ptr<ta::taskable> mechanism);
+  cache_transferer(const struct rta::task_alloc_params* params,
+                   std::unique_ptr<rta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -68,6 +70,7 @@ class cache_transferer : public foraging_task,
   TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
   TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
 
   /* block transportation */
   TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
@@ -75,7 +78,7 @@ class cache_transferer : public foraging_task,
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const ta::taskable_argument*) override;
+  void task_start(const rta::taskable_argument*) override;
   double abort_prob_calc(void) override;
   double interface_time_calc(uint interface,
                              double start_time) override;

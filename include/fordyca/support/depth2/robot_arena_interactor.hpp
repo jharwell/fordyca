@@ -36,7 +36,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 class dynamic_cache_manager;
 
 /*******************************************************************************

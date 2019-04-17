@@ -40,17 +40,18 @@ goal_acquisition_metrics_collector::goal_acquisition_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> goal_acquisition_metrics_collector::csv_header_cols(void) const {
+std::list<std::string> goal_acquisition_metrics_collector::csv_header_cols(
+    void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-    /* clang-format off */
+      /* clang-format off */
     "int_avg_acquiring_goal",
     "cum_avg_acquiring_goal",
     "int_avg_vectoring_to_goal",
     "cum_avg_vectoring_to_goal",
     "int_avg_exploring_for_goal",
-    "cum_avg_exploring_for_goal"
-    /* clang-format on */
+    "cum_avg_exploring_for_goal",
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -64,7 +65,8 @@ void goal_acquisition_metrics_collector::reset(void) {
 void goal_acquisition_metrics_collector::collect(
     const rcppsw::metrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
-  m_stats.n_int_exploring_for_goal += static_cast<uint>(m.is_exploring_for_goal());
+  m_stats.n_int_exploring_for_goal +=
+      static_cast<uint>(m.is_exploring_for_goal());
   m_stats.n_int_acquiring_goal +=
       static_cast<uint>(m.is_exploring_for_goal() || m.is_vectoring_to_goal());
   m_stats.n_int_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());

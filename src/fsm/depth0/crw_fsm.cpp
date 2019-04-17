@@ -36,13 +36,10 @@ namespace rfsm = rcppsw::patterns::state_machine;
  * Constructors/Destructors
  ******************************************************************************/
 crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
-    : base_foraging_fsm(saa, ST_MAX_STATES),
+    : base_foraging_fsm(saa, kST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
-      entry_transport_to_nest(),
-      entry_leaving_nest(),
-      entry_wait_for_signal(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
@@ -74,69 +71,73 @@ crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
  ******************************************************************************/
 HFSM_STATE_DEFINE(crw_fsm, start, rfsm::event_data* data) {
   /* first time running FSM */
-  if (rfsm::event_type::NORMAL == data->type()) {
-    internal_event(ST_ACQUIRE_BLOCK);
-    return controller::foraging_signal::HANDLED;
+  if (rfsm::event_type::kNORMAL == data->type()) {
+    internal_event(kST_ACQUIRE_BLOCK);
+    return controller::foraging_signal::kHANDLED;
   }
-  if (rfsm::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::LEFT_NEST == data->signal()) {
+  if (rfsm::event_type::kCHILD == data->type()) {
+    if (controller::foraging_signal::kLEFT_NEST == data->signal()) {
       m_explore_fsm.task_start(nullptr);
-      internal_event(ST_ACQUIRE_BLOCK);
-      return controller::foraging_signal::HANDLED;
-    } else if (controller::foraging_signal::ENTERED_NEST == data->signal()) {
-      internal_event(ST_WAIT_FOR_BLOCK_DROP);
-      return controller::foraging_signal::HANDLED;
+      internal_event(kST_ACQUIRE_BLOCK);
+      return controller::foraging_signal::kHANDLED;
+    } else if (controller::foraging_signal::kENTERED_NEST == data->signal()) {
+      internal_event(kST_WAIT_FOR_BLOCK_DROP);
+      return controller::foraging_signal::kHANDLED;
     }
   }
   ER_FATAL_SENTINEL("Unhandled signal");
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
-    internal_event(ST_WAIT_FOR_BLOCK_PICKUP);
+    internal_event(kST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_explore_fsm.task_execute();
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rfsm::event_data* data) {
-  if (controller::foraging_signal::BLOCK_PICKUP == data->signal()) {
+  if (controller::foraging_signal::kBLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
-    internal_event(ST_TRANSPORT_TO_NEST);
-  } else if (controller::foraging_signal::BLOCK_VANISHED == data->signal()) {
+    internal_event(kST_TRANSPORT_TO_NEST);
+  } else if (controller::foraging_signal::kBLOCK_VANISHED == data->signal()) {
     m_explore_fsm.task_reset();
-    internal_event(ST_ACQUIRE_BLOCK);
+    internal_event(kST_ACQUIRE_BLOCK);
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rfsm::event_data* data) {
-  if (controller::foraging_signal::BLOCK_DROP == data->signal()) {
+  if (controller::foraging_signal::kBLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block drop signal received");
-    internal_event(ST_LEAVING_NEST);
+    internal_event(kST_LEAVING_NEST);
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::kHANDLED;
 }
 
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
 bool crw_fsm::is_exploring_for_goal(void) const {
-  return current_state() == ST_ACQUIRE_BLOCK;
+  return current_state() == kST_ACQUIRE_BLOCK;
 } /* is_exploring_for_goal() */
 
 bool crw_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::kBlock == acquisition_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
+    return current_state() == kST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::kNest == block_transport_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
+    return current_state() == kST_WAIT_FOR_BLOCK_DROP;
   }
   return false;
 } /* goal_acquired() */
+
+rmath::vector2u crw_fsm::acquisition_loc(void) const {
+  return saa_subsystem()->sensing()->discrete_position();
+} /* acquisition_loc() */
 
 /*******************************************************************************
  * Collision Metrics
@@ -177,7 +178,7 @@ void crw_fsm::init(void) {
 } /* init() */
 
 void crw_fsm::run(void) {
-  inject_event(controller::foraging_signal::FSM_RUN, rfsm::event_type::NORMAL);
+  inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {
@@ -185,16 +186,16 @@ bool crw_fsm::block_detected(void) const {
 } /* block_detected() */
 
 transport_goal_type crw_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_NEST == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (kST_TRANSPORT_TO_NEST == current_state() ||
+      kST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::kNest;
   }
   return transport_goal_type::kNone;
 } /* block_transport_goal() */
 
 acquisition_goal_type crw_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+  if (kST_ACQUIRE_BLOCK == current_state() ||
+      kST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::kBlock;
   }
   return acquisition_goal_type::kNone;

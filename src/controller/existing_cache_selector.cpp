@@ -57,7 +57,7 @@ ds::dp_cache_map::value_type existing_cache_selector::operator()(
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
-  for (auto& c : existing_caches.values_range()) {
+  for (auto& c : existing_caches.const_values_range()) {
     /*
      * No picking up from caches is allowed until our cache acquisition policy
      * has been satisfied.

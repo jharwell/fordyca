@@ -40,10 +40,11 @@ manipulation_metrics_collector::manipulation_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> manipulation_metrics_collector::csv_header_cols(void) const {
+std::list<std::string> manipulation_metrics_collector::csv_header_cols(
+    void) const {
   auto merged = dflt_csv_header_cols();
-  auto cols = std::list<std::string> {
-    /* clang-format off */
+  auto cols = std::list<std::string>{
+      /* clang-format off */
     "int_avg_free_pickup_events",
     "int_avg_free_drop_events",
     "int_avg_free_pickup_penalty",
@@ -52,7 +53,7 @@ std::list<std::string> manipulation_metrics_collector::csv_header_cols(void) con
     "int_avg_cache_drop_events",
     "int_avg_cache_pickup_penalty",
     "int_avg_cache_drop_penalty"
-    /* clang-format on */
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;

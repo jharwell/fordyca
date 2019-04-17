@@ -26,15 +26,15 @@
  ******************************************************************************/
 #include "fordyca/controller/foraging_signal.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
-#include "rcppsw/task_allocation/taskable_argument.hpp"
+#include "rcppsw/ta/taskable.hpp"
+#include "rcppsw/ta/taskable_argument.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
 namespace rmath = rcppsw::math;
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Class Definitions
@@ -44,10 +44,10 @@ namespace ta = rcppsw::task_allocation;
  * @ingroup tasks
  *
  * @brief An argument that can be passed to a \ref
- * rcppsw::task_allocation::taskable function which contains a vector, mostly
+ * rta::taskable function which contains a vector, mostly
  * likely representing an arena location.
  */
-class vector_argument : public ta::taskable_argument {
+class vector_argument : public rta::taskable_argument {
  public:
   vector_argument(double tolerance, const rmath::vector2d& v)
       : m_tolerance(tolerance), m_vector(v) {}
@@ -66,11 +66,11 @@ class vector_argument : public ta::taskable_argument {
  * @ingroup tasks
  *
  * @brief An argument that can be passed to a \ref
- * rcppsw::task_allocation::taskable::task_start() function which contains a
+ * rta::taskable::task_start() function which contains a
  * foraging signal, for use in specifying initial conditions/commands for
  * certain state machines.
  */
-class foraging_signal_argument : public ta::taskable_argument {
+class foraging_signal_argument : public rta::taskable_argument {
  public:
   explicit foraging_signal_argument(controller::foraging_signal::type s)
       : m_signal(s) {}

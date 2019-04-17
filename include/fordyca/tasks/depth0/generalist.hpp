@@ -31,6 +31,8 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth0);
 
+namespace rmath = rcppsw::math;
+
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
@@ -49,20 +51,21 @@ NS_START(fordyca, tasks, depth0);
  */
 class generalist : public foraging_task {
  public:
-  generalist(const ta::task_allocation_params* params,
-             std::unique_ptr<ta::taskable> mechanism);
+  generalist(const rta::task_alloc_params* params,
+             std::unique_ptr<rta::taskable> mechanism);
 
   /* event handling */
-  void accept(events::detail::free_block_pickup& v) override;
+  void accept(events::detail::free_block_pickup& visitor) override;
   void accept(events::detail::free_block_drop&) override {}
-  void accept(events::detail::nest_block_drop& v) override;
-  void accept(events::detail::block_vanished& v) override;
+  void accept(events::detail::nest_block_drop& visitor) override;
+  void accept(events::detail::block_vanished& visitor) override;
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLAREC(bool, goal_acquired);
   TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
   TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
 
   /* block transportation */
   TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
@@ -71,7 +74,7 @@ class generalist : public foraging_task {
   bool task_at_interface(void) const override { return false; }
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const ta::taskable_argument* const) override {}
+  void task_start(const rta::taskable_argument* const) override {}
 
   double current_time(void) const override;
   double interface_time_calc(uint, double) override { return 0.0; }

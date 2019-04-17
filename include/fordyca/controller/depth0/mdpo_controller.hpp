@@ -66,13 +66,11 @@ class mdpo_controller : public dpo_controller,
   void ControlStep(void) override;
 
   std::type_index type_index(void) const override {
-    return std::type_index(typeid(*this));
+    return {typeid(*this)};
   }
 
   mdpo_perception_subsystem* mdpo_perception(void);
-  const mdpo_perception_subsystem* mdpo_perception(void) const {
-    return const_cast<mdpo_controller*>(this)->mdpo_perception();
-  }
+  const mdpo_perception_subsystem* mdpo_perception(void) const;
 
   /**
    * @brief Initialization that derived classes may also need to perform, if the

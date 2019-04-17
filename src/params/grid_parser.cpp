@@ -43,7 +43,7 @@ void grid_parser::parse(const ticpp::Element& node) {
    * does not use grids.
    */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element gnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element gnode = node_get(node, kXMLRoot);
     std::vector<std::string> res;
     rcppsw::utils::line_parser parser(' ');
     res = parser.parse(gnode.GetAttribute("size"));

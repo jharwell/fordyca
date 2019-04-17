@@ -64,7 +64,7 @@ class crw_controller : public base_controller,
   void Reset(void) override;
 
   std::type_index type_index(void) const override {
-    return std::type_index(typeid(*this));
+    return {typeid(*this)};
   }
 
   /* goal acquisition metrics */
@@ -72,13 +72,13 @@ class crw_controller : public base_controller,
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
   FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
 
   /* block transportation */
   FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }
-
 
  private:
   /* clang-format off */

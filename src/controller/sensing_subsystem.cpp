@@ -37,9 +37,6 @@ sensing_subsystem::sensing_subsystem(
     const struct sensor_list* const list)
     : mc_obstacle_delta(params->proximity.delta),
       mc_los_dim(params->los_dim),
-      m_tick(0),
-      m_position(),
-      m_prev_position(),
       m_sensors(*list),
       m_fov(rmath::radians(-5 * M_PI / 6), rmath::radians(5 * M_PI / 6)) {}
 

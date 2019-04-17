@@ -47,8 +47,8 @@
 
 #include "rcppsw/ds/type_map.hpp"
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,7 +67,8 @@ using ds::arena_grid;
  * convergence calculations.
  */
 struct controller_task_extractor_mapper : public boost::static_visitor<int> {
-  controller_task_extractor_mapper(const controller::base_controller* const c)
+  explicit controller_task_extractor_mapper(
+      const controller::base_controller* const c)
       : mc_controller(c) {}
 
   template <typename T>
@@ -163,7 +164,8 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   controller->block_manip_collator()->reset();
 
   /* send the robot its view of the world: what it sees and where it is */
-  loop_utils::set_robot_pos<decltype(*controller)>(robot);
+  loop_utils::set_robot_pos<decltype(*controller)>(
+      robot, arena_map()->grid_resolution());
   ER_ASSERT(std::fmod(controller->los_dim(), arena_map()->grid_resolution()) <=
                 std::numeric_limits<double>::epsilon(),
             "LOS dimension (%f) not an even multiple of grid resolution (%f)",
@@ -177,9 +179,8 @@ void depth2_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(*controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord =
-      rmath::dvec2uvec(controller->position(), arena_map()->grid_resolution());
-  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
+  arena_map()->access<arena_grid::kRobotOccupancy>(
+      controller->discrete_position()) = true;
 
   /*
    * The MAGIC of boost so that we can avoid a series of if()/else if() for each
@@ -319,9 +320,7 @@ void depth2_loop_functions::Reset(void) {
 
 std::vector<int> depth2_loop_functions::calc_robot_tasks(uint) const {
   std::vector<int> v;
-  auto& robots =
-      const_cast<depth2_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   /*
    * We map the controller type into a templated task extractor in order to be

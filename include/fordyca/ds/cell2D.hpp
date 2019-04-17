@@ -121,7 +121,7 @@ class cell2D : public decorator::decorator<fsm::cell2D_fsm> {
   /* clang-format off */
   std::string                             m_robot_id{};
   std::shared_ptr<repr::base_cell_entity> m_entity{nullptr};
-  rmath::vector2u                         m_loc;
+  rmath::vector2u                         m_loc{};
   /* clang-format on */
 };
 

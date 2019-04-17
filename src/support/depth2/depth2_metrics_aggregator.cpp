@@ -29,8 +29,8 @@
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bi_tab.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tab.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
@@ -94,8 +94,8 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth2_metrics_aggregator::task_alloc_cb(const ta::polled_task* const task,
-                                              const ta::bi_tab* const tab) {
+void depth2_metrics_aggregator::task_alloc_cb(const rta::polled_task* const task,
+                                              const rta::bi_tab* const tab) {
   if (task0::kGeneralistName == tab->root()->name()) {
     collect("tasks::tab::generalist", *tab);
   } else if (task1::kHarvesterName == tab->root()->name()) {
@@ -108,7 +108,7 @@ void depth2_metrics_aggregator::task_alloc_cb(const ta::polled_task* const task,
 } /* task_alloc_cb() */
 
 void depth2_metrics_aggregator::task_finish_or_abort_cb(
-    const ta::polled_task* const task) {
+    const rta::polled_task* const task) {
   collect("tasks::execution::" + task->name(),
           dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */

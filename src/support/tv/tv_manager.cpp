@@ -200,9 +200,7 @@ void tv_manager::cache_site_init(const params::tv::tv_manager_params* params,
 
 double tv_manager::swarm_motion_throttle(void) const {
   double accum = 0.0;
-  auto& robots = const_cast<support::base_loop_functions*>(mc_lf)
-                     ->GetSpace()
-                     .GetEntitiesByType("foot-bot");
+  auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
@@ -214,9 +212,7 @@ double tv_manager::swarm_motion_throttle(void) const {
 } /* swarm_motion_throttle() */
 
 double tv_manager::env_block_manipulation(void) const {
-  uint timestep = const_cast<support::base_loop_functions*>(mc_lf)
-                      ->GetSpace()
-                      .GetSimulationClock();
+  uint timestep = mc_lf->GetSpace().GetSimulationClock();
 
   return penalty_handler<controller::depth0::crw_controller>(
              block_op_src::kSrcNestDrop)
@@ -224,9 +220,7 @@ double tv_manager::env_block_manipulation(void) const {
 } /* env_block_manipulation() */
 
 double tv_manager::env_cache_usage(void) const {
-  uint timestep = const_cast<support::base_loop_functions*>(mc_lf)
-                      ->GetSpace()
-                      .GetSimulationClock();
+  uint timestep = mc_lf->GetSpace().GetSimulationClock();
   return penalty_handler<controller::depth1::gp_dpo_controller>(
              cache_op_src::kSrcExistingCachePickup)
       ->timestep_penalty(timestep);
@@ -239,12 +233,8 @@ void tv_manager::register_controller(int robot_id) {
 } /* register_controller() */
 
 void tv_manager::update(void) {
-  auto& robots = const_cast<support::base_loop_functions*>(mc_lf)
-                     ->GetSpace()
-                     .GetEntitiesByType("foot-bot");
-  uint timestep = const_cast<support::base_loop_functions*>(mc_lf)
-                      ->GetSpace()
-                      .GetSimulationClock();
+  auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");
+  uint timestep = mc_lf->GetSpace().GetSimulationClock();
 
   for (auto& entity_pair : robots) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);

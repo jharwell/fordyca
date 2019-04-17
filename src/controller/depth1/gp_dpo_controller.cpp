@@ -35,8 +35,8 @@
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/repr/base_block.hpp"
 
-#include "rcppsw/task_allocation/bi_tdgraph.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -117,26 +117,26 @@ void gp_dpo_controller::private_init(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* private_init() */
 
-void gp_dpo_controller::task_abort_cb(const ta::polled_task*) {
+void gp_dpo_controller::task_abort_cb(const rta::polled_task*) {
   m_task_aborted = true;
 } /* task_abort_cb() */
 
-__rcsw_pure const ta::bi_tab* gp_dpo_controller::active_tab(void) const {
+__rcsw_pure const rta::bi_tab* gp_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
 __rcsw_pure tasks::base_foraging_task* gp_dpo_controller::current_task(void) {
-  return dynamic_cast<tasks::base_foraging_task*>(
-      m_executive.get()->current_task());
+  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
 __rcsw_pure const tasks::base_foraging_task* gp_dpo_controller::current_task(
     void) const {
-  return const_cast<gp_dpo_controller*>(this)->current_task();
+  return dynamic_cast<const tasks::base_foraging_task*>(
+      m_executive->current_task());
 } /* current_task() */
 
 void gp_dpo_controller::executive(
-    std::unique_ptr<ta::bi_tdgraph_executive> executive) {
+    std::unique_ptr<rta::bi_tdgraph_executive> executive) {
   m_executive = std::move(executive);
 }
 
@@ -163,11 +163,11 @@ TASK_WRAPPER_DEFINEC_PTR(bool, gp_dpo_controller, goal_acquired, current_task())
  ******************************************************************************/
 int gp_dpo_controller::current_task_depth(void) const {
   return executive()->graph()->vertex_depth(
-      dynamic_cast<const ta::polled_task*>(current_task()));
+      dynamic_cast<const rta::polled_task*>(current_task()));
 } /* current_task_depth() */
 
 int gp_dpo_controller::current_task_id(void) const {
-  auto task = dynamic_cast<const ta::polled_task*>(current_task());
+  auto task = dynamic_cast<const rta::polled_task*>(current_task());
   if (nullptr != task) {
     return executive()->graph()->vertex_id(task);
   }
@@ -180,7 +180,7 @@ int gp_dpo_controller::task_id(const std::string& task_name) const {
 } /* task_id() */
 
 __rcsw_pure int gp_dpo_controller::current_task_tab(void) const {
-  return dynamic_cast<const ta::bi_tdgraph*>(executive()->graph())
+  return dynamic_cast<const rta::bi_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */
 

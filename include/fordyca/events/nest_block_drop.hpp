@@ -33,7 +33,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 
 namespace fsm {
 namespace depth0 {
@@ -80,7 +80,7 @@ NS_START(events, detail);
 struct nest_block_drop_visit_set {
   using inherited = block_drop_base_visit_set::value;
 
-  using defined = visitor::precise_visit_set<
+  using defined = rvisitor::precise_visit_set<
       /* depth0 */
       controller::depth0::crw_controller,
       controller::depth0::dpo_controller,
@@ -109,7 +109,7 @@ struct nest_block_drop_visit_set {
  */
 class nest_block_drop : public rcppsw::er::client<nest_block_drop> {
  public:
-  nest_block_drop(std::shared_ptr<repr::base_block> block, uint timestep);
+  nest_block_drop(const std::shared_ptr<repr::base_block>& block, uint timestep);
   ~nest_block_drop(void) override = default;
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -158,7 +158,7 @@ class nest_block_drop : public rcppsw::er::client<nest_block_drop> {
  * compiler).
  */
 using nest_block_drop_visitor_impl =
-    visitor::precise_visitor<detail::nest_block_drop,
+    rvisitor::precise_visitor<detail::nest_block_drop,
                              detail::nest_block_drop_visit_set::value>;
 
 NS_END(detail);

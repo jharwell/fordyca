@@ -36,7 +36,7 @@
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -108,8 +108,8 @@ void grp_dpo_controller::private_init(
       &grp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* private_init() */
 
-void grp_dpo_controller::task_alloc_cb(const ta::polled_task* const task,
-                                       const ta::bi_tab* const) {
+void grp_dpo_controller::task_alloc_cb(const rta::polled_task* const task,
+                                       const rta::bi_tab* const) {
   if (!m_bsel_exception_added) {
     block_sel_matrix()->sel_exceptions_clear();
   }

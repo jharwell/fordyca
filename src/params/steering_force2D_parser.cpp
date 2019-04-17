@@ -39,7 +39,7 @@ void steering_force2D_parser::parse(const ticpp::Element& node) {
   *std::static_pointer_cast<steering::force_calculator_params>(m_params) =
       *force_calculator_xml_parser::parse_results();
 
-  ticpp::Element snode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element snode = node_get(node, kXMLRoot);
   m_phototaxis.parse(snode);
   m_params->phototaxis = *m_phototaxis.parse_results();
 } /* parse() */

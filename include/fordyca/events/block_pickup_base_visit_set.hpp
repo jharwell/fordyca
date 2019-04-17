@@ -32,7 +32,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
+namespace rvisitor = rcppsw::patterns::visitor;
 namespace repr {
 class base_block;
 } // namespace repr
@@ -56,7 +56,7 @@ NS_START(events, detail);
  * dropping a block will need to visit (think data structures).
  */
 struct block_pickup_base_visit_set {
-  using value = visitor::precise_visit_set<ds::arena_map,
+  using value = rvisitor::precise_visit_set<ds::arena_map,
                                            ds::dpo_semantic_map,
                                            ds::dpo_store,
                                            repr::base_block>;

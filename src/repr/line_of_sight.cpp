@@ -35,9 +35,9 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 ds::block_list line_of_sight::blocks(void) const {
   ds::block_list blocks{};
-  for (uint i = 0; i < m_view.shape()[0]; ++i) {
-    for (uint j = 0; j < m_view.shape()[1]; ++j) {
-      const ds::cell2D& cell = m_view[i][j];
+  for (uint i = 0; i < mc_view.shape()[0]; ++i) {
+    for (uint j = 0; j < mc_view.shape()[1]; ++j) {
+      const ds::cell2D& cell = mc_view[i][j];
       if (cell.state_has_block()) {
         ER_ASSERT(nullptr != cell.block(),
                   "Cell at(%u,%u) in HAS_BLOCK state, but does not have block",
@@ -53,9 +53,9 @@ ds::block_list line_of_sight::blocks(void) const {
 ds::cache_list line_of_sight::caches(void) const {
   ds::cache_list caches = m_caches;
 
-  for (uint i = 0; i < m_view.shape()[0]; ++i) {
-    for (uint j = 0; j < m_view.shape()[1]; ++j) {
-      const ds::cell2D& cell = m_view[i][j];
+  for (uint i = 0; i < mc_view.shape()[0]; ++i) {
+    for (uint j = 0; j < mc_view.shape()[1]; ++j) {
+      const ds::cell2D& cell = mc_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = cell.cache();
         ER_ASSERT(
@@ -84,10 +84,6 @@ ds::cache_list line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-__rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
-  return const_cast<line_of_sight*>(this)->cell(i, j);
-}
-
 bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   for (size_t i = 0; i < xsize(); ++i) {
     for (size_t j = 0; j < ysize(); ++j) {
@@ -99,16 +95,16 @@ bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   return false;
 } /* contains_loc() */
 
-__rcsw_pure ds::cell2D& line_of_sight::cell(uint i, uint j) {
-  ER_ASSERT(i < m_view.shape()[0],
+__rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
+  ER_ASSERT(i < mc_view.shape()[0],
             "Out of bounds X access: %u >= %lu",
             i,
-            m_view.shape()[0]);
-  ER_ASSERT(j < m_view.shape()[1],
+            mc_view.shape()[0]);
+  ER_ASSERT(j < mc_view.shape()[1],
             "Out of bounds Y access: %u >= %lu",
             j,
-            m_view.shape()[1]);
-  return m_view[i][j];
+            mc_view.shape()[1]);
+  return mc_view[i][j];
 }
 
 rmath::vector2u line_of_sight::abs_ll(void) const {

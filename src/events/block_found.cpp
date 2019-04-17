@@ -59,7 +59,7 @@ void block_found::visit(ds::dpo_store& store) {
    * If the cell in the arena that we thought contained a cache now contains a
    * block, remove the out-of-date cache.
    */
-  for (auto&& c : store.caches().values_range()) {
+  for (auto& c : store.caches().values_range()) {
     if (m_block->discrete_loc() == c.ent()->discrete_loc()) {
       store.cache_remove(c.ent_obj());
 
@@ -68,7 +68,7 @@ void block_found::visit(ds::dpo_store& store) {
        * given cell has changed. This is regardless of the status repeat
        * deposits, which only affect repeated sightings of KNOWN objects.
        */
-      const_cast<ds::dp_cache_map::value_type&>(c).density().reset();
+      c.density().reset();
     }
   } /* for(&&c..) */
 
@@ -159,6 +159,22 @@ void block_found::visit(ds::dpo_semantic_map& map) {
     density.reset();
   }
 
+  pheromone_update(map);
+
+  ER_ASSERT(cell.state_has_block(),
+            "Cell@%s not in HAS_BLOCK",
+            cell.loc().to_str().c_str());
+  ER_ASSERT(cell.block()->id() == m_block->id(),
+            "Block for cell@%s ID mismatch: %d/%d",
+            cell.loc().to_str().c_str(),
+            m_block->id(),
+            cell.block()->id());
+} /* visit() */
+
+void block_found::pheromone_update(ds::dpo_semantic_map& map) {
+  rswarm::pheromone_density& density =
+      map.access<occupancy_grid::kPheromone>(x(), y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   if (map.pheromone_repeat_deposit()) {
     density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
   } else {
@@ -201,15 +217,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
      */
     visit(cell);
   }
-  ER_ASSERT(cell.state_has_block(),
-            "Cell@%s not in HAS_BLOCK",
-            cell.loc().to_str().c_str());
-  ER_ASSERT(cell.block()->id() == m_block->id(),
-            "Block for cell@%s ID mismatch: %d/%d",
-            cell.loc().to_str().c_str(),
-            m_block->id(),
-            cell.block()->id());
-} /* visit() */
+} /* pheromone_update() */
 
 /*******************************************************************************
  * Depth2 Foraging

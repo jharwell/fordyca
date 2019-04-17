@@ -38,7 +38,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 namespace er = rcppsw::er;
 
 /*******************************************************************************

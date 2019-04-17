@@ -70,7 +70,7 @@ class base_block : public multicell_entity,
    * from 0.
    */
   base_block(const rmath::vector2d& dim, const ut::color& color)
-      : multicell_entity(dim, color, -1), movable_cell_entity() {}
+      : multicell_entity(dim, color, -1) {}
 
   /**
    * @param dim 2 element vector of the dimensions of the block.
@@ -78,7 +78,7 @@ class base_block : public multicell_entity,
    * @param id The id of the block.
    */
   base_block(const rmath::vector2d& dim, const ut::color& color, int id)
-      : multicell_entity(dim, color, id), movable_cell_entity() {}
+      : multicell_entity(dim, color, id) {}
 
   ~base_block(void) override = default;
 

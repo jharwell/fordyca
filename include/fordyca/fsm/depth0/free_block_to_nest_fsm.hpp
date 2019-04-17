@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
@@ -37,7 +37,7 @@
 NS_START(fordyca);
 
 namespace ds { class dpo_semantic_map; }
-namespace task_allocation = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 NS_START(fsm, depth0);
 
@@ -57,7 +57,7 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
                                er::client<free_block_to_nest_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,
-                               public task_allocation::taskable {
+                               public rta::taskable {
  public:
   free_block_to_nest_fsm(const controller::block_sel_matrix* sel_matrix,
                          controller::saa_subsystem* saa,
@@ -66,13 +66,13 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   /* taskable overrides */
   void task_execute(void) override;
   void task_reset(void) override { init(); }
-  void task_start(const task_allocation::taskable_argument*) override {}
+  void task_start(const rta::taskable_argument*) override {}
 
   bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
+    return kST_FINISHED == current_state();
   }
   bool task_running(void) const override {
-    return !(ST_FINISHED == current_state() || ST_START == current_state());
+    return !(kST_FINISHED == current_state() || kST_START == current_state());
   }
 
   /* collision metrics */
@@ -84,6 +84,7 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   /* goal acquisition metrics */
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   bool goal_acquired(void) const override;
   acquisition_goal_type acquisition_goal(void) const override;
 
@@ -94,18 +95,18 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    ST_START,
-    ST_ACQUIRE_BLOCK,     /* superstate for finding a block */
+    kST_START,
+    kST_ACQUIRE_BLOCK,     /* superstate for finding a block */
     /**
      * @brief State robots wait in after acquiring a block for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
-    ST_WAIT_FOR_PICKUP,
-    ST_WAIT_FOR_DROP,
-    ST_TRANSPORT_TO_NEST, /* take block to nest */
-    ST_FINISHED,
-    ST_MAX_STATES
+    kST_WAIT_FOR_PICKUP,
+    kST_WAIT_FOR_DROP,
+    kST_TRANSPORT_TO_NEST, /* take block to nest */
+    kST_FINISHED,
+    kST_MAX_STATES
   };
 
  private:
@@ -144,7 +145,7 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   acquire_free_block_fsm m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
 };
 
 NS_END(depth0, fsm, fordyca);

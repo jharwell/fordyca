@@ -1,7 +1,7 @@
 /**
- * @file task_visualizer.cpp
+ * @file acquisition_loc_metrics_collector.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,29 +21,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/task_visualizer.hpp"
-
-#include <argos3/core/utility/datatypes/color.h>
-#include <argos3/core/utility/math/quaternion.h>
-#include <argos3/core/utility/math/vector3.h>
-#include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-
-#include "rcppsw/ta/logical_task.hpp"
+#include "fordyca/metrics/fsm/acquisition_loc_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void task_visualizer::draw(const rta::logical_task* const current_task) {
-  if (nullptr != current_task) {
-    m_qt->DrawText(argos::CVector3(0.0, 0.0, m_text_vis_offset),
-                   current_task->name(),
-                   argos::CColor::BLUE);
-  }
-}
+uint acquisition_loc_metrics_collector::collect_cell(
+    const rcppsw::metrics::base_metrics& metrics,
+    const rmath::vector2u& coord) const {
+  auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
 
-NS_END(support, fordyca);
+  return static_cast<uint>(m.acquisition_loc() == coord);
+} /* collect_cell() */
+
+NS_END(fsm, metrics, fordyca);

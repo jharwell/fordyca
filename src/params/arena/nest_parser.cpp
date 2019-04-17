@@ -38,7 +38,7 @@ constexpr char nest_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void nest_parser::parse(const ticpp::Element& node) {
-  ticpp::Element nnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element nnode = node_get(node, kXMLRoot);
 
   std::vector<std::string> res;
   rcppsw::utils::line_parser parser(' ');

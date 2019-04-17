@@ -25,11 +25,14 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
+
+namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -83,6 +86,12 @@ class goal_acquisition_metrics : public virtual rcppsw::metrics::base_metrics {
    * the next part of its current FSM as part of its current task.
    */
   virtual bool goal_acquired(void) const = 0;
+
+  /**
+   * @brief When \ref goal_acquired() returns \c TRUE, then this should return
+   * the location of the goal that was acquired.
+   */
+  virtual rmath::vector2u acquisition_loc(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

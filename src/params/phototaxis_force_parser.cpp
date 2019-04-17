@@ -39,7 +39,7 @@ constexpr char phototaxis_force_parser::kXMLRoot[];
  ******************************************************************************/
 void phototaxis_force_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element pnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+    ticpp::Element pnode = node_get(node, kXMLRoot);
     m_params =
         std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
     XML_PARSE_ATTR(pnode, m_params, max);

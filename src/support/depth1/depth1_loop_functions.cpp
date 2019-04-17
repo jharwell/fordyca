@@ -51,8 +51,8 @@
 
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -138,7 +138,8 @@ struct controller_configurer {
  * convergence calculations.
  */
 struct controller_task_extractor_mapper : public boost::static_visitor<int> {
-  controller_task_extractor_mapper(const controller::base_controller* const c)
+  explicit controller_task_extractor_mapper(
+      const controller::base_controller* const c)
       : mc_controller(c) {}
 
   template <typename T>
@@ -158,7 +159,7 @@ struct controller_task_extractor_mapper : public boost::static_visitor<int> {
  * during initialization.
  */
 struct controller_configurer_mapper : public boost::static_visitor<void> {
-  controller_configurer_mapper(controller::base_controller* const c)
+  explicit controller_configurer_mapper(controller::base_controller* const c)
       : mc_controller(c) {}
 
   using gp_dpo_configurer =
@@ -278,7 +279,7 @@ void depth1_loop_functions::oracle_init(void) {
         dynamic_cast<controller::depth1::gp_mdpo_controller&>(
             robot0.GetControllableEntity().GetController());
     auto* bigraph =
-        dynamic_cast<const ta::bi_tdgraph*>(controller0.executive()->graph());
+        dynamic_cast<const rta::bi_tdgraph*>(controller0.executive()->graph());
     m_tasking_oracle = std::make_unique<support::tasking_oracle>(bigraph);
   }
 } /* oracle_init() */
@@ -292,7 +293,8 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   controller->block_manip_collator()->reset();
 
   /* send the robot its view of the world: what it sees and where it is */
-  loop_utils::set_robot_pos<decltype(*controller)>(robot);
+  loop_utils::set_robot_pos<decltype(*controller)>(
+      robot, arena_map()->grid_resolution());
   ER_ASSERT(std::fmod(controller->los_dim(), arena_map()->grid_resolution()) <=
                 std::numeric_limits<double>::epsilon(),
             "LOS dimension (%f) not an even multiple of grid resolution (%f)",
@@ -305,9 +307,8 @@ void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
   set_robot_tick<decltype(*controller)>(robot);
 
   /* update arena map metrics with robot position */
-  auto coord =
-      rmath::dvec2uvec(controller->position(), arena_map()->grid_resolution());
-  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
+  arena_map()->access<arena_grid::kRobotOccupancy>(
+      controller->discrete_position()) = true;
 
   /*
    * The MAGIC of boost so that we can avoid a series of if()/else if() for each
@@ -446,9 +447,7 @@ void depth1_loop_functions::Reset() {
 
 std::vector<int> depth1_loop_functions::calc_robot_tasks(uint) const {
   std::vector<int> v;
-  auto& robots =
-      const_cast<depth1_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   /*
    * We map the controller type into a templated task extractor in order to be
@@ -482,11 +481,7 @@ std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
    * controllers in depth1 are derived from the DPO controller.
    */
   argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
-      (*const_cast<depth1_loop_functions*>(this)
-            ->GetSpace()
-            .GetEntitiesByType("foot-bot")
-            .begin())
-          .second);
+      (*GetSpace().GetEntitiesByType("foot-bot").begin()).second);
   auto gp_dpo = dynamic_cast<controller::depth1::gp_dpo_controller*>(
       &robot.GetControllableEntity().GetController());
   ER_ASSERT(nullptr != gp_dpo, "Controller not derived from GP_DPO");

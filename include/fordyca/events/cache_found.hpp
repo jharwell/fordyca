@@ -54,7 +54,7 @@ NS_START(events, detail);
 struct cache_found_visit_set {
   using inherited = cell_op_visit_set::value;
   using defined =
-      visitor::precise_visit_set<controller::depth2::grp_dpo_controller,
+      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
                                  controller::depth2::grp_mdpo_controller,
                                  ds::dpo_store,
                                  ds::dpo_semantic_map>;
@@ -88,7 +88,7 @@ class cache_found : public cell_op, public rcppsw::er::client<cache_found> {
 
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& controller);
-  void visit(controller::depth2::grp_mdpo_controller& controller);
+  void visit(controller::depth2::grp_mdpo_controller& c);
 
  private:
   std::shared_ptr<repr::base_cache> m_cache;
@@ -101,7 +101,7 @@ class cache_found : public cell_op, public rcppsw::er::client<cache_found> {
  * compiler).
  */
 using cache_found_visitor_impl =
-    visitor::precise_visitor<detail::cache_found,
+    rvisitor::precise_visitor<detail::cache_found,
                              detail::cache_found_visit_set::value>;
 
 NS_END(detail);

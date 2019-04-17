@@ -51,7 +51,7 @@ struct caches_params : public rcppsw::params::base_params {
    * static and dynamic) ?
    */
   double               dimension{0.0};
-  static_cache_params  static_{};
+  static_cache_params  static_{}; // NOLINT
   dynamic_cache_params dynamic{};
   ct::waveform_params  usage_penalty{};
 };

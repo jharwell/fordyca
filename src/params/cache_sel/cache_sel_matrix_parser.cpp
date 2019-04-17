@@ -37,7 +37,7 @@ constexpr char cache_sel_matrix_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
-  ticpp::Element cnode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element cnode = node_get(node, kXMLRoot);
 
   m_initial_pickup.parse(cnode);
   m_params =

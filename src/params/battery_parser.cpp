@@ -37,7 +37,7 @@ constexpr char battery_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void battery_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bynode = node_get(const_cast<ticpp::Element&>(node), kXMLRoot);
+  ticpp::Element bynode = node_get(node, kXMLRoot);
 
   m_params =
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
@@ -51,9 +51,8 @@ __rcsw_pure bool battery_parser::validate(void) const {
     return false;
   } else if (m_params->power_station_amount < 0) {
     return false;
-  } else {
-    return true;
   }
+  return true;
 } /* validate() */
 
 NS_END(params, fordyca);

@@ -51,7 +51,7 @@ class static_cache_creator : public base_cache_creator,
 
   ds::cache_vector create_all(const ds::cache_vector& existing_caches,
                               ds::block_vector& blocks,
-                              uint timstep) override;
+                              uint timestep) override;
 
  private:
   /* clang-format off */

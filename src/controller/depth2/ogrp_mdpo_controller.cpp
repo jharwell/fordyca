@@ -27,8 +27,8 @@
 #include "fordyca/params/depth2/controller_repository.hpp"
 #include "fordyca/params/oracle_params.hpp"
 #include "fordyca/support/tasking_oracle.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces

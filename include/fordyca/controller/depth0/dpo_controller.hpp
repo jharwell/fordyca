@@ -41,7 +41,6 @@ NS_START(controller);
 class base_perception_subsystem;
 class dpo_perception_subsystem;
 class block_sel_matrix;
-namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
 
@@ -67,7 +66,7 @@ class dpo_controller : public crw_controller,
   void Reset(void) override;
 
   std::type_index type_index(void) const override {
-    return std::type_index(typeid(*this));
+    return {typeid(*this)};
   }
 
   /* goal acquisition metrics */
@@ -75,6 +74,7 @@ class dpo_controller : public crw_controller,
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
 
   /* block transportation */
   FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
@@ -108,12 +108,10 @@ class dpo_controller : public crw_controller,
   base_perception_subsystem* perception(void) override { return m_perception.get(); }
 
   dpo_perception_subsystem* dpo_perception(void);
-  const dpo_perception_subsystem* dpo_perception(void) const {
-    return const_cast<dpo_controller*>(this)->dpo_perception();
-  }
+  const dpo_perception_subsystem* dpo_perception(void) const;
 
-  const fsm::depth0::dpo_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::dpo_fsm* fsm(void) { return m_fsm.get(); }
+  const fsm::depth0::dpo_fsm* fsm(void) const { return m_fsm.get(); }
 
   const class block_sel_matrix* block_sel_matrix(void) const {
     return m_block_sel_matrix.get();
@@ -169,7 +167,6 @@ class dpo_controller : public crw_controller,
 
   /* clang-format off */
   bool                                       m_display_los{false};
-  rmath::vector2d                            m_light_loc;
   std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
   std::unique_ptr<fsm::depth0::dpo_fsm>      m_fsm;

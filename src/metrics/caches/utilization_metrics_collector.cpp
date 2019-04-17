@@ -43,7 +43,7 @@ utilization_metrics_collector::utilization_metrics_collector(
 std::list<std::string> utilization_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-    /* clang-format off */
+      /* clang-format off */
     "int_avg_blocks",
     "cum_avg_blocks",
     "int_avg_pickups",
@@ -52,7 +52,7 @@ std::list<std::string> utilization_metrics_collector::csv_header_cols(void) cons
     "cum_avg_drops" ,
     "int_avg_caches",
     "cum_avg_caches"
-    /* clang-format on */
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;

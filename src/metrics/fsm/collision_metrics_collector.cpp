@@ -42,7 +42,7 @@ collision_metrics_collector::collision_metrics_collector(const std::string& ofna
 std::list<std::string> collision_metrics_collector::csv_header_cols(void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-  /* clang-format off */
+      /* clang-format off */
     "int_avg_in_avoidance",
     "cum_avg_in_avoidance",
     "int_avg_entered_avoidance",
@@ -51,7 +51,7 @@ std::list<std::string> collision_metrics_collector::csv_header_cols(void) const 
     "cum_avg_exited_avoidance",
     "int_avg_avoidance_duration",
     "cum_avg_avoidance_duration"
-    /* clang-format on */
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;

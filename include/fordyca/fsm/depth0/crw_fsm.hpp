@@ -55,9 +55,9 @@ using transport_goal_type = block_transporter::goal_type;
  * block back to the nest, and drops it.
  */
 class crw_fsm : public base_foraging_fsm,
-                               public er::client<crw_fsm>,
-                               public metrics::fsm::goal_acquisition_metrics,
-                               public block_transporter {
+                public er::client<crw_fsm>,
+                public metrics::fsm::goal_acquisition_metrics,
+                public block_transporter {
  public:
   explicit crw_fsm(controller::saa_subsystem* saa);
 
@@ -75,6 +75,7 @@ class crw_fsm : public base_foraging_fsm,
   bool is_exploring_for_goal(void) const override;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override;
+  rmath::vector2u acquisition_loc(void) const override;
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;
@@ -93,13 +94,13 @@ class crw_fsm : public base_foraging_fsm,
   bool block_detected(void) const;
 
   enum fsm_states {
-    ST_START, /* Initial state */
-    ST_ACQUIRE_BLOCK,
-    ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
-    ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
-    ST_WAIT_FOR_BLOCK_PICKUP,
-    ST_WAIT_FOR_BLOCK_DROP,
-    ST_MAX_STATES
+    kST_START, /* Initial state */
+    kST_ACQUIRE_BLOCK,
+    kST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
+    kST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    kST_WAIT_FOR_BLOCK_PICKUP,
+    kST_WAIT_FOR_BLOCK_DROP,
+    kST_MAX_STATES
   };
 
   /* inherited states */
@@ -134,7 +135,7 @@ class crw_fsm : public base_foraging_fsm,
   explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
 };
 
 NS_END(depth0, controller, fordyca);

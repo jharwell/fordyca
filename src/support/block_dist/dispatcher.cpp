@@ -38,11 +38,11 @@ using ds::arena_grid;
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char dispatcher::kDIST_RANDOM[];
-constexpr char dispatcher::kDIST_SINGLE_SRC[];
-constexpr char dispatcher::kDIST_DUAL_SRC[];
-constexpr char dispatcher::kDIST_QUAD_SRC[];
-constexpr char dispatcher::kDIST_POWERLAW[];
+constexpr char dispatcher::kDistRandom[];
+constexpr char dispatcher::kDistSingleSrc[];
+constexpr char dispatcher::kDistDualSrc[];
+constexpr char dispatcher::kDistQuadSrc[];
+constexpr char dispatcher::kDistPowerlaw[];
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -69,10 +69,10 @@ bool dispatcher::initialize(void) {
       kINDEX_MIN + padding,
       m_grid->xdsize() - kINDEX_MIN - padding,
       m_grid->ydsize() - kINDEX_MIN - padding);
-  if (kDIST_RANDOM == m_dist_type) {
+  if (kDistRandom == m_dist_type) {
     m_dist = rcppsw::make_unique<random_distributor>(arena,
                                                      mc_params.arena_resolution);
-  } else if (kDIST_SINGLE_SRC == m_dist_type) {
+  } else if (kDistSingleSrc == m_dist_type) {
     ds::arena_grid::view area = m_grid->layer<arena_grid::kCell>()->subgrid(
         m_grid->xdsize() * 0.80,
         kINDEX_MIN,
@@ -82,7 +82,7 @@ bool dispatcher::initialize(void) {
         area,
         mc_params.arena_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDIST_DUAL_SRC == m_dist_type) {
+  } else if (kDistDualSrc == m_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         m_grid->xdsize() * 0.10,
         kINDEX_MIN + padding,
@@ -98,7 +98,7 @@ bool dispatcher::initialize(void) {
         grids,
         mc_params.arena_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDIST_QUAD_SRC == m_dist_type) {
+  } else if (kDistQuadSrc == m_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         m_grid->xdsize() * 0.10,
         kINDEX_MIN,
@@ -124,7 +124,7 @@ bool dispatcher::initialize(void) {
         grids,
         mc_params.arena_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDIST_POWERLAW == m_dist_type) {
+  } else if (kDistPowerlaw == m_dist_type) {
     auto p = rcppsw::make_unique<powerlaw_distributor>(&mc_params);
     if (!p->map_clusters(m_grid)) {
       return false;
