@@ -38,7 +38,6 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/visualization_params.hpp"

@@ -80,7 +80,7 @@ bool lifecycle_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void lifecycle_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = static_cast<const lifecycle_metrics&>(metrics);
   auto ages = m.cache_depletion_ages();
   uint sum = std::accumulate(ages.begin(), ages.end(), 0U);

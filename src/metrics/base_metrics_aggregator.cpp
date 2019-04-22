@@ -31,7 +31,8 @@
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_counts_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
 #include "fordyca/metrics/robot_occupancy_metrics.hpp"
@@ -76,10 +77,17 @@ base_metrics_aggregator::base_metrics_aggregator(
       metrics_path() + "/" + mparams->fsm_collision_fname,
       mparams->collect_interval);
 
-  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-      "blocks::acquisition",
-      metrics_path() + "/" + mparams->block_acquisition_fname,
+  register_collector<metrics::fsm::goal_acq_counts_metrics_collector>(
+      "blocks::acq_counts",
+      metrics_path() + "/" + mparams->block_acquisition_counts_fname,
       mparams->collect_interval);
+
+  register_collector<metrics::fsm::goal_acq_locs_metrics_collector>(
+      "blocks::acq_locs",
+      metrics_path() + "/" + mparams->block_acquisition_locs_fname,
+      mparams->collect_interval,
+      rmath::dvec2uvec(mparams->arena_grid.upper,
+                       mparams->arena_grid.resolution));
 
   register_collector<metrics::blocks::transport_metrics_collector>(
       "blocks::transport",
@@ -92,8 +100,8 @@ base_metrics_aggregator::base_metrics_aggregator(
       mparams->collect_interval);
 
   register_collector<metrics::robot_occupancy_metrics_collector>(
-      "arena::robot_occupancy",
-      metrics_path() + "/" + mparams->arena_robot_occupancy_fname,
+      "arena::robot_locs",
+      metrics_path() + "/" + mparams->arena_robot_locs_fname,
       mparams->collect_interval,
       rmath::dvec2uvec(mparams->arena_grid.upper,
                        mparams->arena_grid.resolution));
@@ -125,7 +133,7 @@ void base_metrics_aggregator::collect_from_block(
 
 void base_metrics_aggregator::collect_from_arena(
     const ds::arena_map* const arena) {
-  collect("arena::robot_occupancy", *arena);
+  collect("arena::robot_locs", *arena);
 } /* collect_from_arena() */
 
 NS_END(metrics, fordyca);

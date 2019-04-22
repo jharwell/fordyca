@@ -154,7 +154,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
           dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               dynamic_cast<const rta::polled_task*>(controller->current_task())
               ->mechanism());
-      auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
+      auto dist_m = dynamic_cast<const rmetrics::tasks::bi_tdgraph_metrics*>(
           controller);
 
 
@@ -165,29 +165,47 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
 
       collect("fsm::collision", *collision_m);
       collect_if(
-          "blocks::acquisition",
+          "blocks::acq_counts",
           *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               controller->current_task()),
-          [&](const rcppsw::metrics::base_metrics& metrics) {
+          [&](const rmetrics::base_metrics& metrics) {
             return acquisition_goal_type::kBlock ==
                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
                     metrics)
                 .acquisition_goal();
           });
       collect_if(
-          "caches::acquisition",
+          "blocks::acq_locs",
           *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               controller->current_task()),
-          [&](const rcppsw::metrics::base_metrics& metrics) {
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::kBlock == m.acquisition_goal() &&
+                m.goal_acquired();
+          });
+      collect_if(
+          "caches::acq_locs",
+          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+              controller->current_task()),
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::kExistingCache == m.acquisition_goal() &&
+                m.goal_acquired();
+          });
+      collect_if(
+          "caches::acq_counts",
+          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+              controller->current_task()),
+          [&](const rmetrics::base_metrics& metrics) {
             return acquisition_goal_type::kExistingCache ==
                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                    metrics)
-                .acquisition_goal();
+                metrics).acquisition_goal();
           });
       collect("tasks::distribution", *dist_m);
     }
   } /* collect_controller_common() */
-
 };
 
 NS_END(depth1, support, fordyca);

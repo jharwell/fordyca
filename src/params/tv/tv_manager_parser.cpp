@@ -51,7 +51,7 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
     ticpp::Element bnode = node_get(tvnode, "blocks");
 
     if (nullptr != bnode.FirstChild("manipulation_penalty", false)) {
-      m_block_manip.parse(node_get(tvnode, "manipulation_penalty"));
+      m_block_manip.parse(node_get(bnode, "manipulation_penalty"));
       m_params->block_manipulation_penalty = *m_block_manip.parse_results();
     }
     if (nullptr != bnode.FirstChild("carry_throttle", false)) {

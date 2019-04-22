@@ -56,7 +56,7 @@ class manipulation_metrics_collector : public rmetrics::base_metrics_collector {
   manipulation_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
  private:

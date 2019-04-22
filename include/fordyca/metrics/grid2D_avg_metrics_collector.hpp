@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <vector>
 #include <string>
 
 #include "rcppsw/ds/grid2D.hpp"
@@ -59,13 +60,17 @@ class grid2D_avg_metrics_collector : public rmetrics::base_metrics_collector {
                                const rmath::vector2u& dims);
 
   /**
-   * @brief Collect a count of SOMETHING from an (i,j) cell.
+   * @brief Return a list of coordinates in which the count for SOMETHING should
+   * be incremented.
    */
-  virtual uint collect_cell(const rcppsw::metrics::base_metrics& metrics,
-                            const rmath::vector2u& coord) const = 0;
+  virtual std::vector<rmath::vector2u> collect_cells(
+      const rmetrics::base_metrics& metrics) const = 0;
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
+
+  uint xsize(void) const { return m_stats.xsize(); }
+  uint ysize(void) const { return m_stats.ysize(); }
 
  private:
   std::list<std::string> csv_header_cols(void) const override;

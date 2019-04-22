@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <grp_dpo_controller id="ffc"
+    <gp_dpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -47,7 +47,7 @@
             update_interface_ests="true"
             tab_init_method="max_depth"
             />
-        <task_allocation>
+        <task_alloc>
           <task_abort>
             <src_sigmoid_sel
                 input_src="exec">
@@ -108,7 +108,7 @@
               </sigmoid_sel>
             </src_sigmoid_sel>
           </tab_sel>
-        </task_allocation>
+        </task_alloc>
         <block_sel_matrix
               nest="2.0, 3">
               <block_priorities
@@ -125,7 +125,7 @@
             site_yrange="2.5:3">
           <pickup_policy
               policy="time"
-              timestep="20000"/>
+              timestep="1000"/>
             </cache_sel_matrix>
         <sensing
             los_dim="0.4">
@@ -153,7 +153,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </grp_dpo_controller>
+    </gp_dpo_controller>
 
   </controllers>
 
@@ -161,7 +161,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth1_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -174,10 +174,12 @@
           output_dir="metrics"
           fsm_collision_fname="fsm-collision.csv"
           fsm_movement_fname="fsm-movement.csv"
-          block_acquisition_fname="block-acquisition.csv"
+          block_acquisition_counts_fname="block-acquisition-counts.csv"
+          block_acquisition_locs_fname="block-acquisition-locs.csv"
           block_transport_fname="block-transport.csv"
           block_manipulation_fname="block-manipulation.csv"
-          cache_acquisition_fname="cache-acquisition.csv"
+          cache_acquisition_counts_fname="cache-acquisition-counts.csv"
+          cache_acquisition_locs_fname="cache-acquisition-locs.csv"
           cache_utilization_fname="cache-utilization.csv"
           cache_lifecycle_fname="cache-lifecycle.csv"
           cache_locations_fname="cache-locations.csv"
@@ -192,8 +194,9 @@
           task_tab_collector_fname="task-tab-collector.csv"
           task_tab_harvester_fname="task-tab-harvester.csv"
           task_distribution_fname="task-distribution.csv"
-          perception_world_model_fname="perception-world-model.csv"
-          arena_robot_occupancy_fname="arena-robot-occupancy.csv"
+          perception_dpo_fname="perception-dpo.csv"
+          perception_mdpo_fname="perception-mdpo.csv"
+          arena_robot_locs_fname="arena-robot-locs.csv"
           swarm_convergence_fname="swarm-convergence.csv"
           loop_temporal_variance_fname="loop-temporal-variance.csv"
           collect_interval="1000">

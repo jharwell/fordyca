@@ -31,6 +31,8 @@
  ******************************************************************************/
 NS_START(fordyca, metrics, perception);
 
+namespace rmetrics = rcppsw::metrics;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -44,7 +46,7 @@ NS_START(fordyca, metrics, perception);
  *
  * Metrics are collected every timestep.
  */
-class mdpo_perception_metrics : public virtual rcppsw::metrics::base_metrics {
+class mdpo_perception_metrics : public virtual rmetrics::base_metrics {
  public:
   mdpo_perception_metrics(void) = default;
 

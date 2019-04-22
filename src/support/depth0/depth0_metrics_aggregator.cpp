@@ -101,7 +101,8 @@ void depth0_metrics_aggregator::collect_from_controller(
 
   collect("fsm::movement", *mov_m);
   collect("fsm::collision", *collision_m);
-  collect("blocks::acquisition", *block_acq_m);
+  collect("blocks::acq_locs", *block_acq_m);
+  collect("blocks::acq_counts", *block_acq_m);
   collect("blocks::manipulation", *manip_m);
 
   /*

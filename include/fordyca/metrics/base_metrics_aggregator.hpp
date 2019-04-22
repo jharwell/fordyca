@@ -33,6 +33,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
+namespace rmetrics = rcppsw::metrics;
 
 namespace params {
 struct metrics_params;
@@ -57,12 +58,12 @@ NS_START(metrics);
  * @ingroup metrics
  *
  * @brief Base class for aggregating collection of metrics for various
- * sources. Extends \ref rcppsw::metrics::collector_group to include
+ * sources. Extends \ref rmetrics::collector_group to include
  * initialization bits to make loop functions simpler/clearer.
  */
 class base_metrics_aggregator
     : public rcppsw::er::client<base_metrics_aggregator>,
-      public rcppsw::metrics::collector_group {
+      public rmetrics::collector_group {
  public:
   base_metrics_aggregator(const params::metrics_params* mparams,
                           const std::string& output_root);

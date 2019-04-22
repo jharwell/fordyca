@@ -57,7 +57,7 @@ class utilization_metrics_collector : public rmetrics::base_metrics_collector {
 
   void reset(void) override;
   void reset_after_interval(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
   /**

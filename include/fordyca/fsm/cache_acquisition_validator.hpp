@@ -66,7 +66,19 @@ class cache_acquisition_validator
   cache_acquisition_validator& operator=(const cache_acquisition_validator& v) =
       delete;
 
-  bool operator()(const rmath::vector2d& loc, int id, uint timestep) const;
+  /**
+   * @brief Validate the acquisition
+   *
+   * @param loc The location of the cache.
+   * @param The ID of the cache.
+   * @param timestep The current timestep.
+   * @param is_pickup Are we going to pick up from the cache if/when we acquire
+   * it?
+   */
+  bool operator()(const rmath::vector2d& loc,
+                  int id,
+                  uint timestep,
+                  bool is_pickup) const;
 
   /* clang-format off */
   const controller::cache_sel_matrix* const mc_csel_matrix;

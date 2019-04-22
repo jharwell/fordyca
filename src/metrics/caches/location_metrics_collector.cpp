@@ -32,12 +32,10 @@ NS_START(fordyca, metrics, caches);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-uint location_metrics_collector::collect_cell(
-    const rcppsw::metrics::base_metrics& metrics,
-    const rmath::vector2u& coord) const {
+std::vector<rmath::vector2u> location_metrics_collector::collect_cells(
+    const rmetrics::base_metrics& metrics) const {
   auto& m = dynamic_cast<const location_metrics&>(metrics);
-
-  return static_cast<uint>(m.location() == coord);
-} /* collect_cell() */
+  return {m.location()};
+} /* collect_cells() */
 
 NS_END(caches, metrics, fordyca);

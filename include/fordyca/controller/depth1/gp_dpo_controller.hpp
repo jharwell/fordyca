@@ -60,6 +60,7 @@ NS_START(controller);
 class cache_sel_matrix;
 class dpo_perception_subsystem;
 NS_START(depth1);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -75,7 +76,7 @@ NS_START(depth1);
  */
 class gp_dpo_controller : public depth0::dpo_controller,
                           public er::client<gp_dpo_controller>,
-                          public rcppsw::metrics::tasks::bi_tdgraph_metrics {
+                          public rmetrics::tasks::bi_tdgraph_metrics {
  public:
   using dpo_controller::perception;
 

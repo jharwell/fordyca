@@ -30,6 +30,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -48,7 +49,7 @@ NS_START(fordyca, metrics);
  *
  * Metrics are collected and output every timestep.
  */
-class temporal_variance_metrics : public virtual rcppsw::metrics::base_metrics {
+class temporal_variance_metrics : public virtual rmetrics::base_metrics {
  public:
   temporal_variance_metrics(void) = default;
 

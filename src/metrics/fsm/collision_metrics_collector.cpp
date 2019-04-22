@@ -63,7 +63,7 @@ void collision_metrics_collector::reset(void) {
 } /* reset() */
 
 void collision_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
   m_stats.int_n_in_avoidance += static_cast<uint>(m.in_collision_avoidance());
   m_stats.cum_n_in_avoidance += static_cast<uint>(m.in_collision_avoidance());

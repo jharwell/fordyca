@@ -86,8 +86,8 @@ acquire_existing_cache_fsm::calc_acquisition_location(void) {
                        saa_subsystem()->sensing()->position(),
                        saa_subsystem()->sensing()->tick());
   /*
-   * If this happens, all the caches we know of are too close for us to vector
-   * to, or otherwise unsuitable.
+   * If this happens, all the caches we know of are invalid for acquisition for
+   * some reason or another.
    */
   if (nullptr == best.ent()) {
     return boost::optional<acquisition_loc_type>();
@@ -159,7 +159,7 @@ bool acquire_existing_cache_fsm::cache_acquisition_valid(
     const rmath::vector2d& loc,
     uint id) const {
   return cache_acquisition_validator(&mc_store->caches(), mc_matrix)(
-      loc, id, saa_subsystem()->sensing()->tick());
+      loc, id, saa_subsystem()->sensing()->tick(), mc_is_pickup);
 } /* cache_acquisition_valid() */
 
 NS_END(controller, fordyca);

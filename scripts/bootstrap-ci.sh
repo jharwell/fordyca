@@ -22,6 +22,7 @@ sudo apt-get install "${libra_pkgs[@]}" "${rcppsw_pkgs[@]}" "${fordyca_pkgs[@]}"
 # Install ARGoS
 git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
+git checkout devel
 mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release \
       -DARGOS_BUILD_FOR=simulator\

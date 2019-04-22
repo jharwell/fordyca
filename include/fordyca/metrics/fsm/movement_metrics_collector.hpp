@@ -33,6 +33,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -45,7 +46,7 @@ NS_START(fordyca, metrics, fsm);
  *
  * Metrics are written out every timestep.
  */
-class movement_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class movement_metrics_collector : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
@@ -54,7 +55,7 @@ class movement_metrics_collector : public rcppsw::metrics::base_metrics_collecto
   movement_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
  private:

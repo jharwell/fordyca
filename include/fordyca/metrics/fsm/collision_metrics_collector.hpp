@@ -33,6 +33,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -45,7 +46,7 @@ NS_START(fordyca, metrics, fsm);
  *
  * Metrics are written out after the specified interval.
  */
-class collision_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class collision_metrics_collector : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
@@ -55,7 +56,7 @@ class collision_metrics_collector : public rcppsw::metrics::base_metrics_collect
                              uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
  private:

@@ -136,7 +136,7 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void transport_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const transport_metrics&>(metrics);
   ++m_stats.int_collected;
   m_stats.int_cube_collected +=

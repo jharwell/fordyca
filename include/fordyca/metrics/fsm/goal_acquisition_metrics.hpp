@@ -33,6 +33,7 @@
 NS_START(fordyca, metrics, fsm);
 
 namespace rmath = rcppsw::math;
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -45,7 +46,7 @@ namespace rmath = rcppsw::math;
  * they attempt to acquire a goal (site/object of interest) in SOME way (driving
  * to it directly, exploring for it, etc).
  */
-class goal_acquisition_metrics : public virtual rcppsw::metrics::base_metrics {
+class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
  public:
   enum class goal_type {
     kNone,

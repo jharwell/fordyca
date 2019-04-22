@@ -79,7 +79,7 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void utilization_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const utilization_metrics&>(metrics);
   m_stats.int_pickups += m.total_block_pickups();
   m_stats.int_drops += m.total_block_drops();

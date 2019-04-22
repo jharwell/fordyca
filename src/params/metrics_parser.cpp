@@ -45,10 +45,12 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_ATTR(mnode, m_params, fsm_movement_fname);
 
     XML_PARSE_ATTR(mnode, m_params, block_transport_fname);
-    XML_PARSE_ATTR(mnode, m_params, block_acquisition_fname);
+    XML_PARSE_ATTR(mnode, m_params, block_acquisition_counts_fname);
+    XML_PARSE_ATTR(mnode, m_params, block_acquisition_locs_fname);
     XML_PARSE_ATTR(mnode, m_params, block_manipulation_fname);
 
-    XML_PARSE_ATTR(mnode, m_params, cache_acquisition_fname);
+    XML_PARSE_ATTR(mnode, m_params, cache_acquisition_counts_fname);
+    XML_PARSE_ATTR(mnode, m_params, cache_acquisition_locs_fname);
     XML_PARSE_ATTR(mnode, m_params, cache_utilization_fname);
     XML_PARSE_ATTR(mnode, m_params, cache_lifecycle_fname);
     XML_PARSE_ATTR(mnode, m_params, cache_locations_fname);
@@ -72,7 +74,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_ATTR(mnode, m_params, perception_mdpo_fname);
     XML_PARSE_ATTR(mnode, m_params, perception_dpo_fname);
 
-    XML_PARSE_ATTR(mnode, m_params, arena_robot_occupancy_fname);
+    XML_PARSE_ATTR(mnode, m_params, arena_robot_locs_fname);
     XML_PARSE_ATTR(mnode, m_params, swarm_convergence_fname);
     XML_PARSE_ATTR(mnode, m_params, loop_temporal_variance_fname);
     XML_PARSE_ATTR(mnode, m_params, collect_interval);

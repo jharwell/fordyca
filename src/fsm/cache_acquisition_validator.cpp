@@ -48,7 +48,8 @@ cache_acquisition_validator::cache_acquisition_validator(
  ******************************************************************************/
 bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
                                              int id,
-                                             uint timestep) const {
+                                             uint timestep,
+                                             bool is_pickup) const {
   /*
    * We can't just lookup the cache by the location key we are passed directly,
    * as it is for a point somewhere *inside* the cache, and thus probably not at
@@ -70,6 +71,15 @@ bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
             id,
             it->ent()->discrete_loc().to_str().c_str(),
             loc.to_str().c_str());
+    return false;
+  }
+
+  /*
+   * If we are not picking up from the cache, then we are OK to acquire it after
+   * verifying it exists. Otherwise, we have to check with our pickup policy.
+   */
+  if (!is_pickup) {
+    return true;
   }
 
   auto cache = it->ent();

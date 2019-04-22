@@ -87,7 +87,7 @@ bool manipulation_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void manipulation_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const manipulation_metrics&>(metrics);
   if (m.free_pickup_event()) {
     ++m_stats.int_free_pickup_events;

@@ -1,5 +1,5 @@
 /**
- * @file acquisition_loc_metrics_collector.hpp
+ * @file goal_acq_counts_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_ACQUISITION_LOC_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_ACQUISITION_LOC_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_COUNTS_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_COUNTS_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,42 +27,56 @@
 #include <string>
 #include <list>
 
-#include "fordyca/metrics/grid2D_avg_metrics_collector.hpp"
+#include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
-namespace rmath = rcppsw::math;
 namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquisition_loc_metrics_collector
+ * @class goal_acq_counts_metrics_collector
  * @ingroup metrics fsm
  *
- * @brief Collector for \ref goal_acquisition_metrics goal locations, which is
- * collected as a 2D array, and needs its own collector separate from the \ref
- * goal_acquisition_metrics_collector (1 .csv per collector).
+ * @brief Collector for \ref goal_acq_counts_metrics.
+ *
+ * Metrics are written out at the end of the specified interval.
  */
-class acquisition_loc_metrics_collector : public grid2D_avg_metrics_collector {
+class goal_acq_counts_metrics_collector : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname The output file name.
-   * @param interval Collection interval.
-   * @param dims Dimensions of the arena.
+   * @param ofname Output file name.
+   * @param interval The collection interval.
    */
-  acquisition_loc_metrics_collector(const std::string& ofname,
-                                    uint interval,
-                                    const rmath::vector2u& dims) :
-      grid2D_avg_metrics_collector(ofname, interval, dims) {}
+  goal_acq_counts_metrics_collector(const std::string& ofname, uint interval);
 
-  uint collect_cell(const rcppsw::metrics::base_metrics& metrics,
-                    const rmath::vector2u& coord) const override;
+  void reset(void) override;
+  void reset_after_interval(void) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
+
+ private:
+  struct stats {
+    uint n_int_exploring_for_goal;
+    uint n_int_vectoring_to_goal;
+    uint n_int_acquiring_goal;
+
+    uint n_cum_exploring_for_goal;
+    uint n_cum_vectoring_to_goal;
+    uint n_cum_acquiring_goal;
+  };
+
+  std::list<std::string> csv_header_cols(void) const override;
+  bool csv_line_build(std::string& line) override;
+
+  /* clang-format off */
+  struct stats m_stats;
+  /* clang-format on */
 };
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_ACQUISITION_LOC_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_COUNTS_METRICS_COLLECTOR_HPP_ */

@@ -1,7 +1,8 @@
 # FORDYCA (FOraging Robots use DYnamic CAches)
 
-[![Coverity scan](https://scan.coverity.com/projects/15212/badge.svg)](https://scan.coverity.com/projects/15212/badge.svg)
+[![Coverity scan](https://scan.coverity.com/projects/swarm-robotics-fordyca)](https://img.shields.io/coverity/scan/15212.svg)
 [![Build Status](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)
+![Amazing Simulation](docs/10000-robots.png?raw=true "10,000 Robot Swarm")
 
 This is the main entry point for getting started on the project.
 

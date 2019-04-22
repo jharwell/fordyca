@@ -34,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, perception);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -47,7 +48,7 @@ NS_START(fordyca, metrics, perception);
  * Metrics are written out at the specified collection interval.
  */
 class mdpo_perception_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector {
+    : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
@@ -56,7 +57,7 @@ class mdpo_perception_metrics_collector
   mdpo_perception_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
  private:

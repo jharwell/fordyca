@@ -88,7 +88,7 @@ class existing_cache_selector
   /* clang-format off */
   const cache_sel_matrix* const mc_matrix;
   const ds::dp_cache_map* const mc_cache_map;
-  bool                          m_is_pickup;
+  bool                          mc_is_pickup;
   /* clang-format on */
 };
 

@@ -57,8 +57,8 @@ class location_metrics_collector : public grid2D_avg_metrics_collector {
                              const rmath::vector2u& dims) :
       grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  uint collect_cell(const rcppsw::metrics::base_metrics& metrics,
-                    const rmath::vector2u& coord) const override;
+  std::vector<rmath::vector2u> collect_cells(
+      const rmetrics::base_metrics& metrics) const override;
 };
 
 NS_END(caches, metrics, fordyca);

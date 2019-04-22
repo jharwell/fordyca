@@ -31,6 +31,8 @@
  ******************************************************************************/
 NS_START(fordyca, metrics, blocks);
 
+namespace rmetrics = rcppsw::metrics;
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -46,7 +48,7 @@ NS_START(fordyca, metrics, blocks);
  * Metrics should be collected upon deposition in nest, rather than every
  * timestep.
  */
-class transport_metrics : public rcppsw::metrics::base_metrics {
+class transport_metrics : public rmetrics::base_metrics {
  public:
   enum block_type {
     kCube,

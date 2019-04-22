@@ -71,14 +71,11 @@ bool grid2D_avg_metrics_collector::csv_line_build(std::string& line) {
   return true;
 } /* csv_line_build() */
 
-void grid2D_avg_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+void grid2D_avg_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   ++m_count;
-  for (size_t i = 0; i < m_stats.xsize(); ++i) {
-    for (size_t j = 0; j < m_stats.ysize(); ++j) {
-      m_stats.access(i, j) += collect_cell(metrics, rmath::vector2u(i, j));
-    } /* for(j..) */
-  }   /* for(i..) */
+  for (auto &c : collect_cells(metrics)) {
+    ++m_stats.access(c);
+  } /* for(c..) */
 } /* collect() */
 
 NS_END(metrics, fordyca);

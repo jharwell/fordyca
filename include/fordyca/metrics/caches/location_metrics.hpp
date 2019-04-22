@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,6 +31,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
+namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -45,7 +46,7 @@ NS_START(fordyca, metrics, caches);
  *
  * Metrics are collected every timestep.
  */
-class location_metrics : public virtual rcppsw::metrics::base_metrics {
+class location_metrics : public virtual rmetrics::base_metrics {
  public:
   location_metrics(void) = default;
 
@@ -57,4 +58,4 @@ class location_metrics : public virtual rcppsw::metrics::base_metrics {
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_HPP_ */

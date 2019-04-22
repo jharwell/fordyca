@@ -44,7 +44,7 @@ existing_cache_selector::existing_cache_selector(
     : ER_CLIENT_INIT("fordyca.controller.depth1.existing_cache_selector"),
       mc_matrix(matrix),
       mc_cache_map(cache_map),
-      m_is_pickup(is_pickup) {}
+      mc_is_pickup(is_pickup) {}
 
 /*******************************************************************************
  * Member Functions
@@ -59,15 +59,20 @@ ds::dp_cache_map::value_type existing_cache_selector::operator()(
   double max_utility = 0.0;
   for (auto& c : existing_caches.const_values_range()) {
     /*
-     * No picking up from caches is allowed until our cache acquisition policy
-     * has been satisfied.
+     * No picking up from/dropping into caches is allowed until our cache
+     * acquisition policy has been satisfied.
      */
     bool acq_valid = fsm::cache_acquisition_validator(mc_cache_map, mc_matrix)(
-        c.ent()->real_loc(), c.ent()->id(), timestep);
-    if (m_is_pickup && !acq_valid) {
+        c.ent()->real_loc(), c.ent()->id(), timestep, mc_is_pickup);
+    if (!acq_valid) {
       continue;
     }
 
+    /*
+     * Caches that are otherwise valid to acquire can be excluded from
+     * consideration if they have been placed on our exception list, for
+     * whatever reason.
+     */
     if (cache_is_excluded(position, c.ent())) {
       continue;
     }
@@ -126,7 +131,7 @@ bool existing_cache_selector::cache_is_excluded(
   }
 
   std::vector<int> exceptions;
-  if (m_is_pickup) {
+  if (mc_is_pickup) {
     exceptions = boost::get<std::vector<int>>(
         mc_matrix->find(cselm::kPickupExceptions)->second);
   } else {

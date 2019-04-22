@@ -57,7 +57,7 @@ class lifecycle_metrics_collector : public rmetrics::base_metrics_collector {
 
   void reset(void) override;
   void reset_after_interval(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
   /**
@@ -72,7 +72,6 @@ class lifecycle_metrics_collector : public rmetrics::base_metrics_collector {
     uint cum_depleted;
     uint cum_depletion_sum;
   };
-
 
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;

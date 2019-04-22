@@ -50,12 +50,12 @@ std::list<std::string> mdpo_perception_metrics_collector::csv_header_cols(
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
       /* clang-format off */
-      "int_avg_kST_EMPTY_inaccuracies",
-      "int_avg_kST_HAS_BLOCK_inaccuracies",
-      "int_avg_kST_HAS_CACHE_inaccuracies",
-      "cum_avg_kST_EMPTY_inaccuracies",
-      "cum_avg_kST_HAS_BLOCK_inaccuracies",
-      "cum_avg_kST_HAS_CACHE_inaccuracies",
+      "int_avg_ST_EMPTY_inaccuracies",
+      "int_avg_ST_HAS_BLOCK_inaccuracies",
+      "int_avg_ST_HAS_CACHE_inaccuracies",
+      "cum_avg_ST_EMPTY_inaccuracies",
+      "cum_avg_ST_HAS_BLOCK_inaccuracies",
+      "cum_avg_ST_HAS_CACHE_inaccuracies",
       "int_avg_known_percentage",
       "int_avg_unknown_percentage",
       "int_avg_knowledge_ratio",
@@ -96,7 +96,7 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void mdpo_perception_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
   m_int_states[fsm::cell2D_fsm::kST_EMPTY] +=
       m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_EMPTY);

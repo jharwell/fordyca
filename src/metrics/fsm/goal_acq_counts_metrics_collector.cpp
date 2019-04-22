@@ -1,5 +1,5 @@
 /**
- * @file goal_acquisition_metrics_collector.cpp
+ * @file goal_acq_counts_metrics_collector.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_counts_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
@@ -32,7 +32,7 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-goal_acquisition_metrics_collector::goal_acquisition_metrics_collector(
+goal_acq_counts_metrics_collector::goal_acq_counts_metrics_collector(
     const std::string& ofname,
     uint interval)
     : base_metrics_collector(ofname, interval), m_stats() {}
@@ -40,7 +40,7 @@ goal_acquisition_metrics_collector::goal_acquisition_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> goal_acquisition_metrics_collector::csv_header_cols(
+std::list<std::string> goal_acq_counts_metrics_collector::csv_header_cols(
     void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
@@ -57,13 +57,13 @@ std::list<std::string> goal_acquisition_metrics_collector::csv_header_cols(
   return merged;
 } /* csv_header_cols() */
 
-void goal_acquisition_metrics_collector::reset(void) {
+void goal_acq_counts_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-void goal_acquisition_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+void goal_acq_counts_metrics_collector::collect(
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
   m_stats.n_int_exploring_for_goal +=
       static_cast<uint>(m.is_exploring_for_goal());
@@ -78,7 +78,7 @@ void goal_acquisition_metrics_collector::collect(
   m_stats.n_cum_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 } /* collect() */
 
-bool goal_acquisition_metrics_collector::csv_line_build(std::string& line) {
+bool goal_acq_counts_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
@@ -91,7 +91,7 @@ bool goal_acquisition_metrics_collector::csv_line_build(std::string& line) {
   return true;
 } /* store_foraging_stats() */
 
-void goal_acquisition_metrics_collector::reset_after_interval(void) {
+void goal_acq_counts_metrics_collector::reset_after_interval(void) {
   m_stats.n_int_exploring_for_goal = 0;
   m_stats.n_int_acquiring_goal = 0;
   m_stats.n_int_vectoring_to_goal = 0;

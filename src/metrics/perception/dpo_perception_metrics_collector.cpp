@@ -87,7 +87,7 @@ bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void dpo_perception_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const dpo_perception_metrics&>(metrics);
   ++m_int_robot_count;
   ++m_cum_robot_count;
