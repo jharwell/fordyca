@@ -33,7 +33,7 @@ NS_START(fordyca, metrics, caches);
  * Member Functions
  ******************************************************************************/
 uint location_metrics_collector::collect_cell(
-    const rcppsw::metrics::base_metrics& metrics,
+    const rmetrics::base_metrics& metrics,
     const rmath::vector2u& coord) const {
   auto& m = dynamic_cast<const location_metrics&>(metrics);
 

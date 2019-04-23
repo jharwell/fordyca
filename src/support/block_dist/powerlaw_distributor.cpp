@@ -37,8 +37,6 @@
 NS_START(fordyca, support, block_dist);
 using fordyca::ds::arena_grid;
 
-namespace rmath = rcppsw::math;
-
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
@@ -154,8 +152,7 @@ __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
 } /* check_cluster_placements() */
 
 powerlaw_distributor::cluster_paramvec powerlaw_distributor::
-    compute_cluster_placements(ds::arena_grid* const grid,
-                               uint n_clusters) {
+    compute_cluster_placements(ds::arena_grid* const grid, uint n_clusters) {
   ER_INFO("Computing cluster placements for %u clusters", n_clusters);
 
   std::vector<uint> clust_sizes;

@@ -27,6 +27,7 @@
 #include <list>
 #include <string>
 
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/ds/grid2D.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
@@ -34,8 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
-namespace rmath = rcppsw::math;
-namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -61,11 +60,11 @@ class grid2D_avg_metrics_collector : public rmetrics::base_metrics_collector {
   /**
    * @brief Collect a count of SOMETHING from an (i,j) cell.
    */
-  virtual uint collect_cell(const rcppsw::metrics::base_metrics& metrics,
+  virtual uint collect_cell(const rmetrics::base_metrics& metrics,
                             const rmath::vector2u& coord) const = 0;
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
   std::list<std::string> csv_header_cols(void) const override;

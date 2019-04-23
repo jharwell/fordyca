@@ -55,9 +55,9 @@ struct block_found_visit_set {
 
   using defined =
       rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                 controller::depth2::grp_mdpo_controller,
-                                 ds::dpo_store,
-                                 ds::dpo_semantic_map>;
+                                  controller::depth2::grp_mdpo_controller,
+                                  ds::dpo_store,
+                                  ds::dpo_semantic_map>;
 
   using value = boost::mpl::joint_view<inherited::type, defined::type>;
 };
@@ -69,7 +69,7 @@ struct block_found_visit_set {
  * @brief Event that is created whenever a block (possibly known, possibly
  * unknown) appears in a robot's LOS.
  */
-class block_found : public rcppsw::er::client<block_found>, public cell_op {
+class block_found : public rer::client<block_found>, public cell_op {
  public:
   explicit block_found(std::unique_ptr<repr::base_block> block);
   explicit block_found(const std::shared_ptr<repr::base_block>& block);
@@ -106,7 +106,7 @@ class block_found : public rcppsw::er::client<block_found>, public cell_op {
  */
 using block_found_visitor_impl =
     rvisitor::precise_visitor<detail::block_found,
-                             detail::block_found_visit_set::value>;
+                              detail::block_found_visit_set::value>;
 
 NS_END(detail);
 

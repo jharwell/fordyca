@@ -152,11 +152,12 @@ void cache_block_drop::visit(controller::depth1::gp_dpo_controller& controller) 
   controller.block(nullptr);
   controller.block_manip_collator()->cache_drop_event(true);
 
-  ER_INFO(
-      "Dropped block%d in cache%d,task='%s'",
-      m_block->id(),
-      m_cache->id(),
-      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -169,11 +170,12 @@ void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller)
   controller.block(nullptr);
   controller.block_manip_collator()->cache_drop_event(true);
 
-  ER_INFO(
-      "Dropped block%d in cache%d,task='%s'",
-      m_block->id(),
-      m_cache->id(),
-      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -199,11 +201,12 @@ void cache_block_drop::visit(controller::depth2::grp_dpo_controller& controller)
   }
   controller.block_manip_collator()->cache_drop_event(true);
   controller.block(nullptr);
-  ER_INFO(
-      "Dropped block%d in cache%d,task='%s'",
-      m_block->id(),
-      m_cache->id(),
-      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
 
   controller.ndc_pop();
 } /* visit() */
@@ -218,11 +221,12 @@ void cache_block_drop::visit(controller::depth2::grp_mdpo_controller& controller
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->cache_drop_event(true);
   controller.block(nullptr);
-  ER_INFO(
-      "Dropped block%d in cache%d,task='%s'",
-      m_block->id(),
-      m_cache->id(),
-      dynamic_cast<rta::logical_task*>(controller.current_task())->name().c_str());
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
 
   controller.ndc_pop();
 } /* visit() */

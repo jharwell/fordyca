@@ -24,7 +24,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -51,7 +51,7 @@ namespace rta = rcppsw::ta;
  * @brief Renders the task that a robot is currently executing in text above the
  * robot for visualization/debugging purposes.
  */
-class task_visualizer : public rcppsw::er::client<task_visualizer> {
+class task_visualizer : public rer::client<task_visualizer> {
  public:
   task_visualizer(argos::CQTOpenGLUserFunctions* qt, double text_vis_offset)
       : ER_CLIENT_INIT("fordyca.support.task_visualizer"),

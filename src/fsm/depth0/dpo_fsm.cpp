@@ -29,7 +29,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
-namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors

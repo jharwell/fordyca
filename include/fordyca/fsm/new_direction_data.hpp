@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/state_machine/event.hpp"
 
@@ -31,8 +32,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace rfsm = rcppsw::patterns::state_machine;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions

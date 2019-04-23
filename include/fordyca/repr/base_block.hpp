@@ -35,7 +35,6 @@
  ******************************************************************************/
 NS_START(fordyca, repr);
 namespace prototype = rcppsw::patterns::prototype;
-namespace ut = rcppsw::utils;
 
 /*******************************************************************************
  * Class Definitions
@@ -69,7 +68,7 @@ class base_block : public multicell_entity,
    * Using this constructor, blocks are assigned the next available id, starting
    * from 0.
    */
-  base_block(const rmath::vector2d& dim, const ut::color& color)
+  base_block(const rmath::vector2d& dim, const rutils::color& color)
       : multicell_entity(dim, color, -1) {}
 
   /**
@@ -77,7 +76,7 @@ class base_block : public multicell_entity,
    * @param color The color of the block.
    * @param id The id of the block.
    */
-  base_block(const rmath::vector2d& dim, const ut::color& color, int id)
+  base_block(const rmath::vector2d& dim, const rutils::color& color, int id)
       : multicell_entity(dim, color, id) {}
 
   ~base_block(void) override = default;

@@ -28,7 +28,7 @@
 
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -46,7 +46,7 @@ NS_START(fordyca, controller);
  * @brief Base class for different exploration behaviors that robots can exhibit
  * when looking for stuff.
  */
-class explore_behavior : public rcppsw::er::client<explore_behavior>,
+class explore_behavior : public rer::client<explore_behavior>,
                          public metrics::fsm::collision_metrics {
  public:
   explicit explore_behavior(controller::saa_subsystem* const saa)

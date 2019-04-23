@@ -27,12 +27,12 @@
 #include "fordyca/params/block_sel/block_priority_params.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, block_sel);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Structure Definitions

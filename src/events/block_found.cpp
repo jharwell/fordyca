@@ -36,7 +36,6 @@
  ******************************************************************************/
 NS_START(fordyca, events, detail);
 using ds::occupancy_grid;
-namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -196,7 +195,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    */
   auto res = map.block_update(ds::dp_block_map::value_type(m_block, density));
   if (res.status) {
-    if (ds::dpo_store::update_status::kBlockMoved == res.reason) {
+    if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
                res.old_loc.to_str().c_str(),
                m_block->id(),
@@ -205,7 +204,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
       events::cell_empty_visitor op(res.old_loc);
       op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {
-      ER_ASSERT(ds::dpo_store::update_status::kNewBlockAdded == res.reason,
+      ER_ASSERT(ds::dpo_store::update_status::kNEW_BLOCK_ADDED == res.reason,
                 "Bad reason for DPO store update: %d",
                 res.reason);
     }

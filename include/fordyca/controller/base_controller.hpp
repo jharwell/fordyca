@@ -55,8 +55,6 @@ struct actuation_params;
 NS_START(controller);
 class base_perception_subsystem;
 class saa_subsystem;
-namespace rmath = rcppsw::math;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -74,7 +72,7 @@ namespace er = rcppsw::er;
 class base_controller : public argos::CCI_Controller,
                         public metrics::fsm::movement_metrics,
                         public metrics::fsm::goal_acquisition_metrics,
-                        public rcppsw::er::client<base_controller> {
+                        public rer::client<base_controller> {
  public:
   base_controller(void);
   ~base_controller(void) override;

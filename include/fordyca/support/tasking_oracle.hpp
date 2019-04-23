@@ -28,7 +28,7 @@
 #include <map>
 #include <string>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/ta/time_estimate.hpp"
 
@@ -42,8 +42,6 @@ class polled_task;
 }} // namespace rcppsw::ta
 
 NS_START(fordyca, support);
-namespace rta = rcppsw::ta;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -56,7 +54,7 @@ namespace er = rcppsw::er;
  * allocation. Used to provide an upper bound on the performance of different
  * allocation methods.
  */
-class tasking_oracle : public er::client<tasking_oracle> {
+class tasking_oracle : public rer::client<tasking_oracle> {
  public:
   using mapped_type = boost::variant<rta::time_estimate>;
 

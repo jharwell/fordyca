@@ -105,7 +105,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::site_s
 
 __rcsw_const acquisition_goal_type
 acquire_cache_site_fsm::acquisition_goal_internal(void) const {
-  return acquisition_goal_type::kCacheSite;
+  return acquisition_goal_type::ekCACHE_SITE;
 } /* acquisition_goal_internal() */
 
 NS_END(depth2, controller, fordyca);

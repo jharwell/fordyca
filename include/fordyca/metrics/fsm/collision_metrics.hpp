@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, fsm);
  * @brief Interface defining what metrics should be collected regarding
  * collision avoidance as robots go about their tasks.
  */
-class collision_metrics : public virtual rcppsw::metrics::base_metrics {
+class collision_metrics : public virtual rmetrics::base_metrics {
  public:
   collision_metrics(void) = default;
   ~collision_metrics(void) override = default;

@@ -33,7 +33,7 @@ NS_START(fordyca, metrics, fsm);
  * Member Functions
  ******************************************************************************/
 uint acquisition_loc_metrics_collector::collect_cell(
-    const rcppsw::metrics::base_metrics& metrics,
+    const rmetrics::base_metrics& metrics,
     const rmath::vector2u& coord) const {
   auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
 

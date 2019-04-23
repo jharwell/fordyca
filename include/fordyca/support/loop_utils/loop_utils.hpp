@@ -49,7 +49,6 @@ class base_block;
 }
 namespace ds { class arena_map; }
 NS_START(support, loop_utils);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Types

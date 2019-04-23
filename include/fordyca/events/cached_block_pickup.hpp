@@ -33,7 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 class cache_sel_matrix;
 }
@@ -105,7 +104,7 @@ struct cached_block_pickup_visit_set {
  * The cache usage penalty, if there is one, is assessed prior to this event
  * being created, at a higher level.
  */
-class cached_block_pickup : public rcppsw::er::client<cached_block_pickup>,
+class cached_block_pickup : public rer::client<cached_block_pickup>,
                             public cell_op {
  public:
   cached_block_pickup(const std::shared_ptr<repr::arena_cache>& cache,
@@ -168,7 +167,7 @@ class cached_block_pickup : public rcppsw::er::client<cached_block_pickup>,
  */
 using cached_block_pickup_visitor_impl =
     rvisitor::precise_visitor<detail::cached_block_pickup,
-                             detail::cached_block_pickup_visit_set::value>;
+                              detail::cached_block_pickup_visit_set::value>;
 
 NS_END(detail);
 

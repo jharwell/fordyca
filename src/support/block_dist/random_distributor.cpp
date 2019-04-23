@@ -35,7 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructor

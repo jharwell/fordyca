@@ -32,7 +32,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth0 {
 class crw_controller;
@@ -79,20 +78,20 @@ NS_START(events, detail);
 struct block_vanished_visit_set {
   using value =
       rvisitor::precise_visit_set<controller::depth0::crw_controller,
-                                 controller::depth0::dpo_controller,
-                                 controller::depth0::mdpo_controller,
-                                 controller::depth1::gp_dpo_controller,
-                                 controller::depth1::gp_mdpo_controller,
-                                 controller::depth2::grp_dpo_controller,
-                                 controller::depth2::grp_mdpo_controller,
-                                 tasks::depth0::generalist,
-                                 tasks::depth1::harvester,
-                                 tasks::depth2::cache_starter,
-                                 tasks::depth2::cache_finisher,
-                                 fsm::depth0::crw_fsm,
-                                 fsm::depth0::dpo_fsm,
-                                 fsm::depth0::free_block_to_nest_fsm,
-                                 fsm::block_to_goal_fsm>;
+                                  controller::depth0::dpo_controller,
+                                  controller::depth0::mdpo_controller,
+                                  controller::depth1::gp_dpo_controller,
+                                  controller::depth1::gp_mdpo_controller,
+                                  controller::depth2::grp_dpo_controller,
+                                  controller::depth2::grp_mdpo_controller,
+                                  tasks::depth0::generalist,
+                                  tasks::depth1::harvester,
+                                  tasks::depth2::cache_starter,
+                                  tasks::depth2::cache_finisher,
+                                  fsm::depth0::crw_fsm,
+                                  fsm::depth0::dpo_fsm,
+                                  fsm::depth0::free_block_to_nest_fsm,
+                                  fsm::block_to_goal_fsm>;
 };
 
 /*
@@ -103,7 +102,7 @@ struct block_vanished_visit_set {
  * serving the penalty the block it is waiting for vanishes due to another
  * robot picking it up (ramp blocks only).
  */
-class block_vanished : public rcppsw::er::client<block_vanished> {
+class block_vanished : public rer::client<block_vanished> {
  public:
   explicit block_vanished(uint block_id);
   ~block_vanished(void) override = default;
@@ -148,7 +147,7 @@ class block_vanished : public rcppsw::er::client<block_vanished> {
  */
 using block_vanished_visitor_impl =
     rvisitor::precise_visitor<detail::block_vanished,
-                             detail::block_vanished_visit_set::value>;
+                              detail::block_vanished_visit_set::value>;
 
 NS_END(detail);
 

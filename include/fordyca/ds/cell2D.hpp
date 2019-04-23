@@ -43,7 +43,6 @@ class base_cell_entity;
 NS_START(ds);
 
 namespace decorator = rcppsw::patterns::decorator;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions

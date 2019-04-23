@@ -100,12 +100,9 @@ NS_START(tv);
  * with the environment/robotic mechanical functioning.
  */
 
-class tv_manager : public rcppsw::er::client<tv_manager>,
+class tv_manager : public rer::client<tv_manager>,
                    public metrics::temporal_variance_metrics {
  public:
-  template<typename T>
-  using filter_status = typename block_op_filter<T>::filter_status;
-
   template<typename T>
   using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
 
@@ -130,16 +127,16 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
   block_op_penalty_handler<T>* penalty_handler(
       const block_op_src& src) const {
     switch (src) {
-      case block_op_src::kSrcFreePickup:
+      case block_op_src::ekFREE_PICKUP:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_fb_pickup.at(typeid(T))).get();
-      case block_op_src::kSrcNestDrop:
+      case block_op_src::ekNEST_DROP:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_nest_drop.at(typeid(T))).get();
-      case block_op_src::kSrcNewCacheDrop:
+      case block_op_src::ekNEW_CACHE_DROP:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_new_cache.at(typeid(T))).get();
-      case block_op_src::kSrcCacheSiteDrop:
+      case block_op_src::ekCACHE_SITE_DROP:
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_cache_site.at(typeid(T))).get();
       default:
@@ -156,8 +153,8 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
   template<class T>
   cache_op_penalty_handler<T>* penalty_handler(const cache_op_src& src) const {
     switch (src) {
-      case cache_op_src::kSrcExistingCachePickup:
-      case cache_op_src::kSrcExistingCacheDrop:
+      case cache_op_src::ekEXISTING_CACHE_PICKUP:
+      case cache_op_src::ekEXISTING_CACHE_DROP:
         return boost::get<std::unique_ptr<cache_op_penalty_handler<T>>>(
             m_existing_cache.at(typeid(T))).get();
         break;
@@ -183,8 +180,8 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
                                  controller::depth0::mdpo_controller>::value)
            >
   penalty_handler_list<T> all_penalty_handlers(void) {
-    return {penalty_handler<T>(block_op_src::kSrcFreePickup),
-          penalty_handler<T>(block_op_src::kSrcNestDrop)};
+    return {penalty_handler<T>(block_op_src::ekFREE_PICKUP),
+          penalty_handler<T>(block_op_src::ekNEST_DROP)};
   }
   template<typename T,
            RCPPSW_SFINAE_REQUIRE(std::is_same<T,
@@ -193,9 +190,9 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
                                  controller::depth1::gp_mdpo_controller>::value)
            >
   penalty_handler_list<T> all_penalty_handlers(void) {
-    return {penalty_handler<T>(block_op_src::kSrcFreePickup),
-          penalty_handler<T>(block_op_src::kSrcNestDrop),
-          penalty_handler<T>(cache_op_src::kSrcExistingCacheDrop)};
+    return {penalty_handler<T>(block_op_src::ekFREE_PICKUP),
+          penalty_handler<T>(block_op_src::ekNEST_DROP),
+          penalty_handler<T>(cache_op_src::ekEXISTING_CACHE_DROP)};
   }
 
   template<typename T,
@@ -205,11 +202,11 @@ class tv_manager : public rcppsw::er::client<tv_manager>,
                                  controller::depth2::grp_mdpo_controller>::value)
            >
   penalty_handler_list<T> all_penalty_handlers(void) {
-    return {penalty_handler<T>(block_op_src::kSrcFreePickup),
-          penalty_handler<T>(block_op_src::kSrcNestDrop),
-          penalty_handler<T>(cache_op_src::kSrcExistingCacheDrop),
-          penalty_handler<T>(block_op_src::kSrcCacheSiteDrop),
-          penalty_handler<T>(block_op_src::kSrcNewCacheDrop),
+    return {penalty_handler<T>(block_op_src::ekFREE_PICKUP),
+          penalty_handler<T>(block_op_src::ekNEST_DROP),
+          penalty_handler<T>(cache_op_src::ekEXISTING_CACHE_DROP),
+          penalty_handler<T>(block_op_src::ekCACHE_SITE_DROP),
+          penalty_handler<T>(block_op_src::ekNEW_CACHE_DROP),
           };
   }
 

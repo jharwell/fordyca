@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/arena/blocks_params.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 #include "rcppsw/control/waveform_xml_parser.hpp"
 #include "fordyca/params/arena/block_dist_parser.hpp"

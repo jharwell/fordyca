@@ -39,19 +39,19 @@ NS_START(fordyca, repr);
  * @class cube_block
  * @ingroup fordyca repr
  *
- * @brief A repr of a cube block within the arena. Cube blocks are 1
+ * @brief A representation of a cube block within the arena. Cube blocks are 1
  * cell in size.
  */
 class cube_block : public base_block {
  public:
   explicit cube_block(const rmath::vector2d& dim)
-      : base_block(dim, ut::color::kBLACK, -1) {}
+      : base_block(dim, rutils::color::kBLACK, -1) {}
 
   cube_block(const rmath::vector2d& dim, int id)
-      : base_block(dim, ut::color::kBLACK, id) {}
+      : base_block(dim, rutils::color::kBLACK, id) {}
 
-  transport_metrics::block_type type(void) const override {
-    return transport_metrics::kCube;
+  repr::block_type type(void) const override {
+    return repr::block_type::ekCUBE;
   }
   std::unique_ptr<base_block> clone(void) const override {
     std::unique_ptr<base_block> tmp =

@@ -35,7 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace rmath = rcppsw::math;
 namespace repr {
 class base_block;
 }

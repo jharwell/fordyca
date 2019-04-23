@@ -37,7 +37,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Classes
@@ -50,7 +49,7 @@ namespace rmath = rcppsw::math;
  * on a given timestep.
  */
 template <typename T>
-class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_interactor<T>> {
+class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_interactor<T>> {
  public:
   new_cache_block_drop_interactor(ds::arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
@@ -61,7 +60,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
         m_map(map_in),
         m_cache_manager(cache_manager),
         m_penalty_handler(tv_manager->template penalty_handler<T>(
-            tv::block_op_src::kSrcNewCacheDrop)) {}
+            tv::block_op_src::ekNEW_CACHE_DROP)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -99,12 +98,12 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
        * waiting until after the penalty is served to figure out that the
        * robot is too close to a block/cache.
        */
-      penalty_status status = m_penalty_handler->penalty_init(controller,
-                                                   tv::block_op_src::kSrcNewCacheDrop,
+      auto status = m_penalty_handler->penalty_init(controller,
+                                                   tv::block_op_src::ekNEW_CACHE_DROP,
                                                    timestep,
                                                    m_cache_manager->cache_proximity_dist(),
                                                    m_cache_manager->block_proximity_dist());
-      if (penalty_status::kStatusCacheProximity == status) {
+      if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
         auto prox_status = loop_utils::new_cache_cache_proximity(controller,
                                                                  *m_map,
                                                                  m_cache_manager->cache_proximity_dist());
@@ -117,8 +116,6 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
   }
 
  private:
-  using penalty_status = typename tv::tv_manager::filter_status<T>;
-
   void cache_proximity_notify(T& controller,
                               const loop_utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
@@ -156,7 +153,7 @@ class new_cache_block_drop_interactor : public er::client<new_cache_block_drop_i
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              tv::acquisition_goal_type::kNewCache == controller.current_task()->acquisition_goal(),
+              tv::acquisition_goal_type::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for new cache block drop");
     auto status = loop_utils::new_cache_cache_proximity(controller,
                                                        *m_map,

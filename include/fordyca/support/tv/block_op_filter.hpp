@@ -30,6 +30,7 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +39,6 @@ NS_START(fordyca, support, tv);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -52,16 +52,8 @@ namespace er = rcppsw::er;
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
-class block_op_filter : public er::client<block_op_filter<T>> {
+class block_op_filter : public rer::client<block_op_filter<T>> {
  public:
-  enum filter_status {
-    kStatusOK,
-    kStatusControllerNotReady,
-    kStatusControllerNotOnBlock,
-    kStatusControllerNotInCache,
-    kStatusBlockProximity,
-    kStatusCacheProximity
-  };
   /**
    * @brief The result of checking a controller instance to see if it has
    * satisfied the preconditions for a block operation (pickup/drop/etc).
@@ -75,7 +67,7 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    */
   struct filter_res_t {
     bool status;
-    filter_status reason;
+    op_filter_status reason;
   };
 
   explicit block_op_filter(ds::arena_map* const map)
@@ -102,15 +94,15 @@ class block_op_filter : public er::client<block_op_filter<T>> {
      * transporting it (even if it IS currently in the nest), nothing to do.
      */
     switch (src) {
-      case kSrcFreePickup:
+      case block_op_src::ekFREE_PICKUP:
         return free_pickup_filter(controller);
-      case kSrcNestDrop:
+      case block_op_src::ekNEST_DROP:
         return nest_drop_filter(controller);
-      case kSrcCacheSiteDrop:
+      case block_op_src::ekCACHE_SITE_DROP:
         return cache_site_drop_filter(controller,
                                       block_prox_dist,
                                       cache_prox_dist);
-      case kSrcNewCacheDrop:
+      case block_op_src::ekNEW_CACHE_DROP:
         return new_cache_drop_filter(controller, cache_prox_dist);
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
@@ -129,12 +121,12 @@ class block_op_filter : public er::client<block_op_filter<T>> {
   filter_res_t free_pickup_filter(const T& controller) const {
     int block_id = loop_utils::robot_on_block(controller, *m_map);
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kBlock == controller.acquisition_goal())) {
-      return filter_res_t{true, kStatusControllerNotReady};
+          acquisition_goal_type::ekBLOCK == controller.acquisition_goal())) {
+      return filter_res_t{true, op_filter_status::ekROBOT_INTERNAL_UNREADY};
     } else if (-1 == block_id) {
-      return filter_res_t{true, kStatusControllerNotOnBlock};
+      return filter_res_t{true, op_filter_status::ekROBOT_NOT_ON_BLOCK};
     }
-    return filter_res_t{false, kStatusOK};
+    return filter_res_t{false, op_filter_status::ekSATISFIED};
   }
 
   /**
@@ -146,10 +138,10 @@ class block_op_filter : public er::client<block_op_filter<T>> {
    */
   filter_res_t nest_drop_filter(const T& controller) const {
     if (!(controller.in_nest() && controller.goal_acquired() &&
-          transport_goal_type::kNest == controller.block_transport_goal())) {
-      return filter_res_t{true, kStatusControllerNotReady};
+          transport_goal_type::ekNEST == controller.block_transport_goal())) {
+      return filter_res_t{true, op_filter_status::ekROBOT_INTERNAL_UNREADY};
     }
-    return filter_res_t{false, kStatusOK};
+    return filter_res_t{false, op_filter_status::ekSATISFIED};
   }
 
   /**
@@ -164,25 +156,25 @@ class block_op_filter : public er::client<block_op_filter<T>> {
                                       double block_prox_dist,
                                       double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kCacheSite == controller.acquisition_goal() &&
-          transport_goal_type::kCacheSite == controller.block_transport_goal())) {
-      return filter_res_t{true, kStatusControllerNotReady};
+          acquisition_goal_type::ekCACHE_SITE == controller.acquisition_goal() &&
+          transport_goal_type::ekCACHE_SITE == controller.block_transport_goal())) {
+      return filter_res_t{true, op_filter_status::ekROBOT_INTERNAL_UNREADY};
     }
     int block_id = loop_utils::cache_site_block_proximity(controller,
                                                           *m_map,
                                                           block_prox_dist)
                        .entity_id;
     if (-1 != block_id) {
-      return filter_res_t{true, kStatusBlockProximity};
+      return filter_res_t{true, op_filter_status::ekBLOCK_PROXIMITY};
     }
     int cache_id = loop_utils::new_cache_cache_proximity(controller,
                                                          *m_map,
                                                          cache_prox_dist)
                    .entity_id;
     if (-1 != cache_id) {
-      return filter_res_t{true, kStatusCacheProximity};
+      return filter_res_t{true, op_filter_status::ekCACHE_PROXIMITY};
     }
-    return filter_res_t{false, kStatusOK};
+    return filter_res_t{false, op_filter_status::ekSATISFIED};
   }
 
   /**
@@ -196,18 +188,18 @@ class block_op_filter : public er::client<block_op_filter<T>> {
   filter_res_t new_cache_drop_filter(const T& controller,
                                      double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::kNewCache == controller.acquisition_goal() &&
-          transport_goal_type::kNewCache == controller.block_transport_goal())) {
-      return filter_res_t{true, kStatusControllerNotReady};
+          acquisition_goal_type::ekNEW_CACHE == controller.acquisition_goal() &&
+          transport_goal_type::ekNEW_CACHE == controller.block_transport_goal())) {
+      return filter_res_t{true, op_filter_status::ekROBOT_INTERNAL_UNREADY};
     }
     int cache_id = loop_utils::new_cache_cache_proximity(controller,
                                                          *m_map,
                                                          cache_prox_dist)
                        .entity_id;
     if (-1 != cache_id) {
-      return filter_res_t{true, kStatusCacheProximity};
+      return filter_res_t{true, op_filter_status::ekCACHE_PROXIMITY};
     }
-    return filter_res_t{false, kStatusOK};
+    return filter_res_t{false, op_filter_status::ekSATISFIED};
   }
 
   /* clang-format off */

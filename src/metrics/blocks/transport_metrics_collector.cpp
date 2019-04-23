@@ -135,20 +135,15 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   return true;
 } /* csv_line_build() */
 
-void transport_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+void transport_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const transport_metrics&>(metrics);
   ++m_stats.int_collected;
-  m_stats.int_cube_collected +=
-      (transport_metrics::block_type::kCube == m.type());
-  m_stats.int_ramp_collected +=
-      (transport_metrics::block_type::kRamp == m.type());
+  m_stats.int_cube_collected += (repr::block_type::ekCUBE == m.type());
+  m_stats.int_ramp_collected += (repr::block_type::ekRAMP == m.type());
 
   ++m_stats.cum_collected;
-  m_stats.cum_cube_collected +=
-      (transport_metrics::block_type::kCube == m.type());
-  m_stats.cum_ramp_collected +=
-      (transport_metrics::block_type::kRamp == m.type());
+  m_stats.cum_cube_collected += (repr::block_type::ekCUBE == m.type());
+  m_stats.cum_ramp_collected += (repr::block_type::ekRAMP == m.type());
 
   m_stats.int_transporters += m.total_transporters();
   m_stats.cum_transporters += m.total_transporters();

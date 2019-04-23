@@ -213,16 +213,15 @@ double tv_manager::swarm_motion_throttle(void) const {
 
 double tv_manager::env_block_manipulation(void) const {
   uint timestep = mc_lf->GetSpace().GetSimulationClock();
-
   return penalty_handler<controller::depth0::crw_controller>(
-             block_op_src::kSrcNestDrop)
+             block_op_src::ekNEST_DROP)
       ->timestep_penalty(timestep);
 } /* env_block_manipulation() */
 
 double tv_manager::env_cache_usage(void) const {
   uint timestep = mc_lf->GetSpace().GetSimulationClock();
   return penalty_handler<controller::depth1::gp_dpo_controller>(
-             cache_op_src::kSrcExistingCachePickup)
+             cache_op_src::ekEXISTING_CACHE_PICKUP)
       ->timestep_penalty(timestep);
 } /* env_cache_usage() */
 

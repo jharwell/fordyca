@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -42,7 +42,6 @@ class cache_sel_matrix;
 } /* namespace controller */
 
 NS_START(fsm);
-namespace rmath = rcppsw::math;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
@@ -57,7 +56,7 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  * current simulation state.
  */
 class cache_acquisition_validator
-    : public rcppsw::er::client<cache_acquisition_validator> {
+    : public rer::client<cache_acquisition_validator> {
  public:
   cache_acquisition_validator(const ds::dp_cache_map* map,
                               const controller::cache_sel_matrix* csel_matrix);

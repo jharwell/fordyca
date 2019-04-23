@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcsw/common/common.h"
 
@@ -33,9 +34,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-
-namespace rfsm = rcppsw::patterns::state_machine;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -48,7 +46,7 @@ namespace er = rcppsw::er;
  * block, has a cache, or unknown, etc.).
  *
  */
-class cell2D_fsm : public rfsm::simple_fsm, public er::client<cell2D_fsm> {
+class cell2D_fsm : public rfsm::simple_fsm, public rer::client<cell2D_fsm> {
  public:
   enum state {
     kST_UNKNOWN,

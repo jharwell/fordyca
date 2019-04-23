@@ -44,14 +44,12 @@
 namespace rcppsw { namespace ta {
 class bi_tab;
 }}
-namespace rta = rcppsw::ta;
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class gp_mdpo_controller; }}
 namespace repr { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -71,7 +69,7 @@ namespace er = rcppsw::er;
  * - TAB metrics (rooted at generalist)
  */
 class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
-                                  public er::client<depth1_metrics_aggregator> {
+                                  public rer::client<depth1_metrics_aggregator> {
  public:
   using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
@@ -154,7 +152,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
           dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               dynamic_cast<const rta::polled_task*>(controller->current_task())
               ->mechanism());
-      auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
+      auto dist_m = dynamic_cast<const rmetrics::tasks::bi_tdgraph_metrics*>(
           controller);
 
 
@@ -168,8 +166,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
           "blocks::acquisition",
           *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               controller->current_task()),
-          [&](const rcppsw::metrics::base_metrics& metrics) {
-            return acquisition_goal_type::kBlock ==
+          [&](const rmetrics::base_metrics& metrics) {
+            return acquisition_goal_type::ekBLOCK ==
                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
                     metrics)
                 .acquisition_goal();
@@ -178,8 +176,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
           "caches::acquisition",
           *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               controller->current_task()),
-          [&](const rcppsw::metrics::base_metrics& metrics) {
-            return acquisition_goal_type::kExistingCache ==
+          [&](const rmetrics::base_metrics& metrics) {
+            return acquisition_goal_type::ekEXISTING_CACHE ==
                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
                     metrics)
                 .acquisition_goal();
@@ -187,7 +185,6 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
       collect("tasks::distribution", *dist_m);
     }
   } /* collect_controller_common() */
-
 };
 
 NS_END(depth1, support, fordyca);

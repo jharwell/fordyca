@@ -152,7 +152,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
 
 __rcsw_const acquisition_goal_type
 acquire_existing_cache_fsm::acquisition_goal_internal(void) const {
-  return acquisition_goal_type::kExistingCache;
+  return acquisition_goal_type::ekEXISTING_CACHE;
 } /* acquisition_goal() */
 
 bool acquire_existing_cache_fsm::cache_acquisition_valid(

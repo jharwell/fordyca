@@ -48,7 +48,7 @@ NS_START(fordyca, support, block_dist);
  * each cluster to do the actual distribution.
  */
 class multi_cluster_distributor : public base_distributor,
-                                  public er::client<multi_cluster_distributor> {
+                                  public rer::client<multi_cluster_distributor> {
  public:
   multi_cluster_distributor(std::vector<ds::arena_grid::view>& grids,
                             double arena_resolution,

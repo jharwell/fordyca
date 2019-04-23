@@ -32,8 +32,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace rfsm = rcppsw::patterns::state_machine;
-namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -171,17 +169,17 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data* data) {
 }
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
-  m_saa->actuation()->leds_set_color(utils::color::kWHITE);
+  m_saa->actuation()->leds_set_color(rutils::color::kWHITE);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_transport_to_nest) {
-  m_saa->actuation()->leds_set_color(utils::color::kGREEN);
+  m_saa->actuation()->leds_set_color(rutils::color::kGREEN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
-  actuators()->leds_set_color(utils::color::kCYAN);
+  actuators()->leds_set_color(rutils::color::kCYAN);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
   actuators()->differential_drive().stop();
-  actuators()->leds_set_color(utils::color::kWHITE);
+  actuators()->leds_set_color(rutils::color::kWHITE);
 }
 
 /*******************************************************************************

@@ -57,8 +57,6 @@ NS_START(ds);
 
 class cell2D;
 namespace decorator = rcppsw::patterns::decorator;
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -73,7 +71,7 @@ namespace rmath = rcppsw::math;
  * providing accessors and mutators, but not more complex logic, separating the
  * data in manages from the algorithms that operate on that data.
  */
-class arena_map : public er::client<arena_map>,
+class arena_map : public rer::client<arena_map>,
                   public metrics::robot_occupancy_metrics,
                   public decorator::decorator<arena_grid> {
  public:

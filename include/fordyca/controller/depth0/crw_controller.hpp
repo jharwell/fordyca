@@ -53,7 +53,7 @@ NS_START(depth0);
  */
 class crw_controller : public base_controller,
                        public fsm::block_transporter,
-                       public er::client<crw_controller> {
+                       public rer::client<crw_controller> {
  public:
   crw_controller(void);
   ~crw_controller(void) override;

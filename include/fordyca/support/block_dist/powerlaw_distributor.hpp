@@ -63,7 +63,7 @@ NS_START(support, block_dist);
  *   checked).
  */
 class powerlaw_distributor : public base_distributor,
-                             public er::client<powerlaw_distributor> {
+                             public rer::client<powerlaw_distributor> {
  public:
   /**
    * @brief Initialize the distributor.

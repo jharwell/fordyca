@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -38,14 +38,13 @@ class dp_block_map;
 } /* namespace ds */
 
 NS_START(fsm);
-namespace rmath = rcppsw::math;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 class block_acquisition_validator
-    : public rcppsw::er::client<block_acquisition_validator> {
+    : public rer::client<block_acquisition_validator> {
  public:
   explicit block_acquisition_validator(const ds::dp_block_map* map);
 

@@ -36,7 +36,6 @@
 NS_START(fordyca);
 NS_START(controller);
 class cache_sel_matrix;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -49,8 +48,7 @@ namespace rmath = rcppsw::math;
  * this point, although that may not be true as a robot's knowledge of the arena
  * is imperfect).
  */
-class existing_cache_selector
-    : public rcppsw::er::client<existing_cache_selector> {
+class existing_cache_selector : public rer::client<existing_cache_selector> {
  public:
   existing_cache_selector(bool is_pickup,
                           const cache_sel_matrix* matrix,

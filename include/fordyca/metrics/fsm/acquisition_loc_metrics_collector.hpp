@@ -33,8 +33,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
-namespace rmath = rcppsw::math;
-namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +57,7 @@ class acquisition_loc_metrics_collector : public grid2D_avg_metrics_collector {
                                     const rmath::vector2u& dims) :
       grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  uint collect_cell(const rcppsw::metrics::base_metrics& metrics,
+  uint collect_cell(const rmetrics::base_metrics& metrics,
                     const rmath::vector2u& coord) const override;
 };
 

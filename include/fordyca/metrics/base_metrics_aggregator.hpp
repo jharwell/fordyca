@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
 
@@ -57,12 +58,11 @@ NS_START(metrics);
  * @ingroup fordyca metrics
  *
  * @brief Base class for aggregating collection of metrics for various
- * sources. Extends \ref rcppsw::metrics::collector_group to include
+ * sources. Extends \ref rmetrics::collector_group to include
  * initialization bits to make loop functions simpler/clearer.
  */
-class base_metrics_aggregator
-    : public rcppsw::er::client<base_metrics_aggregator>,
-      public rcppsw::metrics::collector_group {
+class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
+                                public rmetrics::collector_group {
  public:
   base_metrics_aggregator(const params::metrics_params* mparams,
                           const std::string& output_root);

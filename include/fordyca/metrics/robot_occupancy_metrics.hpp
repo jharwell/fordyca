@@ -31,7 +31,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -46,7 +45,7 @@ namespace rmath = rcppsw::math;
  *
  * Metrics are collected every timestep.
  */
-class robot_occupancy_metrics : public virtual rcppsw::metrics::base_metrics {
+class robot_occupancy_metrics : public virtual rmetrics::base_metrics {
  public:
   robot_occupancy_metrics(void) = default;
 

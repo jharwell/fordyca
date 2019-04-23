@@ -43,7 +43,7 @@ NS_START(fordyca, metrics, caches);
  * @brief Interface defining lifecycle metrics that can be collected on
  * static/dynamic caches in the arena during their lifetime.
  */
-class lifecycle_metrics : public rcppsw::metrics::base_metrics {
+class lifecycle_metrics : public rmetrics::base_metrics {
  public:
   lifecycle_metrics(void) = default;
   ~lifecycle_metrics(void) override = default;

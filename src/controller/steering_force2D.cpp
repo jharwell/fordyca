@@ -28,7 +28,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors

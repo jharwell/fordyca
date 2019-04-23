@@ -132,7 +132,7 @@ acquisition_goal_type acquire_goal_fsm::acquisition_goal(void) const {
   if (kST_ACQUIRE_GOAL == current_state()) {
     return m_hooks.acquisition_goal();
   }
-  return acquisition_goal_type::kNone;
+  return acquisition_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 rmath::vector2u acquire_goal_fsm::acquisition_loc(void) const {

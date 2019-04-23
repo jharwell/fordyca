@@ -49,7 +49,7 @@ NS_START(fsm, depth2);
  * cache or via random exploration). Once the chosen new cache has been
  * acquired, it signals that it has completed its task.
  */
-class acquire_new_cache_fsm : public er::client<acquire_new_cache_fsm>,
+class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
                               public acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(const controller::cache_sel_matrix* matrix,

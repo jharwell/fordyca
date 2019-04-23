@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
@@ -48,7 +49,6 @@ namespace depth2 {
 class cache_starter;
 }
 } // namespace tasks
-namespace rvisitor = rcppsw::patterns::visitor;
 
 NS_START(events, detail);
 
@@ -58,9 +58,9 @@ NS_START(events, detail);
 struct block_proximity_visit_set {
   using value =
       rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                 controller::depth2::grp_mdpo_controller,
-                                 fsm::block_to_goal_fsm,
-                                 tasks::depth2::cache_starter>;
+                                  controller::depth2::grp_mdpo_controller,
+                                  fsm::block_to_goal_fsm,
+                                  tasks::depth2::cache_starter>;
 };
 
 /**
@@ -70,7 +70,7 @@ struct block_proximity_visit_set {
  * @brief Event that is created whenever a block that a robot is not currently
  * aware of blocks its ability to complete its current task.
  */
-class block_proximity : public rcppsw::er::client<block_proximity> {
+class block_proximity : public rer::client<block_proximity> {
  public:
   explicit block_proximity(const std::shared_ptr<repr::base_block>& block);
   ~block_proximity(void) override = default;
@@ -100,7 +100,7 @@ class block_proximity : public rcppsw::er::client<block_proximity> {
  */
 using block_proximity_visitor_impl =
     rvisitor::precise_visitor<detail::block_proximity,
-                             detail::block_proximity_visit_set::value>;
+                              detail::block_proximity_visit_set::value>;
 
 NS_END(detail);
 

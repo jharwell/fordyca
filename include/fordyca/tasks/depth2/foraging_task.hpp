@@ -35,7 +35,6 @@
  ******************************************************************************/
 namespace rcppsw { namespace ta { struct task_alloc_params; }}
 NS_START(fordyca, tasks, depth2);
-namespace rvisitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Structure Definitions

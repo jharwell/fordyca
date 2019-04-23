@@ -32,7 +32,7 @@
 #include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -58,7 +58,7 @@ NS_START(controller);
  * into a useful internal repr: a \ref dpo_semantic_map.
  */
 class mdpo_perception_subsystem
-    : public rcppsw::er::client<mdpo_perception_subsystem>,
+    : public rer::client<mdpo_perception_subsystem>,
       public base_perception_subsystem,
       public metrics::perception::mdpo_perception_metrics {
  public:

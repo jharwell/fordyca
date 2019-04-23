@@ -54,7 +54,6 @@
 NS_START(fordyca, support, depth1);
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -69,25 +68,25 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       metrics_path() + "/" + mparams->cache_acquisition_fname,
       mparams->collect_interval);
 
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kCollectorName),
       metrics_path() + "/" + mparams->task_execution_collector_fname,
       mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kHarvesterName),
       metrics_path() + "/" + mparams->task_execution_harvester_fname,
       mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task0::kGeneralistName),
       metrics_path() + "/" + mparams->task_execution_generalist_fname,
       mparams->collect_interval);
 
-  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
+  register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::generalist",
       metrics_path() + "/" + mparams->task_tab_generalist_fname,
       mparams->collect_interval);
 
-  register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
+  register_collector<rmetrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
       metrics_path() + "/" + mparams->task_distribution_fname,
       mparams->collect_interval,
@@ -138,7 +137,7 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
     return;
   }
   collect("tasks::execution::" + task->name(),
-          dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
+          dynamic_cast<const rmetrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
 void depth1_metrics_aggregator::task_alloc_cb(const rta::polled_task* const,

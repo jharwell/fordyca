@@ -38,7 +38,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth1);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Structure Definitions
@@ -53,7 +52,7 @@ namespace rmath = rcppsw::math;
 class collector : public foraging_task,
                   public events::existing_cache_interactor,
                   public events::nest_interactor,
-                  public rcppsw::er::client<collector> {
+                  public rer::client<collector> {
  public:
   collector(const struct rta::task_alloc_params* params,
             const std::string& name,

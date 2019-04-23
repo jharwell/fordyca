@@ -53,7 +53,7 @@ NS_START(depth1);
  * Cleaner to do it this way.
  */
 class gp_mdpo_controller : public depth1::gp_dpo_controller,
-                           public er::client<gp_mdpo_controller> {
+                           public rer::client<gp_mdpo_controller> {
  public:
   gp_mdpo_controller(void);
   ~gp_mdpo_controller(void) override;

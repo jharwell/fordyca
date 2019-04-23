@@ -27,7 +27,7 @@
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces

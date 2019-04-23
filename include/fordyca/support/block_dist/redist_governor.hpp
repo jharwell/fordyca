@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/arena/block_redist_governor_params.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -52,7 +52,7 @@ NS_START(fordyca, support, block_dist);
  * change multiple times, or to only occur at most once, like a switch flip (for
  * some trigger types).
  */
-class redist_governor : public rcppsw::er::client<redist_governor> {
+class redist_governor : public rer::client<redist_governor> {
  public:
   static constexpr char kStatusSwitchPolicySingle[] = "single";
   static constexpr char kStatusSwitchPolicyMulti[] = "multi";

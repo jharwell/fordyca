@@ -35,7 +35,6 @@ NS_START(fordyca);
 namespace controller { namespace depth2 { class grp_mdpo_controller; }}
 
 NS_START(support, depth2);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -51,7 +50,7 @@ namespace er = rcppsw::er;
  * - TAB metrics (rooted at collector)
  */
 class depth2_metrics_aggregator : public depth1::depth1_metrics_aggregator,
-                                  public er::client<depth2_metrics_aggregator> {
+                                  public rer::client<depth2_metrics_aggregator> {
  public:
   depth2_metrics_aggregator(const params::metrics_params* mparams,
                             const std::string& output_root);

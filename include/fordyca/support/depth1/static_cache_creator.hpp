@@ -43,7 +43,7 @@ NS_START(fordyca, support, depth1);
  * location.
  */
 class static_cache_creator : public base_cache_creator,
-                             public er::client<static_cache_creator> {
+                             public rer::client<static_cache_creator> {
  public:
   static_cache_creator(ds::arena_grid* grid,
                        const rmath::vector2d& center,

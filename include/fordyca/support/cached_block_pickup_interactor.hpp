@@ -39,7 +39,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -53,7 +52,7 @@ namespace er = rcppsw::er;
  */
 template <typename T>
 class cached_block_pickup_interactor
-    : public er::client<cached_block_pickup_interactor<T>> {
+    : public rer::client<cached_block_pickup_interactor<T>> {
  public:
   cached_block_pickup_interactor(ds::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
@@ -63,7 +62,7 @@ class cached_block_pickup_interactor
         m_floor(floor_in),
         m_map(map_in),
         m_penalty_handler(tv_manager->penalty_handler<T>(
-            tv::cache_op_src::kSrcExistingCachePickup)),
+            tv::cache_op_src::ekEXISTING_CACHE_PICKUP)),
         m_cache_manager(cache_manager) {}
 
   /**
@@ -93,7 +92,7 @@ class cached_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      tv::cache_op_src::kSrcExistingCachePickup,
+                                      tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
                                       timestep);
     }
   }
@@ -111,7 +110,7 @@ class cached_block_pickup_interactor
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
-    ER_ASSERT(tv::acquisition_goal_type::kExistingCache ==
+    ER_ASSERT(tv::acquisition_goal_type::ekEXISTING_CACHE ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
 

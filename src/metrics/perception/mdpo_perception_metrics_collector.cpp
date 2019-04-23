@@ -96,7 +96,7 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void mdpo_perception_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
   m_int_states[fsm::cell2D_fsm::kST_EMPTY] +=
       m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_EMPTY);

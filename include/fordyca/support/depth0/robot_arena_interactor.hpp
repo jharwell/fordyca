@@ -46,7 +46,7 @@ NS_START(fordyca, support, depth0);
  * - Dropping a carried block in the nest (possibly with a penalty).
  */
 template <typename T>
-class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
+class robot_arena_interactor : public rer::client<robot_arena_interactor<T>> {
  public:
   using controller_type = T;
 

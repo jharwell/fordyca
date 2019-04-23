@@ -30,8 +30,6 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-namespace utils = rcppsw::utils;
-
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
@@ -43,7 +41,7 @@ base_explore_fsm::base_explore_fsm(controller::saa_subsystem* const saa,
  * States
  ******************************************************************************/
 HFSM_ENTRY_DEFINE_ND(base_explore_fsm, entry_explore) {
-  base_foraging_fsm::actuators()->leds_set_color(utils::color::kMAGENTA);
+  base_foraging_fsm::actuators()->leds_set_color(rutils::color::kMAGENTA);
 }
 
 /*******************************************************************************

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/depth1/controller_repository.hpp"
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/cache_sel/cache_sel_matrix_parser.hpp"
 #include "rcppsw/ta/task_alloc_xml_parser.hpp"
 #include "rcppsw/ta/task_executive_xml_parser.hpp"
@@ -30,7 +31,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, depth1);
-namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -47,14 +47,11 @@ controller_repository::controller_repository(void) {
       rta::task_executive_xml_parser::kXMLRoot,
       rcppsw::params::xml_param_parser::kHeader1);
 
-  get_parser<rta::task_alloc_xml_parser>(
-      rta::task_alloc_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("generalist");
-  get_parser<rta::task_alloc_xml_parser>(
-      rta::task_alloc_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("collector");
-  get_parser<rta::task_alloc_xml_parser>(
-      rta::task_alloc_xml_parser::kXMLRoot)
+  get_parser<rta::task_alloc_xml_parser>(rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("harvester");
 }
 

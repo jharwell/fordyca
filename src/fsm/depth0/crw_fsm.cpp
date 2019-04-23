@@ -30,7 +30,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
-namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -127,9 +126,9 @@ bool crw_fsm::is_exploring_for_goal(void) const {
 } /* is_exploring_for_goal() */
 
 bool crw_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::kBlock == acquisition_goal()) {
+  if (acquisition_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == kST_WAIT_FOR_BLOCK_PICKUP;
-  } else if (transport_goal_type::kNest == block_transport_goal()) {
+  } else if (transport_goal_type::ekNEST == block_transport_goal()) {
     return current_state() == kST_WAIT_FOR_BLOCK_DROP;
   }
   return false;
@@ -188,17 +187,17 @@ bool crw_fsm::block_detected(void) const {
 transport_goal_type crw_fsm::block_transport_goal(void) const {
   if (kST_TRANSPORT_TO_NEST == current_state() ||
       kST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::kNest;
+    return transport_goal_type::ekNEST;
   }
-  return transport_goal_type::kNone;
+  return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
 acquisition_goal_type crw_fsm::acquisition_goal(void) const {
   if (kST_ACQUIRE_BLOCK == current_state() ||
       kST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acquisition_goal_type::kBlock;
+    return acquisition_goal_type::ekBLOCK;
   }
-  return acquisition_goal_type::kNone;
+  return acquisition_goal_type::ekNONE;
 } /* block_transport_goal() */
 
 NS_END(depth0, fsm, fordyca);

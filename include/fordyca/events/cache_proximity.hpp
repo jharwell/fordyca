@@ -50,8 +50,6 @@ class cache_starter;
 } // namespace depth2
 } // namespace tasks
 
-namespace rvisitor = rcppsw::patterns::visitor;
-
 NS_START(events, detail);
 
 /*******************************************************************************
@@ -60,10 +58,10 @@ NS_START(events, detail);
 struct cache_proximity_visit_set {
   using value =
       rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                 controller::depth2::grp_mdpo_controller,
-                                 tasks::depth2::cache_finisher,
-                                 tasks::depth2::cache_starter,
-                                 fsm::block_to_goal_fsm>;
+                                  controller::depth2::grp_mdpo_controller,
+                                  tasks::depth2::cache_finisher,
+                                  tasks::depth2::cache_starter,
+                                  fsm::block_to_goal_fsm>;
 };
 
 /*
@@ -73,7 +71,7 @@ struct cache_proximity_visit_set {
  * @brief Created whenever a robot is attempting to start a new cache, but an
  * existing cache unknown to the robot is too close.
  */
-class cache_proximity : public rcppsw::er::client<cache_proximity> {
+class cache_proximity : public rer::client<cache_proximity> {
  public:
   explicit cache_proximity(const std::shared_ptr<repr::base_cache>& cache);
   ~cache_proximity(void) override = default;
@@ -103,7 +101,7 @@ class cache_proximity : public rcppsw::er::client<cache_proximity> {
  */
 using cache_proximity_visitor_impl =
     rvisitor::precise_visitor<detail::cache_proximity,
-                             detail::cache_proximity_visit_set::value>;
+                              detail::cache_proximity_visit_set::value>;
 
 NS_END(detail);
 

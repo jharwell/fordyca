@@ -47,8 +47,6 @@ class base_block;
 class multicell_entity;
 } // namespace repr
 NS_START(support, depth2);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -66,7 +64,7 @@ namespace rmath = rcppsw::math;
  *   during placement.
  * - Existing caches that need to be avoided during placement.
  */
-class cache_center_calculator : public er::client<cache_center_calculator> {
+class cache_center_calculator : public rer::client<cache_center_calculator> {
  public:
   static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 10;
 

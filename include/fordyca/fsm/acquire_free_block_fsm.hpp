@@ -57,7 +57,7 @@ NS_START(fsm);
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
+class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public acquire_goal_fsm {
  public:
   acquire_free_block_fsm(const controller::block_sel_matrix* matrix,

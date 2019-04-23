@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces

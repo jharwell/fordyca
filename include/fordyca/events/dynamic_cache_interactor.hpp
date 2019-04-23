@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
@@ -34,8 +35,6 @@ namespace detail {
 class block_proximity;
 class cache_proximity;
 } // namespace detail
-
-namespace rvisitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Structure Definitions
@@ -49,7 +48,7 @@ namespace rvisitor = rcppsw::patterns::visitor;
  */
 class dynamic_cache_interactor
     : public rvisitor::polymorphic_accept_set<detail::block_proximity,
-                                             detail::cache_proximity> {};
+                                              detail::cache_proximity> {};
 
 NS_END(events, fordyca);
 

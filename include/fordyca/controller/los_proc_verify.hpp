@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ NS_START(controller);
  * @brief Verifies that a LOS has been processed properly and that the contents
  * of the LOS is now accurately reflected in a robots perception.
  */
-class los_proc_verify : public rcppsw::er::client<los_proc_verify> {
+class los_proc_verify : public rer::client<los_proc_verify> {
  public:
   explicit los_proc_verify(const repr::line_of_sight* const c_los)
       : ER_CLIENT_INIT("fordyca.controller.los_proc_verify"), mc_los(c_los) {}

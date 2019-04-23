@@ -106,7 +106,8 @@ class dpo_map {
    * @brief Return an iterator for examining, but not modifying the values of
    * the map.
    */
-  auto const_values_range(void) const -> decltype(std::declval<map_type>() | boost::adaptors::map_values) {
+  auto const_values_range(void) const
+      -> decltype(std::declval<map_type>() | boost::adaptors::map_values) {
     return m_obj | boost::adaptors::map_values;
   }
 

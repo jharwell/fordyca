@@ -39,7 +39,6 @@
  ******************************************************************************/
 NS_START(fordyca, repr);
 namespace prototype = rcppsw::patterns::prototype;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions

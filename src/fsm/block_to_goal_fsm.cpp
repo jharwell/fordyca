@@ -128,18 +128,18 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
     ER_DEBUG("Block drop signal received");
     internal_event(kST_FINISHED);
   } else if (controller::foraging_signal::kBLOCK_PROXIMITY == data->signal()) {
-    ER_ASSERT(acquisition_goal_type::kCacheSite == acquisition_goal(),
+    ER_ASSERT(acquisition_goal_type::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on block proximity");
     m_goal_fsm->task_reset();
     internal_event(kST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::kCACHE_VANISHED == data->signal()) {
-    ER_ASSERT(acquisition_goal_type::kExistingCache == acquisition_goal(),
+    ER_ASSERT(acquisition_goal_type::ekEXISTING_CACHE == acquisition_goal(),
               "Non-existing cache vanished? ");
     m_goal_fsm->task_reset();
     internal_event(kST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::kCACHE_PROXIMITY == data->signal()) {
-    ER_ASSERT(acquisition_goal_type::kNewCache == acquisition_goal() ||
-                  acquisition_goal_type::kCacheSite == acquisition_goal(),
+    ER_ASSERT(acquisition_goal_type::ekNEW_CACHE == acquisition_goal() ||
+                  acquisition_goal_type::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on cache proxmity");
     m_goal_fsm->task_reset();
     internal_event(kST_TRANSPORT_TO_GOAL);
@@ -206,7 +206,7 @@ acquisition_goal_type block_to_goal_fsm::acquisition_goal(void) const {
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->acquisition_goal();
   }
-  return acquisition_goal_type::kNone;
+  return acquisition_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {

@@ -29,7 +29,7 @@
 #include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/params/perception/pheromone_parser.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************

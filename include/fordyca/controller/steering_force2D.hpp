@@ -25,8 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/phototaxis_force.hpp"
-#include "fordyca/controller/steering_force_type.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/robotics/steering2D/force_calculator.hpp"
 
 /*******************************************************************************
@@ -40,7 +39,6 @@ struct steering_force2D_params;
 
 NS_START(controller);
 namespace steering = rcppsw::robotics::steering2D;
-namespace er = rcppsw::er;
 class sensing_subsystem;
 
 /*******************************************************************************
@@ -54,24 +52,24 @@ class sensing_subsystem;
  * @brief Extends \ref rcppsw::robotics::steering2D::force_calculator with
  * steering forces specific to foraging:
  *
- * \ref kPhototaxis
- * \ref kAntiphototaxis
+ * - Phototaxis
+ * - Anti-Phototaxis
  */
 class steering_force2D : public steering::force_calculator,
-                         public er::client<steering_force2D> {
+                         public rer::client<steering_force2D> {
  public:
   steering_force2D(steering::boid& entity,
                    const params::steering_force2D_params* params,
                    const std::shared_ptr<sensing_subsystem>& sensors);
 
   /**
-   * @brief Add the \ref kPhototaxis force to the sum forces for this timestep.
+   * @brief Add the \ref phototaxis force to the sum forces for this timestep.
    */
   void phototaxis(void);
 
   /**
-   * @brief Add the \ref kAntiphototaxis force to the sum forces for this
-   * timestep.
+   * @brief Add the negative of the \ref phototaxis force to the sum forces for
+   * this timestep.
    */
   void anti_phototaxis(void);
 

@@ -42,7 +42,6 @@
  ******************************************************************************/
 NS_START(fordyca, controller);
 class cache_sel_matrix;
-namespace rmath = rcppsw::math;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -56,7 +55,7 @@ NS_START(depth2);
  * and the nest (ideally the halfway point), subject to constraints such as it
  * can't be too near other known blocks, known caches, or the nest.
  */
-class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
+class cache_site_selector: public rer::client<cache_site_selector> {
  public:
   struct cache_constraint_data {
     const repr::base_cache* mc_cache{nullptr};

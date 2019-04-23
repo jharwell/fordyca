@@ -49,7 +49,7 @@ class dynamic_cache_manager;
  * drop, creation, depletion, etc.
  */
 class depth2_loop_functions : public depth1::depth1_loop_functions,
-                              public er::client<depth2_loop_functions> {
+                              public rer::client<depth2_loop_functions> {
  public:
   depth2_loop_functions(void);
   ~depth2_loop_functions(void) override;

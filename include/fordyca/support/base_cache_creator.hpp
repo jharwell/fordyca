@@ -47,8 +47,6 @@ class base_block;
 class multicell_entity;
 } // namespace repr
 NS_START(support);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +57,7 @@ namespace rmath = rcppsw::math;
  *
  * @brief Base class for creating static/dynamic caches in the arena.
  */
-class base_cache_creator : public er::client<base_cache_creator> {
+class base_cache_creator : public rer::client<base_cache_creator> {
  public:
   /**
    * @brief Initialize a new cache creator.

@@ -64,7 +64,7 @@ using transport_goal_type = block_transporter::goal_type;
  * one.
  */
 class cached_block_to_nest_fsm : public base_foraging_fsm,
-                                 er::client<cached_block_to_nest_fsm>,
+                                 rer::client<cached_block_to_nest_fsm>,
                                  public metrics::fsm::goal_acquisition_metrics,
                                  public block_transporter,
                                  public rta::taskable {

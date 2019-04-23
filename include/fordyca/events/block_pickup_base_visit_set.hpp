@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
@@ -32,7 +32,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
 namespace repr {
 class base_block;
 } // namespace repr
@@ -57,9 +56,9 @@ NS_START(events, detail);
  */
 struct block_pickup_base_visit_set {
   using value = rvisitor::precise_visit_set<ds::arena_map,
-                                           ds::dpo_semantic_map,
-                                           ds::dpo_store,
-                                           repr::base_block>;
+                                            ds::dpo_semantic_map,
+                                            ds::dpo_store,
+                                            repr::base_block>;
 };
 
 NS_END(detail, events, fordyca);

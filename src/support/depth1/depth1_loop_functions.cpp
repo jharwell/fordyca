@@ -59,7 +59,6 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
 using ds::arena_grid;
-namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Template Instantiations

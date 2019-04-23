@@ -59,7 +59,7 @@ using transport_goal_type = block_transporter::goal_type;
  * (i.e. it loops indefinitely).
  */
 class dpo_fsm : public base_foraging_fsm,
-                     er::client<dpo_fsm>,
+                     rer::client<dpo_fsm>,
                      public metrics::fsm::goal_acquisition_metrics,
                      public block_transporter {
  public:

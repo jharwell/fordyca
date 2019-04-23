@@ -40,7 +40,6 @@
 NS_START(fordyca, support);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -55,7 +54,7 @@ namespace er = rcppsw::er;
  */
 template <typename T>
 class free_block_pickup_interactor
-    : public er::client<free_block_pickup_interactor<T>> {
+    : public rer::client<free_block_pickup_interactor<T>> {
  public:
   free_block_pickup_interactor(ds::arena_map* const map,
                                argos::CFloorEntity* const floor,
@@ -64,7 +63,7 @@ class free_block_pickup_interactor
         m_floor(floor),
         m_map(map),
         m_penalty_handler(
-            tv_manager->penalty_handler<T>(tv::block_op_src::kSrcFreePickup)) {}
+            tv_manager->penalty_handler<T>(tv::block_op_src::ekFREE_PICKUP)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -94,7 +93,7 @@ class free_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      tv::block_op_src::kSrcFreePickup,
+                                      tv::block_op_src::ekFREE_PICKUP,
                                       timestep);
     }
   }
@@ -105,7 +104,7 @@ class free_block_pickup_interactor
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
   void finish_free_block_pickup(T& controller, uint timestep) {
-    ER_ASSERT(controller.goal_acquired() && acquisition_goal_type::kBlock ==
+    ER_ASSERT(controller.goal_acquired() && acquisition_goal_type::ekBLOCK ==
                                                 controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),

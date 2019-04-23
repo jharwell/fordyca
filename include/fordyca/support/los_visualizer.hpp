@@ -24,7 +24,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ NS_START(support);
  * @brief Renders the LOS for a given robot for visualization/debugging
  * purposes.
  */
-class los_visualizer : public rcppsw::er::client<los_visualizer> {
+class los_visualizer : public rer::client<los_visualizer> {
  public:
   explicit los_visualizer(argos::CQTOpenGLUserFunctions* qt)
       : ER_CLIENT_INIT("fordyca.support.los_visualizer"), m_qt(qt) {}

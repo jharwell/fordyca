@@ -26,13 +26,12 @@
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
-
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -45,14 +44,14 @@ namespace rmath = rcppsw::math;
  * they attempt to acquire a goal (site/object of interest) in SOME way (driving
  * to it directly, exploring for it, etc).
  */
-class goal_acquisition_metrics : public virtual rcppsw::metrics::base_metrics {
+class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
  public:
   enum class goal_type {
-    kNone,
-    kCacheSite,
-    kNewCache,
-    kExistingCache,
-    kBlock
+    ekNONE,
+    ekCACHE_SITE,
+    ekNEW_CACHE,
+    ekEXISTING_CACHE,
+    ekBLOCK
   };
   goal_acquisition_metrics(void) = default;
   ~goal_acquisition_metrics(void) override = default;

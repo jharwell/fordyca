@@ -29,7 +29,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Class Constants
@@ -175,7 +174,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data* data) {
     internal_event(kST_COLLISION_AVOIDANCE);
   } else {
     saa_subsystem()->steering_force().seek_to(m_goal_data.loc);
-    saa_subsystem()->actuation()->leds_set_color(utils::color::kBLUE);
+    saa_subsystem()->actuation()->leds_set_color(rutils::color::kBLUE);
     saa_subsystem()->apply_steering_force(std::make_pair(true, false));
   }
   return controller::foraging_signal::kHANDLED;
@@ -192,15 +191,15 @@ FSM_STATE_DEFINE(vector_fsm, arrived, __rcsw_unused struct goal_data* data) {
 
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
   ER_DEBUG("Entering kST_VECTOR");
-  actuators()->leds_set_color(utils::color::kBLUE);
+  actuators()->leds_set_color(rutils::color::kBLUE);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
   ER_DEBUG("Entering kST_COLLISION_AVOIDANCE");
-  actuators()->leds_set_color(utils::color::kRED);
+  actuators()->leds_set_color(rutils::color::kRED);
 }
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DEBUG("Entering kST_COLLISION_RECOVERY");
-  actuators()->leds_set_color(utils::color::kYELLOW);
+  actuators()->leds_set_color(rutils::color::kYELLOW);
 }
 /*******************************************************************************
  * Collision Metrics
@@ -220,8 +219,7 @@ bool vector_fsm::exited_collision_avoidance(void) const {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-void vector_fsm::task_start(
-    const rta::taskable_argument* const c_arg) {
+void vector_fsm::task_start(const rta::taskable_argument* const c_arg) {
   static const uint8_t kTRANSITIONS[] = {
       kST_VECTOR,                            /* start */
       kST_VECTOR,                            /* vector */

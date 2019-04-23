@@ -26,13 +26,12 @@
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace rswarm = rcppsw::swarm;
-NS_START(metrics, perception);
+NS_START(fordyca, metrics, perception);
 
 /*******************************************************************************
  * Class Definitions
@@ -47,7 +46,7 @@ NS_START(metrics, perception);
  *
  * Metrics are collected every timestep.
  */
-class dpo_perception_metrics : public virtual rcppsw::metrics::base_metrics {
+class dpo_perception_metrics : public virtual rmetrics::base_metrics {
  public:
   dpo_perception_metrics(void) = default;
 

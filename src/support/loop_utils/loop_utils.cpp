@@ -41,7 +41,7 @@ __rcsw_pure int robot_on_block(const controller::base_controller& controller,
 __rcsw_pure int robot_on_block(const argos::CFootBotEntity& robot,
                                const ds::arena_map& map) {
   return robot_on_block(dynamic_cast<const controller::base_controller&>(
-      robot.GetControllableEntity().GetController()),
+                            robot.GetControllableEntity().GetController()),
                         map);
 } /* robot_on_block() */
 
@@ -63,7 +63,7 @@ __rcsw_pure int robot_on_cache(const controller::base_controller& controller,
 __rcsw_pure int robot_on_cache(const argos::CFootBotEntity& robot,
                                const ds::arena_map& map) {
   return robot_on_cache(dynamic_cast<const controller::base_controller&>(
-      robot.GetControllableEntity().GetController()),
+                            robot.GetControllableEntity().GetController()),
                         map);
 }
 

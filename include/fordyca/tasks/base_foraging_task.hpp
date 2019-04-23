@@ -34,8 +34,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-namespace rvisitor = rcppsw::patterns::visitor;
-namespace rta = rcppsw::ta;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 

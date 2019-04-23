@@ -28,7 +28,7 @@
 
 #include "fordyca/params/arena/block_redist_governor_params.hpp"
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************

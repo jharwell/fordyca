@@ -1,7 +1,7 @@
 /**
- * @file block_drop_base_visit_set.hpp
+ * @file op_filter_status.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,44 +18,60 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_BASE_VISIT_SET_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_BASE_VISIT_SET_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace repr {
-class base_block;
-} // namespace repr
-
-namespace ds {
-class arena_map;
-} // namespace ds
-
-NS_START(events, detail);
+NS_START(fordyca, support, tv);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct block_drop_base_visit_set
- * @ingroup fordyca events detail
- *
- * @brief Interface specifying the core class of classes any action involving
- * dropping a block will need to visit (think data structures).
+ * @brief Contains the various statuses relating to robots and block operations
+ * (picking up, dropping).
  */
-struct block_drop_base_visit_set {
-  using value = rvisitor::precise_visit_set<ds::arena_map, repr::base_block>;
+enum class op_filter_status {
+  /**
+   * @brief The robot has passed all necessary filter checkes for the requested
+   * operation.
+   *
+   */
+  ekSATISFIED,
+
+  /**
+   * @brief The robot has not currently achieved the necessary internal state
+   * for the block operation.
+   */
+  ekROBOT_INTERNAL_UNREADY,
+
+  /**
+   * @brief The robot has achieved the necessary internal state for the block
+   * operation, but is not actually on a block, so the desired operation is
+   * invalid.
+   */
+  ekROBOT_NOT_ON_BLOCK,
+
+  /**
+   * @brief The robot has requested an action that while too close to an
+   * existing block in the arena.
+   */
+  ekBLOCK_PROXIMITY,
+
+  /**
+   * @brief The robot has requested an action while too close to an existing
+   * cache in the arena.
+   */
+  ekCACHE_PROXIMITY
 };
 
-NS_END(detail, events, fordyca);
+NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_DROP_BASE_VISIT_SET_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_OP_FILTER_STATUS_HPP_ */

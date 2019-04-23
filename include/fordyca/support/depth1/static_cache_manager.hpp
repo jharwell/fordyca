@@ -46,8 +46,6 @@ class base_block;
 class arena_cache;
 }
 NS_START(support, depth1);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -60,7 +58,7 @@ namespace rmath = rcppsw::math;
  * cache in the arena, when it is employed.
  */
 class static_cache_manager : public base_cache_manager,
-                             public er::client<static_cache_manager> {
+                             public rer::client<static_cache_manager> {
  public:
   static_cache_manager(const struct params::caches::caches_params* params,
                        ds::arena_grid* arena_grid,

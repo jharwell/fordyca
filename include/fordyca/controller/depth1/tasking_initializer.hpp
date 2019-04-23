@@ -27,7 +27,7 @@
 #include <map>
 #include <string>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -55,9 +55,6 @@ class saa_subsystem;
 class base_perception_subsystem;
 NS_START(depth1);
 
-namespace rta = rcppsw::ta;
-namespace er = rcppsw::er;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -68,7 +65,7 @@ namespace er = rcppsw::er;
  * @brief A helper class to offload initialization of the task tree for depth1
  * foraging.
  */
-class tasking_initializer : public er::client<tasking_initializer> {
+class tasking_initializer : public rer::client<tasking_initializer> {
  public:
   tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,

@@ -30,8 +30,8 @@
 #include <vector>
 
 #include "fordyca/controller/cache_sel_exception.hpp"
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/cache_sel/pickup_policy_params.hpp"
-#include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -44,8 +44,6 @@ namespace params { namespace cache_sel {
 struct cache_sel_matrix_params;
 }} // namespace params::cache_sel
 NS_START(controller);
-namespace rmath = rcppsw::math;
-namespace er = rcppsw::er;
 using cache_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
@@ -71,7 +69,7 @@ using cache_sel_variant =
  * This class may be separated into those components in the future if it makes
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
-class cache_sel_matrix : public er::client<cache_sel_matrix>,
+class cache_sel_matrix : public rer::client<cache_sel_matrix>,
                          private std::map<std::string, cache_sel_variant> {
  public:
   static constexpr char kNestLoc[] = "nest_loc";

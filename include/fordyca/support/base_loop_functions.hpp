@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/loop_function_repository.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/radians.hpp"
@@ -60,7 +61,6 @@ NS_START(support);
 namespace tv {
 class tv_manager;
 }
-namespace rmath = rcppsw::math;
 namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
@@ -79,7 +79,7 @@ namespace rswc = rcppsw::swarm::convergence;
  * the \ref argos::CLoopFunctions class.
  */
 class base_loop_functions : public argos::CLoopFunctions,
-                            public rcppsw::er::client<base_loop_functions> {
+                            public rer::client<base_loop_functions> {
  public:
   base_loop_functions(void);
   ~base_loop_functions(void) override;

@@ -57,7 +57,7 @@ NS_START(fsm);
  * acquired (always by vectoring), it signals that it has completed its task.
  */
 class acquire_existing_cache_fsm
-    : public er::client<acquire_existing_cache_fsm>,
+    : public rer::client<acquire_existing_cache_fsm>,
       public acquire_goal_fsm {
  public:
   /**

@@ -34,7 +34,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace er = rcppsw::er;
 namespace controller { namespace depth0 { class depth0_controller; }}
 NS_START(support, depth0);
 
@@ -55,7 +54,7 @@ class depth0_metrics_aggregator;
  * - Sending robot the current simulation tick each timestep.
  */
 class depth0_loop_functions : public base_loop_functions,
-                              public er::client<depth0_loop_functions> {
+                              public rer::client<depth0_loop_functions> {
  public:
   depth0_loop_functions(void);
   ~depth0_loop_functions(void) override;

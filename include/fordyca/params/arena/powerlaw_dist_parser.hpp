@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/params/arena/powerlaw_dist_params.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************

@@ -40,8 +40,6 @@ NS_START(fordyca, support);
 
 using transport_goal_type = fsm::block_transporter::goal_type;
 
-namespace er = rcppsw::er;
-
 /*******************************************************************************
  * Classes
  ******************************************************************************/
@@ -55,7 +53,7 @@ namespace er = rcppsw::er;
  */
 template <typename T>
 class nest_block_drop_interactor
-    : public er::client<nest_block_drop_interactor<T>> {
+    : public rer::client<nest_block_drop_interactor<T>> {
  public:
   nest_block_drop_interactor(ds::arena_map* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
@@ -66,7 +64,7 @@ class nest_block_drop_interactor
         m_metrics_agg(metrics_agg),
         m_map(map),
         m_penalty_handler(
-            tv_manager->penalty_handler<T>(tv::block_op_src::kSrcNestDrop)) {}
+            tv_manager->penalty_handler<T>(tv::block_op_src::ekNEST_DROP)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -95,7 +93,7 @@ class nest_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      tv::block_op_src::kSrcNestDrop,
+                                      tv::block_op_src::ekNEST_DROP,
                                       timestep);
     }
   }
@@ -107,7 +105,7 @@ class nest_block_drop_interactor
    */
   void finish_nest_block_drop(T& controller, uint timestep) {
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
-    ER_ASSERT(transport_goal_type::kNest == controller.block_transport_goal(),
+    ER_ASSERT(transport_goal_type::ekNEST == controller.block_transport_goal(),
               "Controller still has nest as goal");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving drop penalty");

@@ -35,12 +35,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace rfsm = rcppsw::patterns::state_machine;
-namespace rta = rcppsw::ta;
-
-NS_START(fsm);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
@@ -61,7 +56,7 @@ NS_START(fsm);
  * "arrive" at it.
  */
 class vector_fsm : public base_foraging_fsm,
-                   public er::client<vector_fsm>,
+                   public rer::client<vector_fsm>,
                    public rta::taskable {
  public:
   /**

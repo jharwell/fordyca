@@ -71,8 +71,7 @@ bool grid2D_avg_metrics_collector::csv_line_build(std::string& line) {
   return true;
 } /* csv_line_build() */
 
-void grid2D_avg_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+void grid2D_avg_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   ++m_count;
   for (size_t i = 0; i < m_stats.xsize(); ++i) {
     for (size_t j = 0; j < m_stats.ysize(); ++j) {

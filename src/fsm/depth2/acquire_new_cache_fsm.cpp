@@ -114,7 +114,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
  ******************************************************************************/
 __rcsw_const acquisition_goal_type
 acquire_new_cache_fsm::acquisition_goal_internal(void) const {
-  return acquisition_goal_type::kNewCache;
+  return acquisition_goal_type::ekNEW_CACHE;
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

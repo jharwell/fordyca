@@ -58,7 +58,7 @@ class static_cache_manager;
  * drop, etc.
  */
 class depth1_loop_functions : public depth0::depth0_loop_functions,
-                              public er::client<depth1_loop_functions> {
+                              public rer::client<depth1_loop_functions> {
  public:
   depth1_loop_functions(void);
   ~depth1_loop_functions(void) override;

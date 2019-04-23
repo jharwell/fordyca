@@ -30,6 +30,7 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +39,6 @@ NS_START(fordyca, support, tv);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -52,12 +52,8 @@ namespace er = rcppsw::er;
  * in places that involve existing caches.
  */
 template <typename T>
-class cache_op_filter : public er::client<cache_op_filter<T>> {
+class cache_op_filter : public rer::client<cache_op_filter<T>> {
  public:
-  enum filter_status {
-    kStatusOK,
-    kStatusControllerNotReady,
-  };
   /**
    * @brief The result of checking a controller instance to see if it has
    * satisfied the preconditions for a cache operation (pickup/drop/etc).
@@ -71,7 +67,7 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
    */
   struct filter_res_t {
     bool status;
-    filter_status reason;
+    op_filter_status reason;
   };
 
   explicit cache_op_filter(ds::arena_map* const map)
@@ -95,8 +91,8 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
      * transporting it (even if it IS currently in the nest), nothing to do.
      */
     switch (src) {
-      case kSrcExistingCacheDrop:
-      case kSrcExistingCachePickup:
+      case cache_op_src::ekEXISTING_CACHE_DROP:
+      case cache_op_src::ekEXISTING_CACHE_PICKUP:
         return do_filter(controller);
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
@@ -115,13 +111,13 @@ class cache_op_filter : public er::client<cache_op_filter<T>> {
   filter_res_t do_filter(const T& controller) const {
     int cache_id = loop_utils::robot_on_cache(controller, *m_map);
     bool ready = (controller.goal_acquired() &&
-                  acquisition_goal_type::kExistingCache ==
+                  acquisition_goal_type::ekEXISTING_CACHE ==
                       controller.acquisition_goal() &&
                   -1 != cache_id);
     if (ready) {
-      return filter_res_t{false, kStatusOK};
+      return filter_res_t{false, op_filter_status::ekSATISFIED};
     }
-    return filter_res_t{true, kStatusControllerNotReady};
+    return filter_res_t{true, op_filter_status::ekROBOT_INTERNAL_UNREADY};
   }
 
   /* clang-format off */

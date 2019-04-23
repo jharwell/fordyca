@@ -56,7 +56,7 @@ NS_START(depth0);
  * collection functions can be reused.
  */
 class mdpo_controller : public dpo_controller,
-                        public er::client<mdpo_controller> {
+                        public rer::client<mdpo_controller> {
  public:
   mdpo_controller(void);
   ~mdpo_controller(void) override;

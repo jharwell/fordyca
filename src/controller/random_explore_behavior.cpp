@@ -83,7 +83,7 @@ void random_explore_behavior::execute(void) {
              obs.angle().value(),
              obs.length());
     saa_subsystem()->apply_steering_force(std::make_pair(false, false));
-    saa_subsystem()->actuation()->leds_set_color(utils::color::kRED);
+    saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
   } else {
     if (!m_exited_avoidance) {
       if (m_in_avoidance) {
@@ -96,7 +96,7 @@ void random_explore_behavior::execute(void) {
     m_entered_avoidance = false; /* catches 1 timestep avoidances correctly */
 
     ER_DEBUG("No threatening obstacle found");
-    saa_subsystem()->actuation()->leds_set_color(utils::color::kMAGENTA);
+    saa_subsystem()->actuation()->leds_set_color(rutils::color::kMAGENTA);
     rmath::vector2d force = saa_subsystem()->steering_force().value();
     /*
      * This can be 0 if the wander force is not active this timestep.

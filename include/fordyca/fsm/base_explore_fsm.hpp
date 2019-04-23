@@ -49,8 +49,7 @@ NS_START(fsm);
  *
  * This class cannot be instantiated on its own.
  */
-class base_explore_fsm : public base_foraging_fsm,
-                         public rta::taskable {
+class base_explore_fsm : public base_foraging_fsm, public rta::taskable {
  public:
   base_explore_fsm(controller::saa_subsystem* saa, uint8_t max_states);
 

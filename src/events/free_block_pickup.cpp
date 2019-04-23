@@ -48,7 +48,6 @@
 NS_START(fordyca, events, detail);
 
 using ds::occupancy_grid;
-namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructor

@@ -42,8 +42,6 @@
 NS_START(fordyca, fsm);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-namespace rmath = rcppsw::math;
-namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +57,7 @@ namespace rta = rcppsw::ta;
  * acquired, it signals that it has completed its task.
  */
 class acquire_goal_fsm : public base_foraging_fsm,
-                         public er::client<acquire_goal_fsm>,
+                         public rer::client<acquire_goal_fsm>,
                          public metrics::fsm::goal_acquisition_metrics,
                          public rta::taskable {
  public:

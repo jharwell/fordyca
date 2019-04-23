@@ -79,7 +79,7 @@ double collector::interface_time_calc(uint interface, double start_time) {
 
 void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (acquisition_goal_type::kExistingCache != fsm->acquisition_goal()) {
+  if (acquisition_goal_type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
     return;
   }
 
@@ -155,7 +155,7 @@ TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
  ******************************************************************************/
 __rcsw_pure bool collector::task_at_interface(void) const {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  return !(transport_goal_type::kNest == fsm->block_transport_goal());
+  return !(transport_goal_type::ekNEST == fsm->block_transport_goal());
 } /* task_at_interface() */
 
 NS_END(depth1, tasks, fordyca);

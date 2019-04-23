@@ -30,7 +30,7 @@
 #include "fordyca/params/grid_parser.hpp"
 #include "fordyca/params/arena/nest_parser.hpp"
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************

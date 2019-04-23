@@ -36,8 +36,6 @@ class bi_tdgraph_executive;
 }}
 
 NS_START(fordyca);
-namespace rvisitor = rcppsw::patterns::visitor;
-namespace rta = rcppsw::ta;
 
 namespace params { namespace depth2 { class controller_repository; }}
 NS_START(controller, depth2);
@@ -55,7 +53,7 @@ NS_START(controller, depth2);
  * using a DPO data store for tracking arena state and object relevance.
  */
 class grp_dpo_controller : public depth1::gp_dpo_controller,
-                           public er::client<grp_dpo_controller> {
+                           public rer::client<grp_dpo_controller> {
  public:
   grp_dpo_controller(void);
   ~grp_dpo_controller(void) override = default;

@@ -39,9 +39,6 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-namespace rct = rcppsw::control;
-namespace er = rcppsw::er;
-
 /*******************************************************************************
  * Classes
  ******************************************************************************/
@@ -58,7 +55,7 @@ namespace er = rcppsw::er;
  */
 template <typename T>
 class temporal_penalty_handler
-    : public er::client<temporal_penalty_handler<T>> {
+    : public rer::client<temporal_penalty_handler<T>> {
  public:
   using iterator_type = typename std::list<temporal_penalty<T>>::iterator;
 

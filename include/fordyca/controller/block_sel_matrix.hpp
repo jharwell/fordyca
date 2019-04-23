@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
@@ -40,7 +40,6 @@ namespace params { namespace block_sel {
 struct block_sel_matrix_params;
 }} // namespace params::block_sel
 NS_START(controller);
-namespace rmath = rcppsw::math;
 using block_sel_variant =
     boost::variant<double, rmath::vector2d, std::vector<int>>;
 

@@ -27,7 +27,7 @@
 #include <string>
 
 #include "fordyca/ds/dpo_map.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
@@ -38,7 +38,6 @@ namespace repr {
 class base_cache;
 }
 NS_START(ds);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions

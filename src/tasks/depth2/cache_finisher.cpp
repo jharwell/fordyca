@@ -39,9 +39,8 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_finisher::cache_finisher(
-    const struct rta::task_alloc_params* params,
-    std::unique_ptr<rta::taskable> mechanism)
+cache_finisher::cache_finisher(const struct rta::task_alloc_params* params,
+                               std::unique_ptr<rta::taskable> mechanism)
     : foraging_task(kCacheFinisherName, params, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.cache_finisher") {}
 
@@ -70,14 +69,14 @@ void cache_finisher::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::block_to_new_cache_fsm*>(mechanism());
 
   if (fsm->goal_acquired() &&
-      transport_goal_type::kNewCache == fsm->block_transport_goal()) {
+      transport_goal_type::ekNEW_CACHE == fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
       ER_TRACE("Interface finished at timestep %f", current_time());
     }
     ER_TRACE("Interface time: %f", interface_time(0));
-  } else if (transport_goal_type::kNewCache == fsm->block_transport_goal()) {
+  } else if (transport_goal_type::ekNEW_CACHE == fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);

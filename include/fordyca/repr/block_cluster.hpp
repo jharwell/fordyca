@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_list.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +48,7 @@ NS_START(fordyca, repr);
  * - The blocks distributed in that area.
  * - The maximum capacity of the cluster.
  */
-class block_cluster : public rcppsw::er::client<block_cluster> {
+class block_cluster : public rer::client<block_cluster> {
  public:
   block_cluster(const ds::arena_grid::const_view& view, uint capacity)
       : ER_CLIENT_INIT("fordyca.repr.block_cluster"),

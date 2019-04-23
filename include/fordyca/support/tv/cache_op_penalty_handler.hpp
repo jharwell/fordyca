@@ -35,13 +35,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace controller { namespace depth0 {
-class stateful_foraging_controller;
-class crw_controller;
-}} // namespace controller::depth0
-
-NS_START(support, tv);
+NS_START(fordyca, support, tv);
 
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
@@ -60,7 +54,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 template <typename T>
 class cache_op_penalty_handler
     : public temporal_penalty_handler<T>,
-      public er::client<cache_op_penalty_handler<T>> {
+      public rer::client<cache_op_penalty_handler<T>> {
  public:
   using temporal_penalty_handler<T>::is_serving_penalty;
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
@@ -78,8 +72,6 @@ class cache_op_penalty_handler
       delete;
   cache_op_penalty_handler(const cache_op_penalty_handler& other) = delete;
 
-  using filter_status = typename cache_op_filter<T>::filter_status;
-
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
    * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
@@ -90,7 +82,7 @@ class cache_op_penalty_handler
    *            applied).
    * @param timestep The current timestep.
   */
-  filter_status penalty_init(T& controller, cache_op_src src, uint timestep) {
+  op_filter_status penalty_init(T& controller, cache_op_src src, uint timestep) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
@@ -116,7 +108,7 @@ class cache_op_penalty_handler
 
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));
-    return filter_status::kStatusOK;
+    return op_filter_status::ekSATISFIED;
   }
 
  protected:

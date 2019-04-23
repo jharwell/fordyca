@@ -37,7 +37,6 @@
  ******************************************************************************/
 NS_START(fordyca, controller);
 class cache_sel_matrix;
-namespace rmath = rcppsw::math;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -51,7 +50,7 @@ NS_START(depth2);
  * arena) which are presumed to still exist at this point, although that may not
  * be true as a robot's knowledge of the arena is imperfect).
  */
-class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
+class new_cache_selector: public rer::client<new_cache_selector> {
  public:
   explicit new_cache_selector(const controller::cache_sel_matrix* csel_matrix);
 

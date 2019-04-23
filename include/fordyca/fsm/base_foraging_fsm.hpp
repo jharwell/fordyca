@@ -41,9 +41,6 @@ class saa_subsystem;
 class sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
-namespace rfsm = rcppsw::patterns::state_machine;
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 NS_START(fsm);
 
@@ -61,7 +58,7 @@ NS_START(fsm);
  * per-se.
  */
 class base_foraging_fsm : public rfsm::hfsm,
-                          public er::client<base_foraging_fsm>,
+                          public rer::client<base_foraging_fsm>,
                           public metrics::fsm::collision_metrics {
  public:
   base_foraging_fsm(controller::saa_subsystem* saa, uint8_t max_states);

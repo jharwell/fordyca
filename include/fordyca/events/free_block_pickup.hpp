@@ -33,8 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
-
 namespace fsm {
 namespace depth0 {
 class crw_fsm;
@@ -112,8 +110,7 @@ struct free_block_pickup_visit_set {
  * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
  */
-class free_block_pickup : public rcppsw::er::client<free_block_pickup>,
-                          public cell_op {
+class free_block_pickup : public rer::client<free_block_pickup>, public cell_op {
  public:
   free_block_pickup(const std::shared_ptr<repr::base_block>& block,
                     uint robot_index,
@@ -170,7 +167,7 @@ class free_block_pickup : public rcppsw::er::client<free_block_pickup>,
  */
 using free_block_pickup_visitor_impl =
     rvisitor::precise_visitor<detail::free_block_pickup,
-                             detail::free_block_pickup_visit_set::value>;
+                              detail::free_block_pickup_visit_set::value>;
 
 NS_END(detail);
 

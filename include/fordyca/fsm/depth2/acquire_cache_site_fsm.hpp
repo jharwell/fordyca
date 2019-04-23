@@ -50,7 +50,7 @@ NS_START(fsm, depth2);
  * cache at, and then acquire that location within the arena. Once this has been
  * done, it signals that it has completed its task.
  */
-class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
+class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
                                public acquire_goal_fsm {
  public:
   acquire_cache_site_fsm(const controller::cache_sel_matrix* matrix,

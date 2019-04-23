@@ -39,9 +39,6 @@ struct pheromone_params;
 }} // namespace params::perception
 NS_START(ds);
 
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -55,17 +52,17 @@ namespace rmath = rcppsw::math;
  * an entity are encountered (e.g. the real version has vanished and the tracked
  * version is out of date).
  */
-class dpo_store : public er::client<dpo_store> {
+class dpo_store : public rer::client<dpo_store> {
  public:
   template <typename T>
   using dp_entity = repr::dp_entity<T>;
 
   enum update_status {
-    kNoChange,
-    kNewBlockAdded,
-    kBlockMoved,
-    kNewCacheAdded,
-    kCacheUpdated /* # blocks can change */
+    kNO_CHANGE,
+    kNEW_BLOCK_ADDED,
+    kBLOCK_MOVED,
+    kNEW_CACHE_ADDED,
+    kCACHE_UPDATED /* # blocks can change */
   };
 
   /**
@@ -79,7 +76,7 @@ class dpo_store : public er::client<dpo_store> {
 
   struct update_res_t {
     bool status{false};
-    update_status reason{kNoChange};
+    update_status reason{kNO_CHANGE};
     rmath::vector2u old_loc{};
   };
 

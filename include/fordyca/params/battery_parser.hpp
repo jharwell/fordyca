@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/battery_params.hpp"
 #include "fordyca/params/metrics_parser.hpp"
-#include "rcppsw/common/common.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 
 /*******************************************************************************

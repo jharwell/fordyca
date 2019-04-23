@@ -33,8 +33,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-namespace rmath = rcppsw::math;
-namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Class Definitions

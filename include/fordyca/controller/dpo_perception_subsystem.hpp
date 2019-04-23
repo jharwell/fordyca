@@ -28,7 +28,7 @@
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -56,7 +56,7 @@ NS_START(controller);
  * into a useful internal repr: a \ref dpo_store.
  */
 class dpo_perception_subsystem
-    : public rcppsw::er::client<dpo_perception_subsystem>,
+    : public rer::client<dpo_perception_subsystem>,
       public base_perception_subsystem,
       public metrics::perception::dpo_perception_metrics {
  public:

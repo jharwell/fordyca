@@ -38,12 +38,8 @@ class bi_tab;
 class executable_task;
 class polled_task;
 }}
-namespace rvisitor = rcppsw::patterns::visitor;
-namespace rta = rcppsw::ta;
 
 NS_START(fordyca);
-namespace rvisitor = rcppsw::patterns::visitor;
-namespace rta = rcppsw::ta;
 
 namespace tasks {
 namespace depth0 { class generalist; }
@@ -74,8 +70,8 @@ NS_START(depth1);
  * uses a DPO data store for tracking arena state and object relavance.
  */
 class gp_dpo_controller : public depth0::dpo_controller,
-                          public er::client<gp_dpo_controller>,
-                          public rcppsw::metrics::tasks::bi_tdgraph_metrics {
+                          public rer::client<gp_dpo_controller>,
+                          public rmetrics::tasks::bi_tdgraph_metrics {
  public:
   using dpo_controller::perception;
 

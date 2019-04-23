@@ -32,7 +32,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 namespace depth1 {
 class gp_dpo_controller;
@@ -69,14 +68,14 @@ NS_START(events, detail);
 struct cache_vanished_visit_set {
   using value =
       rvisitor::precise_visit_set<controller::depth1::gp_dpo_controller,
-                                 controller::depth1::gp_mdpo_controller,
-                                 controller::depth2::grp_dpo_controller,
-                                 controller::depth2::grp_mdpo_controller,
-                                 tasks::depth1::collector,
-                                 tasks::depth1::harvester,
-                                 tasks::depth2::cache_transferer,
-                                 fsm::block_to_goal_fsm,
-                                 fsm::depth1::cached_block_to_nest_fsm>;
+                                  controller::depth1::gp_mdpo_controller,
+                                  controller::depth2::grp_dpo_controller,
+                                  controller::depth2::grp_mdpo_controller,
+                                  tasks::depth1::collector,
+                                  tasks::depth1::harvester,
+                                  tasks::depth2::cache_transferer,
+                                  fsm::block_to_goal_fsm,
+                                  fsm::depth1::cached_block_to_nest_fsm>;
 };
 
 /*
@@ -87,7 +86,7 @@ struct cache_vanished_visit_set {
  * serving the penalty the cache it is waiting in vanishes due to another
  * robot picking up the last available block.
  */
-class cache_vanished : public rcppsw::er::client<cache_vanished> {
+class cache_vanished : public rer::client<cache_vanished> {
  public:
   explicit cache_vanished(uint cache_id);
   ~cache_vanished(void) override = default;
@@ -123,7 +122,7 @@ class cache_vanished : public rcppsw::er::client<cache_vanished> {
  */
 using cache_vanished_visitor_impl =
     rvisitor::precise_visitor<detail::cache_vanished,
-                             detail::cache_vanished_visit_set::value>;
+                              detail::cache_vanished_visit_set::value>;
 
 NS_END(detail);
 

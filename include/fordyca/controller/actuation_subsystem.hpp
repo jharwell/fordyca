@@ -42,9 +42,7 @@ class tv_manager;
 
 NS_START(controller);
 
-namespace rfsm = rcppsw::patterns::state_machine;
 namespace hal = rcppsw::robotics::hal;
-namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Class Definitions
@@ -83,7 +81,7 @@ class actuation_subsystem {
    *
    * @param color The new color.
    */
-  void leds_set_color(const utils::color& color);
+  void leds_set_color(const rutils::color& color);
 
   throttling_differential_drive& differential_drive(void) { return m_drive; }
   const throttling_differential_drive& differential_drive(void) const {

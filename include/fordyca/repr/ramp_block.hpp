@@ -39,7 +39,7 @@ NS_START(fordyca, repr);
  * @class ramp_block
  * @ingroup fordyca repr
  *
- * @brief A repr of a ramp block within the arena. Ramp blocks are 2x1
+ * @brief A representation of a ramp block within the arena. Ramp blocks are 2x1
  * cells in size. Ramped blocks only need X,Y dimensions, because they are only
  * handled concretely in the arena in 2D (3D is only for visualization purposes,
  * and I can cheat a bit there).
@@ -47,13 +47,13 @@ NS_START(fordyca, repr);
 class ramp_block : public base_block {
  public:
   explicit ramp_block(const rmath::vector2d& dim)
-      : base_block(dim, ut::color::kBLUE, -1) {}
+      : base_block(dim, rutils::color::kBLUE, -1) {}
 
   ramp_block(const rmath::vector2d& dim, int id)
-      : base_block(dim, ut::color::kBLUE, id) {}
+      : base_block(dim, rutils::color::kBLUE, id) {}
 
-  transport_metrics::block_type type(void) const override {
-    return transport_metrics::kRamp;
+  repr::block_type type(void) const override {
+    return repr::block_type::ekRAMP;
   }
   std::unique_ptr<base_block> clone(void) const override {
     auto tmp = rcppsw::make_unique<ramp_block>(dims(), id());

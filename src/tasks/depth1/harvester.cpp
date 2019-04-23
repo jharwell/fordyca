@@ -81,14 +81,15 @@ void harvester::active_interface_update(int) {
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
 
   if (fsm->goal_acquired() &&
-      transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
+      transport_goal_type::ekEXISTING_CACHE == fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
       ER_DEBUG("Interface finished at timestep %f", current_time());
     }
     ER_TRACE("Interface time: %f", interface_time(0));
-  } else if (transport_goal_type::kExistingCache == fsm->block_transport_goal()) {
+  } else if (transport_goal_type::ekEXISTING_CACHE ==
+             fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);
@@ -158,7 +159,7 @@ TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
 __rcsw_pure bool harvester::task_at_interface(void) const {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
-  return transport_goal_type::kExistingCache == fsm->block_transport_goal();
+  return transport_goal_type::ekEXISTING_CACHE == fsm->block_transport_goal();
 } /* task_at_interface()() */
 
 NS_END(depth1, tasks, fordyca);

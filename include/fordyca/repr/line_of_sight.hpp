@@ -41,7 +41,6 @@ NS_START(fordyca);
 namespace ds {
 class cell2D;
 }
-namespace rmath = rcppsw::math;
 
 NS_START(repr);
 class base_block;
@@ -65,7 +64,7 @@ class base_cache;
  * All coordinates within a LOS are relative to the LOS itself (not its location
  * within the arena). The origin is in the lower left corner of the LOS.
  */
-class line_of_sight : public rcppsw::er::client<line_of_sight> {
+class line_of_sight : public rer::client<line_of_sight> {
  public:
   using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
   using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;

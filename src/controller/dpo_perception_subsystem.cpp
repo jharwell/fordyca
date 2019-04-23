@@ -213,11 +213,11 @@ void dpo_perception_subsystem::los_tracking_sync(
 /*******************************************************************************
  * DPO Perception Metrics
  ******************************************************************************/
-uint dpo_perception_subsystem::n_known_blocks(void) const {
+__rcsw_pure uint dpo_perception_subsystem::n_known_blocks(void) const {
   return m_store->blocks().size();
 } /* n_known_blocks() */
 
-uint dpo_perception_subsystem::n_known_caches(void) const {
+__rcsw_pure uint dpo_perception_subsystem::n_known_caches(void) const {
   return m_store->caches().size();
 } /* n_known_caches() */
 
@@ -231,7 +231,8 @@ rswarm::pheromone_density dpo_perception_subsystem::avg_block_density(void) cons
                          rswarm::pheromone_density(),
                          [&](const auto& accum, const auto& block) {
                            return accum + block.density();
-                         }) / m_store->blocks().size();
+                         }) /
+         m_store->blocks().size();
 } /* avg_block_density() */
 
 rswarm::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
@@ -244,7 +245,8 @@ rswarm::pheromone_density dpo_perception_subsystem::avg_cache_density(void) cons
                          rswarm::pheromone_density(),
                          [&](const auto& accum, const auto& cache) {
                            return accum + cache.density();
-                         }) / m_store->caches().size();
+                         }) /
+         m_store->caches().size();
 } /* avg_cache_density() */
 
 NS_END(controller, fordyca);

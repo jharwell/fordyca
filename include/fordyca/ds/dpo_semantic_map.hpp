@@ -44,7 +44,6 @@ struct perception_params;
 NS_START(ds);
 
 namespace decorator = rcppsw::patterns::decorator;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -66,7 +65,7 @@ namespace er = rcppsw::er;
  * Does *NOT* track which cells are in CACHE_EXTENT, as that is irrelevant for
  * what the robots need (as of 9/14/18 anyway).
  */
-class dpo_semantic_map : public er::client<dpo_semantic_map>,
+class dpo_semantic_map : public rer::client<dpo_semantic_map>,
                          public decorator::decorator<occupancy_grid> {
  public:
   dpo_semantic_map(const params::perception::perception_params* c_params,

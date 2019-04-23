@@ -55,7 +55,7 @@ using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
  * density/relevance on the state of those cells. Used by robots in making
  * decisions in how they execute their tasks.
  */
-class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
+class occupancy_grid : public rer::client<occupancy_grid>,
                        public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
   /**

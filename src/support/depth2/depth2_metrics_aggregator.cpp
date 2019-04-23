@@ -55,27 +55,27 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
     const std::string& output_root)
     : depth1_metrics_aggregator(mparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
-  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
+  register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::harvester",
       metrics_path() + "/" + mparams->task_tab_collector_fname,
       mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
+  register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::collector",
       metrics_path() + "/" + mparams->task_tab_harvester_fname,
       mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheStarterName),
       metrics_path() + "/" + mparams->task_execution_cache_starter_fname,
       mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheFinisherName),
       metrics_path() + "/" + mparams->task_execution_cache_finisher_fname,
       mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheTransfererName),
       metrics_path() + "/" + mparams->task_execution_cache_transferer_fname,
       mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheCollectorName),
       metrics_path() + "/" + mparams->task_execution_cache_collector_fname,
       mparams->collect_interval);
@@ -83,7 +83,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
   /*
    * Overwrite depth1; we have a deeper decomposition now
    */
-  register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
+  register_collector<rmetrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
       metrics_path() + "/" + mparams->task_distribution_fname,
       mparams->collect_interval,
@@ -110,7 +110,7 @@ void depth2_metrics_aggregator::task_alloc_cb(const rta::polled_task* const task
 void depth2_metrics_aggregator::task_finish_or_abort_cb(
     const rta::polled_task* const task) {
   collect("tasks::execution::" + task->name(),
-          dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
+          dynamic_cast<const rmetrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
 NS_END(depth2, support, fordyca);

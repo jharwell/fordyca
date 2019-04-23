@@ -47,7 +47,7 @@ NS_START(fordyca, fsm);
  * its task is complete.
  */
 class explore_for_goal_fsm : public base_explore_fsm,
-                             public er::client<explore_for_goal_fsm> {
+                             public rer::client<explore_for_goal_fsm> {
  public:
   enum fsm_states {
     kST_START,

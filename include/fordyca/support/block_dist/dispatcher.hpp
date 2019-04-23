@@ -27,7 +27,7 @@
 #include <list>
 #include <string>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "fordyca/params/arena/block_dist_params.hpp"
 #include "fordyca/ds/entity_list.hpp"

@@ -24,7 +24,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -49,8 +49,7 @@ NS_START(support);
  * @brief Renders a block in 3D that the robot is carrying for
  * visualization/debugging purposes.
  */
-class block_carry_visualizer
-    : public rcppsw::er::client<block_carry_visualizer> {
+class block_carry_visualizer : public rer::client<block_carry_visualizer> {
  public:
   block_carry_visualizer(argos::CQTOpenGLUserFunctions* qt,
                          double block_vis_offset,

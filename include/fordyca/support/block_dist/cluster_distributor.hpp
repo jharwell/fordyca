@@ -44,7 +44,7 @@ NS_START(fordyca, support, block_dist);
  * bounds randomly, using \ref random_distributor.
  */
 class cluster_distributor : public base_distributor,
-                            public er::client<cluster_distributor> {
+                            public rer::client<cluster_distributor> {
  public:
   cluster_distributor(const ds::arena_grid::view& view,
                       double arena_resolution,

@@ -33,8 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
 
-namespace rmath = rcppsw::math;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -49,7 +47,7 @@ namespace rmath = rcppsw::math;
  */
 class cache_transferer : public foraging_task,
                          public events::existing_cache_interactor,
-                         rcppsw::er::client<cache_transferer> {
+                         rer::client<cache_transferer> {
  public:
   cache_transferer(const struct rta::task_alloc_params* params,
                    std::unique_ptr<rta::taskable> mechanism);

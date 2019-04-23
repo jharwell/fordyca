@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/robotics/steering2D/boid.hpp"
 
 /*******************************************************************************
@@ -38,7 +38,6 @@ struct phototaxis_force_params;
 NS_START(controller);
 class sensing_subsystem;
 namespace steering = rcppsw::robotics::steering2D;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions

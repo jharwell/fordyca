@@ -38,8 +38,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace rta = rcppsw::ta;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -53,14 +51,14 @@ namespace er = rcppsw::er;
  */
 template <typename T>
 class existing_cache_block_drop_interactor
-    : public er::client<existing_cache_block_drop_interactor<T>> {
+    : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
   existing_cache_block_drop_interactor(ds::arena_map* const map_in,
                                        tv::tv_manager* tv_manager)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
         m_penalty_handler(tv_manager->penalty_handler<T>(
-            tv::cache_op_src::kSrcExistingCacheDrop)) {}
+            tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -89,7 +87,7 @@ class existing_cache_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      tv::cache_op_src::kSrcExistingCacheDrop,
+                                      tv::cache_op_src::ekEXISTING_CACHE_DROP,
                                       timestep);
     }
   }
@@ -107,7 +105,7 @@ class existing_cache_block_drop_interactor
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  tv::acquisition_goal_type::kExistingCache ==
+                  tv::acquisition_goal_type::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
 

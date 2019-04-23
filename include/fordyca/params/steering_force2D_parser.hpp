@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/phototaxis_force_parser.hpp"
 #include "fordyca/params/steering_force2D_params.hpp"
-#include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/steering2D/force_calculator_xml_parser.hpp"
 
 /*******************************************************************************

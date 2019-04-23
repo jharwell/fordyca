@@ -34,7 +34,6 @@
 NS_START(fordyca, events, detail);
 using ds::occupancy_grid;
 using repr::base_cache;
-namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor

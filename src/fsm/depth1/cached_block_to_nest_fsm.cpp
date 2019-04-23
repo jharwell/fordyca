@@ -30,7 +30,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth1);
-namespace rfsm = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -174,9 +173,9 @@ FSM_OVERRIDE_DEF(rmath::vector2u,
                  const);
 
 bool cached_block_to_nest_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::kExistingCache == acquisition_goal()) {
+  if (acquisition_goal_type::ekEXISTING_CACHE == acquisition_goal()) {
     return current_state() == kST_WAIT_FOR_PICKUP;
-  } else if (transport_goal_type::kNest == block_transport_goal()) {
+  } else if (transport_goal_type::ekNEST == block_transport_goal()) {
     return current_state() == kST_WAIT_FOR_DROP;
   }
   return false;
@@ -185,12 +184,12 @@ bool cached_block_to_nest_fsm::goal_acquired(void) const {
 acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
   if (kST_ACQUIRE_BLOCK == current_state() ||
       kST_WAIT_FOR_PICKUP == current_state()) {
-    return acquisition_goal_type::kExistingCache;
+    return acquisition_goal_type::ekEXISTING_CACHE;
   } else if (kST_ACQUIRE_BLOCK == current_state() ||
              kST_WAIT_FOR_PICKUP == current_state()) {
-    return acquisition_goal_type::kExistingCache;
+    return acquisition_goal_type::ekEXISTING_CACHE;
   }
-  return acquisition_goal_type::kNone;
+  return acquisition_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 /*******************************************************************************
@@ -199,9 +198,9 @@ acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
 transport_goal_type cached_block_to_nest_fsm::block_transport_goal(void) const {
   if (kST_TRANSPORT_TO_NEST == current_state() ||
       kST_WAIT_FOR_DROP == current_state()) {
-    return transport_goal_type::kNest;
+    return transport_goal_type::ekNEST;
   }
-  return transport_goal_type::kNone;
+  return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
 void cached_block_to_nest_fsm::init(void) {

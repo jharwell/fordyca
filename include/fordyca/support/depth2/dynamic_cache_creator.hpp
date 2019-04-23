@@ -30,7 +30,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -43,7 +42,7 @@ namespace er = rcppsw::er;
  * candidate blocks, and constraints on proximity, minimum # for a cache, etc.
  */
 class dynamic_cache_creator : public base_cache_creator,
-                              public er::client<dynamic_cache_creator> {
+                              public rer::client<dynamic_cache_creator> {
  public:
   struct params {
     ds::arena_grid* grid;

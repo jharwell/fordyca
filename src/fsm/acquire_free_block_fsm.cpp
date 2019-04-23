@@ -112,7 +112,7 @@ __rcsw_pure bool acquire_free_block_fsm::candidates_exist(void) const {
 
 __rcsw_const acquisition_goal_type
 acquire_free_block_fsm::acquisition_goal_internal(void) const {
-  return acquisition_goal_type::kBlock;
+  return acquisition_goal_type::ekBLOCK;
 } /* acquisition_goal() */
 
 bool acquire_free_block_fsm::block_acquisition_valid(const rmath::vector2d& loc,

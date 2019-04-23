@@ -26,15 +26,14 @@
  ******************************************************************************/
 #include "rcppsw/math/vector2.hpp"
 
+#include "fordyca/nsalias.hpp"
 #include "fordyca/repr/base_cell_entity.hpp"
-#include "rcppsw/common/common.hpp"
 #include "rcppsw/math/range.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, repr);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions

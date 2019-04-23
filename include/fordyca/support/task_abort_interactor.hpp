@@ -35,8 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace rta = rcppsw::ta;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
@@ -49,7 +47,7 @@ namespace er = rcppsw::er;
  * timestep.
  */
 template <typename T>
-class task_abort_interactor : public er::client<task_abort_interactor<T>> {
+class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
  public:
   using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
 

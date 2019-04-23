@@ -30,7 +30,7 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/robotics/kinematics/twist.hpp"
 
 /*******************************************************************************
@@ -44,7 +44,6 @@ struct sensing_params;
 } // namespace params
 
 NS_START(controller);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -58,7 +57,7 @@ namespace rmath = rcppsw::math;
  * than wrap the two components.
  */
 class saa_subsystem : public rcppsw::robotics::steering2D::boid,
-                      rcppsw::er::client<saa_subsystem> {
+                      rer::client<saa_subsystem> {
  public:
   saa_subsystem(const struct params::actuation_params* aparams,
                 const struct params::sensing_params* sparams,

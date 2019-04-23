@@ -31,7 +31,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace rmath = rcppsw::math;
 namespace repr {
 class base_cache;
 } // namespace repr
@@ -85,7 +84,7 @@ class cell_cache_extent : public cell_op {
  */
 using cell_cache_extent_visitor_impl =
     rvisitor::precise_visitor<detail::cell_cache_extent,
-                             detail::cell_cache_extent_visit_set::value>;
+                              detail::cell_cache_extent_visit_set::value>;
 
 NS_END(detail);
 

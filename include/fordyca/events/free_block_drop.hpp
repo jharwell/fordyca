@@ -34,8 +34,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
-namespace rmath = rcppsw::math;
 namespace controller {
 class block_sel_matrix;
 }
@@ -100,8 +98,7 @@ struct free_block_drop_visit_set {
  * - The loop functions are doing block distribution.
  * - A robot aborts its task, and is carrying a block.
  */
-class free_block_drop : public rcppsw::er::client<free_block_drop>,
-                        public cell_op {
+class free_block_drop : public rer::client<free_block_drop>, public cell_op {
  public:
   /**
    * @param block The block to drop.
@@ -157,7 +154,7 @@ class free_block_drop : public rcppsw::er::client<free_block_drop>,
  */
 using free_block_drop_visitor_impl =
     rvisitor::precise_visitor<detail::free_block_drop,
-                             detail::free_block_drop_visit_set::value>;
+                              detail::free_block_drop_visit_set::value>;
 
 NS_END(detail);
 

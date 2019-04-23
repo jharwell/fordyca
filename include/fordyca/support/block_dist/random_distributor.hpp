@@ -28,7 +28,7 @@
 #include <vector>
 #include <random>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
@@ -43,8 +43,6 @@ class multicell_entity;
 } // namespace repr
 
 NS_START(support, block_dist);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -63,7 +61,7 @@ namespace rmath = rcppsw::math;
  *   not checked).
  */
 class random_distributor : public base_distributor,
-                           public er::client<random_distributor> {
+                           public rer::client<random_distributor> {
  public:
   random_distributor(const ds::arena_grid::view& grid,
                      double resolution);

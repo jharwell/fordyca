@@ -42,8 +42,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace ralg = rcppsw::algorithm;
-namespace rmath = rcppsw::math;
 namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
@@ -177,12 +175,8 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
   for (auto& entity_pair : robots) {
     auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     rmath::vector2d pos;
-    pos.set(robot.GetEmbodiedEntity()
-                .GetOriginAnchor()
-                .Position.GetX(),
-            robot.GetEmbodiedEntity()
-                .GetOriginAnchor()
-                .Position.GetY());
+    pos.set(robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+            robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
     v.push_back(pos);
   } /* for(&entity..) */
 

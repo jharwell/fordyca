@@ -48,7 +48,7 @@ dpo_store::dpo_store(const params::perception::pheromone_params* const params)
 dpo_store::update_res_t dpo_store::cache_update(
     const dp_entity<repr::base_cache>& cache) {
   update_res_t res = {.status = true,
-                      .reason = kNoChange,
+                      .reason = kNO_CHANGE,
                       .old_loc = rmath::vector2u()};
   ER_TRACE("Updating cache%d@%s",
            cache.ent()->id(),
@@ -59,9 +59,9 @@ dpo_store::update_res_t dpo_store::cache_update(
    * it.
    */
   if (cache_remove(cache.ent_obj())) {
-    res.reason = kCacheUpdated;
+    res.reason = kCACHE_UPDATED;
   } else {
-    res.reason = kNewCacheAdded;
+    res.reason = kNEW_CACHE_ADDED;
   }
   m_caches.obj_add({cache.ent()->discrete_loc(), cache});
   return res;
@@ -142,7 +142,7 @@ dpo_store::update_res_t dpo_store::block_update(
                id,
                block_in.ent()->discrete_loc().to_str().c_str(),
                m_blocks.size());
-      return update_res_t{true, kBlockMoved, old_loc};
+      return update_res_t{true, kBLOCK_MOVED, old_loc};
     }
     /*
      * Even if the block's location has not changed, if we have seen it again we
@@ -163,9 +163,9 @@ dpo_store::update_res_t dpo_store::block_update(
              block_in.ent()->id(),
              block_in.ent()->discrete_loc().to_str().c_str(),
              m_blocks.size());
-    return {true, kNewBlockAdded, rmath::vector2u()};
+    return {true, kNEW_BLOCK_ADDED, rmath::vector2u()};
   }
-  return {false, kNoChange, rmath::vector2u()};
+  return {false, kNO_CHANGE, rmath::vector2u()};
 } /* block_update() */
 
 bool dpo_store::block_remove(const std::shared_ptr<repr::base_block>& victim) {

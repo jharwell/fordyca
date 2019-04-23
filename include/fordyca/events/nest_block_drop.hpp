@@ -33,8 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
-
 namespace fsm {
 namespace depth0 {
 class crw_fsm;
@@ -107,7 +105,7 @@ struct nest_block_drop_visit_set {
  *
  * @brief Fired whenever a robot drops a block in the nest.
  */
-class nest_block_drop : public rcppsw::er::client<nest_block_drop> {
+class nest_block_drop : public rer::client<nest_block_drop> {
  public:
   nest_block_drop(const std::shared_ptr<repr::base_block>& block, uint timestep);
   ~nest_block_drop(void) override = default;
@@ -159,7 +157,7 @@ class nest_block_drop : public rcppsw::er::client<nest_block_drop> {
  */
 using nest_block_drop_visitor_impl =
     rvisitor::precise_visitor<detail::nest_block_drop,
-                             detail::nest_block_drop_visit_set::value>;
+                              detail::nest_block_drop_visit_set::value>;
 
 NS_END(detail);
 

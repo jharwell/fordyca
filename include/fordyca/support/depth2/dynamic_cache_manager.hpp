@@ -46,7 +46,6 @@ class base_block;
 class arena_cache;
 }
 NS_START(support, depth2);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +58,7 @@ namespace er = rcppsw::er;
  * caches in the arena, whenever they are enabled.
  */
 class dynamic_cache_manager : public base_cache_manager,
-                              public er::client<dynamic_cache_manager> {
+                              public rer::client<dynamic_cache_manager> {
  public:
   dynamic_cache_manager(const struct params::caches::caches_params* params,
                         ds::arena_grid* arena_grid);

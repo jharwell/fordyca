@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
@@ -37,8 +38,6 @@ class cache_block_drop;
 class cache_vanished;
 } // namespace detail
 
-namespace rvisitor = rcppsw::patterns::visitor;
-
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
@@ -51,8 +50,8 @@ namespace rvisitor = rcppsw::patterns::visitor;
  */
 class existing_cache_interactor
     : public rvisitor::polymorphic_accept_set<detail::cache_block_drop,
-                                             detail::cached_block_pickup,
-                                             detail::cache_vanished> {};
+                                              detail::cached_block_pickup,
+                                              detail::cache_vanished> {};
 
 NS_END(events, fordyca);
 

@@ -84,7 +84,7 @@ ds::cache_list line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
+__rcsw_pure bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   for (size_t i = 0; i < xsize(); ++i) {
     for (size_t j = 0; j < ysize(); ++j) {
       if (cell(i, j).loc() == loc) {

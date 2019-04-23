@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <sstream>
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
@@ -46,7 +46,6 @@ struct sensing_params;
 
 NS_START(controller);
 namespace hal = rcppsw::robotics::hal;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions

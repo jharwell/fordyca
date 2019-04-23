@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/params/base_params.hpp"
 
@@ -31,7 +32,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Structure Definitions

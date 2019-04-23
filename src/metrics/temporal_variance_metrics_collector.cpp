@@ -61,7 +61,7 @@ bool temporal_variance_metrics_collector::csv_line_build(std::string& line) {
 } /* csv_line_build() */
 
 void temporal_variance_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const temporal_variance_metrics&>(metrics);
   m_swarm_motion_throttle = m.swarm_motion_throttle();
   m_env_block_manip = m.env_block_manipulation();

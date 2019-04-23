@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
@@ -37,8 +38,6 @@ class free_block_pickup;
 class free_block_drop;
 } // namespace detail
 
-namespace rvisitor = rcppsw::patterns::visitor;
-
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
@@ -51,8 +50,8 @@ namespace rvisitor = rcppsw::patterns::visitor;
  */
 class free_block_interactor
     : public rvisitor::polymorphic_accept_set<detail::free_block_drop,
-                                             detail::free_block_pickup,
-                                             detail::block_vanished> {};
+                                              detail::free_block_pickup,
+                                              detail::block_vanished> {};
 
 NS_END(events, fordyca);
 

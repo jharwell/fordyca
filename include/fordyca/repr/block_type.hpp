@@ -1,7 +1,7 @@
 /**
- * @file steering_force_type.hpp
+ * @file block_type.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,41 +18,24 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_BLOCK_TYPE_HPP_
+#define INCLUDE_FORDYCA_REPR_BLOCK_TYPE_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/robotics/steering2D/force_type.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, repr);
 
 /*******************************************************************************
- * Type Definitions
+ * Class Definitions
  ******************************************************************************/
-/**
- * @brief List of steering forces available within the class
- */
-class steering_force_type : public rcppsw::robotics::steering2D::force_type {
- public:
-  enum {
-    /**
-     * Force pushing robots towards light.
-     */
-    kPhototaxis = rcppsw::robotics::steering2D::force_type::kExternalForces,
+enum class block_type { ekCUBE, ekRAMP };
 
-    /**
-     * Force pushing robots away from light.
-     */
-    kAntiphototaxis
-  };
-};
+NS_END(repr, fordyca);
 
-NS_END(controller, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONTROLLER_STEERING_FORCE_TYPE_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_BLOCK_TYPE_HPP_ */

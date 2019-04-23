@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, caches);
  * @brief Interface defining utilization metrics that can be collected on
  * static/dynamic caches in the arena during their lifetime.
  */
-class utilization_metrics : virtual public rcppsw::metrics::base_metrics {
+class utilization_metrics : virtual public rmetrics::base_metrics {
  public:
   utilization_metrics(void) = default;
   ~utilization_metrics(void) override = default;

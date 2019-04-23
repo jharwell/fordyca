@@ -55,9 +55,9 @@ struct cache_found_visit_set {
   using inherited = cell_op_visit_set::value;
   using defined =
       rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                 controller::depth2::grp_mdpo_controller,
-                                 ds::dpo_store,
-                                 ds::dpo_semantic_map>;
+                                  controller::depth2::grp_mdpo_controller,
+                                  ds::dpo_store,
+                                  ds::dpo_semantic_map>;
   using value = boost::mpl::joint_view<inherited::type, defined::type>;
 };
 
@@ -69,7 +69,7 @@ struct cache_found_visit_set {
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public cell_op, public rcppsw::er::client<cache_found> {
+class cache_found : public cell_op, public rer::client<cache_found> {
  public:
   explicit cache_found(std::unique_ptr<repr::base_cache> cache);
   explicit cache_found(const std::shared_ptr<repr::base_cache>& cache);
@@ -102,7 +102,7 @@ class cache_found : public cell_op, public rcppsw::er::client<cache_found> {
  */
 using cache_found_visitor_impl =
     rvisitor::precise_visitor<detail::cache_found,
-                             detail::cache_found_visit_set::value>;
+                              detail::cache_found_visit_set::value>;
 
 NS_END(detail);
 

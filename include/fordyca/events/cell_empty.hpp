@@ -39,7 +39,6 @@ class occupancy_grid;
 class dpo_semantic_map;
 } // namespace ds
 
-namespace rmath = rcppsw::math;
 NS_START(events, detail);
 
 /*******************************************************************************
@@ -48,8 +47,8 @@ NS_START(events, detail);
 struct cell_empty_visit_set {
   using inherited = cell_op_visit_set::value;
   using defined = rvisitor::precise_visit_set<ds::arena_map,
-                                             ds::occupancy_grid,
-                                             ds::dpo_semantic_map>;
+                                              ds::occupancy_grid,
+                                              ds::dpo_semantic_map>;
   using value = boost::mpl::joint_view<inherited::type, defined::type>;
 };
 
@@ -64,7 +63,7 @@ struct cell_empty_visit_set {
  * square that the block was on is now  (probably) empty. It might not be if in
  * the same timestep a new cache is created on that same cell.
  */
-class cell_empty : public cell_op, public rcppsw::er::client<cell_empty> {
+class cell_empty : public cell_op, public rer::client<cell_empty> {
  public:
   explicit cell_empty(const rmath::vector2u& coord)
       : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_empty") {}
@@ -84,7 +83,7 @@ class cell_empty : public cell_op, public rcppsw::er::client<cell_empty> {
  */
 using cell_empty_visitor_impl =
     rvisitor::precise_visitor<detail::cell_empty,
-                             detail::cell_empty_visit_set::value>;
+                              detail::cell_empty_visit_set::value>;
 
 NS_END(detail);
 

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/caches/static_cache_params.hpp"
 #include "rcppsw/params/xml_param_parser.hpp"
 

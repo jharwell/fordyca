@@ -37,8 +37,6 @@ namespace depth2 { class controller_repository; }
 }
 
 NS_START(controller, depth2);
-namespace er = rcppsw::er;
-namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Class Definitions
@@ -51,7 +49,7 @@ namespace rta = rcppsw::ta;
  * foraging.
  */
 class tasking_initializer : public depth1::tasking_initializer,
-                            public er::client<tasking_initializer> {
+                            public rer::client<tasking_initializer> {
  public:
   tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,

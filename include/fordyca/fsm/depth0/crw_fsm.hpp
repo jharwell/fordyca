@@ -55,7 +55,7 @@ using transport_goal_type = block_transporter::goal_type;
  * block back to the nest, and drops it.
  */
 class crw_fsm : public base_foraging_fsm,
-                public er::client<crw_fsm>,
+                public rer::client<crw_fsm>,
                 public metrics::fsm::goal_acquisition_metrics,
                 public block_transporter {
  public:

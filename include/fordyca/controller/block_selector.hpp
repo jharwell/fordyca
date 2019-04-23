@@ -35,7 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
@@ -47,7 +46,7 @@ namespace rmath = rcppsw::math;
  * @brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.
  */
-class block_selector : public rcppsw::er::client<block_selector> {
+class block_selector : public rer::client<block_selector> {
  public:
   explicit block_selector(const block_sel_matrix* sel_matrix);
 

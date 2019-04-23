@@ -39,7 +39,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Classes
@@ -52,7 +51,7 @@ namespace rmath = rcppsw::math;
  * site on a given timestep.
  */
 template <typename T>
-class cache_site_block_drop_interactor : public er::client<cache_site_block_drop_interactor<T>> {
+class cache_site_block_drop_interactor : public rer::client<cache_site_block_drop_interactor<T>> {
  public:
   cache_site_block_drop_interactor(ds::arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
@@ -63,7 +62,7 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
         m_map(map_in),
         m_cache_manager(cache_manager),
         m_penalty_handler(tv_manager->template penalty_handler<T>(
-            tv::block_op_src::kSrcCacheSiteDrop)) {}
+            tv::block_op_src::ekCACHE_SITE_DROP)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -106,19 +105,19 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
      * waiting until after the penalty is served to figure out that the robot
      * is too close to a block.
      */
-    penalty_status status = m_penalty_handler->penalty_init(controller,
-                                                 tv::block_op_src::kSrcCacheSiteDrop,
-                                                 timestep,
-                                                 m_cache_manager->cache_proximity_dist(),
-                                                 m_cache_manager->block_proximity_dist());
-    if (penalty_status::kStatusBlockProximity == status) {
+    auto status = m_penalty_handler->penalty_init(controller,
+                                                  tv::block_op_src::ekCACHE_SITE_DROP,
+                                                  timestep,
+                                                  m_cache_manager->cache_proximity_dist(),
+                                                  m_cache_manager->block_proximity_dist());
+    if (tv::op_filter_status::ekBLOCK_PROXIMITY == status) {
       auto prox_status = loop_utils::cache_site_block_proximity(controller,
                                                                 *m_map,
                                                                 m_cache_manager->block_proximity_dist());
       ER_ASSERT(-1 != prox_status.entity_id,
                 "No block too close with BlockProximity return status");
       block_proximity_notify(controller, prox_status);
-    } else if (penalty_status::kStatusCacheProximity == status) {
+    } else if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
       auto prox_status = loop_utils::new_cache_cache_proximity(controller,
                                                                *m_map,
                                                                m_cache_manager->cache_proximity_dist());
@@ -129,8 +128,6 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
   }
 
  private:
-  using penalty_status = typename tv::tv_manager::filter_status<T>;
-
   void block_proximity_notify(T& controller,
                               const loop_utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in cache site: Block%d@%s too close (%f <= %f)",
@@ -177,7 +174,7 @@ class cache_site_block_drop_interactor : public er::client<cache_site_block_drop
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              tv::acquisition_goal_type::kCacheSite == controller.current_task()->acquisition_goal(),
+              tv::acquisition_goal_type::ekCACHE_SITE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache site block drop");
     auto status = loop_utils::cache_site_block_proximity(controller,
                                                              *m_map,

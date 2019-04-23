@@ -27,6 +27,7 @@
 #include <list>
 #include <string>
 
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 
 /*******************************************************************************
@@ -46,14 +47,14 @@ NS_START(fordyca, metrics);
  * Metrics are written out every timestep.
  */
 class temporal_variance_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector {
+    : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
    */
   explicit temporal_variance_metrics_collector(const std::string& ofname);
 
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
   std::list<std::string> csv_header_cols(void) const override;

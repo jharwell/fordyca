@@ -33,7 +33,7 @@ NS_START(fordyca, metrics);
  * Member Functions
  ******************************************************************************/
 uint robot_occupancy_metrics_collector::collect_cell(
-    const rcppsw::metrics::base_metrics& metrics,
+    const rmetrics::base_metrics& metrics,
     const rmath::vector2u& coord) const {
   auto& m = dynamic_cast<const robot_occupancy_metrics&>(metrics);
   return static_cast<uint>(m.has_robot(coord));

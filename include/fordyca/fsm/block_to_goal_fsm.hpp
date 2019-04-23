@@ -35,8 +35,6 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-namespace er = rcppsw::er;
-namespace rta = rcppsw::ta;
 using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
@@ -57,7 +55,7 @@ class acquire_free_block_fsm;
  * or via random exploration), pickup the block and bring it to its chosen
  * goal. Once it has done that it will signal that its task is complete.
  */
-class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
+class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
                           public base_foraging_fsm,
                           public rta::taskable,
                           public metrics::fsm::goal_acquisition_metrics,

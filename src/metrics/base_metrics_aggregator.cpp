@@ -51,7 +51,6 @@
  ******************************************************************************/
 namespace fs = std::experimental::filesystem;
 NS_START(fordyca, metrics);
-namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
  * Constructors/Destructors

@@ -34,7 +34,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rvisitor = rcppsw::patterns::visitor;
 namespace controller {
 class cache_sel_matrix;
 namespace depth1 {
@@ -101,7 +100,7 @@ struct cache_block_drop_visit_set {
  * The cache usuage penalty, if there is one, is not assessed during the event,
  * but at a higher level.
  */
-class cache_block_drop : public rcppsw::er::client<cache_block_drop>,
+class cache_block_drop : public rer::client<cache_block_drop>,
                          public detail::cell_op {
  public:
   cache_block_drop(const std::shared_ptr<repr::base_block>& block,
@@ -149,7 +148,7 @@ class cache_block_drop : public rcppsw::er::client<cache_block_drop>,
  */
 using cache_block_drop_visitor_impl =
     rvisitor::precise_visitor<detail::cache_block_drop,
-                             detail::cache_block_drop_visit_set::value>;
+                              detail::cache_block_drop_visit_set::value>;
 
 NS_END(detail);
 
