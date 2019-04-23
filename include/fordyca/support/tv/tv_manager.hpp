@@ -95,7 +95,7 @@ NS_START(tv);
  ******************************************************************************/
 /**
  * @class tv_manager
- * @ingroup support tv
+ * @ingroup fordyca support tv
  * @brief Orchestrates all application of temporal variance to robot interations
  * with the environment/robotic mechanical functioning.
  */

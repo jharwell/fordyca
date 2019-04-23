@@ -47,7 +47,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class dpo_store
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Stores sets of caches and blocks the robot encounters in the arena,
  * along with the pheromone-based relevance for each. Also contains the logic

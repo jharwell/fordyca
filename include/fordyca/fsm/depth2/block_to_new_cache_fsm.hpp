@@ -38,7 +38,7 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 /**
  * @class block_to_new_cache_fsm
- * @ingroup fsm depth2
+ * @ingroup fordyca fsm depth2
  *
  * @brief The FSM for the block-to-new-cache subtask.
  *

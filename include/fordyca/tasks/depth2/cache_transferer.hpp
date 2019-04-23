@@ -40,7 +40,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class cache_transferer
- * @ingroup tasks depth2
+ * @ingroup fordyca tasks depth2
  *
  * @brief Task in which robots locate an existing cache, pickup a block from it,
  * and then transfer the block to a cache with higher utility (presumably one

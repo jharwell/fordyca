@@ -53,7 +53,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class dynamic_cache_manager
- * @ingroup support depth2
+ * @ingroup fordyca support depth2
  *
  * @brief Manager for creation, depletion, and metric gathering for dynamic
  * caches in the arena, whenever they are enabled.

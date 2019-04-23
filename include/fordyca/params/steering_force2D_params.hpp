@@ -39,7 +39,7 @@ namespace steering = rcppsw::robotics::steering2D;
  ******************************************************************************/
 /**
  * @struct steering_force2D_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct steering_force2D_params : public steering::force_calculator_params {
   struct phototaxis_force_params phototaxis {};

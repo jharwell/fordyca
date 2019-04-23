@@ -41,7 +41,7 @@ namespace rmetrics = rcppsw::metrics;
  ******************************************************************************/
 /**
  * @class location_metrics_collector
- * @ingroup metrics caches
+ * @ingroup fordyca metrics caches
  *
  * @brief Collector for \ref location_metrics.
  */

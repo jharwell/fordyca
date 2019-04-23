@@ -48,7 +48,7 @@ namespace er = rcppsw::er;
 
 /**
  * @class free_block_pickup_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Handle's a robot's (possible) \ref free_block_pickup event on a given
  * timestep.

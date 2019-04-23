@@ -63,7 +63,7 @@ struct cache_found_visit_set {
 
 /*
  * @class cache_found
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a NEW cache (i.e. one that is not currently known to
  * a robot, but possibly one that it has seen before and whose relevance had

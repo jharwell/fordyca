@@ -36,7 +36,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct visualization_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct visualization_params : public rcppsw::params::base_params {
   bool robot_id{false};

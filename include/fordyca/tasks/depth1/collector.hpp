@@ -45,7 +45,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class collector
- * @ingroup tasks depth1
+ * @ingroup fordyca tasks depth1
  *
  * @brief Task in which robots locate a cache and bring a block from it to the
  * nest. It is abortable, and has one task interface.

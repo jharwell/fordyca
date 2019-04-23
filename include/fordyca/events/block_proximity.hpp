@@ -65,7 +65,7 @@ struct block_proximity_visit_set {
 
 /**
  * @class block_proximity
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Event that is created whenever a block that a robot is not currently
  * aware of blocks its ability to complete its current task.

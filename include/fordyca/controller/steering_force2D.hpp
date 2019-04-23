@@ -49,7 +49,7 @@ class sensing_subsystem;
 
 /**
  * @class steering_force2D
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Extends \ref rcppsw::robotics::steering2D::force_calculator with
  * steering forces specific to foraging:

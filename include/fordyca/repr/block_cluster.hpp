@@ -38,7 +38,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * @class block_cluster
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief Represents a cluster of blocks in the arena as an entity for use
  * during block distribution and dynamic cache creation. A cluster is defined

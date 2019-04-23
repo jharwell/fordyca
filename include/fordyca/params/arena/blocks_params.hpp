@@ -38,7 +38,7 @@ NS_START(fordyca, params, arena);
  ******************************************************************************/
 /**
  * @struct blocks_params
- * @ingroup params arena
+ * @ingroup fordyca params arena
  */
 struct blocks_params : public rcppsw::params::base_params {
   struct block_dist_params dist{};

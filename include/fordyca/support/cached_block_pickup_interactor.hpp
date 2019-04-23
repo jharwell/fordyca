@@ -46,7 +46,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class cached_block_pickup_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Handles a robot's (possible) \ref cached_block_pickup event on a given
  * timestep.

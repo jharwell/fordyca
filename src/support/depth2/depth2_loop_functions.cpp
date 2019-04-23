@@ -61,7 +61,7 @@ using ds::arena_grid;
  ******************************************************************************/
 /**
  * @struct controller_task_extractor_mapper
- * @ingroup support depth2
+ * @ingroup fordyca support depth2
  *
  * @brief Map a controller instance to the task extraction action run during
  * convergence calculations.

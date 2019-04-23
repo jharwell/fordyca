@@ -49,7 +49,7 @@ class generalist;
  ******************************************************************************/
 /**
  * @class foraging_task
- * @ingroup tasks depth0
+ * @ingroup fordyca tasks depth0
  *
  * @brief Interface specifying the visit set for all depth0 foraging tasks in
  * FORDYCA.

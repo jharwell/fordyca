@@ -50,7 +50,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class tasking_oracle
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Repository of perfect knowledge about swarm level task
  * allocation. Used to provide an upper bound on the performance of different

@@ -36,7 +36,7 @@ NS_START(fordyca, params, arena);
  ******************************************************************************/
 /**
  * @struct powerlaw_dist_params
- * @ingroup params arena
+ * @ingroup fordyca params arena
  */
 struct powerlaw_dist_params : public rcppsw::params::base_params {
   /**

@@ -42,7 +42,7 @@ NS_START(fordyca, params, perception);
  ******************************************************************************/
 /**
  * @class perception_parser
- * @ingroup params perception
+ * @ingroup fordyca params perception
  *
  * @brief Parses XML parameters for various perception subsystems into
  * \ref perception_params.

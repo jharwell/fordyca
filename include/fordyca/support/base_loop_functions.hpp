@@ -68,7 +68,7 @@ namespace rswc = rcppsw::swarm::convergence;
  ******************************************************************************/
 /**
  * @class base_loop_functions
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief The base loop functions in FORDYCA that all other loop functions
  * inherit from.

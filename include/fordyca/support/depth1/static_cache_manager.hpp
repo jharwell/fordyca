@@ -54,7 +54,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class static_cache_manager
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief Manager for creation, depletion, and metric gathering for the static
  * cache in the arena, when it is employed.

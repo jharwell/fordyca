@@ -44,7 +44,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  ******************************************************************************/
 /**
  * @class base_foraging_task
- * @ingroup tasks
+ * @ingroup fordyca tasks
  *
  * @brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.

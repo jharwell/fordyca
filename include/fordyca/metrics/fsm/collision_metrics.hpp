@@ -36,7 +36,7 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 /**
  * @class collision_metrics
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Interface defining what metrics should be collected regarding
  * collision avoidance as robots go about their tasks.

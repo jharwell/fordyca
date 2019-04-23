@@ -38,7 +38,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct output_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct output_params : public rcppsw::params::base_params {
   std::string output_root{};

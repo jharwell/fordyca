@@ -45,7 +45,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class dp_cache_map
- * @ingroup ds
+ * @ingroup fordyca ds
  * @brief The cache map is a repr of the robot's perception of caches
  * in the arena. It uses the locations of caches as keys, as caches are
  * immovable during simulation. Using cache IDs as keys for insertion/removal

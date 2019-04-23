@@ -50,7 +50,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class cell2D
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Base repr of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref base_cell_entity the cell contains, if any.

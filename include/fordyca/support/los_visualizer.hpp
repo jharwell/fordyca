@@ -47,7 +47,7 @@ NS_START(support);
  ******************************************************************************/
 /**
  * @class los_visualizer
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Renders the LOS for a given robot for visualization/debugging
  * purposes.

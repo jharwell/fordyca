@@ -41,7 +41,7 @@ namespace ct = rcppsw::control;
  ******************************************************************************/
 /**
  * @struct caches_params
- * @ingroup params arena
+ * @ingroup fordyca params arena
  *
  * @brief Contains parameters for both static and dynamic caches in the arena.
  */

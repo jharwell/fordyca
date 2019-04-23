@@ -40,7 +40,7 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * @class gp_mdpo_controller
- * @ingroup controller depth1
+ * @ingroup fordyca controller depth1
  *
  * @brief A Greedy Partitioning (GP) controller that switches between \ref generalist,
  * \ref harvester, and \ref collector tasks, according to dynamic changes in the

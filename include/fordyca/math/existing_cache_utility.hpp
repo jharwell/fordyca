@@ -39,7 +39,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class existing_cache_utility
- * @ingroup math
+ * @ingroup fordyca math
  *
  * @brief Calculates the utility associated with an existing cache that the
  * robot knows about.

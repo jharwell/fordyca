@@ -36,7 +36,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * @class unicell_entity
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief Representation of an entity in the arena that only spans a single
  * cell.

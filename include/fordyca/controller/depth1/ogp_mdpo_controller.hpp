@@ -42,7 +42,7 @@ NS_START(controller, depth1);
  ******************************************************************************/
 /**
  * @class ogp_mdpo_controller
- * @ingroup controller depth1
+ * @ingroup fordyca controller depth1
  *
  * @brief A Greedy Partitioning controller which also has perfect information
  * about:

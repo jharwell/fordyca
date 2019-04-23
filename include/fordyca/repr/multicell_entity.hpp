@@ -41,7 +41,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class multicell_entity
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief Representation of an entity in the arena that can span multiple cells.
  *

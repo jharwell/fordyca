@@ -41,7 +41,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * @class arena_cache
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief A repr of an ACTUAL cache within the arena. This differs from \ref
  * dp_entity caches because they handle cache penalties and can collect metrics

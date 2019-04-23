@@ -65,7 +65,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class arena_map
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Combines a 2D grid with sets of objects (blocks, caches, nests, etc.)
  * that populate the grid and move around as the state of the arena

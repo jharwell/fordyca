@@ -94,7 +94,7 @@ struct cache_block_drop_visit_set {
 
 /**
  * @class cache_block_drop
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Created whenever a robot drops a block in a cache.
  *

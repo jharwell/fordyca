@@ -48,7 +48,7 @@ namespace er = rcppsw::er;
 
 /**
  * @class temporal_penalty_handler
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief The penalty handler for penalties for robots (e.g. how long they have
  * to wait when they pickup/drop a block).

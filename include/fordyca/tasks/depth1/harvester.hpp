@@ -43,7 +43,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class harvester
- * @ingroup tasks
+ * @ingroup fordyca tasks
  *
  * @brief Task in which robots locate a free block and bring it to a known
  * cache. It is abortable, and has one task interface.

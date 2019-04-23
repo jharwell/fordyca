@@ -39,7 +39,7 @@ namespace ct = rcppsw::control;
  ******************************************************************************/
 /**
  * @struct dynamic_cache_params
- * @ingroup params cache
+ * @ingroup fordyca params cache
  */
 struct dynamic_cache_params : public rcppsw::params::base_params {
   bool   enable{false};

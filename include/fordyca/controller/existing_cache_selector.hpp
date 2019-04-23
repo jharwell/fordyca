@@ -43,7 +43,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class existing_cache_selector
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Selects from among known caches (which are presumed to still exist at
  * this point, although that may not be true as a robot's knowledge of the arena

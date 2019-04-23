@@ -43,7 +43,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class task_abort_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Handles a robot's (possible) aborting of its current task on a given
  * timestep.

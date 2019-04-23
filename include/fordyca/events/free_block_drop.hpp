@@ -90,7 +90,7 @@ struct free_block_drop_visit_set {
 
 /**
  * @class free_block_drop
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a block is dropped somewhere in the arena that is not
  * a cache or the nest.

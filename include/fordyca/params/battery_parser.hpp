@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class battery_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters relating to pheromones into
  * \ref battery_params.

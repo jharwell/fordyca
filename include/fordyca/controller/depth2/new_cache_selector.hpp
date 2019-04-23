@@ -45,7 +45,7 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * @class new_cache_selector
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief Selects from among "new" caches (which are the same as blocks in the
  * arena) which are presumed to still exist at this point, although that may not

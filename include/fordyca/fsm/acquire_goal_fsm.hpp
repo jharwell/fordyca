@@ -50,7 +50,7 @@ namespace rta = rcppsw::ta;
  ******************************************************************************/
 /**
  * @class acquire_goal_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief The base FSM for an acquiring a goal in the arena.
  *

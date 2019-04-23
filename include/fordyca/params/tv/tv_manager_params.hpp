@@ -39,7 +39,7 @@ namespace rct = rcppsw::control;
  ******************************************************************************/
 /**
  * @struct tv_manager_params
- * @ingroup params tv
+ * @ingroup fordyca params tv
  */
 struct tv_manager_params : public rcppsw::params::base_params {
   rct::waveform_params block_manipulation_penalty{};

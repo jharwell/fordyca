@@ -42,7 +42,7 @@ namespace rmetrics = rcppsw::metrics;
  ******************************************************************************/
 /**
  * @class grid2D_avg_metrics_collector
- * @ingroup metrics
+ * @ingroup fordyca metrics
  *
  * @brief Base class for collectors using a 2D grid to fill with counts of
  * SOMETHING, to be averaged over the entire simulation.

@@ -36,7 +36,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * @struct controller_task_extractor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Given a controller of type T, extract the ID of its current task. This
  * is used in computing task distribution entropy in depth1, depth2 in

@@ -40,7 +40,7 @@ namespace kinematics2D = rcppsw::robotics::kinematics2D;
 
 /**
  * @struct actuation_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct actuation_params : public rcppsw::params::base_params {
   struct kinematics2D::differential_drive_params differential_drive {};

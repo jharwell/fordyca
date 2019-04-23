@@ -39,7 +39,7 @@ namespace rswarm = rcppsw::swarm;
  ******************************************************************************/
 /**
  * @struct dp_entity
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief A repr of a Decaying Pheromone (DP) entity in the arena,
  * which has a pheromone density/relevance associated with it.

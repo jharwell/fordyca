@@ -48,7 +48,7 @@ class acquire_free_block_fsm;
  ******************************************************************************/
 /**
  * @class block_to_goal_fsm
- * @ingroup fsm depth1
+ * @ingroup fordyca fsm depth1
  *
  * @brief Base FSM for acquiring, picking up a block, and then bringing it
  * somewhere and dropping it.

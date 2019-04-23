@@ -37,7 +37,7 @@ NS_START(fordyca, metrics);
 
 /**
  * @class temporal_variance_metrics
- * @ingroup metrics
+ * @ingroup fordyca metrics
  *
  * @brief Defines the metrics to be collected from the environment and the swarm
  * about the different types of temporal variance that can be applied to

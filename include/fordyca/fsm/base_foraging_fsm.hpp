@@ -52,7 +52,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class base_foraging_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief A collection of base states/common functionality that foraging FSMs
  * can use if they choose.

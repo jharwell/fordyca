@@ -42,7 +42,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class cache_finisher
- * @ingroup tasks depth2
+ * @ingroup fordyca tasks depth2
  *
  * @brief Task in which robots locate a free block and drop it next to/on top of
  * a free block in the arena to finish the creation of a new cache. It is

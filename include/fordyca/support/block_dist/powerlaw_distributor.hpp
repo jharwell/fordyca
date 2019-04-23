@@ -53,7 +53,7 @@ NS_START(support, block_dist);
  ******************************************************************************/
 /**
  * @class powerlaw_distributor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Distributes a block, or set of blocks, within the arena as randomly
  * placed clusters with sizes ranging [minsize, maxsize], with a power law based

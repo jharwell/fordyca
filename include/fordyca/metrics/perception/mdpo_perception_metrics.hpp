@@ -37,7 +37,7 @@ NS_START(fordyca, metrics, perception);
 
 /**
  * @class mdpo_perception_metrics
- * @ingroup metrics perception
+ * @ingroup fordyca metrics perception
  *
  * @brief Defines the metrics to be collected from robots about their mapped DPO
  * world model.

@@ -53,7 +53,7 @@ struct cell_cache_extent_visit_set {
 
 /**
  * @class cell_cache_extent
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Created whenever a cell needs to go from some other state to being
  * part of a cache's extent (dub). All the blocks (and the cache itself) live in

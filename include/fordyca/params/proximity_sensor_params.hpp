@@ -36,7 +36,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct proximity_sensor_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct proximity_sensor_params : public rcppsw::params::base_params {
   /*

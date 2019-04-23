@@ -38,7 +38,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class generalist
- * @ingroup tasks
+ * @ingroup fordyca tasks
  *
  * @brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.

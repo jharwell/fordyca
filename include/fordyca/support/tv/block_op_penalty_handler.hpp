@@ -48,7 +48,7 @@ namespace rct = rcppsw::control;
 
 /**
  * @class block_op_penalty_handler
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.

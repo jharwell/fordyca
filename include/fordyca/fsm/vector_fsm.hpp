@@ -47,7 +47,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class vector_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief An FSM used to send a robot to a particular ABSOLUTE location in the
  * arena.

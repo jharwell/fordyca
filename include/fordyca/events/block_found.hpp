@@ -64,7 +64,7 @@ struct block_found_visit_set {
 
 /**
  * @class block_found
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Event that is created whenever a block (possibly known, possibly
  * unknown) appears in a robot's LOS.

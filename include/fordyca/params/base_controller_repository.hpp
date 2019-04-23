@@ -36,7 +36,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class base_controller_repository
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Collection of all parameter parsers and parse results needed by
  * all foraging controllers.

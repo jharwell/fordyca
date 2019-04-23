@@ -44,7 +44,7 @@ namespace rvisitor = rcppsw::patterns::visitor;
  ******************************************************************************/
 /**
  * @class existing_cache_interactor
- * @ingroup tasks depth1
+ * @ingroup fordyca tasks depth1
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with existing caches in FORDYCA.

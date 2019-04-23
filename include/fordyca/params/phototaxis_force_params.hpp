@@ -36,7 +36,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct phototaxis_force_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct phototaxis_force_params : public rcppsw::params::base_params {
   double max;

@@ -54,7 +54,7 @@ using transport_goal_type = block_transporter::goal_type;
  ******************************************************************************/
 /**
  * @class cached_block_to_nest_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Each robot executing this FSM will locate for a block (either a known
  * block or via random exploration), pickup the block and bring it all the way

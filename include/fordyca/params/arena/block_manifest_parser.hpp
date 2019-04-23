@@ -41,7 +41,7 @@ NS_START(fordyca, params, arena);
  ******************************************************************************/
 /**
  * @class block_manifest_parser
- * @ingroup params arena
+ * @ingroup fordyca params arena
  *
  * @brief Parses XML parameters for related block distribution \ref block_manifest.
  */

@@ -50,7 +50,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * @struct block_pickup_base_visit_set
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).

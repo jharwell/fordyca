@@ -37,7 +37,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct block_priority_params
- * @ingroup params block_sel
+ * @ingroup fordyca params block_sel
  */
 struct block_priority_params : public rcppsw::params::base_params {
   int cube{-1};

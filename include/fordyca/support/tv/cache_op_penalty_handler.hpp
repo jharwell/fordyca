@@ -52,7 +52,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 
 /**
  * @class cache_op_penalty_handler
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.

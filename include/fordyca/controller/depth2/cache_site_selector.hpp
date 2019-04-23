@@ -50,7 +50,7 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * @class cache_site_selector
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief Selects the best cache site between the location of the block pickup
  * and the nest (ideally the halfway point), subject to constraints such as it

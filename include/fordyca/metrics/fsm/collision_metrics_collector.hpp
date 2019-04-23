@@ -39,7 +39,7 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 /**
  * @class collision_metrics_collector
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Collector for \ref collision_metrics.
  *

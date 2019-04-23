@@ -81,7 +81,7 @@ struct cache_vanished_visit_set {
 
 /*
  * @class cache_vanished
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a robot is serving a cache penalty, but while
  * serving the penalty the cache it is waiting in vanishes due to another

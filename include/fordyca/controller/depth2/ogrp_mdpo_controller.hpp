@@ -44,7 +44,7 @@ NS_START(controller, depth2);
  ******************************************************************************/
 /**
  * @class ogrp_mdpo_controller
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief A Greedy Recursive Partitioning controller which also has perfect
  * information about:

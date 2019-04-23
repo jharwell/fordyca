@@ -40,7 +40,7 @@ NS_START(fordyca, params, block_sel);
  ******************************************************************************/
 /**
  * @class block_sel_matrix_parser
- * @ingroup params block_sel
+ * @ingroup fordyca params block_sel
  *
  * @brief Parses XML parameters for the \ref block_sel_matrix at the start
  * of simulation.

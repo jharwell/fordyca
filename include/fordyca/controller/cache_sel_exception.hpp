@@ -36,7 +36,7 @@ NS_START(fordyca, controller);
 ******************************************************************************/
 /**
  * @class cache_sel_exception
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  */
 struct cache_sel_exception {

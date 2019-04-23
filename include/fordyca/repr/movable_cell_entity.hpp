@@ -37,7 +37,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class movable_cell_entity
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief A class representing objects that reside within one or more squares
  * within a 2D grid whose position CAN change during the lifetime of the object.

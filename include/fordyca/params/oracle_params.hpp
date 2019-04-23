@@ -36,7 +36,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct oracle_params
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parameters for the various oracles that can be employed during
  * simulation.

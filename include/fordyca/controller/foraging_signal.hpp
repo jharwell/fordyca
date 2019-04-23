@@ -37,7 +37,7 @@ namespace rfsm = rcppsw::patterns::state_machine;
  ******************************************************************************/
 /**
  * @class foraging_signal
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Signals that sub-states can return in order to notify their super
  * states that a condition that they do not know how to handle has arisen.

@@ -37,7 +37,7 @@ NS_START(fordyca, params);
 ******************************************************************************/
 /**
   * @struct battery_params
-  * @ingroup params
+  * @ingroup fordyca params
   */
 struct battery_params : public rcppsw::params::base_params {
   int power_station_amount{0};

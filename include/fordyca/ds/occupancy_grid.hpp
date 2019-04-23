@@ -49,7 +49,7 @@ using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
  ******************************************************************************/
 /**
  * @class occupancy_grid
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Multilayered grid of cells and associated information
  * density/relevance on the state of those cells. Used by robots in making

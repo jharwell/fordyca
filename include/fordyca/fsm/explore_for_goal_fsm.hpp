@@ -40,7 +40,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 /**
  * @class explore_for_goal_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Robots executing this task will roam around randomly looking for an
  * instance of their goal. Once they have found one, the FSM will signal that

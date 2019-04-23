@@ -103,7 +103,7 @@ struct nest_block_drop_visit_set {
 
 /**
  * @class nest_block_drop
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Fired whenever a robot drops a block in the nest.
  */

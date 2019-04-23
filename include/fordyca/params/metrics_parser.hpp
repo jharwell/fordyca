@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class metrics_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters related to metric collection into
  * \ref metrics_params.

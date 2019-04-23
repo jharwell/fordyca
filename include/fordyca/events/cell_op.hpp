@@ -54,7 +54,7 @@ struct cell_op_visit_set {
 
 /**
  * @class cell_op
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Non-abstract interface specifying the minimum set of classes that all
  * events that operate on cells within an occupany grid need to visit.

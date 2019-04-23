@@ -51,7 +51,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class dpo_semantic_map
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Stores a semantic map of the state of the arena, from the perspective
  * of the robot (i.e. th physical extent of the arena + semantic information

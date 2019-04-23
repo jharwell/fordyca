@@ -39,7 +39,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class goal_acquisition_metrics
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Interface defining what metrics that should be collected from FSMs as
  * they attempt to acquire a goal (site/object of interest) in SOME way (driving

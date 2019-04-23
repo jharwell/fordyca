@@ -40,7 +40,7 @@ NS_START(fordyca, metrics, perception);
  ******************************************************************************/
 /**
  * @class mdpo_perception_metrics_collector
- * @ingroup metrics blocks
+ * @ingroup fordyca metrics blocks
  *
  * @brief Collector for \ref mdpo_perception_metrics.
  *

@@ -36,7 +36,7 @@ NS_START(fordyca, params, arena);
  ******************************************************************************/
 /**
  * @struct block_manifest
- * @ingroup params arena
+ * @ingroup fordyca params arena
  *
  * @brief Params of what types of blocks and how many of each should be
  * created, as well as size and other characteristics.

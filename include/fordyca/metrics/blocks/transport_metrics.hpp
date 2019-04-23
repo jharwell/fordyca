@@ -37,7 +37,7 @@ NS_START(fordyca, metrics, blocks);
 
 /**
  * @class transport_metrics
- * @ingroup metrics blocks
+ * @ingroup fordyca metrics blocks
  *
  * @brief Defines the metrics to be collected from blocks about the process of
  * transportation from their original location in the arena after distribution

@@ -41,7 +41,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class sensing_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters relating to sensings into \ref sensing_params.
  */

@@ -38,7 +38,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class depth0_metrics_aggregator
- * @ingroup support depth0
+ * @ingroup fordyca support depth0
  *
  * @brief Aggregates and metrics metric collection for depth0 foraging. That
  * includes:

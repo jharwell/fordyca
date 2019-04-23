@@ -41,7 +41,7 @@ namespace rmetrics = rcppsw::metrics;
  ******************************************************************************/
 /**
  * @class acquisition_loc_metrics_collector
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Collector for \ref goal_acquisition_metrics goal locations, which is
  * collected as a 2D array, and needs its own collector separate from the \ref

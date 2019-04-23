@@ -42,7 +42,7 @@ namespace steering = rcppsw::robotics::steering2D;
  ******************************************************************************/
 /**
  * @class steering_force2D_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters related to \ref steering_force2D objects
  * into \ref steering_force2D_params.

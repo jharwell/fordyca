@@ -44,7 +44,7 @@ NS_START(support);
  ******************************************************************************/
 /**
  * @class block_carry_visualizer
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Renders a block in 3D that the robot is carrying for
  * visualization/debugging purposes.

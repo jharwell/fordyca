@@ -40,7 +40,7 @@ NS_START(fordyca, params, arena);
  ******************************************************************************/
 /**
  * @class blocks_parser
- * @ingroup params arena
+ * @ingroup fordyca params arena
  *
  * @brief Parses XML parameters related to blocks in the arena into \ref
  * blocks_params.

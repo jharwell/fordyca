@@ -63,7 +63,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class base_controller
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief The base controller foraging class that all FORDYCA controllers derive
  * from. It holds all functionality common to all controllers, as well that some

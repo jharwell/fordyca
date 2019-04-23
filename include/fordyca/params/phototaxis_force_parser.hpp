@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class phototaxis_force_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters for related to \ref phototaxis_force objects
  * into \ref phototaxis_force_params.

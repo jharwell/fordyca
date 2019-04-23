@@ -37,7 +37,7 @@ NS_START(fordyca, repr);
 
 /**
  * @class ramp_block
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief A repr of a ramp block within the arena. Ramp blocks are 2x1
  * cells in size. Ramped blocks only need X,Y dimensions, because they are only

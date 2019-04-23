@@ -42,7 +42,7 @@ namespace ct = rcppsw::control;
  ******************************************************************************/
 /**
  * @class motion_throttling_handler
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief Handler for a type of motion_throttling for the robot actuators
  */

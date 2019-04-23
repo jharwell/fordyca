@@ -44,7 +44,7 @@ NS_START(tasks, depth1);
  ******************************************************************************/
 /**
  * @class foraging_task
- * @ingroup tasks depth1
+ * @ingroup fordyca tasks depth1
  *
  * @brief Interface specifying the visit set for all depth1 foraging tasks
  * in FORDYCA.

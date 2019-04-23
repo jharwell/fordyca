@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class grid_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters for various 2D grid structures into
  * \ref grid_params.

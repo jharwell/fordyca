@@ -60,7 +60,7 @@ using ds::arena_grid;
  ******************************************************************************/
 /**
  * @struct controller_metric_collector
- * @ingroup support depth0
+ * @ingroup fordyca support depth0
  *
  * @brief Collect metrics from a depth0 controller
  */
@@ -79,7 +79,7 @@ struct controller_metric_collector {
 
 /**
  * @struct controller_metric_collector_mapper
- * @ingroup support depth0
+ * @ingroup fordyca support depth0
  *
  * @brief Map a particular controller instance to the configuration action run
  * during initialization.

@@ -48,7 +48,7 @@ namespace er = rcppsw::er;
 
 /**
  * @class nest_block_drop_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Handle's a robot's (possible) \ref nest_block_drop event on a given
  * timestep.

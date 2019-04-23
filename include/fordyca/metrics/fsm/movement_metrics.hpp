@@ -38,7 +38,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class movement_metrics
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Interface defining what metrics regarding movement traveled should be
  * collected from all robots.

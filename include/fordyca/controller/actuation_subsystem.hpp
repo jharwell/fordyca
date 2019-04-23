@@ -51,7 +51,7 @@ namespace utils = rcppsw::utils;
  ******************************************************************************/
 /**
  * @class actuation_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Handles the control of all actuators on the robot.
  *

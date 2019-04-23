@@ -68,7 +68,7 @@ struct cache_proximity_visit_set {
 
 /*
  * @class cache_proximity
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a robot is attempting to start a new cache, but an
  * existing cache unknown to the robot is too close.

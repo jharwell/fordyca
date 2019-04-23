@@ -63,7 +63,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class tasking_initializer
- * @ingroup controller depth1
+ * @ingroup fordyca controller depth1
  *
  * @brief A helper class to offload initialization of the task tree for depth1
  * foraging.

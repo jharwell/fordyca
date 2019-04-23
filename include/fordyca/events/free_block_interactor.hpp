@@ -44,7 +44,7 @@ namespace rvisitor = rcppsw::patterns::visitor;
  ******************************************************************************/
 /**
  * @class free_block_interactor
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with free blocks in FORDYCA.

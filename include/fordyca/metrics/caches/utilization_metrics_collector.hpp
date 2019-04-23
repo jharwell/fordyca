@@ -41,7 +41,7 @@ namespace rmetrics = rcppsw::metrics;
  ******************************************************************************/
 /**
  * @class utilization_metrics_collector
- * @ingroup metrics caches
+ * @ingroup fordyca metrics caches
  *
  * @brief Collector for \ref utilization_metrics.
  *

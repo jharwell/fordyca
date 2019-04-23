@@ -45,7 +45,7 @@ namespace rta = rcppsw::ta;
  ******************************************************************************/
 /**
  * @class tasking_initializer
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief A helper class to offload initialization of the task tree for depth2
  * foraging.

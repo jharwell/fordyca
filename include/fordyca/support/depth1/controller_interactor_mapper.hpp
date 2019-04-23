@@ -51,7 +51,7 @@ using gp_mdpo_itype = robot_arena_interactor<controller::depth1::gp_mdpo_control
  ******************************************************************************/
 /**
  * @class controller_interactor_mapper
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  * @brief Helper class to map the typeid of a \ref controller::base_controller
  * to a \ref depth1::robot_arena_interactor to correctly handle robot-arena
  * interactions for that type.

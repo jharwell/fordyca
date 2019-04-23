@@ -59,7 +59,7 @@ using cache_sel_variant =
 
 /**
  * @class cache_sel_matrix
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief A dictionary of information needed by robots using various utility
  * functions to calculate the best:

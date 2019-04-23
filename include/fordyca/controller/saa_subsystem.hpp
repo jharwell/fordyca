@@ -52,7 +52,7 @@ namespace rmath = rcppsw::math;
 
 /**
  * @class saa_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Sensing and Actuation subsystem for the robot. Does not do much other
  * than wrap the two components.

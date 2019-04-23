@@ -41,7 +41,7 @@ class dynamic_cache_manager;
  ******************************************************************************/
 /**
  * @class loop_functions
- * @ingroup support depth2
+ * @ingroup fordyca support depth2
  *
  * @brief The loop functions for depth 2 foraging.
  *

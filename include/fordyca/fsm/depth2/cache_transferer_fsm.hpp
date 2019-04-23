@@ -42,7 +42,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  ******************************************************************************/
 /**
  * @class cache_transferer_fsm
- * @ingroup fsm depth2
+ * @ingroup fordyca fsm depth2
  *
  * @brief The FSM for a cache transferer task. Each robot executing this FSM
  * will acquire a cache (either a known cache or via random exploration), pickup

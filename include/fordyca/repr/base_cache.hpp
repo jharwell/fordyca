@@ -46,7 +46,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class base_cache
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief Base class for representating a cache within the arena. Caches do not
  * have state, and if/when a cache becomes empty, it needs to be deleted by an

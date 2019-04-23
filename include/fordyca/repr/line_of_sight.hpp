@@ -52,7 +52,7 @@ class base_cache;
  ******************************************************************************/
 /**
  * @class line_of_sight
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief A repr of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in

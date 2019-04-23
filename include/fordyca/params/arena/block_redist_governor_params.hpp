@@ -37,7 +37,7 @@ NS_START(fordyca, params, arena);
  ******************************************************************************/
 /**
  * @struct block_redist_governor_params
- * @ingroup params arena
+ * @ingroup fordyca params arena
  */
 struct block_redist_governor_params : public rcppsw::params::base_params {
   uint        timestep{0};

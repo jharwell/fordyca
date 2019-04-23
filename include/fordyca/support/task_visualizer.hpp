@@ -46,7 +46,7 @@ namespace rta = rcppsw::ta;
  ******************************************************************************/
 /**
  * @class task_visualizer
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Renders the task that a robot is currently executing in text above the
  * robot for visualization/debugging purposes.

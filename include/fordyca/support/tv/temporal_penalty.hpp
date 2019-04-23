@@ -36,7 +36,7 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 /**
  * @class temporal_penalty
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief Handles subjecting a robot to a penalty when doing something via a
  * timeout in which the robot will sit still.

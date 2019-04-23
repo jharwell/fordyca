@@ -39,7 +39,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class cache_site_utility
- * @ingroup math
+ * @ingroup fordyca math
  *
  * @brief Calculates the utility associated with a cache to a robot as part
  * of its decision process for what to do with a block once it has picked it up.

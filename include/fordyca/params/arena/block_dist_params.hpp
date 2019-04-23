@@ -39,7 +39,7 @@ NS_START(fordyca, params, arena);
  ******************************************************************************/
 /**
  * @struct block_dist_params
- * @ingroup params arena
+ * @ingroup fordyca params arena
  */
 struct block_dist_params : public rcppsw::params::base_params {
   block_manifest manifest{};

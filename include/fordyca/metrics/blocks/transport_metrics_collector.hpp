@@ -41,7 +41,7 @@ namespace rmetrics = rcppsw::metrics;
  ******************************************************************************/
 /**
  * @class transport_metrics_collector
- * @ingroup metrics blocks
+ * @ingroup fordyca metrics blocks
  *
  * @brief Collector for \ref transport_metrics.
  *

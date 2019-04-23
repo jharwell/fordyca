@@ -74,7 +74,7 @@ template void depth1_loop_functions::controller_configure(
  ******************************************************************************/
 /**
  * @struct controller_configurer
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief Configure a depth1 controller during initialization.
  */
@@ -132,7 +132,7 @@ struct controller_configurer {
 
 /**
  * @struct controller_task_extractor_mapper
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief Map a controller instance to the task extraction action run during
  * convergence calculations.
@@ -153,7 +153,7 @@ struct controller_task_extractor_mapper : public boost::static_visitor<int> {
 
 /**
  * @struct controller_configurer_mapper
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief Map a particular controller instance to the configuration action run
  * during initialization.

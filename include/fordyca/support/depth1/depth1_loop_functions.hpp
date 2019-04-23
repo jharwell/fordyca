@@ -50,7 +50,7 @@ class static_cache_manager;
  ******************************************************************************/
 /**
  * @class loop_functions
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief The loop functions for depth 1 foraging.
  *

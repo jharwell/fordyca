@@ -39,7 +39,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class block_utility
- * @ingroup math
+ * @ingroup fordyca math
  *
  * @brief Calculates the utility associated with a known block, as part of a
  * robot's decision on whether or not to go and attempt to pick it up.

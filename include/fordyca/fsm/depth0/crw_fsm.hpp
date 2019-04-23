@@ -48,7 +48,7 @@ using transport_goal_type = block_transporter::goal_type;
 
 /**
  * @class crw_fsm
- * @ingroup fsm depth0
+ * @ingroup fordyca fsm depth0
  *
  * @brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the

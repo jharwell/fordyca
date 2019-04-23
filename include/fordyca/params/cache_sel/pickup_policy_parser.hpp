@@ -39,7 +39,7 @@ NS_START(fordyca, params, cache_sel);
  ******************************************************************************/
 /**
  * @class pickup_policy_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters for \ref pickup_policy_params at the
  * start of simulation.

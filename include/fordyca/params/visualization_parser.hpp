@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class visualization_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters relating to visualization in loop functions into
  * \ref visualization_params.

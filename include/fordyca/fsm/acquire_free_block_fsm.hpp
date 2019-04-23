@@ -48,7 +48,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class acquire_free_block_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief The FSM for an acquiring a free (i.e. not in a cache) block in the
  * arena.

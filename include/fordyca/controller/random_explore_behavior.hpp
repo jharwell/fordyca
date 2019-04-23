@@ -37,7 +37,7 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 /**
  * @class random_explore_behavior
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  *
  * @brief Perform random walk exploration: wander force + avoidance force.

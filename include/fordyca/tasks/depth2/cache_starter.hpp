@@ -42,7 +42,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class cache_starter
- * @ingroup tasks depth2
+ * @ingroup fordyca tasks depth2
  *
  * @brief Task in which robots locate a free block and drop it somewhere to
  * start a new cache. It is abortable, and has one task interface.

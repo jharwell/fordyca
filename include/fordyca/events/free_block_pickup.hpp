@@ -107,7 +107,7 @@ struct free_block_pickup_visit_set {
 
 /**
  * @class free_block_pickup
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).

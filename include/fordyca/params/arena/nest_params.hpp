@@ -38,7 +38,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @struct nest_params
- * @ingroup params arena
+ * @ingroup fordyca params arena
  */
 struct nest_params : public rcppsw::params::base_params {
   rmath::vector2d center{};

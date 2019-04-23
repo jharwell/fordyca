@@ -44,7 +44,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class new_cache_block_drop_interactor
- * @ingroup support depth2
+ * @ingroup fordyca support depth2
  *
  * @brief Handles a robot's (possible) \ref free_block_drop event at a new cache
  * on a given timestep.

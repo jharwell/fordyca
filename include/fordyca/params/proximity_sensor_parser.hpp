@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class proximity_sensor_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters relating to proximity_sensors into \ref proximity_sensor_params.
  */

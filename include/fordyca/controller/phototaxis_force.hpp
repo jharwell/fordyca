@@ -46,7 +46,7 @@ namespace rmath = rcppsw::math;
 
 /**
  * @class phototaxis_force
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief A force pushing the robot away from light sources.
  */

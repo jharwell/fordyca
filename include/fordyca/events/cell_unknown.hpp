@@ -55,7 +55,7 @@ struct cell_unknown_visit_set {
 
 /**
  * @class cell_unknown
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a cell within an occupancy grid needs to go into an
  * unknown state.

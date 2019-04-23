@@ -54,7 +54,7 @@ NS_START(metrics);
  ******************************************************************************/
 /**
  * @class base_metrics_aggregator
- * @ingroup metrics
+ * @ingroup fordyca metrics
  *
  * @brief Base class for aggregating collection of metrics for various
  * sources. Extends \ref rcppsw::metrics::collector_group to include

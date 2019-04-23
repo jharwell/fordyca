@@ -53,7 +53,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class sensing_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief The base sensing subsystem for all sensors used by the different
  * foraging controllers.  Contains common sensor functionality for all

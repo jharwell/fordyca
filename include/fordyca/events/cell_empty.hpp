@@ -55,7 +55,7 @@ struct cell_empty_visit_set {
 
 /**
  * @class cell_empty
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a cell needs to go from some other state to being
  * empty.

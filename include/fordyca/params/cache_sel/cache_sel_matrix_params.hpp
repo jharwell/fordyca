@@ -40,7 +40,7 @@ NS_START(fordyca, params, cache_sel);
  ******************************************************************************/
 /**
  * @struct cache_sel_matrix_params
- * @ingroup params cache_sel
+ * @ingroup fordyca params cache_sel
  *
  * @brief XML parameters for the \ref cache_sel_matrix
  */

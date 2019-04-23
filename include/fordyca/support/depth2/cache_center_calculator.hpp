@@ -55,7 +55,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class cache_center_calculator
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Calculate the center for a cache to create in the arena:
  *

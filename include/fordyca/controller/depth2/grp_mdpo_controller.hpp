@@ -38,7 +38,7 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * @class grp_mdpo_controller
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief A Greedy Recursive Partitioning controller that moves through a depth2
  * recursive task decomposition graph, changing task according to dynamic

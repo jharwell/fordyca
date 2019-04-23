@@ -45,7 +45,7 @@ class depth0_metrics_aggregator;
  ******************************************************************************/
 /**
  * @class depth0_loop_functions
- * @ingroup support depth0
+ * @ingroup fordyca support depth0
  *
  * @brief Contains the simulation support functions for depth0 foraging, such
  * as:

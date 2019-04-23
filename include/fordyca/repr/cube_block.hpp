@@ -37,7 +37,7 @@ NS_START(fordyca, repr);
 
 /**
  * @class cube_block
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief A repr of a cube block within the arena. Cube blocks are 1
  * cell in size.

@@ -51,7 +51,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class random_distributor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Distributes a set of blocks randomly within a specified 2D area, such
  * that no blocks overlap with each other or other entities already present in

@@ -37,7 +37,7 @@ NS_START(fordyca, tasks, depth2);
  ******************************************************************************/
 /**
  * @class cache_collector
- * @ingroup tasks depth2
+ * @ingroup fordyca tasks depth2
  *
  * @brief Task in which robots locate a cache and bring a block from it to the
  * nest. It is abortable, and has one task interface.

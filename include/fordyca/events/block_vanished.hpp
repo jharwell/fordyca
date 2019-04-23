@@ -97,7 +97,7 @@ struct block_vanished_visit_set {
 
 /*
  * @class block_vanished
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a robot is serving a block pickup penalty, but while
  * serving the penalty the block it is waiting for vanishes due to another

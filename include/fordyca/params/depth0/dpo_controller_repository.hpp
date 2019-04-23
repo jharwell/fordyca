@@ -36,7 +36,7 @@ NS_START(fordyca, params, depth0);
  ******************************************************************************/
 /**
  * @class dpo_controller_repository
- * @ingroup params depth0
+ * @ingroup fordyca params depth0
  *
  * @brief Collection of all parameter parsers and parse results needed by
  * \ref dpo_controller.

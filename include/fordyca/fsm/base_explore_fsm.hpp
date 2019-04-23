@@ -42,7 +42,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class base_explore_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief The base FSM for an exploration subtask. Does not actually contain an
  * FSM per-se, but just some pieces common to all exploration FSMs.

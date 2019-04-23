@@ -46,7 +46,7 @@ NS_START(depth0);
  ******************************************************************************/
 /**
  * @class crw_controller
- * @ingroup controller depth0
+ * @ingroup fordyca controller depth0
  *
  * @brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.

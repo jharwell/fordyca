@@ -40,7 +40,7 @@ NS_START(fordyca, params, caches);
  ******************************************************************************/
 /**
  * @class static_cache_parser
- * @ingroup params caches
+ * @ingroup fordyca params caches
  *
  * @brief Parses XML parameters for relating to cache into \ref caches_params.
  */

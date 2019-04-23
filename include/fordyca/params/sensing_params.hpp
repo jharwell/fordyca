@@ -37,7 +37,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct sensing_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct sensing_params : public rcppsw::params::base_params {
   /**

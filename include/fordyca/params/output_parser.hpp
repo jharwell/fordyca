@@ -41,7 +41,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @class output_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters relating to simulation output into
  * \ref output_params. This parser is used by both loop functions and robots,

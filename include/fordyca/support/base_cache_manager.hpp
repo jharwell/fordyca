@@ -49,7 +49,7 @@ NS_START(support);
  ******************************************************************************/
 /**
  * @class base_cache_manager
- * @ingroup support depth2
+ * @ingroup fordyca support depth2
  *
  * @brief Manager for creation, depletion, and metric gathering for base
  * caches in the arena, whenever they are enabled.

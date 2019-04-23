@@ -43,7 +43,7 @@ NS_START(controller);
  ******************************************************************************/
 /**
  * @class base_perception_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  */
 class base_perception_subsystem {
  public:

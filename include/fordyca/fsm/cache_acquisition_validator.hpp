@@ -50,7 +50,7 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  ******************************************************************************/
 /**
  * @class cache_acquisition_validator
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Determine if the acquisition of a cache at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and

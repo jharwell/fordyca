@@ -49,7 +49,7 @@ using transport_goal_type = block_transporter::goal_type;
  ******************************************************************************/
 /**
  * @class free_block_to_nest_fsm
- * @ingroup fsm depth0
+ * @ingroup fordyca fsm depth0
  *
  * @brief FILL ME IN!
  */

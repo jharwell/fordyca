@@ -42,7 +42,7 @@ namespace rvisitor = rcppsw::patterns::visitor;
  ******************************************************************************/
 /**
  * @class dynamic_cache_interactor
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with dynamic caches in FORDYCA.

@@ -46,7 +46,7 @@ namespace er = rcppsw::er;
 
 /**
  * @class cache_op_filter
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief The filter for cache operation for robots (e.g. picking up, dropping
  * in places that involve existing caches.

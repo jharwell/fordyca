@@ -45,7 +45,7 @@ NS_START(controller);
  ******************************************************************************/
 /**
  * @class loc_proc_verify
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Verifies that a LOS has been processed properly and that the contents
  * of the LOS is now accurately reflected in a robots perception.

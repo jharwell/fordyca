@@ -39,7 +39,7 @@ namespace rmath = rcppsw::math;
 
 /**
  * @class robot_occupancy_metrics
- * @ingroup metrics
+ * @ingroup fordyca metrics
  *
  * @brief Defines the metrics to be collected regarding robot occupancy in the
  * arena.

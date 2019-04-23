@@ -41,7 +41,7 @@ NS_START(fordyca, params);
 
 /**
  * @class actuation_parser
- * @ingroup params
+ * @ingroup fordyca params
  *
  * @brief Parses XML parameters for \ref actuation_subsystem into
  * \ref actuation_params.

@@ -39,7 +39,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @struct new_direction_data
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Structure containing randomness to inject into robot motion by having
  * them change their direction.

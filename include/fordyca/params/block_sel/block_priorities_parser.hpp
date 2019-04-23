@@ -40,7 +40,7 @@ NS_START(fordyca, params, block_sel);
  ******************************************************************************/
 /**
  * @class block_priorities_parser
- * @ingroup params block_sel
+ * @ingroup fordyca params block_sel
  *
  * @brief Parses XML parameters related to block priorties into \ref
  * block_priority_params.

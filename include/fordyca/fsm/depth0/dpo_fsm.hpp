@@ -48,7 +48,7 @@ using transport_goal_type = block_transporter::goal_type;
  ******************************************************************************/
 /**
  * @class dpo_fsm
- * @ingroup fsm depth0
+ * @ingroup fordyca fsm depth0
  *
  * @brief The FSM for an unpartitioned foraging task. Each robot executing this
  * FSM will locate for a block (either a known block or via random exploration),

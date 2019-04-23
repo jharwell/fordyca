@@ -41,7 +41,7 @@ namespace rta = rcppsw::ta;
  ******************************************************************************/
 /**
  * @class vector_argument
- * @ingroup tasks
+ * @ingroup fordyca tasks
  *
  * @brief An argument that can be passed to a \ref
  * rta::taskable function which contains a vector, mostly
@@ -63,7 +63,7 @@ class vector_argument : public rta::taskable_argument {
 
 /**
  * @class foraging_signal_argument
- * @ingroup tasks
+ * @ingroup fordyca tasks
  *
  * @brief An argument that can be passed to a \ref
  * rta::taskable::task_start() function which contains a

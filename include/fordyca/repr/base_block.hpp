@@ -43,7 +43,7 @@ namespace ut = rcppsw::utils;
 
 /**
  * @class base_block
- * @ingroup repr
+ * @ingroup fordyca repr
  *
  * @brief Base class for representing blocks (i.e. things that robots carry
  * within the arena). Blocks have both real (where they actually live in the

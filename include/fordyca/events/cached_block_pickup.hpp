@@ -98,7 +98,7 @@ struct cached_block_pickup_visit_set {
 
 /*
  * @class cached_block_pickup
- * @ingroup events detail
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a robpot picks up a block from a cache.
  *

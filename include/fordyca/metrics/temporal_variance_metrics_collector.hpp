@@ -39,7 +39,7 @@ NS_START(fordyca, metrics);
  ******************************************************************************/
 /**
  * @class temporal_variance_metrics_collector
- * @ingroup metrics blocks
+ * @ingroup fordyca metrics blocks
  *
  * @brief Collector for \ref temporal_variance_metrics.
  *

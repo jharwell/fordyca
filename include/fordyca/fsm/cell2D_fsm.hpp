@@ -42,7 +42,7 @@ namespace er = rcppsw::er;
  ******************************************************************************/
 /**
  * @class cell2D_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Per-cell FSM containing the current state of the cell (empty, has a
  * block, has a cache, or unknown, etc.).

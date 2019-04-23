@@ -42,7 +42,7 @@ namespace rvisitor = rcppsw::patterns::visitor;
  ******************************************************************************/
 /**
  * @class foraging_task
- * @ingroup tasks depth2
+ * @ingroup fordyca tasks depth2
  *
  * @brief Interface specifying the visit set for all depth2 foraging tasks
  * in FORDYCA.

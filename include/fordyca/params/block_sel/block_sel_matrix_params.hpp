@@ -39,7 +39,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @struct block_sel_matrix_params
- * @ingroup params block_sel
+ * @ingroup fordyca params block_sel
  *
  * @brief XML parameters for the \ref block_sel_matrix
  */

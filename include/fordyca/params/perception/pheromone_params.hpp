@@ -37,7 +37,7 @@ NS_START(fordyca, params, perception);
  ******************************************************************************/
 /**
  * @struct pheromone_params
- * @ingroup params perception
+ * @ingroup fordyca params perception
  */
 struct pheromone_params : public rcppsw::params::base_params {
   double rho{0.0};

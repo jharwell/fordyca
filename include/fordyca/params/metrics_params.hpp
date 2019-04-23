@@ -39,7 +39,7 @@ NS_START(fordyca, params);
  ******************************************************************************/
 /**
  * @struct metrics_params
- * @ingroup params
+ * @ingroup fordyca params
  */
 struct metrics_params : public rcppsw::params::base_params {
   std::string fsm_movement_fname{};

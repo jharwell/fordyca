@@ -41,7 +41,7 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 /**
  * @class explore_behavior
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Base class for different exploration behaviors that robots can exhibit
  * when looking for stuff.

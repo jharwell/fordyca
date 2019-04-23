@@ -46,7 +46,7 @@ namespace er = rcppsw::er;
 
 /**
  * @class block_op_filter
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief The filter for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.

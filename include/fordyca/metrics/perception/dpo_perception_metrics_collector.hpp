@@ -41,7 +41,7 @@ namespace rswarm = rcppsw::swarm;
  ******************************************************************************/
 /**
  * @class dpo_perception_metrics_collector
- * @ingroup metrics blocks
+ * @ingroup fordyca metrics blocks
  *
  * @brief Collector for \ref dpo_perception_metrics.
  *

@@ -55,7 +55,7 @@ namespace rmath = rcppsw::math;
  ******************************************************************************/
 /**
  * @class base_cache_creator
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Base class for creating static/dynamic caches in the arena.
  */
