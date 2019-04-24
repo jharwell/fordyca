@@ -24,8 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,36 +37,12 @@ NS_START(fordyca);
 namespace repr {
 class base_cache;
 }
-namespace controller { namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-}} // namespace controller::depth2
-
-namespace fsm {
-class block_to_goal_fsm;
-} // namespace fsm
-namespace tasks {
-class base_foraging_task;
-namespace depth2 {
-class cache_finisher;
-class cache_starter;
-} // namespace depth2
-} // namespace tasks
 
 NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cache_proximity_visit_set {
-  using value =
-      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                  controller::depth2::grp_mdpo_controller,
-                                  tasks::depth2::cache_finisher,
-                                  tasks::depth2::cache_starter,
-                                  fsm::block_to_goal_fsm>;
-};
-
 /*
  * @class cache_proximity
  * @ingroup fordyca events detail
@@ -72,7 +51,19 @@ struct cache_proximity_visit_set {
  * existing cache unknown to the robot is too close.
  */
 class cache_proximity : public rer::client<cache_proximity> {
+ private:
+  struct visit_typelist_impl {
+    using others = rmpl::typelist<tasks::depth2::cache_finisher,
+                                 tasks::depth2::cache_starter,
+                                 fsm::block_to_goal_fsm>;
+    using value = boost::mpl::joint_view<controller::depth2::typelist::type,
+                                         others::type>;
+  };
+
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   explicit cache_proximity(const std::shared_ptr<repr::base_cache>& cache);
   ~cache_proximity(void) override = default;
 
@@ -81,7 +72,9 @@ class cache_proximity : public rer::client<cache_proximity> {
 
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& c);
+  void visit(controller::depth2::grp_odpo_controller& c);
   void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(controller::depth2::grp_omdpo_controller& c);
   void visit(tasks::depth2::cache_finisher& task);
   void visit(tasks::depth2::cache_starter& task);
   void visit(fsm::block_to_goal_fsm& fsm);
@@ -101,7 +94,7 @@ class cache_proximity : public rer::client<cache_proximity> {
  */
 using cache_proximity_visitor_impl =
     rvisitor::precise_visitor<detail::cache_proximity,
-                              detail::cache_proximity_visit_set::value>;
+                              detail::cache_proximity::visit_typelist>;
 
 NS_END(detail);
 

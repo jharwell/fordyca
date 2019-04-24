@@ -26,6 +26,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/xml_param_repository.hpp"
 
 /*******************************************************************************
@@ -36,7 +37,7 @@ NS_START(fordyca, params);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class loop_function_repository : public rcppsw::params::xml_param_repository {
+class loop_function_repository : public rparams::xml_param_repository {
  public:
   loop_function_repository(void) noexcept;
 };

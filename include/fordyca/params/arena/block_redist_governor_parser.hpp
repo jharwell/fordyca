@@ -46,7 +46,7 @@ NS_START(fordyca, params, arena);
  * @brief Parses XML parameters related to block redistribution by the \ref
  * redist_governor.
  */
-class block_redist_governor_parser : public rcppsw::params::xml_param_parser {
+class block_redist_governor_parser : public rparams::xml_param_parser {
  public:
   explicit block_redist_governor_parser(uint level) : xml_param_parser(level) {}
 
@@ -64,7 +64,7 @@ class block_redist_governor_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

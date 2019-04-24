@@ -43,7 +43,7 @@ NS_START(fordyca, params, tv);
  *
  * @brief Parses XML parameters for \ref tv_manager into \ref tv_manager_params.
  */
-class tv_manager_parser : public rcppsw::params::xml_param_parser {
+class tv_manager_parser : public rparams::xml_param_parser {
  public:
   explicit tv_manager_parser(uint level)
       : xml_param_parser(level),
@@ -67,7 +67,7 @@ class tv_manager_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

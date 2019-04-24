@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  * @struct nest_params
  * @ingroup fordyca params arena
  */
-struct nest_params : public rcppsw::params::base_params {
+struct nest_params : public rparams::base_params {
   rmath::vector2d center{};
   rmath::vector2d dims{};
 };

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_TV_TV_MANAGER_PARAMS_HPP_
+#define INCLUDE_FORDYCA_PARAMS_TV_TV_MANAGER_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,12 +27,12 @@
 #include <string>
 #include "rcppsw/params/base_params.hpp"
 #include "rcppsw/control/waveform_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, tv);
-namespace rct = rcppsw::control;
 
 /*******************************************************************************
  * Structure Definitions
@@ -41,7 +41,7 @@ namespace rct = rcppsw::control;
  * @struct tv_manager_params
  * @ingroup fordyca params tv
  */
-struct tv_manager_params : public rcppsw::params::base_params {
+struct tv_manager_params : public rparams::base_params {
   rct::waveform_params block_manipulation_penalty{};
   rct::waveform_params block_carry_throttle{};
   rct::waveform_params cache_usage_penalty{};
@@ -49,4 +49,4 @@ struct tv_manager_params : public rcppsw::params::base_params {
 
 NS_END(tv, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_TV_TV_MANAGER_PARAMS_HPP_ */

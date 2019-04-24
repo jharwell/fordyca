@@ -46,12 +46,6 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cell_unknown_visit_set {
-  using inherited = cell_op_visit_set::value;
-  using defined = rvisitor::precise_visit_set<ds::occupancy_grid>;
-  using value = boost::mpl::joint_view<inherited::type, defined::type>;
-};
-
 /**
  * @class cell_unknown
  * @ingroup fordyca events detail
@@ -65,7 +59,16 @@ struct cell_unknown_visit_set {
  * 2. Before the robot sees it for the first time (ala Fog of War).
  */
 class cell_unknown : public cell_op, public rer::client<cell_unknown> {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using others = rmpl::typelist<ds::occupancy_grid>;
+    using value = boost::mpl::joint_view<inherited::type, others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   explicit cell_unknown(const rmath::vector2u& coord)
       : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_unknown") {}
 
@@ -82,7 +85,7 @@ class cell_unknown : public cell_op, public rer::client<cell_unknown> {
  */
 using cell_unknown_visitor_impl =
     rvisitor::precise_visitor<detail::cell_unknown,
-                              detail::cell_unknown_visit_set::value>;
+                              detail::cell_unknown::visit_typelist>;
 
 NS_END(detail);
 

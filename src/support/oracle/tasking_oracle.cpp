@@ -21,9 +21,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/tasking_oracle.hpp"
+#include "fordyca/support/oracle/tasking_oracle.hpp"
 #include <functional>
 
+#include "fordyca/params/oracle/tasking_oracle_params.hpp"
 #include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/polled_task.hpp"
@@ -31,13 +32,17 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, support, oracle);
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-tasking_oracle::tasking_oracle(const rta::bi_tdgraph* const graph)
-    : ER_CLIENT_INIT("fordyca.support.tasking_oracle") {
+tasking_oracle::tasking_oracle(
+    const params::oracle::tasking_oracle_params* const params,
+    const rta::bi_tdgraph* const graph)
+    : ER_CLIENT_INIT("fordyca.support.tasking_oracle"),
+      mc_exec_ests(params->task_exec_ests),
+      mc_int_ests(params->task_interface_ests) {
   graph->walk([&](const rta::polled_task* task) {
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
     m_map.insert(
@@ -49,8 +54,11 @@ tasking_oracle::tasking_oracle(const rta::bi_tdgraph* const graph)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-tasking_oracle::mapped_type tasking_oracle::ask(const std::string& query) const {
-  return m_map.find(query)->second;
+boost::optional<tasking_oracle::variant_type> tasking_oracle::ask(
+    const std::string& query) const {
+  auto it = m_map.find(query);
+  return (it != m_map.end()) ? boost::make_optional(it->second)
+                             : boost::optional<variant_type>();
 } /* ask() */
 
 void tasking_oracle::listener_add(rta::bi_tdgraph_executive* const executive) {
@@ -85,6 +93,16 @@ void tasking_oracle::task_finish_cb(const rta::polled_task* task) {
 } /* task_finish_cb() */
 
 void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
+  /*
+   * @todo Updating task exec/interface estimates on abort is a little dicey, as
+   * it can cause tasks that just failed to be re-attempted because they have a
+   * much lower estimate than successful tasks. This is the current non-oracle
+   * behavior, so we duplicate it here; it should be less of an issues, as we
+   * should have a lot of updates coming in.
+   *
+   * Whether updating estimates on abort actually matters is tracked by #416,
+   * and will be eventually be implemented.
+   */
   auto& est = boost::get<rta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
   __rcsw_unused double old = est.last_result();
@@ -94,12 +112,18 @@ void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
            task->name().c_str(),
            old,
            est.last_result());
-  /*
-   * @todo We do not update interface estimates on task abort! It would be safe
-   * to do so if we knew that we had completed our interface upon abortion, but
-   * there is currently no clean way to do that. Plus, since we are the oracle,
-   * we should get plenty of updates to interface times on task completion.
-   */
+
+  est = boost::get<rta::time_estimate>(
+      m_map.find("interface_est." + task->name())->second);
+  old = est.last_result();
+
+  /* Assuming 1 interface! */
+  est.calc(task->task_interface_estimate(0));
+
+  ER_DEBUG("Update interface_est.%s on abort: %f -> %f",
+           task->name().c_str(),
+           old,
+           est.last_result());
 } /* task_abort_cb() */
 
-NS_END(support, fordyca);
+NS_END(oracle, support, fordyca);

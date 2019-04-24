@@ -45,7 +45,7 @@ NS_START(fordyca, params, perception);
  * @brief Parses XML parameters relating to pheromones into
  * \ref pheromone_params.
  */
-class pheromone_parser : public rcppsw::params::xml_param_parser {
+class pheromone_parser : public rparams::xml_param_parser {
  public:
   explicit pheromone_parser(uint level) : xml_param_parser(level) {}
 
@@ -64,7 +64,7 @@ class pheromone_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

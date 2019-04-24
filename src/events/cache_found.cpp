@@ -22,7 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -195,7 +199,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   if (map.pheromone_repeat_deposit()) {
     density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
   } else {
-    /*p
+    /*
      * Seeing a new cache on empty square or one that used to contain a block.
      */
     if (!cell.state_has_cache()) {
@@ -216,6 +220,30 @@ void cache_found::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
 
   visit(*c.mdpo_perception()->map());
+
+  c.ndc_pop();
+} /* visit() */
+
+void cache_found::visit(controller::depth2::grp_dpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
+
+  c.ndc_pop();
+} /* visit() */
+
+void cache_found::visit(controller::depth2::grp_omdpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.mdpo_perception()->map());
+
+  c.ndc_pop();
+} /* visit() */
+
+void cache_found::visit(controller::depth2::grp_odpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
 
   c.ndc_pop();
 } /* visit() */

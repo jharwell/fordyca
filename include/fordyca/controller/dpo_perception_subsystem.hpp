@@ -74,7 +74,7 @@ class dpo_perception_subsystem
    * @brief Update the robot's perception of the environment, passing it its
    * current line of sight.
    */
-  void update(void) override;
+  void update(oracular_info_receptor* receptor) override;
 
   /**
    * @brief Reset the robot's perception of the environment to an initial state
@@ -92,7 +92,8 @@ class dpo_perception_subsystem
    *
    * @param c_los The LOS to process.
    */
-  void process_los(const repr::line_of_sight* c_los);
+  void process_los(const repr::line_of_sight* c_los,
+                   oracular_info_receptor* receptor);
 
   void process_los_blocks(const repr::line_of_sight* c_los);
   void process_los_caches(const repr::line_of_sight* c_los);

@@ -23,9 +23,18 @@
  ******************************************************************************/
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth0/odpo_controller.hpp"
+#include "fordyca/controller/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
@@ -103,12 +112,34 @@ void nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
+void nest_block_drop::visit(controller::depth0::odpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.fsm());
+  controller.block(nullptr);
+  controller.block_manip_collator()->free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
                    rfsm::event_type::kNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.fsm());
+  controller.block(nullptr);
+  controller.block_manip_collator()->free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void nest_block_drop::visit(controller::depth0::omdpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.fsm());
@@ -133,7 +164,29 @@ void nest_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
+void nest_block_drop::visit(controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void nest_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void nest_block_drop::visit(controller::depth1::gp_omdpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);
@@ -166,6 +219,39 @@ void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void nest_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void nest_block_drop::visit(controller::depth2::grp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void nest_block_drop::visit(controller::depth2::grp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  controller.block(nullptr);
+  dispatch_nest_interactor(controller.current_task());
+  controller.block_manip_collator()->free_drop_event(true);
+  ER_INFO("Dropped block%d in nest", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void nest_block_drop::visit(controller::depth2::grp_omdpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);

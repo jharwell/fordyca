@@ -1,7 +1,7 @@
 /**
- * @file oracle_parser.cpp
+ * @file oracle_manager.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,37 +21,47 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/oracle_parser.hpp"
+#include "fordyca/support/oracle/oracle_manager.hpp"
+#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/params/oracle/oracle_manager_params.hpp"
+#include "fordyca/support/oracle/entities_oracle.hpp"
+#include "fordyca/support/oracle/tasking_oracle.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support, oracle);
 
 /*******************************************************************************
- * Global Variables
+ * Constructors/Destructor
  ******************************************************************************/
-constexpr char oracle_parser::kXMLRoot[];
+oracle_manager::oracle_manager(
+    const params::oracle::oracle_manager_params* const params)
+    : m_entities(rcppsw::make_unique<class entities_oracle>(&params->entities)),
+      m_tasking(nullptr) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void oracle_parser::parse(const ticpp::Element& node) {
-  ticpp::Element enode = node_get(node, kXMLRoot);
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_ATTR(enode, m_params, enabled);
-  if (m_params->enabled) {
-    XML_PARSE_ATTR(enode, m_params, task_exec_ests);
-    XML_PARSE_ATTR(enode, m_params, task_interface_ests);
+void oracle_manager::tasking_oracle(std::unique_ptr<class tasking_oracle> o) {
+  m_tasking = std::move(o);
+} /* tasking_oracle */
+
+void oracle_manager::update(ds::arena_map* const map) {
+  if (m_entities->blocks_enabled()) {
+    entities_oracle::variant_vector_type v;
+    for (auto& b : map->blocks()) {
+      v.push_back(b);
+    } /* for(&b..) */
+    m_entities->set_blocks(v);
   }
-} /* parse() */
+  if (m_entities->caches_enabled()) {
+    entities_oracle::variant_vector_type v;
+    for (auto& b : map->caches()) {
+      v.push_back(b);
+    } /* for(&b..) */
+    m_entities->set_caches(v);
+  }
+} /* update() */
 
-void oracle_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_params, enabled) << std::endl
-         << XML_ATTR_STR(m_params, task_exec_ests) << std::endl
-         << XML_ATTR_STR(m_params, task_interface_ests) << std::endl
-         << build_footer();
-} /* show() */
-
-NS_END(params, fordyca);
+NS_END(oracle, support, fordyca);

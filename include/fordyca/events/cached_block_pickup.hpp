@@ -24,9 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,65 +39,18 @@ NS_START(fordyca);
 namespace controller {
 class cache_sel_matrix;
 }
-namespace fsm {
-class block_to_goal_fsm;
-namespace depth1 {
-class cached_block_to_nest_fsm;
-}
-} // namespace fsm
-namespace controller {
-namespace depth1 {
-class gp_dpo_controller;
-class gp_mdpo_controller;
-} // namespace depth1
-namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-} // namespace depth2
-} // namespace controller
 namespace repr {
 class arena_cache;
 }
-namespace tasks {
-class base_foraging_task;
-namespace depth1 {
-class collector;
-}
-namespace depth2 {
-class cache_transferer;
-class cache_collector;
-} // namespace depth2
-} // namespace tasks
-
 namespace support {
 class base_cache_manager;
 } /* namespace support */
+
 NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cached_block_pickup_visit_set {
-  using inherited = boost::mpl::joint_view<detail::cell_op_visit_set::value,
-                                           block_pickup_base_visit_set::value>;
-  using defined = rvisitor::precise_visit_set<
-      /* depth1 */
-      controller::depth1::gp_dpo_controller,
-      controller::depth1::gp_mdpo_controller,
-      fsm::block_to_goal_fsm,
-      fsm::depth1::cached_block_to_nest_fsm,
-      tasks::depth1::collector,
-      support::base_cache_manager,
-      /* depth2 */
-      controller::depth2::grp_dpo_controller,
-      controller::depth2::grp_mdpo_controller,
-      tasks::depth2::cache_transferer,
-      tasks::depth2::cache_collector,
-      repr::arena_cache>;
-
-  using value = boost::mpl::joint_view<inherited, defined>;
-};
-
 /*
  * @class cached_block_pickup
  * @ingroup fordyca events detail
@@ -106,7 +62,32 @@ struct cached_block_pickup_visit_set {
  */
 class cached_block_pickup : public rer::client<cached_block_pickup>,
                             public cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = boost::mpl::joint_view<cell_op::visit_typelist::type,
+                                             block_pickup_base_visit_typelist::type>;
+    using controllers = boost::mpl::joint_view<controller::depth1::typelist::type,
+                                               controller::depth2::typelist::type>;
+    using others = rmpl::typelist<
+      /* depth1 */
+      fsm::block_to_goal_fsm,
+      fsm::depth1::cached_block_to_nest_fsm,
+      tasks::depth1::collector,
+      support::base_cache_manager,
+      /* depth2 */
+      tasks::depth2::cache_transferer,
+      tasks::depth2::cache_collector,
+      repr::arena_cache>;
+
+    using value = boost::mpl::joint_view<
+      boost::mpl::joint_view<inherited,
+                             controllers>,
+      others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   cached_block_pickup(const std::shared_ptr<repr::arena_cache>& cache,
                       uint robot_index,
                       uint timestep);
@@ -128,11 +109,15 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
   void visit(controller::depth1::gp_dpo_controller& controller);
   void visit(controller::depth1::gp_mdpo_controller& controller);
+  void visit(controller::depth1::gp_odpo_controller& controller);
+  void visit(controller::depth1::gp_omdpo_controller& controller);
   void visit(support::base_cache_manager& manager);
 
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& controller);
   void visit(controller::depth2::grp_mdpo_controller& controller);
+  void visit(controller::depth2::grp_odpo_controller& controller);
+  void visit(controller::depth2::grp_omdpo_controller& controller);
   void visit(tasks::depth2::cache_transferer& task);
   void visit(tasks::depth2::cache_collector& task);
 
@@ -167,7 +152,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
  */
 using cached_block_pickup_visitor_impl =
     rvisitor::precise_visitor<detail::cached_block_pickup,
-                              detail::cached_block_pickup_visit_set::value>;
+                              detail::cached_block_pickup::visit_typelist>;
 
 NS_END(detail);
 

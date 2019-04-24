@@ -1,5 +1,5 @@
 /**
- * @file controller_interactor_mapper.cpp
+ * @file robot_metric_extractor.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -17,40 +17,46 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
+#ifndef INCLUDE_FORDYCA_SUPPORT_ROBOT_METRIC_EXTRACTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_ROBOT_METRIC_EXTRACTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * This is needed because without it boost instantiates static assertions that
- * verify that every possible handler<controller> instantiation is valid, which
- * includes checking for depth1 controllers being valid for new cache drop/cache
- * site drop events. These will not happen in reality (or shouldn't), and if
- * they do it's 100% OK to crash with an exception.
+#include <boost/variant/static_visitor.hpp>
+#include "fordyca/nsalias.hpp"
+
+/*******************************************************************************
+ * Namespaces/Decls
+ ******************************************************************************/
+NS_START(fordyca, support);
+
+/*******************************************************************************
+ * Class Definitions
+ ******************************************************************************/
+/**
+ * @struct robot_metric_extractor
+ * @ingroup fordyca support
+ *
+ * @brief Functor to perform metric extraction from a controller on each
+ * timestep.
  */
-#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
+template <class AggregatorType, class ControllerType>
+class robot_metric_extractor : public boost::static_visitor<void> {
+ public:
+  using controller_type = ControllerType;
+  explicit robot_metric_extractor(AggregatorType* const agg) : m_agg(agg) {}
 
-#include "fordyca/support/depth1/controller_interactor_mapper.hpp"
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/support/depth1/robot_arena_interactor.hpp"
+  void operator()(const ControllerType* const c) const {
+    m_agg->collect_from_controller(c);
+  }
 
-/*******************************************************************************
- * Namespaces/decls
- ******************************************************************************/
-NS_START(fordyca, support, depth1);
+ private:
+  /* clang-format off */
+  AggregatorType* const m_agg;
+  /* clang-format on */
+};
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void controller_interactor_mapper::operator()(gp_dpo_itype& interactor) const {
-  interactor(*dynamic_cast<gp_dpo_itype::controller_type*>(controller()),
-             timestep());
-}
+NS_END(support, fordyca);
 
-void controller_interactor_mapper::operator()(gp_mdpo_itype& interactor) const {
-  interactor(*dynamic_cast<gp_mdpo_itype::controller_type*>(controller()),
-             timestep());
-}
-
-NS_END(depth1, support, fordyca);
+#endif /* INCLUDE_FORDYCA_SUPPORT_ROBOT_METRIC_EXTRACTOR_HPP_ */

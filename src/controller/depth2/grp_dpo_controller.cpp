@@ -54,13 +54,11 @@ grp_dpo_controller::grp_dpo_controller(void)
  ******************************************************************************/
 void grp_dpo_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
-  dpo_perception()->update();
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
+  dpo_perception()->update(nullptr);
 
   executive()->run();
   ndc_pop();

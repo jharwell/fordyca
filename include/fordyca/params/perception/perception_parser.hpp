@@ -47,7 +47,7 @@ NS_START(fordyca, params, perception);
  * @brief Parses XML parameters for various perception subsystems into
  * \ref perception_params.
  */
-class perception_parser : public rcppsw::params::xml_param_parser {
+class perception_parser : public rparams::xml_param_parser {
  public:
   explicit perception_parser(uint level)
       : xml_param_parser(level),
@@ -69,7 +69,7 @@ class perception_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

@@ -95,9 +95,8 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
       case cache_op_src::ekEXISTING_CACHE_PICKUP:
         return do_filter(controller);
       default:
-        ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
+        ER_FATAL_SENTINEL("Unhandled penalty type %d", static_cast<int>(src));
     } /* switch() */
-    ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
     return filter_res_t{};
   }
 

@@ -28,6 +28,8 @@
 
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
+#include "rcppsw/ta/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,13 +43,6 @@ class polled_task;
 
 NS_START(fordyca);
 
-namespace tasks {
-namespace depth0 { class generalist; }
-namespace depth1 {
-class harvester;
-class collector;
-}
-}
 namespace params {
 namespace depth1 { class controller_repository; }
 }

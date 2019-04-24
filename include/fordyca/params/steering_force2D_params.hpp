@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/phototaxis_force_params.hpp"
 #include "rcppsw/params/base_params.hpp"
 #include "rcppsw/robotics/steering2D/force_calculator_params.hpp"

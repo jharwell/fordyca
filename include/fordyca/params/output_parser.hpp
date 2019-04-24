@@ -48,7 +48,7 @@ NS_START(fordyca, params);
  * and so its logic is slighly more complex in order to handle the needs of
  * both.
  */
-class output_parser : public rcppsw::params::xml_param_parser {
+class output_parser : public rparams::xml_param_parser {
  public:
   explicit output_parser(uint level)
       : xml_param_parser(level), m_metrics_parser(level + 1) {}
@@ -68,8 +68,7 @@ class output_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<output_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
+  std::shared_ptr<rparams::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 

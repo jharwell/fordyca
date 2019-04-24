@@ -27,9 +27,13 @@
 
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/params/arena/arena_map_params.hpp"
+#include "fordyca/params/oracle/oracle_manager_params.hpp"
 #include "fordyca/params/output_params.hpp"
 #include "fordyca/params/tv/tv_manager_params.hpp"
 #include "fordyca/params/visualization_params.hpp"
+#include "fordyca/support/oracle/entities_oracle.hpp"
+#include "fordyca/support/oracle/oracle_manager.hpp"
+#include "fordyca/support/oracle/tasking_oracle.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 #include "fordyca/ds/arena_map.hpp"
@@ -51,7 +55,8 @@ base_loop_functions::base_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.base"),
       m_arena_map(nullptr),
       m_tv_manager(nullptr),
-      m_conv_calc(nullptr) {}
+      m_conv_calc(nullptr),
+      m_oracle_manager(nullptr) {}
 
 base_loop_functions::~base_loop_functions(void) = default;
 
@@ -102,6 +107,9 @@ void base_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize temporal variance injection */
   tv_init(params()->parse_results<params::tv::tv_manager_params>());
+
+  /* initialize oracle, if configured */
+  oracle_init(params()->parse_results<params::oracle::oracle_manager_params>());
 
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
@@ -160,6 +168,12 @@ void base_loop_functions::arena_map_init(
     } /* for(&block..) */
   }
 } /* arena_map_init() */
+
+void base_loop_functions::oracle_init(
+    const params::oracle::oracle_manager_params* const oraclep) {
+  ER_INFO("Creating oracle manager");
+  m_oracle_manager = rcppsw::make_unique<oracle::oracle_manager>(oraclep);
+} /* oracle_init() */
 
 void base_loop_functions::Reset(void) {
   m_arena_map->distribute_all_blocks();

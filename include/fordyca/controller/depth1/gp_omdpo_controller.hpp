@@ -1,7 +1,7 @@
 /**
- * @file oracle_parser.hpp
+ * @file gp_omdpo_controller.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,58 +18,56 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_ORACLE_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ORACLE_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_OMDPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_OMDPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
-#include "fordyca/params/oracle_params.hpp"
-#include "rcppsw/params/xml_param_parser.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, controller);
+class oracular_info_receptor;
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class oracle_parser
- * @ingroup fordyca params
+ * @class gp_omdpo_controller
+ * @ingroup fordyca controller depth1
  *
- * @brief Parses XML parameters used for oracles at the start of simulation.
+ * @brief A foraging controller built on \ref gp_mdpo_controller
+ * that has perfect information about on or more of the following, depending on
+ * configuration:
+ *
+ * - Block/cache locations
+ * - Task durations/estimates
  */
-class oracle_parser : public rcppsw::params::xml_param_parser {
+class gp_omdpo_controller : public depth1::gp_mdpo_controller,
+                            public rer::client<gp_omdpo_controller> {
  public:
-  explicit oracle_parser(uint level) : xml_param_parser(level) {}
+  using gp_dpo_controller::perception;
 
-  /**
-   * @brief The root tag that all cache parameters should lie under in the
-   * XML tree.
-   */
-  static constexpr char kXMLRoot[] = "oracle";
+  gp_omdpo_controller(void);
+  ~gp_omdpo_controller(void) override;
 
-  void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
+  /* CCI_Controller overrides */
+  void ControlStep(void) override;
 
-  std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<oracle_params> parse_results(void) const { return m_params; }
+  std::type_index type_index(void) const override { return {typeid(*this)}; }
+
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor);
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
-    return m_params;
-  }
-
   /* clang-format off */
-  std::shared_ptr<oracle_params> m_params{nullptr};
+  std::unique_ptr<oracular_info_receptor> m_receptor;
   /* clang-format on */
 };
 
-NS_END(params, fordyca);
+NS_END(depth1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ORACLE_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_OMDPO_CONTROLLER_HPP_ */

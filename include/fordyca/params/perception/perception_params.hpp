@@ -40,7 +40,7 @@ NS_START(fordyca, params, perception);
  * @struct perception_grid_params
  * @ingroup fordyca params perception
  */
-struct perception_params : public rcppsw::params::base_params {
+struct perception_params : public rparams::base_params {
   struct grid_params occupancy_grid {};
   struct pheromone_params pheromone {};
 };

@@ -25,7 +25,7 @@
 #include "fordyca/params/arena/arena_map_parser.hpp"
 #include "fordyca/params/battery_parser.hpp"
 #include "fordyca/params/caches/caches_parser.hpp"
-#include "fordyca/params/oracle_parser.hpp"
+#include "fordyca/params/oracle/oracle_manager_parser.hpp"
 #include "fordyca/params/output_parser.hpp"
 #include "fordyca/params/tv/tv_manager_parser.hpp"
 #include "fordyca/params/visualization_parser.hpp"
@@ -43,26 +43,22 @@ namespace rswc = rcppsw::swarm::convergence;
  ******************************************************************************/
 loop_function_repository::loop_function_repository(void) noexcept {
   register_parser<output_parser, output_params>(
-      output_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
+      output_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
   register_parser<arena::arena_map_parser, arena::arena_map_params>(
-      arena::arena_map_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      arena::arena_map_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
   register_parser<tv::tv_manager_parser, tv::tv_manager_params>(
-      tv::tv_manager_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      tv::tv_manager_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
   register_parser<visualization_parser, visualization_params>(
-      visualization_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      visualization_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
   register_parser<battery_parser, battery_params>(
-      battery_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
-  register_parser<oracle_parser, oracle_params>(
-      oracle_parser::kXMLRoot, rcppsw::params::xml_param_parser::kHeader1);
+      battery_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
+  register_parser<oracle::oracle_manager_parser, oracle::oracle_manager_params>(
+      oracle::oracle_manager_parser::kXMLRoot,
+      rparams::xml_param_parser::kHeader1);
   register_parser<caches::caches_parser, caches::caches_params>(
-      caches::caches_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      caches::caches_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
   register_parser<rswc::convergence_parser, rswc::convergence_params>(
-      rswc::convergence_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      rswc::convergence_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
 }
 
 NS_END(params, fordyca);

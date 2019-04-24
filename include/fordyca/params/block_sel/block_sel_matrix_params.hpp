@@ -43,7 +43,7 @@ NS_START(fordyca, params, block_sel);
  *
  * @brief XML parameters for the \ref block_sel_matrix
  */
-struct block_sel_matrix_params : public rcppsw::params::base_params {
+struct block_sel_matrix_params : public rparams::base_params {
   rmath::vector2d nest{};
   struct block_priority_params priorities {};
 };

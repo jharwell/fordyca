@@ -44,12 +44,6 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cell_cache_extent_visit_set {
-  using inherited = cell_op_visit_set::value;
-  using defined = rvisitor::precise_visit_set<ds::arena_map>;
-  using value = boost::mpl::joint_view<inherited::type, defined::type>;
-};
-
 /**
  * @class cell_cache_extent
  * @ingroup fordyca events
@@ -61,7 +55,16 @@ struct cell_cache_extent_visit_set {
  * (See #432).
  */
 class cell_cache_extent : public cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using others = rmpl::typelist<ds::arena_map>;
+    using value = boost::mpl::joint_view<inherited::type, others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   cell_cache_extent(const rmath::vector2u& coord,
                     const std::shared_ptr<repr::base_cache>& cache);
 
@@ -84,7 +87,7 @@ class cell_cache_extent : public cell_op {
  */
 using cell_cache_extent_visitor_impl =
     rvisitor::precise_visitor<detail::cell_cache_extent,
-                              detail::cell_cache_extent_visit_set::value>;
+                              detail::cell_cache_extent::visit_typelist>;
 
 NS_END(detail);
 

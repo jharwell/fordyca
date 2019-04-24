@@ -45,7 +45,7 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters relating to visualization in loop functions into
  * \ref visualization_params.
  */
-class visualization_parser : public rcppsw::params::xml_param_parser {
+class visualization_parser : public rparams::xml_param_parser {
  public:
   explicit visualization_parser(uint level) : xml_param_parser(level) {}
 
@@ -64,8 +64,7 @@ class visualization_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
+  std::shared_ptr<rparams::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 

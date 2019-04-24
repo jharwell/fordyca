@@ -47,7 +47,7 @@ NS_START(fordyca, params, arena);
  *
  * @brief Parses XML parameters for \ref arena_map into \ref arena_map_params.
  */
-class arena_map_parser : public rcppsw::params::xml_param_parser {
+class arena_map_parser : public rparams::xml_param_parser {
  public:
   explicit arena_map_parser(uint level)
       : xml_param_parser(level),
@@ -72,7 +72,7 @@ class arena_map_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

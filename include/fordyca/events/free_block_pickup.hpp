@@ -24,85 +24,21 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace fsm {
-namespace depth0 {
-class crw_fsm;
-class dpo_fsm;
-class free_block_to_nest_fsm;
-} // namespace depth0
-class block_to_goal_fsm;
-} // namespace fsm
-namespace controller {
-namespace depth0 {
-class crw_controller;
-class dpo_controller;
-class mdpo_controller;
-} // namespace depth0
-namespace depth1 {
-class gp_dpo_controller;
-class gp_mdpo_controller;
-} // namespace depth1
-namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-} // namespace depth2
-} // namespace controller
-
-namespace tasks {
-class base_foraging_task;
-namespace depth0 {
-class generalist;
-}
-namespace depth1 {
-class harvester;
-}
-namespace depth2 {
-class cache_starter;
-class cache_finisher;
-} // namespace depth2
-} // namespace tasks
-
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct free_block_pickup_visit_set {
-  using inherited = boost::mpl::joint_view<block_pickup_base_visit_set::value,
-                                           cell_op_visit_set::value>;
-
-  using defined = rvisitor::precise_visit_set<
-      /* depth0 */
-      controller::depth0::crw_controller,
-      controller::depth0::dpo_controller,
-      controller::depth0::mdpo_controller,
-      fsm::depth0::crw_fsm,
-      fsm::depth0::dpo_fsm,
-      fsm::depth0::free_block_to_nest_fsm,
-      fsm::block_to_goal_fsm,
-      /* depth1 */
-      controller::depth1::gp_dpo_controller,
-      controller::depth1::gp_mdpo_controller,
-      tasks::depth0::generalist,
-      tasks::depth1::harvester,
-      /* depth2 */
-      controller::depth2::grp_dpo_controller,
-      controller::depth2::grp_mdpo_controller,
-      tasks::depth2::cache_starter,
-      tasks::depth2::cache_finisher>;
-
-  using value = boost::mpl::joint_view<inherited::type, defined::type>;
-};
-
 /**
  * @class free_block_pickup
  * @ingroup fordyca events detail
@@ -111,7 +47,35 @@ struct free_block_pickup_visit_set {
  * that is not part of a cache).
  */
 class free_block_pickup : public rer::client<free_block_pickup>, public cell_op {
+ private:
+  struct visit_typelist_impl {
+  using inherited = boost::mpl::joint_view<block_pickup_base_visit_typelist,
+                                           cell_op::visit_typelist>;
+  using controllers = boost::mpl::joint_view<
+    boost::mpl::joint_view<controller::depth0::typelist,
+                           controller::depth1::typelist>,
+    controller::depth2::typelist>;
+  using tasks = rmpl::typelist<tasks::depth0::generalist,
+                               tasks::depth1::harvester,
+                               tasks::depth2::cache_starter,
+                               tasks::depth2::cache_finisher>;
+  using fsms = rmpl::typelist<fsm::depth0::crw_fsm,
+                              fsm::depth0::dpo_fsm,
+                              fsm::depth0::free_block_to_nest_fsm,
+                              fsm::block_to_goal_fsm>;
+  using value = boost::mpl::joint_view<
+    boost::mpl::joint_view<
+    boost::mpl::joint_view<controllers::type,
+                           tasks::type>,
+    fsms::type>,
+    boost::mpl::joint_view<inherited::type,
+                           controllers::type>
+    >;
+  };
+
  public:
+    using visit_typelist = visit_typelist_impl::value;
+
   free_block_pickup(const std::shared_ptr<repr::base_block>& block,
                     uint robot_index,
                     uint timestep);
@@ -134,11 +98,15 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   void visit(fsm::depth0::dpo_fsm& fsm);
   void visit(controller::depth0::dpo_controller& controller);
   void visit(controller::depth0::mdpo_controller& controller);
+  void visit(controller::depth0::odpo_controller& controller);
+  void visit(controller::depth0::omdpo_controller& controller);
 
   /* depth1 DPO/MDPO foraging */
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
   void visit(controller::depth1::gp_dpo_controller& controller);
   void visit(controller::depth1::gp_mdpo_controller& controller);
+  void visit(controller::depth1::gp_odpo_controller& controller);
+  void visit(controller::depth1::gp_omdpo_controller& controller);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth0::generalist& task);
   void visit(tasks::depth1::harvester& task);
@@ -146,6 +114,8 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   /* depth2 DPO/MDPO foraging */
   void visit(controller::depth2::grp_dpo_controller& controller);
   void visit(controller::depth2::grp_mdpo_controller& controller);
+  void visit(controller::depth2::grp_odpo_controller& controller);
+  void visit(controller::depth2::grp_omdpo_controller& controller);
   void visit(tasks::depth2::cache_starter& task);
   void visit(tasks::depth2::cache_finisher& task);
 
@@ -167,7 +137,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
  */
 using free_block_pickup_visitor_impl =
     rvisitor::precise_visitor<detail::free_block_pickup,
-                              detail::free_block_pickup_visit_set::value>;
+                              detail::free_block_pickup::visit_typelist>;
 
 NS_END(detail);
 

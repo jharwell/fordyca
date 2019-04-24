@@ -26,13 +26,12 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/params/base_params.hpp"
-#include "rcppsw/control/waveform_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, caches);
-namespace ct = rcppsw::control;
 
 /*******************************************************************************
  * Structure Definitions
@@ -41,7 +40,7 @@ namespace ct = rcppsw::control;
  * @struct static_cache_params
  * @ingroup fordyca params caches
  */
-struct static_cache_params : public rcppsw::params::base_params {
+struct static_cache_params : public rparams::base_params {
   bool                enable{false};
 
   /**

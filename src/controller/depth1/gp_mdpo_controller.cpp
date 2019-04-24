@@ -28,6 +28,7 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/params/perception/perception_params.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
@@ -67,8 +68,12 @@ void gp_mdpo_controller::Init(ticpp::Element& node) {
 
 void gp_mdpo_controller::ControlStep(void) {
   ndc_pusht();
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
 
-  perception()->update();
+  perception()->update(nullptr);
   task_aborted(false);
   executive()->run();
   ndc_pop();

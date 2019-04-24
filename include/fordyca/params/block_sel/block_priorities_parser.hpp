@@ -45,7 +45,7 @@ NS_START(fordyca, params, block_sel);
  * @brief Parses XML parameters related to block priorties into \ref
  * block_priority_params.
  */
-class block_priorities_parser : public rcppsw::params::xml_param_parser {
+class block_priorities_parser : public rparams::xml_param_parser {
  public:
   explicit block_priorities_parser(uint level) : xml_param_parser(level) {}
 
@@ -64,7 +64,7 @@ class block_priorities_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

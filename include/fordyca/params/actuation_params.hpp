@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/steering_force2D_params.hpp"
 #include "rcppsw/params/base_params.hpp"
 #include "rcppsw/robotics/kinematics2D/differential_drive_params.hpp"
@@ -42,7 +43,7 @@ namespace kinematics2D = rcppsw::robotics::kinematics2D;
  * @struct actuation_params
  * @ingroup fordyca params
  */
-struct actuation_params : public rcppsw::params::base_params {
+struct actuation_params : public rparams::base_params {
   struct kinematics2D::differential_drive_params differential_drive {};
   struct steering_force2D_params steering {};
 };

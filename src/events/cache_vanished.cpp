@@ -22,8 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_vanished.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 
@@ -76,6 +82,22 @@ void cache_vanished::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
+void cache_vanished::visit(controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_vanished::visit(controller::depth1::gp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void cache_vanished::visit(tasks::depth1::collector& task) {
   visit(*static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
@@ -106,6 +128,22 @@ void cache_vanished::visit(controller::depth2::grp_dpo_controller& controller) {
 } /* visit() */
 
 void cache_vanished::visit(controller::depth2::grp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_vanished::visit(controller::depth2::grp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_vanished::visit(controller::depth2::grp_omdpo_controller& controller) {
   controller.ndc_push();
 
   dispatch_cache_interactor(controller.current_task());

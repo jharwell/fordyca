@@ -44,7 +44,7 @@ NS_START(fordyca, params, caches);
  *
  * @brief Parses XML parameters for relating to cache into \ref caches_params.
  */
-class static_cache_parser: public rcppsw::params::xml_param_parser {
+class static_cache_parser: public rparams::xml_param_parser {
  public:
   explicit static_cache_parser(uint level)
       : xml_param_parser(level) {}
@@ -66,7 +66,7 @@ class static_cache_parser: public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(void) const override {
+  std::shared_ptr<rparams::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 

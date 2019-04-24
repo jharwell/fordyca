@@ -25,6 +25,7 @@
   * Includes
 ******************************************************************************/
 #include <string>
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -39,7 +40,7 @@ NS_START(fordyca, params);
   * @struct battery_params
   * @ingroup fordyca params
   */
-struct battery_params : public rcppsw::params::base_params {
+struct battery_params : public rparams::base_params {
   int power_station_amount{0};
   float power_station_size{1};
   std::string power_station_distrubtion{"normal"};

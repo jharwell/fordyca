@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ NS_START(fordyca, params, arena);
  * @brief Params of what types of blocks and how many of each should be
  * created, as well as size and other characteristics.
  */
-struct block_manifest : public rcppsw::params::base_params {
+struct block_manifest : public rparams::base_params {
   uint n_cube{0};  /// # cube blocks to distribute in arena
   uint n_ramp{0};  /// # ramp blocks to distribute in arena
 

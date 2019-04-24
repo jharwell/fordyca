@@ -45,7 +45,7 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters related to metric collection into
  * \ref metrics_params.
  */
-class metrics_parser : public rcppsw::params::xml_param_parser {
+class metrics_parser : public rparams::xml_param_parser {
  public:
   explicit metrics_parser(uint level)
       : xml_param_parser(level),
@@ -68,8 +68,7 @@ class metrics_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<metrics_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
+  std::shared_ptr<rparams::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 

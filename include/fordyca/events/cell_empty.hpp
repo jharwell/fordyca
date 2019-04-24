@@ -44,14 +44,6 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cell_empty_visit_set {
-  using inherited = cell_op_visit_set::value;
-  using defined = rvisitor::precise_visit_set<ds::arena_map,
-                                              ds::occupancy_grid,
-                                              ds::dpo_semantic_map>;
-  using value = boost::mpl::joint_view<inherited::type, defined::type>;
-};
-
 /**
  * @class cell_empty
  * @ingroup fordyca events detail
@@ -64,7 +56,18 @@ struct cell_empty_visit_set {
  * the same timestep a new cache is created on that same cell.
  */
 class cell_empty : public cell_op, public rer::client<cell_empty> {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using others = rmpl::typelist<ds::arena_map,
+                                  ds::occupancy_grid,
+                                  ds::dpo_semantic_map>;
+    using value = boost::mpl::joint_view<inherited::type, others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   explicit cell_empty(const rmath::vector2u& coord)
       : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_empty") {}
 
@@ -83,7 +86,7 @@ class cell_empty : public cell_op, public rer::client<cell_empty> {
  */
 using cell_empty_visitor_impl =
     rvisitor::precise_visitor<detail::cell_empty,
-                              detail::cell_empty_visit_set::value>;
+                              detail::cell_empty::visit_typelist>;
 
 NS_END(detail);
 

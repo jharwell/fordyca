@@ -1,5 +1,5 @@
 /**
- * @file depth1/controller_interactor_mapper.hpp
+ * @file depth1/robot_configurer_adaptor.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -17,57 +17,54 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_CONTROLLER_INTERACTOR_MAPPER_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_CONTROLLER_INTERACTOR_MAPPER_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_ADAPTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_ADAPTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
-#include "fordyca/support/depth0/controller_interactor_mapper.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
+#include "rcppsw/ds/type_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller {
-class base_controller;
-namespace depth1 {
-class gp_dpo_controller;
-class gp_mdpo_controller;
-}
-}
-NS_START(support, depth1);
+NS_START(fordyca, support, depth1);
 template<class T>
-class robot_arena_interactor;
+class robot_configurer;
 
-using gp_dpo_itype = robot_arena_interactor<controller::depth1::gp_dpo_controller>;
-using gp_mdpo_itype = robot_arena_interactor<controller::depth1::gp_mdpo_controller>;
+using configurer_map_type = rds::type_map<
+   rmpl::typelist_wrap_apply<controller::depth1::typelist,
+                               robot_configurer>::type>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class controller_interactor_mapper
+ * @class robot_configurer_adaptor
  * @ingroup fordyca support depth1
- * @brief Helper class to map the typeid of a \ref controller::base_controller
- * to a \ref depth1::robot_arena_interactor to correctly handle robot-arena
- * interactions for that type.
+ *
+ * @brief Wrapping functor to perform robot controller configuration during
+ * initialization.
  */
-
-class controller_interactor_mapper : public depth0::controller_interactor_mapper {
+class robot_configurer_adaptor {
  public:
-  controller_interactor_mapper(controller::base_controller* const controller,
-                               uint timestep)
-      : depth0::controller_interactor_mapper(controller, timestep) {}
+  robot_configurer_adaptor(controller::base_controller* const c) : controller(c) {}
 
-  /* depth1 */
-  void operator()(gp_dpo_itype& interactor) const;
-  void operator()(gp_mdpo_itype& interactor) const;
+
+  template<typename T>
+  void operator()(robot_configurer<T>& configurer) const {
+    auto cast = dynamic_cast<typename robot_configurer<T>::controller_type*>(controller);
+    configurer(cast);
+  }
+
+ private:
+  /* clang-format off */
+  controller::base_controller* const controller;
+  /* clang-format on */
 };
 
 NS_END(depth1, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_CONTROLLER_INTERACTOR_MAPPER_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_ADAPTOR_HPP_ */

@@ -1,7 +1,7 @@
 /**
- * @file ogrp_mdpo_controller.cpp
+ * @file gp_omdpo_controller.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,61 +21,54 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth2/ogrp_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/tasking_initializer.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/params/depth2/controller_repository.hpp"
-#include "fordyca/params/oracle_params.hpp"
-#include "fordyca/support/tasking_oracle.hpp"
+#include "fordyca/repr/base_block.hpp"
+
+#include "fordyca/controller/oracular_info_receptor.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth2);
+NS_START(fordyca, controller, depth1);
+
+/*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+gp_omdpo_controller::gp_omdpo_controller(void)
+    : ER_CLIENT_INIT("fordyca.controller.depth1.gp_omdpo"),
+      m_receptor(nullptr) {}
+
+gp_omdpo_controller::~gp_omdpo_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void ogrp_mdpo_controller::Init(ticpp::Element& node) {
-  ndc_push();
-  ER_INFO("Initializing...");
-  params::depth2::controller_repository param_repo;
+void gp_omdpo_controller::ControlStep(void) {
+  ndc_pusht();
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
 
-  param_repo.parse_all(node);
-  if (!param_repo.validate_all()) {
-    ER_FATAL_SENTINEL("Not all parameters were validated");
-    std::exit(EXIT_FAILURE);
-  }
+  mdpo_perception()->update(m_receptor.get());
+  executive()->run();
 
-  shared_init(param_repo);
-
-  ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* ControlStep() */
 
-void ogrp_mdpo_controller::shared_init(
-    const params::depth2::controller_repository& param_repo) {
-  /* create initial executive and bind task abort callback */
-  gp_mdpo_controller::shared_init(param_repo);
-
-  /*
-   * Rebind executive to use depth2 decomposition graph instead of depth1
-   * version.
-   */
-  executive(tasking_initializer(block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa_subsystem(),
-                                perception())(param_repo));
-  ogp_mdpo_controller::oracle_init();
-} /* shared_init() */
+void gp_omdpo_controller::oracle_init(
+    std::unique_ptr<oracular_info_receptor> receptor) {
+  m_receptor = std::move(receptor);
+} /* oracle_init() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-REGISTER_CONTROLLER(ogrp_mdpo_controller, "ogrp_mdpo_controller");
+REGISTER_CONTROLLER(gp_omdpo_controller, "gp_omdpo_controller");
 #pragma clang diagnostic pop
-NS_END(depth2, controller, fordyca);
+NS_END(depth1, controller, fordyca);

@@ -24,44 +24,27 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/nsalias.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller { namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-}} // namespace controller::depth2
 namespace repr {
 class base_block;
 }
-namespace fsm {
-class block_to_goal_fsm;
-} // namespace fsm
-namespace tasks {
-class base_foraging_task;
-namespace depth2 {
-class cache_starter;
-}
-} // namespace tasks
 
 NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct block_proximity_visit_set {
-  using value =
-      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                  controller::depth2::grp_mdpo_controller,
-                                  fsm::block_to_goal_fsm,
-                                  tasks::depth2::cache_starter>;
-};
 
 /**
  * @class block_proximity
@@ -71,7 +54,17 @@ struct block_proximity_visit_set {
  * aware of blocks its ability to complete its current task.
  */
 class block_proximity : public rer::client<block_proximity> {
+ private:
+  struct visit_typelist_impl {
+    using controllers = controller::depth2::typelist;
+    using others = rmpl::typelist<fsm::block_to_goal_fsm,
+                                 tasks::depth2::cache_starter>;
+    using value = boost::mpl::joint_view<controllers, others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   explicit block_proximity(const std::shared_ptr<repr::base_block>& block);
   ~block_proximity(void) override = default;
 
@@ -81,6 +74,8 @@ class block_proximity : public rer::client<block_proximity> {
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& c);
   void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(controller::depth2::grp_odpo_controller& c);
+  void visit(controller::depth2::grp_omdpo_controller& c);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth2::cache_starter& task);
 
@@ -100,7 +95,7 @@ class block_proximity : public rer::client<block_proximity> {
  */
 using block_proximity_visitor_impl =
     rvisitor::precise_visitor<detail::block_proximity,
-                              detail::block_proximity_visit_set::value>;
+                              detail::block_proximity::visit_typelist>;
 
 NS_END(detail);
 

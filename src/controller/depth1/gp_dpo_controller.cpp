@@ -34,6 +34,7 @@
 #include "fordyca/params/cache_sel/cache_sel_matrix_params.hpp"
 #include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/repr/base_block.hpp"
+#include "fordyca/tasks/base_foraging_task.hpp"
 
 #include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
@@ -58,14 +59,12 @@ gp_dpo_controller::~gp_dpo_controller(void) = default;
  ******************************************************************************/
 void gp_dpo_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
 
-  dpo_perception()->update();
+  dpo_perception()->update(nullptr);
   executive()->run();
 
   ndc_pop();

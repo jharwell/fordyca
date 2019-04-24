@@ -47,19 +47,11 @@ mdpo_controller::~mdpo_controller(void) = default;
  ******************************************************************************/
 void mdpo_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
-
-  /*
-   * Update the robot's model of the world with the current line-of-sight, and
-   * update the relevance of information within it. Then, you can run the main
-   * FSM loop.
-   */
-  perception()->update();
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
+  perception()->update(nullptr);
 
   fsm()->run();
   ndc_pop();

@@ -44,7 +44,7 @@ NS_START(fordyca, params, arena);
  * @brief Parses XML parameters for related to \ref nest objects into
  * \ref nest_params.
  */
-class nest_parser : public rcppsw::params::xml_param_parser {
+class nest_parser : public rparams::xml_param_parser {
  public:
   explicit nest_parser(uint level) : xml_param_parser(level) {}
 
@@ -63,7 +63,7 @@ class nest_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<nest_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

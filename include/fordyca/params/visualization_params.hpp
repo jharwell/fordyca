@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -38,7 +39,7 @@ NS_START(fordyca, params);
  * @struct visualization_params
  * @ingroup fordyca params
  */
-struct visualization_params : public rcppsw::params::base_params {
+struct visualization_params : public rparams::base_params {
   bool robot_id{false};
   bool robot_los{false};
   bool robot_task{false};

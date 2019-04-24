@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "fordyca/params/proximity_sensor_params.hpp"
 #include "rcppsw/params/base_params.hpp"
 
@@ -39,7 +40,7 @@ NS_START(fordyca, params);
  * @struct sensing_params
  * @ingroup fordyca params
  */
-struct sensing_params : public rcppsw::params::base_params {
+struct sensing_params : public rparams::base_params {
   /**
    * @brief The dimension of a robot's line of sight, specified in meters.
    */

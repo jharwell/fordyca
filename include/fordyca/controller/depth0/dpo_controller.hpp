@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/tasks/base_foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces

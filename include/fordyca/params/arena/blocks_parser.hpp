@@ -45,7 +45,7 @@ NS_START(fordyca, params, arena);
  * @brief Parses XML parameters related to blocks in the arena into \ref
  * blocks_params.
  */
-class blocks_parser : public rcppsw::params::xml_param_parser {
+class blocks_parser : public rparams::xml_param_parser {
  public:
   explicit blocks_parser(uint level)
       : xml_param_parser(level),
@@ -64,7 +64,7 @@ class blocks_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<blocks_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -38,7 +39,7 @@ NS_START(fordyca, params);
  * @struct proximity_sensor_params
  * @ingroup fordyca params
  */
-struct proximity_sensor_params : public rcppsw::params::base_params {
+struct proximity_sensor_params : public rparams::base_params {
   /*
    * Maximum tolerance for the proximity reading between the robot and the
    * closest obstacle.  The proximity reading is 0 when nothing is detected and

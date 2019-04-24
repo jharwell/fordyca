@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +39,7 @@ NS_START(fordyca, params, arena);
  * @struct powerlaw_dist_params
  * @ingroup fordyca params arena
  */
-struct powerlaw_dist_params : public rcppsw::params::base_params {
+struct powerlaw_dist_params : public rparams::base_params {
   /**
    * @brief Min power of 2 for distribution.
    */

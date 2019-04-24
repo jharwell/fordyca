@@ -105,7 +105,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
       case block_op_src::ekNEW_CACHE_DROP:
         return new_cache_drop_filter(controller, cache_prox_dist);
       default:
-        ER_FATAL_SENTINEL("Unhandled penalty type %d", src);
+        ER_FATAL_SENTINEL("Unhandled penalty type %d", static_cast<int>(src));
     } /* switch() */
     return filter_res_t{};
   }

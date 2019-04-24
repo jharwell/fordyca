@@ -35,6 +35,8 @@
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth0/odpo_controller.hpp"
+#include "fordyca/controller/depth0/omdpo_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
@@ -56,6 +58,10 @@ template void depth0_metrics_aggregator::collect_from_controller(
     const controller::depth0::dpo_controller* const c);
 template void depth0_metrics_aggregator::collect_from_controller(
     const controller::depth0::mdpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::odpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::omdpo_controller* const c);
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -101,9 +107,18 @@ void depth0_metrics_aggregator::collect_from_controller(
 
   collect("fsm::movement", *mov_m);
   collect("fsm::collision", *collision_m);
-  collect("blocks::acquisition", *block_acq_m);
   collect("blocks::manipulation", *manip_m);
+  collect("blocks::acq_counts", *block_acq_m);
 
+  collect_if(
+      "blocks::acq_locs",
+      *block_acq_m,
+      [&](const rmetrics::base_metrics& metrics) {
+        auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+            metrics);
+        return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+            m.goal_acquired();
+      });
   /*
    * Only controllers with MDPO perception provide these.
    */

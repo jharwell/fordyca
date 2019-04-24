@@ -45,7 +45,7 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters relating to sensings into \ref sensing_params.
  */
-class sensing_parser : public rcppsw::params::xml_param_parser {
+class sensing_parser : public rparams::xml_param_parser {
  public:
   explicit sensing_parser(uint level)
       : xml_param_parser(level), m_proximity_parser(level + 1) {}
@@ -67,8 +67,7 @@ class sensing_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<sensing_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
+  std::shared_ptr<rparams::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 

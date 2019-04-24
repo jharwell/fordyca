@@ -44,7 +44,7 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters relating to proximity_sensors into \ref proximity_sensor_params.
  */
-class proximity_sensor_parser : public rcppsw::params::xml_param_parser {
+class proximity_sensor_parser : public rparams::xml_param_parser {
  public:
   explicit proximity_sensor_parser(uint level) : xml_param_parser(level) {}
 
@@ -67,8 +67,7 @@ class proximity_sensor_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
+  std::shared_ptr<rparams::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 

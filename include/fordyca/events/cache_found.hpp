@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -41,26 +42,11 @@ class dpo_store;
 class dpo_semantic_map;
 } // namespace ds
 
-namespace controller { namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-}} // namespace controller::depth2
-
 NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cache_found_visit_set {
-  using inherited = cell_op_visit_set::value;
-  using defined =
-      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                  controller::depth2::grp_mdpo_controller,
-                                  ds::dpo_store,
-                                  ds::dpo_semantic_map>;
-  using value = boost::mpl::joint_view<inherited::type, defined::type>;
-};
-
 /*
  * @class cache_found
  * @ingroup fordyca events detail
@@ -70,7 +56,20 @@ struct cache_found_visit_set {
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
 class cache_found : public cell_op, public rer::client<cache_found> {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
+    using controllers = controller::depth2::typelist;
+    using value = boost::mpl::joint_view<
+      boost::mpl::joint_view<controllers::type,
+                             others::type>,
+      inherited::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   explicit cache_found(std::unique_ptr<repr::base_cache> cache);
   explicit cache_found(const std::shared_ptr<repr::base_cache>& cache);
   ~cache_found(void) override = default;
@@ -89,6 +88,8 @@ class cache_found : public cell_op, public rer::client<cache_found> {
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& controller);
   void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(controller::depth2::grp_odpo_controller& controller);
+  void visit(controller::depth2::grp_omdpo_controller& c);
 
  private:
   std::shared_ptr<repr::base_cache> m_cache;
@@ -102,7 +103,7 @@ class cache_found : public cell_op, public rer::client<cache_found> {
  */
 using cache_found_visitor_impl =
     rvisitor::precise_visitor<detail::cache_found,
-                              detail::cache_found_visit_set::value>;
+                              detail::cache_found::visit_typelist>;
 
 NS_END(detail);
 

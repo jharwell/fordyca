@@ -1,5 +1,5 @@
 /**
- * @file controller_task_extractor.hpp
+ * @file oracle_manager_parser.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,41 +18,32 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_CONTROLLER_TASK_EXTRACTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_CONTROLLER_TASK_EXTRACTOR_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
+#include "fordyca/params/oracle/oracle_manager_parser.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
+NS_START(fordyca, params, oracle);
 
 /*******************************************************************************
- * Class Definitions
+ * Global Variables
  ******************************************************************************/
-/**
- * @struct controller_task_extractor
- * @ingroup fordyca support
- *
- * @brief Given a controller of type T, extract the ID of its current task. This
- * is used in computing task distribution entropy in depth1, depth2 in
- * conjunction with boost::variant.
- */
-template <class T>
-struct controller_task_extractor {
-  using controller_type = T;
+constexpr char oracle_manager_parser::kXMLRoot[];
 
-  controller_task_extractor(void) = default;
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void oracle_manager_parser::parse(const ticpp::Element& node) {
+  ticpp::Element enode = node_get(node, kXMLRoot);
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  m_entities.parse(enode);
+  m_tasking.parse(enode);
+  m_params->tasking = *m_tasking.parse_results();
+  m_params->entities = *m_entities.parse_results();
+} /* parse() */
 
-  int operator()(const controller_type* const c) const {
-    return c->current_task_id();
-  }
-};
-
-NS_END(support, fordyca);
-
-#endif /* INCLUDE_FORDYCA_SUPPORT_CONTROLLER_TASK_EXTRACTOR_HPP_ */
+NS_END(oracle, params, fordyca);

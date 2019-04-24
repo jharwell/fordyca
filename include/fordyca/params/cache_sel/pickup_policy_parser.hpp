@@ -44,7 +44,7 @@ NS_START(fordyca, params, cache_sel);
  * @brief Parses XML parameters for \ref pickup_policy_params at the
  * start of simulation.
  */
-class pickup_policy_parser : public rcppsw::params::xml_param_parser {
+class pickup_policy_parser : public rparams::xml_param_parser {
  public:
   explicit pickup_policy_parser(uint level) : xml_param_parser(level) {}
 
@@ -62,7 +62,7 @@ class pickup_policy_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

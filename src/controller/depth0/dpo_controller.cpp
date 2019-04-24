@@ -77,19 +77,12 @@ double dpo_controller::los_dim(void) const {
 
 void dpo_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
 
-  /*
-   * Update the robot's model of the world with the current line-of-sight, and
-   * update the relevance of information within it. Then, you can run the main
-   * FSM loop.
-   */
-  m_perception->update();
+  m_perception->update(nullptr);
   m_fsm->run();
 
   ndc_pop();

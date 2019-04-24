@@ -50,12 +50,12 @@ std::list<std::string> mdpo_perception_metrics_collector::csv_header_cols(
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
       /* clang-format off */
-      "int_avg_kST_EMPTY_inaccuracies",
-      "int_avg_kST_HAS_BLOCK_inaccuracies",
-      "int_avg_kST_HAS_CACHE_inaccuracies",
-      "cum_avg_kST_EMPTY_inaccuracies",
-      "cum_avg_kST_HAS_BLOCK_inaccuracies",
-      "cum_avg_kST_HAS_CACHE_inaccuracies",
+      "int_avg_ST_EMPTY_inaccuracies",
+      "int_avg_ST_HAS_BLOCK_inaccuracies",
+      "int_avg_ST_HAS_CACHE_inaccuracies",
+      "cum_avg_ST_EMPTY_inaccuracies",
+      "cum_avg_ST_HAS_BLOCK_inaccuracies",
+      "cum_avg_ST_HAS_CACHE_inaccuracies",
       "int_avg_known_percentage",
       "int_avg_unknown_percentage",
       "int_avg_knowledge_ratio",

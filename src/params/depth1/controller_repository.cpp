@@ -41,11 +41,10 @@ controller_repository::controller_repository(void) {
       cache_sel::cache_sel_matrix_parser::kXMLRoot,
       cache_sel::cache_sel_matrix_parser::kHeader1);
   register_parser<rta::task_alloc_xml_parser, rta::task_alloc_params>(
-      rta::task_alloc_xml_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      rta::task_alloc_xml_parser::kXMLRoot, rparams::xml_param_parser::kHeader1);
   register_parser<rta::task_executive_xml_parser, rta::task_executive_params>(
       rta::task_executive_xml_parser::kXMLRoot,
-      rcppsw::params::xml_param_parser::kHeader1);
+      rparams::xml_param_parser::kHeader1);
 
   get_parser<rta::task_alloc_xml_parser>(rta::task_alloc_xml_parser::kXMLRoot)
       ->exec_est_task_add("generalist");

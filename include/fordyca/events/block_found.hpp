@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -35,10 +36,6 @@ NS_START(fordyca);
 namespace repr {
 class base_block;
 }
-namespace controller { namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-}} // namespace controller::depth2
 
 namespace ds {
 class dpo_semantic_map;
@@ -50,17 +47,6 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct block_found_visit_set {
-  using inherited = cell_op_visit_set::value;
-
-  using defined =
-      rvisitor::precise_visit_set<controller::depth2::grp_dpo_controller,
-                                  controller::depth2::grp_mdpo_controller,
-                                  ds::dpo_store,
-                                  ds::dpo_semantic_map>;
-
-  using value = boost::mpl::joint_view<inherited::type, defined::type>;
-};
 
 /**
  * @class block_found
@@ -70,7 +56,21 @@ struct block_found_visit_set {
  * unknown) appears in a robot's LOS.
  */
 class block_found : public rer::client<block_found>, public cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using controllers = controller::depth2::typelist;
+    using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
+
+    using value = boost::mpl::joint_view<
+      boost::mpl::joint_view<inherited::type,
+                             controllers::type>::type,
+      others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   explicit block_found(std::unique_ptr<repr::base_block> block);
   explicit block_found(const std::shared_ptr<repr::base_block>& block);
   ~block_found(void) override = default;
@@ -89,6 +89,8 @@ class block_found : public rer::client<block_found>, public cell_op {
   /* depth2 foraging */
   void visit(controller::depth2::grp_dpo_controller& c);
   void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(controller::depth2::grp_odpo_controller& c);
+  void visit(controller::depth2::grp_omdpo_controller& c);
 
  private:
   void pheromone_update(ds::dpo_semantic_map& map);
@@ -106,7 +108,7 @@ class block_found : public rer::client<block_found>, public cell_op {
  */
 using block_found_visitor_impl =
     rvisitor::precise_visitor<detail::block_found,
-                              detail::block_found_visit_set::value>;
+                              detail::block_found::visit_typelist>;
 
 NS_END(detail);
 

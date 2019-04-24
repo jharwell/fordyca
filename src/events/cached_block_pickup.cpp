@@ -24,9 +24,16 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
@@ -217,12 +224,24 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
             m_real_cache->discrete_loc().to_str().c_str());
 
   auto pcache = store.find(m_real_cache);
-  ER_ASSERT(pcache->ent()->contains_block(m_pickup_block),
-            "DPO cache%d@%s/%s does not contain pickup block%d",
-            pcache->ent()->id(),
-            pcache->ent()->real_loc().to_str().c_str(),
-            pcache->ent()->discrete_loc().to_str().c_str(),
-            m_pickup_block->id());
+
+  /*
+   * In general this should be true, but it cannot be an assert, because for
+   * oracular controllers LOS processing happens BEFORE arena interactions, and
+   * they may have their internal object store updated to reflect the depleted
+   * cache state.
+   *
+   * This is not an issue for blocks, because a block that has moved/disappeared
+   * via oracular information injection vanishes from the robot's perception.
+   */
+  if (!pcache->ent()->contains_block(m_pickup_block)) {
+    ER_INFO("DPO cache%d@%s/%s does not contain pickup block%d",
+        pcache->ent()->id(),
+        pcache->ent()->real_loc().to_str().c_str(),
+        pcache->ent()->discrete_loc().to_str().c_str(),
+        m_pickup_block->id());
+    return;
+  }
 
   if (pcache->ent()->n_blocks() > base_cache::kMinBlocks) {
     pcache->ent_obj()->block_remove(m_pickup_block);
@@ -329,6 +348,30 @@ void cached_block_pickup::visit(
   controller.ndc_pop();
 } /* visit() */
 
+void cached_block_pickup::visit(
+    controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.dpo_perception()->dpo_store());
+  controller.block(m_pickup_block);
+  controller.block_manip_collator()->cache_pickup_event(true);
+  dispatch_d1_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cached_block_pickup::visit(
+    controller::depth1::gp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  controller.block(m_pickup_block);
+  controller.block_manip_collator()->cache_pickup_event(true);
+  dispatch_d1_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void cached_block_pickup::visit(tasks::depth1::collector& task) {
   visit(*static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
@@ -364,6 +407,36 @@ void cached_block_pickup::visit(
 
 void cached_block_pickup::visit(
     controller::depth2::grp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  controller.block(m_pickup_block);
+  controller.block_manip_collator()->cache_pickup_event(true);
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+  controller.ndc_pop();
+} /* visit() */
+
+void cached_block_pickup::visit(
+    controller::depth2::grp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.dpo_perception()->dpo_store());
+  controller.block(m_pickup_block);
+  controller.block_manip_collator()->cache_pickup_event(true);
+
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cached_block_pickup::visit(
+    controller::depth2::grp_omdpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());

@@ -22,7 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -230,6 +237,22 @@ void block_found::visit(controller::depth2::grp_mdpo_controller& c) {
 } /* visit() */
 
 void block_found::visit(controller::depth2::grp_dpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
+
+  c.ndc_pop();
+} /* visit() */
+
+void block_found::visit(controller::depth2::grp_omdpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.mdpo_perception()->map());
+
+  c.ndc_pop();
+} /* visit() */
+
+void block_found::visit(controller::depth2::grp_odpo_controller& c) {
   c.ndc_push();
 
   visit(*c.dpo_perception()->dpo_store());

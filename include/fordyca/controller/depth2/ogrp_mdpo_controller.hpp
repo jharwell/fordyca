@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/controller/depth1/ogp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +53,7 @@ NS_START(controller, depth2);
  *
  * for use in task allocation.
  */
-class ogrp_mdpo_controller : public depth1::ogp_mdpo_controller,
+class ogrp_mdpo_controller : public depth1::gp_omdpo_controller,
                              public rer::client<ogrp_mdpo_controller> {
  public:
   ogrp_mdpo_controller(void)

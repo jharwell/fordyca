@@ -23,8 +23,14 @@
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
@@ -180,6 +186,41 @@ void cache_block_drop::visit(controller::depth1::gp_mdpo_controller& controller)
   controller.ndc_pop();
 } /* visit() */
 
+void cache_block_drop::visit(controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_d1_cache_interactor(controller.current_task());
+  controller.block(nullptr);
+  controller.block_manip_collator()->cache_drop_event(true);
+
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(controller::depth1::gp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  dispatch_d1_cache_interactor(controller.current_task());
+  controller.block(nullptr);
+  controller.block_manip_collator()->cache_drop_event(true);
+
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void cache_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::kBLOCK_DROP,
                    rfsm::event_type::kNORMAL);
@@ -212,6 +253,46 @@ void cache_block_drop::visit(controller::depth2::grp_dpo_controller& controller)
 } /* visit() */
 
 void cache_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+  visit(*controller.mdpo_perception()->map());
+  controller.block_manip_collator()->cache_drop_event(true);
+  controller.block(nullptr);
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(controller::depth2::grp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+  controller.block_manip_collator()->cache_drop_event(true);
+  controller.block(nullptr);
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_block->id(),
+          m_cache->id(),
+          dynamic_cast<rta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(
+    controller::depth2::grp_omdpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_d2_cache_interactor(controller.current_task(),

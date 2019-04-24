@@ -23,9 +23,18 @@
  ******************************************************************************/
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth0/odpo_controller.hpp"
+#include "fordyca/controller/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
@@ -89,6 +98,24 @@ void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
+void block_vanished::visit(controller::depth0::odpo_controller& controller) {
+  controller.ndc_push();
+
+  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  visit(*controller.fsm());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth0::omdpo_controller& controller) {
+  controller.ndc_push();
+
+  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  visit(*controller.fsm());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void block_vanished::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::kBLOCK_VANISHED,
                    rfsm::event_type::kNORMAL);
@@ -111,6 +138,22 @@ void block_vanished::visit(controller::depth1::gp_dpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth1::gp_omdpo_controller& controller) {
   controller.ndc_push();
 
   dispatch_free_block_interactor(controller.current_task());
@@ -149,6 +192,22 @@ void block_vanished::visit(controller::depth2::grp_mdpo_controller& controller) 
 } /* visit() */
 
 void block_vanished::visit(controller::depth2::grp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth2::grp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth2::grp_odpo_controller& controller) {
   controller.ndc_push();
 
   dispatch_free_block_interactor(controller.current_task());

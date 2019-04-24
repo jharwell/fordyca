@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/dpo_controller.hpp"
-#include "fordyca/tasks/base_foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,10 +46,11 @@ NS_START(depth0);
  * @class mdpo_controller
  * @ingroup fordyca controller depth0
  *
- * @brief A foraging controller that remembers what it has seen for a period of
- * time (knowledge is modeled by pheromone density and decays as such). It
- * models the state of the environment (empty, unknown, contains object, etc.)
- * AND the objects within the environment.
+ * @brief A foraging controller that:
+ *
+ * - Models/tracks the state of the environment (empty, unknown, contains
+ *   object, etc.)
+ * - Models/tracks the seen objects in the environment.
  *
  * It shares the underlying FSM with the \ref dpo_controller so that the metrics
  * collection functions can be reused.

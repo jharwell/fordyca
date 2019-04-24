@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -35,7 +36,7 @@ NS_START(fordyca, params, cache_sel);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-struct pickup_policy_params : public rcppsw::params::base_params {
+struct pickup_policy_params : public rparams::base_params {
   std::string policy{};
   uint        timestep{0};
   uint        cache_count{0};

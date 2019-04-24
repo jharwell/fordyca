@@ -28,6 +28,7 @@
 #include "fordyca/params/arena/powerlaw_dist_params.hpp"
 #include "fordyca/params/arena/block_manifest.hpp"
 #include "fordyca/params/arena/block_redist_governor_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ NS_START(fordyca, params, arena);
  * @struct block_dist_params
  * @ingroup fordyca params arena
  */
-struct block_dist_params : public rcppsw::params::base_params {
+struct block_dist_params : public rparams::base_params {
   block_manifest manifest{};
 
   /**

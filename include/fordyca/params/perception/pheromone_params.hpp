@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/params/grid_params.hpp"
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +39,7 @@ NS_START(fordyca, params, perception);
  * @struct pheromone_params
  * @ingroup fordyca params perception
  */
-struct pheromone_params : public rcppsw::params::base_params {
+struct pheromone_params : public rparams::base_params {
   double rho{0.0};
   bool repeat_deposit{false};
 };

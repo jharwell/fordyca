@@ -163,24 +163,42 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
 
       collect("fsm::collision", *collision_m);
       collect_if(
-          "blocks::acquisition",
+          "blocks::acq_counts",
           *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               controller->current_task()),
           [&](const rmetrics::base_metrics& metrics) {
-            return acquisition_goal_type::ekBLOCK ==
-                dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                    metrics)
-                .acquisition_goal();
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekBLOCK == m.acquisition_goal();
           });
       collect_if(
-          "caches::acquisition",
+          "blocks::acq_locs",
           *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               controller->current_task()),
           [&](const rmetrics::base_metrics& metrics) {
-            return acquisition_goal_type::ekEXISTING_CACHE ==
-                dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                    metrics)
-                .acquisition_goal();
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+                m.goal_acquired();
+          });
+      collect_if(
+          "caches::acq_counts",
+          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+              controller->current_task()),
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal();
+          });
+      collect_if(
+          "caches::acq_locs",
+          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+              controller->current_task()),
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
+                m.goal_acquired();
           });
       collect("tasks::distribution", *dist_m);
     }

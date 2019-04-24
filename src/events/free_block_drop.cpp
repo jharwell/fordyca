@@ -25,8 +25,16 @@
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
@@ -150,7 +158,15 @@ void free_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) 
   controller.block(nullptr);
 } /* visit() */
 
+void free_block_drop::visit(controller::depth1::gp_omdpo_controller& controller) {
+  controller.block(nullptr);
+} /* visit() */
+
 void free_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
+  controller.block(nullptr);
+} /* visit() */
+
+void free_block_drop::visit(controller::depth1::gp_odpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
@@ -170,6 +186,30 @@ void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller)
 } /* visit() */
 
 void free_block_drop::visit(controller::depth2::grp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_free_block_interactor(controller.current_task(),
+                                     controller.block_sel_matrix())) {
+    controller.bsel_exception_added(true);
+  }
+  controller.block(nullptr);
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_drop::visit(controller::depth2::grp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_free_block_interactor(controller.current_task(),
+                                     controller.block_sel_matrix())) {
+    controller.bsel_exception_added(true);
+  }
+  controller.block(nullptr);
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_drop::visit(controller::depth2::grp_odpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/base_params.hpp"
 
 /*******************************************************************************
@@ -38,7 +39,7 @@ NS_START(fordyca, params);
  * @struct phototaxis_force_params
  * @ingroup fordyca params
  */
-struct phototaxis_force_params : public rcppsw::params::base_params {
+struct phototaxis_force_params : public rparams::base_params {
   double max;
 };
 

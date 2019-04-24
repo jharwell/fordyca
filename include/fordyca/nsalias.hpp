@@ -52,6 +52,12 @@ namespace er {
 } /* namespace er */
 namespace control {
 } /* namespace control */
+namespace params {
+} /* namespace params */
+namespace ds {
+} /* namespace ds */
+namespace mpl {
+} /* namespace mpl */
 } /* namespace rcppsw */
 
 NS_START(fordyca);
@@ -66,6 +72,9 @@ namespace ralg = rcppsw::algorithm;
 namespace rutils = rcppsw::utils;
 namespace rer = rcppsw::er;
 namespace rct = rcppsw::control;
+namespace rparams = rcppsw::params;
+namespace rds = rcppsw::ds;
+namespace rmpl = rcppsw::mpl;
 
 NS_END(fordyca);
 

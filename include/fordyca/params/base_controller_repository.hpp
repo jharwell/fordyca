@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/params/xml_param_repository.hpp"
 
 /*******************************************************************************
@@ -41,7 +42,7 @@ NS_START(fordyca, params);
  * @brief Collection of all parameter parsers and parse results needed by
  * all foraging controllers.
  */
-class base_controller_repository : public rcppsw::params::xml_param_repository {
+class base_controller_repository : public rparams::xml_param_repository {
  public:
   base_controller_repository();
 };

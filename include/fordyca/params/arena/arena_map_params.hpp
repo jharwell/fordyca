@@ -41,7 +41,7 @@ NS_START(fordyca, params, arena);
  * @struct arena_map_params
  * @ingroup fordyca params arena
  */
-struct arena_map_params : public rcppsw::params::base_params {
+struct arena_map_params : public rparams::base_params {
   struct grid_params grid {};
   struct blocks_params blocks {};
   struct nest_params nest {};

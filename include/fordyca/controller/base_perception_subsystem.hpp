@@ -37,6 +37,7 @@ class dpo_store;
 }
 
 NS_START(controller);
+class oracular_info_receptor;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +60,7 @@ class base_perception_subsystem {
    * @brief Update the internal data structure/repr of the
    * environment/arena, after the LOS has been updated.
    */
-  virtual void update(void) = 0;
+  virtual void update(oracular_info_receptor* receptor) = 0;
 
   virtual const ds::dpo_store* dpo_store(void) const = 0;
   virtual ds::dpo_store* dpo_store(void) = 0;

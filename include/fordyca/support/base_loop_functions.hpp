@@ -52,6 +52,9 @@ struct output_params;
 namespace tv {
 struct tv_manager_params;
 }
+namespace oracle {
+struct oracle_manager_params;
+} /* namespace oracle */
 } // namespace params
 namespace ds {
 class arena_map;
@@ -61,6 +64,10 @@ NS_START(support);
 namespace tv {
 class tv_manager;
 }
+namespace oracle {
+class oracle_manager;
+} /* namespace oracle */
+
 namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
@@ -115,6 +122,13 @@ class base_loop_functions : public argos::CLoopFunctions,
   rswc::convergence_calculator* conv_calculator(void) {
     return m_conv_calc.get();
   }
+  const oracle::oracle_manager* oracle_manager(void) const {
+    return m_oracle_manager.get();
+  }
+  oracle::oracle_manager* oracle_manager(void) {
+    return m_oracle_manager.get();
+  }
+
   /**
    * @brief Initialize convergence calculations.
    *
@@ -144,6 +158,13 @@ class base_loop_functions : public argos::CLoopFunctions,
    */
   void tv_init(const params::tv::tv_manager_params* tvp);
 
+  /**
+   * @brief Initialize oracular information injection.
+   *
+   * @param oraclep Parsed \ref oracle_manager parameters.
+   */
+  void oracle_init(const params::oracle::oracle_manager_params* oraclep);
+
   std::vector<double> calc_robot_nn(uint n_threads) const;
   std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;
   std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
@@ -155,6 +176,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   std::unique_ptr<ds::arena_map>                m_arena_map;
   std::unique_ptr<tv::tv_manager>               m_tv_manager;
   std::unique_ptr<rswc::convergence_calculator> m_conv_calc;
+  std::unique_ptr<oracle::oracle_manager>       m_oracle_manager;
   /* clang-format on */
 };
 

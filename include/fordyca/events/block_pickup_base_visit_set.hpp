@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
+#include "rcppsw/mpl/typelist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,19 +48,15 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct block_pickup_base_visit_set
  * @ingroup fordyca events detail
  *
  * @brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).
  */
-struct block_pickup_base_visit_set {
-  using value = rvisitor::precise_visit_set<ds::arena_map,
-                                            ds::dpo_semantic_map,
-                                            ds::dpo_store,
-                                            repr::base_block>;
-};
-
+using block_pickup_base_visit_typelist = rmpl::typelist<ds::arena_map,
+                                                        ds::dpo_semantic_map,
+                                                        ds::dpo_store,
+                                                        repr::base_block>;
 NS_END(detail, events, fordyca);
 
 #endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_ */

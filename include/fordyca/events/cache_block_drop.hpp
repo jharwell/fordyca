@@ -24,27 +24,18 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace controller {
-class cache_sel_matrix;
-namespace depth1 {
-class gp_dpo_controller;
-class gp_mdpo_controller;
-} // namespace depth1
-namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-} // namespace depth2
-} // namespace controller
 
 namespace repr {
 class arena_cache;
@@ -53,44 +44,16 @@ class arena_cache;
 namespace ds {
 class dpo_semantic_map;
 } // namespace ds
-namespace fsm {
-class block_to_goal_fsm;
-} // namespace fsm
-namespace tasks {
-class base_foraging_task;
-namespace depth1 {
-class harvester;
-}
-namespace depth2 {
-class cache_transferer;
-}
-} // namespace tasks
+
+namespace controller {
+class cache_sel_matrix;
+} /* namespace controller */
 
 NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cache_block_drop_visit_set {
-  using inherited = boost::mpl::joint_view<block_drop_base_visit_set::value,
-                                           cell_op_visit_set::value>;
-
-  using defined = rvisitor::precise_visit_set<
-      /* depth1 */
-      fsm::block_to_goal_fsm,
-      ds::dpo_semantic_map,
-      repr::arena_cache,
-      controller::depth1::gp_dpo_controller,
-      controller::depth1::gp_mdpo_controller,
-      tasks::depth1::harvester,
-      /* depth2 */
-      controller::depth2::grp_dpo_controller,
-      controller::depth2::grp_mdpo_controller,
-      tasks::depth2::cache_transferer>;
-
-  using value = boost::mpl::joint_view<inherited::type, defined::type>;
-};
-
 /**
  * @class cache_block_drop
  * @ingroup fordyca events
@@ -102,7 +65,32 @@ struct cache_block_drop_visit_set {
  */
 class cache_block_drop : public rer::client<cache_block_drop>,
                          public detail::cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = boost::mpl::joint_view<block_drop_base_visit_typelist,
+                                             cell_op::visit_typelist>;
+
+    using controllers =  boost::mpl::joint_view<controller::depth1::typelist,
+                                                controller::depth2::typelist>;
+
+    using others = rmpl::typelist<
+      /* depth1 */
+      fsm::block_to_goal_fsm,
+      ds::dpo_semantic_map,
+      repr::arena_cache,
+      tasks::depth1::harvester,
+      /* depth2 */
+      tasks::depth2::cache_transferer>;
+
+    using value = boost::mpl::joint_view<
+      boost::mpl::joint_view<inherited::type,
+                             controllers::type>,
+      others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   cache_block_drop(const std::shared_ptr<repr::base_block>& block,
                    const std::shared_ptr<repr::arena_cache>& cache,
                    double resolution);
@@ -122,10 +110,14 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   void visit(tasks::depth1::harvester& task);
   void visit(controller::depth1::gp_dpo_controller& controller);
   void visit(controller::depth1::gp_mdpo_controller& controller);
+  void visit(controller::depth1::gp_odpo_controller& controller);
+  void visit(controller::depth1::gp_omdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller&);
-  void visit(controller::depth2::grp_mdpo_controller&);
+  void visit(controller::depth2::grp_dpo_controller& controller);
+  void visit(controller::depth2::grp_mdpo_controller& controller);
+  void visit(controller::depth2::grp_odpo_controller& controller);
+  void visit(controller::depth2::grp_omdpo_controller& controller);
   void visit(tasks::depth2::cache_transferer& task);
 
  private:
@@ -148,7 +140,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
  */
 using cache_block_drop_visitor_impl =
     rvisitor::precise_visitor<detail::cache_block_drop,
-                              detail::cache_block_drop_visit_set::value>;
+                              detail::cache_block_drop::visit_typelist>;
 
 NS_END(detail);
 

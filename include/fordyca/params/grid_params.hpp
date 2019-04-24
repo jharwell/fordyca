@@ -40,7 +40,7 @@ NS_START(fordyca, params);
  * @struct grid_params
  * @ingroup fordyca params perception
  */
-struct grid_params : public rcppsw::params::base_params {
+struct grid_params : public rparams::base_params {
   double resolution{0.0};
   rmath::vector2d upper{};
   rmath::vector2d lower{};

@@ -28,9 +28,8 @@
 #include <typeindex>
 #include <list>
 #include <map>
-
 #include <boost/variant.hpp>
-#include <boost/container/map.hpp>
+#include "fordyca/controller/controller_fwd.hpp"
 
 #include "fordyca/metrics/temporal_variance_metrics.hpp"
 #include "fordyca/support/tv/block_op_penalty_handler.hpp"
@@ -39,49 +38,13 @@
 #include "fordyca/support/tv/block_op_src.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "rcppsw/er/client.hpp"
-
-/*******************************************************************************
- * Macros
- ******************************************************************************/
-#define BLOCK_HANDLERS                                                  \
-  std::unique_ptr<block_op_penalty_handler<controller::depth0::crw_controller>> , \
-    std::unique_ptr<block_op_penalty_handler<controller::depth0::dpo_controller>>, \
-    std::unique_ptr<block_op_penalty_handler<controller::depth0::mdpo_controller>>, \
-    std::unique_ptr<block_op_penalty_handler<controller::depth1::gp_dpo_controller>>, \
-    std::unique_ptr<block_op_penalty_handler<controller::depth1::gp_mdpo_controller>>,\
-    std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
-    std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
-
-#define EXISTING_CACHE_HANDLERS                                                  \
-  std::unique_ptr<cache_op_penalty_handler<controller::depth1::gp_dpo_controller>>, \
-    std::unique_ptr<cache_op_penalty_handler<controller::depth1::gp_mdpo_controller>>,\
-    std::unique_ptr<cache_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
-    std::unique_ptr<cache_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
-
-#define FREE_BLOCK_DROP_HANDLERS                                                  \
-  std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_dpo_controller>>, \
-    std::unique_ptr<block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>
+#include "rcppsw/ds/type_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-namespace depth0 {
-class crw_controller;
-class dpo_controller;
-class mdpo_controller;
-}
-namespace depth1 {
-class gp_dpo_controller;
-class gp_mdpo_controller;
-}
-namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-}
-} /* namespace controller */
 namespace params { namespace tv { struct tv_manager_params; }}
 namespace ds { class arena_map; }
 NS_START(support);
@@ -89,6 +52,7 @@ NS_START(support);
 class base_loop_functions;
 
 NS_START(tv);
+
 
 /*******************************************************************************
  * Class Definitions
@@ -140,7 +104,7 @@ class tv_manager : public rer::client<tv_manager>,
         return boost::get<std::unique_ptr<block_op_penalty_handler<T>>>(
             m_cache_site.at(typeid(T))).get();
       default:
-        ER_FATAL_SENTINEL("Bad penalty source %d", src);
+        ER_FATAL_SENTINEL("Bad penalty source %d", static_cast<int>(src));
     } /* switch() */
     return nullptr;
   }
@@ -159,7 +123,7 @@ class tv_manager : public rer::client<tv_manager>,
             m_existing_cache.at(typeid(T))).get();
         break;
       default:
-        ER_FATAL_SENTINEL("Bad penalty source %d", src);
+        ER_FATAL_SENTINEL("Bad penalty source %d", static_cast<int>(src));
     } /* switch() */
     return nullptr;
   }
@@ -172,23 +136,13 @@ class tv_manager : public rer::client<tv_manager>,
    * (for example).
    */
   template<typename T,
-           RCPPSW_SFINAE_REQUIRE(std::is_same<T,
-                                 controller::depth0::crw_controller>::value ||
-                                 std::is_same<T,
-                                 controller::depth0::dpo_controller>::value ||
-                                 std::is_same<T,
-                                 controller::depth0::mdpo_controller>::value)
-           >
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth0::typelist, T)>
   penalty_handler_list<T> all_penalty_handlers(void) {
     return {penalty_handler<T>(block_op_src::ekFREE_PICKUP),
           penalty_handler<T>(block_op_src::ekNEST_DROP)};
   }
   template<typename T,
-           RCPPSW_SFINAE_REQUIRE(std::is_same<T,
-                                 controller::depth1::gp_dpo_controller>::value ||
-                                 std::is_same<T,
-                                 controller::depth1::gp_mdpo_controller>::value)
-           >
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth1::typelist, T)>
   penalty_handler_list<T> all_penalty_handlers(void) {
     return {penalty_handler<T>(block_op_src::ekFREE_PICKUP),
           penalty_handler<T>(block_op_src::ekNEST_DROP),
@@ -196,11 +150,7 @@ class tv_manager : public rer::client<tv_manager>,
   }
 
   template<typename T,
-           RCPPSW_SFINAE_REQUIRE(std::is_same<T,
-                                 controller::depth2::grp_dpo_controller>::value ||
-                                 std::is_same<T,
-                                 controller::depth2::grp_mdpo_controller>::value)
-           >
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth2::typelist, T)>
   penalty_handler_list<T> all_penalty_handlers(void) {
     return {penalty_handler<T>(block_op_src::ekFREE_PICKUP),
           penalty_handler<T>(block_op_src::ekNEST_DROP),
@@ -235,30 +185,37 @@ class tv_manager : public rer::client<tv_manager>,
   void update(void);
 
  private:
-  void nest_drop_init(const params::tv::tv_manager_params* params,
-                      ds::arena_map* map);
-  void fb_pickup_init(const params::tv::tv_manager_params* params,
-                      ds::arena_map* map);
-  void existing_cache_init(const params::tv::tv_manager_params* params,
-                           ds::arena_map* map);
-  void cache_site_init(const params::tv::tv_manager_params* params,
-                       ds::arena_map* map);
+  template<template<class> class PenaltyHandlerType>
+  struct ptr_to_penalty_handler {
+    template<class T>
+    struct apply {
+      using type = std::unique_ptr<PenaltyHandlerType<T>>;
+    };
+  };
 
-  using block_variant = boost::variant<BLOCK_HANDLERS>;
-  using existing_cache_variant = boost::variant<EXISTING_CACHE_HANDLERS>;
-  using fb_drop_variant = boost::variant<FREE_BLOCK_DROP_HANDLERS>;
+  using block_handler_typelist = boost::mpl::transform<
+   controller::typelist,
+    ptr_to_penalty_handler<block_op_penalty_handler>>::type;
+
+  using existing_cache_handler_typelist = boost::mpl::transform<
+    controller::d1d2_typelist,
+    ptr_to_penalty_handler<cache_op_penalty_handler>>::type;
+
+  using fb_drop_handler_typelist = boost::mpl::transform<
+    controller::depth2::typelist,
+    ptr_to_penalty_handler<block_op_penalty_handler>>::type;
 
   /* clang-format off */
-  const support::base_loop_functions* const mc_lf;
-  const rct::waveform_params                mc_motion_throttle_params;
+  const support::base_loop_functions* const      mc_lf;
+  const rct::waveform_params                     mc_motion_throttle_params;
 
-  boost::container::map<std::type_index, block_variant>          m_fb_pickup{};
-  boost::container::map<std::type_index, block_variant>          m_nest_drop{};
-  boost::container::map<std::type_index, existing_cache_variant> m_existing_cache{};
-  boost::container::map<std::type_index, fb_drop_variant>        m_new_cache{};
-  boost::container::map<std::type_index, fb_drop_variant>        m_cache_site{};
+  rds::type_map<block_handler_typelist>          m_fb_pickup{};
+  rds::type_map<block_handler_typelist>          m_nest_drop{};
+  rds::type_map<existing_cache_handler_typelist> m_existing_cache{};
+  rds::type_map<fb_drop_handler_typelist>        m_new_cache{};
+  rds::type_map<fb_drop_handler_typelist>        m_cache_site{};
 
-  std::map<int, motion_throttling_handler>                       m_motion_throttling{};
+  std::map<int, motion_throttling_handler>       m_motion_throttling{};
   /* clang-format on */
 };
 

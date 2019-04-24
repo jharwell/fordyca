@@ -45,7 +45,7 @@ NS_START(fordyca, params, block_sel);
  * @brief Parses XML parameters for the \ref block_sel_matrix at the start
  * of simulation.
  */
-class block_sel_matrix_parser : public rcppsw::params::xml_param_parser {
+class block_sel_matrix_parser : public rparams::xml_param_parser {
  public:
   explicit block_sel_matrix_parser(uint level)
       : xml_param_parser(level), m_priorities(level + 1) {}
@@ -64,7 +64,7 @@ class block_sel_matrix_parser : public rcppsw::params::xml_param_parser {
   }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }

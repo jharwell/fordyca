@@ -1,5 +1,5 @@
 /**
- * @file controller_interactor_mapper.cpp
+ * @file robot_task_extractor_adaptor.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,38 +18,42 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_ROBOT_TASK_EXTRACTOR_ADAPTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_ROBOT_TASK_EXTRACTOR_ADAPTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-/*
- * This is needed because without it boost instantiates static assertions that
- * verify that every possible handler<controller> instantiation is valid, which
- * includes checking for depth1 controllers being valid for new cache drop/cache
- * site drop events. These will not happen in reality (or shouldn't), and if
- * they do it's 100% OK to crash with an exception.
- */
-#define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
-
-#include "fordyca/support/depth2/controller_interactor_mapper.hpp"
-#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include "fordyca/support/depth2/robot_arena_interactor.hpp"
+#include <boost/variant/static_visitor.hpp>
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, support, depth2);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-bool controller_interactor_mapper::operator()(grp_dpo_itype& interactor) const {
-  return interactor(*dynamic_cast<grp_dpo_itype::controller_type*>(controller()),
-                    timestep());
-}
-bool controller_interactor_mapper::operator()(grp_mdpo_itype& interactor) const {
-  return interactor(
-      *dynamic_cast<grp_mdpo_itype::controller_type*>(controller()), timestep());
-}
+/**
+ * @struct robot_task_extractor_adaptor
+ * @ingroup fordyca support
+ *
+ * @brief Map a controller instance to the task extraction action run during
+ * convergence calculations.
+ */
+struct robot_task_extractor_adaptor : public boost::static_visitor<int> {
+  explicit robot_task_extractor_adaptor(const controller::base_controller* const c)
+      : mc_controller(c) {}
 
-NS_END(depth2, support, fordyca);
+  template <typename ControllerType>
+  int operator()(const robot_task_extractor<ControllerType>& extractor) const {
+    return extractor(dynamic_cast<const ControllerType*>(mc_controller));
+  }
+  const controller::base_controller* const mc_controller;
+};
+
+NS_END(support, fordyca);
+
+#endif /* INCLUDE_FORYDCA_SUPPORT_ROBOT_TASK_EXTRACTOR_ADAPTOR_HPP_ */

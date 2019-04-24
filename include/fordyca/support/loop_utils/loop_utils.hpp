@@ -181,23 +181,19 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
  * the robot, probably using on-board cameras.
  */
 template <typename T>
-void set_robot_los(argos::CFootBotEntity& robot,
+void set_robot_los(T* const controller,
                    uint los_grid_size,
                    ds::arena_map& map) {
-  rmath::vector2d pos;
-  pos.set(robot.GetEmbodiedEntity()
-          .GetOriginAnchor()
-          .Position.GetX(),
-          robot.GetEmbodiedEntity()
-          .GetOriginAnchor()
-          .Position.GetY());
-
-  auto& controller =
-      dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-  controller.los(std::move(compute_robot_los(map, los_grid_size, pos)));
+  controller->los(std::move(compute_robot_los(map,
+                                              los_grid_size,
+                                              controller->position())));
 }
 
-
+template<typename T>
+void set_robot_tick(argos::CFootBotEntity& robot, uint timestep) {
+  auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
+  controller.tick(timestep);
+}
 /**
  * @brief Determine if an entity of the specified dimensions, placed at the
  * specified location (or that currently exists at the specified location), will

@@ -23,10 +23,18 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth0/odpo_controller.hpp"
+#include "fordyca/controller/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
@@ -191,7 +199,31 @@ void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
+void free_block_pickup::visit(controller::depth0::omdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  visit(*controller.fsm());
+  controller.block(m_block);
+  controller.block_manip_collator()->free_pickup_event(true);
+  ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.dpo_perception()->dpo_store());
+  visit(*controller.fsm());
+  controller.block(m_block);
+  controller.block_manip_collator()->free_pickup_event(true);
+  ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -219,6 +251,31 @@ void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller)
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth1::gp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  controller.block_manip_collator()->free_pickup_event(true);
+  controller.block(m_block);
+  dispatch_free_block_interactor(controller.current_task());
+  ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_pickup::visit(controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.dpo_perception()->dpo_store());
+  controller.block_manip_collator()->free_pickup_event(true);
+  controller.block(m_block);
+  dispatch_free_block_interactor(controller.current_task());
+  ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_pickup::visit(
+    controller::depth1::gp_omdpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
@@ -265,6 +322,32 @@ void free_block_pickup::visit(controller::depth2::grp_dpo_controller& controller
 
 void free_block_pickup::visit(
     controller::depth2::grp_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  controller.block_manip_collator()->free_pickup_event(true);
+  controller.block(m_block);
+  dispatch_free_block_interactor(controller.current_task());
+  ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_pickup::visit(
+    controller::depth2::grp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.dpo_perception()->dpo_store());
+  controller.block_manip_collator()->free_pickup_event(true);
+  controller.block(m_block);
+  dispatch_free_block_interactor(controller.current_task());
+  ER_INFO("Picked up block%d", m_block->id());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void free_block_pickup::visit(
+    controller::depth2::grp_omdpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());

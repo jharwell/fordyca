@@ -1,7 +1,7 @@
 /**
- * @file oracle_params.hpp
+ * @file depth2/robot_configurer_adaptor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -17,45 +17,31 @@
  * You should have received a copy of the GNU General Public License along with
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
-
-#ifndef INCLUDE_FORDYCA_PARAMS_ORACLE_PARAMS_HPP_
-#define INCLUDE_FORDYCA_PARAMS_ORACLE_PARAMS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH2_ROBOT_CONFIGURER_ADAPTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_DEPTH2_ROBOT_CONFIGURER_ADAPTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/params/base_params.hpp"
+#include "fordyca/nsalias.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
+#include "rcppsw/ds/type_map.hpp"
+#include "fordyca/support/depth1/robot_configurer_adaptor.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, support, depth2, detail);
+
+using configurer_map_type = rds::type_map<
+   rmpl::typelist_wrap_apply<controller::depth2::typelist,
+                             robot_configurer>::type>;
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-/**
- * @struct oracle_params
- * @ingroup fordyca params
- *
- * @brief Parameters for the various oracles that can be employed during
- * simulation.
- */
-struct oracle_params : public rcppsw::params::base_params {
-  bool enabled{false};
-  /**
-   * @brief Should the all-knowing oracle be used when updating task execution
-   * time estimates? Only applicable to certain controllers.
-   */
-  bool task_exec_ests{false};
+using robot_configurer_adaptor = depth1::robot_configurer_adaptor;
 
-  /**
-   * @brief Should the all-knowing oracle be used when updating task interface
-   * time estimates? Only applicable to certain controllers.
-   */
-  bool task_interface_ests{false};
-};
+NS_END(detail, depth2, support, fordyca);
 
-NS_END(params, fordyca);
-
-#endif /* INCLUDE_FORDYCA_PARAMS_ORACLE_PARAMS_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_ROBOT_CONFIGURER_ADAPTOR_HPP_ */

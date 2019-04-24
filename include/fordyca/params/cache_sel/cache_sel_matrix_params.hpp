@@ -29,6 +29,7 @@
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/params/base_params.hpp"
 #include "fordyca/params/cache_sel/pickup_policy_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +45,7 @@ NS_START(fordyca, params, cache_sel);
  *
  * @brief XML parameters for the \ref cache_sel_matrix
  */
-struct cache_sel_matrix_params : public rcppsw::params::base_params {
+struct cache_sel_matrix_params : public rparams::base_params {
   double cache_prox_dist{0.0};
   double block_prox_dist{0.0};
   double nest_prox_dist{0.0};

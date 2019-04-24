@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/params/base_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,7 +40,7 @@ NS_START(fordyca, params, arena);
  * @struct block_redist_governor_params
  * @ingroup fordyca params arena
  */
-struct block_redist_governor_params : public rcppsw::params::base_params {
+struct block_redist_governor_params : public rparams::base_params {
   uint        timestep{0};
   uint        block_count{0};
   std::string trigger{};

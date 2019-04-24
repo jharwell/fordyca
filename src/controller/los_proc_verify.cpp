@@ -69,8 +69,8 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
     ER_ASSERT(c1->id() == exists->ent()->id(),
               "DPO store/LOS disagree on cache ID @%s: %d/%d",
               c1->discrete_loc().to_str().c_str(),
-              c1->id(),
-              exists->ent()->id());
+              exists->ent()->id(),
+              c1->id());
     ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
               "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
               c1->id(),

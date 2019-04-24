@@ -105,7 +105,7 @@ class block_op_penalty_handler
             timestep,
             original_penalty(),
             penalty,
-            src);
+            static_cast<int>(src));
 
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));

@@ -24,6 +24,8 @@
 #include "fordyca/events/block_proximity.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
@@ -71,6 +73,28 @@ void block_proximity::visit(controller::depth2::grp_dpo_controller& c) {
 } /* visit() */
 
 void block_proximity::visit(controller::depth2::grp_mdpo_controller& c) {
+  c.ndc_push();
+
+  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  events::block_found_visitor found_op(m_block);
+  found_op.visit(*c.mdpo_perception()->map());
+  dispatch_cache_starter(c.current_task());
+
+  c.ndc_pop();
+} /* visit() */
+
+void block_proximity::visit(controller::depth2::grp_odpo_controller& c) {
+  c.ndc_push();
+
+  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  events::block_found_visitor found_op(m_block);
+  found_op.visit(*c.dpo_perception()->dpo_store());
+  dispatch_cache_starter(c.current_task());
+
+  c.ndc_pop();
+} /* visit() */
+
+void block_proximity::visit(controller::depth2::grp_omdpo_controller& c) {
   c.ndc_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id());

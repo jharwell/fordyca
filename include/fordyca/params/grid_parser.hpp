@@ -46,7 +46,7 @@ NS_START(fordyca, params);
  * \ref grid_params.
  */
 
-class grid_parser : public rcppsw::params::xml_param_parser {
+class grid_parser : public rparams::xml_param_parser {
  public:
   explicit grid_parser(uint level) : xml_param_parser(level) {}
 
@@ -63,8 +63,7 @@ class grid_parser : public rcppsw::params::xml_param_parser {
   std::shared_ptr<grid_params> parse_results(void) const { return m_params; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override {
+  std::shared_ptr<rparams::base_params> parse_results_impl(void) const override {
     return m_params;
   }
 

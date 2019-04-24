@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/los_proc_verify.hpp"
+#include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
@@ -47,8 +48,8 @@ dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void dpo_perception_subsystem::update(void) {
-  process_los(los());
+void dpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
+  process_los(los(), receptor);
   ER_ASSERT(los_proc_verify(los())(dpo_store()), "LOS verification failed");
   m_store->decay_all();
 } /* update() */
@@ -56,15 +57,31 @@ void dpo_perception_subsystem::update(void) {
 void dpo_perception_subsystem::reset(void) { m_store->clear_all(); }
 
 void dpo_perception_subsystem::process_los(
-    const repr::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los,
+    oracular_info_receptor* const receptor) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
            c_los->abs_lr().to_str().c_str(),
            c_los->abs_ul().to_str().c_str(),
            c_los->abs_ur().to_str().c_str());
 
-  process_los_blocks(c_los);
-  process_los_caches(c_los);
+  /* If we are in an oracular controller, process the updates from the oracle */
+  if (nullptr != receptor) {
+    receptor->dpo_store_update(m_store.get());
+  }
+
+  /*
+   * Depending on oracle configuration, we may be able to skip processing parts
+   * of our LOS, as they will be a subset of the updates we get from the oracle.
+   */
+  if (nullptr == receptor ||
+      (nullptr != receptor && !receptor->entities_blocks_enabled())) {
+    process_los_blocks(c_los);
+  }
+  if (nullptr == receptor ||
+      (nullptr != receptor && !receptor->entities_caches_enabled())) {
+    process_los_caches(c_los);
+  }
 } /* process_los() */
 
 void dpo_perception_subsystem::process_los_caches(
@@ -190,7 +207,7 @@ void dpo_perception_subsystem::los_tracking_sync(
    * has moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  for (auto&& block : m_store->blocks().const_values_range()) {
+  for (auto& block : m_store->blocks().const_values_range()) {
     if (c_los->contains_loc(block.ent()->discrete_loc())) {
       auto it = std::find_if(blocks.begin(), blocks.end(), [&](const auto& b) {
         return b->idcmp(*block.ent_obj());

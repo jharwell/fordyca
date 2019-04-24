@@ -24,17 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include "rcppsw/params/base_params.hpp"
-#include "rcppsw/control/waveform_params.hpp"
 #include "fordyca/params/caches/static_cache_params.hpp"
 #include "fordyca/params/caches/dynamic_cache_params.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, params, caches);
-namespace ct = rcppsw::control;
 
 /*******************************************************************************
  * Structure Definitions
@@ -45,7 +43,7 @@ namespace ct = rcppsw::control;
  *
  * @brief Contains parameters for both static and dynamic caches in the arena.
  */
-struct caches_params : public rcppsw::params::base_params {
+struct caches_params : public rparams::base_params {
   /**
    * @brief How large are cache (geometrical area), when created (same for
    * static and dynamic) ?
@@ -53,7 +51,6 @@ struct caches_params : public rcppsw::params::base_params {
   double               dimension{0.0};
   static_cache_params  static_{}; // NOLINT
   dynamic_cache_params dynamic{};
-  ct::waveform_params  usage_penalty{};
 };
 
 NS_END(arena, params, fordyca);

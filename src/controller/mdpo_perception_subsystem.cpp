@@ -25,6 +25,7 @@
 #include <algorithm>
 
 #include "fordyca/controller/los_proc_verify.hpp"
+#include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
@@ -54,9 +55,9 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void mdpo_perception_subsystem::update() {
+void mdpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
   update_cell_stats(los());
-  process_los(los());
+  process_los(los(), receptor);
   ER_ASSERT(los_proc_verify(los())(map()), "LOS verification failed");
   m_map->decay_all();
 } /* update() */
@@ -64,15 +65,31 @@ void mdpo_perception_subsystem::update() {
 void mdpo_perception_subsystem::reset(void) { m_map->reset(); }
 
 void mdpo_perception_subsystem::process_los(
-    const repr::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los,
+    oracular_info_receptor* const receptor) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
            c_los->abs_lr().to_str().c_str(),
            c_los->abs_ul().to_str().c_str(),
            c_los->abs_ur().to_str().c_str());
 
-  process_los_blocks(c_los);
-  process_los_caches(c_los);
+  /* If we are in an oracular controller, process the updates from the oracle */
+  if (nullptr != receptor) {
+    receptor->dpo_store_update(dpo_store());
+  }
+
+  /*
+   * Depending on oracle configuration, we may be able to skip processing parts
+   * of our LOS, as they will be a subset of the updates we get from the oracle.
+   */
+  if (nullptr == receptor ||
+      (nullptr != receptor && !receptor->entities_blocks_enabled())) {
+    process_los_blocks(c_los);
+  }
+  if (nullptr == receptor ||
+      (nullptr != receptor && !receptor->entities_caches_enabled())) {
+    process_los_caches(c_los);
+  }
 } /* process_los() */
 
 void mdpo_perception_subsystem::process_los_blocks(

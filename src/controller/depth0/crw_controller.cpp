@@ -64,13 +64,10 @@ void crw_controller::Reset(void) {
 
 void crw_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
-
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
   m_fsm->run();
   ndc_pop();
 } /* ControlStep() */

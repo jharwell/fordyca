@@ -24,10 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,52 +43,12 @@ class block_sel_matrix;
 namespace ds {
 class dpo_semantic_map;
 }
-namespace fsm {
-class block_to_goal_fsm;
-} // namespace fsm
-namespace controller {
-namespace depth1 {
-class gp_dpo_controller;
-class gp_mdpo_controller;
-} // namespace depth1
-namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-} // namespace depth2
-} // namespace controller
-namespace tasks {
-class base_foraging_task;
-namespace depth2 {
-class cache_starter;
-class cache_finisher;
-} // namespace depth2
-} // namespace tasks
 
 NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct free_block_drop_visit_set {
-  using inherited = boost::mpl::joint_view<block_drop_base_visit_set::value,
-                                           cell_op_visit_set::value>;
-  using defined = boost::mpl::vector<
-      /* depth0 */
-      fsm::block_to_goal_fsm,
-      ds::dpo_semantic_map,
-      /* depth1 */
-      controller::depth1::gp_dpo_controller,
-      controller::depth1::gp_mdpo_controller,
-      /* depth2 */
-      controller::depth2::grp_dpo_controller,
-      controller::depth2::grp_mdpo_controller,
-      tasks::depth2::cache_starter,
-      tasks::depth2::cache_finisher,
-      fsm::block_to_goal_fsm,
-      ds::dpo_semantic_map>;
-  using value = boost::mpl::joint_view<inherited, defined>;
-};
-
 /**
  * @class free_block_drop
  * @ingroup fordyca events detail
@@ -99,7 +62,32 @@ struct free_block_drop_visit_set {
  * - A robot aborts its task, and is carrying a block.
  */
 class free_block_drop : public rer::client<free_block_drop>, public cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = boost::mpl::joint_view<block_drop_base_visit_typelist,
+                                             cell_op::visit_typelist>;
+    using controllers = boost::mpl::joint_view<controller::depth1::typelist,
+                                               controller::depth2::typelist>;
+    using others = rmpl::typelist<
+      /* depth0 */
+      fsm::block_to_goal_fsm,
+      ds::dpo_semantic_map,
+      /* depth2 */
+      tasks::depth2::cache_starter,
+      tasks::depth2::cache_finisher,
+      fsm::block_to_goal_fsm,
+      ds::dpo_semantic_map>;
+
+    using value = boost::mpl::joint_view<
+      controllers::type,
+      boost::mpl::joint_view<inherited::type,
+                             others::type>
+      >;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   /**
    * @param block The block to drop.
    * @param coord The discrete coordinates of the cell to drop the block in.
@@ -122,10 +110,14 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   /* depth1 */
   void visit(controller::depth1::gp_dpo_controller&);
   void visit(controller::depth1::gp_mdpo_controller&);
+  void visit(controller::depth1::gp_odpo_controller&);
+  void visit(controller::depth1::gp_omdpo_controller&);
 
   /* depth2 */
   void visit(controller::depth2::grp_dpo_controller&);
   void visit(controller::depth2::grp_mdpo_controller&);
+  void visit(controller::depth2::grp_odpo_controller&);
+  void visit(controller::depth2::grp_omdpo_controller&);
   void visit(tasks::depth2::cache_starter&);
   void visit(tasks::depth2::cache_finisher&);
   void visit(fsm::block_to_goal_fsm&);
@@ -154,7 +146,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
  */
 using free_block_drop_visitor_impl =
     rvisitor::precise_visitor<detail::free_block_drop,
-                              detail::free_block_drop_visit_set::value>;
+                              detail::free_block_drop::visit_typelist>;
 
 NS_END(detail);
 

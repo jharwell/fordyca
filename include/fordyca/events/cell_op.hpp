@@ -47,10 +47,6 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-struct cell_op_visit_set {
-  using value = boost::mpl::vector<ds::cell2D, fsm::cell2D_fsm>;
-};
-
 /**
  * @class cell_op
  * @ingroup fordyca events detail
@@ -63,6 +59,8 @@ struct cell_op_visit_set {
  */
 class cell_op {
  public:
+  using visit_typelist = rmpl::typelist<ds::cell2D, fsm::cell2D_fsm>;
+
   explicit cell_op(const rmath::vector2u& coord) : m_coord(coord) {}
 
   virtual ~cell_op(void) = default;
@@ -87,7 +85,7 @@ NS_END(detail);
  * compiler).
  */
 using cell_op_visitor = rvisitor::precise_visitor<detail::cell_op,
-                                               detail::cell_op_visit_set::value>;
+                                                  detail::cell_op::visit_typelist>;
 NS_END(events, fordyca);
 
 #endif /* INCLUDE_FORDYCA_EVENTS_CELL_OP_HPP_ */

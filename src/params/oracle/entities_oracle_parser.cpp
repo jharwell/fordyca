@@ -1,5 +1,5 @@
 /**
- * @file controller_interactor_mapper.cpp
+ * @file entities_oracle_parser.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,31 +21,33 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth0/controller_interactor_mapper.hpp"
-#include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/controller/depth0/dpo_controller.hpp"
-#include "fordyca/controller/depth0/mdpo_controller.hpp"
-#include "fordyca/support/depth0/robot_arena_interactor.hpp"
+#include "fordyca/params/oracle/entities_oracle_parser.hpp"
 
 /*******************************************************************************
- * Namespaces/decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca, params, oracle);
+
+/*******************************************************************************
+ * Global Variables
+ ******************************************************************************/
+constexpr char entities_oracle_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void controller_interactor_mapper::operator()(crw_itype& interactor) const {
-  interactor(*dynamic_cast<crw_itype::controller_type*>(m_controller),
-             m_timestep);
-}
-void controller_interactor_mapper::operator()(dpo_itype& interactor) const {
-  interactor(*dynamic_cast<dpo_itype::controller_type*>(m_controller),
-             m_timestep);
-}
-void controller_interactor_mapper::operator()(mdpo_itype& interactor) const {
-  interactor(*dynamic_cast<mdpo_itype::controller_type*>(m_controller),
-             m_timestep);
-}
+void entities_oracle_parser::parse(const ticpp::Element& node) {
+  /*
+   * Needs to be populated always so we it is disabled by default rather than a
+   * nullptr and a segfault.
+   */
+  m_params =
+      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element cnode = node_get(node, kXMLRoot);
+    XML_PARSE_ATTR(cnode, m_params, caches_enabled);
+    XML_PARSE_ATTR(cnode, m_params, blocks_enabled);
+  }
+} /* parse() */
 
-NS_END(depth0, support, fordyca);
+NS_END(oracle, params, fordyca);

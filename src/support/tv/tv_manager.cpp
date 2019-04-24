@@ -29,25 +29,74 @@
  * they do it's 100% OK to crash with an exception.
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
+#include <boost/mpl/for_each.hpp>
 
-#include "fordyca/support/tv/tv_manager.hpp"
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth0/odpo_controller.hpp"
+#include "fordyca/controller/depth0/omdpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/params/tv/tv_manager_params.hpp"
-#include "fordyca/support/depth0/depth0_loop_functions.hpp"
-#include "fordyca/support/depth1/depth1_loop_functions.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
- * Namespaces/decls
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, tv);
+
+/*******************************************************************************
+ * Class Definitions
+ ******************************************************************************/
+template <typename Typelist,
+          template <class> class PenaltyHandlerType,
+          class PenaltyHandlerParamType>
+class penalty_handler_initializer : public boost::static_visitor<void> {
+ public:
+  penalty_handler_initializer(const PenaltyHandlerParamType* const params,
+                              ds::arena_map* const arena_map,
+                              rds::type_map<Typelist>* type_map,
+                              const std::string& handler_name)
+      : mc_handler_name(handler_name),
+        mc_params(params),
+        m_arena_map(arena_map),
+        m_type_map(type_map) {}
+
+  /*
+   * @todo Ideally these would be deleted, but emplace() does not seem to do
+   * what I think it does (i.e. construct an object in place without a need for
+   * a copy constructor), so it is defaulted instead.
+   */
+  penalty_handler_initializer(const penalty_handler_initializer&) = default;
+  penalty_handler_initializer& operator=(const penalty_handler_initializer&) =
+      delete;
+
+  template <typename ControllerType>
+  void operator()(const ControllerType& controller) {
+    m_type_map->emplace(
+        typeid(controller),
+        rcppsw::make_unique<class PenaltyHandlerType<ControllerType>>(
+            m_arena_map, mc_params, mc_handler_name));
+  }
+
+ private:
+  /* clang-format off */
+  const std::string                    mc_handler_name;
+  const PenaltyHandlerParamType* const mc_params;
+  ds::arena_map* const                 m_arena_map;
+  rds::type_map<Typelist>*             m_type_map;
+  /* clang-format on */
+};
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -58,146 +107,57 @@ tv_manager::tv_manager(const params::tv::tv_manager_params* params,
     : ER_CLIENT_INIT("fordyca.support.tv.tv_manager"),
       mc_lf(lf),
       mc_motion_throttle_params(params->block_carry_throttle) {
-  nest_drop_init(params, map);
-  fb_pickup_init(params, map);
-  existing_cache_init(params, map);
-  cache_site_init(params, map);
+  /* All controllers can drop blocks in the nest */
+  boost::mpl::for_each<controller::typelist>(
+      penalty_handler_initializer<block_handler_typelist,
+                                  block_op_penalty_handler,
+                                  decltype(params->block_manipulation_penalty)>(
+          &params->block_manipulation_penalty,
+          map,
+          &m_nest_drop,
+          "Nest Block Drop"));
+
+  /* all controllers can pickup blocks */
+  boost::mpl::for_each<controller::typelist>(
+      penalty_handler_initializer<block_handler_typelist,
+                                  block_op_penalty_handler,
+                                  decltype(params->block_manipulation_penalty)>(
+          &params->block_manipulation_penalty,
+          map,
+          &m_fb_pickup,
+          "Free Block Pickup"));
+
+  /* Only D1/D2 controllers interact with existing caches */
+  boost::mpl::for_each<controller::d1d2_typelist>(
+      penalty_handler_initializer<existing_cache_handler_typelist,
+                                  cache_op_penalty_handler,
+                                  decltype(params->cache_usage_penalty)>(
+          &params->cache_usage_penalty,
+          map,
+          &m_existing_cache,
+          "Existing Cache"));
+
+  /* Only D2 controllers deal with new caches */
+  boost::mpl::for_each<controller::depth2::typelist>(
+      penalty_handler_initializer<fb_drop_handler_typelist,
+                                  block_op_penalty_handler,
+                                  decltype(params->block_manipulation_penalty)>(
+          &params->block_manipulation_penalty, map, &m_new_cache, "New Cache"));
+
+  /* Only D2 controllers deal with cache sites */
+  boost::mpl::for_each<controller::depth2::typelist>(
+      penalty_handler_initializer<fb_drop_handler_typelist,
+                                  block_op_penalty_handler,
+                                  decltype(params->block_manipulation_penalty)>(
+          &params->block_manipulation_penalty,
+          map,
+          &m_cache_site,
+          "Cache Site"));
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void tv_manager::nest_drop_init(const params::tv::tv_manager_params* params,
-                                ds::arena_map* const map) {
-  m_nest_drop.emplace(
-      typeid(controller::depth0::crw_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth0::crw_controller>>(
-          map, &params->block_manipulation_penalty, "Nest block drop"));
-  m_nest_drop.emplace(
-      typeid(controller::depth0::dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth0::dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Nest block drop"));
-  m_nest_drop.emplace(
-      typeid(controller::depth0::mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth0::mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Nest block drop"));
-  m_nest_drop.emplace(
-      typeid(controller::depth1::gp_dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth1::gp_dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Nest block drop"));
-  m_nest_drop.emplace(
-      typeid(controller::depth1::gp_mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth1::gp_mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Nest block drop"));
-  m_nest_drop.emplace(
-      typeid(controller::depth2::grp_dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Nest block drop"));
-  m_nest_drop.emplace(
-      typeid(controller::depth2::grp_mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Nest block drop"));
-} /* nest_drop_init() */
-
-void tv_manager::fb_pickup_init(const params::tv::tv_manager_params* params,
-                                ds::arena_map* const map) {
-  m_fb_pickup.emplace(
-      typeid(controller::depth0::crw_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth0::crw_controller>>(
-          map, &params->block_manipulation_penalty, "Free block pickup"));
-  m_fb_pickup.emplace(
-      typeid(controller::depth0::dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth0::dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Free block pickup"));
-  m_fb_pickup.emplace(
-      typeid(controller::depth0::mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth0::mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Free block pickup"));
-  m_fb_pickup.emplace(
-      typeid(controller::depth1::gp_dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth1::gp_dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Free block pickup"));
-  m_fb_pickup.emplace(
-      typeid(controller::depth1::gp_mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth1::gp_mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Free block pickup"));
-  m_fb_pickup.emplace(
-      typeid(controller::depth2::grp_dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_dpo_controller>>(
-          map, &params->block_manipulation_penalty, "nFree block pickup"));
-  m_fb_pickup.emplace(
-      typeid(controller::depth2::grp_mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Free block pickup"));
-} /* fb_pickup_init() */
-
-void tv_manager::existing_cache_init(const params::tv::tv_manager_params* params,
-                                     ds::arena_map* const map) {
-  m_existing_cache.emplace(
-      typeid(controller::depth1::gp_dpo_controller),
-      rcppsw::make_unique<
-          cache_op_penalty_handler<controller::depth1::gp_dpo_controller>>(
-          map, &params->cache_usage_penalty, "Cache"));
-  m_existing_cache.emplace(
-      typeid(controller::depth1::gp_mdpo_controller),
-      rcppsw::make_unique<
-          cache_op_penalty_handler<controller::depth1::gp_mdpo_controller>>(
-          map, &params->cache_usage_penalty, "Cache"));
-
-  m_existing_cache.emplace(
-      typeid(controller::depth2::grp_dpo_controller),
-      rcppsw::make_unique<
-          cache_op_penalty_handler<controller::depth2::grp_dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Cache"));
-
-  m_existing_cache.emplace(
-      typeid(controller::depth2::grp_mdpo_controller),
-      rcppsw::make_unique<
-          cache_op_penalty_handler<controller::depth2::grp_mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Cache"));
-} /* existing_cache_init() */
-
-void tv_manager::cache_site_init(const params::tv::tv_manager_params* params,
-                                 ds::arena_map* const map) {
-  m_cache_site.emplace(
-      typeid(controller::depth2::grp_dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Cache site block drop"));
-
-  m_cache_site.emplace(
-      typeid(controller::depth2::grp_mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Cache site block drop"));
-
-  m_new_cache.emplace(
-      typeid(controller::depth2::grp_dpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_dpo_controller>>(
-          map, &params->block_manipulation_penalty, "Cache site block drop"));
-
-  m_new_cache.emplace(
-      typeid(controller::depth2::grp_mdpo_controller),
-      rcppsw::make_unique<
-          block_op_penalty_handler<controller::depth2::grp_mdpo_controller>>(
-          map, &params->block_manipulation_penalty, "Cache site block drop"));
-} /* cache_site_init() */
-
 double tv_manager::swarm_motion_throttle(void) const {
   double accum = 0.0;
   auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");

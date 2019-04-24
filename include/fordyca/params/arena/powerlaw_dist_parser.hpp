@@ -43,7 +43,7 @@ NS_START(fordyca, params, arena);
  * @brief Parses XML parameters for related to \ref powerlaw_distributor
  * objects into \ref powerlaw_dist_params.
  */
-class powerlaw_dist_parser : public rcppsw::params::xml_param_parser {
+class powerlaw_dist_parser : public rparams::xml_param_parser {
  public:
   explicit powerlaw_dist_parser(uint level) : xml_param_parser(level) {}
 
@@ -64,7 +64,7 @@ class powerlaw_dist_parser : public rcppsw::params::xml_param_parser {
   bool parsed(void) const override { return m_parsed; }
 
  private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
+  std::shared_ptr<rparams::base_params> parse_results_impl(
       void) const override {
     return m_params;
   }
