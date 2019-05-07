@@ -47,20 +47,21 @@ cache_site_selector::cache_site_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-rmath::vector2d cache_site_selector::operator()(
+boost::optional<rmath::vector2d> cache_site_selector::operator()(
     const ds::dp_cache_map& known_caches,
     const ds::dp_block_map& known_blocks,
     rmath::vector2d position) {
   double max_utility;
   std::vector<double> point;
   struct site_utility_data u;
-  rmath::vector2d site(-1, -1);
+  rmath::vector2d site;
   opt_initialize(known_caches, known_blocks, position, &u, &point);
 
   /*
    * @bug Sometimes NLopt just fails with a generic error code and I don't
-   * know why. This should be investigated and fixed, but for now this seems to
-   * work.
+   * know why. I *think* it is because I hand it an infeasible point to start
+   * with (i.e. one that violates the existing constraints). Should probably fix
+   * so exception catching is not necessary, but for now this seems to work.
    */
   try {
     nlopt::result res = m_alg.optimize(point, max_utility);
@@ -70,7 +71,7 @@ rmath::vector2d cache_site_selector::operator()(
     ER_ASSERT(res >= 1, "NLopt failed with code %d", res);
   } catch (std::runtime_error&) {
     ER_FATAL_SENTINEL("NLopt failed");
-    return site;
+    return boost::optional<rmath::vector2d>();
   }
   site.set(point[0], point[1]);
   ER_ASSERT(verify_site(site, known_caches, known_blocks),
@@ -78,7 +79,7 @@ rmath::vector2d cache_site_selector::operator()(
 
   ER_INFO("Selected cache site @(%f, %f)", point[0], point[1]);
 
-  return site;
+  return boost::make_optional(site);
 } /* operator()() */
 
 bool cache_site_selector::verify_site(const rmath::vector2d& site,

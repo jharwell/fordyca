@@ -82,41 +82,42 @@ acquire_existing_cache_fsm::calc_acquisition_location(void) {
   controller::existing_cache_selector selector(mc_is_pickup,
                                                mc_matrix,
                                                &mc_store->caches());
-  auto best = selector(mc_store->caches(),
-                       saa_subsystem()->sensing()->position(),
-                       saa_subsystem()->sensing()->tick());
-  /*
-   * If this happens, all the caches we know of are too close for us to vector
-   * to, or otherwise unsuitable.
-   */
-  if (nullptr == best.ent()) {
+
+  if (auto best = selector(mc_store->caches(),
+                           saa_subsystem()->sensing()->position(),
+                           saa_subsystem()->sensing()->tick())) {
+    ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
+            best->ent()->id(),
+            best->ent()->real_loc().to_str().c_str(),
+            best->ent()->discrete_loc().to_str().c_str(),
+            best->density().last_result());
+    /*
+     * Now that we have the location of the best cache, we need to pick a random
+     * point inside it to vector to. This helps a LOT with maximimizing caches'
+     * potential for traffic/congestion regulation, because it does not require
+     * that all robots be able to make it to the center/near center of the cache
+     * in order to utilize it (this is more realistic too).
+     */
+    auto xrange = best->ent()->xspan(best->ent()->real_loc());
+    auto yrange = best->ent()->yspan(best->ent()->real_loc());
+    std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
+    std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
+
+    rmath::vector2d loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
+    ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
+            loc.to_str().c_str(),
+            best->ent()->id(),
+            xrange.to_str().c_str(),
+            yrange.to_str().c_str());
+    return boost::make_optional(std::make_pair(best->ent()->id(), loc));
+
+  } else {
+    /*
+     * If this happens, all the caches we know of are too close for us to vector
+     * to, or otherwise unsuitable.
+     */
     return boost::optional<acquisition_loc_type>();
   }
-
-  ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
-          best.ent()->id(),
-          best.ent()->real_loc().to_str().c_str(),
-          best.ent()->discrete_loc().to_str().c_str(),
-          best.density().last_result());
-  /*
-   * Now that we have the location of the best cache, we need to pick a random
-   * point inside it to vector to. This helps a LOT with maximimizing caches'
-   * potential for traffic/congestion regulation, because it does not require
-   * that all robots be able to make it to the center/near center of the cache
-   * in order to utilize it (this is more realistic too).
-   */
-  auto xrange = best.ent()->xspan(best.ent()->real_loc());
-  auto yrange = best.ent()->yspan(best.ent()->real_loc());
-  std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
-  std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
-
-  rmath::vector2d loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
-  ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
-          loc.to_str().c_str(),
-          best.ent()->id(),
-          xrange.to_str().c_str(),
-          yrange.to_str().c_str());
-  return boost::make_optional(std::make_pair(best.ent()->id(), loc));
 } /* calc_acquisition_location() */
 
 bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {

@@ -93,16 +93,16 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
 boost::optional<acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
     block_select(void) const {
   controller::block_selector selector(mc_matrix);
-  auto best = selector.calc_best(mc_store->blocks(),
-                                 saa_subsystem()->sensing()->position());
 
-  if (nullptr == best.ent()) {
-    return boost::optional<acquire_goal_fsm::candidate_type>();
-  } else {
+
+  if (auto best = selector(mc_store->blocks(),
+                           saa_subsystem()->sensing()->position())) {
     return boost::make_optional(
-        acquire_goal_fsm::candidate_type(best.ent()->real_loc(),
+        acquire_goal_fsm::candidate_type(best->ent()->real_loc(),
                                          vector_fsm::kBLOCK_ARRIVAL_TOL,
-                                         best.ent()->id()));
+                                         best->ent()->id()));
+  } else {
+    return boost::optional<acquire_goal_fsm::candidate_type>();
   }
 } /* block_select() */
 

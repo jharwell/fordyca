@@ -43,7 +43,7 @@ new_cache_selector::new_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::dp_block_map::value_type new_cache_selector::operator()(
+boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
     const ds::dp_block_map& new_caches,
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position) const {
@@ -80,11 +80,11 @@ ds::dp_block_map::value_type new_cache_selector::operator()(
             best.ent()->real_loc().to_str().c_str(),
             best.ent()->discrete_loc().to_str().c_str(),
             max_utility);
+    return boost::optional<ds::dp_block_map::value_type>();
   } else {
     ER_WARN("No best new cache found: all known new caches excluded!");
+        return boost::make_optional(best);
   }
-
-  return best;
 } /* operator() */
 
 bool new_cache_selector::new_cache_is_excluded(

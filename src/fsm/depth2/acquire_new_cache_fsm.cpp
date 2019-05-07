@@ -72,26 +72,27 @@ __rcsw_pure bool acquire_new_cache_fsm::candidates_exist(void) const {
 
 boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_select(
     void) const {
-  /* A "new" cache is the same as a single block  */
-  auto best = controller::depth2::new_cache_selector(
-      mc_matrix)(mc_store->blocks(), mc_store->caches(), sensors()->position());
+  controller::depth2::new_cache_selector selector(mc_matrix);
 
-  /*
-   * If this happens, all the blocks we know of are ineligible for us to
-   * vector to (too close or something similar).
-   */
-  if (nullptr == best.ent()) {
-    return boost::optional<acquire_goal_fsm::candidate_type>();
-  } else {
+  /* A "new" cache is the same as a single block  */
+  if (auto best = selector(mc_store->blocks(),
+                           mc_store->caches(),
+                           sensors()->position())) {
     ER_INFO("Select new cache%d@%s/%s, utility=%f for acquisition",
-            best.ent()->id(),
-            best.ent()->real_loc().to_str().c_str(),
-            best.ent()->discrete_loc().to_str().c_str(),
-            best.density().last_result());
+            best->ent()->id(),
+            best->ent()->real_loc().to_str().c_str(),
+            best->ent()->discrete_loc().to_str().c_str(),
+            best->density().last_result());
     return boost::make_optional(
-        acquire_goal_fsm::candidate_type(best.ent()->real_loc(),
+        acquire_goal_fsm::candidate_type(best->ent()->real_loc(),
                                          vector_fsm::kCACHE_ARRIVAL_TOL,
-                                         best.ent()->id()));
+                                         best->ent()->id()));
+  } else {
+    /*
+     * If this happens, all the blocks we know of are ineligible for us to
+     * vector to (too close or something similar).
+     */
+    return boost::optional<acquire_goal_fsm::candidate_type>();
   }
 } /* cache_select() */
 

@@ -43,7 +43,7 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::dp_block_map::value_type block_selector::calc_best(
+boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
     const ds::dp_block_map& blocks,
     const rmath::vector2d& position) {
   double max_utility = 0.0;
@@ -87,11 +87,12 @@ ds::dp_block_map::value_type block_selector::calc_best(
             best.ent()->real_loc().to_str().c_str(),
             best.ent()->discrete_loc().to_str().c_str(),
             max_utility);
+    return boost::make_optional(best);
   } else {
     ER_WARN("No best block found: all known blocks excluded!");
+    return boost::optional<ds::dp_block_map::value_type>();
   }
-  return best;
-} /* calc_best() */
+} /* operator() */
 
 bool block_selector::block_is_excluded(const rmath::vector2d& position,
                                        const repr::base_block* const block) const {

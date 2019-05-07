@@ -95,9 +95,10 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * @return The location of the best cache site, or (-1, -1) if no best cache
    * site could be found (can happen if NLopt mysteriously fails).
    */
-  rmath::vector2d operator()(const ds::dp_cache_map& known_caches,
-                             const ds::dp_block_map& known_blocks,
-                             rmath::vector2d position);
+  boost::optional<rmath::vector2d> operator()(
+      const ds::dp_cache_map& known_caches,
+      const ds::dp_block_map& known_blocks,
+      rmath::vector2d position);
 
  private:
   /*

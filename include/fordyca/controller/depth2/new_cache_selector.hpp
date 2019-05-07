@@ -65,7 +65,7 @@ class new_cache_selector: public rer::client<new_cache_selector> {
    *
    * @return The "best" new cache.
    */
-  ds::dp_block_map::value_type operator()(
+  boost::optional<ds::dp_block_map::value_type> operator()(
       const ds::dp_block_map& new_caches,
       const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position) const;

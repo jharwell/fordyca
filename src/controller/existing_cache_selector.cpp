@@ -49,7 +49,7 @@ existing_cache_selector::existing_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::dp_cache_map::value_type existing_cache_selector::operator()(
+boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator()(
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position,
     uint timestep) {
@@ -97,11 +97,11 @@ ds::dp_cache_map::value_type existing_cache_selector::operator()(
             best.ent()->real_loc().to_str().c_str(),
             best.ent()->discrete_loc().to_str().c_str(),
             max_utility);
+    return boost::make_optional(best);
   } else {
     ER_WARN("No best existing cache found: all known caches excluded!");
+    return boost::optional<ds::dp_cache_map::value_type>();
   }
-
-  return best;
 } /* operator()() */
 
 bool existing_cache_selector::cache_is_excluded(

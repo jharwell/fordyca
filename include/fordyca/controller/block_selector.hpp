@@ -59,10 +59,12 @@ class block_selector : public rer::client<block_selector> {
    * into an unknown state), compute which is the "best", for use in deciding
    * which block to go attempt to pickup.
    *
-   * @return A pointer to the "best" block, along with its utility value.
+   * @return A pointer to the "best" block, along with its utility value, if a
+   * best block is found, and empty otherwise.
    */
-  ds::dp_block_map::value_type calc_best(const ds::dp_block_map& blocks,
-                                         const rmath::vector2d& position);
+  boost::optional<ds::dp_block_map::value_type> operator()(
+      const ds::dp_block_map& blocks,
+      const rmath::vector2d& position);
 
  private:
   /**
