@@ -50,7 +50,6 @@ ds::cache_vector static_cache_creator::create_all(
     ds::block_vector& blocks,
     uint timestep) {
   ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
-  ds::cache_vector caches;
 
   ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
             "Cannot create static cache from < %zu blocks",
@@ -58,15 +57,9 @@ ds::cache_vector static_cache_creator::create_all(
   ER_INFO("Creating static cache@%s from %zu free blocks",
           m_center.to_str().c_str(),
           blocks.size());
-  ds::block_list starter_blocks;
-  for (auto& b : blocks) {
-    starter_blocks.push_back(b);
-  } /* for(b..) */
+  ds::block_list starter_blocks(blocks.begin(), blocks.end());
 
-  std::shared_ptr<repr::arena_cache> cache =
-      create_single_cache(starter_blocks, m_center, timestep);
-  caches.push_back(cache);
-  return caches;
-} /* create() */
+  return {create_single_cache(starter_blocks, m_center, timestep)};
+} /* create_all() */
 
 NS_END(depth1, support, fordyca);

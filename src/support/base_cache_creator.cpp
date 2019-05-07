@@ -102,13 +102,6 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
     op.visit(m_grid->access<arena_grid::kCell>(op.x(), op.y()));
   } /* for(block..) */
 
-  std::string s = std::accumulate(
-      blocks.begin(),
-      blocks.end(),
-      std::string(),
-      [&](const std::string& a, const std::shared_ptr<repr::base_block>& b) {
-        return a + "b" + std::to_string(b->id()) + ",";
-      });
   ds::block_vector block_vec(blocks.begin(), blocks.end());
   auto ret = rcppsw::make_unique<repr::arena_cache>(
       mc_cache_dim, m_grid->resolution(), center, block_vec, -1);
@@ -120,7 +113,7 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
           ret->xspan(ret->real_loc()).to_str().c_str(),
           ret->yspan(ret->real_loc()).to_str().c_str(),
           ret->n_blocks(),
-          s.c_str());
+          rcppsw::to_string(blocks).c_str());
   return ret;
 } /* create_single_cache() */
 

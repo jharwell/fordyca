@@ -27,6 +27,7 @@
 #include <vector>
 #include <utility>
 #include <random>
+#include <boost/optional.hpp>
 
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
@@ -77,12 +78,12 @@ class static_cache_manager : public base_cache_manager,
    * currently being carried by robots and there are not enough free blocks with
    * which to create a cache of the specified minimum size.
    */
-  creation_res_t create(ds::block_vector& blocks, uint timestep);
+  boost::optional<ds::cache_vector> create(ds::block_vector& blocks, uint timestep);
 
-  creation_res_t create_conditional(ds::block_vector& blocks,
-                                    uint timestep,
-                                    uint n_harvesters,
-                                    uint n_collectors);
+  boost::optional<ds::cache_vector> create_conditional(ds::block_vector& blocks,
+                                                       uint timestep,
+                                                       uint n_harvesters,
+                                                       uint n_collectors);
 
  private:
   /**
@@ -98,8 +99,21 @@ class static_cache_manager : public base_cache_manager,
    * size of the cache. If it returns \c TRUE, then the second parameter of the
    * pair is the vector of blocks to use for cache creation.
    */
-  block_calc_res_t calc_blocks_for_creation(ds::block_vector& blocks);
+  boost::optional<ds::block_vector> calc_blocks_for_creation(
+      ds::block_vector& blocks);
 
+  /**
+   * @brief Perform adjustments to blocks in the arena after creating caches.
+   *
+   * Any blocks that are under where the cache currently is (i.e. will be hidden
+   * by it) need to be added to the cache so that all blocks in the arena are
+   * accessible. This is generally only an issue at the start of simulation if
+   * random block distribution is used, but weird cases can arise due to task
+   * abort+block drop as well, so it is best to be safe and do it
+   * unconditionally after creation.
+   */
+  void post_creation_blocks_adjust(const ds::cache_vector& caches,
+                                   const ds::block_vector& blocks);
   /* clang-format off */
   const params::caches::caches_params mc_cache_params;
   const rmath::vector2d               mc_cache_loc;

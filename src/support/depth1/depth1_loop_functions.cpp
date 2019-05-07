@@ -265,10 +265,11 @@ void depth1_loop_functions::cache_handling_init(
     m_cache_manager = rcppsw::make_unique<static_cache_manager>(
         cachep, &arena_map()->decoratee(), cache_loc);
 
-    /* return value ignored at this level (for now...) */
-    auto ret = m_cache_manager->create(arena_map()->blocks(),
-                                       GetSpace().GetSimulationClock());
-    arena_map()->caches_add(ret.caches);
+    if (auto created = m_cache_manager->create(arena_map()->blocks(),
+                                                GetSpace().GetSimulationClock())) {
+      arena_map()->caches_add(*created);
+      floor()->SetChanged();
+    }
   }
 } /* cache_handling_init() */
 
@@ -417,10 +418,9 @@ void depth1_loop_functions::Reset() {
   base_loop_functions::Reset();
   m_metrics_agg->reset_all();
 
-  auto ret = m_cache_manager->create(arena_map()->blocks(),
-                                     GetSpace().GetSimulationClock());
-  if (ret.status) {
-    arena_map()->caches_add(ret.caches);
+  if (auto created = m_cache_manager->create(arena_map()->blocks(),
+                                             GetSpace().GetSimulationClock())) {
+    arena_map()->caches_add(*created);
     floor()->SetChanged();
   }
   ndc_pop();
@@ -459,13 +459,12 @@ void depth1_loop_functions::static_cache_monitor(void) {
     counts.second += res.second;
   } /* for(&entity..) */
 
-  auto ret = m_cache_manager->create_conditional(arena_map()->blocks(),
-                                                 GetSpace().GetSimulationClock(),
-                                                 counts.first,
-                                                 counts.second);
-
-  if (ret.status) {
-    arena_map()->caches_add(ret.caches);
+  auto created = m_cache_manager->create_conditional(arena_map()->blocks(),
+                                                     GetSpace().GetSimulationClock(),
+                                                     counts.first,
+                                                     counts.second);
+  if (created) {
+    arena_map()->caches_add(*created);
     __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
         arena_map()->caches()[0]->discrete_loc());
     ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),

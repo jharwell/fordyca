@@ -27,6 +27,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <boost/optional.hpp>
 
 #include "fordyca/params/caches/caches_params.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
@@ -78,10 +79,10 @@ class dynamic_cache_manager : public base_cache_manager,
    * created. Non-fatal failures to create dynamic caches can occur if, for
    * example, all blocks are currently being carried by robots.
    */
-  creation_res_t create(const ds::cache_vector& existing_caches,
-                         const ds::const_block_cluster_list& clusters,
-                        ds::block_vector& blocks,
-                        uint timestep);
+  boost::optional<ds::cache_vector> create(const ds::cache_vector& existing_caches,
+                                           const ds::const_block_cluster_list& clusters,
+                                           ds::block_vector& blocks,
+                                           uint timestep);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches
@@ -113,7 +114,7 @@ class dynamic_cache_manager : public base_cache_manager,
    *
    * are eligible.
    */
-  block_calc_res_t calc_blocks_for_creation(
+  boost::optional<ds::block_vector> calc_blocks_for_creation(
       const ds::cache_vector& existing_caches,
       const ds::const_block_cluster_list& clusters,
       const ds::block_vector& blocks);

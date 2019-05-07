@@ -360,16 +360,17 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
     ER_INFO("Not performing dynamic cache creation: no robot block drop");
     return false;
   }
-  auto ret =
+  auto created =
       m_cache_manager->create(arena_map()->caches(),
                               arena_map()->block_distributor()->block_clusters(),
                               arena_map()->blocks(),
                               GetSpace().GetSimulationClock());
-  if (ret.status) {
-    arena_map()->caches_add(ret.caches);
+  if (created) {
+    arena_map()->caches_add(*created);
     floor()->SetChanged();
+    return true;
   }
-  return ret.status;
+  return false;
 } /* cache_creation_handle() */
 
 using namespace argos; // NOLINT

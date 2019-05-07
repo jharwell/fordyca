@@ -51,7 +51,7 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creation(
+boost::optional<ds::block_vector> static_cache_manager::calc_blocks_for_creation(
     ds::block_vector& blocks) {
   /*
    * Only blocks that are not:
@@ -73,7 +73,6 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
     }
   } /* for(b..) */
 
-  bool ret = true;
   if (to_use.size() < repr::base_cache::kMinBlocks) {
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
@@ -107,7 +106,7 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
               to_use.size() - count,
               to_use.size(),
               repr::base_cache::kMinBlocks);
-    ret = false;
+    return boost::optional<ds::block_vector>();
   }
   if (to_use.size() < mc_cache_params.static_.size) {
     ER_WARN(
@@ -117,12 +116,12 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
         dcenter.to_str().c_str(),
         to_use.size(),
         mc_cache_params.static_.size);
-    ret = false;
+    return boost::optional<ds::block_vector>();
   }
-  return block_calc_res_t{ret, to_use};
+  return boost::make_optional(to_use);
 } /* calc_blocks_for_creation() */
 
-base_cache_manager::creation_res_t static_cache_manager::create_conditional(
+boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
     ds::block_vector& blocks,
     uint timestep,
     uint n_harvesters,
@@ -133,11 +132,11 @@ base_cache_manager::creation_res_t static_cache_manager::create_conditional(
   if (p.calc(n_harvesters, n_collectors) >= dist(m_reng)) {
     return create(blocks, timestep);
   } else {
-    return creation_res_t{false, ds::cache_vector()};
+    return boost::optional<ds::cache_vector>();
   }
 } /* create_conditional() */
 
-base_cache_manager::creation_res_t static_cache_manager::create(
+boost::optional<ds::cache_vector> static_cache_manager::create(
     ds::block_vector& blocks,
     uint timestep) {
   ER_DEBUG("(Re)-Creating static cache");
@@ -146,11 +145,11 @@ base_cache_manager::creation_res_t static_cache_manager::create(
             mc_cache_params.static_.size,
             repr::base_cache::kMinBlocks);
 
-  auto ret = calc_blocks_for_creation(blocks);
-  if (!ret.status) {
+  auto to_use = calc_blocks_for_creation(blocks);
+  if (!to_use) {
     ER_WARN("Unable to create static cache @%s: Not enough free blocks",
             mc_cache_loc.to_str().c_str());
-    return creation_res_t{false, ds::cache_vector()};
+    return boost::optional<ds::cache_vector>();
   }
   ds::cache_vector created;
 
@@ -159,21 +158,27 @@ base_cache_manager::creation_res_t static_cache_manager::create(
                                                 mc_cache_params.dimension);
 
   /* no existing caches, so empty vector */
-  created = creator.create_all(ds::cache_vector(), ret.blocks, timestep);
+  created = creator.create_all(ds::cache_vector(), *to_use, timestep);
   ER_ASSERT(1 == created.size(),
             "Wrong # caches after static create: %zu",
             created.size());
   caches_created(1);
 
+
   /*
-   * Any blocks that are under where the cache currently is (i.e. will be
-   * hidden by it) need to be added to the cache so that there all blocks in the
-   * arena are accessible. This is generally only an issue at the start of
-   * simulation if random block distribution is used, but weird cases can arise
-   * due to task abort+block drop as well, so it is best to be safe.
+   * Fix hidden blocks and update host cells. Host cell updating must be second,
+   * otherwise the cache host cell will have a block as its entity!
    */
+  post_creation_blocks_adjust(created, blocks);
+  creator.update_host_cells(created);
+  return boost::make_optional(created);
+} /* create() */
+
+void static_cache_manager::post_creation_blocks_adjust(
+    const ds::cache_vector& caches,
+    const ds::block_vector& blocks) {
   for (auto& b : blocks) {
-    for (auto& c : created) {
+    for (auto& c : caches) {
       if (!c->contains_block(b) &&
           c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
@@ -189,13 +194,5 @@ base_cache_manager::creation_res_t static_cache_manager::create(
       }
     } /* for(&c..) */
   }   /* for(&b..) */
-
-  /*
-   * Must be after fixing hidden blocks, otherwise the cache host cell will
-   * have a block as its entity!
-   */
-  creator.update_host_cells(created);
-  return creation_res_t{true, created};
-} /* create() */
-
+} /* post_creation_blocks_adjust() */
 NS_END(depth1, support, fordyca);
