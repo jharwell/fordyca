@@ -91,8 +91,8 @@ class block_op_penalty_handler
                                 double block_prox_dist = -1) {
     auto filter = block_op_filter<T>(
         m_map)(controller, src, cache_prox_dist, block_prox_dist);
-    if (filter.status) {
-      return filter.reason;
+    if (filter != op_filter_status::ekSATISFIED) {
+      return filter;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot already serving block penalty?");
@@ -109,7 +109,7 @@ class block_op_penalty_handler
 
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));
-    return op_filter_status::ekSATISFIED;
+    return filter;
   }
 
  protected:

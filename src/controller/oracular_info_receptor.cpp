@@ -135,11 +135,11 @@ void oracular_info_receptor::int_est_update(rta::polled_task* const task) {
           task->task_interface_estimate(0).last_result());
 } /* int_est_update() */
 
-bool oracular_info_receptor::entities_blocks_enabled(void) const {
+__rcsw_pure bool oracular_info_receptor::entities_blocks_enabled(void) const {
   return m_entities_oracle->blocks_enabled();
 } /* entities_blocks_enabled() */
 
-bool oracular_info_receptor::entities_caches_enabled(void) const {
+__rcsw_pure bool oracular_info_receptor::entities_caches_enabled(void) const {
   return m_entities_oracle->caches_enabled();
 } /* entities_blocks_enabled() */
 

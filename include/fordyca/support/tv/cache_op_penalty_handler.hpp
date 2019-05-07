@@ -88,8 +88,8 @@ class cache_op_penalty_handler
      * not, nothing to do.
      */
     auto filter = cache_op_filter<T>(m_map)(controller, src);
-    if (filter.status) {
-      return filter.reason;
+    if (filter != op_filter_status::ekSATISFIED) {
+      return filter;
     }
 
     ER_ASSERT(!is_serving_penalty(controller),
@@ -108,7 +108,7 @@ class cache_op_penalty_handler
 
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));
-    return op_filter_status::ekSATISFIED;
+    return filter;
   }
 
  protected:

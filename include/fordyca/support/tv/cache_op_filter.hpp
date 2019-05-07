@@ -54,22 +54,6 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 template <typename T>
 class cache_op_filter : public rer::client<cache_op_filter<T>> {
  public:
-  /**
-   * @brief The result of checking a controller instance to see if it has
-   * satisfied the preconditions for a cache operation (pickup/drop/etc).
-   *
-   * If \c TRUE, then the controller should be filtered out and has NOT
-   * satisfied the preconditions. In this case, the reason is set to indicate
-   * why it failed the preconditions.
-   *
-   * If \c FALSE, then the controller should NOT be filtered out, and has
-   * satisfied the preconditions. reason is undefined in this case.
-   */
-  struct filter_res_t {
-    bool status;
-    op_filter_status reason;
-  };
-
   explicit cache_op_filter(ds::arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.cache_op_filter"), m_map(map) {}
 
@@ -80,11 +64,8 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
   /**
    * @brief Filters out controllers that actually are not eligible to start
    * serving penalties.
-   *
-   * @return (\c TRUE, status) iff the controller should be filtered out
-   * and the reason why. (\c FALSE, -1) otherwise.
    */
-  filter_res_t operator()(T& controller, cache_op_src src) {
+  op_filter_status operator()(T& controller, cache_op_src src) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a cache but is still
@@ -97,7 +78,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", static_cast<int>(src));
     } /* switch() */
-    return filter_res_t{};
+    return op_filter_status{};
   }
 
  private:
@@ -107,16 +88,16 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * use an existing cache).
    *
    */
-  filter_res_t do_filter(const T& controller) const {
+  op_filter_status do_filter(const T& controller) const {
     int cache_id = loop_utils::robot_on_cache(controller, *m_map);
     bool ready = (controller.goal_acquired() &&
                   acquisition_goal_type::ekEXISTING_CACHE ==
                       controller.acquisition_goal() &&
                   -1 != cache_id);
     if (ready) {
-      return filter_res_t{false, op_filter_status::ekSATISFIED};
+      return op_filter_status::ekSATISFIED;
     }
-    return filter_res_t{true, op_filter_status::ekROBOT_INTERNAL_UNREADY};
+    return op_filter_status::ekROBOT_INTERNAL_UNREADY;
   }
 
   /* clang-format off */
