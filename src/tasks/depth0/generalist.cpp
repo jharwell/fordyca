@@ -106,4 +106,16 @@ TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
                          static_cast<fsm::depth0::free_block_to_nest_fsm*>(
                              polled_task::mechanism()));
 
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         generalist,
+                         current_explore_loc,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         generalist,
+                         current_vector_loc,
+                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+
 NS_END(depth0, tasks, fordyca);

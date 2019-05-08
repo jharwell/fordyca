@@ -150,6 +150,8 @@ class acquire_goal_fsm : public base_foraging_fsm,
   bool goal_acquired(void) const override;
   acquisition_goal_type acquisition_goal(void) const override;
   rmath::vector2u acquisition_loc(void) const override;
+  rmath::vector2u current_explore_loc(void) const override;
+  rmath::vector2u current_vector_loc(void) const override;
 
   /**
    * @brief Reset the FSM

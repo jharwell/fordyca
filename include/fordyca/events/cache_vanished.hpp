@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,17 +49,17 @@ NS_START(fordyca, events, detail);
 class cache_vanished : public rer::client<cache_vanished> {
  private:
   struct visit_typelist_impl {
-    using controllers = boost::mpl::joint_view<controller::depth1::typelist::type,
-                                               controller::depth2::typelist::type>;
+    using controllers =
+        boost::mpl::joint_view<controller::depth1::typelist::type,
+                               controller::depth2::typelist::type>;
     using tasks = rmpl::typelist<tasks::depth1::collector,
                                  tasks::depth1::harvester,
                                  tasks::depth2::cache_transferer>;
     using fsms = rmpl::typelist<fsm::block_to_goal_fsm,
                                 fsm::depth1::cached_block_to_nest_fsm>;
-    using value = boost::mpl::joint_view<
-      boost::mpl::joint_view<tasks::type,
-                             fsms::type>,
-      controllers::type>;
+    using value =
+        boost::mpl::joint_view<boost::mpl::joint_view<tasks::type, fsms::type>,
+                               controllers::type>;
   };
 
  public:

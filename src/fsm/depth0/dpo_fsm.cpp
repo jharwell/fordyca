@@ -124,6 +124,16 @@ FSM_OVERRIDE_DEF(transport_goal_type,
                  const);
 FSM_OVERRIDE_DEF(bool, dpo_fsm, goal_acquired, m_block_fsm, const);
 FSM_OVERRIDE_DEF(rmath::vector2u, dpo_fsm, acquisition_loc, m_block_fsm, const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 dpo_fsm,
+                 current_explore_loc,
+                 m_block_fsm,
+                 const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 dpo_fsm,
+                 current_vector_loc,
+                 m_block_fsm,
+                 const);
 
 /*******************************************************************************
  * General Member Functions

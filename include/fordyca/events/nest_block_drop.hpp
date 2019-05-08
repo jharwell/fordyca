@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,26 +50,21 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   struct visit_typelist_impl {
     using inherited = block_drop_base_visit_typelist;
     using controllers = boost::mpl::joint_view<
-      boost::mpl::joint_view<controller::depth0::typelist,
-                             controller::depth1::typelist>,
-      controller::depth2::typelist>;
+        boost::mpl::joint_view<controller::depth0::typelist,
+                               controller::depth1::typelist>,
+        controller::depth2::typelist>;
 
-    using fsms = rmpl::typelist<
-      fsm::depth0::crw_fsm,
-      fsm::depth0::dpo_fsm,
-      fsm::depth0::free_block_to_nest_fsm,
-      fsm::depth1::cached_block_to_nest_fsm>;
-    using tasks = rmpl::typelist<tasks::depth0::generalist,
-                                 tasks::depth1::collector>;
+    using fsms = rmpl::typelist<fsm::depth0::crw_fsm,
+                                fsm::depth0::dpo_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
+                                fsm::depth1::cached_block_to_nest_fsm>;
+    using tasks =
+        rmpl::typelist<tasks::depth0::generalist, tasks::depth1::collector>;
 
     using value = boost::mpl::joint_view<
-      boost::mpl::joint_view<
-        boost::mpl::joint_view<controllers::type,
-                               tasks::type>,
-        fsms::type>,
-      boost::mpl::joint_view<inherited::type,
-                             controllers::type>
-      >;
+        boost::mpl::joint_view<boost::mpl::joint_view<controllers::type, tasks::type>,
+                               fsms::type>,
+        boost::mpl::joint_view<inherited::type, controllers::type> >;
   };
 
  public:

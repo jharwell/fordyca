@@ -169,6 +169,17 @@ FSM_OVERRIDE_DEF(rmath::vector2u,
                  m_block_fsm,
                  const);
 
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 free_block_to_nest_fsm,
+                 current_explore_loc,
+                 m_block_fsm,
+                 const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 free_block_to_nest_fsm,
+                 current_vector_loc,
+                 m_block_fsm,
+                 const);
+
 acquisition_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (kST_ACQUIRE_BLOCK == current_state() ||
       kST_WAIT_FOR_PICKUP == current_state()) {

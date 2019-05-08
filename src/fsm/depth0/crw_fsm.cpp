@@ -138,6 +138,15 @@ rmath::vector2u crw_fsm::acquisition_loc(void) const {
   return saa_subsystem()->sensing()->discrete_position();
 } /* acquisition_loc() */
 
+rmath::vector2u crw_fsm::current_explore_loc(void) const {
+  return saa_subsystem()->sensing()->discrete_position();
+} /* current_explore_loc() */
+
+rmath::vector2u crw_fsm::current_vector_loc(void) const {
+  ER_FATAL_SENTINEL("CRW_FSM current vector location undefined");
+  return saa_subsystem()->sensing()->discrete_position();
+} /* current_vector_loc() */
+
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/

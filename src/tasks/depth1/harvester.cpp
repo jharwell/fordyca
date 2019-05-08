@@ -153,6 +153,18 @@ TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
                          static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
                              polled_task::mechanism()));
 
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         harvester,
+                         current_explore_loc,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         harvester,
+                         current_vector_loc,
+                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()));
+
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/

@@ -1,7 +1,7 @@
 /**
- * @file block_pickup_base_visit_set.hpp
+ * @file current_vector_loc_metrics_collector.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,43 +18,26 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_
-#define INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/mpl/typelist.hpp"
+#include "fordyca/metrics/fsm/current_vector_loc_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace repr {
-class base_block;
-} // namespace repr
-
-namespace ds {
-class arena_map;
-class dpo_semantic_map;
-class dpo_store;
-} // namespace ds
-
-NS_START(events, detail);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @ingroup fordyca events detail
- *
- * @brief Interface specifying the core class of classes any action involving
- * dropping a block will need to visit (think data structures).
- */
-using block_pickup_base_visit_typelist = rmpl::
-    typelist<ds::arena_map, ds::dpo_semantic_map, ds::dpo_store, repr::base_block>;
-NS_END(detail, events, fordyca);
+uint current_vector_loc_metrics_collector::collect_cell(
+    const rmetrics::base_metrics& metrics,
+    const rmath::vector2u& coord) const {
+  auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_ */
+  return static_cast<uint>(m.current_vector_loc() == coord);
+} /* collect_cell() */
+
+NS_END(fsm, metrics, fordyca);

@@ -110,15 +110,32 @@ void depth0_metrics_aggregator::collect_from_controller(
   collect("blocks::manipulation", *manip_m);
   collect("blocks::acq_counts", *block_acq_m);
 
-  collect_if(
-      "blocks::acq_locs",
-      *block_acq_m,
-      [&](const rmetrics::base_metrics& metrics) {
-        auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-            metrics);
-        return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
-            m.goal_acquired();
-      });
+  collect_if("blocks::acq_locs",
+             *block_acq_m,
+             [&](const rmetrics::base_metrics& metrics) {
+               auto& m =
+                   dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                       metrics);
+               return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+                      m.goal_acquired();
+             });
+
+  collect_if("blocks::acq_explore_locs",
+             *block_acq_m,
+             [&](const rmetrics::base_metrics& metrics) {
+               auto& m =
+                   dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                       metrics);
+               return m.is_exploring_for_goal();
+             });
+  collect_if("blocks::acq_vector_locs",
+             *block_acq_m,
+             [&](const rmetrics::base_metrics& metrics) {
+               auto& m =
+                   dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                       metrics);
+               return m.is_vectoring_to_goal();
+             });
   /*
    * Only controllers with MDPO perception provide these.
    */

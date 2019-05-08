@@ -75,9 +75,8 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_s
   controller::depth2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
-  if (auto best = selector(mc_store->blocks(),
-                           mc_store->caches(),
-                           sensors()->position())) {
+  if (auto best = selector(
+          mc_store->blocks(), mc_store->caches(), sensors()->position())) {
     ER_INFO("Select new cache%d@%s/%s, utility=%f for acquisition",
             best->ent()->id(),
             best->ent()->real_loc().to_str().c_str(),

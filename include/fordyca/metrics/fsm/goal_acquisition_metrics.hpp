@@ -91,6 +91,18 @@ class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
    * the location of the goal that was acquired.
    */
   virtual rmath::vector2u acquisition_loc(void) const = 0;
+
+  /**
+   * @brief When \ref is_exploring_for_goal() returns \c TRUE, then this should
+   * return the robot's current position as it explores for its goal.
+   */
+  virtual rmath::vector2u current_explore_loc(void) const = 0;
+
+  /**
+   * @brief When \ref is_vectoring_to_goal() returns \c TRUE, then this should
+   * return the robot's current position as it vectors to its goal.
+   */
+  virtual rmath::vector2u current_vector_loc(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

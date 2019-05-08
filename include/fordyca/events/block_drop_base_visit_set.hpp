@@ -51,8 +51,8 @@ NS_START(events, detail);
  * @brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).
  */
-using block_drop_base_visit_typelist = rmpl::typelist<ds::arena_map,
-                                                      repr::base_block>;
+using block_drop_base_visit_typelist =
+    rmpl::typelist<ds::arena_map, repr::base_block>;
 
 NS_END(detail, events, fordyca);
 

@@ -69,6 +69,8 @@ class crw_fsm : public base_foraging_fsm,
   FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
   FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
   FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

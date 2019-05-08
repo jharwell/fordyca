@@ -165,10 +165,19 @@ FSM_OVERRIDE_DEF(acquisition_goal_type,
                  const);
 
 FSM_OVERRIDE_DEF(rmath::vector2u, dpo_controller, acquisition_loc, *m_fsm, const);
-
 FSM_OVERRIDE_DEF(bool, dpo_controller, goal_acquired, *m_fsm, const);
 FSM_OVERRIDE_DEF(bool, dpo_controller, is_exploring_for_goal, *m_fsm, const);
 FSM_OVERRIDE_DEF(bool, dpo_controller, is_vectoring_to_goal, *m_fsm, const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 dpo_controller,
+                 current_vector_loc,
+                 *m_fsm,
+                 const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 dpo_controller,
+                 current_explore_loc,
+                 *m_fsm,
+                 const);
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

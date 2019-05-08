@@ -46,10 +46,14 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
     XML_PARSE_ATTR(mnode, m_params, block_transport_fname);
     XML_PARSE_ATTR(mnode, m_params, block_acq_locs_fname);
+    XML_PARSE_ATTR(mnode, m_params, block_acq_explore_locs_fname);
+    XML_PARSE_ATTR(mnode, m_params, block_acq_vector_locs_fname);
     XML_PARSE_ATTR(mnode, m_params, block_acq_counts_fname);
     XML_PARSE_ATTR(mnode, m_params, block_manipulation_fname);
 
     XML_PARSE_ATTR(mnode, m_params, cache_acq_locs_fname);
+    XML_PARSE_ATTR(mnode, m_params, cache_acq_explore_locs_fname);
+    XML_PARSE_ATTR(mnode, m_params, cache_acq_vector_locs_fname);
     XML_PARSE_ATTR(mnode, m_params, cache_acq_counts_fname);
     XML_PARSE_ATTR(mnode, m_params, cache_utilization_fname);
     XML_PARSE_ATTR(mnode, m_params, cache_lifecycle_fname);

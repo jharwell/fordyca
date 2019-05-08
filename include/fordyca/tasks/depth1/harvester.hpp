@@ -77,6 +77,8 @@ class harvester : public foraging_task,
   TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
   TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
   TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
+  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_explore_loc);
+  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_vector_loc);
 
   /* block transportation */
   TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);

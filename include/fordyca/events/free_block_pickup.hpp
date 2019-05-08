@@ -27,9 +27,9 @@
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,32 +49,28 @@ NS_START(fordyca, events, detail);
 class free_block_pickup : public rer::client<free_block_pickup>, public cell_op {
  private:
   struct visit_typelist_impl {
-  using inherited = boost::mpl::joint_view<block_pickup_base_visit_typelist,
-                                           cell_op::visit_typelist>;
-  using controllers = boost::mpl::joint_view<
-    boost::mpl::joint_view<controller::depth0::typelist,
-                           controller::depth1::typelist>,
-    controller::depth2::typelist>;
-  using tasks = rmpl::typelist<tasks::depth0::generalist,
-                               tasks::depth1::harvester,
-                               tasks::depth2::cache_starter,
-                               tasks::depth2::cache_finisher>;
-  using fsms = rmpl::typelist<fsm::depth0::crw_fsm,
-                              fsm::depth0::dpo_fsm,
-                              fsm::depth0::free_block_to_nest_fsm,
-                              fsm::block_to_goal_fsm>;
-  using value = boost::mpl::joint_view<
-    boost::mpl::joint_view<
-    boost::mpl::joint_view<controllers::type,
-                           tasks::type>,
-    fsms::type>,
-    boost::mpl::joint_view<inherited::type,
-                           controllers::type>
-    >;
+    using inherited = boost::mpl::joint_view<block_pickup_base_visit_typelist,
+                                             cell_op::visit_typelist>;
+    using controllers = boost::mpl::joint_view<
+        boost::mpl::joint_view<controller::depth0::typelist,
+                               controller::depth1::typelist>,
+        controller::depth2::typelist>;
+    using tasks = rmpl::typelist<tasks::depth0::generalist,
+                                 tasks::depth1::harvester,
+                                 tasks::depth2::cache_starter,
+                                 tasks::depth2::cache_finisher>;
+    using fsms = rmpl::typelist<fsm::depth0::crw_fsm,
+                                fsm::depth0::dpo_fsm,
+                                fsm::depth0::free_block_to_nest_fsm,
+                                fsm::block_to_goal_fsm>;
+    using value = boost::mpl::joint_view<
+        boost::mpl::joint_view<boost::mpl::joint_view<controllers::type, tasks::type>,
+                               fsms::type>,
+        boost::mpl::joint_view<inherited::type, controllers::type> >;
   };
 
  public:
-    using visit_typelist = visit_typelist_impl::value;
+  using visit_typelist = visit_typelist_impl::value;
 
   free_block_pickup(const std::shared_ptr<repr::base_block>& block,
                     uint robot_index,

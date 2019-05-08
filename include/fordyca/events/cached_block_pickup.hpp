@@ -27,9 +27,9 @@
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,25 +64,26 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
                             public cell_op {
  private:
   struct visit_typelist_impl {
-    using inherited = boost::mpl::joint_view<cell_op::visit_typelist::type,
-                                             block_pickup_base_visit_typelist::type>;
-    using controllers = boost::mpl::joint_view<controller::depth1::typelist::type,
-                                               controller::depth2::typelist::type>;
+    using inherited =
+        boost::mpl::joint_view<cell_op::visit_typelist::type,
+                               block_pickup_base_visit_typelist::type>;
+    using controllers =
+        boost::mpl::joint_view<controller::depth1::typelist::type,
+                               controller::depth2::typelist::type>;
     using others = rmpl::typelist<
-      /* depth1 */
-      fsm::block_to_goal_fsm,
-      fsm::depth1::cached_block_to_nest_fsm,
-      tasks::depth1::collector,
-      support::base_cache_manager,
-      /* depth2 */
-      tasks::depth2::cache_transferer,
-      tasks::depth2::cache_collector,
-      repr::arena_cache>;
+        /* depth1 */
+        fsm::block_to_goal_fsm,
+        fsm::depth1::cached_block_to_nest_fsm,
+        tasks::depth1::collector,
+        support::base_cache_manager,
+        /* depth2 */
+        tasks::depth2::cache_transferer,
+        tasks::depth2::cache_collector,
+        repr::arena_cache>;
 
-    using value = boost::mpl::joint_view<
-      boost::mpl::joint_view<inherited,
-                             controllers>,
-      others::type>;
+    using value =
+        boost::mpl::joint_view<boost::mpl::joint_view<inherited, controllers>,
+                               others::type>;
   };
 
  public:

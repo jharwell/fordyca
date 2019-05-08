@@ -139,6 +139,14 @@ rmath::vector2u acquire_goal_fsm::acquisition_loc(void) const {
   return saa_subsystem()->sensing()->discrete_position();
 } /* acquisition_loc() */
 
+rmath::vector2u acquire_goal_fsm::current_explore_loc(void) const {
+  return saa_subsystem()->sensing()->discrete_position();
+} /* current_explore_loc() */
+
+rmath::vector2u acquire_goal_fsm::current_vector_loc(void) const {
+  return saa_subsystem()->sensing()->discrete_position();
+} /* current_vector_loc() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/

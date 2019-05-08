@@ -63,9 +63,8 @@ class block_found : public rer::client<block_found>, public cell_op {
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
 
     using value = boost::mpl::joint_view<
-      boost::mpl::joint_view<inherited::type,
-                             controllers::type>::type,
-      others::type>;
+        boost::mpl::joint_view<inherited::type, controllers::type>::type,
+        others::type>;
   };
 
  public:

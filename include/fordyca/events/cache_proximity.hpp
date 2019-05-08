@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,12 +54,11 @@ class cache_proximity : public rer::client<cache_proximity> {
  private:
   struct visit_typelist_impl {
     using others = rmpl::typelist<tasks::depth2::cache_finisher,
-                                 tasks::depth2::cache_starter,
-                                 fsm::block_to_goal_fsm>;
-    using value = boost::mpl::joint_view<controller::depth2::typelist::type,
-                                         others::type>;
+                                  tasks::depth2::cache_starter,
+                                  fsm::block_to_goal_fsm>;
+    using value =
+        boost::mpl::joint_view<controller::depth2::typelist::type, others::type>;
   };
-
 
  public:
   using visit_typelist = visit_typelist_impl::value;

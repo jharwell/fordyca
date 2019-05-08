@@ -80,10 +80,10 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
             best.ent()->real_loc().to_str().c_str(),
             best.ent()->discrete_loc().to_str().c_str(),
             max_utility);
-    return boost::optional<ds::dp_block_map::value_type>();
+    return boost::make_optional(best);
   } else {
     ER_WARN("No best new cache found: all known new caches excluded!");
-        return boost::make_optional(best);
+    return boost::optional<ds::dp_block_map::value_type>();
   }
 } /* operator() */
 

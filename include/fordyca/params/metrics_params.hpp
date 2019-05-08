@@ -47,11 +47,15 @@ struct metrics_params : public rparams::base_params {
 
   std::string block_acq_counts_fname{};
   std::string block_acq_locs_fname{};
+  std::string block_acq_explore_locs_fname{};
+  std::string block_acq_vector_locs_fname{};
   std::string block_transport_fname{};
   std::string block_manipulation_fname{};
 
   std::string cache_acq_counts_fname{};
   std::string cache_acq_locs_fname{};
+  std::string cache_acq_explore_locs_fname{};
+  std::string cache_acq_vector_locs_fname{};
   std::string cache_utilization_fname{};
   std::string cache_lifecycle_fname{};
   std::string cache_locations_fname{};

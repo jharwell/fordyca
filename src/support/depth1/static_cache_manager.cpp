@@ -164,7 +164,6 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
             created.size());
   caches_created(1);
 
-
   /*
    * Fix hidden blocks and update host cells. Host cell updating must be second,
    * otherwise the cache host cell will have a block as its entity!

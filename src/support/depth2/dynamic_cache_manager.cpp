@@ -53,13 +53,13 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
     const ds::const_block_cluster_list& clusters,
     ds::block_vector& blocks,
     uint timestep) {
-  if (auto to_use = calc_blocks_for_creation(existing_caches, clusters,
-                                             blocks)) {
+  if (auto to_use =
+          calc_blocks_for_creation(existing_caches, clusters, blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
-      .grid = arena_grid(),
-      .cache_dim = mc_cache_params.dimension,
-      .min_dist = mc_cache_params.dynamic.min_dist,
-      .min_blocks = mc_cache_params.dynamic.min_blocks};
+        .grid = arena_grid(),
+        .cache_dim = mc_cache_params.dimension,
+        .min_dist = mc_cache_params.dynamic.min_dist,
+        .min_blocks = mc_cache_params.dynamic.min_blocks};
     support::depth2::dynamic_cache_creator creator(&params);
 
     ds::cache_vector created =
@@ -83,31 +83,24 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
     const ds::block_vector& blocks) {
   ds::block_vector to_use;
   auto filter = [&](const auto& b) {
-                 /* Blocks cannot be in existing caches */
-                 return std::all_of(existing_caches.begin(),
-                                    existing_caches.end(),
-                                    [&](const auto& c) {
-                                      return !c->contains_block(b);
-                                    }) &&
+    /* Blocks cannot be in existing caches */
+    return std::all_of(existing_caches.begin(),
+                       existing_caches.end(),
+                       [&](const auto& c) { return !c->contains_block(b); }) &&
 
-                        /* blocks cannot be in clusters */
-                        std::all_of(clusters.begin(),
-                                    clusters.end(),
-                                    [&](const auto& clust) {
-                                      /* constructed, so must assign before search */
-                                      auto cblocks = clust->blocks();
-                                      return cblocks.end() ==
-                                             std::find(cblocks.begin(),
-                                                       cblocks.end(),
-                                                       b);
-                                    }) &&
-                        /* blocks cannot be carried by a robot */
-                 -1 == b->robot_id();
+           /* blocks cannot be in clusters */
+           std::all_of(clusters.begin(),
+                       clusters.end(),
+                       [&](const auto& clust) {
+                         /* constructed, so must assign before search */
+                         auto cblocks = clust->blocks();
+                         return cblocks.end() ==
+                                std::find(cblocks.begin(), cblocks.end(), b);
+                       }) &&
+           /* blocks cannot be carried by a robot */
+           -1 == b->robot_id();
   };
-  std::copy_if(blocks.begin(),
-               blocks.end(),
-               std::back_inserter(to_use),
-               filter);
+  std::copy_if(blocks.begin(), blocks.end(), std::back_inserter(to_use), filter);
 
   if (to_use.size() < mc_cache_params.dynamic.min_blocks) {
     /*

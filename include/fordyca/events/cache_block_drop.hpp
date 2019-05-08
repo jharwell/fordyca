@@ -27,10 +27,10 @@
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,22 +70,21 @@ class cache_block_drop : public rer::client<cache_block_drop>,
     using inherited = boost::mpl::joint_view<block_drop_base_visit_typelist,
                                              cell_op::visit_typelist>;
 
-    using controllers =  boost::mpl::joint_view<controller::depth1::typelist,
-                                                controller::depth2::typelist>;
+    using controllers = boost::mpl::joint_view<controller::depth1::typelist,
+                                               controller::depth2::typelist>;
 
     using others = rmpl::typelist<
-      /* depth1 */
-      fsm::block_to_goal_fsm,
-      ds::dpo_semantic_map,
-      repr::arena_cache,
-      tasks::depth1::harvester,
-      /* depth2 */
-      tasks::depth2::cache_transferer>;
+        /* depth1 */
+        fsm::block_to_goal_fsm,
+        ds::dpo_semantic_map,
+        repr::arena_cache,
+        tasks::depth1::harvester,
+        /* depth2 */
+        tasks::depth2::cache_transferer>;
 
     using value = boost::mpl::joint_view<
-      boost::mpl::joint_view<inherited::type,
-                             controllers::type>,
-      others::type>;
+        boost::mpl::joint_view<inherited::type, controllers::type>,
+        others::type>;
   };
 
  public:

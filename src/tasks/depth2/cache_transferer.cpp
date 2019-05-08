@@ -143,4 +143,16 @@ TASK_WRAPPER_DEFINEC_PTR(
     acquisition_loc,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
 
+TASK_WRAPPER_DEFINEC_PTR(
+    rmath::vector2u,
+    cache_transferer,
+    current_vector_loc,
+    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(
+    rmath::vector2u,
+    cache_transferer,
+    current_explore_loc,
+    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()));
+
 NS_END(depth2, tasks, fordyca);

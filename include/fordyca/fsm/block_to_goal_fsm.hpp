@@ -92,6 +92,8 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
   FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /**
    * @brief Reset the FSM

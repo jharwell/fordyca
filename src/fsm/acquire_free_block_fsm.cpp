@@ -94,7 +94,6 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
     block_select(void) const {
   controller::block_selector selector(mc_matrix);
 
-
   if (auto best = selector(mc_store->blocks(),
                            saa_subsystem()->sensing()->position())) {
     return boost::make_optional(

@@ -59,9 +59,8 @@ class cell_empty : public cell_op, public rer::client<cell_empty> {
  private:
   struct visit_typelist_impl {
     using inherited = cell_op::visit_typelist;
-    using others = rmpl::typelist<ds::arena_map,
-                                  ds::occupancy_grid,
-                                  ds::dpo_semantic_map>;
+    using others =
+        rmpl::typelist<ds::arena_map, ds::occupancy_grid, ds::dpo_semantic_map>;
     using value = boost::mpl::joint_view<inherited::type, others::type>;
   };
 

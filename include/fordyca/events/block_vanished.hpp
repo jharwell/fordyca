@@ -26,15 +26,14 @@
  ******************************************************************************/
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
 
 NS_START(events, detail);
 
@@ -53,9 +52,9 @@ class block_vanished : public rer::client<block_vanished> {
  private:
   struct visit_typelist_impl {
     using controllers = boost::mpl::joint_view<
-     boost::mpl::joint_view<controller::depth0::typelist,
-                            controller::depth1::typelist>,
-     controller::depth2::typelist>;
+        boost::mpl::joint_view<controller::depth0::typelist,
+                               controller::depth1::typelist>,
+        controller::depth2::typelist>;
     using tasks = rmpl::typelist<tasks::depth0::generalist,
                                  tasks::depth1::harvester,
                                  tasks::depth2::cache_starter,
@@ -66,9 +65,8 @@ class block_vanished : public rer::client<block_vanished> {
                                 fsm::block_to_goal_fsm>;
 
     using value = boost::mpl::joint_view<
-      boost::mpl::joint_view<controllers::type,
-                             tasks::type>,
-      fsms::type>;
+        boost::mpl::joint_view<controllers::type, tasks::type>,
+        fsms::type>;
   };
 
  public:

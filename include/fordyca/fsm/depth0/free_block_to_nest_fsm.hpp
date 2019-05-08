@@ -37,7 +37,6 @@
 NS_START(fordyca);
 
 namespace ds { class dpo_semantic_map; }
-namespace rta = rcppsw::ta;
 
 NS_START(fsm, depth0);
 
@@ -85,6 +84,9 @@ class free_block_to_nest_fsm : public base_foraging_fsm,
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+
   bool goal_acquired(void) const override;
   acquisition_goal_type acquisition_goal(void) const override;
 

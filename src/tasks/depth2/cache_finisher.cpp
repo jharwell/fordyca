@@ -123,6 +123,18 @@ TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
                          static_cast<fsm::depth2::block_to_new_cache_fsm*>(
                              polled_task::mechanism()));
 
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         cache_finisher,
+                         current_explore_loc,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         cache_finisher,
+                         current_vector_loc,
+                         static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()));
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/

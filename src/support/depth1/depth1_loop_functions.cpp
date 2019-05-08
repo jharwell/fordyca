@@ -215,7 +215,8 @@ void depth1_loop_functions::private_init(void) {
   m_metric_extractor_map = rcppsw::make_unique<metric_extractor_map_type>();
   m_los_update_map = rcppsw::make_unique<los_updater_map_type>();
   m_task_extractor_map = rcppsw::make_unique<task_extractor_map_type>();
-  m_subtask_status_map = rcppsw::make_unique<detail::d1_subtask_status_map_type>();
+  m_subtask_status_map =
+      rcppsw::make_unique<detail::d1_subtask_status_map_type>();
 
   /* only needed for initialization, so not a member */
   auto config_map = configurer_map_type();
@@ -265,8 +266,8 @@ void depth1_loop_functions::cache_handling_init(
     m_cache_manager = rcppsw::make_unique<static_cache_manager>(
         cachep, &arena_map()->decoratee(), cache_loc);
 
-    if (auto created = m_cache_manager->create(arena_map()->blocks(),
-                                                GetSpace().GetSimulationClock())) {
+    if (auto created = m_cache_manager->create(
+            arena_map()->blocks(), GetSpace().GetSimulationClock())) {
       arena_map()->caches_add(*created);
       floor()->SetChanged();
     }
@@ -459,10 +460,11 @@ void depth1_loop_functions::static_cache_monitor(void) {
     counts.second += res.second;
   } /* for(&entity..) */
 
-  auto created = m_cache_manager->create_conditional(arena_map()->blocks(),
-                                                     GetSpace().GetSimulationClock(),
-                                                     counts.first,
-                                                     counts.second);
+  auto created =
+      m_cache_manager->create_conditional(arena_map()->blocks(),
+                                          GetSpace().GetSimulationClock(),
+                                          counts.first,
+                                          counts.second);
   if (created) {
     arena_map()->caches_add(*created);
     __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(

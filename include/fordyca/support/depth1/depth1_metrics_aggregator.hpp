@@ -148,16 +148,17 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
       auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
           dynamic_cast<const rta::polled_task*>(controller->current_task())
           ->mechanism());
-      auto block_acq_m =
+      auto acq_m =
           dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
               dynamic_cast<const rta::polled_task*>(controller->current_task())
               ->mechanism());
+
       auto dist_m = dynamic_cast<const rmetrics::tasks::bi_tdgraph_metrics*>(
           controller);
 
 
-      ER_ASSERT(block_acq_m,
-                "Task does not provide FSM block acquisition metrics");
+      ER_ASSERT(acq_m,
+                "Task does not provide FSM acquisition metrics");
       ER_ASSERT(collision_m, "FSM does not provide collision metrics");
       ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
 
@@ -181,10 +182,29 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
             return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
                 m.goal_acquired();
           });
+
+      collect_if(
+          "blocks::acq_explore_locs",
+          *acq_m,
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+                m.is_exploring_for_goal();
+          });
+      collect_if(
+          "blocks::acq_vector_locs",
+          *acq_m,
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+                m.is_vectoring_to_goal();
+          });
+
       collect_if(
           "caches::acq_counts",
-          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-              controller->current_task()),
+          *acq_m,
           [&](const rmetrics::base_metrics& metrics) {
             auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
                 metrics);
@@ -192,13 +212,31 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
           });
       collect_if(
           "caches::acq_locs",
-          *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-              controller->current_task()),
+          *acq_m,
           [&](const rmetrics::base_metrics& metrics) {
             auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
                 metrics);
             return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
                 m.goal_acquired();
+          });
+
+      collect_if(
+          "caches::acq_explore_locs",
+          *acq_m,
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
+                m.is_exploring_for_goal();
+          });
+      collect_if(
+          "caches::acq_vector_locs",
+          *acq_m,
+          [&](const rmetrics::base_metrics& metrics) {
+            auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+                metrics);
+            return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
+                m.is_vectoring_to_goal();
           });
       collect("tasks::distribution", *dist_m);
     }

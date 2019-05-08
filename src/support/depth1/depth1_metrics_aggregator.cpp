@@ -28,10 +28,12 @@
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/location_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/acquisition_loc_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
+#include "fordyca/metrics/fsm/current_explore_loc_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/current_vector_loc_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/acquisition_loc_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/params/metrics_params.hpp"
 
@@ -64,7 +66,6 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
     const std::string& output_root)
     : depth0_metrics_aggregator(mparams, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
-
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acq_counts",
       metrics_path() + "/" + mparams->cache_acq_counts_fname,
@@ -72,6 +73,19 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
   register_collector<metrics::fsm::acquisition_loc_metrics_collector>(
       "caches::acq_locs",
       metrics_path() + "/" + mparams->cache_acq_locs_fname,
+      mparams->collect_interval,
+      rmath::dvec2uvec(mparams->arena_grid.upper,
+                       mparams->arena_grid.resolution));
+
+  register_collector<metrics::fsm::current_explore_loc_metrics_collector>(
+      "caches::acq_explore_locs",
+      metrics_path() + "/" + mparams->cache_acq_explore_locs_fname,
+      mparams->collect_interval,
+      rmath::dvec2uvec(mparams->arena_grid.upper,
+                       mparams->arena_grid.resolution));
+  register_collector<metrics::fsm::current_vector_loc_metrics_collector>(
+      "caches::acq_vector_locs",
+      metrics_path() + "/" + mparams->cache_acq_vector_locs_fname,
       mparams->collect_interval,
       rmath::dvec2uvec(mparams->arena_grid.upper,
                        mparams->arena_grid.resolution));

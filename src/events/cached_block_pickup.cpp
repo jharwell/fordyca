@@ -236,10 +236,10 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
    */
   if (!pcache->ent()->contains_block(m_pickup_block)) {
     ER_INFO("DPO cache%d@%s/%s does not contain pickup block%d",
-        pcache->ent()->id(),
-        pcache->ent()->real_loc().to_str().c_str(),
-        pcache->ent()->discrete_loc().to_str().c_str(),
-        m_pickup_block->id());
+            pcache->ent()->id(),
+            pcache->ent()->real_loc().to_str().c_str(),
+            pcache->ent()->discrete_loc().to_str().c_str(),
+            m_pickup_block->id());
     return;
   }
 

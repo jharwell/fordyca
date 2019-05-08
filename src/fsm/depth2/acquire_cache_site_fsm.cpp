@@ -89,7 +89,6 @@ __rcsw_const bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
 
 boost::optional<acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::site_select(
     void) const {
-
   if (auto best = controller::depth2::cache_site_selector(
           mc_matrix)(mc_store->caches(),
                      mc_store->blocks(),
@@ -99,7 +98,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::site_s
         *best, vector_fsm::kCACHE_SITE_ARRIVAL_TOL, -1));
   } else {
     ER_WARN("No cache site selected for acquisition--internal error?")
-        return boost::optional<acquire_goal_fsm::candidate_type>();
+    return boost::optional<acquire_goal_fsm::candidate_type>();
   }
 } /* site_select() */
 

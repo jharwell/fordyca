@@ -62,9 +62,8 @@ class cache_found : public cell_op, public rer::client<cache_found> {
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
     using controllers = controller::depth2::typelist;
     using value = boost::mpl::joint_view<
-      boost::mpl::joint_view<controllers::type,
-                             others::type>,
-      inherited::type>;
+        boost::mpl::joint_view<controllers::type, others::type>,
+        inherited::type>;
   };
 
  public:

@@ -172,6 +172,17 @@ FSM_OVERRIDE_DEF(rmath::vector2u,
                  m_cache_fsm,
                  const);
 
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 cached_block_to_nest_fsm,
+                 current_explore_loc,
+                 m_cache_fsm,
+                 const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 cached_block_to_nest_fsm,
+                 current_vector_loc,
+                 m_cache_fsm,
+                 const);
+
 bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::ekEXISTING_CACHE == acquisition_goal()) {
     return current_state() == kST_WAIT_FOR_PICKUP;

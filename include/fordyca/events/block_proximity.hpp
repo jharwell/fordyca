@@ -25,11 +25,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/nsalias.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,8 +57,8 @@ class block_proximity : public rer::client<block_proximity> {
  private:
   struct visit_typelist_impl {
     using controllers = controller::depth2::typelist;
-    using others = rmpl::typelist<fsm::block_to_goal_fsm,
-                                 tasks::depth2::cache_starter>;
+    using others =
+        rmpl::typelist<fsm::block_to_goal_fsm, tasks::depth2::cache_starter>;
     using value = boost::mpl::joint_view<controllers, others::type>;
   };
 

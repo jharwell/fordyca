@@ -150,6 +150,18 @@ TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
                          static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
                              polled_task::mechanism()));
 
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         collector,
+                         current_vector_loc,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+
+TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
+                         collector,
+                         current_explore_loc,
+                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()));
+
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/

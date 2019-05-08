@@ -92,6 +92,16 @@ FSM_OVERRIDE_DEF(transport_goal_type,
                  const);
 
 FSM_OVERRIDE_DEF(rmath::vector2u, crw_controller, acquisition_loc, *m_fsm, const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 crw_controller,
+                 current_vector_loc,
+                 *m_fsm,
+                 const);
+FSM_OVERRIDE_DEF(rmath::vector2u,
+                 crw_controller,
+                 current_explore_loc,
+                 *m_fsm,
+                 const);
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

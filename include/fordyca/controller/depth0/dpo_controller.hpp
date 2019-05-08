@@ -74,6 +74,8 @@ class dpo_controller : public crw_controller,
   FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
   FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);

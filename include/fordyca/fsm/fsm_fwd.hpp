@@ -35,11 +35,11 @@ namespace depth0 {
 class crw_fsm;
 class dpo_fsm;
 class free_block_to_nest_fsm;
-}  // namespace depth0
+} // namespace depth0
 
 namespace depth1 {
 class cached_block_to_nest_fsm;
-}  // namespace depth1
+} // namespace depth1
 
 NS_END(fsm, fordyca);
 

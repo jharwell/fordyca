@@ -27,10 +27,10 @@
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -69,20 +69,18 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
     using controllers = boost::mpl::joint_view<controller::depth1::typelist,
                                                controller::depth2::typelist>;
     using others = rmpl::typelist<
-      /* depth0 */
-      fsm::block_to_goal_fsm,
-      ds::dpo_semantic_map,
-      /* depth2 */
-      tasks::depth2::cache_starter,
-      tasks::depth2::cache_finisher,
-      fsm::block_to_goal_fsm,
-      ds::dpo_semantic_map>;
+        /* depth0 */
+        fsm::block_to_goal_fsm,
+        ds::dpo_semantic_map,
+        /* depth2 */
+        tasks::depth2::cache_starter,
+        tasks::depth2::cache_finisher,
+        fsm::block_to_goal_fsm,
+        ds::dpo_semantic_map>;
 
     using value = boost::mpl::joint_view<
-      controllers::type,
-      boost::mpl::joint_view<inherited::type,
-                             others::type>
-      >;
+        controllers::type,
+        boost::mpl::joint_view<inherited::type, others::type> >;
   };
 
  public:
