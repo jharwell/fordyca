@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <gp_odpo_controller id="ffc"
+    <grp_odpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -60,7 +60,7 @@
               </src_sigmoid_sel>
           </task_abort>
           <task_partition
-              always_partition="true"
+              always_partition="false"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -124,8 +124,9 @@
             site_xrange="2:10"
             site_yrange="2.5:3">
           <pickup_policy
-              policy="Null"
-              timestep="20000"/>
+              policy="cache_size"
+              timestep="20000"
+              cache_size="3"/>
             </cache_sel_matrix>
         <sensing
             los_dim="0.4">
@@ -153,7 +154,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </gp_odpo_controller>
+    </grp_odpo_controller>
 
   </controllers>
 
@@ -161,7 +162,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth2_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -226,7 +227,7 @@
           />
       <entities_oracle
           blocks_enabled="true"
-          caches_enabled="false"/>
+          caches_enabled="true"/>
       </oracle_manager>
     <temporal_variance>
       <blocks>
@@ -277,7 +278,7 @@
               n_clusters="15"
               />
           <manifest
-              n_cube="5"
+              n_cube="50"
               n_ramp="0"
               unit_dim="0.2"
               />
@@ -292,7 +293,7 @@
       <dynamic enable="true"
                min_dist="0.8"
                min_blocks="2"
-               robot_drop_only="true"/>
+               robot_drop_only="false"/>
     </caches>
 
     <visualization robot_id="true"

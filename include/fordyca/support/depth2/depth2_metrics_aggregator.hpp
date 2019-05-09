@@ -26,15 +26,12 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller { namespace depth2 { class grp_mdpo_controller; }}
-
-NS_START(support, depth2);
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Class Definitions

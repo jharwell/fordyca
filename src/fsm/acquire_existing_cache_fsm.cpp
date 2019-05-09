@@ -159,7 +159,9 @@ acquire_existing_cache_fsm::acquisition_goal_internal(void) const {
 bool acquire_existing_cache_fsm::cache_acquisition_valid(
     const rmath::vector2d& loc,
     uint id) const {
-  return cache_acquisition_validator(&mc_store->caches(), mc_matrix)(
+  return cache_acquisition_validator(&mc_store->caches(),
+                                     mc_matrix,
+                                     mc_is_pickup)(
       loc, id, saa_subsystem()->sensing()->tick());
 } /* cache_acquisition_valid() */
 

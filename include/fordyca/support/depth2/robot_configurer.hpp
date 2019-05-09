@@ -34,9 +34,12 @@ NS_START(fordyca, support, depth2);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-template<class ControllerType>
-using robot_configurer = depth1::robot_configurer<ControllerType>;
-
+template<class ControllerType, class AggregatorType>
+class robot_configurer : public depth1::robot_configurer<ControllerType,
+                                                         AggregatorType> {
+  using depth1::robot_configurer<ControllerType,
+                                 AggregatorType>::robot_configurer;
+};
 NS_END(depth2, support, fordyca);
 
 #endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH2_ROBOT_CONFIGURER_HPP_ */

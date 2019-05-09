@@ -13,6 +13,10 @@ This is the main entry point for getting started on the project.
    Australia, 2018, pp. 116-122.
    [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8376280&isnumber=8376259)
 
+2. J. Harwell and M. Gini, "Swarm Engineering Through Quantitative Measurement
+   of Swarm Robotic Principles in a 10,000 Robot Swarm," 2019 Joint Conference
+   of Artificial Intelligence (IJCAI), Macau, China, 2019, pp. XXX-XXX.
+
 # Setup
 
 Download `scripts/bootstrap.sh` BEFORE cloning this repo, and run it, with the

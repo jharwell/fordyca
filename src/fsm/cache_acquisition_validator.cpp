@@ -38,8 +38,10 @@ using cselm = controller::cache_sel_matrix;
  ******************************************************************************/
 cache_acquisition_validator::cache_acquisition_validator(
     const ds::dp_cache_map* map,
-    const controller::cache_sel_matrix* csel_matrix)
+    const controller::cache_sel_matrix* csel_matrix,
+    bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.cache_acquisition_validator"),
+      mc_for_pickup(for_pickup),
       mc_csel_matrix(csel_matrix),
       mc_map(map) {}
 
@@ -70,6 +72,16 @@ bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
             id,
             it->ent()->discrete_loc().to_str().c_str(),
             loc.to_str().c_str());
+    return false;
+  }
+
+  /*
+   * As long as (1) the cache exists, (2) the point we are trying to acquire is
+   * inside it, (3) we are dropping something in the cache, we can go ahead and
+   * acquire it without further checking.
+   */
+  if (!mc_for_pickup) {
+    return true;
   }
 
   auto cache = it->ent();
@@ -81,13 +93,6 @@ bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
     return false;
   } else if (cselm::kInitialPickupPolicyCacheSize == params.policy &&
              cache->n_blocks() < params.cache_size) {
-    ER_WARN(
-        "Existing cache%d@%s invalid for acquisition: too few blocks (%zu < "
-        "%u)",
-        cache->id(),
-        cache->discrete_loc().to_str().c_str(),
-        cache->n_blocks(),
-        params.cache_size);
     return false;
   }
   return true;

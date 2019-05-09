@@ -215,12 +215,12 @@ void mdpo_perception_subsystem::process_los_caches(
               cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
-      ER_INFO("Fixed cache%d@%s/%s block count: %zu blocks -> %zu blocks",
+      ER_INFO("Fixed cache%d@%s/%s block count: %zu -> %zu",
               cache->id(),
               cache->real_loc().to_str().c_str(),
               cache->discrete_loc().to_str().c_str(),
-              cell.cache()->n_blocks(),
-              cache->n_blocks());
+              cache->n_blocks(),
+              cell.cache()->n_blocks());
     }
     /*
      * The cache we get a handle to is owned by the simulation, and we don't

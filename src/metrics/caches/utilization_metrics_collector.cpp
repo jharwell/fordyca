@@ -97,7 +97,6 @@ void utilization_metrics_collector::reset_after_interval(void) {
   m_stats.int_blocks = 0;
   m_stats.int_pickups = 0;
   m_stats.int_drops = 0;
-  m_stats.int_blocks = 0;
   m_stats.int_cache_count = 0;
 } /* reset_after_interval() */
 

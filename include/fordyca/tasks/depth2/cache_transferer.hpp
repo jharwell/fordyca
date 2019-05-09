@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"

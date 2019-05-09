@@ -31,11 +31,16 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, support, depth2, detail);
+NS_START(fordyca, support, depth2);
+class depth2_metrics_aggregator;
+template<class ControllerType, class AggregatorType>
+class robot_configurer;
+NS_START(detail);
 
 using configurer_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::depth2::typelist,
-                             robot_configurer>::type>;
+                             robot_configurer,
+                             depth2_metrics_aggregator>::type>;
 
 /*******************************************************************************
  * Class Definitions

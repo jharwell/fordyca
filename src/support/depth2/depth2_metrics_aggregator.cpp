@@ -80,9 +80,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
       metrics_path() + "/" + mparams->task_execution_cache_collector_fname,
       mparams->collect_interval);
 
-  /*
-   * Overwrite depth1; we have a deeper decomposition now
-   */
+  /* Overwrite depth1; we have a deeper decomposition now */
   register_collector<rmetrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
       metrics_path() + "/" + mparams->task_distribution_fname,
@@ -94,8 +92,9 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth2_metrics_aggregator::task_alloc_cb(const rta::polled_task* const task,
-                                              const rta::bi_tab* const tab) {
+void depth2_metrics_aggregator::task_alloc_cb(
+    __rcsw_unused const rta::polled_task* const task,
+    const rta::bi_tab* const tab) {
   if (task0::kGeneralistName == tab->root()->name()) {
     collect("tasks::tab::generalist", *tab);
   } else if (task1::kHarvesterName == tab->root()->name()) {

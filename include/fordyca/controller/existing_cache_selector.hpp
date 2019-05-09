@@ -85,9 +85,9 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
                          const repr::base_cache* cache) const;
 
   /* clang-format off */
+  const bool                    mc_is_pickup;
   const cache_sel_matrix* const mc_matrix;
   const ds::dp_cache_map* const mc_cache_map;
-  bool                          m_is_pickup;
   /* clang-format on */
 };
 

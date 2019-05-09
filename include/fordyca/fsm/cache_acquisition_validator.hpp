@@ -59,7 +59,8 @@ class cache_acquisition_validator
     : public rer::client<cache_acquisition_validator> {
  public:
   cache_acquisition_validator(const ds::dp_cache_map* map,
-                              const controller::cache_sel_matrix* csel_matrix);
+                              const controller::cache_sel_matrix* csel_matrix,
+                              bool for_pickup);
 
   cache_acquisition_validator(const cache_acquisition_validator& v) = delete;
   cache_acquisition_validator& operator=(const cache_acquisition_validator& v) =
@@ -68,6 +69,7 @@ class cache_acquisition_validator
   bool operator()(const rmath::vector2d& loc, int id, uint timestep) const;
 
   /* clang-format off */
+  const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_csel_matrix;
   const ds::dp_cache_map*      const        mc_map;
   /* clang-format on */

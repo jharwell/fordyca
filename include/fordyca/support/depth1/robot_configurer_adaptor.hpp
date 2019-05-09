@@ -31,12 +31,13 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-template<class T>
+template<class ControllerType, class AggregatorType>
 class robot_configurer;
-
+class depth1_metrics_aggregator;
 using configurer_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::depth1::typelist,
-                               robot_configurer>::type>;
+                             robot_configurer,
+                             depth1_metrics_aggregator>::type>;
 
 /*******************************************************************************
  * Class Definitions
@@ -53,9 +54,11 @@ class robot_configurer_adaptor {
   robot_configurer_adaptor(controller::base_controller* const c) : controller(c) {}
 
 
-  template<typename T>
-  void operator()(robot_configurer<T>& configurer) const {
-    auto cast = dynamic_cast<typename robot_configurer<T>::controller_type*>(controller);
+  template<typename ControllerType, typename AggregatorType>
+  void operator()(robot_configurer<ControllerType, AggregatorType>& configurer) const {
+    auto cast = dynamic_cast<
+      typename robot_configurer<ControllerType, AggregatorType>::controller_type*
+      >(controller);
     configurer(cast);
   }
 

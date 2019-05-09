@@ -50,21 +50,21 @@ NS_START(fordyca, support, depth1);
  * - Enabled oracles (if applicable) via task executive hooks
  * - Enabling tasking metric aggregation via task executive hooks
  */
-template <class T>
+template <class ControllerType, class AggregatorType>
 class robot_configurer {
  public:
-  using controller_type = T;
+  using controller_type = ControllerType;
 
   robot_configurer(const params::visualization_params* const params,
                    oracle::entities_oracle* const ent_oracle,
                    oracle::tasking_oracle* const task_oracle,
-                   depth1_metrics_aggregator* const agg)
+                   AggregatorType* const agg)
       : mc_params(params),
         m_tasking_oracle(task_oracle),
         m_ent_oracle(ent_oracle),
         m_agg(agg) {}
 
-  template<typename U = T,
+  template<typename U = ControllerType,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::depth1::oracular_typelist,
                                          U)>
   void operator()(controller_type* const c) const {
@@ -72,7 +72,7 @@ class robot_configurer {
     metric_callbacks_bind(c);
   } /* operator() */
 
-  template<typename U = T,
+  template<typename U = ControllerType,
            RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth1::oracular_typelist,
                                           U)>
   void operator()(controller_type* const c) const {
@@ -84,15 +84,15 @@ class robot_configurer {
  private:
   void metric_callbacks_bind(controller_type* const c) const {
     c->executive()->task_finish_notify(
-        std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
+        std::bind(&AggregatorType::task_finish_or_abort_cb,
                   m_agg,
                   std::placeholders::_1));
     c->executive()->task_abort_notify(
-        std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
+        std::bind(&AggregatorType::task_finish_or_abort_cb,
                   m_agg,
                   std::placeholders::_1));
     c->executive()->task_alloc_notify(
-        std::bind(&depth1_metrics_aggregator::task_alloc_cb,
+        std::bind(&AggregatorType::task_alloc_cb,
                   m_agg,
                   std::placeholders::_1,
                   std::placeholders::_2));
@@ -132,7 +132,7 @@ class robot_configurer {
   const params::visualization_params* const mc_params;
   oracle::tasking_oracle* const             m_tasking_oracle;
   oracle::entities_oracle* const            m_ent_oracle;
-  depth1_metrics_aggregator* const          m_agg;
+  AggregatorType* const                     m_agg;
   /* clang-format on */
 };
 

@@ -95,7 +95,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
             lf->m_metrics_agg.get()));
     config_map->emplace(
         typeid(controller),
-        robot_configurer<T>(
+        robot_configurer<T, depth2_metrics_aggregator>(
             lf->params()->parse_results<params::visualization_params>(),
             lf->oracle_manager()->entities_oracle(),
             lf->oracle_manager()->tasking_oracle(),

@@ -34,7 +34,7 @@
  ******************************************************************************/
 NS_START(fordyca, support);
 
-template<typename Controllertype>
+template<typename ControllerType>
 class robot_los_updater;
 template<typename AggregatorType, typename ControllerType>
 class robot_metric_extractor;
@@ -87,7 +87,7 @@ class depth0_loop_functions : public base_loop_functions,
     >;
   using los_updater_map_type = rds::type_map<
     rmpl::typelist_wrap_apply<controller::depth0::typelist,
-                                robot_los_updater>::type>;
+                              robot_los_updater>::type>;
 
   using metric_extraction_typelist = rmpl::typelist<
     robot_metric_extractor<depth0_metrics_aggregator,

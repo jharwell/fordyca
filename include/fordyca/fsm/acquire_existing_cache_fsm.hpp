@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <boost/optional.hpp>
 #include <random>
+#include <utility>
 
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
@@ -72,8 +73,8 @@ class acquire_existing_cache_fsm
                              ds::dpo_store* store);
   ~acquire_existing_cache_fsm(void) override = default;
 
-  acquire_existing_cache_fsm(const acquire_existing_cache_fsm& fsm) = delete;
-  acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) =
+  acquire_existing_cache_fsm(const acquire_existing_cache_fsm&) = delete;
+  acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm&) =
       delete;
 
   void by_exploration_ok(bool b) { m_by_exploration_ok = b; }

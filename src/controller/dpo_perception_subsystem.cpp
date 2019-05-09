@@ -106,8 +106,8 @@ void dpo_perception_subsystem::process_los_caches(
       ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
               cache->id(),
               cache->discrete_loc().to_str().c_str(),
-              cache->n_blocks(),
-              m_store->find(cache)->ent()->n_blocks());
+              m_store->find(cache)->ent()->n_blocks(),
+              cache->n_blocks());
     }
     /*
      * The cache we get a handle to is owned by the simulation, and we don't
