@@ -58,7 +58,7 @@ using transport_goal_type = block_transporter::goal_type;
  * way to the nest and dropped it in the nest, it will repeat the same sequence
  * (i.e. it loops indefinitely).
  */
-class dpo_fsm : public base_foraging_fsm,
+class dpo_fsm final : public base_foraging_fsm,
                      rer::client<dpo_fsm>,
                      public metrics::fsm::goal_acquisition_metrics,
                      public block_transporter {

@@ -47,7 +47,7 @@ NS_START(fordyca, tasks, depth2);
  * that is closer to the nest). It is abortable, and has two task interfaces:
  * one at each cache it interacts with.
  */
-class cache_transferer : public foraging_task,
+class cache_transferer final : public foraging_task,
                          public events::existing_cache_interactor,
                          rer::client<cache_transferer> {
  public:
@@ -66,16 +66,16 @@ class cache_transferer : public foraging_task,
   void accept(events::detail::cache_vanished& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_explore_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_vector_loc);
+  TASK_WRAPPER_DECLARE(bool, goal_acquired, const override);
+  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal, const override);
+  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal, const override);
+  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, acquisition_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_explore_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_vector_loc, const override);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal, const override);
 
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }

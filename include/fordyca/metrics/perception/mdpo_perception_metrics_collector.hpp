@@ -47,7 +47,7 @@ NS_START(fordyca, metrics, perception);
  *
  * Metrics are written out at the specified collection interval.
  */
-class mdpo_perception_metrics_collector : public rmetrics::base_metrics_collector {
+class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

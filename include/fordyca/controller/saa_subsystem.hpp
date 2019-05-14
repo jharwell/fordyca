@@ -56,8 +56,8 @@ NS_START(controller);
  * @brief Sensing and Actuation subsystem for the robot. Does not do much other
  * than wrap the two components.
  */
-class saa_subsystem : public rcppsw::robotics::steering2D::boid,
-                      rer::client<saa_subsystem> {
+class saa_subsystem final : public rcppsw::robotics::steering2D::boid,
+                            rer::client<saa_subsystem> {
  public:
   saa_subsystem(const struct params::actuation_params* aparams,
                 const struct params::sensing_params* sparams,

@@ -180,7 +180,8 @@ FSM_OVERRIDE_DEF(rmath::vector2u,
                  m_block_fsm,
                  const);
 
-acquisition_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
+__rcsw_pure acquisition_goal_type
+free_block_to_nest_fsm::acquisition_goal(void) const {
   if (kST_ACQUIRE_BLOCK == current_state() ||
       kST_WAIT_FOR_PICKUP == current_state()) {
     return acquisition_goal_type::ekBLOCK;
@@ -188,7 +189,7 @@ acquisition_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   return acquisition_goal_type::ekNONE;
 } /* acquisition_goal() */
 
-bool free_block_to_nest_fsm::goal_acquired(void) const {
+__rcsw_pure bool free_block_to_nest_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == kST_WAIT_FOR_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
@@ -209,7 +210,8 @@ void free_block_to_nest_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
 } /* task_execute() */
 
-transport_goal_type free_block_to_nest_fsm::block_transport_goal(void) const {
+__rcsw_pure transport_goal_type
+free_block_to_nest_fsm::block_transport_goal(void) const {
   if (kST_TRANSPORT_TO_NEST == current_state() ||
       kST_WAIT_FOR_DROP == current_state()) {
     return transport_goal_type::ekNEST;

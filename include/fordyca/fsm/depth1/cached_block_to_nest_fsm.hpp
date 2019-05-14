@@ -63,7 +63,7 @@ using transport_goal_type = block_transporter::goal_type;
  * It can be directed to acquire a block either from a cache or to find a free
  * one.
  */
-class cached_block_to_nest_fsm : public base_foraging_fsm,
+class cached_block_to_nest_fsm final : public base_foraging_fsm,
                                  rer::client<cached_block_to_nest_fsm>,
                                  public metrics::fsm::goal_acquisition_metrics,
                                  public block_transporter,

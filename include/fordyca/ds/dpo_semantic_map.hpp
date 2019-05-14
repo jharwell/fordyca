@@ -65,8 +65,8 @@ namespace decorator = rcppsw::patterns::decorator;
  * Does *NOT* track which cells are in CACHE_EXTENT, as that is irrelevant for
  * what the robots need (as of 9/14/18 anyway).
  */
-class dpo_semantic_map : public rer::client<dpo_semantic_map>,
-                         public decorator::decorator<occupancy_grid> {
+class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
+                               public decorator::decorator<occupancy_grid> {
  public:
   dpo_semantic_map(const params::perception::perception_params* c_params,
                    const std::string& robot_id);
@@ -83,23 +83,23 @@ class dpo_semantic_map : public rer::client<dpo_semantic_map>,
    *
    * @return The cell.
    */
-  template <int Index>
-  typename occupancy_grid::layer_value_type<Index>::value_type& access(uint i,
-                                                                       uint j) {
+  template <size_t Index>
+  typename occupancy_grid::layer_value_type<Index>::value_type& access(size_t i,
+                                                                       size_t j) {
     return decoratee().access<Index>(i, j);
   }
-  template <int Index>
+  template <size_t Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      uint i,
-      uint j) const {
+      size_t i,
+      size_t j) const {
     return decoratee().access<Index>(i, j);
   }
-  template <int Index>
+  template <size_t Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) {
     return decoratee().access<Index>(d);
   }
-  template <int Index>
+  template <size_t Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) const {
     return decoratee().access<Index>(d);

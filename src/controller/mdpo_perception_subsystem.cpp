@@ -261,11 +261,11 @@ void mdpo_perception_subsystem::update_cell_stats(
   }   /* for(i..) */
 } /* update_cell_stats() */
 
-ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
+__rcsw_pure ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
   return m_map->store();
 } /* dpo_store() */
 
-const ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) const {
+__rcsw_pure const ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) const {
   return m_map->store();
 } /* dpo_store() */
 
@@ -277,7 +277,7 @@ __rcsw_pure double mdpo_perception_subsystem::known_percentage(void) const {
          static_cast<double>(m_map->xdsize() * m_map->ydsize());
 } /* known_percentage() */
 
-double mdpo_perception_subsystem::unknown_percentage(void) const {
+__rcsw_pure double mdpo_perception_subsystem::unknown_percentage(void) const {
   return 1.0 - known_percentage();
 } /* unknown_percentage() */
 

@@ -52,7 +52,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
-class cache_op_penalty_handler
+class cache_op_penalty_handler final
     : public temporal_penalty_handler<T>,
       public rer::client<cache_op_penalty_handler<T>> {
  public:

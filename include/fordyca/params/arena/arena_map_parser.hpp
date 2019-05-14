@@ -47,7 +47,7 @@ NS_START(fordyca, params, arena);
  *
  * @brief Parses XML parameters for \ref arena_map into \ref arena_map_params.
  */
-class arena_map_parser : public rparams::xml_param_parser {
+class arena_map_parser final : public rparams::xml_param_parser {
  public:
   explicit arena_map_parser(uint level)
       : xml_param_parser(level),

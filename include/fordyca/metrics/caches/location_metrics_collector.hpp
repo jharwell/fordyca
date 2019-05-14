@@ -43,7 +43,7 @@ NS_START(fordyca, metrics, caches);
  *
  * @brief Collector for \ref location_metrics.
  */
-class location_metrics_collector : public grid2D_avg_metrics_collector {
+class location_metrics_collector final : public grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

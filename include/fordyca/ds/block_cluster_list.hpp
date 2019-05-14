@@ -34,6 +34,7 @@ NS_START(fordyca);
 namespace repr {
 class block_cluster;
 } // namespace repr
+
 NS_START(ds);
 
 using block_cluster_list_type = repr::block_cluster*;

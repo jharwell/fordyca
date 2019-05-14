@@ -117,7 +117,7 @@ class dispatcher {
    * repeatedly running into the walls of the arena as they try to acquire a
    * block that is too close and triggers their obstacle avoidance.
    */
-  static uint constexpr kINDEX_MIN = 2;
+  static size_t constexpr kINDEX_MIN = 2;
 
   /* clang-format off */
   const double                                  mc_padding;

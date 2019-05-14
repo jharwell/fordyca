@@ -81,24 +81,24 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const final);
+  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const final);
+  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const final);
+  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const final);
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
-  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const final);
+  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const final);
+  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const final);
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
   FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const final);
+  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const final);
 
   /**
    * @brief Reset the FSM
    */
-  void init(void) override;
+  void init(void) override final;
 
  protected:
   enum fsm_states {

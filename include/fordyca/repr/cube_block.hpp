@@ -42,7 +42,7 @@ NS_START(fordyca, repr);
  * @brief A representation of a cube block within the arena. Cube blocks are 1
  * cell in size.
  */
-class cube_block : public base_block {
+class cube_block final : public base_block {
  public:
   explicit cube_block(const rmath::vector2d& dim)
       : base_block(dim, rutils::color::kBLACK, -1) {}

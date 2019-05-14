@@ -43,7 +43,8 @@ NS_START(fordyca, metrics);
  *
  * @brief Collector for \ref robot_occupancy_metrics.
  */
-class robot_occupancy_metrics_collector : public grid2D_avg_metrics_collector {
+class robot_occupancy_metrics_collector final
+    : public grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

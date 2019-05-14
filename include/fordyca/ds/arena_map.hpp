@@ -71,9 +71,9 @@ namespace decorator = rcppsw::patterns::decorator;
  * providing accessors and mutators, but not more complex logic, separating the
  * data in manages from the algorithms that operate on that data.
  */
-class arena_map : public rer::client<arena_map>,
-                  public metrics::robot_occupancy_metrics,
-                  public decorator::decorator<arena_grid> {
+class arena_map final : public rer::client<arena_map>,
+                        public metrics::robot_occupancy_metrics,
+                        public decorator::decorator<arena_grid> {
  public:
   using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
   using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
@@ -134,22 +134,22 @@ class arena_map : public rer::client<arena_map>,
    */
   void cache_extent_clear(const std::shared_ptr<repr::arena_cache>& victim);
 
-  template <int Index>
+  template <uint Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) {
     return decoratee().access<Index>(d);
   }
-  template <int Index>
+  template <uint Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) const {
     return decoratee().access<Index>(d);
   }
-  template <int Index>
+  template <uint Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(size_t i,
                                                                    size_t j) {
     return decoratee().access<Index>(i, j);
   }
-  template <int Index>
+  template <uint Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
       size_t i,
       size_t j) const {

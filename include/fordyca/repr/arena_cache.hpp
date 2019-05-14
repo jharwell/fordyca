@@ -47,9 +47,9 @@ NS_START(fordyca, repr);
  * dp_entity caches because they handle cache penalties and can collect metrics
  * about their usage.
  */
-class arena_cache : public base_cache,
-                    public metrics::caches::utilization_metrics,
-                    public metrics::caches::location_metrics {
+class arena_cache final : public base_cache,
+                          public metrics::caches::utilization_metrics,
+                          public metrics::caches::location_metrics {
  public:
   arena_cache(double dimension,
               double resolution,

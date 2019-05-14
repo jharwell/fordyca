@@ -56,7 +56,7 @@ void cell_empty::visit(ds::occupancy_grid& grid) {
     grid.known_cells_inc();
   }
   ER_ASSERT(grid.known_cell_count() <= grid.xdsize() * grid.ydsize(),
-            "Known cell count (%u) >= arena dimensions (%ux%u)",
+            "Known cell count (%u) >= arena dimensions (%zux%zu)",
             grid.known_cell_count(),
             grid.xdsize(),
             grid.ydsize());

@@ -42,12 +42,12 @@ NS_START(fordyca, tasks, depth1);
  ******************************************************************************/
 /**
  * @class harvester
- * @ingroup fordyca tasks
+ * @ingroup fordyca tasks depth1
  *
  * @brief Task in which robots locate a free block and bring it to a known
  * cache. It is abortable, and has one task interface.
  */
-class harvester : public foraging_task,
+class harvester final : public foraging_task,
                   public events::existing_cache_interactor,
                   public events::free_block_interactor,
                   public rer::client<harvester> {
@@ -72,16 +72,16 @@ class harvester : public foraging_task,
   void accept(events::detail::cache_vanished& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_explore_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_vector_loc);
+  TASK_WRAPPER_DECLARE(bool, goal_acquired, const override);
+  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal, const override);
+  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal, const override);
+  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, acquisition_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_explore_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_vector_loc, const override);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal, const override);
 
   /* task metrics */
   bool task_at_interface(void) const override;

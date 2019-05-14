@@ -40,7 +40,7 @@ cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
                                          uint capacity)
     : ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
       m_clust(view, capacity),
-      m_dist(view, arena_resolution) {}
+      m_impl(view, arena_resolution) {}
 
 /*******************************************************************************
  * Member Functions
@@ -54,7 +54,7 @@ bool cluster_distributor::distribute_block(
              m_clust.capacity());
     return false;
   }
-  return m_dist.distribute_block(block, entities);
+  return m_impl.distribute_block(block, entities);
 } /* distribute_block() */
 
 bool cluster_distributor::distribute_blocks(ds::block_vector& blocks,
@@ -66,7 +66,7 @@ bool cluster_distributor::distribute_blocks(ds::block_vector& blocks,
         m_clust.capacity());
     return false;
   }
-  return m_dist.distribute_blocks(blocks, entities);
+  return m_impl.distribute_blocks(blocks, entities);
 } /* distribute_blocks() */
 
 ds::const_block_cluster_list cluster_distributor::block_clusters(void) const {

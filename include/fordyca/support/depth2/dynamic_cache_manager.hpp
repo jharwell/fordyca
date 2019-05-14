@@ -58,7 +58,7 @@ NS_START(support, depth2);
  * @brief Manager for creation, depletion, and metric gathering for dynamic
  * caches in the arena, whenever they are enabled.
  */
-class dynamic_cache_manager : public base_cache_manager,
+class dynamic_cache_manager final : public base_cache_manager,
                               public rer::client<dynamic_cache_manager> {
  public:
   dynamic_cache_manager(const struct params::caches::caches_params* params,

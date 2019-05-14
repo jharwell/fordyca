@@ -45,7 +45,7 @@ NS_START(fordyca, params);
  * @brief Parses XML parameters relating to pheromones into
  * \ref battery_params.
  */
-class battery_parser : public rparams::xml_param_parser {
+class battery_parser final : public rparams::xml_param_parser {
  public:
   explicit battery_parser(uint level)
       : xml_param_parser(level), m_metrics_parser(level + 1) {}

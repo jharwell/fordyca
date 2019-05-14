@@ -54,7 +54,7 @@ namespace decorator = rcppsw::patterns::decorator;
  * @brief Base repr of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref base_cell_entity the cell contains, if any.
  */
-class cell2D : public decorator::decorator<fsm::cell2D_fsm> {
+class cell2D final : public decorator::decorator<fsm::cell2D_fsm> {
  public:
   cell2D(void);
 

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARSER_HPP_
-#define INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_PARAMS_TV_TV_MANAGER_PARSER_HPP_
+#define INCLUDE_FORDYCA_PARAMS_TV_TV_MANAGER_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -43,7 +43,7 @@ NS_START(fordyca, params, tv);
  *
  * @brief Parses XML parameters for \ref tv_manager into \ref tv_manager_params.
  */
-class tv_manager_parser : public rparams::xml_param_parser {
+class tv_manager_parser final : public rparams::xml_param_parser {
  public:
   explicit tv_manager_parser(uint level)
       : xml_param_parser(level),
@@ -82,4 +82,4 @@ class tv_manager_parser : public rparams::xml_param_parser {
 
 NS_END(tv, params, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_TV_TV_CONTROLLER_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_TV_TV_MANAGER_PARSER_HPP_ */

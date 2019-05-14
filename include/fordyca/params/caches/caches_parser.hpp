@@ -46,7 +46,7 @@ NS_START(fordyca, params, caches);
  *
  * @brief Parses XML parameters for relating to cache into \ref caches_params.
  */
-class caches_parser: public rparams::xml_param_parser {
+class caches_parser final: public rparams::xml_param_parser {
  public:
   explicit caches_parser(uint level)
       : xml_param_parser(level),

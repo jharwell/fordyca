@@ -52,7 +52,7 @@ using transport_goal_type = block_transporter::goal_type;
  *
  * @brief FILL ME IN!
  */
-class free_block_to_nest_fsm : public base_foraging_fsm,
+class free_block_to_nest_fsm final : public base_foraging_fsm,
                                rer::client<free_block_to_nest_fsm>,
                                public metrics::fsm::goal_acquisition_metrics,
                                public block_transporter,

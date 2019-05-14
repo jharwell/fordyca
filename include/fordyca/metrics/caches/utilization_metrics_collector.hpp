@@ -46,7 +46,7 @@ NS_START(fordyca, metrics, caches);
  *
  * Metrics are output at the specified interval.
  */
-class utilization_metrics_collector : public rmetrics::base_metrics_collector {
+class utilization_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.

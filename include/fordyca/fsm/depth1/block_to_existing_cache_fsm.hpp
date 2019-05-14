@@ -49,7 +49,7 @@ NS_START(fsm, depth1);
  * existing cache it knows about. Once it has done that it will signal that its
  * task is complete.
  */
-class block_to_existing_cache_fsm : public block_to_goal_fsm {
+class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
   block_to_existing_cache_fsm(const controller::block_sel_matrix* bsel_matrix,
                               const controller::cache_sel_matrix* csel_matrix,

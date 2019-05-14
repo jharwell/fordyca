@@ -62,7 +62,7 @@ NS_START(support, block_dist);
  * - Blocks are assumed to be the same size as arena resolution (this is not
  *   checked).
  */
-class powerlaw_distributor : public base_distributor,
+class powerlaw_distributor final : public base_distributor,
                              public rer::client<powerlaw_distributor> {
  public:
   /**

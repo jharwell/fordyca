@@ -45,7 +45,7 @@ NS_START(fordyca, params, oracle);
  *
  * @brief Parses XML parameters used for oracles at the start of simulation.
  */
-class oracle_manager_parser : public rparams::xml_param_parser {
+class oracle_manager_parser final : public rparams::xml_param_parser {
  public:
   explicit oracle_manager_parser(uint level)
       : xml_param_parser(level),

@@ -100,7 +100,7 @@ FSM_OVERRIDE_DEF(uint,
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-bool explore_for_goal_fsm::task_running(void) const {
+__rcsw_pure bool explore_for_goal_fsm::task_running(void) const {
   return kST_START != current_state() && kST_FINISHED != current_state();
 }
 

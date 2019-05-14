@@ -104,7 +104,7 @@ class base_block : public multicell_entity,
   }
 
   /* transport metrics */
-  void reset_metrics(void) override;
+  void reset_metrics(void) override final;
   uint total_transporters(void) const override { return m_transporters; }
   double total_transport_time(void) const override;
   double initial_wait_time(void) const override;

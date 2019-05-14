@@ -49,7 +49,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * a block from it and then bring it to ANOTHER cache (either a known cache or
  * one found via random exploration) and drop it.
  */
-class cache_transferer_fsm : public block_to_goal_fsm {
+class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(const controller::cache_sel_matrix* matrix,
                        controller::saa_subsystem* saa,

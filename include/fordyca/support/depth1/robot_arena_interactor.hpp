@@ -55,7 +55,7 @@ NS_START(fordyca, support, depth1);
  * - Free block drop due to task abort.
  */
 template <typename T>
-class robot_arena_interactor : public rer::client<robot_arena_interactor<T>> {
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
  public:
   using controller_type = T;
 

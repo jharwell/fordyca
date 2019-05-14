@@ -46,7 +46,7 @@ NS_START(fordyca, metrics, fsm);
  *
  * Metrics are written out after the specified interval.
  */
-class collision_metrics_collector : public rmetrics::base_metrics_collector {
+class collision_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.

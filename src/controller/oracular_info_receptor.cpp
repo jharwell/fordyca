@@ -127,7 +127,7 @@ void oracular_info_receptor::int_est_update(rta::polled_task* const task) {
             task->name().c_str());
   auto oracle_int_est = boost::get<rta::time_estimate>(int_result.get());
   __rcsw_unused double int_old = task->task_interface_estimate(0).last_result();
-  task->interface_estimate_update(oracle_int_est.last_result(), 0);
+  task->interface_estimate_update(0, oracle_int_est.last_result());
   ER_INFO("Update 'int_est.%s' with oracular estimate %f on abort: %f -> %f",
           task->name().c_str(),
           oracle_int_est.last_result(),

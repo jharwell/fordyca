@@ -79,15 +79,15 @@ class gp_dpo_controller : public depth0::dpo_controller,
 
   /* task distribution metrics */
   int current_task_depth(void) const override;
-  int current_task_id(void) const override;
+  int current_task_id(void) const override final;
   int current_task_tab(void) const override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  TASK_WRAPPER_DECLARE(bool, goal_acquired, const override final);
+  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal, const override final);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal, const override final);
 
   /**
    * @brief Get the current task the controller is executing.

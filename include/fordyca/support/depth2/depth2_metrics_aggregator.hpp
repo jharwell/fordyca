@@ -46,7 +46,7 @@ NS_START(fordyca, support, depth2);
  * - TAB metrics (rooted at harvester)
  * - TAB metrics (rooted at collector)
  */
-class depth2_metrics_aggregator : public depth1::depth1_metrics_aggregator,
+class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator,
                                   public rer::client<depth2_metrics_aggregator> {
  public:
   depth2_metrics_aggregator(const params::metrics_params* mparams,

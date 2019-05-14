@@ -45,7 +45,7 @@ NS_START(fordyca, metrics, fsm);
  * 2D array, and needs its own collector separate from the \ref
  * goal_acquisition_metrics_collector (1 .csv per collector).
  */
-class current_vector_loc_metrics_collector : public grid2D_avg_metrics_collector {
+class current_vector_loc_metrics_collector final : public grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

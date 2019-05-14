@@ -74,14 +74,16 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics {
   base_cache_manager& operator=(const base_cache_manager& other) = delete;
 
   /* cache lifecycle metrics */
-  uint caches_created(void) const override { return m_caches_created; }
-  uint caches_depleted(void) const override { return m_depletion_ages.size(); }
+  uint caches_created(void) const override final { return m_caches_created; }
+  uint caches_depleted(void) const override final {
+    return m_depletion_ages.size();
+  }
   std::vector<uint> cache_depletion_ages(void) const override {
     return m_depletion_ages;
   }
 
   void cache_depleted(uint age) { m_depletion_ages.push_back(age); }
-  void reset_metrics(void) override {
+  void reset_metrics(void) override final {
     m_caches_created = 0;
     m_depletion_ages.clear();
   }

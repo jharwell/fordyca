@@ -48,7 +48,7 @@ NS_START(fordyca, fsm, depth2);
  * and then drop the block there. Once it has done that it will signal that its
  * task is complete.
  */
-class block_to_cache_site_fsm : public block_to_goal_fsm {
+class block_to_cache_site_fsm final : public block_to_goal_fsm {
  public:
   block_to_cache_site_fsm(const controller::block_sel_matrix* bsel_matrix,
                           const controller::cache_sel_matrix* csel_matrix,

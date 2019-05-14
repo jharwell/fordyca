@@ -27,6 +27,7 @@
 #include <list>
 #include <vector>
 #include <random>
+#include <boost/optional.hpp>
 
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -60,7 +61,7 @@ NS_START(support, block_dist);
  *   the arena map the blocks are being distributed into some part of (this is
  *   not checked).
  */
-class random_distributor : public base_distributor,
+class random_distributor final : public base_distributor,
                            public rer::client<random_distributor> {
  public:
   random_distributor(const ds::arena_grid::view& grid,
@@ -79,7 +80,6 @@ class random_distributor : public base_distributor,
 
  private:
   struct coord_search_res_t {
-    bool            status{false};
     rmath::vector2u rel{};
     rmath::vector2u abs{};
   };
@@ -95,15 +95,19 @@ class random_distributor : public base_distributor,
    *
    * @param entities The entities to avoid.
    */
-  coord_search_res_t avail_coord_search(const ds::const_entity_list& entities,
-                                         const rmath::vector2d& block_dim);
+  boost::optional<coord_search_res_t> avail_coord_search(
+      const ds::const_entity_list& entities,
+      const rmath::vector2d& block_dim);
   bool verify_block_dist(const repr::base_block* block,
                          const ds::const_entity_list& entities,
                          const ds::cell2D* cell);
 
   /* clang-format off */
-  double               m_resolution;
-  ds::arena_grid::view m_grid;
+  const double          mc_resolution;
+  const rmath::vector2u mc_origin;
+  const rmath::rangeu   mc_xspan;
+  const rmath::rangeu   mc_yspan;
+  ds::arena_grid::view  m_grid;
   /* clang-format on */
 };
 

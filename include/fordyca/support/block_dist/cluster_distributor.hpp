@@ -43,7 +43,7 @@ NS_START(fordyca, support, block_dist);
  * @brief Distributes a block or set of blocks within the specified cluster
  * bounds randomly, using \ref random_distributor.
  */
-class cluster_distributor : public base_distributor,
+class cluster_distributor final : public base_distributor,
                             public rer::client<cluster_distributor> {
  public:
   cluster_distributor(const ds::arena_grid::view& view,
@@ -63,7 +63,7 @@ class cluster_distributor : public base_distributor,
  private:
   /* clang-format off */
   repr::block_cluster m_clust;
-  random_distributor  m_dist;
+  random_distributor  m_impl;
   /* clang-format on */
 };
 

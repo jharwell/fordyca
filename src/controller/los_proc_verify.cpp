@@ -47,8 +47,8 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    * not a cache that contains the block's location, and it is therefore not
    * occluded.
    */
-  for (auto &cache : c_dpo->caches().const_values_range()) {
-    for (auto &block : mc_los->blocks()) {
+  for (auto& cache : c_dpo->caches().const_values_range()) {
+    for (auto& block : mc_los->blocks()) {
       if (!cache.ent()->contains_point(block->real_loc())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
@@ -56,7 +56,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
                   block->discrete_loc().to_str().c_str());
       }
     } /* for(&block..) */
-  } /* for(&cache..) */
+  }   /* for(&cache..) */
 
   /*
    * Verify that for each cell that contained a cache in the LOS:

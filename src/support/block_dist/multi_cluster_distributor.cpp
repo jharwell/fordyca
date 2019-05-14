@@ -52,17 +52,24 @@ bool multi_cluster_distributor::distribute_block(
     std::shared_ptr<repr::base_block>& block,
     ds::const_entity_list& entities) {
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
-    std::uniform_int_distribution<> rng_dist(0, m_dists.size());
-
+    /* -1 because we are working with array indices */
+    std::uniform_int_distribution<size_t> rng_dist(0, m_dists.size() - 1);
     uint idx = rng_dist(rng());
     cluster_distributor& dist = m_dists[idx];
-    const auto* clust = dist.block_clusters().front(); /* only 1 */
+
+    /* Always/only 1 cluster per cluster distributor, so this is safe to do */
+    auto* clust = dist.block_clusters().front();
     if (clust->capacity() == clust->block_count()) {
-      ER_DEBUG("block%d to cluster%u failed: Cluster capacity (%u) reached",
+      ER_DEBUG("Block%d to cluster%u failed: capacity (%u) reached",
                block->id(),
                idx,
                clust->capacity());
     } else {
+      ER_DEBUG("Block%d to cluster%u: capacity=%u,size=%zu",
+               block->id(),
+               idx,
+               clust->capacity(),
+               clust->block_count());
       return dist.distribute_block(block, entities);
     }
   } /* for(i..) */

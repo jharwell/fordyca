@@ -44,7 +44,7 @@ NS_START(fordyca, tasks, depth2);
  * @brief Task in which robots locate a free block and drop it somewhere to
  * start a new cache. It is abortable, and has one task interface.
  */
-class cache_starter : public foraging_task,
+class cache_starter final : public foraging_task,
                       public events::free_block_interactor,
                       public events::dynamic_cache_interactor,
                       public rer::client<cache_starter> {
@@ -67,16 +67,16 @@ class cache_starter : public foraging_task,
 
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_explore_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_vector_loc);
+  TASK_WRAPPER_DECLARE(bool, goal_acquired, const override);
+  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal, const override);
+  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal, const override);
+  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, acquisition_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_explore_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_vector_loc, const override);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal, const override);
 
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }

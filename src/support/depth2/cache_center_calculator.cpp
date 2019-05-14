@@ -66,8 +66,8 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
                                   return sum + b->real_loc().y();
                                 });
 
-  rmath::vector2u center(sumx / cache_i_blocks.size(),
-                         sumy / cache_i_blocks.size());
+  rmath::vector2u center(static_cast<uint>(sumx / cache_i_blocks.size()),
+                         static_cast<uint>(sumy / cache_i_blocks.size()));
   ER_DEBUG("Guess center=%s", center.to_str().c_str());
 
   /*
@@ -158,8 +158,10 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundar
   double y_max = m_grid->yrsize() - m_cache_dim * 2;
   double y_min = m_cache_dim * 2;
 
-  rmath::rangeu xbounds(std::ceil(x_min), std::floor(x_max));
-  rmath::rangeu ybounds(std::ceil(y_min), std::floor(y_max));
+  rmath::rangeu xbounds(static_cast<uint>(std::ceil(x_min)),
+                        static_cast<uint>(std::floor(x_max)));
+  rmath::rangeu ybounds(static_cast<uint>(std::ceil(y_min)),
+                        static_cast<uint>(std::floor(y_max)));
   bool conflict = false;
   rmath::vector2u new_center = center;
 
@@ -254,7 +256,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
              ent_loc.to_str().c_str(),
              exc_xspan.to_str().c_str(),
              x_delta);
-    new_center.x(new_center.x() + x_delta);
+    new_center.x(static_cast<uint>(new_center.x() + x_delta));
   }
   if (status.y_conflict) {
     ER_TRACE("cache: yspan=%s,center=%s overlap ent%d@%s: yspan=%s, y_delta=%f",
@@ -264,7 +266,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
              ent_loc.to_str().c_str(),
              exc_yspan.to_str().c_str(),
              y_delta);
-    new_center.y(new_center.y() + y_delta);
+    new_center.y(static_cast<uint>(new_center.y() + y_delta));
   }
   return (status.x_conflict && status.y_conflict)
              ? boost::make_optional(new_center)

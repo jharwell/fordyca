@@ -115,52 +115,60 @@ void collector::accept(events::detail::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         collector,
-                         is_exploring_for_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         collector,
-                         is_vectoring_to_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        collector,
+                        is_exploring_for_goal,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        collector,
+                        is_vectoring_to_goal,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
 
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         collector,
-                         goal_acquired,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        collector,
+                        goal_acquired,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
 
-TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
-                         collector,
-                         acquisition_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                        collector,
+                        acquisition_goal,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
 
-TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                         collector,
-                         block_transport_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        collector,
+                        block_transport_goal,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
 
-TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
-                         collector,
-                         acquisition_loc,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(rmath::vector2u,
+                        collector,
+                        acquisition_loc,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
 
-TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
-                         collector,
-                         current_vector_loc,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(rmath::vector2u,
+                        collector,
+                        current_vector_loc,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
 
-TASK_WRAPPER_DEFINEC_PTR(rmath::vector2u,
-                         collector,
-                         current_explore_loc,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+TASK_WRAPPER_DEFINE_PTR(rmath::vector2u,
+                        collector,
+                        current_explore_loc,
+                        static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                            polled_task::mechanism()),
+                        const);
 
 /*******************************************************************************
  * Task Metrics

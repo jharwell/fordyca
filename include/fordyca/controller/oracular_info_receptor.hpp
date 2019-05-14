@@ -59,7 +59,7 @@ NS_START(controller);
  * - Block/cache locations
  */
 
-class oracular_info_receptor : public rer::client<oracular_info_receptor> {
+class oracular_info_receptor final : public rer::client<oracular_info_receptor> {
  public:
   oracular_info_receptor(support::oracle::tasking_oracle* tasking_oracle,
                          support::oracle::entities_oracle* entities_oracle)

@@ -128,35 +128,35 @@ class acquire_goal_fsm : public base_foraging_fsm,
   acquire_goal_fsm& operator=(const acquire_goal_fsm& fsm) = delete;
 
   /* taskable overrides */
-  void task_execute(void) override;
+  void task_execute(void) override final;
   void task_start(const rta::taskable_argument*) override {}
-  bool task_finished(void) const override {
+  bool task_finished(void) const override final {
     return kST_FINISHED == current_state();
   }
-  bool task_running(void) const override {
+  bool task_running(void) const override final {
     return kST_ACQUIRE_GOAL == current_state();
   }
-  void task_reset(void) override { init(); }
+  void task_reset(void) override final { init(); }
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
+  bool in_collision_avoidance(void) const override final;
+  bool entered_collision_avoidance(void) const override final;
+  bool exited_collision_avoidance(void) const override final;
+  uint collision_avoidance_duration(void) const override final;
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
-  acquisition_goal_type acquisition_goal(void) const override;
-  rmath::vector2u acquisition_loc(void) const override;
-  rmath::vector2u current_explore_loc(void) const override;
-  rmath::vector2u current_vector_loc(void) const override;
+  bool is_exploring_for_goal(void) const override final;
+  bool is_vectoring_to_goal(void) const override final;
+  bool goal_acquired(void) const override final;
+  acquisition_goal_type acquisition_goal(void) const override final;
+  rmath::vector2u acquisition_loc(void) const override final;
+  rmath::vector2u current_explore_loc(void) const override final;
+  rmath::vector2u current_vector_loc(void) const override final;
 
   /**
    * @brief Reset the FSM
    */
-  void init(void) override;
+  void init(void) override final;
 
  protected:
   enum fsm_states {

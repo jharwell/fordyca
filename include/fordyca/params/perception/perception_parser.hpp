@@ -47,7 +47,7 @@ NS_START(fordyca, params, perception);
  * @brief Parses XML parameters for various perception subsystems into
  * \ref perception_params.
  */
-class perception_parser : public rparams::xml_param_parser {
+class perception_parser final : public rparams::xml_param_parser {
  public:
   explicit perception_parser(uint level)
       : xml_param_parser(level),

@@ -121,11 +121,11 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rfsm::event_data* data) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-bool crw_fsm::is_exploring_for_goal(void) const {
+__rcsw_pure bool crw_fsm::is_exploring_for_goal(void) const {
   return current_state() == kST_ACQUIRE_BLOCK;
 } /* is_exploring_for_goal() */
 
-bool crw_fsm::goal_acquired(void) const {
+__rcsw_pure bool crw_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == kST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
@@ -193,7 +193,7 @@ bool crw_fsm::block_detected(void) const {
   return saa_subsystem()->sensing()->block_detected();
 } /* block_detected() */
 
-transport_goal_type crw_fsm::block_transport_goal(void) const {
+__rcsw_pure transport_goal_type crw_fsm::block_transport_goal(void) const {
   if (kST_TRANSPORT_TO_NEST == current_state() ||
       kST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::ekNEST;
@@ -201,7 +201,7 @@ transport_goal_type crw_fsm::block_transport_goal(void) const {
   return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
-acquisition_goal_type crw_fsm::acquisition_goal(void) const {
+__rcsw_pure acquisition_goal_type crw_fsm::acquisition_goal(void) const {
   if (kST_ACQUIRE_BLOCK == current_state() ||
       kST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::ekBLOCK;

@@ -55,9 +55,9 @@ NS_START(fordyca, fsm);
  * avoid multiple robots all trying to drive to the center of the cache to
  * "arrive" at it.
  */
-class vector_fsm : public base_foraging_fsm,
-                   public rer::client<vector_fsm>,
-                   public rta::taskable {
+class vector_fsm final : public base_foraging_fsm,
+                         public rer::client<vector_fsm>,
+                         public rta::taskable {
  public:
   /**
    * @brief The tolerance within which a robot's location has to be in order to
@@ -147,7 +147,7 @@ class vector_fsm : public base_foraging_fsm,
    * @brief A structure containing all the information needed for the controller
    * to tell the FSM where to travel to next.
    */
-  struct goal_data : public rfsm::event_data {
+  struct goal_data final : public rfsm::event_data {
     goal_data(rmath::vector2d loc_in, double tol)
         : tolerance(tol), loc(loc_in) {}
     goal_data(void) = default;

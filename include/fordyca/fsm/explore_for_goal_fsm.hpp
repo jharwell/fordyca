@@ -46,8 +46,8 @@ NS_START(fordyca, fsm);
  * instance of their goal. Once they have found one, the FSM will signal that
  * its task is complete.
  */
-class explore_for_goal_fsm : public base_explore_fsm,
-                             public rer::client<explore_for_goal_fsm> {
+class explore_for_goal_fsm final : public base_explore_fsm,
+                                   public rer::client<explore_for_goal_fsm> {
  public:
   enum fsm_states {
     kST_START,

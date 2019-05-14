@@ -110,7 +110,7 @@
           </tab_sel>
         </task_alloc>
         <block_sel_matrix
-              nest="2.0, 3">
+              nest="6, 3">
               <block_priorities
                   cube="1.0"
                   ramp="1.0"
@@ -266,7 +266,7 @@
       <blocks>
         <distribution
             arena_resolution="0.2"
-            dist_type="random">
+            dist_type="powerlaw">
           <redist_governor
               trigger="Null"
               recurrence_policy="multi"
@@ -284,7 +284,7 @@
               />
         </distribution>
       </blocks>
-      <nest size="1.0, 4.0" center="2, 3" />
+      <nest size="1.0, 4.0" center="6, 3" />
     </arena_map>
     <caches dimension="0.8">
       <static enable="true"

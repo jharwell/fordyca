@@ -73,16 +73,16 @@ class collector : public foraging_task,
   void accept(events::detail::cache_block_drop&) override {}
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, acquisition_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_explore_loc);
-  TASK_WRAPPER_DECLAREC(rmath::vector2u, current_vector_loc);
+  TASK_WRAPPER_DECLARE(bool, goal_acquired, const override);
+  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal, const override);
+  TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal, const override);
+  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, acquisition_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_explore_loc, const override);
+  TASK_WRAPPER_DECLARE(rmath::vector2u, current_vector_loc, const override);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal, const override);
 
   /* task metrics */
   bool task_at_interface(void) const override;

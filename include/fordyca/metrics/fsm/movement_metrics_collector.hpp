@@ -46,7 +46,7 @@ NS_START(fordyca, metrics, fsm);
  *
  * Metrics are written out every timestep.
  */
-class movement_metrics_collector : public rmetrics::base_metrics_collector {
+class movement_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

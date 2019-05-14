@@ -45,7 +45,7 @@ NS_START(fordyca, params);
  *
  * @brief Parses XML parameters relating to sensings into \ref sensing_params.
  */
-class sensing_parser : public rparams::xml_param_parser {
+class sensing_parser final : public rparams::xml_param_parser {
  public:
   explicit sensing_parser(uint level)
       : xml_param_parser(level), m_proximity_parser(level + 1) {}

@@ -59,7 +59,7 @@ NS_START(support, oracle);
  * caches, etc). Used to provide an upper bound on the performance of different
  * foraging methods.
  */
-class entities_oracle : public rer::client<entities_oracle> {
+class entities_oracle final : public rer::client<entities_oracle> {
  public:
   using variant_type = boost::variant<std::shared_ptr<repr::base_block>,
                                       std::shared_ptr<repr::base_cache>>;

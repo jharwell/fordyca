@@ -64,7 +64,7 @@ NS_START(tv);
  * with the environment/robotic mechanical functioning.
  */
 
-class tv_manager : public rer::client<tv_manager>,
+class tv_manager final : public rer::client<tv_manager>,
                    public metrics::temporal_variance_metrics {
  public:
   template<typename T>

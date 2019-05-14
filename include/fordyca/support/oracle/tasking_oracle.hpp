@@ -62,7 +62,7 @@ NS_START(support, oracle);
  * allocation. Used to provide an upper bound on the performance of different
  * allocation methods.
  */
-class tasking_oracle : public rer::client<tasking_oracle> {
+class tasking_oracle final : public rer::client<tasking_oracle> {
  public:
   using variant_type = boost::variant<rta::time_estimate>;
 

@@ -58,7 +58,7 @@ class dynamic_cache_manager;
  * - Creating a new cache.
  */
 template <typename T>
-class robot_arena_interactor : public rer::client<robot_arena_interactor<T>> {
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
  public:
   using controller_type = T;
   robot_arena_interactor(ds::arena_map* const map,

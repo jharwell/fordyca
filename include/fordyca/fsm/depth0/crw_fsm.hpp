@@ -54,7 +54,7 @@ using transport_goal_type = block_transporter::goal_type;
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest, and drops it.
  */
-class crw_fsm : public base_foraging_fsm,
+class crw_fsm final : public base_foraging_fsm,
                 public rer::client<crw_fsm>,
                 public metrics::fsm::goal_acquisition_metrics,
                 public block_transporter {

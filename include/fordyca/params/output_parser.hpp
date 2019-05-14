@@ -48,7 +48,7 @@ NS_START(fordyca, params);
  * and so its logic is slighly more complex in order to handle the needs of
  * both.
  */
-class output_parser : public rparams::xml_param_parser {
+class output_parser final : public rparams::xml_param_parser {
  public:
   explicit output_parser(uint level)
       : xml_param_parser(level), m_metrics_parser(level + 1) {}

@@ -195,7 +195,7 @@ __rcsw_pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
          (m_goal_fsm->is_vectoring_to_goal() && m_goal_fsm->task_running());
 } /* is_vectoring_to_block */
 
-bool block_to_goal_fsm::goal_acquired(void) const {
+__rcsw_pure bool block_to_goal_fsm::goal_acquired(void) const {
   return (kST_WAIT_FOR_BLOCK_PICKUP == current_state()) ||
          (kST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */

@@ -183,7 +183,7 @@ FSM_OVERRIDE_DEF(rmath::vector2u,
                  m_cache_fsm,
                  const);
 
-bool cached_block_to_nest_fsm::goal_acquired(void) const {
+__rcsw_pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::ekEXISTING_CACHE == acquisition_goal()) {
     return current_state() == kST_WAIT_FOR_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
@@ -192,7 +192,8 @@ bool cached_block_to_nest_fsm::goal_acquired(void) const {
   return false;
 }
 
-acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
+__rcsw_pure acquisition_goal_type
+cached_block_to_nest_fsm::acquisition_goal(void) const {
   if (kST_ACQUIRE_BLOCK == current_state() ||
       kST_WAIT_FOR_PICKUP == current_state()) {
     return acquisition_goal_type::ekEXISTING_CACHE;
@@ -206,7 +207,8 @@ acquisition_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-transport_goal_type cached_block_to_nest_fsm::block_transport_goal(void) const {
+__rcsw_pure transport_goal_type
+cached_block_to_nest_fsm::block_transport_goal(void) const {
   if (kST_TRANSPORT_TO_NEST == current_state() ||
       kST_WAIT_FOR_DROP == current_state()) {
     return transport_goal_type::ekNEST;

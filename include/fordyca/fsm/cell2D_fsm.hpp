@@ -46,7 +46,8 @@ NS_START(fordyca, fsm);
  * block, has a cache, or unknown, etc.).
  *
  */
-class cell2D_fsm : public rfsm::simple_fsm, public rer::client<cell2D_fsm> {
+class cell2D_fsm final : public rfsm::simple_fsm,
+                         public rer::client<cell2D_fsm> {
  public:
   enum state {
     kST_UNKNOWN,

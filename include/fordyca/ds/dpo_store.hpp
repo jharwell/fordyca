@@ -52,7 +52,7 @@ NS_START(ds);
  * an entity are encountered (e.g. the real version has vanished and the tracked
  * version is out of date).
  */
-class dpo_store : public rer::client<dpo_store> {
+class dpo_store final : public rer::client<dpo_store> {
  public:
   template <typename T>
   using dp_entity = repr::dp_entity<T>;

@@ -44,7 +44,7 @@ NS_START(fordyca, repr);
  * handled concretely in the arena in 2D (3D is only for visualization purposes,
  * and I can cheat a bit there).
  */
-class ramp_block : public base_block {
+class ramp_block final : public base_block {
  public:
   explicit ramp_block(const rmath::vector2d& dim)
       : base_block(dim, rutils::color::kBLUE, -1) {}

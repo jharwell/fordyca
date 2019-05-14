@@ -44,7 +44,7 @@ existing_cache_selector::existing_cache_selector(
     : ER_CLIENT_INIT("fordyca.controller.depth1.existing_cache_selector"),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
-    mc_cache_map(cache_map) {}
+      mc_cache_map(cache_map) {}
 
 /*******************************************************************************
  * Member Functions

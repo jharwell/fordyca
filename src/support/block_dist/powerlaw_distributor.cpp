@@ -91,7 +91,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
 
     uint x = xgen(rng());
     uint y = ygen(rng());
-    uint x_max = x + std::sqrt(clust_sizes[i]);
+    uint x_max = x + static_cast<uint>(std::sqrt(clust_sizes[i]));
     uint y_max = y + clust_sizes[i] / (x_max - x);
 
     /*
@@ -189,7 +189,7 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
   for (auto& it : m_dist_map) {
     ER_INFO("Mapped %zu clusters of capacity %u", it.second.size(), it.first);
     for (__rcsw_unused auto& dist : it.second) {
-      ER_DEBUG(
+      ER_INFO(
           "Cluster with origin@%s: capacity=%u",
           dist.block_clusters().front()->view().origin()->loc().to_str().c_str(),
           dist.block_clusters().front()->capacity());

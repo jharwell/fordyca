@@ -139,7 +139,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
   if (!cell.state_is_known()) {
     map.known_cells_inc();
     ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
-              "Known cell count (%u) >= arena dimensions (%ux%u)",
+              "Known cell count (%u) >= arena dimensions (%zux%zu)",
               map.known_cell_count(),
               map.xdsize(),
               map.ydsize());

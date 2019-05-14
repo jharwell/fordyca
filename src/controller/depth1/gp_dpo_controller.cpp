@@ -142,20 +142,26 @@ void gp_dpo_controller::executive(
 /*******************************************************************************
  * Block Transportation
  ******************************************************************************/
-TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                         gp_dpo_controller,
-                         block_transport_goal,
-                         current_task());
+TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
+                        gp_dpo_controller,
+                        block_transport_goal,
+                        current_task(),
+                        const);
 
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
-                         gp_dpo_controller,
-                         acquisition_goal,
-                         current_task());
+TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+                        gp_dpo_controller,
+                        acquisition_goal,
+                        current_task(),
+                        const);
 
-TASK_WRAPPER_DEFINEC_PTR(bool, gp_dpo_controller, goal_acquired, current_task());
+TASK_WRAPPER_DEFINE_PTR(bool,
+                        gp_dpo_controller,
+                        goal_acquired,
+                        current_task(),
+                        const);
 
 /*******************************************************************************
  * Task Distribution Metrics

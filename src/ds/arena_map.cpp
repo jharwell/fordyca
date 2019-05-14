@@ -50,7 +50,7 @@ arena_map::arena_map(const struct params::arena::arena_map_params* params)
       m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
       m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()),
       m_redist_governor(&params->blocks.dist.redist_governor) {
-  ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
+  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),
           yrsize(),
           xdsize(),

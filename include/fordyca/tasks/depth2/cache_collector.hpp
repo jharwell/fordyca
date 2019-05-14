@@ -42,7 +42,7 @@ NS_START(fordyca, tasks, depth2);
  * @brief Task in which robots locate a cache and bring a block from it to the
  * nest. It is abortable, and has one task interface.
  */
-class cache_collector : public depth1::collector {
+class cache_collector final : public depth1::collector {
  public:
   cache_collector(const struct rta::task_alloc_params* params,
                   std::unique_ptr<rta::taskable> mechanism) :

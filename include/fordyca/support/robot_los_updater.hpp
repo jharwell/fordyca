@@ -46,7 +46,7 @@ NS_START(fordyca, support);
  * @brief Functor to update robot LOS each timestep.
  */
 template <typename ControllerType>
-class robot_los_updater
+class robot_los_updater final
     : public boost::static_visitor<void>,
       public rer::client<robot_los_updater<ControllerType>> {
  public:
@@ -67,7 +67,8 @@ class robot_los_updater
               "LOS dimension (%f) not an even multiple of grid resolution (%f)",
               c->los_dim(),
               m_map->grid_resolution());
-    uint los_grid_size = c->los_dim() / m_map->grid_resolution();
+    uint los_grid_size =
+        static_cast<uint>(c->los_dim() / m_map->grid_resolution());
     loop_utils::set_robot_los(c, los_grid_size, *m_map);
   }
 

@@ -58,7 +58,7 @@ NS_START(support, depth1);
  * @brief Manager for creation, depletion, and metric gathering for the static
  * cache in the arena, when it is employed.
  */
-class static_cache_manager : public base_cache_manager,
+class static_cache_manager final : public base_cache_manager,
                              public rer::client<static_cache_manager> {
  public:
   static_cache_manager(const struct params::caches::caches_params* params,

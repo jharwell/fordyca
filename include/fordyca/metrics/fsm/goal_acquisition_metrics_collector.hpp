@@ -46,7 +46,7 @@ NS_START(fordyca, metrics, fsm);
  *
  * Metrics are written out at the end of the specified interval.
  */
-class goal_acquisition_metrics_collector : public rmetrics::base_metrics_collector {
+class goal_acquisition_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.

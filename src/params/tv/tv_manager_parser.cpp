@@ -70,7 +70,7 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_pure bool tv_manager_parser::validate(void) const {
+__rcsw_const bool tv_manager_parser::validate(void) const {
   return m_block_manip.validate() && m_block_carry.validate() &&
          m_cache_usage.validate();
 } /* validate() */

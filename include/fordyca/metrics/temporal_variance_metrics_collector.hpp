@@ -46,7 +46,7 @@ NS_START(fordyca, metrics);
  *
  * Metrics are written out every timestep.
  */
-class temporal_variance_metrics_collector
+class temporal_variance_metrics_collector final
     : public rmetrics::base_metrics_collector {
  public:
   /**

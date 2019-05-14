@@ -69,8 +69,9 @@ using cache_sel_variant =
  * This class may be separated into those components in the future if it makes
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
-class cache_sel_matrix : public rer::client<cache_sel_matrix>,
-                         private std::map<std::string, cache_sel_variant> {
+class cache_sel_matrix final
+    : public rer::client<cache_sel_matrix>,
+      private std::map<std::string, cache_sel_variant> {
  public:
   static constexpr char kNestLoc[] = "nest_loc";
   static constexpr char kCacheProxDist[] = "cache_prox_dist";

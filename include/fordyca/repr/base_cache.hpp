@@ -157,7 +157,7 @@ class base_cache : public multicell_entity,
    */
   std::shared_ptr<base_block> oldest_block(void) { return m_blocks.front(); }
 
-  std::unique_ptr<base_cache> clone(void) const override;
+  std::unique_ptr<base_cache> clone(void) const override final;
 
   uint creation_ts(void) const { return m_creation_ts; }
   void creation_ts(uint creation_ts) { m_creation_ts = creation_ts; }

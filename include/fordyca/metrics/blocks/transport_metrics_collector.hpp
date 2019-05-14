@@ -46,7 +46,7 @@ NS_START(fordyca, metrics, blocks);
  *
  * Metrics are written out at the specified collection interval.
  */
-class transport_metrics_collector : public rmetrics::base_metrics_collector {
+class transport_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
