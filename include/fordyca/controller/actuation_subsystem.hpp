@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/config/actuation_config.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
-#include "fordyca/params/actuation_params.hpp"
 #include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
 #include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
 #include "rcppsw/robotics/hal/actuators/wifi_actuator.hpp"
@@ -70,10 +70,10 @@ class actuation_subsystem {
   /**
    * @brief Initialize the actuation subsystem.
    *
-   * @param c_params Subsystem parameters.
+   * @param c_config Subsystem parameters.
    * @param list List of handles to actuator devices.
    */
-  actuation_subsystem(const struct params::actuation_params* c_params,
+  actuation_subsystem(const config::actuation_config* c_config,
                       struct actuator_list* list);
 
   /**
@@ -95,7 +95,7 @@ class actuation_subsystem {
 
  private:
   /* clang-format off */
-  const struct params::actuation_params    mc_params;
+  const config::actuation_config    mc_config;
   struct actuator_list                     m_actuators;
   throttling_differential_drive            m_drive;
   /* clang-format on */

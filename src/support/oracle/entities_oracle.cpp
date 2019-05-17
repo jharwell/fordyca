@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/oracle/entities_oracle.hpp"
-#include "fordyca/params/oracle/entities_oracle_params.hpp"
+#include "fordyca/config/oracle/entities_oracle_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,10 +33,10 @@ NS_START(fordyca, support, oracle);
  * Constructors/Destructors
  ******************************************************************************/
 entities_oracle::entities_oracle(
-    const params::oracle::entities_oracle_params* const params)
+    const config::oracle::entities_oracle_config* const config)
     : ER_CLIENT_INIT("fordyca.support.entities_oracle"),
-      mc_blocks(params->blocks_enabled),
-      mc_caches(params->caches_enabled) {}
+      mc_blocks(config->blocks_enabled),
+      mc_caches(config->caches_enabled) {}
 
 /*******************************************************************************
  * Member Functions

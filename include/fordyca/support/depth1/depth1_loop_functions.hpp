@@ -35,7 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace caches { struct caches_params; }}
+namespace config { namespace caches { struct caches_config; }}
 
 NS_START(support, depth1);
 class depth1_metrics_aggregator;
@@ -132,7 +132,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   /**
    * @brief Initialize static cache handling/management.
    */
-  void cache_handling_init(const struct params::caches::caches_params *cachep);
+  void cache_handling_init(const config::caches::caches_config *cachep);
 
   /**
    * @brief Initialize all oracles.

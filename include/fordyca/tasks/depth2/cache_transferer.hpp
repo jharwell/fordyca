@@ -51,7 +51,7 @@ class cache_transferer final : public foraging_task,
                          public events::existing_cache_interactor,
                          rer::client<cache_transferer> {
  public:
-  cache_transferer(const struct rta::task_alloc_params* params,
+  cache_transferer(const struct rta::config::task_alloc_config* config,
                    std::unique_ptr<rta::taskable> mechanism);
 
   /*

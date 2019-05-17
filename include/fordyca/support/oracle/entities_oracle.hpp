@@ -37,11 +37,11 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
+namespace config {
 namespace oracle {
-struct entities_oracle_params;
+struct entities_oracle_config;
 } /* namespace oracle */
-} /* namespace params */
+} /* namespace config */
 namespace repr {
 class base_block;
 class base_cache;
@@ -65,7 +65,7 @@ class entities_oracle final : public rer::client<entities_oracle> {
                                       std::shared_ptr<repr::base_cache>>;
   using variant_vector_type = std::vector<variant_type>;
 
-  explicit entities_oracle(const params::oracle::entities_oracle_params* params);
+  explicit entities_oracle(const config::oracle::entities_oracle_config* config);
 
   /**
    * @brief Ask the oracle something.

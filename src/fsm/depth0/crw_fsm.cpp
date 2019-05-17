@@ -24,7 +24,8 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/random_explore_behavior.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/fsm/expstrat/crw.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,8 +35,9 @@ NS_START(fordyca, fsm, depth0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
-    : base_foraging_fsm(saa, kST_MAX_STATES),
+crw_fsm::crw_fsm(controller::saa_subsystem* const saa,
+                 std::unique_ptr<expstrat::base_expstrat> exp_behavior)
+    : base_foraging_fsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -44,7 +46,7 @@ crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       m_explore_fsm(saa,
-                    std::make_unique<controller::random_explore_behavior>(saa),
+                    std::move(exp_behavior),
                     std::bind(&crw_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
@@ -70,66 +72,66 @@ crw_fsm::crw_fsm(controller::saa_subsystem* const saa)
  ******************************************************************************/
 HFSM_STATE_DEFINE(crw_fsm, start, rfsm::event_data* data) {
   /* first time running FSM */
-  if (rfsm::event_type::kNORMAL == data->type()) {
-    internal_event(kST_ACQUIRE_BLOCK);
-    return controller::foraging_signal::kHANDLED;
+  if (rfsm::event_type::ekNORMAL == data->type()) {
+    internal_event(ekST_ACQUIRE_BLOCK);
+    return controller::foraging_signal::ekHANDLED;
   }
-  if (rfsm::event_type::kCHILD == data->type()) {
-    if (controller::foraging_signal::kLEFT_NEST == data->signal()) {
+  if (rfsm::event_type::ekCHILD == data->type()) {
+    if (controller::foraging_signal::ekLEFT_NEST == data->signal()) {
       m_explore_fsm.task_start(nullptr);
-      internal_event(kST_ACQUIRE_BLOCK);
-      return controller::foraging_signal::kHANDLED;
-    } else if (controller::foraging_signal::kENTERED_NEST == data->signal()) {
-      internal_event(kST_WAIT_FOR_BLOCK_DROP);
-      return controller::foraging_signal::kHANDLED;
+      internal_event(ekST_ACQUIRE_BLOCK);
+      return controller::foraging_signal::ekHANDLED;
+    } else if (controller::foraging_signal::ekENTERED_NEST == data->signal()) {
+      internal_event(ekST_WAIT_FOR_BLOCK_DROP);
+      return controller::foraging_signal::ekHANDLED;
     }
   }
   ER_FATAL_SENTINEL("Unhandled signal");
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(crw_fsm, acquire_block) {
   if (m_explore_fsm.task_finished()) {
-    internal_event(kST_WAIT_FOR_BLOCK_PICKUP);
+    internal_event(ekST_WAIT_FOR_BLOCK_PICKUP);
   } else {
     m_explore_fsm.task_execute();
   }
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rfsm::event_data* data) {
-  if (controller::foraging_signal::kBLOCK_PICKUP == data->signal()) {
+  if (controller::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block pickup signal received");
-    internal_event(kST_TRANSPORT_TO_NEST);
-  } else if (controller::foraging_signal::kBLOCK_VANISHED == data->signal()) {
+    internal_event(ekST_TRANSPORT_TO_NEST);
+  } else if (controller::foraging_signal::ekBLOCK_VANISHED == data->signal()) {
     m_explore_fsm.task_reset();
-    internal_event(kST_ACQUIRE_BLOCK);
+    internal_event(ekST_ACQUIRE_BLOCK);
   }
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rfsm::event_data* data) {
-  if (controller::foraging_signal::kBLOCK_DROP == data->signal()) {
+  if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
     ER_INFO("Block drop signal received");
-    internal_event(kST_LEAVING_NEST);
+    internal_event(ekST_LEAVING_NEST);
   }
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
 __rcsw_pure bool crw_fsm::is_exploring_for_goal(void) const {
-  return current_state() == kST_ACQUIRE_BLOCK;
+  return current_state() == ekST_ACQUIRE_BLOCK;
 } /* is_exploring_for_goal() */
 
 __rcsw_pure bool crw_fsm::goal_acquired(void) const {
   if (acquisition_goal_type::ekBLOCK == acquisition_goal()) {
-    return current_state() == kST_WAIT_FOR_BLOCK_PICKUP;
+    return current_state() == ekST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
-    return current_state() == kST_WAIT_FOR_BLOCK_DROP;
+    return current_state() == ekST_WAIT_FOR_BLOCK_DROP;
   }
   return false;
 } /* goal_acquired() */
@@ -186,7 +188,8 @@ void crw_fsm::init(void) {
 } /* init() */
 
 void crw_fsm::run(void) {
-  inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
+  inject_event(controller::foraging_signal::ekFSM_RUN,
+               rfsm::event_type::ekNORMAL);
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {
@@ -194,16 +197,16 @@ bool crw_fsm::block_detected(void) const {
 } /* block_detected() */
 
 __rcsw_pure transport_goal_type crw_fsm::block_transport_goal(void) const {
-  if (kST_TRANSPORT_TO_NEST == current_state() ||
-      kST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (ekST_TRANSPORT_TO_NEST == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::ekNEST;
   }
   return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
 __rcsw_pure acquisition_goal_type crw_fsm::acquisition_goal(void) const {
-  if (kST_ACQUIRE_BLOCK == current_state() ||
-      kST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::ekBLOCK;
   }
   return acquisition_goal_type::ekNONE;

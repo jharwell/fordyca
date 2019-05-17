@@ -25,19 +25,19 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
-#include "rcppsw/robotics/steering2D/boid.hpp"
+#include "rcppsw/robotics/steer2D/boid.hpp"
 
 /*******************************************************************************
  * namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
-struct phototaxis_force_params;
+namespace config {
+struct phototaxis_force_config;
 }
 
 NS_START(controller);
 class sensing_subsystem;
-namespace steering = rcppsw::robotics::steering2D;
+namespace steering = rcppsw::robotics::steer2D;
 
 /*******************************************************************************
  * Class Definitions
@@ -51,7 +51,7 @@ namespace steering = rcppsw::robotics::steering2D;
  */
 class phototaxis_force {
  public:
-  phototaxis_force(const struct params::phototaxis_force_params* params,
+  phototaxis_force(const config::phototaxis_force_config* config,
                    const std::shared_ptr<sensing_subsystem>& sensors);
 
   rmath::vector2d operator()() const;

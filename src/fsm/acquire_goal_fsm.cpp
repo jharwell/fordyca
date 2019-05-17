@@ -25,7 +25,7 @@
 
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/random_explore_behavior.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
@@ -38,43 +38,43 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_goal_fsm::acquire_goal_fsm(controller::saa_subsystem* const saa,
-                                   const struct hook_list& hooks)
-    : base_foraging_fsm(saa, kST_MAX_STATES),
+acquire_goal_fsm::acquire_goal_fsm(
+    controller::saa_subsystem* const saa,
+    std::unique_ptr<expstrat::base_expstrat> behavior,
+    const struct hook_list& hooks)
+    : base_foraging_fsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("forydca.fsm.acquire_goal_fsm"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(fsm_acquire_goal, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
       m_hooks(hooks),
       m_vector_fsm(saa),
-      m_explore_fsm(saa,
-                    std::make_unique<controller::random_explore_behavior>(saa),
-                    m_hooks.explore_term_cb),
+      m_explore_fsm(saa, std::move(behavior), m_hooks.explore_term_cb),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
                                                nullptr,
                                                nullptr,
                                                &exit_fsm_acquire_goal),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {
-  m_explore_fsm.change_parent(explore_for_goal_fsm::kST_EXPLORE,
+  m_explore_fsm.change_parent(explore_for_goal_fsm::ekST_EXPLORE,
                               &fsm_acquire_goal);
 }
 
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, start) {
-  ER_DEBUG("Executing kST_START");
-  internal_event(kST_ACQUIRE_GOAL);
-  return controller::foraging_signal::kHANDLED;
+  ER_DEBUG("Executing ekST_START");
+  internal_event(ekST_ACQUIRE_GOAL);
+  return controller::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, fsm_acquire_goal) {
-  if (kST_ACQUIRE_GOAL != last_state()) {
-    ER_DEBUG("Executing kST_ACQUIRE_GOAL");
+  if (ekST_ACQUIRE_GOAL != last_state()) {
+    ER_DEBUG("Executing ekST_ACQUIRE_GOAL");
   }
 
   if (acquire_goal()) {
-    internal_event(kST_FINISHED);
+    internal_event(ekST_FINISHED);
   }
-  return rfsm::event_signal::kHANDLED;
+  return rfsm::event_signal::ekHANDLED;
 }
 
 HFSM_EXIT_DEFINE(acquire_goal_fsm, exit_fsm_acquire_goal) {
@@ -82,54 +82,59 @@ HFSM_EXIT_DEFINE(acquire_goal_fsm, exit_fsm_acquire_goal) {
   m_explore_fsm.task_reset();
 }
 HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
-  if (kST_FINISHED != last_state()) {
-    ER_DEBUG("Executing kST_FINISHED");
+  if (ekST_FINISHED != last_state()) {
+    ER_DEBUG("Executing ekST_FINISHED");
   }
 
-  return rfsm::event_signal::kHANDLED;
+  return rfsm::event_signal::ekHANDLED;
 }
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
 __rcsw_pure bool acquire_goal_fsm::in_collision_avoidance(void) const {
-  return m_explore_fsm.in_collision_avoidance() ||
-         m_vector_fsm.in_collision_avoidance();
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.in_collision_avoidance()) ||
+         (m_vector_fsm.task_running() && m_vector_fsm.in_collision_avoidance());
 } /* in_collision_avoidance() */
 
 __rcsw_pure bool acquire_goal_fsm::entered_collision_avoidance(void) const {
-  return m_explore_fsm.entered_collision_avoidance() ||
-         m_vector_fsm.entered_collision_avoidance();
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.entered_collision_avoidance()) ||
+         (m_vector_fsm.task_running() &&
+          m_vector_fsm.entered_collision_avoidance());
 } /* entered_collision_avoidance() */
 
 __rcsw_pure bool acquire_goal_fsm::exited_collision_avoidance(void) const {
-  return m_explore_fsm.exited_collision_avoidance() ||
-         m_vector_fsm.exited_collision_avoidance();
+  return (m_explore_fsm.task_running() &&
+          m_explore_fsm.exited_collision_avoidance()) ||
+         (m_vector_fsm.task_running() &&
+          m_vector_fsm.exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
 __rcsw_pure uint acquire_goal_fsm::collision_avoidance_duration(void) const {
-  if (kST_ACQUIRE_GOAL == current_state() && m_explore_fsm.task_running()) {
+  if (m_explore_fsm.task_running()) {
     return m_explore_fsm.collision_avoidance_duration();
-  } else if (kST_ACQUIRE_GOAL == current_state() && m_vector_fsm.task_running()) {
+  } else if (m_vector_fsm.task_running()) {
     return m_vector_fsm.collision_avoidance_duration();
   }
   return 0;
 } /* collision_avoidance_duration() */
 
 __rcsw_pure bool acquire_goal_fsm::goal_acquired(void) const {
-  return current_state() == kST_FINISHED;
+  return current_state() == ekST_FINISHED;
 } /* cache_acquired() */
 
 __rcsw_pure bool acquire_goal_fsm::is_exploring_for_goal(void) const {
-  return (current_state() == kST_ACQUIRE_GOAL && m_explore_fsm.task_running());
+  return (current_state() == ekST_ACQUIRE_GOAL && m_explore_fsm.task_running());
 } /* is_exploring_for_goal() */
 
 __rcsw_pure bool acquire_goal_fsm::is_vectoring_to_goal(void) const {
-  return current_state() == kST_ACQUIRE_GOAL && m_vector_fsm.task_running();
+  return current_state() == ekST_ACQUIRE_GOAL && m_vector_fsm.task_running();
 } /* is_vectoring_to_goal() */
 
 acquisition_goal_type acquire_goal_fsm::acquisition_goal(void) const {
-  if (kST_ACQUIRE_GOAL == current_state()) {
+  if (ekST_ACQUIRE_GOAL == current_state()) {
     return m_hooks.acquisition_goal();
   }
   return acquisition_goal_type::ekNONE;
@@ -243,7 +248,8 @@ bool acquire_goal_fsm::acquire_known_goal(void) {
 } /* acquire_known_block() */
 
 void acquire_goal_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
+  inject_event(controller::foraging_signal::ekFSM_RUN,
+               rfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

@@ -37,9 +37,9 @@ NS_START(fordyca, tasks, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-generalist::generalist(const rta::task_alloc_params* const params,
+generalist::generalist(const rta::config::task_alloc_config* const config,
                        std::unique_ptr<rta::taskable> mechanism)
-    : foraging_task(kGeneralistName, params, std::move(mechanism)) {}
+    : foraging_task(kGeneralistName, config, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions

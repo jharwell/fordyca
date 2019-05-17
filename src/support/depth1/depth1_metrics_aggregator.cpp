@@ -24,6 +24,7 @@
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include <vector>
 
+#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/location_metrics_collector.hpp"
@@ -35,7 +36,6 @@
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/params/metrics_params.hpp"
 
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
@@ -62,73 +62,73 @@ using task1 = tasks::depth1::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
-    const params::metrics_params* const mparams,
+    const config::metrics_config* const mconfig,
     const std::string& output_root)
-    : depth0_metrics_aggregator(mparams, output_root),
+    : depth0_metrics_aggregator(mconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "caches::acq_counts",
-      metrics_path() + "/" + mparams->cache_acq_counts_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->cache_acq_counts_fname,
+      mconfig->collect_interval);
   register_collector<metrics::fsm::acquisition_loc_metrics_collector>(
       "caches::acq_locs",
-      metrics_path() + "/" + mparams->cache_acq_locs_fname,
-      mparams->collect_interval,
-      rmath::dvec2uvec(mparams->arena_grid.upper,
-                       mparams->arena_grid.resolution));
+      metrics_path() + "/" + mconfig->cache_acq_locs_fname,
+      mconfig->collect_interval,
+      rmath::dvec2uvec(mconfig->arena_grid.upper,
+                       mconfig->arena_grid.resolution));
 
   register_collector<metrics::fsm::current_explore_loc_metrics_collector>(
       "caches::acq_explore_locs",
-      metrics_path() + "/" + mparams->cache_acq_explore_locs_fname,
-      mparams->collect_interval,
-      rmath::dvec2uvec(mparams->arena_grid.upper,
-                       mparams->arena_grid.resolution));
+      metrics_path() + "/" + mconfig->cache_acq_explore_locs_fname,
+      mconfig->collect_interval,
+      rmath::dvec2uvec(mconfig->arena_grid.upper,
+                       mconfig->arena_grid.resolution));
   register_collector<metrics::fsm::current_vector_loc_metrics_collector>(
       "caches::acq_vector_locs",
-      metrics_path() + "/" + mparams->cache_acq_vector_locs_fname,
-      mparams->collect_interval,
-      rmath::dvec2uvec(mparams->arena_grid.upper,
-                       mparams->arena_grid.resolution));
+      metrics_path() + "/" + mconfig->cache_acq_vector_locs_fname,
+      mconfig->collect_interval,
+      rmath::dvec2uvec(mconfig->arena_grid.upper,
+                       mconfig->arena_grid.resolution));
 
   register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kCollectorName),
-      metrics_path() + "/" + mparams->task_execution_collector_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_collector_fname,
+      mconfig->collect_interval);
   register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task1::kHarvesterName),
-      metrics_path() + "/" + mparams->task_execution_harvester_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_harvester_fname,
+      mconfig->collect_interval);
   register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task0::kGeneralistName),
-      metrics_path() + "/" + mparams->task_execution_generalist_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_generalist_fname,
+      mconfig->collect_interval);
 
   register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::generalist",
-      metrics_path() + "/" + mparams->task_tab_generalist_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_tab_generalist_fname,
+      mconfig->collect_interval);
 
   register_collector<rmetrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
-      metrics_path() + "/" + mparams->task_distribution_fname,
-      mparams->collect_interval,
+      metrics_path() + "/" + mconfig->task_distribution_fname,
+      mconfig->collect_interval,
       1);
 
   register_collector<metrics::caches::utilization_metrics_collector>(
       "caches::utilization",
-      metrics_path() + "/" + mparams->cache_utilization_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->cache_utilization_fname,
+      mconfig->collect_interval);
   register_collector<metrics::caches::lifecycle_metrics_collector>(
       "caches::lifecycle",
-      metrics_path() + "/" + mparams->cache_lifecycle_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->cache_lifecycle_fname,
+      mconfig->collect_interval);
 
   register_collector<metrics::caches::location_metrics_collector>(
       "caches::locations",
-      metrics_path() + "/" + mparams->cache_locations_fname,
-      mparams->collect_interval,
-      rmath::dvec2uvec(mparams->arena_grid.upper,
-                       mparams->arena_grid.resolution));
+      metrics_path() + "/" + mconfig->cache_locations_fname,
+      mconfig->collect_interval,
+      rmath::dvec2uvec(mconfig->arena_grid.upper,
+                       mconfig->arena_grid.resolution));
   reset_all();
 }
 

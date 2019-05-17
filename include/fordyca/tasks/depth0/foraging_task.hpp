@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 #include <boost/variant.hpp>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
@@ -36,7 +37,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta { struct task_alloc_params; }}
+namespace rcppsw { namespace ta { namespace config { struct task_alloc_config; }}}
 
 NS_START(fordyca, tasks, depth0);
 class generalist;
@@ -66,7 +67,7 @@ class foraging_task
   static constexpr char kGeneralistName[] = "Generalist";
 
   foraging_task(const std::string& name,
-                const rta::task_alloc_params* params,
+                const rta::config::task_alloc_config* config,
                 std::unique_ptr<rta::taskable> mechanism);
 
   ~foraging_task(void) override = default;

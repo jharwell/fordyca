@@ -39,11 +39,11 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 dynamic_cache_manager::dynamic_cache_manager(
-    const struct params::caches::caches_params* params,
+    const config::caches::caches_config* config,
     ds::arena_grid* const arena_grid)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_manager"),
-      mc_cache_params(*params) {}
+      mc_cache_config(*config) {}
 
 /*******************************************************************************
  * Member Functions
@@ -57,9 +57,9 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
           calc_blocks_for_creation(existing_caches, clusters, blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
         .grid = arena_grid(),
-        .cache_dim = mc_cache_params.dimension,
-        .min_dist = mc_cache_params.dynamic.min_dist,
-        .min_blocks = mc_cache_params.dynamic.min_blocks};
+        .cache_dim = mc_cache_config.dimension,
+        .min_dist = mc_cache_config.dynamic.min_dist,
+        .min_blocks = mc_cache_config.dynamic.min_blocks};
     support::depth2::dynamic_cache_creator creator(&params);
 
     ds::cache_vector created =
@@ -102,7 +102,7 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
   };
   std::copy_if(blocks.begin(), blocks.end(), std::back_inserter(to_use), filter);
 
-  if (to_use.size() < mc_cache_params.dynamic.min_blocks) {
+  if (to_use.size() < mc_cache_config.dynamic.min_blocks) {
     /*
      * @todo Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
@@ -131,18 +131,18 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
-    ER_ASSERT(to_use.size() - count < mc_cache_params.dynamic.min_blocks,
+    ER_ASSERT(to_use.size() - count < mc_cache_config.dynamic.min_blocks,
               "For new caches, %zu blocks SHOULD be available, but only %zu "
               "are (min=%u)",
               to_use.size() - count,
               to_use.size(),
-              mc_cache_params.dynamic.min_blocks);
+              mc_cache_config.dynamic.min_blocks);
     return boost::optional<ds::block_vector>();
   }
-  if (to_use.size() < mc_cache_params.static_.size) {
+  if (to_use.size() < mc_cache_config.static_.size) {
     ER_WARN("Free block count < min blocks for new caches (%zu < %u)",
             to_use.size(),
-            mc_cache_params.dynamic.min_blocks);
+            mc_cache_config.dynamic.min_blocks);
     return boost::optional<ds::block_vector>();
   }
   return boost::make_optional(to_use);

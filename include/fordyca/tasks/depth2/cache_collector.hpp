@@ -24,6 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
+#include <memory>
+
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
@@ -44,9 +47,9 @@ NS_START(fordyca, tasks, depth2);
  */
 class cache_collector final : public depth1::collector {
  public:
-  cache_collector(const struct rta::task_alloc_params* params,
+  cache_collector(const rta::config::task_alloc_config* config,
                   std::unique_ptr<rta::taskable> mechanism) :
-      collector(params,
+      collector(config,
                 depth2::foraging_task::kCacheCollectorName,
                 std::move(mechanism)) {}
 };

@@ -37,9 +37,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { namespace perception {
-struct perception_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct perception_config;
+}} // namespace config::perception
 
 NS_START(ds);
 using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
@@ -68,7 +68,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
    */
   constexpr static uint kCell = 1;
 
-  occupancy_grid(const params::perception::perception_params* c_params,
+  occupancy_grid(const config::perception::perception_config* c_config,
                  const std::string& robot_id);
 
   /**

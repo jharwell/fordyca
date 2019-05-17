@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
@@ -59,7 +61,8 @@ class crw_fsm final : public base_foraging_fsm,
                 public metrics::fsm::goal_acquisition_metrics,
                 public block_transporter {
  public:
-  explicit crw_fsm(controller::saa_subsystem* saa);
+  explicit crw_fsm(controller::saa_subsystem* saa,
+                   std::unique_ptr<expstrat::base_expstrat> exp_behavior);
 
   crw_fsm(const crw_fsm& fsm) = delete;
   crw_fsm& operator=(const crw_fsm& fsm) = delete;
@@ -96,13 +99,13 @@ class crw_fsm final : public base_foraging_fsm,
   bool block_detected(void) const;
 
   enum fsm_states {
-    kST_START, /* Initial state */
-    kST_ACQUIRE_BLOCK,
-    kST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
-    kST_LEAVING_NEST,          /* Block dropped in nest--time to go */
-    kST_WAIT_FOR_BLOCK_PICKUP,
-    kST_WAIT_FOR_BLOCK_DROP,
-    kST_MAX_STATES
+    ekST_START, /* Initial state */
+    ekST_ACQUIRE_BLOCK,
+    ekST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
+    ekST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    ekST_WAIT_FOR_BLOCK_PICKUP,
+    ekST_WAIT_FOR_BLOCK_DROP,
+    ekST_MAX_STATES
   };
 
   /* inherited states */
@@ -137,7 +140,7 @@ class crw_fsm final : public base_foraging_fsm,
   explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, controller, fordyca);

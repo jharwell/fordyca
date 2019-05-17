@@ -46,11 +46,11 @@ namespace repr {
 class base_block;
 class line_of_sight;
 } // namespace repr
-namespace params {
-struct output_params;
-struct sensing_params;
-struct actuation_params;
-} // namespace params
+namespace config {
+struct output_config;
+struct sensing_config;
+struct actuation_config;
+} // namespace config
 
 NS_START(controller);
 class base_perception_subsystem;
@@ -221,9 +221,9 @@ class base_controller : public argos::CCI_Controller,
   const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
 
  private:
-  void output_init(const struct params::output_params* params);
-  void saa_init(const params::actuation_params* actuation_p,
-                const params::sensing_params* sensing_p);
+  void output_init(const config::output_config* config);
+  void saa_init(const config::actuation_config* actuation_p,
+                const config::sensing_config* sensing_p);
 
   /* clang-format off */
   const support::tv::tv_manager*             m_tv_manager{nullptr};

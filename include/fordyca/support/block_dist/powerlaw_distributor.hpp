@@ -44,7 +44,7 @@ namespace repr {
 class block;
 } // namespace repr
 
-namespace params { namespace arena { struct block_dist_params; }}
+namespace config { namespace arena { struct block_dist_config; }}
 
 NS_START(support, block_dist);
 
@@ -68,7 +68,7 @@ class powerlaw_distributor final : public base_distributor,
   /**
    * @brief Initialize the distributor.
    */
-  explicit powerlaw_distributor(const struct params::arena::block_dist_params* params);
+  explicit powerlaw_distributor(const config::arena::block_dist_config* config);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
@@ -90,12 +90,12 @@ class powerlaw_distributor final : public base_distributor,
   bool map_clusters(ds::arena_grid* grid);
 
  private:
-  struct cluster_params {
+  struct cluster_config {
     ds::arena_grid::view view;
     uint                 capacity;
   };
 
-  using cluster_paramvec = std::vector<cluster_params>;
+  using cluster_paramvec = std::vector<cluster_config>;
 
   /**
    * @brief Assign cluster centers randomly, with the only restriction that the

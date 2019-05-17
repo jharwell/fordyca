@@ -27,9 +27,9 @@
 #include <string>
 #include <vector>
 
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
 
 #include "fordyca/nsalias.hpp"
@@ -62,7 +62,7 @@ class mdpo_perception_subsystem final
       public base_perception_subsystem,
       public metrics::perception::mdpo_perception_metrics {
  public:
-  mdpo_perception_subsystem(const params::perception::perception_params* params,
+  mdpo_perception_subsystem(const config::perception::perception_config* config,
                             const std::string& id);
   ~mdpo_perception_subsystem(void) override = default;
 

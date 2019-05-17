@@ -39,9 +39,9 @@ NS_START(fordyca);
 namespace ds {
 class dpo_store;
 }
-namespace params { namespace perception {
-struct perception_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct perception_config;
+}} // namespace config::perception
 
 NS_START(controller);
 
@@ -61,7 +61,7 @@ class dpo_perception_subsystem final
       public metrics::perception::dpo_perception_metrics {
  public:
   explicit dpo_perception_subsystem(
-      const struct params::perception::perception_params* params);
+      const config::perception::perception_config* config);
   ~dpo_perception_subsystem(void) override;
 
   /* DPO perception metrics */

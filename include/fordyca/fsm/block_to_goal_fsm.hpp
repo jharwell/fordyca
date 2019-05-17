@@ -66,17 +66,17 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
                     controller::saa_subsystem* saa);
   ~block_to_goal_fsm(void) override = default;
 
-  block_to_goal_fsm(const block_to_goal_fsm& fsm) = delete;
-  block_to_goal_fsm& operator=(const block_to_goal_fsm& fsm) = delete;
+  block_to_goal_fsm(const block_to_goal_fsm&) = delete;
+  block_to_goal_fsm& operator=(const block_to_goal_fsm&) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
   void task_start(const rta::taskable_argument* arg) override;
   bool task_finished(void) const override {
-    return kST_FINISHED == current_state();
+    return ekST_FINISHED == current_state();
   }
   bool task_running(void) const override {
-    return !(kST_FINISHED == current_state() || kST_START == current_state());
+    return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
   void task_reset(void) override { init(); }
 
@@ -102,32 +102,32 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
 
  protected:
   enum fsm_states {
-    kST_START,
+    ekST_START,
     /**
      * Superstate for acquiring a block (free or from a cache).
      */
-    kST_ACQUIRE_BLOCK,
+    ekST_ACQUIRE_BLOCK,
 
     /**
      * A block has been acquired--wait for area to send the block pickup signal.
      */
-    kST_WAIT_FOR_BLOCK_PICKUP,
+    ekST_WAIT_FOR_BLOCK_PICKUP,
 
     /**
      * We are transporting a carried block to our goal.
      */
-    kST_TRANSPORT_TO_GOAL,
+    ekST_TRANSPORT_TO_GOAL,
 
     /**
      * We have acquired our goal--wait for arena to send the block drop signal.
      */
-    kST_WAIT_FOR_BLOCK_DROP,
+    ekST_WAIT_FOR_BLOCK_DROP,
 
     /**
      * Block has been successfully dropped at our goal/in our goal.
      */
-    kST_FINISHED,
-    kST_MAX_STATES,
+    ekST_FINISHED,
+    ekST_MAX_STATES,
   };
 
   const acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
@@ -160,7 +160,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   acquire_goal_fsm * const m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

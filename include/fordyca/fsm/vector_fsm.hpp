@@ -24,9 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <algorithm>
-
-#include <argos3/core/utility/math/rng.h>
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -79,18 +76,17 @@ class vector_fsm final : public base_foraging_fsm,
 
   explicit vector_fsm(controller::saa_subsystem* saa);
 
-  vector_fsm(const vector_fsm& fsm) = delete;
   vector_fsm& operator=(const vector_fsm& fsm) = delete;
 
   /* taskable overrides */
   void task_reset(void) override { init(); }
   bool task_running(void) const override {
-    return current_state() != kST_START && current_state() != kST_ARRIVED;
+    return current_state() != ekST_START && current_state() != ekST_ARRIVED;
   }
   void task_execute(void) override;
   void task_start(const rta::taskable_argument* c_arg) override;
   bool task_finished(void) const override {
-    return current_state() == kST_ARRIVED;
+    return current_state() == ekST_ARRIVED;
   }
 
   const rmath::vector2d& target(void) const { return m_goal_data.loc; }
@@ -109,16 +105,16 @@ class vector_fsm final : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    kST_START,
+    ekST_START,
     /**
      * Vectoring toward the target.
      */
-    kST_VECTOR,
+    ekST_VECTOR,
 
     /**
      * Avoiding an obstacle nearby to the robot's current location.
      */
-    kST_COLLISION_AVOIDANCE,
+    ekST_COLLISION_AVOIDANCE,
 
     /**
      * Recovering from frequent collision avoidance by driving AWAY from the
@@ -127,19 +123,19 @@ class vector_fsm final : public base_foraging_fsm,
      * of time butting heads when they are traveling in opposite/spatially
      * conflicting directions.
      */
-    kST_COLLISION_RECOVERY,
+    ekST_COLLISION_RECOVERY,
 
     /**
      * We have been colliding too frequently--time to change things up and
      * hopefully move away from the problem location.
      */
-    kST_NEW_DIRECTION,
+    ekST_NEW_DIRECTION,
 
     /**
      * We have arrived at the specified location within tolerance.
      */
-    kST_ARRIVED,
-    kST_MAX_STATES
+    ekST_ARRIVED,
+    ekST_MAX_STATES
   };
 
  private:

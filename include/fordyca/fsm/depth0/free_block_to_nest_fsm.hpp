@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "rcppsw/ta/taskable.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
@@ -53,14 +55,16 @@ using transport_goal_type = block_transporter::goal_type;
  * @brief FILL ME IN!
  */
 class free_block_to_nest_fsm final : public base_foraging_fsm,
-                               rer::client<free_block_to_nest_fsm>,
-                               public metrics::fsm::goal_acquisition_metrics,
-                               public block_transporter,
-                               public rta::taskable {
+                                     public rer::client<free_block_to_nest_fsm>,
+                                     public metrics::fsm::goal_acquisition_metrics,
+                                     public block_transporter,
+                                     public rta::taskable {
  public:
-  free_block_to_nest_fsm(const controller::block_sel_matrix* sel_matrix,
-                         controller::saa_subsystem* saa,
-                         ds::dpo_store* store);
+  free_block_to_nest_fsm(
+      const controller::block_sel_matrix* sel_matrix,
+      controller::saa_subsystem* saa,
+      ds::dpo_store* store,
+      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -68,10 +72,10 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
   void task_start(const rta::taskable_argument*) override {}
 
   bool task_finished(void) const override {
-    return kST_FINISHED == current_state();
+    return ekST_FINISHED == current_state();
   }
   bool task_running(void) const override {
-    return !(kST_FINISHED == current_state() || kST_START == current_state());
+    return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
 
   /* collision metrics */
@@ -97,18 +101,18 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    kST_START,
-    kST_ACQUIRE_BLOCK,     /* superstate for finding a block */
+    ekST_START,
+    ekST_ACQUIRE_BLOCK,     /* superstate for finding a block */
     /**
      * @brief State robots wait in after acquiring a block for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
-    kST_WAIT_FOR_PICKUP,
-    kST_WAIT_FOR_DROP,
-    kST_TRANSPORT_TO_NEST, /* take block to nest */
-    kST_FINISHED,
-    kST_MAX_STATES
+    ekST_WAIT_FOR_PICKUP,
+    ekST_WAIT_FOR_DROP,
+    ekST_TRANSPORT_TO_NEST, /* take block to nest */
+    ekST_FINISHED,
+    ekST_MAX_STATES
   };
 
  private:
@@ -147,7 +151,7 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
   acquire_free_block_fsm m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, fsm, fordyca);

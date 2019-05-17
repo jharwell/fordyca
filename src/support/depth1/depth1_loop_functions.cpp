@@ -32,16 +32,16 @@
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 #include <boost/mpl/for_each.hpp>
 
+#include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/oracle/oracle_manager_config.hpp"
+#include "fordyca/config/output_config.hpp"
+#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_odpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/oracle/oracle_manager_params.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth1/robot_configurer.hpp"
@@ -135,7 +135,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
     config_map->emplace(
         typeid(controller),
         robot_configurer<T, depth1_metrics_aggregator>(
-            lf->params()->parse_results<params::visualization_params>(),
+            lf->config()->config_get<config::visualization_config>(),
             lf->oracle_manager()->entities_oracle(),
             lf->oracle_manager()->tasking_oracle(),
             lf->m_metrics_agg.get()));
@@ -186,9 +186,9 @@ void depth1_loop_functions::shared_init(ticpp::Element& node) {
   depth0_loop_functions::shared_init(node);
 
   /* initialize stat collecting */
-  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
-  params::output_params output =
-      *params()->parse_results<const struct params::output_params>();
+  auto* arenap = config()->config_get<config::arena::arena_map_config>();
+  config::output_config output =
+      *config()->config_get<const config::output_config>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(&output.metrics,
                                                                  output_root());
@@ -198,7 +198,7 @@ void depth1_loop_functions::shared_init(ticpp::Element& node) {
 
 void depth1_loop_functions::private_init(void) {
   /* initialize cache handling and create initial cache */
-  cache_handling_init(params()->parse_results<params::caches::caches_params>());
+  cache_handling_init(config()->config_get<config::caches::caches_config>());
 
   /*
    * Initialize convergence calculations to include task distribution (not
@@ -236,8 +236,7 @@ void depth1_loop_functions::private_init(void) {
 } /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
-  auto* oraclep =
-      params()->parse_results<params::oracle::oracle_manager_params>();
+  auto* oraclep = config()->config_get<config::oracle::oracle_manager_config>();
   if (oraclep->tasking.enabled) {
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
@@ -253,7 +252,7 @@ void depth1_loop_functions::oracle_init(void) {
 } /* oracle_init() */
 
 void depth1_loop_functions::cache_handling_init(
-    const struct params::caches::caches_params* cachep) {
+    const config::caches::caches_config* cachep) {
   if (nullptr != cachep && cachep->static_.enable) {
     /*
      * Regardless of how many foragers/etc there are, always create an

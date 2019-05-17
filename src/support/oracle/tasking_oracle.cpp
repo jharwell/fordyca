@@ -24,7 +24,7 @@
 #include "fordyca/support/oracle/tasking_oracle.hpp"
 #include <functional>
 
-#include "fordyca/params/oracle/tasking_oracle_params.hpp"
+#include "fordyca/config/oracle/tasking_oracle_config.hpp"
 #include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/polled_task.hpp"
@@ -38,11 +38,11 @@ NS_START(fordyca, support, oracle);
  * Constructors/Destructors
  ******************************************************************************/
 tasking_oracle::tasking_oracle(
-    const params::oracle::tasking_oracle_params* const params,
+    const config::oracle::tasking_oracle_config* const config,
     const rta::bi_tdgraph* const graph)
     : ER_CLIENT_INIT("fordyca.support.tasking_oracle"),
-      mc_exec_ests(params->task_exec_ests),
-      mc_int_ests(params->task_interface_ests) {
+      mc_exec_ests(config->task_exec_ests),
+      mc_int_ests(config->task_interface_ests) {
   graph->walk([&](const rta::polled_task* task) {
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
     m_map.insert(

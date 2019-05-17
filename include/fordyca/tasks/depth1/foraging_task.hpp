@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/ta/polled_task.hpp"
@@ -32,10 +33,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta { struct task_alloc_params; }}
-NS_START(fordyca);
-
-NS_START(tasks, depth1);
+namespace rcppsw { namespace ta { namespace config { struct task_alloc_config; }}}
+NS_START(fordyca, tasks, depth1);
 
 /*******************************************************************************
  * Structure Definitions
@@ -58,7 +57,7 @@ class foraging_task : public base_foraging_task,
   static constexpr char kHarvesterName[] = "Harvester";
 
   foraging_task(const std::string& name,
-                const struct rta::task_alloc_params *params,
+                const struct rta::config::task_alloc_config *config,
                 std::unique_ptr<rta::taskable> mechanism);
   ~foraging_task(void) override = default;
 

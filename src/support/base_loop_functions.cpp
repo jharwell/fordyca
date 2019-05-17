@@ -25,12 +25,12 @@
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/oracle/oracle_manager_config.hpp"
+#include "fordyca/config/output_config.hpp"
+#include "fordyca/config/tv/tv_manager_config.hpp"
+#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/oracle/oracle_manager_params.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/tv/tv_manager_params.hpp"
-#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
@@ -39,8 +39,8 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/swarm/convergence/config/convergence_config.hpp"
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,8 +63,7 @@ base_loop_functions::~base_loop_functions(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_loop_functions::output_init(
-    const struct params::output_params* const output) {
+void base_loop_functions::output_init(const config::output_config* const output) {
   if ("__current_date__" == output->output_dir) {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
     m_output_root = output->output_root + "/" +
@@ -94,22 +93,22 @@ void base_loop_functions::output_init(
 void base_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
   /* parse simulation input file */
-  m_params.parse_all(node);
+  m_config.parse_all(node);
 
   /* initialize output and metrics collection */
-  output_init(m_params.parse_results<params::output_params>());
+  output_init(m_config.config_get<config::output_config>());
 
   /* initialize arena map and distribute blocks */
-  arena_map_init(params());
+  arena_map_init(config());
 
   /* initialize convergence calculations */
-  convergence_init(m_params.parse_results<rswc::convergence_params>());
+  convergence_init(m_config.config_get<rswc::config::convergence_config>());
 
   /* initialize temporal variance injection */
-  tv_init(params()->parse_results<params::tv::tv_manager_params>());
+  tv_init(config()->config_get<config::tv::tv_manager_config>());
 
   /* initialize oracle, if configured */
-  oracle_init(params()->parse_results<params::oracle::oracle_manager_params>());
+  oracle_init(config()->config_get<config::oracle::oracle_manager_config>());
 
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
@@ -117,9 +116,9 @@ void base_loop_functions::Init(ticpp::Element& node) {
 } /* Init() */
 
 void base_loop_functions::convergence_init(
-    const rswc::convergence_params* const params) {
+    const rswc::config::convergence_config* const config) {
   m_conv_calc = rcppsw::make_unique<rswc::convergence_calculator>(
-      params,
+      config,
       std::bind(&base_loop_functions::calc_robot_headings,
                 this,
                 std::placeholders::_1),
@@ -134,7 +133,7 @@ void base_loop_functions::PreStep(void) {
   m_conv_calc->update();
 } /* PreStep() */
 
-void base_loop_functions::tv_init(const params::tv::tv_manager_params* const tvp) {
+void base_loop_functions::tv_init(const config::tv::tv_manager_config* const tvp) {
   m_tv_manager = rcppsw::make_unique<tv::tv_manager>(tvp, this, arena_map());
 
   for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -147,11 +146,11 @@ void base_loop_functions::tv_init(const params::tv::tv_manager_params* const tvp
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
-    const params::loop_function_repository* const repo) {
-  auto* aparams = repo->parse_results<params::arena::arena_map_params>();
-  auto* vparams = repo->parse_results<params::visualization_params>();
+    const config::loop_function_repository* const repo) {
+  auto* aconfig = repo->config_get<config::arena::arena_map_config>();
+  auto* vconfig = repo->config_get<config::visualization_config>();
 
-  m_arena_map = rcppsw::make_unique<ds::arena_map>(aparams);
+  m_arena_map = rcppsw::make_unique<ds::arena_map>(aconfig);
   if (!m_arena_map->initialize(this)) {
     ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
@@ -162,15 +161,15 @@ void base_loop_functions::arena_map_init(
   /*
    * If null, visualization has been disabled.
    */
-  if (nullptr != vparams) {
+  if (nullptr != vconfig) {
     for (auto& block : m_arena_map->blocks()) {
-      block->display_id(vparams->block_id);
+      block->display_id(vconfig->block_id);
     } /* for(&block..) */
   }
 } /* arena_map_init() */
 
 void base_loop_functions::oracle_init(
-    const params::oracle::oracle_manager_params* const oraclep) {
+    const config::oracle::oracle_manager_config* const oraclep) {
   ER_INFO("Creating oracle manager");
   m_oracle_manager = rcppsw::make_unique<oracle::oracle_manager>(oraclep);
 } /* oracle_init() */

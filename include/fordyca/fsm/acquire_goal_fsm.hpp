@@ -27,6 +27,7 @@
 #include <boost/optional.hpp>
 #include <functional>
 #include <list>
+#include <memory>
 #include <tuple>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
@@ -114,13 +115,17 @@ class acquire_goal_fsm : public base_foraging_fsm,
   };
 
   /**
-   * @param saa              Handle to sensing and actuation subsystem.
+   * @param saa Handle to sensing and actuation subsystem.
    *
-   * @param hook_list List of function callbacks that derived classes should
-   *                         pass in ordr to make use of the general purpose
-   *                         machinery in this class.
+   * @param exp_behavior The exploration behavior to use; can be NULL if goal
+   * acquisition should always be performed via vectoring.
+   *
+   * @param hooks List of function callbacks that derived classes should pass in
+   *              ordr to make use of the general purpose machinery in this
+   *              class.
    */
   acquire_goal_fsm(controller::saa_subsystem* saa,
+                   std::unique_ptr<expstrat::base_expstrat> behavior,
                    const struct hook_list& hooks);
   ~acquire_goal_fsm(void) override = default;
 
@@ -131,10 +136,10 @@ class acquire_goal_fsm : public base_foraging_fsm,
   void task_execute(void) override final;
   void task_start(const rta::taskable_argument*) override {}
   bool task_finished(void) const override final {
-    return kST_FINISHED == current_state();
+    return ekST_FINISHED == current_state();
   }
   bool task_running(void) const override final {
-    return kST_ACQUIRE_GOAL == current_state();
+    return ekST_ACQUIRE_GOAL == current_state();
   }
   void task_reset(void) override final { init(); }
 
@@ -160,10 +165,10 @@ class acquire_goal_fsm : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    kST_START,
-    kST_ACQUIRE_GOAL, /* superstate for finding a goal */
-    kST_FINISHED,
-    kST_MAX_STATES
+    ekST_START,
+    ekST_ACQUIRE_GOAL, /* superstate for finding a goal */
+    ekST_FINISHED,
+    ekST_MAX_STATES
   };
 
  private:
@@ -206,7 +211,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
   explore_for_goal_fsm      m_explore_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

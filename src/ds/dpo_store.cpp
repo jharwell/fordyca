@@ -25,7 +25,7 @@
 #include <boost/range/adaptor/map.hpp>
 #include <numeric>
 
-#include "fordyca/params/perception/pheromone_params.hpp"
+#include "fordyca/config/perception/pheromone_config.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
@@ -37,10 +37,10 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dpo_store::dpo_store(const params::perception::pheromone_params* const params)
+dpo_store::dpo_store(const config::perception::pheromone_config* const config)
     : ER_CLIENT_INIT("fordyca.ds.dpo_store"),
-      mc_repeat_deposit(params->repeat_deposit),
-      mc_pheromone_rho(params->rho) {}
+      mc_repeat_deposit(config->repeat_deposit),
+      mc_pheromone_rho(config->rho) {}
 
 /*******************************************************************************
  * Member Functions
@@ -78,6 +78,9 @@ bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
     ER_TRACE("Removing cache%d@%s",
              it->ent()->id(),
              it->ent()->discrete_loc().to_str().c_str());
+    if (1 == m_caches.size()) {
+      m_last_cache_loc = boost::make_optional(it->ent()->real_loc());
+    }
     m_caches.obj_remove(it->ent()->discrete_loc());
     return true;
   }
@@ -177,6 +180,9 @@ bool dpo_store::block_remove(const std::shared_ptr<repr::base_block>& victim) {
     ER_TRACE("Removing block%d@%s",
              victim->id(),
              victim->discrete_loc().to_str().c_str());
+    if (1 == m_blocks.size()) {
+      m_last_block_loc = boost::make_optional(it->ent()->real_loc());
+    }
     m_blocks.obj_remove(it->ent()->id());
     return true;
   }

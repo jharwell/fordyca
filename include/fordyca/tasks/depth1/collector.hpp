@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "rcppsw/ta/abort_probability.hpp"
 #include "rcppsw/ta/polled_task.hpp"
@@ -54,10 +55,10 @@ class collector : public foraging_task,
                   public events::nest_interactor,
                   public rer::client<collector> {
  public:
-  collector(const struct rta::task_alloc_params* params,
+  collector(const struct rta::config::task_alloc_config* config,
             const std::string& name,
             std::unique_ptr<rta::taskable> mechanism);
-  collector(const struct rta::task_alloc_params* params,
+  collector(const struct rta::config::task_alloc_config* config,
             std::unique_ptr<rta::taskable> mechanism);
 
   /*

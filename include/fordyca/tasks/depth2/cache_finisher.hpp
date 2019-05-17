@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
@@ -50,7 +52,7 @@ class cache_finisher final : public foraging_task,
                        public events::dynamic_cache_interactor,
                        public rer::client<cache_finisher> {
  public:
-  cache_finisher(const struct rta::task_alloc_params* params,
+  cache_finisher(const struct rta::config::task_alloc_config* config,
                  std::unique_ptr<rta::taskable> mechanism);
 
   /*

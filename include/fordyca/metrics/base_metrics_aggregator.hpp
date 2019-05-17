@@ -35,8 +35,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct metrics_params;
+namespace config {
+struct metrics_config;
 }
 
 namespace support {
@@ -64,7 +64,7 @@ NS_START(metrics);
 class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
                                 public rmetrics::collector_group {
  public:
-  base_metrics_aggregator(const params::metrics_params* mparams,
+  base_metrics_aggregator(const config::metrics_config* mconfig,
                           const std::string& output_root);
   ~base_metrics_aggregator(void) override = default;
 

@@ -50,12 +50,12 @@ class cell2D_fsm final : public rfsm::simple_fsm,
                          public rer::client<cell2D_fsm> {
  public:
   enum state {
-    kST_UNKNOWN,
-    kST_EMPTY,
-    kST_HAS_BLOCK,
-    kST_HAS_CACHE,
-    kST_CACHE_EXTENT,
-    kST_MAX_STATES
+    ekST_UNKNOWN,
+    ekST_EMPTY,
+    ekST_HAS_BLOCK,
+    ekST_HAS_CACHE,
+    ekST_CACHE_EXTENT,
+    ekST_MAX_STATES
   };
 
   cell2D_fsm(void);
@@ -64,13 +64,13 @@ class cell2D_fsm final : public rfsm::simple_fsm,
 
   void init(void) override;
 
-  bool state_is_known(void) const { return current_state() != kST_UNKNOWN; }
-  bool state_has_block(void) const { return current_state() == kST_HAS_BLOCK; }
-  bool state_has_cache(void) const { return current_state() == kST_HAS_CACHE; }
+  bool state_is_known(void) const { return current_state() != ekST_UNKNOWN; }
+  bool state_has_block(void) const { return current_state() == ekST_HAS_BLOCK; }
+  bool state_has_cache(void) const { return current_state() == ekST_HAS_CACHE; }
   bool state_in_cache_extent(void) const {
-    return current_state() == kST_CACHE_EXTENT;
+    return current_state() == ekST_CACHE_EXTENT;
   }
-  bool state_is_empty(void) const { return current_state() == kST_EMPTY; }
+  bool state_is_empty(void) const { return current_state() == ekST_EMPTY; }
 
   /* events */
   void event_unknown(void);
@@ -101,7 +101,7 @@ class cell2D_fsm final : public rfsm::simple_fsm,
         FSM_STATE_MAP_ENTRY(&state_cache),
         FSM_STATE_MAP_ENTRY(&state_cache_extent),
     };
-    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, kST_MAX_STATES);
+    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ekST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
 

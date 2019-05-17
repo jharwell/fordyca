@@ -50,15 +50,15 @@ base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
  * States
  ******************************************************************************/
 HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
-  ER_ASSERT(rfsm::event_type::kNORMAL == data->type(),
-            "kST_LEAVING_NEST cannot handle child events");
-  ER_ASSERT(controller::foraging_signal::kBLOCK_PICKUP != data->signal(),
-            "kST_LEAVING_NEST should never pickup blocks...");
-  ER_ASSERT(controller::foraging_signal::kBLOCK_DROP != data->signal(),
-            "kST_LEAVING_NEST should never drop blocks...");
+  ER_ASSERT(rfsm::event_type::ekNORMAL == data->type(),
+            "ekST_LEAVING_NEST cannot handle child events");
+  ER_ASSERT(controller::foraging_signal::ekBLOCK_PICKUP != data->signal(),
+            "ekST_LEAVING_NEST should never pickup blocks...");
+  ER_ASSERT(controller::foraging_signal::ekBLOCK_DROP != data->signal(),
+            "ekST_LEAVING_NEST should never drop blocks...");
 
   if (current_state() != last_state()) {
-    ER_DEBUG("Executing kST_LEAVING_NEST");
+    ER_DEBUG("Executing ekST_LEAVING_NEST");
   }
   /*
    * We don't want to just apply anti-phototaxis force, because that will make
@@ -78,19 +78,19 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
   m_saa->apply_steering_force(std::make_pair(false, false));
 
   if (!m_saa->sensing()->in_nest()) {
-    return controller::foraging_signal::kLEFT_NEST;
+    return controller::foraging_signal::ekLEFT_NEST;
   }
-  return rfsm::event_signal::kHANDLED;
+  return rfsm::event_signal::ekHANDLED;
 }
 HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) {
-  ER_ASSERT(rfsm::event_type::kNORMAL == data->type(),
-            "kST_TRANSPORT_TO_NEST cannot handle child events");
-  ER_ASSERT(controller::foraging_signal::kBLOCK_PICKUP != data->signal(),
-            "kST_TRANSPORT_TO_NEST should never pickup blocks...");
-  ER_ASSERT(controller::foraging_signal::kBLOCK_PICKUP != data->signal(),
-            "kST_TRANSPORT_TO_NEST should never drop blocks");
+  ER_ASSERT(rfsm::event_type::ekNORMAL == data->type(),
+            "ekST_TRANSPORT_TO_NEST cannot handle child events");
+  ER_ASSERT(controller::foraging_signal::ekBLOCK_PICKUP != data->signal(),
+            "ekST_TRANSPORT_TO_NEST should never pickup blocks...");
+  ER_ASSERT(controller::foraging_signal::ekBLOCK_PICKUP != data->signal(),
+            "ekST_TRANSPORT_TO_NEST should never drop blocks");
   if (current_state() != last_state()) {
-    ER_DEBUG("Executing kST_TRANSPORT_TO_NEST");
+    ER_DEBUG("Executing ekST_TRANSPORT_TO_NEST");
   }
 
   /*
@@ -101,10 +101,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) 
     if (m_nest_count++ < kNEST_COUNT_MAX_STEPS) {
       m_saa->steering_force().wander();
       m_saa->apply_steering_force(std::make_pair(false, false));
-      return controller::foraging_signal::kHANDLED;
+      return controller::foraging_signal::ekHANDLED;
     } else {
       m_nest_count = 0;
-      return controller::foraging_signal::kENTERED_NEST;
+      return controller::foraging_signal::ekENTERED_NEST;
     }
   }
 
@@ -127,7 +127,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) 
   }
 
   m_saa->apply_steering_force(std::make_pair(true, false));
-  return rfsm::event_signal::kHANDLED;
+  return rfsm::event_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data* data) {
@@ -165,7 +165,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data* data) {
     internal_event(previous_state());
   }
   ++m_new_dir_count;
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {

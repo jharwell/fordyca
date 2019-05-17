@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <boost/optional.hpp>
 
-#include "fordyca/params/caches/caches_params.hpp"
+#include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
@@ -61,7 +61,7 @@ NS_START(support, depth2);
 class dynamic_cache_manager final : public base_cache_manager,
                               public rer::client<dynamic_cache_manager> {
  public:
-  dynamic_cache_manager(const struct params::caches::caches_params* params,
+  dynamic_cache_manager(const config::caches::caches_config* config,
                         ds::arena_grid* arena_grid);
 
   /**
@@ -91,8 +91,8 @@ class dynamic_cache_manager final : public base_cache_manager,
    * caches);
    */
   double cache_proximity_dist(void) const {
-    return std::max(2 * mc_cache_params.dimension,
-                    mc_cache_params.dynamic.min_dist);
+    return std::max(2 * mc_cache_config.dimension,
+                    mc_cache_config.dynamic.min_dist);
   }
 
   /**
@@ -101,7 +101,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    * cache distance.
    */
   double block_proximity_dist(void) const {
-    return mc_cache_params.dynamic.min_dist;
+    return mc_cache_config.dynamic.min_dist;
   }
 
  private:
@@ -120,7 +120,7 @@ class dynamic_cache_manager final : public base_cache_manager,
       const ds::block_vector& blocks);
 
   /* clang-format off */
-  const params::caches::caches_params mc_cache_params;
+  const config::caches::caches_config mc_cache_config;
   /* clang-format on */
 };
 

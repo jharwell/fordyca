@@ -35,9 +35,9 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 explore_for_goal_fsm::explore_for_goal_fsm(
     controller::saa_subsystem* const saa,
-    std::unique_ptr<controller::explore_behavior> behavior,
+    std::unique_ptr<expstrat::base_expstrat> behavior,
     const std::function<bool(void)>& goal_detect)
-    : base_explore_fsm(saa, kST_MAX_STATES),
+    : base_foraging_fsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.explore_for_goal"),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(explore, hfsm::top_state()),
@@ -50,27 +50,33 @@ explore_for_goal_fsm::explore_for_goal_fsm(
       m_goal_detect(goal_detect) {}
 
 HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, start) {
-  internal_event(kST_EXPLORE);
-  return controller::foraging_signal::kHANDLED;
+  internal_event(ekST_EXPLORE);
+  return controller::foraging_signal::ekHANDLED;
 }
 
 __rcsw_const HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, explore) {
-  if (kST_EXPLORE != last_state()) {
-    ER_DEBUG("Executing kST_EXPLORE");
+  if (ekST_EXPLORE != last_state()) {
+    ER_DEBUG("Executing ekST_EXPLORE");
     m_explore_time = 0;
   }
 
   if (m_explore_time >= kMIN_EXPLORE_TIME && m_goal_detect()) {
-    internal_event(kST_FINISHED);
+    internal_event(ekST_FINISHED);
   } else {
-    m_explore_behavior->execute();
+    if (nullptr != m_explore_behavior) {
+      m_explore_behavior->task_execute();
+    }
     ++m_explore_time;
   }
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
+}
+
+HFSM_ENTRY_DEFINE_ND(explore_for_goal_fsm, entry_explore) {
+  base_foraging_fsm::actuators()->leds_set_color(rutils::color::kMAGENTA);
 }
 
 /*******************************************************************************
@@ -101,7 +107,13 @@ FSM_OVERRIDE_DEF(uint,
  * General Member Functions
  ******************************************************************************/
 __rcsw_pure bool explore_for_goal_fsm::task_running(void) const {
-  return kST_START != current_state() && kST_FINISHED != current_state();
+  return ekST_START != current_state() && ekST_FINISHED != current_state() &&
+         nullptr != m_explore_behavior;
 }
+
+void explore_for_goal_fsm::task_execute(void) {
+  inject_event(controller::foraging_signal::ekFSM_RUN,
+               rfsm::event_type::ekNORMAL);
+} /* task_execute() */
 
 NS_END(fsm, fordyca);

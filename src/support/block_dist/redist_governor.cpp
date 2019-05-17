@@ -42,9 +42,9 @@ constexpr char redist_governor::kStatusSwitchPolicyMulti[];
  * Constructors/Destructors
  ******************************************************************************/
 redist_governor::redist_governor(
-    const params::arena::block_redist_governor_params* const params)
+    const config::arena::block_redist_governor_config* const config)
     : ER_CLIENT_INIT("fordyca.support.block_dist.redist_governor"),
-      mc_params(*params) {}
+      mc_config(*config) {}
 
 /*******************************************************************************
  * Member Functions
@@ -53,14 +53,14 @@ void redist_governor::update(uint timestep,
                              uint blocks_collected,
                              bool convergence_status) {
   /* # blocks is always infinite */
-  if (kTriggerNull == mc_params.trigger) {
+  if (kTriggerNull == mc_config.trigger) {
     return;
   }
   /*
    * Can only be tripped once, so if already tripped avoid printing
    * diagnostic multiple times.
    */
-  if (kTriggerTime == mc_params.trigger && timestep >= mc_params.timestep &&
+  if (kTriggerTime == mc_config.trigger && timestep >= mc_config.timestep &&
       m_dist_status) {
     ER_INFO(
         "Redistribution disabled by trigger '%s': "
@@ -72,8 +72,8 @@ void redist_governor::update(uint timestep,
     m_dist_status = false;
     return;
   }
-  if (kTriggerBlockCount == mc_params.trigger &&
-      blocks_collected >= mc_params.block_count && m_dist_status) {
+  if (kTriggerBlockCount == mc_config.trigger &&
+      blocks_collected >= mc_config.block_count && m_dist_status) {
     ER_INFO("Redistribution disabled by '%s': t=%u,n_blocks=%u,convergence=%d",
             kTriggerBlockCount,
             timestep,
@@ -82,8 +82,8 @@ void redist_governor::update(uint timestep,
     m_dist_status = false;
     return;
   }
-  if (kTriggerConvergence == mc_params.trigger) {
-    if (kStatusSwitchPolicySingle == mc_params.recurrence_policy &&
+  if (kTriggerConvergence == mc_config.trigger) {
+    if (kStatusSwitchPolicySingle == mc_config.recurrence_policy &&
         !m_dist_status) {
       return;
     }
@@ -104,7 +104,7 @@ void redist_governor::update(uint timestep,
         convergence_status);
     return;
   }
-  ER_FATAL_SENTINEL("Bad trigger type '%s'", mc_params.trigger.c_str());
+  ER_FATAL_SENTINEL("Bad trigger type '%s'", mc_config.trigger.c_str());
 } /* update() */
 
 NS_END(block_dist, support, fordyca);

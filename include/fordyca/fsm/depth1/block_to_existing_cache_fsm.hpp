@@ -24,9 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
+#include "fordyca/fsm/expstrat/base_expstrat.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,20 +48,31 @@ NS_START(fsm, depth1);
  * @brief The FSM for the block-to-existing-cache subtask.
  *
  * Each robot executing this FSM will locate a free block (either a known block
- * or via random exploration), pickup the block and bring it to the best
- * existing cache it knows about. Once it has done that it will signal that its
- * task is complete.
+ * or via exploration), pickup the block and bring it to the best existing cache
+ * it knows about. Once it has done that it will signal that its task is
+ * complete.
+ *
+ * This FSM takes \ref config::exploration_config as an argument because it
+ * needs to be able to use the \ref expstrat::factory to create exploration
+ * strategies for BOTH blocks and caches, and so you can't cleanly pass the
+ * result of factory creation at a higher level into the constructor, like you
+ * can with other FSMs.
  */
 class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
-  block_to_existing_cache_fsm(const controller::block_sel_matrix* bsel_matrix,
-                              const controller::cache_sel_matrix* csel_matrix,
-                              controller::saa_subsystem* saa,
-                              ds::dpo_store* store);
+  struct params {
+    const controller::block_sel_matrix* bsel_matrix;
+    const controller::cache_sel_matrix* csel_matrix;
+    controller::saa_subsystem*          saa;
+    ds::dpo_store*                      store;
+    fordyca::config::exploration_config exp_config;
+  };
+  explicit block_to_existing_cache_fsm(const params* c_params);
+
   ~block_to_existing_cache_fsm(void) override = default;
 
-  block_to_existing_cache_fsm(const block_to_existing_cache_fsm& fsm) = delete;
-  block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm& fsm) = delete;
+  block_to_existing_cache_fsm(const block_to_existing_cache_fsm&) = delete;
+  block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm&) = delete;
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
-#include "fordyca/params/arena/block_redist_governor_params.hpp"
+#include "fordyca/config/arena/block_redist_governor_config.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -62,7 +62,7 @@ class redist_governor : public rer::client<redist_governor> {
   static constexpr char kTriggerConvergence[] = "convergence";
 
   explicit redist_governor(
-      const params::arena::block_redist_governor_params* params);
+      const config::arena::block_redist_governor_config* config);
 
   /**
    * @brief Update the distribution status according to the policy parameters.
@@ -76,7 +76,7 @@ class redist_governor : public rer::client<redist_governor> {
 
  private:
   /* clang-format off */
-  const params::arena::block_redist_governor_params mc_params;
+  const config::arena::block_redist_governor_config mc_config;
 
   bool                                              m_dist_status{true};
   /* clang-format on */

@@ -32,6 +32,7 @@
 #include <boost/mpl/for_each.hpp>
 
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+#include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
@@ -46,7 +47,6 @@
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
-#include "fordyca/params/tv/tv_manager_params.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
@@ -63,12 +63,12 @@ template <typename Typelist,
           class PenaltyHandlerParamType>
 class penalty_handler_initializer : public boost::static_visitor<void> {
  public:
-  penalty_handler_initializer(const PenaltyHandlerParamType* const params,
+  penalty_handler_initializer(const PenaltyHandlerParamType* const config,
                               ds::arena_map* const arena_map,
                               rds::type_map<Typelist>* type_map,
                               const std::string& handler_name)
       : mc_handler_name(handler_name),
-        mc_params(params),
+        mc_config(config),
         m_arena_map(arena_map),
         m_type_map(type_map) {}
 
@@ -86,13 +86,13 @@ class penalty_handler_initializer : public boost::static_visitor<void> {
     m_type_map->emplace(
         typeid(controller),
         rcppsw::make_unique<class PenaltyHandlerType<ControllerType>>(
-            m_arena_map, mc_params, mc_handler_name));
+            m_arena_map, mc_config, mc_handler_name));
   }
 
  private:
   /* clang-format off */
   const std::string                    mc_handler_name;
-  const PenaltyHandlerParamType* const mc_params;
+  const PenaltyHandlerParamType* const mc_config;
   ds::arena_map* const                 m_arena_map;
   rds::type_map<Typelist>*             m_type_map;
   /* clang-format on */
@@ -101,18 +101,18 @@ class penalty_handler_initializer : public boost::static_visitor<void> {
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-tv_manager::tv_manager(const params::tv::tv_manager_params* params,
+tv_manager::tv_manager(const config::tv::tv_manager_config* config,
                        const support::base_loop_functions* const lf,
                        ds::arena_map* const map)
     : ER_CLIENT_INIT("fordyca.support.tv.tv_manager"),
       mc_lf(lf),
-      mc_motion_throttle_params(params->block_carry_throttle) {
+      mc_motion_throttle_config(config->block_carry_throttle) {
   /* All controllers can drop blocks in the nest */
   boost::mpl::for_each<controller::typelist>(
       penalty_handler_initializer<block_handler_typelist,
                                   block_op_penalty_handler,
-                                  decltype(params->block_manipulation_penalty)>(
-          &params->block_manipulation_penalty,
+                                  decltype(config->block_manipulation_penalty)>(
+          &config->block_manipulation_penalty,
           map,
           &m_nest_drop,
           "Nest Block Drop"));
@@ -121,8 +121,8 @@ tv_manager::tv_manager(const params::tv::tv_manager_params* params,
   boost::mpl::for_each<controller::typelist>(
       penalty_handler_initializer<block_handler_typelist,
                                   block_op_penalty_handler,
-                                  decltype(params->block_manipulation_penalty)>(
-          &params->block_manipulation_penalty,
+                                  decltype(config->block_manipulation_penalty)>(
+          &config->block_manipulation_penalty,
           map,
           &m_fb_pickup,
           "Free Block Pickup"));
@@ -131,8 +131,8 @@ tv_manager::tv_manager(const params::tv::tv_manager_params* params,
   boost::mpl::for_each<controller::d1d2_typelist>(
       penalty_handler_initializer<existing_cache_handler_typelist,
                                   cache_op_penalty_handler,
-                                  decltype(params->cache_usage_penalty)>(
-          &params->cache_usage_penalty,
+                                  decltype(config->cache_usage_penalty)>(
+          &config->cache_usage_penalty,
           map,
           &m_existing_cache,
           "Existing Cache"));
@@ -141,15 +141,15 @@ tv_manager::tv_manager(const params::tv::tv_manager_params* params,
   boost::mpl::for_each<controller::depth2::typelist>(
       penalty_handler_initializer<fb_drop_handler_typelist,
                                   block_op_penalty_handler,
-                                  decltype(params->block_manipulation_penalty)>(
-          &params->block_manipulation_penalty, map, &m_new_cache, "New Cache"));
+                                  decltype(config->block_manipulation_penalty)>(
+          &config->block_manipulation_penalty, map, &m_new_cache, "New Cache"));
 
   /* Only D2 controllers deal with cache sites */
   boost::mpl::for_each<controller::depth2::typelist>(
       penalty_handler_initializer<fb_drop_handler_typelist,
                                   block_op_penalty_handler,
-                                  decltype(params->block_manipulation_penalty)>(
-          &params->block_manipulation_penalty,
+                                  decltype(config->block_manipulation_penalty)>(
+          &config->block_manipulation_penalty,
           map,
           &m_cache_site,
           "Cache Site"));
@@ -188,7 +188,7 @@ double tv_manager::env_cache_usage(void) const {
 void tv_manager::register_controller(int robot_id) {
   m_motion_throttling.emplace(std::piecewise_construct,
                               std::forward_as_tuple(robot_id),
-                              std::forward_as_tuple(&mc_motion_throttle_params));
+                              std::forward_as_tuple(&mc_motion_throttle_config));
 } /* register_controller() */
 
 void tv_manager::update(void) {

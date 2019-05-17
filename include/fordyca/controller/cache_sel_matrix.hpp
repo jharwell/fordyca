@@ -29,9 +29,9 @@
 #include <string>
 #include <vector>
 
+#include "fordyca/config/cache_sel/pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_exception.hpp"
 #include "fordyca/nsalias.hpp"
-#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -40,16 +40,16 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace cache_sel {
-struct cache_sel_matrix_params;
-}} // namespace params::cache_sel
+namespace config { namespace cache_sel {
+struct cache_sel_matrix_config;
+}} // namespace config::cache_sel
 NS_START(controller);
 using cache_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
                    rmath::rangeu,
                    std::vector<int>,
-                   params::cache_sel::pickup_policy_params>;
+                   config::cache_sel::pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions
@@ -94,7 +94,7 @@ class cache_sel_matrix final
   static constexpr char kInitialPickupPolicyCacheSize[] = "cache_size";
 
   using std::map<std::string, cache_sel_variant>::find;
-  cache_sel_matrix(const struct params::cache_sel::cache_sel_matrix_params* params,
+  cache_sel_matrix(const config::cache_sel::cache_sel_matrix_config* config,
                    const rmath::vector2d& nest_loc);
   ~cache_sel_matrix(void) override = default;
 

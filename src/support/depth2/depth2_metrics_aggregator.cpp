@@ -24,7 +24,7 @@
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include <vector>
 
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/config/metrics_config.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
@@ -51,40 +51,40 @@ using task2 = tasks::depth2::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth2_metrics_aggregator::depth2_metrics_aggregator(
-    const params::metrics_params* const mparams,
+    const config::metrics_config* const mconfig,
     const std::string& output_root)
-    : depth1_metrics_aggregator(mparams, output_root),
+    : depth1_metrics_aggregator(mconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
   register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::harvester",
-      metrics_path() + "/" + mparams->task_tab_collector_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_tab_collector_fname,
+      mconfig->collect_interval);
   register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::collector",
-      metrics_path() + "/" + mparams->task_tab_harvester_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_tab_harvester_fname,
+      mconfig->collect_interval);
   register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheStarterName),
-      metrics_path() + "/" + mparams->task_execution_cache_starter_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_cache_starter_fname,
+      mconfig->collect_interval);
   register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheFinisherName),
-      metrics_path() + "/" + mparams->task_execution_cache_finisher_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_cache_finisher_fname,
+      mconfig->collect_interval);
   register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheTransfererName),
-      metrics_path() + "/" + mparams->task_execution_cache_transferer_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_cache_transferer_fname,
+      mconfig->collect_interval);
   register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheCollectorName),
-      metrics_path() + "/" + mparams->task_execution_cache_collector_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_cache_collector_fname,
+      mconfig->collect_interval);
 
   /* Overwrite depth1; we have a deeper decomposition now */
   register_collector<rmetrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
-      metrics_path() + "/" + mparams->task_distribution_fname,
-      mparams->collect_interval,
+      metrics_path() + "/" + mconfig->task_distribution_fname,
+      mconfig->collect_interval,
       2);
   reset_all();
 }

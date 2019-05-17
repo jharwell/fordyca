@@ -110,8 +110,8 @@ void block_proximity::visit(tasks::depth2::cache_starter& task) {
 } /* visit() */
 
 void block_proximity::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::kBLOCK_PROXIMITY,
-                   rfsm::event_type::kNORMAL);
+  fsm.inject_event(controller::foraging_signal::ekBLOCK_PROXIMITY,
+                   rfsm::event_type::ekNORMAL);
 } /* visit() */
 
 NS_END(detail, events, fordyca);

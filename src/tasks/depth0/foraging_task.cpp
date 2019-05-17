@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "rcppsw/ta/task_alloc_params.hpp"
+#include "rcppsw/ta/config/task_alloc_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,11 +33,11 @@ NS_START(fordyca, tasks, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const rta::task_alloc_params* const params,
+                             const rta::config::task_alloc_config* const config,
                              std::unique_ptr<rta::taskable> mechanism)
     : polled_task(name,
-                  &params->abort,
-                  &params->exec_est.ema,
+                  &config->abort,
+                  &config->exec_est.ema,
                   std::move(mechanism)) {}
 
 /*******************************************************************************

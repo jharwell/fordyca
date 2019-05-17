@@ -36,9 +36,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace block_sel {
-struct block_sel_matrix_params;
-}} // namespace params::block_sel
+namespace config { namespace block_sel {
+struct block_sel_matrix_config;
+}} // namespace config::block_sel
 NS_START(controller);
 using block_sel_variant =
     boost::variant<double, rmath::vector2d, std::vector<int>>;
@@ -56,7 +56,7 @@ using block_sel_variant =
  * - block (of whatever type)
  *
  * This class may be separated into those components in the future if it makes
- * sense. For now, it is cleaner to have all three uses be in the same class.
+ * sense.
  */
 
 class block_sel_matrix : public std::map<std::string, block_sel_variant> {
@@ -67,7 +67,7 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
   static constexpr char kSelExceptions[] = "sel_exceptions";
 
   explicit block_sel_matrix(
-      const struct params::block_sel::block_sel_matrix_params* params);
+      const config::block_sel::block_sel_matrix_config* config);
 
   /**
    * @brief Add a block to the exception list, disqualifying it from being

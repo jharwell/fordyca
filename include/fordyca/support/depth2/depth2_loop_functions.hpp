@@ -106,7 +106,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
 
   void private_init(void);
 
-  void cache_handling_init(const struct params::caches::caches_params* cachep);
+  void cache_handling_init(const config::caches::caches_config* cachep);
 
   /**
    * @brief Handle creation of dynamic caches during initialization, reset, or

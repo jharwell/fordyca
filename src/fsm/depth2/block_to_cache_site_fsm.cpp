@@ -35,21 +35,22 @@ block_to_cache_site_fsm::block_to_cache_site_fsm(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
     controller::saa_subsystem* const saa,
-    ds::dpo_store* const store)
+    ds::dpo_store* const store,
+    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
       m_cache_fsm(csel_matrix, saa, store),
-      m_block_fsm(bsel_matrix, saa, store) {}
+      m_block_fsm(bsel_matrix, saa, store, std::move(exp_behavior)) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
 __rcsw_pure acquisition_goal_type
 block_to_cache_site_fsm::acquisition_goal(void) const {
-  if (kST_ACQUIRE_BLOCK == current_state() ||
-      kST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acquisition_goal_type::ekBLOCK;
-  } else if (kST_TRANSPORT_TO_GOAL == current_state() ||
-             kST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+             ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return acquisition_goal_type::ekCACHE_SITE;
   }
   return acquisition_goal_type::ekNONE;
@@ -57,8 +58,8 @@ block_to_cache_site_fsm::acquisition_goal(void) const {
 
 __rcsw_pure transport_goal_type
 block_to_cache_site_fsm::block_transport_goal(void) const {
-  if (kST_TRANSPORT_TO_GOAL == current_state() ||
-      kST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::ekCACHE_SITE;
   }
   return transport_goal_type::ekNONE;

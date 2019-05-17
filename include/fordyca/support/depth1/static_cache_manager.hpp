@@ -29,7 +29,7 @@
 #include <random>
 #include <boost/optional.hpp>
 
-#include "fordyca/params/caches/caches_params.hpp"
+#include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
@@ -61,7 +61,7 @@ NS_START(support, depth1);
 class static_cache_manager final : public base_cache_manager,
                              public rer::client<static_cache_manager> {
  public:
-  static_cache_manager(const struct params::caches::caches_params* params,
+  static_cache_manager(const config::caches::caches_config* config,
                        ds::arena_grid* arena_grid,
                        const rmath::vector2d& cache_loc);
 
@@ -115,7 +115,7 @@ class static_cache_manager final : public base_cache_manager,
   void post_creation_blocks_adjust(const ds::cache_vector& caches,
                                    const ds::block_vector& blocks);
   /* clang-format off */
-  const params::caches::caches_params mc_cache_params;
+  const config::caches::caches_config mc_cache_config;
   const rmath::vector2d               mc_cache_loc;
   std::default_random_engine          m_reng;
   /* clang-format on */

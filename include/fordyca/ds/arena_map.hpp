@@ -43,9 +43,9 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace arena {
-struct arena_map_params;
-}} // namespace params::arena
+namespace config { namespace arena {
+struct arena_map_config;
+}} // namespace config::arena
 
 namespace repr {
 class arena_cache;
@@ -78,7 +78,7 @@ class arena_map final : public rer::client<arena_map>,
   using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
   using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
 
-  explicit arena_map(const struct params::arena::arena_map_params* params);
+  explicit arena_map(const config::arena::arena_map_config* config);
 
   /* robot occupancy metrics */
   bool has_robot(const rmath::vector2u& coord) const override;

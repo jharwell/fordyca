@@ -22,13 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
-#include "fordyca/params/metrics_params.hpp"
 
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
@@ -67,18 +67,18 @@ template void depth0_metrics_aggregator::collect_from_controller(
  * Constructors/Destructors
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
-    const struct params::metrics_params* const mparams,
+    const config::metrics_config* const mconfig,
     const std::string& output_root)
-    : base_metrics_aggregator(mparams, output_root),
+    : base_metrics_aggregator(mconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
   register_collector<metrics::perception::mdpo_perception_metrics_collector>(
       "perception::mdpo",
-      metrics_path() + "/" + mparams->perception_mdpo_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->perception_mdpo_fname,
+      mconfig->collect_interval);
   register_collector<metrics::perception::dpo_perception_metrics_collector>(
       "perception::dpo",
-      metrics_path() + "/" + mparams->perception_dpo_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->perception_dpo_fname,
+      mconfig->collect_interval);
   reset_all();
 }
 

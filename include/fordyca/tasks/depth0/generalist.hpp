@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 
 /*******************************************************************************
@@ -49,7 +51,7 @@ NS_START(fordyca, tasks, depth0);
  */
 class generalist final : public foraging_task {
  public:
-  generalist(const rta::task_alloc_params* params,
+  generalist(const rta::config::task_alloc_config* config,
              std::unique_ptr<rta::taskable> mechanism);
 
   /* event handling */

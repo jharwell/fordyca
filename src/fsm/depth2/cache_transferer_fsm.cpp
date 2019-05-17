@@ -34,19 +34,20 @@ NS_START(fordyca, fsm, depth2);
 cache_transferer_fsm::cache_transferer_fsm(
     const controller::cache_sel_matrix* const matrix,
     controller::saa_subsystem* const saa,
-    ds::dpo_store* const store)
+    ds::dpo_store* const store,
+    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
     : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa),
-      m_src_cache_fsm(matrix, true, saa, store),
-      m_dest_cache_fsm(matrix, false, saa, store) {}
+      m_src_cache_fsm(matrix, saa, store, exp_behavior->clone(), true),
+      m_dest_cache_fsm(matrix, saa, store, exp_behavior->clone(), false) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
 __rcsw_pure acquisition_goal_type
 cache_transferer_fsm::acquisition_goal(void) const {
-  if (kST_ACQUIRE_BLOCK == current_state() ||
-      kST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
-      kST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return acquisition_goal_type::ekEXISTING_CACHE;
   }
   return acquisition_goal_type::ekNONE;
@@ -54,9 +55,9 @@ cache_transferer_fsm::acquisition_goal(void) const {
 
 __rcsw_pure transport_goal_type
 cache_transferer_fsm::block_transport_goal(void) const {
-  if (kST_ACQUIRE_BLOCK == current_state() ||
-      kST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
-      kST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::ekEXISTING_CACHE;
   }
   return transport_goal_type::ekNONE;

@@ -34,9 +34,9 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace perception {
-struct pheromone_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct pheromone_config;
+}} // namespace config::perception
 NS_START(ds);
 
 /*******************************************************************************
@@ -86,7 +86,7 @@ class dpo_store final : public rer::client<dpo_store> {
    */
   static constexpr double kNRD_MAX_PHEROMONE = 1.0;
 
-  explicit dpo_store(const params::perception::pheromone_params* params);
+  explicit dpo_store(const config::perception::pheromone_config* config);
 
   /**
    * @brief Get all blocks the robot is currently aware of, and their
@@ -159,16 +159,25 @@ class dpo_store final : public rer::client<dpo_store> {
 
   double pheromone_rho(void) const { return mc_pheromone_rho; }
 
+  boost::optional<rmath::vector2d> last_block_loc(void) const {
+    return m_last_block_loc;
+  }
+  boost::optional<rmath::vector2d> last_cache_loc(void) const {
+    return m_last_cache_loc;
+  }
+
  private:
   /*
    * Sets are used for object storage because there is no concept of order
    * among the known blocks/caches.
    */
   /* clang-format off */
-  const bool       mc_repeat_deposit;
-  const double     mc_pheromone_rho;
-  ds::dp_block_map m_blocks{};
-  ds::dp_cache_map m_caches{};
+  const bool                       mc_repeat_deposit;
+  const double                     mc_pheromone_rho;
+  ds::dp_block_map                 m_blocks{};
+  ds::dp_cache_map                 m_caches{};
+  boost::optional<rmath::vector2d> m_last_block_loc{};
+  boost::optional<rmath::vector2d> m_last_cache_loc{};
   /* clang-format on */
 };
 

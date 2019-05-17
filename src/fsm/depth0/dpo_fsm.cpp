@@ -35,52 +35,53 @@ NS_START(fordyca, fsm, depth0);
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const controller::block_sel_matrix* const sel_matrix,
                  controller::saa_subsystem* const saa,
-                 ds::dpo_store* const store)
-    : base_foraging_fsm(saa, kST_MAX_STATES),
+                 ds::dpo_store* const store,
+                 std::unique_ptr<expstrat::base_expstrat> exp_behavior)
+    : base_foraging_fsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.dpo"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
-      m_block_fsm(sel_matrix, saa, store),
+      m_block_fsm(sel_matrix, saa, store, std::move(exp_behavior)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                                nullptr,
                                                &entry_leaving_nest,
                                                nullptr)} {
-  hfsm::change_parent(kST_LEAVING_NEST, &start);
+  hfsm::change_parent(ekST_LEAVING_NEST, &start);
 }
 
 HFSM_STATE_DEFINE(dpo_fsm, start, rfsm::event_data* data) {
   /* first time running FSM */
-  if (rfsm::event_type::kNORMAL == data->type()) {
-    internal_event(kST_BLOCK_TO_NEST);
-    return controller::foraging_signal::kHANDLED;
+  if (rfsm::event_type::ekNORMAL == data->type()) {
+    internal_event(ekST_BLOCK_TO_NEST);
+    return controller::foraging_signal::ekHANDLED;
   }
-  if (rfsm::event_type::kCHILD == data->type()) {
-    if (controller::foraging_signal::kLEFT_NEST == data->signal()) {
-      internal_event(kST_BLOCK_TO_NEST);
-      return controller::foraging_signal::kHANDLED;
+  if (rfsm::event_type::ekCHILD == data->type()) {
+    if (controller::foraging_signal::ekLEFT_NEST == data->signal()) {
+      internal_event(ekST_BLOCK_TO_NEST);
+      return controller::foraging_signal::ekHANDLED;
     }
   }
   ER_FATAL_SENTINEL("Unhandled signal");
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rfsm::event_data* data) {
   if (nullptr != data &&
-      controller::foraging_signal::kFSM_RUN != data->signal() &&
-      rfsm::event_signal::kIGNORED != data->signal()) {
-    m_block_fsm.inject_event(data->signal(), rfsm::event_type::kNORMAL);
-    return controller::foraging_signal::kHANDLED;
+      controller::foraging_signal::ekFSM_RUN != data->signal() &&
+      rfsm::event_signal::ekIGNORED != data->signal()) {
+    m_block_fsm.inject_event(data->signal(), rfsm::event_type::ekNORMAL);
+    return controller::foraging_signal::ekHANDLED;
   }
   if (m_block_fsm.task_finished()) {
     m_block_fsm.task_reset();
-    internal_event(kST_LEAVING_NEST);
+    internal_event(ekST_LEAVING_NEST);
   } else {
     m_block_fsm.task_execute();
   }
-  return controller::foraging_signal::kHANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 /*******************************************************************************
@@ -144,7 +145,8 @@ void dpo_fsm::init(void) {
 } /* init() */
 
 void dpo_fsm::run(void) {
-  inject_event(controller::foraging_signal::kFSM_RUN, rfsm::event_type::kNORMAL);
+  inject_event(controller::foraging_signal::ekFSM_RUN,
+               rfsm::event_type::ekNORMAL);
 } /* run() */
 
 NS_END(depth0, fsm, fordyca);

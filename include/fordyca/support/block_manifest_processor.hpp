@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <vector>
 
+#include "fordyca/config/arena/block_manifest.hpp"
 #include "fordyca/ds/block_vector.hpp"
-#include "fordyca/params/arena/block_manifest.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/patterns/factory/sharing_factory.hpp"
+#include "rcppsw/patterns/factory/factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,21 +39,20 @@ namespace repr {
 class base_block;
 }
 NS_START(support);
-namespace factory = rcppsw::patterns::factory;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 class block_manifest_processor
-    : private factory::sharing_factory<repr::base_block, const rmath::vector2d&, int> {
+    : public rfactory::sharing_factory<repr::base_block, const rmath::vector2d&, int> {
  public:
-  explicit block_manifest_processor(const params::arena::block_manifest* m);
+  explicit block_manifest_processor(const config::arena::block_manifest* m);
 
   ds::block_vector create_blocks(void);
 
  private:
   /* clang-format off */
-  const params::arena::block_manifest mc_manifest;
+  const config::arena::block_manifest mc_manifest;
   /* clang-format on */
 };
 

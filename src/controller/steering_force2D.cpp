@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/steering_force2D.hpp"
-#include "fordyca/params/steering_force2D_params.hpp"
+#include "fordyca/config/steering_force2D_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,11 +34,11 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 steering_force2D::steering_force2D(
     steering::boid& entity,
-    const params::steering_force2D_params* const params,
+    const config::steering_force2D_config* const config,
     const std::shared_ptr<sensing_subsystem>& sensors)
-    : steering::force_calculator(entity, params),
+    : steering::force_calculator(entity, config),
       ER_CLIENT_INIT("fordyca.controller.steering_force2D"),
-      m_phototaxis_force(&params->phototaxis, sensors) {}
+      m_phototaxis_force(&config->phototaxis, sensors) {}
 
 /*******************************************************************************
  * Member Functions

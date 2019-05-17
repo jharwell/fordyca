@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
@@ -35,11 +35,11 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_semantic_map::dpo_semantic_map(
-    const params::perception::perception_params* c_params,
+    const config::perception::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.dpo_semantic_map"),
-      decorator(c_params, robot_id),
-      m_store(&c_params->pheromone) {}
+      decorator(c_config, robot_id),
+      m_store(&c_config->pheromone) {}
 
 /*******************************************************************************
  * Member Functions

@@ -43,7 +43,7 @@ class polled_task;
 
 NS_START(fordyca);
 
-namespace params {
+namespace config {
 namespace depth1 { class controller_repository; }
 }
 
@@ -151,7 +151,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
    * @param param_repo Handle to parameter repository for this controller (after
    *                   parsing and validation).
    */
-  void shared_init(const params::depth1::controller_repository& param_repo);
+  void shared_init(const config::depth1::controller_repository& param_repo);
 
   /*
    * The \ref gp_dpo_controller owns the executive, but derived classes can
@@ -168,7 +168,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void task_abort_cb(const rta::polled_task*);
 
  private:
-  void private_init(const params::depth1::controller_repository& param_repo);
+  void private_init(const config::depth1::controller_repository& param_repo);
 
   /* clang-format off */
   bool                                      m_display_task{false};

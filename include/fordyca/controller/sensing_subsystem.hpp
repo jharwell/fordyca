@@ -40,8 +40,8 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct sensing_params;
+namespace config {
+struct sensing_config;
 }
 
 NS_START(controller);
@@ -71,10 +71,10 @@ class sensing_subsystem {
   /**
    * @brief Initialize the base sensing subsystem.
    *
-   * @param params Subsystem parameters.
+   * @param config Subsystem parameters.
    * @param list List of handles to sensing devices.
    */
-  sensing_subsystem(const struct params::sensing_params* params,
+  sensing_subsystem(const config::sensing_config* config,
                     const struct sensor_list* list);
 
   double los_dim(void) const { return mc_los_dim; }

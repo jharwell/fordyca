@@ -31,17 +31,16 @@
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/nsalias.hpp"
-#include "rcppsw/robotics/kinematics/twist.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct actuation_params;
-struct sensing_params;
-} // namespace params
+namespace config {
+struct actuation_config;
+struct sensing_config;
+} // namespace config
 
 NS_START(controller);
 
@@ -56,11 +55,11 @@ NS_START(controller);
  * @brief Sensing and Actuation subsystem for the robot. Does not do much other
  * than wrap the two components.
  */
-class saa_subsystem final : public rcppsw::robotics::steering2D::boid,
+class saa_subsystem final : public rcppsw::robotics::steer2D::boid,
                             rer::client<saa_subsystem> {
  public:
-  saa_subsystem(const struct params::actuation_params* aparams,
-                const struct params::sensing_params* sparams,
+  saa_subsystem(const config::actuation_config* aconfig,
+                const config::sensing_config* sconfig,
                 struct actuation_subsystem::actuator_list* actuator_list,
                 struct sensing_subsystem::sensor_list* sensor_list);
 

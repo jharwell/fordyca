@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
@@ -39,9 +39,9 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_perception_subsystem::dpo_perception_subsystem(
-    const struct params::perception::perception_params* const params)
+    const config::perception::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.controller.dpo_perception"),
-      m_store(rcppsw::make_unique<ds::dpo_store>(&params->pheromone)) {}
+      m_store(rcppsw::make_unique<ds::dpo_store>(&config->pheromone)) {}
 
 dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
 

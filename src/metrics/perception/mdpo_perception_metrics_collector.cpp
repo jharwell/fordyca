@@ -39,8 +39,8 @@ mdpo_perception_metrics_collector::mdpo_perception_metrics_collector(
     const std::string& ofname,
     uint interval)
     : base_metrics_collector(ofname, interval),
-      m_int_states(fsm::cell2D_fsm::kST_MAX_STATES, 0),
-      m_cum_states(fsm::cell2D_fsm::kST_MAX_STATES, 0) {}
+      m_int_states(fsm::cell2D_fsm::ekST_MAX_STATES, 0),
+      m_cum_states(fsm::cell2D_fsm::ekST_MAX_STATES, 0) {}
 
 /*******************************************************************************
  * Member Functions
@@ -77,12 +77,12 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += csv_entry_intavg(m_int_states[fsm::cell2D_fsm::kST_EMPTY]);
-  line += csv_entry_intavg(m_int_states[fsm::cell2D_fsm::kST_HAS_BLOCK]);
-  line += csv_entry_intavg(m_int_states[fsm::cell2D_fsm::kST_HAS_CACHE]);
-  line += csv_entry_tsavg(m_cum_states[fsm::cell2D_fsm::kST_EMPTY]);
-  line += csv_entry_tsavg(m_cum_states[fsm::cell2D_fsm::kST_HAS_BLOCK]);
-  line += csv_entry_tsavg(m_cum_states[fsm::cell2D_fsm::kST_HAS_CACHE]);
+  line += csv_entry_intavg(m_int_states[fsm::cell2D_fsm::ekST_EMPTY]);
+  line += csv_entry_intavg(m_int_states[fsm::cell2D_fsm::ekST_HAS_BLOCK]);
+  line += csv_entry_intavg(m_int_states[fsm::cell2D_fsm::ekST_HAS_CACHE]);
+  line += csv_entry_tsavg(m_cum_states[fsm::cell2D_fsm::ekST_EMPTY]);
+  line += csv_entry_tsavg(m_cum_states[fsm::cell2D_fsm::ekST_HAS_BLOCK]);
+  line += csv_entry_tsavg(m_cum_states[fsm::cell2D_fsm::ekST_HAS_CACHE]);
 
   line += csv_entry_intavg(m_int_known_percent);
   line += csv_entry_intavg(m_int_unknown_percent);
@@ -98,18 +98,18 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
 void mdpo_perception_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
-  m_int_states[fsm::cell2D_fsm::kST_EMPTY] +=
-      m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_EMPTY);
-  m_int_states[fsm::cell2D_fsm::kST_HAS_BLOCK] +=
-      m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_HAS_BLOCK);
-  m_int_states[fsm::cell2D_fsm::kST_HAS_CACHE] +=
-      m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_HAS_CACHE);
-  m_cum_states[fsm::cell2D_fsm::kST_EMPTY] +=
-      m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_EMPTY);
-  m_cum_states[fsm::cell2D_fsm::kST_HAS_BLOCK] +=
-      m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_HAS_BLOCK);
-  m_cum_states[fsm::cell2D_fsm::kST_HAS_CACHE] +=
-      m.cell_state_inaccuracies(fsm::cell2D_fsm::kST_HAS_CACHE);
+  m_int_states[fsm::cell2D_fsm::ekST_EMPTY] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ekST_EMPTY);
+  m_int_states[fsm::cell2D_fsm::ekST_HAS_BLOCK] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ekST_HAS_BLOCK);
+  m_int_states[fsm::cell2D_fsm::ekST_HAS_CACHE] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ekST_HAS_CACHE);
+  m_cum_states[fsm::cell2D_fsm::ekST_EMPTY] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ekST_EMPTY);
+  m_cum_states[fsm::cell2D_fsm::ekST_HAS_BLOCK] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ekST_HAS_BLOCK);
+  m_cum_states[fsm::cell2D_fsm::ekST_HAS_CACHE] +=
+      m.cell_state_inaccuracies(fsm::cell2D_fsm::ekST_HAS_CACHE);
 
   m_int_known_percent += m.known_percentage();
   m_int_unknown_percent += m.unknown_percentage();

@@ -24,15 +24,15 @@
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include <fstream>
 
+#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
+#include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
+#include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/params/block_sel/block_sel_matrix_params.hpp"
-#include "fordyca/params/cache_sel/cache_sel_matrix_params.hpp"
-#include "fordyca/params/depth1/controller_repository.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
@@ -75,7 +75,7 @@ void gp_dpo_controller::Init(ticpp::Element& node) {
 
   ndc_push();
   ER_INFO("Initializing...");
-  params::depth1::controller_repository param_repo;
+  config::depth1::controller_repository param_repo;
 
   param_repo.parse_all(node);
   if (!param_repo.validate_all()) {
@@ -91,14 +91,14 @@ void gp_dpo_controller::Init(ticpp::Element& node) {
 } /* Init() */
 
 void gp_dpo_controller::shared_init(
-    const params::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& param_repo) {
   /* DPO perception subsystem, block selection matrix */
   dpo_controller::shared_init(param_repo);
 
   auto* cache_mat =
-      param_repo.parse_results<params::cache_sel::cache_sel_matrix_params>();
+      param_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
   auto* block_mat =
-      param_repo.parse_results<params::block_sel::block_sel_matrix_params>();
+      param_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* cache selection matrix */
   m_cache_sel_matrix =
@@ -106,7 +106,7 @@ void gp_dpo_controller::shared_init(
 } /* shared_init() */
 
 void gp_dpo_controller::private_init(
-    const params::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& param_repo) {
   /* task executive */
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),

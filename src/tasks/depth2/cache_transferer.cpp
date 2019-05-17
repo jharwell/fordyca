@@ -40,9 +40,10 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_transferer::cache_transferer(const struct rta::task_alloc_params* params,
-                                   std::unique_ptr<rta::taskable> mechanism)
-    : foraging_task(kCacheTransfererName, params, std::move(mechanism)),
+cache_transferer::cache_transferer(
+    const struct rta::config::task_alloc_config* config,
+    std::unique_ptr<rta::taskable> mechanism)
+    : foraging_task(kCacheTransfererName, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth2.cache_transferer") {}
 
 /*******************************************************************************
@@ -50,7 +51,8 @@ cache_transferer::cache_transferer(const struct rta::task_alloc_params* params,
  ******************************************************************************/
 
 void cache_transferer::task_start(const rta::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::kACQUIRE_CACHED_BLOCK);
+  foraging_signal_argument a(
+      controller::foraging_signal::ekACQUIRE_CACHED_BLOCK);
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 

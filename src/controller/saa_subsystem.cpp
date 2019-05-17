@@ -33,14 +33,14 @@ NS_START(fordyca, controller);
  * Constructors/Destructors
  ******************************************************************************/
 saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
+    const config::actuation_config* const aconfig,
+    const config::sensing_config* const sconfig,
     struct actuation_subsystem::actuator_list* const actuator_list,
     struct sensing_subsystem::sensor_list* const sensor_list)
     : ER_CLIENT_INIT("fordyca.controller.saa_subsystem"),
-      m_actuation(std::make_shared<actuation_subsystem>(aparams, actuator_list)),
-      m_sensing(std::make_shared<sensing_subsystem>(sparams, sensor_list)),
-      m_steering(*this, &aparams->steering, m_sensing) {}
+      m_actuation(std::make_shared<actuation_subsystem>(aconfig, actuator_list)),
+      m_sensing(std::make_shared<sensing_subsystem>(sconfig, sensor_list)),
+      m_steering(*this, &aconfig->steering, m_sensing) {}
 
 /*******************************************************************************
  * Member Functions

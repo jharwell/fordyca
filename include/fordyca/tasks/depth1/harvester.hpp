@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
@@ -52,7 +54,7 @@ class harvester final : public foraging_task,
                   public events::free_block_interactor,
                   public rer::client<harvester> {
  public:
-  harvester(const struct rta::task_alloc_params* params,
+  harvester(const struct rta::config::task_alloc_config* config,
             std::unique_ptr<rta::taskable> mechanism);
   ~harvester(void) override = default;
 

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
 #include <boost/variant/static_visitor.hpp>
-#include "fordyca/params/visualization_params.hpp"
+#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
@@ -49,27 +49,27 @@ template<typename T>
 class robot_configurer : public boost::static_visitor<void> {
  public:
   using controller_type = T;
-  robot_configurer(const params::visualization_params* const params,
+  robot_configurer(const config::visualization_config* const config,
                    oracle::entities_oracle* const oracle)
-      : mc_params(params),
+      : mc_config(config),
         m_oracle(oracle) {}
 
   template<typename U = T,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::depth0::oracular_typelist,
                                          U)>
   void operator()(controller_type* const c) const {
-    if (nullptr != mc_params) {
-      c->display_los(mc_params->robot_los);
-      c->display_id(mc_params->robot_id);
+    if (nullptr != mc_config) {
+      c->display_los(mc_config->robot_los);
+      c->display_id(mc_config->robot_id);
     }
   }
   template<typename U = T,
            RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth0::oracular_typelist,
                                           U)>
   void operator()(controller_type* const c) const {
-    if (nullptr != mc_params) {
-      c->display_los(mc_params->robot_los);
-      c->display_id(mc_params->robot_id);
+    if (nullptr != mc_config) {
+      c->display_los(mc_config->robot_los);
+      c->display_id(mc_config->robot_id);
     }
     if (nullptr != m_oracle) {
       auto receptor = rcppsw::make_unique<controller::oracular_info_receptor>(
@@ -80,7 +80,7 @@ class robot_configurer : public boost::static_visitor<void> {
 
  private:
   /* clang-format off */
-  const params::visualization_params * const mc_params;
+  const config::visualization_config * const mc_config;
   oracle::entities_oracle *                  m_oracle;
   /* clang-format on */
 };

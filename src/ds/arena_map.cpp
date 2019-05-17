@@ -21,11 +21,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/cube_block.hpp"
 #include "fordyca/repr/ramp_block.hpp"
@@ -40,16 +40,16 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct params::arena::arena_map_params* params)
+arena_map::arena_map(const config::arena::arena_map_config* config)
     : ER_CLIENT_INIT("fordyca.ds.arena_map"),
-      decorator(params->grid.resolution,
-                static_cast<uint>(params->grid.upper.x() + arena_padding()),
-                static_cast<uint>(params->grid.upper.y() + arena_padding())),
-      m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
+      decorator(config->grid.resolution,
+                static_cast<uint>(config->grid.upper.x() + arena_padding()),
+                static_cast<uint>(config->grid.upper.y() + arena_padding())),
+      m_blocks(support::block_manifest_processor(&config->blocks.dist.manifest)
                    .create_blocks()),
-      m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
-      m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()),
-      m_redist_governor(&params->blocks.dist.redist_governor) {
+      m_nest(config->nest.dims, config->nest.center, config->grid.resolution),
+      m_block_dispatcher(&decoratee(), &config->blocks.dist, arena_padding()),
+      m_redist_governor(&config->blocks.dist.redist_governor) {
   ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),
           yrsize(),

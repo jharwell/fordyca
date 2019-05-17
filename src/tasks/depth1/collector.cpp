@@ -40,21 +40,22 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-collector::collector(const struct rta::task_alloc_params* const params,
+collector::collector(const rta::config::task_alloc_config* const config,
                      std::unique_ptr<rta::taskable> mechanism)
-    : collector(params, kCollectorName, std::move(mechanism)) {}
+    : collector(config, kCollectorName, std::move(mechanism)) {}
 
-collector::collector(const struct rta::task_alloc_params* const params,
+collector::collector(const rta::config::task_alloc_config* const config,
                      const std::string& name,
                      std::unique_ptr<rta::taskable> mechanism)
-    : foraging_task(name, params, std::move(mechanism)),
+    : foraging_task(name, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.collector") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void collector::task_start(const rta::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::kACQUIRE_CACHED_BLOCK);
+  foraging_signal_argument a(
+      controller::foraging_signal::ekACQUIRE_CACHED_BLOCK);
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 

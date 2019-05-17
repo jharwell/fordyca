@@ -22,25 +22,23 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/params/actuation_params.hpp"
+#include "fordyca/config/actuation_config.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-using kinematics2D::differential_drive;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-actuation_subsystem::actuation_subsystem(
-    const struct params::actuation_params* c_params,
-    struct actuator_list* const list)
-    : mc_params(*c_params),
+actuation_subsystem::actuation_subsystem(const config::actuation_config* c_config,
+                                         struct actuator_list* const list)
+    : mc_config(*c_config),
       m_actuators(*list),
-      m_drive(differential_drive::kFSMDrive,
-              c_params->differential_drive.max_speed,
-              c_params->differential_drive.soft_turn_max,
+      m_drive(rkin2D::differential_drive::kFSMDrive,
+              c_config->differential_drive.max_speed,
+              c_config->differential_drive.soft_turn_max,
               m_actuators.wheels) {}
 
 void actuation_subsystem::reset(void) {

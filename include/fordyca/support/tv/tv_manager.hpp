@@ -45,7 +45,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { namespace tv { struct tv_manager_params; }}
+namespace config { namespace tv { struct tv_manager_config; }}
 namespace ds { class arena_map; }
 NS_START(support);
 
@@ -70,7 +70,7 @@ class tv_manager final : public rer::client<tv_manager>,
   template<typename T>
   using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
 
-  tv_manager(const params::tv::tv_manager_params* params,
+  tv_manager(const config::tv::tv_manager_config* config,
                 const support::base_loop_functions* lf,
                 ds::arena_map* map);
 
@@ -207,7 +207,7 @@ class tv_manager final : public rer::client<tv_manager>,
 
   /* clang-format off */
   const support::base_loop_functions* const      mc_lf;
-  const rct::waveform_params                     mc_motion_throttle_params;
+  const rct::config::waveform_config             mc_motion_throttle_config;
 
   rds::type_map<block_handler_typelist>          m_fb_pickup{};
   rds::type_map<block_handler_typelist>          m_nest_drop{};

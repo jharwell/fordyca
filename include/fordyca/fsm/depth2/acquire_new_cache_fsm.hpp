@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -46,15 +48,17 @@ NS_START(fsm, depth2);
  * @brief The FSM for an acquiring a NEW cache within the arena.
  *
  * Each robot executing this FSM will look for a new cache (either a known new
- * cache or via random exploration). Once the chosen new cache has been
- * acquired, it signals that it has completed its task.
+ * cache or via exploration). Once the chosen new cache has been acquired, it
+ * signals that it has completed its task.
  */
 class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
                               public acquire_goal_fsm {
  public:
-  acquire_new_cache_fsm(const controller::cache_sel_matrix* matrix,
-                        controller::saa_subsystem* saa,
-                        ds::dpo_store* store);
+  acquire_new_cache_fsm(
+      const controller::cache_sel_matrix* matrix,
+      controller::saa_subsystem* saa,
+      ds::dpo_store* store,
+      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
   ~acquire_new_cache_fsm(void) override = default;
 
   acquire_new_cache_fsm(const acquire_new_cache_fsm& fsm) = delete;

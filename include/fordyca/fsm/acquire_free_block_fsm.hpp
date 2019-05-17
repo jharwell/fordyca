@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
@@ -62,7 +64,8 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
  public:
   acquire_free_block_fsm(const controller::block_sel_matrix* matrix,
                          controller::saa_subsystem* saa,
-                         ds::dpo_store* store);
+                         ds::dpo_store* store,
+                         std::unique_ptr<expstrat::base_expstrat> exp_behavior);
 
   ~acquire_free_block_fsm(void) override = default;
 

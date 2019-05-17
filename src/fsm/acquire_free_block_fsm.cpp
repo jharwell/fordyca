@@ -26,6 +26,7 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_selector.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/block_acquisition_validator.hpp"
@@ -42,10 +43,12 @@ NS_START(fordyca, fsm);
 acquire_free_block_fsm::acquire_free_block_fsm(
     const controller::block_sel_matrix* const matrix,
     controller::saa_subsystem* const saa,
-    ds::dpo_store* const store)
+    ds::dpo_store* const store,
+    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
           saa,
+          std::move(exp_behavior),
           acquire_goal_fsm::hook_list{
               .acquisition_goal =
                   std::bind(&acquire_free_block_fsm::acquisition_goal_internal,

@@ -22,11 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/config/depth0/mdpo_controller_repository.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/params/depth0/mdpo_controller_repository.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
+#include "fordyca/fsm/expstrat/factory.hpp"
 #include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
@@ -68,7 +69,7 @@ void mdpo_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */
-  params::depth0::mdpo_controller_repository param_repo;
+  config::depth0::mdpo_controller_repository param_repo;
   param_repo.parse_all(node);
 
   if (!param_repo.validate_all()) {
@@ -77,20 +78,20 @@ void mdpo_controller::Init(ticpp::Element& node) {
   }
 
   shared_init(param_repo);
-  private_init();
+  private_init(param_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void mdpo_controller::shared_init(
-    const params::depth0::mdpo_controller_repository& param_repo) {
+    const config::depth0::mdpo_controller_repository& param_repo) {
   /* block selection matrix and DPO subsystem */
   dpo_controller::shared_init(param_repo);
 
   /* MDPO perception subsystem */
-  params::perception::perception_params p =
-      *param_repo.parse_results<params::perception::perception_params>();
+  config::perception::perception_config p =
+      *param_repo.config_get<config::perception::perception_config>();
   p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
@@ -98,11 +99,17 @@ void mdpo_controller::shared_init(
       rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 } /* shared_init() */
 
-void mdpo_controller::private_init(void) {
-  dpo_controller::fsm(
-      rcppsw::make_unique<fsm::depth0::dpo_fsm>(block_sel_matrix(),
-                                                base_controller::saa_subsystem(),
-                                                perception()->dpo_store()));
+void mdpo_controller::private_init(
+    const config::depth0::mdpo_controller_repository& param_repo) {
+  auto* exp_config = param_repo.config_get<config::exploration_config>();
+  fsm::expstrat::factory f;
+  fsm::expstrat::base_expstrat::params p(saa_subsystem(),
+                                         perception()->dpo_store());
+  dpo_controller::fsm(rcppsw::make_unique<fsm::depth0::dpo_fsm>(
+      block_sel_matrix(),
+      base_controller::saa_subsystem(),
+      perception()->dpo_store(),
+      f.create(exp_config->strategy, &p)));
 } /* private_init() */
 
 __rcsw_pure mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {

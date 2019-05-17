@@ -48,35 +48,35 @@ class foraging_signal : public rfsm::event_signal {
     /**
      * The signal sent to FSMs during nominal operation.
      */
-    kFSM_RUN = rfsm::event_signal::kEXTERNAL_SIGNALS,
-    kBLOCK_PICKUP,       /// A robot has picked up a block
-    kBLOCK_DROP,         /// A robot has dropped a block in {cache, nest, arena}
-    kLEFT_NEST,          /// A robot has left the nest
-    kENTERED_NEST,       /// A robot has entered the nest
-    kACQUIRE_FREE_BLOCK, /// Direct a robot to acquire a free block in the arena
-    kACQUIRE_CACHED_BLOCK, /// Direct a robot to acquire a block from a cache.
+    ekFSM_RUN = rfsm::event_signal::ekEXTERNAL_SIGNALS,
+    ekBLOCK_PICKUP, /// A robot has picked up a block
+    ekBLOCK_DROP,   /// A robot has dropped a block in {cache, nest, arena}
+    ekLEFT_NEST,    /// A robot has left the nest
+    ekENTERED_NEST, /// A robot has entered the nest
+    ekACQUIRE_FREE_BLOCK, /// Direct a robot to acquire a free block in the arena
+    ekACQUIRE_CACHED_BLOCK, /// Direct a robot to acquire a block from a cache.
     /**
      * @brief The block a robot was waiting to pickup from has vanished (see
      * #411).
      */
-    kBLOCK_VANISHED,
+    ekBLOCK_VANISHED,
 
     /**
      * @brief The proximity of a block unknown to the robot is blocnking it from
      * completing its current task. Used by the Cache Starter task.
      */
-    kBLOCK_PROXIMITY,
+    ekBLOCK_PROXIMITY,
 
     /**
      * @brief The cache the robot was waiting to pickup from has vanished (see
      * #247).
      */
-    kCACHE_VANISHED,
+    ekCACHE_VANISHED,
     /**
      * @brief The place the robot wait waiting to drop a block into has suddenly
      * become a cache.
     */
-    kCACHE_PROXIMITY
+    ekCACHE_PROXIMITY
   };
 };
 

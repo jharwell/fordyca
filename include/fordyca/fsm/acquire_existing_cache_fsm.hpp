@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <boost/optional.hpp>
+#include <memory>
 #include <random>
 #include <utility>
 
@@ -63,14 +64,17 @@ class acquire_existing_cache_fsm
  public:
   /**
    * @param matrix The matrix of cache selection info.
-   * @param is_pickup Are we acquiring a cache for pickup or block drop?
    * @param saa Handle to sensing/actuation subsystem.
    * @param store Store of known objects in the arena.
+   * @param exp_behavior The exploration behavior to use when acquiring a cache.
+   * @param for_pickup Are we acquiring a cache for pickup or block drop?
    */
   acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
-                             bool is_pickup,
                              controller::saa_subsystem* saa,
-                             ds::dpo_store* store);
+                             ds::dpo_store* store,
+                             std::unique_ptr<expstrat::base_expstrat> exp_behavior,
+                             bool for_pickup);
+
   ~acquire_existing_cache_fsm(void) override = default;
 
   acquire_existing_cache_fsm(const acquire_existing_cache_fsm&) = delete;
@@ -92,8 +96,8 @@ class acquire_existing_cache_fsm
 
   bool cache_acquired_cb(bool explore_result) const;
   bool cache_exploration_term_cb(void) const;
-  /* clang-format off */
 
+  /* clang-format off */
   /**
    * @brief Is it OK to acquire a cache via exploration? Usually you do not want
    * this because:
@@ -104,7 +108,7 @@ class acquire_existing_cache_fsm
    *   yet.
    */
   bool                                      m_by_exploration_ok{false};
-  const bool                                mc_is_pickup;
+  const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;
   std::default_random_engine                m_rd;

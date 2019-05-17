@@ -37,6 +37,10 @@ namespace state_machine {
 } /* namespace state_machine */
 namespace visitor {
 } /* namespace visitor */
+namespace factory {
+} /* namespace factory */
+namespace prototype {
+} /* namespace prototype */
 } /* namespace patterns */
 namespace swarm {
 } /* namespace swarm */
@@ -52,12 +56,20 @@ namespace er {
 } /* namespace er */
 namespace control {
 } /* namespace control */
-namespace params {
-} /* namespace params */
+namespace config {
+} /* namespace config */
 namespace ds {
 } /* namespace ds */
 namespace mpl {
 } /* namespace mpl */
+namespace robotics {
+namespace kin2D {
+} /* namespace kin2D */
+namespace steer2D {
+} /* namespace steer2D */
+namespace hal {
+} /* namespace hal */
+} /* namespace robotics */
 } /* namespace rcppsw */
 
 NS_START(fordyca);
@@ -65,6 +77,8 @@ NS_START(fordyca);
 namespace rmetrics = rcppsw::metrics;
 namespace rfsm = rcppsw::patterns::state_machine;
 namespace rvisitor = rcppsw::patterns::visitor;
+namespace rfactory = rcppsw::patterns::factory;
+namespace rprototype = rcppsw::patterns::prototype;
 namespace rswarm = rcppsw::swarm;
 namespace rmath = rcppsw::math;
 namespace rta = rcppsw::ta;
@@ -72,9 +86,13 @@ namespace ralg = rcppsw::algorithm;
 namespace rutils = rcppsw::utils;
 namespace rer = rcppsw::er;
 namespace rct = rcppsw::control;
-namespace rparams = rcppsw::params;
+namespace rconfig = rcppsw::config;
 namespace rds = rcppsw::ds;
 namespace rmpl = rcppsw::mpl;
+namespace rrobotics = rcppsw::robotics;
+namespace rhal = rrobotics::hal;
+namespace rkin2D = rrobotics::kin2D;
+namespace rsteer2D = rrobotics::steer2D;
 
 NS_END(fordyca);
 

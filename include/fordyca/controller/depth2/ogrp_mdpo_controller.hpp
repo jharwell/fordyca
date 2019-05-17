@@ -34,7 +34,7 @@ NS_START(fordyca);
 namespace support {
 class tasking_oracle;
 }
-namespace params { namespace depth2 { class controller_repository; }}
+namespace config { namespace depth2 { class controller_repository; }}
 
 NS_START(controller, depth2);
 
@@ -63,7 +63,7 @@ class ogrp_mdpo_controller : public depth1::gp_omdpo_controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
 
-  void shared_init(const params::depth2::controller_repository& param_repo);
+  void shared_init(const config::depth2::controller_repository& param_repo);
 };
 
 NS_END(depth2, controller, fordyca);

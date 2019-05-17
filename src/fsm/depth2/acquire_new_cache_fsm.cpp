@@ -24,6 +24,7 @@
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_cache.hpp"
@@ -39,10 +40,12 @@ NS_START(fordyca, fsm, depth2);
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const controller::cache_sel_matrix* matrix,
     controller::saa_subsystem* saa,
-    ds::dpo_store* const store)
+    ds::dpo_store* const store,
+    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
           saa,
+          std::move(exp_behavior),
           acquire_goal_fsm::hook_list{
               .acquisition_goal =
                   std::bind(&acquire_new_cache_fsm::acquisition_goal_internal,

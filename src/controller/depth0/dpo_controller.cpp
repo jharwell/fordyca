@@ -24,16 +24,17 @@
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include <fstream>
 
+#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
+#include "fordyca/config/depth0/dpo_controller_repository.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
+#include "fordyca/config/sensing_config.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/params/block_sel/block_sel_matrix_params.hpp"
-#include "fordyca/params/depth0/dpo_controller_repository.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/params/sensing_params.hpp"
+#include "fordyca/fsm/expstrat/factory.hpp"
 #include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
@@ -84,7 +85,6 @@ void dpo_controller::ControlStep(void) {
 
   m_perception->update(nullptr);
   m_fsm->run();
-
   ndc_pop();
 } /* ControlStep() */
 
@@ -99,7 +99,7 @@ void dpo_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */
-  params::depth0::dpo_controller_repository param_repo;
+  config::depth0::dpo_controller_repository param_repo;
   param_repo.parse_all(node);
 
   if (!param_repo.validate_all()) {
@@ -108,18 +108,18 @@ void dpo_controller::Init(ticpp::Element& node) {
   }
 
   shared_init(param_repo);
-  private_init();
+  private_init(param_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void dpo_controller::shared_init(
-    const params::depth0::dpo_controller_repository& param_repo) {
+    const config::depth0::dpo_controller_repository& param_repo) {
   auto perception =
-      param_repo.parse_results<params::perception::perception_params>();
+      param_repo.config_get<config::perception::perception_config>();
   auto block_matrix =
-      param_repo.parse_results<params::block_sel::block_sel_matrix_params>();
+      param_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* DPO perception subsystem */
   m_perception = rcppsw::make_unique<dpo_perception_subsystem>(perception);
@@ -128,11 +128,17 @@ void dpo_controller::shared_init(
   m_block_sel_matrix = rcppsw::make_unique<class block_sel_matrix>(block_matrix);
 } /* shared_init() */
 
-void dpo_controller::private_init(void) {
-  m_fsm =
-      rcppsw::make_unique<fsm::depth0::dpo_fsm>(m_block_sel_matrix.get(),
-                                                base_controller::saa_subsystem(),
-                                                m_perception->dpo_store());
+void dpo_controller::private_init(
+    const config::depth0::dpo_controller_repository& param_repo) {
+  auto* exp_config = param_repo.config_get<config::exploration_config>();
+  fsm::expstrat::factory f;
+  fsm::expstrat::base_expstrat::params p(saa_subsystem(),
+                                         perception()->dpo_store());
+  m_fsm = rcppsw::make_unique<fsm::depth0::dpo_fsm>(
+      m_block_sel_matrix.get(),
+      base_controller::saa_subsystem(),
+      m_perception->dpo_store(),
+      f.create(exp_config->strategy + "_block", &p));
 } /* private_init() */
 
 __rcsw_pure dpo_perception_subsystem* dpo_controller::dpo_perception(void) {

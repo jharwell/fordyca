@@ -16,8 +16,8 @@
   <!-- *************** -->
   <controllers>
 
-    <grp_odpo_controller id="ffc"
-                               library="libfordyca">
+    <dpo_controller id="ffc"
+                    library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <leds implementation="default" medium="leds" />
@@ -127,7 +127,9 @@
               policy="cache_size"
               timestep="20000"
               cache_size="3"/>
-            </cache_sel_matrix>
+        </cache_sel_matrix>
+        <exploration
+            strategy="CRW"/>
         <sensing
             los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
@@ -154,7 +156,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </grp_odpo_controller>
+    </dpo_controller>
 
   </controllers>
 
@@ -162,7 +164,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth0_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -212,12 +214,12 @@
         epsilon="0.1"
         epsilon_delta="1000">
       <positional_entropy
-          enable="true"
+          enable="false"
           horizon="0:13.41"
           horizon_delta="1.34"/>
       <task_dist_entropy enable="false"/>
-      <interactivity enable="true"/>
-      <angular_order enable="true"/>
+      <interactivity enable="false"/>
+      <angular_order enable="false"/>
     </convergence>
 
     <oracle_manager>
@@ -266,7 +268,7 @@
       <blocks>
         <distribution
             arena_resolution="0.2"
-            dist_type="powerlaw">
+            dist_type="single_source">
           <redist_governor
               trigger="Null"
               recurrence_policy="multi"
@@ -328,7 +330,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="4" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/phototaxis_force.hpp"
+#include "fordyca/config/phototaxis_force_config.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/params/phototaxis_force_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,9 +34,9 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 phototaxis_force::phototaxis_force(
-    const struct params::phototaxis_force_params* params,
+    const config::phototaxis_force_config* config,
     const std::shared_ptr<sensing_subsystem>& sensors)
-    : m_max(params->max), m_sensors(sensors) {}
+    : m_max(config->max), m_sensors(sensors) {}
 
 /*******************************************************************************
  * Member Functions

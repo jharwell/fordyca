@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/cache_acquisition_validator.hpp"
+#include "fordyca/config/cache_sel/pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
-#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
@@ -85,14 +85,14 @@ bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
   }
 
   auto cache = it->ent();
-  auto& params = boost::get<params::cache_sel::pickup_policy_params>(
+  auto& config = boost::get<config::cache_sel::pickup_policy_config>(
       mc_csel_matrix->find(cselm::kInitialPickupPolicy)->second);
 
-  if (cselm::kInitialPickupPolicyTime == params.policy &&
-      timestep < params.timestep) {
+  if (cselm::kInitialPickupPolicyTime == config.policy &&
+      timestep < config.timestep) {
     return false;
-  } else if (cselm::kInitialPickupPolicyCacheSize == params.policy &&
-             cache->n_blocks() < params.cache_size) {
+  } else if (cselm::kInitialPickupPolicyCacheSize == config.policy &&
+             cache->n_blocks() < config.cache_size) {
     return false;
   }
   return true;

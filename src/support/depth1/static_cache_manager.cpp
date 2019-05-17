@@ -39,12 +39,12 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_manager::static_cache_manager(
-    const struct params::caches::caches_params* params,
+    const config::caches::caches_config* config,
     ds::arena_grid* const arena_grid,
     const rmath::vector2d& cache_loc)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_manager"),
-      mc_cache_params(*params),
+      mc_cache_config(*config),
       mc_cache_loc(cache_loc),
       m_reng(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
@@ -68,7 +68,7 @@ boost::optional<ds::block_vector> static_cache_manager::calc_blocks_for_creation
     if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
       to_use.push_back(b);
     }
-    if (to_use.size() >= mc_cache_params.static_.size) {
+    if (to_use.size() >= mc_cache_config.static_.size) {
       break;
     }
   } /* for(b..) */
@@ -108,14 +108,14 @@ boost::optional<ds::block_vector> static_cache_manager::calc_blocks_for_creation
               repr::base_cache::kMinBlocks);
     return boost::optional<ds::block_vector>();
   }
-  if (to_use.size() < mc_cache_params.static_.size) {
+  if (to_use.size() < mc_cache_config.static_.size) {
     ER_WARN(
         "Not enough free blocks to meet min size for new cache@%s/%s (%zu < "
         "%u)",
         mc_cache_loc.to_str().c_str(),
         dcenter.to_str().c_str(),
         to_use.size(),
-        mc_cache_params.static_.size);
+        mc_cache_config.static_.size);
     return boost::optional<ds::block_vector>();
   }
   return boost::make_optional(to_use);
@@ -127,7 +127,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
-      mc_cache_params.static_.respawn_scale_factor);
+      mc_cache_config.static_.respawn_scale_factor);
   std::uniform_real_distribution<> dist(0.0, 1.0);
   if (p.calc(n_harvesters, n_collectors) >= dist(m_reng)) {
     return create(blocks, timestep);
@@ -140,9 +140,9 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
     ds::block_vector& blocks,
     uint timestep) {
   ER_DEBUG("(Re)-Creating static cache");
-  ER_ASSERT(mc_cache_params.static_.size >= repr::base_cache::kMinBlocks,
+  ER_ASSERT(mc_cache_config.static_.size >= repr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
-            mc_cache_params.static_.size,
+            mc_cache_config.static_.size,
             repr::base_cache::kMinBlocks);
 
   auto to_use = calc_blocks_for_creation(blocks);
@@ -155,7 +155,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
 
   support::depth1::static_cache_creator creator(arena_grid(),
                                                 mc_cache_loc,
-                                                mc_cache_params.dimension);
+                                                mc_cache_config.dimension);
 
   /* no existing caches, so empty vector */
   created = creator.create_all(ds::cache_vector(), *to_use, timestep);

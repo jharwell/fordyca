@@ -32,13 +32,13 @@
 #include "fordyca/support/depth2/depth2_loop_functions.hpp"
 #include <boost/mpl/for_each.hpp>
 
+#include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/output_config.hpp"
+#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
@@ -96,7 +96,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
     config_map->emplace(
         typeid(controller),
         robot_configurer<T, depth2_metrics_aggregator>(
-            lf->params()->parse_results<params::visualization_params>(),
+            lf->config()->config_get<config::visualization_config>(),
             lf->oracle_manager()->entities_oracle(),
             lf->oracle_manager()->tasking_oracle(),
             lf->m_metrics_agg.get()));
@@ -144,10 +144,10 @@ void depth2_loop_functions::shared_init(ticpp::Element& node) {
   depth1_loop_functions::shared_init(node);
 
   /* initialize stat collecting */
-  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
+  auto* arenap = config()->config_get<config::arena::arena_map_config>();
 
-  params::output_params output =
-      *params()->parse_results<const struct params::output_params>();
+  config::output_config output =
+      *config()->config_get<const config::output_config>();
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
                                                                  output_root());
@@ -155,7 +155,7 @@ void depth2_loop_functions::shared_init(ticpp::Element& node) {
 
 void depth2_loop_functions::private_init(void) {
   /* initialize cache handling */
-  auto* cachep = params()->parse_results<params::caches::caches_params>();
+  auto* cachep = config()->config_get<config::caches::caches_config>();
   cache_handling_init(cachep);
 
   /*
@@ -192,7 +192,7 @@ void depth2_loop_functions::private_init(void) {
 } /* private_init() */
 
 void depth2_loop_functions::cache_handling_init(
-    const struct params::caches::caches_params* const cachep) {
+    const config::caches::caches_config* const cachep) {
   m_cache_manager =
       rcppsw::make_unique<dynamic_cache_manager>(cachep,
                                                  &arena_map()->decoratee());
@@ -351,7 +351,7 @@ void depth2_loop_functions::Reset(void) {
 }
 
 bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
-  auto* cachep = params()->parse_results<params::caches::caches_params>();
+  auto* cachep = config()->config_get<config::caches::caches_config>();
   /*
    * If dynamic cache creation is configured to occur only upon a robot dropping
    * a block, then we do not perform cache creation unless that event occurred.

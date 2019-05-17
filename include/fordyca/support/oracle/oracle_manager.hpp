@@ -30,11 +30,11 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
+namespace config {
 namespace oracle {
-struct oracle_manager_params;
+struct oracle_manager_config;
 } /* namespace oracle */
-} /* namespace params */
+} /* namespace config */
 
 namespace ds {
 class arena_map;
@@ -58,7 +58,7 @@ class tasking_oracle;
  */
 class oracle_manager {
  public:
-  explicit oracle_manager(const params::oracle::oracle_manager_params* params);
+  explicit oracle_manager(const config::oracle::oracle_manager_config* config);
 
   class entities_oracle* entities_oracle(void) { return m_entities.get(); }
   class tasking_oracle* tasking_oracle(void) { return m_tasking.get(); }
@@ -71,7 +71,7 @@ class oracle_manager {
 
   /**
    * @brief Because the \ref tasking_oracle requires more than just the \ref
-   * tasking_oracle_params to construct, it is null-constructed by default, and
+   * tasking_oracle_config to construct, it is null-constructed by default, and
    * the loop functions are responsible for actually creating it.
    */
   void tasking_oracle(std::unique_ptr<class tasking_oracle> o);

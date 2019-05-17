@@ -33,15 +33,15 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <boost/mpl/for_each.hpp>
 
+#include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/output_config.hpp"
+#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/visualization_params.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 #include "fordyca/support/depth0/robot_configurer.hpp"
@@ -93,7 +93,7 @@ struct functor_maps_initializer {
     config_map->emplace(
         typeid(controller),
         robot_configurer<T>(
-            lf->params()->parse_results<params::visualization_params>(),
+            lf->config()->config_get<config::visualization_config>(),
             lf->oracle_manager()->entities_oracle()));
     lf->m_los_update_map->emplace(typeid(controller),
                                   robot_los_updater<T>(lf->arena_map()));
@@ -135,9 +135,8 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
   base_loop_functions::Init(node);
 
   /* initialize output and metrics collection */
-  auto* arena = params()->parse_results<params::arena::arena_map_params>();
-  params::output_params output =
-      *params()->parse_results<params::output_params>();
+  auto* arena = config()->config_get<config::arena::arena_map_config>();
+  config::output_config output = *config()->config_get<config::output_config>();
   output.metrics.arena_grid = arena->grid;
 
   m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,

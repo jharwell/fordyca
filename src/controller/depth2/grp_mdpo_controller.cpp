@@ -22,11 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/config/depth2/controller_repository.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/params/depth2/controller_repository.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,7 +47,7 @@ void grp_mdpo_controller::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing");
 
-  params::depth2::controller_repository param_repo;
+  config::depth2::controller_repository param_repo;
   param_repo.parse_all(node);
   if (!param_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
@@ -61,13 +61,13 @@ void grp_mdpo_controller::Init(ticpp::Element& node) {
 } /* Init() */
 
 void grp_mdpo_controller::shared_init(
-    const params::depth2::controller_repository& param_repo) {
+    const config::depth2::controller_repository& param_repo) {
   /* block/cache selection matrices, executive  */
   grp_dpo_controller::shared_init(param_repo);
 
   /* MDPO perception subsystem */
-  params::perception::perception_params p =
-      *param_repo.parse_results<params::perception::perception_params>();
+  config::perception::perception_config p =
+      *param_repo.config_get<config::perception::perception_config>();
   p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 

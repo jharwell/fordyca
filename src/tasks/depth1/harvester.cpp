@@ -33,7 +33,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/ta/task_alloc_params.hpp"
+#include "rcppsw/ta/config/task_alloc_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,16 +44,16 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-harvester::harvester(const struct rta::task_alloc_params* params,
+harvester::harvester(const struct rta::config::task_alloc_config* config,
                      std::unique_ptr<rta::taskable> mechanism)
-    : foraging_task(kHarvesterName, params, std::move(mechanism)),
+    : foraging_task(kHarvesterName, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.harvester") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void harvester::task_start(const rta::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::kACQUIRE_FREE_BLOCK);
+  foraging_signal_argument a(controller::foraging_signal::ekACQUIRE_FREE_BLOCK);
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 

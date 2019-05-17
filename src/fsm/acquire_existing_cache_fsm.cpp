@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/controller/existing_cache_selector.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/cache_acquisition_validator.hpp"
@@ -39,12 +40,14 @@ using cselm = controller::cache_sel_matrix;
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const controller::cache_sel_matrix* matrix,
-    bool is_pickup,
-    controller::saa_subsystem* const saa,
-    ds::dpo_store* const store)
+    controller::saa_subsystem* saa,
+    ds::dpo_store* store,
+    std::unique_ptr<expstrat::base_expstrat> exp_behavior,
+    bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
       acquire_goal_fsm(
           saa,
+          std::move(exp_behavior),
           acquire_goal_fsm::hook_list{
               .acquisition_goal = std::bind(
                   &acquire_existing_cache_fsm::acquisition_goal_internal,
@@ -69,7 +72,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                             this,
                             std::placeholders::_1,
                             std::placeholders::_2)}),
-      mc_is_pickup(is_pickup),
+      mc_for_pickup(for_pickup),
       mc_matrix(matrix),
       mc_store(store),
       m_rd(std::chrono::system_clock::now().time_since_epoch().count()) {}
@@ -79,7 +82,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
  ******************************************************************************/
 boost::optional<acquire_existing_cache_fsm::acquisition_loc_type>
 acquire_existing_cache_fsm::calc_acquisition_location(void) {
-  controller::existing_cache_selector selector(mc_is_pickup,
+  controller::existing_cache_selector selector(mc_for_pickup,
                                                mc_matrix,
                                                &mc_store->caches());
 
@@ -161,7 +164,7 @@ bool acquire_existing_cache_fsm::cache_acquisition_valid(
     uint id) const {
   return cache_acquisition_validator(&mc_store->caches(),
                                      mc_matrix,
-                                     mc_is_pickup)(
+                                     mc_for_pickup)(
       loc, id, saa_subsystem()->sensing()->tick());
 } /* cache_acquisition_valid() */
 

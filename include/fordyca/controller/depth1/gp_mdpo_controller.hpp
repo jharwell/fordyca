@@ -79,7 +79,7 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
    * @param param_repo Handle to parameter repository for this controller (after
    *                   parsing and validation).
    */
-  void shared_init(const params::depth1::controller_repository& param_repo);
+  void shared_init(const config::depth1::controller_repository& param_repo);
 
  private:
 };

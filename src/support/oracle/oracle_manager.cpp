@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/oracle/oracle_manager.hpp"
+#include "fordyca/config/oracle/oracle_manager_config.hpp"
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/params/oracle/oracle_manager_params.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
 
@@ -36,8 +36,8 @@ NS_START(fordyca, support, oracle);
  * Constructors/Destructor
  ******************************************************************************/
 oracle_manager::oracle_manager(
-    const params::oracle::oracle_manager_params* const params)
-    : m_entities(rcppsw::make_unique<class entities_oracle>(&params->entities)),
+    const config::oracle::oracle_manager_config* const config)
+    : m_entities(rcppsw::make_unique<class entities_oracle>(&config->entities)),
       m_tasking(nullptr) {}
 
 /*******************************************************************************

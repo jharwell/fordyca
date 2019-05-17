@@ -29,7 +29,7 @@
 
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/params/arena/block_dist_params.hpp"
+#include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/entity_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
 
@@ -72,7 +72,7 @@ class dispatcher {
   static constexpr char kDistPowerlaw[] = "powerlaw";
 
   dispatcher(ds::arena_grid* grid,
-             const params::arena::block_dist_params* params,
+             const config::arena::block_dist_config* config,
              double arena_padding);
   ~dispatcher(void);
 
@@ -121,7 +121,7 @@ class dispatcher {
 
   /* clang-format off */
   const double                                  mc_padding;
-  const struct params::arena::block_dist_params mc_params;
+  const config::arena::block_dist_config mc_config;
 
   std::string                                   m_dist_type;
   ds::arena_grid*                               m_grid{nullptr};

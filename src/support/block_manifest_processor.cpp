@@ -34,7 +34,7 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 block_manifest_processor::block_manifest_processor(
-    const params::arena::block_manifest* const m)
+    const config::arena::block_manifest* const m)
     : mc_manifest(*m) {
   register_type<repr::cube_block>("cube");
   register_type<repr::ramp_block>("ramp");

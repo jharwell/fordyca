@@ -51,8 +51,8 @@ using transport_goal_type = block_transporter::goal_type;
  * @ingroup fordyca fsm depth0
  *
  * @brief The FSM for an unpartitioned foraging task. Each robot executing this
- * FSM will locate for a block (either a known block or via random exploration),
- * pickup the block and bring it all the way back to the nest.
+ * FSM will locate for a block (either a known block or via exploration), pickup
+ * the block and bring it all the way back to the nest.
  *
  * This FSM will only pickup free blocks. Once it has brought a block all the
  * way to the nest and dropped it in the nest, it will repeat the same sequence
@@ -64,8 +64,9 @@ class dpo_fsm final : public base_foraging_fsm,
                      public block_transporter {
  public:
   dpo_fsm(const controller::block_sel_matrix* sel_matrix,
-               controller::saa_subsystem* saa,
-               ds::dpo_store* store);
+          controller::saa_subsystem* saa,
+          ds::dpo_store* store,
+          std::unique_ptr<expstrat::base_expstrat> exp_behavior);
   ~dpo_fsm(void) override = default;
 
   /* collision metrics */
@@ -95,10 +96,10 @@ class dpo_fsm final : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    kST_START,
-    kST_BLOCK_TO_NEST,     /* Find a block and bring it to the nest */
-    kST_LEAVING_NEST,      /* Block dropped in nest--time to go */
-    kST_MAX_STATES
+    ekST_START,
+    ekST_BLOCK_TO_NEST,     /* Find a block and bring it to the nest */
+    ekST_LEAVING_NEST,      /* Block dropped in nest--time to go */
+    ekST_MAX_STATES
   };
 
  private:
@@ -125,7 +126,7 @@ class dpo_fsm final : public base_foraging_fsm,
   free_block_to_nest_fsm m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, fsm, fordyca);

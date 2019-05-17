@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
@@ -33,7 +34,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta { struct task_alloc_params; }}
+namespace rcppsw { namespace ta { namespace config { struct task_alloc_config; }}}
 NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
@@ -55,7 +56,7 @@ class foraging_task
       public rta::polled_task {
  public:
   foraging_task(const std::string& name,
-                const rta::task_alloc_params *params,
+                const rta::config::task_alloc_config *config,
                 std::unique_ptr<rta::taskable> mechanism);
   ~foraging_task(void) override = default;
 

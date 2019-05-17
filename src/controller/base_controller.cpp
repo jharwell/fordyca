@@ -35,11 +35,11 @@
 #include <experimental/filesystem>
 #include <fstream>
 
+#include "fordyca/config/actuation_config.hpp"
+#include "fordyca/config/base_controller_repository.hpp"
+#include "fordyca/config/output_config.hpp"
+#include "fordyca/config/sensing_config.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/base_controller_repository.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/sensing_params.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
@@ -95,7 +95,7 @@ void base_controller::Init(ticpp::Element& node) {
   }
 #endif
 
-  params::base_controller_repository param_repo;
+  config::base_controller_repository param_repo;
   param_repo.parse_all(node);
 
   ndc_push();
@@ -105,12 +105,12 @@ void base_controller::Init(ticpp::Element& node) {
   }
 
   /* initialize output */
-  auto* params = param_repo.parse_results<struct params::output_params>();
-  output_init(params);
+  auto* config = param_repo.config_get<config::output_config>();
+  output_init(config);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  saa_init(param_repo.parse_results<params::actuation_params>(),
-           param_repo.parse_results<params::sensing_params>());
+  saa_init(param_repo.config_get<config::actuation_config>(),
+           param_repo.config_get<config::sensing_config>());
   ndc_pop();
 } /* Init() */
 
@@ -119,8 +119,8 @@ void base_controller::Reset(void) {
   m_block.reset();
 } /* Reset() */
 
-void base_controller::saa_init(const params::actuation_params* const actuation_p,
-                               const params::sensing_params* const sensing_p) {
+void base_controller::saa_init(const config::actuation_config* const actuation_p,
+                               const config::sensing_config* const sensing_p) {
   struct actuation_subsystem::actuator_list alist = {
       .wheels = hal::actuators::differential_drive_actuator(
           GetActuator<argos::CCI_DifferentialSteeringActuator>(
@@ -164,18 +164,17 @@ void base_controller::saa_init(const params::actuation_params* const actuation_p
       actuation_p, sensing_p, &alist, &slist);
 } /* saa_init() */
 
-void base_controller::output_init(
-    const struct params::output_params* const params) {
+void base_controller::output_init(const config::output_config* const config) {
   std::string output_root;
-  if ("__current_date__" == params->output_dir) {
+  if ("__current_date__" == config->output_dir) {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    output_root = params->output_root + "/" + std::to_string(now.date().year()) +
+    output_root = config->output_root + "/" + std::to_string(now.date().year()) +
                   "-" + std::to_string(now.date().month()) + "-" +
                   std::to_string(now.date().day()) + ":" +
                   std::to_string(now.time_of_day().hours()) + "-" +
                   std::to_string(now.time_of_day().minutes());
   } else {
-    output_root = params->output_root + "/" + params->output_dir;
+    output_root = config->output_root + "/" + config->output_dir;
   }
 
   if (!fs::exists(output_root)) {

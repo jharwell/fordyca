@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/params/cache_sel/cache_sel_matrix_params.hpp"
-#include "fordyca/params/cache_sel/pickup_policy_params.hpp"
+#include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
+#include "fordyca/config/cache_sel/pickup_policy_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,19 +52,19 @@ constexpr char cache_sel_matrix::kInitialPickupPolicyCacheCount[];
  * Constructors/Destructors
  ******************************************************************************/
 cache_sel_matrix::cache_sel_matrix(
-    const struct params::cache_sel::cache_sel_matrix_params* const params,
+    const config::cache_sel::cache_sel_matrix_config* const config,
     const rmath::vector2d& nest_loc)
     : ER_CLIENT_INIT("fordyca.controller.cache_sel_matrix") {
   this->insert(std::make_pair(kNestLoc, nest_loc));
-  this->insert(std::make_pair(kCacheProxDist, params->cache_prox_dist));
-  this->insert(std::make_pair(kBlockProxDist, params->block_prox_dist));
-  this->insert(std::make_pair(kNestProxDist, params->nest_prox_dist));
-  this->insert(std::make_pair(kClusterProxDist, params->nest_prox_dist));
-  this->insert(std::make_pair(kSiteXRange, params->site_xrange));
-  this->insert(std::make_pair(kSiteYRange, params->site_yrange));
+  this->insert(std::make_pair(kCacheProxDist, config->cache_prox_dist));
+  this->insert(std::make_pair(kBlockProxDist, config->block_prox_dist));
+  this->insert(std::make_pair(kNestProxDist, config->nest_prox_dist));
+  this->insert(std::make_pair(kClusterProxDist, config->nest_prox_dist));
+  this->insert(std::make_pair(kSiteXRange, config->site_xrange));
+  this->insert(std::make_pair(kSiteYRange, config->site_yrange));
   this->insert(std::make_pair(kPickupExceptions, std::vector<int>()));
   this->insert(std::make_pair(kDropExceptions, std::vector<int>()));
-  this->insert(std::make_pair(kInitialPickupPolicy, params->initial_pickup));
+  this->insert(std::make_pair(kInitialPickupPolicy, config->initial_pickup));
 }
 
 /*******************************************************************************

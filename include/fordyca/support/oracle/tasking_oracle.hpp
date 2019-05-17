@@ -44,11 +44,11 @@ class polled_task;
 }} // namespace rcppsw::ta
 
 NS_START(fordyca);
-namespace params {
+namespace config {
 namespace oracle {
-struct tasking_oracle_params;
+struct tasking_oracle_config;
 } /* namespace oracle */
-} /* namespace params */
+} /* namespace config */
 NS_START(support, oracle);
 
 /*******************************************************************************
@@ -66,7 +66,7 @@ class tasking_oracle final : public rer::client<tasking_oracle> {
  public:
   using variant_type = boost::variant<rta::time_estimate>;
 
-  tasking_oracle(const params::oracle::tasking_oracle_params* params,
+  tasking_oracle(const config::oracle::tasking_oracle_config* config,
                  const rta::bi_tdgraph* graph);
 
   /**

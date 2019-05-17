@@ -39,16 +39,16 @@ using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_finisher::cache_finisher(const struct rta::task_alloc_params* params,
+cache_finisher::cache_finisher(const struct rta::config::task_alloc_config* config,
                                std::unique_ptr<rta::taskable> mechanism)
-    : foraging_task(kCacheFinisherName, params, std::move(mechanism)),
+    : foraging_task(kCacheFinisherName, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.cache_finisher") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void cache_finisher::task_start(const rta::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::kACQUIRE_FREE_BLOCK);
+  foraging_signal_argument a(controller::foraging_signal::ekACQUIRE_FREE_BLOCK);
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 

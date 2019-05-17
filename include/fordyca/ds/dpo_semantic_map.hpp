@@ -37,9 +37,9 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace perception {
-struct perception_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct perception_config;
+}} // namespace config::perception
 
 NS_START(ds);
 
@@ -68,7 +68,7 @@ namespace decorator = rcppsw::patterns::decorator;
 class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
                                public decorator::decorator<occupancy_grid> {
  public:
-  dpo_semantic_map(const params::perception::perception_params* c_params,
+  dpo_semantic_map(const config::perception::perception_config* c_config,
                    const std::string& robot_id);
 
   RCPPSW_DECORATE_FUNC(pheromone_repeat_deposit, const);

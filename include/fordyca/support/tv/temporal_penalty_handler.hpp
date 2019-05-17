@@ -31,7 +31,7 @@
 #include "fordyca/support/tv/temporal_penalty.hpp"
 #include "rcppsw/control/periodic_waveform.hpp"
 #include "rcppsw/control/waveform_generator.hpp"
-#include "rcppsw/control/waveform_params.hpp"
+#include "rcppsw/control/config/waveform_config.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -62,15 +62,15 @@ class temporal_penalty_handler
   /**
    * @brief Initialize the penalty handler.
    *
-   * @param params Parameters for penalty waveform generation.
+   * @param config Parameters for penalty waveform generation.
    * @param name The name of the handler, for differentiating handler instancces
    * in logging statements.
    */
-  explicit temporal_penalty_handler(const rct::waveform_params* const params,
+  explicit temporal_penalty_handler(const rct::config::waveform_config* const config,
                                     std::string name)
       : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
         mc_name(std::move(name)),
-        m_penalty(rct::waveform_generator()(params->type, params)) {}
+        m_penalty(rct::waveform_generator()(config->type, config)) {}
 
 
   ~temporal_penalty_handler(void) override = default;

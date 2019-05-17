@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
@@ -45,19 +46,21 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * @ingroup fordyca fsm depth2
  *
  * @brief The FSM for a cache transferer task. Each robot executing this FSM
- * will acquire a cache (either a known cache or via random exploration), pickup
- * a block from it and then bring it to ANOTHER cache (either a known cache or
- * one found via random exploration) and drop it.
+ * will acquire a cache (either a known cache or via exploration), pickup a
+ * block from it and then bring it to ANOTHER cache (either a known cache or one
+ * found via exploration) and drop it.
  */
 class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
-  cache_transferer_fsm(const controller::cache_sel_matrix* matrix,
-                       controller::saa_subsystem* saa,
-                       ds::dpo_store* store);
+  cache_transferer_fsm(
+      const controller::cache_sel_matrix* matrix,
+      controller::saa_subsystem* saa,
+      ds::dpo_store* store,
+      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
   ~cache_transferer_fsm(void) override = default;
 
-  cache_transferer_fsm(const cache_transferer_fsm& fsm) = delete;
-  cache_transferer_fsm& operator=(const cache_transferer_fsm& fsm) = delete;
+  cache_transferer_fsm(const cache_transferer_fsm&) = delete;
+  cache_transferer_fsm& operator=(const cache_transferer_fsm&) = delete;
 
   /* goal acquisition metrics */
   acquisition_goal_type acquisition_goal(void) const override;

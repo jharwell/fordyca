@@ -57,21 +57,23 @@ using transport_goal_type = block_transporter::goal_type;
  * @ingroup fordyca fsm
  *
  * @brief Each robot executing this FSM will locate for a block (either a known
- * block or via random exploration), pickup the block and bring it all the way
- * back to the nest.
+ * block or via exploration), pickup the block and bring it all the way back to
+ * the nest.
  *
  * It can be directed to acquire a block either from a cache or to find a free
  * one.
  */
 class cached_block_to_nest_fsm final : public base_foraging_fsm,
-                                 rer::client<cached_block_to_nest_fsm>,
-                                 public metrics::fsm::goal_acquisition_metrics,
-                                 public block_transporter,
-                                 public rta::taskable {
+                                       public rer::client<cached_block_to_nest_fsm>,
+                                       public metrics::fsm::goal_acquisition_metrics,
+                                       public block_transporter,
+                                       public rta::taskable {
  public:
-  cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
-                           controller::saa_subsystem* saa,
-                           ds::dpo_store* store);
+  cached_block_to_nest_fsm(
+      const controller::cache_sel_matrix* sel_matrix,
+      controller::saa_subsystem* saa,
+      ds::dpo_store* store,
+      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
   ~cached_block_to_nest_fsm(void) override = default;
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
@@ -80,11 +82,11 @@ class cached_block_to_nest_fsm final : public base_foraging_fsm,
   /* taskable overrides */
   void task_execute(void) override;
   bool task_finished(void) const override {
-    return kST_FINISHED == current_state();
+    return ekST_FINISHED == current_state();
   }
 
   bool task_running(void) const override {
-    return !(kST_FINISHED == current_state() || kST_START == current_state());
+    return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
 
   /**
@@ -119,33 +121,33 @@ class cached_block_to_nest_fsm final : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    kST_START,
+    ekST_START,
     /**
      * Superstate for finding a cached block.
      */
-    kST_ACQUIRE_BLOCK,
+    ekST_ACQUIRE_BLOCK,
 
     /**
      * @brief State robots wait in after acquiring a cache for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
-    kST_WAIT_FOR_PICKUP,
+    ekST_WAIT_FOR_PICKUP,
 
-    kST_WAIT_FOR_DROP,
+    ekST_WAIT_FOR_DROP,
 
     /**
      * Block found--bring it back to the nest.
      */
-    kST_TRANSPORT_TO_NEST,
+    ekST_TRANSPORT_TO_NEST,
 
-    kST_LEAVING_NEST,
+    ekST_LEAVING_NEST,
 
     /**
      * Block has been brought to the nest successfully.
      */
-    kST_FINISHED,
-    kST_MAX_STATES,
+    ekST_FINISHED,
+    ekST_MAX_STATES,
   };
 
  private:
@@ -198,7 +200,7 @@ class cached_block_to_nest_fsm final : public base_foraging_fsm,
   /* clang-format off */
   acquire_existing_cache_fsm m_cache_fsm;
   /* clang-format on */
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, kST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth1, fsm, fordyca);

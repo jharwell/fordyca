@@ -25,6 +25,7 @@
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_block.hpp"
@@ -44,6 +45,7 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
           saa,
+          nullptr, /* never explore for cache sites */
           acquire_goal_fsm::hook_list{
             .acquisition_goal = std::bind(&acquire_cache_site_fsm::acquisition_goal_internal,
                                           this),

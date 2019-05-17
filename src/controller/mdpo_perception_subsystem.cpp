@@ -45,12 +45,12 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 mdpo_perception_subsystem::mdpo_perception_subsystem(
-    const params::perception::perception_params* const params,
+    const config::perception::perception_config* const config,
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
-      m_cell_stats(fsm::cell2D_fsm::kST_MAX_STATES),
+      m_cell_stats(fsm::cell2D_fsm::ekST_MAX_STATES),
       m_los(),
-      m_map(rcppsw::make_unique<ds::dpo_semantic_map>(params, id)) {}
+      m_map(rcppsw::make_unique<ds::dpo_semantic_map>(config, id)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -247,15 +247,15 @@ void mdpo_perception_subsystem::update_cell_stats(
       if (c_los->cell(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
           !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
-        m_cell_stats[fsm::cell2D_fsm::kST_EMPTY]++;
+        m_cell_stats[fsm::cell2D_fsm::ekST_EMPTY]++;
       } else if (c_los->cell(i, j).state_has_block() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        m_cell_stats[fsm::cell2D_fsm::kST_HAS_BLOCK]++;
+        m_cell_stats[fsm::cell2D_fsm::ekST_HAS_BLOCK]++;
       } else if (c_los->cell(i, j).state_has_cache() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
-        m_cell_stats[fsm::cell2D_fsm::kST_HAS_CACHE]++;
+        m_cell_stats[fsm::cell2D_fsm::ekST_HAS_CACHE]++;
       }
     } /* for(j..) */
   }   /* for(i..) */

@@ -27,8 +27,8 @@
 #include <parallel/algorithm>
 #include <random>
 
+#include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/params/arena/block_dist_params.hpp"
 #include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
@@ -41,11 +41,11 @@ using fordyca::ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 powerlaw_distributor::powerlaw_distributor(
-    const struct params::arena::block_dist_params* const params)
+    const config::arena::block_dist_config* const config)
     : ER_CLIENT_INIT("fordyca.support.block_dist.powerlaw"),
-      m_arena_resolution(params->arena_resolution),
-      m_n_clusters(params->powerlaw.n_clusters),
-      m_pwrdist(params->powerlaw.pwr_min, params->powerlaw.pwr_max, 2) {}
+      m_arena_resolution(config->arena_resolution),
+      m_n_clusters(config->powerlaw.n_clusters),
+      m_pwrdist(config->powerlaw.pwr_min, config->powerlaw.pwr_max, 2) {}
 
 /*******************************************************************************
  * Member Functions
@@ -81,7 +81,7 @@ bool powerlaw_distributor::distribute_block(
 powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_placements(
     ds::arena_grid* const grid,
     const std::vector<uint>& clust_sizes) {
-  cluster_paramvec params;
+  cluster_paramvec config;
 
   for (size_t i = 0; i < clust_sizes.size(); ++i) {
     std::uniform_int_distribution<int> xgen(
@@ -108,14 +108,14 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
              loc.y() + view.index_bases()[1],
              loc.y() + view.index_bases()[1] + view.shape()[1],
              clust_sizes[i]);
-    params.push_back({view, clust_sizes[i]});
+    config.push_back({view, clust_sizes[i]});
   } /* for(i..) */
-  return params;
+  return config;
 } /* guess_cluster_placements() */
 
 __rcsw_pure bool powerlaw_distributor::check_cluster_placements(
     const cluster_paramvec& pvec) {
-  for (const cluster_params& p : pvec) {
+  for (const cluster_config& p : pvec) {
     bool overlap = std::any_of(pvec.begin(), pvec.end(), [&](const auto& other) {
       /*
          * Can't compare directly (boost multi_array makes a COPY of each
@@ -175,13 +175,13 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::
 } /* compute_cluster_placements() */
 
 bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
-  cluster_paramvec params = compute_cluster_placements(grid, m_n_clusters);
-  if (params.empty()) {
+  cluster_paramvec config = compute_cluster_placements(grid, m_n_clusters);
+  if (config.empty()) {
     ER_WARN("Unable to compute all cluster placements");
     return false;
   }
 
-  for (auto& bclustp : params) {
+  for (auto& bclustp : config) {
     m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
                                               bclustp.capacity,
                                               m_arena_resolution);

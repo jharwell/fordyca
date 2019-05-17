@@ -61,9 +61,9 @@ class cache_op_penalty_handler final
   using temporal_penalty_handler<T>::original_penalty;
 
   cache_op_penalty_handler(ds::arena_map* const map,
-                           const rct::waveform_params* const params,
+                           const rct::config::waveform_config* const config,
                            const std::string& name)
-      : temporal_penalty_handler<T>(params, name),
+      : temporal_penalty_handler<T>(config, name),
         ER_CLIENT_INIT("fordyca.support.cache_op_penalty_handler"),
         m_map(map) {}
 
