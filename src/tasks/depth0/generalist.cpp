@@ -72,7 +72,7 @@ void generalist::accept(events::detail::block_vanished& visitor) {
  * FSM Metrics
  ******************************************************************************/
 TASK_WRAPPER_DEFINE_PTR(
-    bool,
+    generalist::exp_status,
     generalist,
     is_exploring_for_goal,
     static_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism()),
@@ -92,7 +92,7 @@ TASK_WRAPPER_DEFINE_PTR(
     const);
 
 TASK_WRAPPER_DEFINE_PTR(
-    acquisition_goal_type,
+    acq_goal_type,
     generalist,
     acquisition_goal,
     static_cast<fsm::depth0::free_block_to_nest_fsm*>(polled_task::mechanism()),

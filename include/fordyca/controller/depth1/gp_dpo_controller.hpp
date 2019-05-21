@@ -84,7 +84,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired, const override final);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal, const override final);
+  TASK_WRAPPER_DECLARE(acq_goal_type, acquisition_goal, const override final);
 
   /* block transportation */
   TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal, const override final);

@@ -70,9 +70,9 @@ class cache_starter final : public foraging_task,
 
   /* goal acquisition metrics */
   TASK_WRAPPER_DECLARE(bool, goal_acquired, const override);
-  TASK_WRAPPER_DECLARE(bool, is_exploring_for_goal, const override);
+  TASK_WRAPPER_DECLARE(exp_status, is_exploring_for_goal, const override);
   TASK_WRAPPER_DECLARE(bool, is_vectoring_to_goal, const override);
-  TASK_WRAPPER_DECLARE(acquisition_goal_type, acquisition_goal, const override);
+  TASK_WRAPPER_DECLARE(acq_goal_type, acquisition_goal, const override);
   TASK_WRAPPER_DECLARE(rmath::vector2u, acquisition_loc, const override);
   TASK_WRAPPER_DECLARE(rmath::vector2u, current_explore_loc, const override);
   TASK_WRAPPER_DECLARE(rmath::vector2u, current_vector_loc, const override);

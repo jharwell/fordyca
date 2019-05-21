@@ -151,7 +151,7 @@ TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+TASK_WRAPPER_DEFINE_PTR(acq_goal_type,
                         gp_dpo_controller,
                         acquisition_goal,
                         current_task(),

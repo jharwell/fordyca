@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
 using transport_goal_type = fsm::block_transporter::goal_type;
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -112,7 +112,7 @@ void cache_transferer::accept(events::detail::cache_vanished& visitor) {
  * FSM Metrics
  ******************************************************************************/
 TASK_WRAPPER_DEFINE_PTR(
-    bool,
+    cache_transferer::exp_status,
     cache_transferer,
     is_exploring_for_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
@@ -132,7 +132,7 @@ TASK_WRAPPER_DEFINE_PTR(
     const);
 
 TASK_WRAPPER_DEFINE_PTR(
-    acquisition_goal_type,
+    acq_goal_type,
     cache_transferer,
     acquisition_goal,
     static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),

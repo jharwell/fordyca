@@ -125,19 +125,21 @@ __rcsw_pure bool acquire_goal_fsm::goal_acquired(void) const {
   return current_state() == ekST_FINISHED;
 } /* cache_acquired() */
 
-__rcsw_pure bool acquire_goal_fsm::is_exploring_for_goal(void) const {
-  return (current_state() == ekST_ACQUIRE_GOAL && m_explore_fsm.task_running());
+__rcsw_pure acquire_goal_fsm::exp_status acquire_goal_fsm::is_exploring_for_goal(void) const {
+  return std::make_pair(current_state() == ekST_ACQUIRE_GOAL &&
+                        m_explore_fsm.task_running(),
+                        !m_hooks.candidates_exist());
 } /* is_exploring_for_goal() */
 
 __rcsw_pure bool acquire_goal_fsm::is_vectoring_to_goal(void) const {
   return current_state() == ekST_ACQUIRE_GOAL && m_vector_fsm.task_running();
 } /* is_vectoring_to_goal() */
 
-acquisition_goal_type acquire_goal_fsm::acquisition_goal(void) const {
+acq_goal_type acquire_goal_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_GOAL == current_state()) {
     return m_hooks.acquisition_goal();
   }
-  return acquisition_goal_type::ekNONE;
+  return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 rmath::vector2u acquire_goal_fsm::acquisition_loc(void) const {

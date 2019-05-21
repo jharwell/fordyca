@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
+
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/nsalias.hpp"
@@ -57,6 +59,16 @@ class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
   ~goal_acquisition_metrics(void) override = default;
 
   /**
+   * @brief A pair of booleans, with the first one indicating that the robot is
+   * exploring for its goal, and the second one (only valid if the first is \c
+   * TRUE) indicating if it is a "true" exploring (i.e. the robot truly does not
+   * know of any instances of its target goal type), as opposed to exploring
+   * because all of the known instances of its goal type are deemed unsuitable
+   * for whatever reason.
+   */
+  using exp_status = std::pair<bool, bool>;
+
+  /**
    * @brief Return the type of acquisition that is currently being
    * performed.
    *
@@ -67,10 +79,11 @@ class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
 
   /**
    * @brief Output only defined if \ref goal_type() is not \ref
-   * goal_type::kNone. If \c TRUE, then the robot is currently exploring for its
-   * goal (i.e. it does not know where it is).
+   * goal_type::ekNone.
+   *
+   * @return \ref exp_status.
    */
-  virtual bool is_exploring_for_goal(void) const = 0;
+  virtual exp_status is_exploring_for_goal(void) const = 0;
 
   /**
    * @brief Output only defined if \ref goal_type() is not \ref

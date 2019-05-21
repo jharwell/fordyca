@@ -62,7 +62,7 @@ class block_to_new_cache_fsm final : public block_to_goal_fsm {
   block_to_new_cache_fsm& operator=(const block_to_new_cache_fsm& fsm) = delete;
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;

@@ -119,7 +119,7 @@ void harvester::accept(events::detail::block_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
+TASK_WRAPPER_DEFINE_PTR(harvester::exp_status,
                         harvester,
                         is_exploring_for_goal,
                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
@@ -139,7 +139,7 @@ TASK_WRAPPER_DEFINE_PTR(bool,
                             polled_task::mechanism()),
                         const);
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+TASK_WRAPPER_DEFINE_PTR(acq_goal_type,
                         harvester,
                         acquisition_goal,
                         static_cast<fsm::depth1::block_to_existing_cache_fsm*>(

@@ -35,7 +35,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
@@ -91,7 +91,7 @@ void cache_starter::active_interface_update(int) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
+TASK_WRAPPER_DEFINE_PTR(cache_starter::exp_status,
                         cache_starter,
                         is_exploring_for_goal,
                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(
@@ -111,7 +111,7 @@ TASK_WRAPPER_DEFINE_PTR(bool,
                             polled_task::mechanism()),
                         const);
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+TASK_WRAPPER_DEFINE_PTR(acq_goal_type,
                         cache_starter,
                         acquisition_goal,
                         static_cast<fsm::depth2::block_to_cache_site_fsm*>(

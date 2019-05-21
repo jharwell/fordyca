@@ -37,7 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
@@ -91,7 +91,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
   op_filter_status do_filter(const T& controller) const {
     int cache_id = loop_utils::robot_on_cache(controller, *m_map);
     bool ready = (controller.goal_acquired() &&
-                  acquisition_goal_type::ekEXISTING_CACHE ==
+                  acq_goal_type::ekEXISTING_CACHE ==
                       controller.acquisition_goal() &&
                   -1 != cache_id);
     if (ready) {

@@ -37,7 +37,7 @@ NS_START(fordyca);
 namespace fsm { namespace depth0 { class crw_fsm; }}
 
 NS_START(controller);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 NS_START(depth0);
 
@@ -69,9 +69,9 @@ class crw_controller : public base_controller,
 
   /* goal acquisition metrics */
   bool is_vectoring_to_goal(void) const override { return false; }
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  FSM_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);

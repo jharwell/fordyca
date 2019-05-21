@@ -112,9 +112,9 @@ __rcsw_pure bool acquire_free_block_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exist() */
 
-__rcsw_const acquisition_goal_type
+__rcsw_const acq_goal_type
 acquire_free_block_fsm::acquisition_goal_internal(void) const {
-  return acquisition_goal_type::ekBLOCK;
+  return acq_goal_type::ekBLOCK;
 } /* acquisition_goal() */
 
 bool acquire_free_block_fsm::block_acquisition_valid(const rmath::vector2d& loc,

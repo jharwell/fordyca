@@ -60,11 +60,13 @@ class goal_acquisition_metrics_collector final : public rmetrics::base_metrics_c
 
  private:
   struct stats {
-    uint n_int_exploring_for_goal;
+    uint n_int_true_exploring_for_goal;
+    uint n_int_false_exploring_for_goal;
     uint n_int_vectoring_to_goal;
     uint n_int_acquiring_goal;
 
-    uint n_cum_exploring_for_goal;
+    uint n_cum_true_exploring_for_goal;
+    uint n_cum_false_exploring_for_goal;
     uint n_cum_vectoring_to_goal;
     uint n_cum_acquiring_goal;
   };

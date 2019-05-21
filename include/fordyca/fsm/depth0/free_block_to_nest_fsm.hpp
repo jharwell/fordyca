@@ -42,7 +42,7 @@ namespace ds { class dpo_semantic_map; }
 
 NS_START(fsm, depth0);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -85,14 +85,14 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
   uint collision_avoidance_duration(void) const override;
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   bool goal_acquired(void) const override;
-  acquisition_goal_type acquisition_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;

@@ -34,7 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************

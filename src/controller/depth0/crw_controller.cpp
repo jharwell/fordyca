@@ -82,9 +82,13 @@ void crw_controller::ControlStep(void) {
  ******************************************************************************/
 FSM_OVERRIDE_DEF(bool, crw_controller, goal_acquired, *m_fsm, const);
 
-FSM_OVERRIDE_DEF(bool, crw_controller, is_exploring_for_goal, *m_fsm, const);
+FSM_OVERRIDE_DEF(crw_controller::exp_status,
+                 crw_controller,
+                 is_exploring_for_goal,
+                 *m_fsm,
+                 const);
 
-FSM_OVERRIDE_DEF(acquisition_goal_type,
+FSM_OVERRIDE_DEF(acq_goal_type,
                  crw_controller,
                  acquisition_goal,
                  *m_fsm,

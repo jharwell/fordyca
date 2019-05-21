@@ -80,7 +80,7 @@ double collector::interface_time_calc(uint interface, double start_time) {
 
 void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (acquisition_goal_type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
+  if (acq_goal_type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
     return;
   }
 
@@ -116,7 +116,7 @@ void collector::accept(events::detail::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(bool,
+TASK_WRAPPER_DEFINE_PTR(collector::exp_status,
                         collector,
                         is_exploring_for_goal,
                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
@@ -136,7 +136,7 @@ TASK_WRAPPER_DEFINE_PTR(bool,
                             polled_task::mechanism()),
                         const);
 
-TASK_WRAPPER_DEFINE_PTR(acquisition_goal_type,
+TASK_WRAPPER_DEFINE_PTR(acq_goal_type,
                         collector,
                         acquisition_goal,
                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(

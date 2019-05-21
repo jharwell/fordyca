@@ -116,17 +116,21 @@ void depth0_metrics_aggregator::collect_from_controller(
                auto& m =
                    dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
                        metrics);
-               return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+               return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
                       m.goal_acquired();
              });
 
+  /*
+   * We count "false" explorations as part of gathering metrics on where robots
+   * explore
+   */
   collect_if("blocks::acq_explore_locs",
              *block_acq_m,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
                    dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
                        metrics);
-               return m.is_exploring_for_goal();
+               return m.is_exploring_for_goal().first;
              });
   collect_if("blocks::acq_vector_locs",
              *block_acq_m,

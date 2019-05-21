@@ -42,7 +42,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Class Definitions
@@ -64,7 +64,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
  public:
   using candidate_type = std::tuple<rmath::vector2d, double, int>;
   using goal_select_ftype = std::function<boost::optional<candidate_type>(void)>;
-  using acquisition_goal_ftype = std::function<acquisition_goal_type(void)>;
+  using acquisition_goal_ftype = std::function<acq_goal_type(void)>;
   using goal_valid_ftype = std::function<bool(const rmath::vector2d&, uint)>;
 
   /**
@@ -150,10 +150,10 @@ class acquire_goal_fsm : public base_foraging_fsm,
   uint collision_avoidance_duration(void) const override final;
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override final;
+  exp_status is_exploring_for_goal(void) const override final;
   bool is_vectoring_to_goal(void) const override final;
   bool goal_acquired(void) const override final;
-  acquisition_goal_type acquisition_goal(void) const override final;
+  acq_goal_type acquisition_goal(void) const override final;
   rmath::vector2u acquisition_loc(void) const override final;
   rmath::vector2u current_explore_loc(void) const override final;
   rmath::vector2u current_vector_loc(void) const override final;

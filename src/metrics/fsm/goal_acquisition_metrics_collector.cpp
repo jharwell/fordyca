@@ -49,8 +49,10 @@ std::list<std::string> goal_acquisition_metrics_collector::csv_header_cols(
     "cum_avg_acquiring_goal",
     "int_avg_vectoring_to_goal",
     "cum_avg_vectoring_to_goal",
-    "int_avg_exploring_for_goal",
-    "cum_avg_exploring_for_goal",
+    "int_avg_true_exploring_for_goal",
+    "cum_avg_true_exploring_for_goal",
+    "int_avg_false_exploring_for_goal",
+    "cum_avg_false_exploring_for_goal",
       /* clang-format on */
   };
   merged.splice(merged.end(), cols);
@@ -65,16 +67,21 @@ void goal_acquisition_metrics_collector::reset(void) {
 void goal_acquisition_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(metrics);
-  m_stats.n_int_exploring_for_goal +=
-      static_cast<uint>(m.is_exploring_for_goal());
+  auto exp_status = m.is_exploring_for_goal();
+  m_stats.n_int_true_exploring_for_goal +=
+      static_cast<uint>(exp_status.first && exp_status.second);
+  m_stats.n_int_false_exploring_for_goal +=
+      static_cast<uint>(exp_status.first && !exp_status.second);
   m_stats.n_int_acquiring_goal +=
-      static_cast<uint>(m.is_exploring_for_goal() || m.is_vectoring_to_goal());
+      static_cast<uint>(exp_status.first || m.is_vectoring_to_goal());
   m_stats.n_int_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 
-  m_stats.n_cum_exploring_for_goal +=
-      static_cast<uint>(m.is_exploring_for_goal());
+  m_stats.n_cum_true_exploring_for_goal +=
+      static_cast<uint>(exp_status.first && exp_status.second);
+  m_stats.n_cum_false_exploring_for_goal +=
+      static_cast<uint>(exp_status.first && !exp_status.second);
   m_stats.n_cum_acquiring_goal +=
-      static_cast<uint>(m.is_exploring_for_goal() || m.is_vectoring_to_goal());
+      static_cast<uint>(exp_status.first || m.is_vectoring_to_goal());
   m_stats.n_cum_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 } /* collect() */
 
@@ -86,13 +93,17 @@ bool goal_acquisition_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_tsavg(m_stats.n_cum_acquiring_goal);
   line += csv_entry_intavg(m_stats.n_int_vectoring_to_goal);
   line += csv_entry_tsavg(m_stats.n_cum_vectoring_to_goal);
-  line += csv_entry_intavg(m_stats.n_int_exploring_for_goal);
-  line += csv_entry_tsavg(m_stats.n_cum_exploring_for_goal);
+  line += csv_entry_intavg(m_stats.n_int_true_exploring_for_goal);
+  line += csv_entry_tsavg(m_stats.n_cum_true_exploring_for_goal);
+  line += csv_entry_intavg(m_stats.n_int_false_exploring_for_goal);
+  line += csv_entry_tsavg(m_stats.n_cum_false_exploring_for_goal);
+
   return true;
 } /* store_foraging_stats() */
 
 void goal_acquisition_metrics_collector::reset_after_interval(void) {
-  m_stats.n_int_exploring_for_goal = 0;
+  m_stats.n_int_true_exploring_for_goal = 0;
+  m_stats.n_int_false_exploring_for_goal = 0;
   m_stats.n_int_acquiring_goal = 0;
   m_stats.n_int_vectoring_to_goal = 0;
 } /* reset_after_interval() */

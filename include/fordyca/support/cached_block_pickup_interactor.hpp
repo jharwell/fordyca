@@ -110,7 +110,7 @@ class cached_block_pickup_interactor
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
-    ER_ASSERT(tv::acquisition_goal_type::ekEXISTING_CACHE ==
+    ER_ASSERT(tv::acq_goal_type::ekEXISTING_CACHE ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
 

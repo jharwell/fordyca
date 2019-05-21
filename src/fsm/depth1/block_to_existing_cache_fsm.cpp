@@ -59,16 +59,16 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_pure acquisition_goal_type
+__rcsw_pure acq_goal_type
 block_to_existing_cache_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acquisition_goal_type::ekBLOCK;
+    return acq_goal_type::ekBLOCK;
   } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
              ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return acquisition_goal_type::ekEXISTING_CACHE;
+    return acq_goal_type::ekEXISTING_CACHE;
   }
-  return acquisition_goal_type::ekNONE;
+  return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 __rcsw_pure transport_goal_type
@@ -81,7 +81,7 @@ block_to_existing_cache_fsm::block_transport_goal(void) const {
 } /* acquisition_goal() */
 
 __rcsw_pure bool block_to_existing_cache_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::ekBLOCK == acquisition_goal()) {
+  if (acq_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::ekEXISTING_CACHE == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_DROP;

@@ -41,7 +41,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -76,8 +76,8 @@ class crw_fsm final : public base_foraging_fsm,
   FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
-  bool is_exploring_for_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
+  exp_status is_exploring_for_goal(void) const override;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override;
   rmath::vector2u acquisition_loc(void) const override;

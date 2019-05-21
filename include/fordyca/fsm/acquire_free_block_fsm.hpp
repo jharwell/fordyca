@@ -40,7 +40,7 @@ NS_START(fordyca);
 namespace ds {
 class dpo_store;
 }
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 namespace rta = rcppsw::ta;
 
 NS_START(fsm);
@@ -76,7 +76,7 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
+  acq_goal_type acquisition_goal_internal(void) const;
   boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
   bool candidates_exist(void) const;
   bool block_exploration_term_cb(void) const;

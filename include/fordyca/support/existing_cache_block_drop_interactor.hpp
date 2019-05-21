@@ -105,7 +105,7 @@ class existing_cache_block_drop_interactor
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  tv::acquisition_goal_type::ekEXISTING_CACHE ==
+                  tv::acq_goal_type::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
 

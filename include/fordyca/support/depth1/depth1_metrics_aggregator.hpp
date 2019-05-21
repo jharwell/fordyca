@@ -71,7 +71,7 @@ NS_START(support, depth1);
 class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
-  using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+  using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
   depth1_metrics_aggregator(const config::metrics_config* mconfig,
                             const std::string& output_root);
@@ -171,7 +171,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekBLOCK == m.acquisition_goal();
+          return acq_goal_type::ekBLOCK == m.acquisition_goal();
         });
     collect_if(
         "blocks::acq_locs",
@@ -180,18 +180,22 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+          return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
               m.goal_acquired();
         });
 
+    /*
+     * We count "false" explorations as part of gathering metrics on where
+     * robots explore.
+     */
     collect_if(
         "blocks::acq_explore_locs",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
-              m.is_exploring_for_goal();
+          return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
+              m.is_exploring_for_goal().first;
         });
     collect_if(
         "blocks::acq_vector_locs",
@@ -199,7 +203,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekBLOCK == m.acquisition_goal() &&
+          return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
 
@@ -209,7 +213,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal();
+          return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal();
         });
     collect_if(
         "caches::acq_locs",
@@ -217,18 +221,22 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.goal_acquired();
         });
 
+    /*
+     * We count "false" explorations as part of gathering metrics on where
+     * robots explore.
+     */
     collect_if(
         "caches::acq_explore_locs",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
-              m.is_exploring_for_goal();
+          return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
+              m.is_exploring_for_goal().first;
         });
     collect_if(
         "caches::acq_vector_locs",
@@ -236,7 +244,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
               metrics);
-          return acquisition_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
     collect("tasks::distribution", *dist_m);

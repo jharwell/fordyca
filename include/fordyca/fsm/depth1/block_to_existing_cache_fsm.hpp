@@ -75,7 +75,7 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
   bool goal_acquired(void) const override;
 
   /* block transportation */

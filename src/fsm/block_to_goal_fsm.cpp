@@ -129,18 +129,18 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
     ER_DEBUG("Block drop signal received");
     internal_event(ekST_FINISHED);
   } else if (controller::foraging_signal::ekBLOCK_PROXIMITY == data->signal()) {
-    ER_ASSERT(acquisition_goal_type::ekCACHE_SITE == acquisition_goal(),
+    ER_ASSERT(acq_goal_type::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on block proximity");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::ekCACHE_VANISHED == data->signal()) {
-    ER_ASSERT(acquisition_goal_type::ekEXISTING_CACHE == acquisition_goal(),
+    ER_ASSERT(acq_goal_type::ekEXISTING_CACHE == acquisition_goal(),
               "Non-existing cache vanished? ");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::ekCACHE_PROXIMITY == data->signal()) {
-    ER_ASSERT(acquisition_goal_type::ekNEW_CACHE == acquisition_goal() ||
-                  acquisition_goal_type::ekCACHE_SITE == acquisition_goal(),
+    ER_ASSERT(acq_goal_type::ekNEW_CACHE == acquisition_goal() ||
+                  acq_goal_type::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on cache proxmity");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
@@ -186,9 +186,13 @@ __rcsw_pure uint block_to_goal_fsm::collision_avoidance_duration(void) const {
 /*******************************************************************************
  * Acquisition Metrics
  ******************************************************************************/
-__rcsw_pure bool block_to_goal_fsm::is_exploring_for_goal(void) const {
-  return (m_block_fsm->is_exploring_for_goal() && m_block_fsm->task_running()) ||
-         (m_goal_fsm->is_exploring_for_goal() && m_goal_fsm->task_running());
+__rcsw_pure block_to_goal_fsm::exp_status block_to_goal_fsm::is_exploring_for_goal(void) const {
+  if (m_block_fsm->task_running()) {
+    return m_block_fsm->is_exploring_for_goal();
+  } else if (m_goal_fsm->task_running()) {
+    return m_goal_fsm->is_exploring_for_goal();
+  }
+  return std::make_pair(false, false);
 } /* is_exploring_for_goal() */
 
 __rcsw_pure bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
@@ -201,13 +205,13 @@ __rcsw_pure bool block_to_goal_fsm::goal_acquired(void) const {
          (ekST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
-acquisition_goal_type block_to_goal_fsm::acquisition_goal(void) const {
+acq_goal_type block_to_goal_fsm::acquisition_goal(void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->acquisition_goal();
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->acquisition_goal();
   }
-  return acquisition_goal_type::ekNONE;
+  return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {

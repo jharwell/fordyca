@@ -153,7 +153,7 @@ __rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) cons
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(bool,
+FSM_OVERRIDE_DEF(free_block_to_nest_fsm::exp_status,
                  free_block_to_nest_fsm,
                  is_exploring_for_goal,
                  m_block_fsm,
@@ -181,17 +181,17 @@ FSM_OVERRIDE_DEF(rmath::vector2u,
                  m_block_fsm,
                  const);
 
-__rcsw_pure acquisition_goal_type
+__rcsw_pure acq_goal_type
 free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
-    return acquisition_goal_type::ekBLOCK;
+    return acq_goal_type::ekBLOCK;
   }
-  return acquisition_goal_type::ekNONE;
+  return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 __rcsw_pure bool free_block_to_nest_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::ekBLOCK == acquisition_goal()) {
+  if (acq_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_DROP;

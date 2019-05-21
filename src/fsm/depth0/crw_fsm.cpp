@@ -123,12 +123,13 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rfsm::event_data* data) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-__rcsw_pure bool crw_fsm::is_exploring_for_goal(void) const {
-  return current_state() == ekST_ACQUIRE_BLOCK;
+__rcsw_pure crw_fsm::exp_status crw_fsm::is_exploring_for_goal(void) const {
+  return std::make_pair(current_state() == ekST_ACQUIRE_BLOCK,
+                        true);
 } /* is_exploring_for_goal() */
 
 __rcsw_pure bool crw_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::ekBLOCK == acquisition_goal()) {
+  if (acq_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_DROP;
@@ -204,12 +205,12 @@ __rcsw_pure transport_goal_type crw_fsm::block_transport_goal(void) const {
   return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
-__rcsw_pure acquisition_goal_type crw_fsm::acquisition_goal(void) const {
+__rcsw_pure acq_goal_type crw_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acquisition_goal_type::ekBLOCK;
+    return acq_goal_type::ekBLOCK;
   }
-  return acquisition_goal_type::ekNONE;
+  return acq_goal_type::ekNONE;
 } /* block_transport_goal() */
 
 NS_END(depth0, fsm, fordyca);

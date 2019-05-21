@@ -37,7 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
@@ -103,7 +103,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   op_filter_status free_pickup_filter(const T& controller) const {
     int block_id = loop_utils::robot_on_block(controller, *m_map);
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::ekBLOCK == controller.acquisition_goal())) {
+          acq_goal_type::ekBLOCK == controller.acquisition_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else if (-1 == block_id) {
       return op_filter_status::ekROBOT_NOT_ON_BLOCK;
@@ -132,7 +132,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
                                       double block_prox_dist,
                                       double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::ekCACHE_SITE == controller.acquisition_goal() &&
+          acq_goal_type::ekCACHE_SITE == controller.acquisition_goal() &&
           transport_goal_type::ekCACHE_SITE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
@@ -161,7 +161,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   op_filter_status new_cache_drop_filter(const T& controller,
                                      double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
-          acquisition_goal_type::ekNEW_CACHE == controller.acquisition_goal() &&
+          acq_goal_type::ekNEW_CACHE == controller.acquisition_goal() &&
           transport_goal_type::ekNEW_CACHE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }

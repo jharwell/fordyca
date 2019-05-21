@@ -88,7 +88,7 @@ class acquire_existing_cache_fsm
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
+  acq_goal_type acquisition_goal_internal(void) const;
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const;
   boost::optional<acquisition_loc_type> calc_acquisition_location(void);

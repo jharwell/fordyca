@@ -65,7 +65,7 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
+  acq_goal_type acquisition_goal_internal(void) const;
   boost::optional<acquire_goal_fsm::candidate_type> site_select(void) const;
   bool candidates_exist(void) const { return true; }
   bool site_exploration_term_cb(void) const;

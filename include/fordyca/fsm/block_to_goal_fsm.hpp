@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 class acquire_goal_fsm;
@@ -89,9 +89,9 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   /* goal acquisition metrics */
   FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const final);
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const final);
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const final);
+  FSM_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const final);
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  FSM_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const final);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const final);
 

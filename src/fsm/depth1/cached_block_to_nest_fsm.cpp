@@ -155,7 +155,7 @@ cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(bool,
+FSM_OVERRIDE_DEF(cached_block_to_nest_fsm::exp_status,
                  cached_block_to_nest_fsm,
                  is_exploring_for_goal,
                  m_cache_fsm,
@@ -185,7 +185,7 @@ FSM_OVERRIDE_DEF(rmath::vector2u,
                  const);
 
 __rcsw_pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::ekEXISTING_CACHE == acquisition_goal()) {
+  if (acq_goal_type::ekEXISTING_CACHE == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_DROP;
@@ -193,16 +193,16 @@ __rcsw_pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
   return false;
 }
 
-__rcsw_pure acquisition_goal_type
+__rcsw_pure acq_goal_type
 cached_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
-    return acquisition_goal_type::ekEXISTING_CACHE;
+    return acq_goal_type::ekEXISTING_CACHE;
   } else if (ekST_ACQUIRE_BLOCK == current_state() ||
              ekST_WAIT_FOR_PICKUP == current_state()) {
-    return acquisition_goal_type::ekEXISTING_CACHE;
+    return acq_goal_type::ekEXISTING_CACHE;
   }
-  return acquisition_goal_type::ekNONE;
+  return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
 /*******************************************************************************

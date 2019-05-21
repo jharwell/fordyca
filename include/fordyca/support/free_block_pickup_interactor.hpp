@@ -39,7 +39,7 @@
  ******************************************************************************/
 NS_START(fordyca, support);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Classes
@@ -104,7 +104,7 @@ class free_block_pickup_interactor
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
   void finish_free_block_pickup(T& controller, uint timestep) {
-    ER_ASSERT(controller.goal_acquired() && acquisition_goal_type::ekBLOCK ==
+    ER_ASSERT(controller.goal_acquired() && acq_goal_type::ekBLOCK ==
                                                 controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),

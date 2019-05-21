@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
@@ -40,7 +41,7 @@ namespace rta = rcppsw::ta;
 
 NS_START(fsm, depth0);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -76,10 +77,10 @@ class dpo_fsm final : public base_foraging_fsm,
   FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
+  FSM_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  FSM_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);

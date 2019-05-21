@@ -111,9 +111,9 @@ __rcsw_pure FSM_OVERRIDE_DEF(uint,
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(bool, dpo_fsm, is_exploring_for_goal, m_block_fsm, const);
+FSM_OVERRIDE_DEF(dpo_fsm::exp_status, dpo_fsm, is_exploring_for_goal, m_block_fsm, const);
 FSM_OVERRIDE_DEF(bool, dpo_fsm, is_vectoring_to_goal, m_block_fsm, const);
-FSM_OVERRIDE_DEF(acquisition_goal_type,
+FSM_OVERRIDE_DEF(acq_goal_type,
                  dpo_fsm,
                  acquisition_goal,
                  m_block_fsm,
