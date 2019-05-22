@@ -1,5 +1,5 @@
 /**
- * @file localized_block_search.hpp
+ * @file likelihood_block_search.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_BLOCK_SEARCH_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_BLOCK_SEARCH_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_BLOCK_SEARCH_HPP_
+#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_BLOCK_SEARCH_HPP_
 
 /*******************************************************************************
  * Includes
@@ -42,32 +42,33 @@ NS_START(fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class localized_block_search
+ * @class likelihood_block_search
  * @ingroup fordyca fsm expstrat
  *
- * @brief An exploration behavior in which robots vector to the last location of
- * a known block and then begin exploration there.
+ * @brief Vector to the last known location of a block, then begin performing
+ * CRW at that location, with the idea being that the likelihood of another
+ * block being nearby is higher, given that you've found one there before.
  */
-class localized_block_search : public localized_search {
+class likelihood_block_search : public localized_search {
  public:
-  explicit localized_block_search(const base_expstrat::params* const c_params)
-      : localized_block_search(c_params->saa, c_params->store) {}
+  explicit likelihood_block_search(const base_expstrat::params* const c_params)
+      : likelihood_block_search(c_params->saa, c_params->store) {}
 
-  explicit localized_block_search(controller::saa_subsystem* saa,
-                                  const ds::dpo_store* store)
+  likelihood_block_search(controller::saa_subsystem* saa,
+                          const ds::dpo_store* store)
       : localized_search(saa),
         mc_store(store) {}
 
-  ~localized_block_search(void) override = default;
-  localized_block_search(const localized_block_search&) = delete;
-  localized_block_search& operator=(const localized_block_search&) = delete;
+  ~likelihood_block_search(void) override = default;
+  likelihood_block_search(const likelihood_block_search&) = delete;
+  likelihood_block_search& operator=(const likelihood_block_search&) = delete;
 
   /* taskable overrides */
   void task_start(const rta::taskable_argument*) override final;
 
   /* prototype overrides */
   std::unique_ptr<base_expstrat> clone(void) const override {
-    return rcppsw::make_unique<localized_block_search>(saa_subsystem(),
+    return rcppsw::make_unique<likelihood_block_search>(saa_subsystem(),
                                                        mc_store);
   }
 
@@ -79,4 +80,4 @@ class localized_block_search : public localized_search {
 
 NS_END(expstrat, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_BLOCK_SEARCH_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_BLOCK_SEARCH_HPP_ */

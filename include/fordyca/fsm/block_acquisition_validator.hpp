@@ -36,6 +36,9 @@ NS_START(fordyca);
 namespace ds {
 class dp_block_map;
 } /* namespace ds */
+namespace controller {
+class block_sel_matrix;
+} /* namespace controller */
 
 NS_START(fsm);
 using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
@@ -43,10 +46,19 @@ using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @lockclass _acquisition_validator
+ * @ingroup fordyca fsm
+ *
+ * @brief Determine if the acquisition of a block at a specific location/with a
+ * specific ID is currently valid, according to simulation parameters and
+ * current simulation state.
+ */
 class block_acquisition_validator
     : public rer::client<block_acquisition_validator> {
  public:
-  explicit block_acquisition_validator(const ds::dp_block_map* map);
+  block_acquisition_validator(const ds::dp_block_map* map,
+                              const controller::block_sel_matrix* matrix);
 
   block_acquisition_validator(const block_acquisition_validator& v) = delete;
   block_acquisition_validator& operator=(const block_acquisition_validator& v) =
@@ -56,7 +68,8 @@ class block_acquisition_validator
 
  private:
   /* clang-format off */
-  const ds::dp_block_map* const mc_map;
+  const ds::dp_block_map* const              mc_map;
+  const controller::block_sel_matrix * const mc_matrix;
   /* clang-format on */
 };
 

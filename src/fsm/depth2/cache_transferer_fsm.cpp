@@ -45,9 +45,7 @@ cache_transferer_fsm::cache_transferer_fsm(
  ******************************************************************************/
 __rcsw_pure acq_goal_type
 cache_transferer_fsm::acquisition_goal(void) const {
-  if (ekST_ACQUIRE_BLOCK == current_state() ||
-      ekST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
-      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+  if (ekST_START != current_state() && ekST_FINISHED != current_state()) {
     return acq_goal_type::ekEXISTING_CACHE;
   }
   return acq_goal_type::ekNONE;
@@ -55,8 +53,7 @@ cache_transferer_fsm::acquisition_goal(void) const {
 
 __rcsw_pure transport_goal_type
 cache_transferer_fsm::block_transport_goal(void) const {
-  if (ekST_ACQUIRE_BLOCK == current_state() ||
-      ekST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
+  if (ekST_TRANSPORT_TO_GOAL == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::ekEXISTING_CACHE;
   }

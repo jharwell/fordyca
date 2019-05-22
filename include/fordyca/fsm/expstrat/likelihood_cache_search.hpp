@@ -1,5 +1,5 @@
 /**
- * @file localized_cache_search.hpp
+ * @file likelihood_cache_search.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_CACHE_SEARCH_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_CACHE_SEARCH_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_CACHE_SEARCH_HPP_
+#define INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_CACHE_SEARCH_HPP_
 
 /*******************************************************************************
  * Includes
@@ -42,32 +42,32 @@ NS_START(fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class localized_cache_search
+ * @class likelihood_cache_search
  * @ingroup fordyca fsm expstrat
  *
- * @brief An exploration behavior in which robots vector to a specific location,
- * then begin correlated random walk exploration there via \ref crw to look for
- * caches.
+ * @brief Vector to the last known location of a cache, then begin performing
+ * CRW at that location, with the idea being that the likelihood of another
+ * cache being nearby is higher, given that you've found one there before.
  */
-class localized_cache_search : public localized_search {
+class likelihood_cache_search : public localized_search {
  public:
-  explicit localized_cache_search(const base_expstrat::params* const c_params)
-      : localized_cache_search(c_params->saa, c_params->store) {}
-  explicit localized_cache_search(controller::saa_subsystem* saa,
-                                  const ds::dpo_store* store)
+  explicit likelihood_cache_search(const base_expstrat::params* const c_params)
+      : likelihood_cache_search(c_params->saa, c_params->store) {}
+  likelihood_cache_search(controller::saa_subsystem* saa,
+                          const ds::dpo_store* store)
       : localized_search(saa),
         mc_store(store) {}
 
-  ~localized_cache_search(void) override = default;
-  localized_cache_search(const localized_cache_search&) = delete;
-  localized_cache_search& operator=(const localized_cache_search&) = delete;
+  ~likelihood_cache_search(void) override = default;
+  likelihood_cache_search(const likelihood_cache_search&) = delete;
+  likelihood_cache_search& operator=(const likelihood_cache_search&) = delete;
 
   /* taskable overrides */
   void task_start(const rta::taskable_argument*) override;
 
   /* prototype overrides */
   std::unique_ptr<base_expstrat> clone(void) const override {
-    return rcppsw::make_unique<localized_cache_search>(saa_subsystem(),
+    return rcppsw::make_unique<likelihood_cache_search>(saa_subsystem(),
                                                        mc_store);
   }
 
@@ -79,4 +79,4 @@ class localized_cache_search : public localized_search {
 
 NS_END(expstrat, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LOCALIZED_CACHE_SEARCH_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_LIKELIHOOD_CACHE_SEARCH_HPP_ */

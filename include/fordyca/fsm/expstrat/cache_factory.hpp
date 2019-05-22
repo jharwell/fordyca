@@ -1,7 +1,7 @@
 /**
- * @file exploration_parser.cpp
+ * @file cache_factory.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,30 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_CACHE_FACTORY_HPP_
+#define INCLUDE_FORDYCA_FSM_EXPSTRAT_CACHE_FACTORY_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/exploration_parser.hpp"
+#include "rcppsw/patterns/factory/factory.hpp"
+#include "fordyca/nsalias.hpp"
+#include "fordyca/fsm/expstrat/base_expstrat.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
- * Global Variables
+ * Class Definitions
  ******************************************************************************/
-constexpr char exploration_parser::kXMLRoot[];
+class cache_factory :
+    public rfactory::releasing_factory<base_expstrat,
+                                       const base_expstrat::params*> {
+ public:
+  static constexpr char kCRW[] = "CRW";
+  static constexpr char kLikelihoodSearch[] = "likelihood_search";
+  static constexpr char kUtilitySearch[] = "utility_search";
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void exploration_parser::parse(const ticpp::Element& node) {
-  ticpp::Element vnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-  XML_PARSE_ATTR(vnode, m_config, block_strategy);
-  XML_PARSE_ATTR(vnode, m_config, cache_strategy);
-} /* parse() */
+  cache_factory(void);
+};
 
-NS_END(config, fordyca);
+NS_END(expstrat, fsm, fordyca);
+
+#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_CACHE_FACTORY_HPP_ */

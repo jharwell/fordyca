@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/pickup_policy_parser.hpp"
@@ -49,7 +50,7 @@ class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
  public:
   explicit cache_sel_matrix_parser(uint level)
       : xml_config_parser(level),
-        m_initial_pickup(level + 1) {}
+        m_pickup_policy(level + 1) {}
 
   /**
    * @brief The root tag that all cache sel matrix parameters should lie
@@ -73,7 +74,7 @@ class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
 
   /* clang-format off */
   std::shared_ptr<cache_sel_matrix_config> m_config{nullptr};
-  pickup_policy_parser             m_initial_pickup;
+  pickup_policy_parser                     m_pickup_policy;
   /* clang-format on */
 };
 

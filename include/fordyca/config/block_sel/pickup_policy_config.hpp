@@ -1,44 +1,46 @@
 /**
- * @file localized_cache_search.cpp
+ * @file block_pickup_config.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
- * This file is part of FORDYCA.
+ * This file is part of RCPPSW.
  *
- * FORDYCA is free software: you can redistribute it and/or modify it under the
+ * RCPPSW is free software: you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  *
- * FORDYCA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * RCPPSW is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License along with
- * FORDYCA.  If not, see <http://www.gnu.org/licenses/
+ * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
+
+#ifndef INCLUDE_FORDYCA_CONFIG_BLOCK_SEL_PICKUP_POLICY_CONFIG_HPP_
+#define INCLUDE_FORDYCA_CONFIG_BLOCK_SEL_PICKUP_POLICY_CONFIG_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/localized_cache_search.hpp"
-#include "fordyca/ds/dpo_store.hpp"
+#include <string>
+#include "rcppsw/config/base_config.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, config, block_sel);
 
 /*******************************************************************************
- * Member Functions
+ * Structure Definitions
  ******************************************************************************/
-void localized_cache_search::task_start(const rta::taskable_argument*) {
-  if (auto loc = mc_store->last_cache_loc()) {
-    tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, *loc);
-    localized_search::task_start(&v);
-  } else {
-    localized_search::task_start(nullptr);
-  }
-} /* task_start() */
+struct pickup_policy_config : public rconfig::base_config {
+  std::string policy{};
+  double      prox_dist{0};
+};
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(block_sel, config, fordyca);
+
+#endif /* INCLUDE_FORDYCA_CONFIG_BLOCK_SEL_PICKUP_POLICY_CONFIG_HPP_ */

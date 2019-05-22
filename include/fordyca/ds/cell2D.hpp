@@ -69,11 +69,11 @@ class cell2D final : public decorator::decorator<fsm::cell2D_fsm> {
   const fsm::cell2D_fsm& fsm(void) const { return decoratee(); }
 
   /* state inquiry */
-  RCPPSW_DECORATE_FUNC(state_is_known, const);
-  RCPPSW_DECORATE_FUNC(state_has_block, const);
-  RCPPSW_DECORATE_FUNC(state_has_cache, const);
-  RCPPSW_DECORATE_FUNC(state_in_cache_extent, const);
-  RCPPSW_DECORATE_FUNC(state_is_empty, const);
+  RCPPSW_DECORATE_FUNC(state_is_known, const)
+  RCPPSW_DECORATE_FUNC(state_has_block, const)
+  RCPPSW_DECORATE_FUNC(state_has_cache, const)
+  RCPPSW_DECORATE_FUNC(state_in_cache_extent, const)
+  RCPPSW_DECORATE_FUNC(state_is_empty, const)
 
   /**
    * @brief Reset the cell to its UNKNOWN state.

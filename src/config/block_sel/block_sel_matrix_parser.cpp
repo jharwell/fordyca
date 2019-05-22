@@ -49,7 +49,9 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
   m_config->nest.set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
 
   m_priorities.parse(cnode);
+  m_pickup_policy.parse(cnode);
   m_config->priorities = *m_priorities.config_get();
+  m_config->pickup_policy = *m_pickup_policy.config_get();
 } /* parse() */
 
 NS_END(block_sel, config, fordyca);

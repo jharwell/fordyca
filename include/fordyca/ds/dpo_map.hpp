@@ -140,9 +140,9 @@ class dpo_map {
   /* clang-format on */
 
  public:
-  RCPPSW_WRAP_MEMFUNC(size, mc_obj_ref, const);
-  RCPPSW_WRAP_MEMFUNC(empty, mc_obj_ref, const);
-  RCPPSW_WRAP_MEMFUNC(clear, m_obj);
+  RCPPSW_WRAP_MEMFUNC(size, mc_obj_ref, const)
+  RCPPSW_WRAP_MEMFUNC(empty, mc_obj_ref, const)
+  RCPPSW_WRAP_MEMFUNC(clear, m_obj)
 
   /**
    * @brief Iterate over mutable values of the map.

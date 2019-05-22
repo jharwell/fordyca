@@ -41,7 +41,8 @@ NS_START(fordyca, config);
   * @ingroup fordyca config
   */
 struct exploration_config : public rconfig::base_config {
-  std::string strategy{};
+  std::string block_strategy{};
+  std::string cache_strategy{};
 };
 
 NS_END(config, fordyca);

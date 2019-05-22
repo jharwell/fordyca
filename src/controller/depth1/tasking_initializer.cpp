@@ -35,7 +35,8 @@
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/fsm/expstrat/factory.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/fsm/expstrat/cache_factory.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
@@ -74,8 +75,10 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
     rta::bi_tdgraph* const graph) {
   auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
   auto* exp_config = param_repo.config_get<config::exploration_config>();
-  fsm::expstrat::factory expb_factory;
-  fsm::expstrat::base_expstrat::params expbp(saa_subsystem(),
+  fsm::expstrat::block_factory block_factory;
+  fsm::expstrat::cache_factory cache_factory;
+  fsm::expstrat::base_expstrat::params expbp(mc_csel_matrix,
+                                             saa_subsystem(),
                                              m_perception->dpo_store());
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
@@ -85,13 +88,13 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
       mc_bsel_matrix,
       m_saa,
       m_perception->dpo_store(),
-      expb_factory.create(exp_config->strategy + "_block", &expbp));
+      block_factory.create(exp_config->block_strategy, &expbp));
   auto collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
           cache_sel_matrix(),
           saa_subsystem(),
           m_perception->dpo_store(),
-          expb_factory.create(exp_config->strategy + "_cache", &expbp));
+          cache_factory.create(exp_config->cache_strategy, &expbp));
 
   fsm::depth1::block_to_existing_cache_fsm::params harvestorp = {
       .bsel_matrix = block_sel_matrix(),

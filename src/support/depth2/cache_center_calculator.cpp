@@ -66,6 +66,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
                                   return sum + b->real_loc().y();
                                 });
 
+  /* center is discretized real coordinates WITHOUT converting via resolution */
   rmath::vector2u center(static_cast<uint>(sumx / cache_i_blocks.size()),
                          static_cast<uint>(sumy / cache_i_blocks.size()));
   ER_DEBUG("Guess center=%s", center.to_str().c_str());

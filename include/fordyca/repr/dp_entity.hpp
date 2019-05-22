@@ -36,7 +36,7 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct dp_entity
+ * @class dp_entity
  * @ingroup fordyca repr
  *
  * @brief A repr of a Decaying Pheromone (DP) entity in the arena,

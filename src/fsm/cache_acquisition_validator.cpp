@@ -86,12 +86,12 @@ bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
 
   auto cache = it->ent();
   auto& config = boost::get<config::cache_sel::pickup_policy_config>(
-      mc_csel_matrix->find(cselm::kInitialPickupPolicy)->second);
+      mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
-  if (cselm::kInitialPickupPolicyTime == config.policy &&
+  if (cselm::kPickupPolicyTime == config.policy &&
       timestep < config.timestep) {
     return false;
-  } else if (cselm::kInitialPickupPolicyCacheSize == config.policy &&
+  } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {
     return false;
   }

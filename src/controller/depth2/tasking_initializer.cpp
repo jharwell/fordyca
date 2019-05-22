@@ -31,7 +31,8 @@
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
-#include "fordyca/fsm/expstrat/factory.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/fsm/expstrat/cache_factory.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -69,8 +70,10 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
     rta::bi_tdgraph* const graph) {
   auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
   auto* exp_config = param_repo.config_get<config::exploration_config>();
-  fsm::expstrat::factory expb_factory;
-  fsm::expstrat::base_expstrat::params expbp(saa_subsystem(),
+  fsm::expstrat::block_factory block_factory;
+  fsm::expstrat::cache_factory cache_factory;
+  fsm::expstrat::base_expstrat::params expbp(cache_sel_matrix(),
+                                             saa_subsystem(),
                                              perception()->dpo_store());
   auto cache_starter_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_cache_site_fsm>(
@@ -78,7 +81,7 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
           cache_sel_matrix(),
           saa_subsystem(),
           perception()->dpo_store(),
-          expb_factory.create(exp_config->strategy + "_block", &expbp));
+          block_factory.create(exp_config->block_strategy, &expbp));
 
   auto cache_finisher_fsm =
       rcppsw::make_unique<fsm::depth2::block_to_new_cache_fsm>(
@@ -86,20 +89,21 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
           cache_sel_matrix(),
           saa_subsystem(),
           perception()->dpo_store(),
-          expb_factory.create(exp_config->strategy + "_block", &expbp));
+          block_factory.create(exp_config->block_strategy, &expbp));
 
   auto cache_transferer_fsm =
       rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(
           cache_sel_matrix(),
           saa_subsystem(),
           perception()->dpo_store(),
-          expb_factory.create(exp_config->strategy + "_cache", &expbp));
+          cache_factory.create(exp_config->cache_strategy, &expbp));
+
   auto cache_collector_fsm =
       rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
           cache_sel_matrix(),
           saa_subsystem(),
           perception()->dpo_store(),
-          expb_factory.create(exp_config->strategy + "_cache", &expbp));
+          cache_factory.create(exp_config->cache_strategy, &expbp));
 
   auto cache_starter = rcppsw::make_unique<tasks::depth2::cache_starter>(
       task_config, std::move(cache_starter_fsm));

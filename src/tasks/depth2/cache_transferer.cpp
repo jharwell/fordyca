@@ -64,32 +64,38 @@ __rcsw_pure double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-__rcsw_pure double cache_transferer::interface_time_calc(uint interface,
+__rcsw_pure double cache_transferer::interface_time_calc(__rcsw_unused uint interface,
                                                          double start_time) {
-  ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
 
 void cache_transferer::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::cache_transferer_fsm*>(mechanism());
 
-  /*
-   * @todo This task really should have 2 task interfaces: one for acquiring
-   * each cache...
-   */
-  if (fsm->goal_acquired() && fsm->is_acquiring_dest_cache()) {
-    if (interface_in_prog(0)) {
+  if (fsm->is_acquiring_src_cache()) {
+    if (fsm->goal_acquired() && interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
-      ER_TRACE("Interface finished at timestep %f", current_time());
+      ER_TRACE("Interface0 finished at timestep %f", current_time());
     }
-    ER_TRACE("Interface time: %f", interface_time(0));
-  } else if (fsm->is_acquiring_dest_cache()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);
+      ER_TRACE("Interface0 start at timestep %f", current_time());
     }
-    ER_TRACE("Interface start at timestep %f", current_time());
+    ER_TRACE("Interface0 time: %f", interface_time(0));
+  } else if (fsm->is_acquiring_dest_cache()) {
+    if (fsm->goal_acquired() && interface_in_prog(1)) {
+      interface_exit(1);
+      interface_time_mark_finish(1);
+      ER_TRACE("Interface1 finished at timestep %f", current_time());
+    }
+    if (!interface_in_prog(1)) {
+      interface_enter(1);
+      interface_time_mark_start(1);
+      ER_TRACE("Interface1 start at timestep %f", current_time());
+    }
+    ER_TRACE("Interface1 time: %f", interface_time(0));
   }
 } /* active_interface_update() */
 
