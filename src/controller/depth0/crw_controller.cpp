@@ -27,7 +27,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/fsm/expstrat/factory.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
@@ -51,11 +51,11 @@ void crw_controller::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
-  fsm::expstrat::base_expstrat::params p = {.saa = saa_subsystem(),
-                                            .store = nullptr};
+  fsm::expstrat::base_expstrat::params p(nullptr, saa_subsystem(), nullptr);
   m_fsm = rcppsw::make_unique<fsm::depth0::crw_fsm>(
       saa_subsystem(),
-      fsm::expstrat::factory().create(fsm::expstrat::factory::kCRWBlock, &p));
+      fsm::expstrat::block_factory().create(fsm::expstrat::block_factory::kCRW,
+                                            &p));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */

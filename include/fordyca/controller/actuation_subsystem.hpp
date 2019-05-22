@@ -27,9 +27,7 @@
 #include "fordyca/config/actuation_config.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
-#include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/wifi_actuator.hpp"
+#include "fordyca/controller/actuator_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,8 +39,6 @@ class tv_manager;
 }} // namespace support::tv
 
 NS_START(controller);
-
-namespace hal = rcppsw::robotics::hal;
 
 /*******************************************************************************
  * Class Definitions
@@ -61,12 +57,6 @@ namespace hal = rcppsw::robotics::hal;
  */
 class actuation_subsystem {
  public:
-  struct actuator_list {
-    hal::actuators::differential_drive_actuator wheels;
-    hal::actuators::led_actuator leds;
-    hal::actuators::wifi_actuator wifi;
-  };
-
   /**
    * @brief Initialize the actuation subsystem.
    *
@@ -95,9 +85,9 @@ class actuation_subsystem {
 
  private:
   /* clang-format off */
-  const config::actuation_config    mc_config;
-  struct actuator_list                     m_actuators;
-  throttling_differential_drive            m_drive;
+  const config::actuation_config mc_config;
+  struct actuator_list           m_actuators;
+  throttling_differential_drive  m_drive;
   /* clang-format on */
 };
 

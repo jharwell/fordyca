@@ -42,11 +42,10 @@ constexpr char cache_sel_matrix::kSiteXRange[];
 constexpr char cache_sel_matrix::kSiteYRange[];
 constexpr char cache_sel_matrix::kPickupExceptions[];
 constexpr char cache_sel_matrix::kDropExceptions[];
-constexpr char cache_sel_matrix::kInitialPickupPolicy[];
-constexpr char cache_sel_matrix::kInitialPickupPolicyTime[];
-constexpr char cache_sel_matrix::kInitialPickupPolicyNull[];
-constexpr char cache_sel_matrix::kInitialPickupPolicyCacheSize[];
-constexpr char cache_sel_matrix::kInitialPickupPolicyCacheCount[];
+constexpr char cache_sel_matrix::kPickupPolicy[];
+constexpr char cache_sel_matrix::kPickupPolicyTime[];
+constexpr char cache_sel_matrix::kPickupPolicyNull[];
+constexpr char cache_sel_matrix::kPickupPolicyCacheSize[];
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -64,7 +63,7 @@ cache_sel_matrix::cache_sel_matrix(
   this->insert(std::make_pair(kSiteYRange, config->site_yrange));
   this->insert(std::make_pair(kPickupExceptions, std::vector<int>()));
   this->insert(std::make_pair(kDropExceptions, std::vector<int>()));
-  this->insert(std::make_pair(kInitialPickupPolicy, config->initial_pickup));
+  this->insert(std::make_pair(kPickupPolicy, config->pickup_policy));
 }
 
 /*******************************************************************************

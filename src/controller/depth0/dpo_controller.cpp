@@ -34,7 +34,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/fsm/expstrat/factory.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
@@ -131,14 +131,15 @@ void dpo_controller::shared_init(
 void dpo_controller::private_init(
     const config::depth0::dpo_controller_repository& param_repo) {
   auto* exp_config = param_repo.config_get<config::exploration_config>();
-  fsm::expstrat::factory f;
-  fsm::expstrat::base_expstrat::params p(saa_subsystem(),
+  fsm::expstrat::block_factory f;
+  fsm::expstrat::base_expstrat::params p(nullptr,
+                                         saa_subsystem(),
                                          perception()->dpo_store());
   m_fsm = rcppsw::make_unique<fsm::depth0::dpo_fsm>(
       m_block_sel_matrix.get(),
       base_controller::saa_subsystem(),
       m_perception->dpo_store(),
-      f.create(exp_config->strategy + "_block", &p));
+      f.create(exp_config->block_strategy, &p));
 } /* private_init() */
 
 __rcsw_pure dpo_perception_subsystem* dpo_controller::dpo_perception(void) {

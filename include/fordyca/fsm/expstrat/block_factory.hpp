@@ -1,5 +1,5 @@
 /**
- * @file factory.hpp
+ * @file block_factory.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_FACTORY_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_FACTORY_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_
+#define INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -36,22 +36,16 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class factory :
+class block_factory :
     public rfactory::releasing_factory<base_expstrat,
                                        const base_expstrat::params*> {
  public:
-  static constexpr char kCRWCache[] = "CRW_cache";
-  static constexpr char kCRWBlock[] = "CRW_block";
-  static constexpr char kLocalizedSearchCache[] = "localized_search_cache";
-  static constexpr char kLocalizedSearchBlock[] = "localized_search_block";
+  static constexpr char kCRW[] = "CRW";
+  static constexpr char kLikelihoodSearch[] = "likelihood_search";
 
-  factory(void);
-
- private:
-  /* clang-format off */
-  /* clang-format on */
+  block_factory(void);
 };
 
 NS_END(expstrat, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_FACTORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_BLOCK_FACTORY_HPP_ */

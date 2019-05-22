@@ -84,8 +84,8 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   explicit cache_site_selector(const controller::cache_sel_matrix* matrix);
 
   ~cache_site_selector(void) override = default;
-  cache_site_selector& operator=(const cache_site_selector& other) = delete;
-  cache_site_selector(const cache_site_selector& other) = delete;
+  cache_site_selector& operator=(const cache_site_selector&) = delete;
+  cache_site_selector(const cache_site_selector&) = delete;
 
   /**
    * @brief Given a list of existing caches/blocks that a robot knows about

@@ -31,6 +31,7 @@
 
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/config/block_sel/pickup_policy_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,10 +39,15 @@
 NS_START(fordyca);
 namespace config { namespace block_sel {
 struct block_sel_matrix_config;
-}} // namespace config::block_sel
+}}  // namespace config::block_sel
 NS_START(controller);
+
 using block_sel_variant =
-    boost::variant<double, rmath::vector2d, std::vector<int>>;
+    boost::variant<double,
+                   rmath::vector2d,
+                   std::vector<int>,
+                   config::block_sel::pickup_policy_config
+                   >;
 
 /*******************************************************************************
  * Class Definitions
@@ -65,6 +71,14 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
   static constexpr char kCubePriority[] = "cube_priority";
   static constexpr char kRampPriority[] = "ramp_priority";
   static constexpr char kSelExceptions[] = "sel_exceptions";
+
+  /**
+   * @brief The conditions that must be satisfied before a robot will be
+   * able to pickup a block (if applicable).
+   */
+  static constexpr char kPickupPolicy[] = "pickup_policy";
+  static constexpr char kPickupPolicyNull[] = "Null";
+  static constexpr char kPickupPolicyClusterProx[] = "cluster_proximity";
 
   explicit block_sel_matrix(
       const config::block_sel::block_sel_matrix_config* config);

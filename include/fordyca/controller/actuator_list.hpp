@@ -1,7 +1,7 @@
 /**
- * @file exploration_parser.cpp
+ * @file actuator_list.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,30 +18,36 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/exploration_parser.hpp"
+#include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
+#include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
+#include "rcppsw/robotics/hal/actuators/wifi_actuator.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Global Variables
+ * Struct Definitions
  ******************************************************************************/
-constexpr char exploration_parser::kXMLRoot[];
+/**
+ * @struct actuator_list
+ * @brief The list of actuators used by the footbots in FORDYCA.
+ * @ingroup fordyca controller
+ */
+struct actuator_list {
+  rhal::actuators::differential_drive_actuator wheels;
+  rhal::actuators::led_actuator leds;
+  rhal::actuators::wifi_actuator wifi;
+};
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void exploration_parser::parse(const ticpp::Element& node) {
-  ticpp::Element vnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-  XML_PARSE_ATTR(vnode, m_config, block_strategy);
-  XML_PARSE_ATTR(vnode, m_config, cache_strategy);
-} /* parse() */
+NS_END(controller, fordyca);
 
-NS_END(config, fordyca);
+#endif /* INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_ */

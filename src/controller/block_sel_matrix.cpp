@@ -36,6 +36,9 @@ constexpr char block_sel_matrix::kNestLoc[];
 constexpr char block_sel_matrix::kCubePriority[];
 constexpr char block_sel_matrix::kRampPriority[];
 constexpr char block_sel_matrix::kSelExceptions[];
+constexpr char block_sel_matrix::kPickupPolicy[];
+constexpr char block_sel_matrix::kPickupPolicyNull[];
+constexpr char block_sel_matrix::kPickupPolicyClusterProx[];
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -46,6 +49,7 @@ block_sel_matrix::block_sel_matrix(
   this->insert(std::make_pair(kCubePriority, config->priorities.cube));
   this->insert(std::make_pair(kRampPriority, config->priorities.ramp));
   this->insert(std::make_pair(kSelExceptions, std::vector<int>()));
+  this->insert(std::make_pair(kPickupPolicy, config->pickup_policy));
 }
 
 /*******************************************************************************

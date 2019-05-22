@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <dpo_controller id="ffc"
+    <grp_dpo_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -115,6 +115,10 @@
                   cube="1.0"
                   ramp="1.0"
                   />
+              <pickup_policy
+                  policy="cluster_proximity"
+                  prox_dist="3.0"
+                  />
         </block_sel_matrix>
         <cache_sel_matrix
             cache_prox_dist="1.6"
@@ -129,7 +133,8 @@
               cache_size="3"/>
         </cache_sel_matrix>
         <exploration
-            strategy="CRW"/>
+            block_strategy="CRW"
+            cache_strategy="utility_search"/>
         <sensing
             los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
@@ -156,7 +161,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </dpo_controller>
+    </grp_dpo_controller>
 
   </controllers>
 
@@ -164,7 +169,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth0_loop_functions">
+                  label="depth2_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -330,7 +335,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="4" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

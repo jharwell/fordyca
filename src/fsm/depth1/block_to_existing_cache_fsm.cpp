@@ -23,7 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/fsm/expstrat/factory.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/fsm/expstrat/cache_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,9 +40,10 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
       m_cache_fsm(c_params->csel_matrix,
                   c_params->saa,
                   c_params->store,
-                  expstrat::factory().create(
-                      c_params->exp_config.strategy + "_cache",
+                  expstrat::cache_factory().create(
+                      c_params->exp_config.cache_strategy,
                       rcppsw::make_unique<expstrat::base_expstrat::params>(
+                          c_params->csel_matrix,
                           c_params->saa,
                           c_params->store)
                           .get()),
@@ -49,9 +51,10 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
       m_block_fsm(c_params->bsel_matrix,
                   c_params->saa,
                   c_params->store,
-                  expstrat::factory().create(
-                      c_params->exp_config.strategy + "_block",
+                  expstrat::block_factory().create(
+                      c_params->exp_config.block_strategy,
                       rcppsw::make_unique<expstrat::base_expstrat::params>(
+                          nullptr,
                           c_params->saa,
                           c_params->store)
                           .get())) {}

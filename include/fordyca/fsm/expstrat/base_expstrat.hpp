@@ -36,6 +36,7 @@
 NS_START(fordyca);
 namespace controller {
 class saa_subsystem;
+class cache_sel_matrix;
 } /* namespace controller */
 namespace ds {
 class dpo_store;
@@ -58,11 +59,17 @@ class base_expstrat : public metrics::fsm::collision_metrics,
                               public rprototype::clonable<base_expstrat> {
  public:
   struct params {
-    params(controller::saa_subsystem* saa_in, ds::dpo_store* store_in)
-        : saa(saa_in),
+    params(const controller::cache_sel_matrix* csel_matrix_in,
+           controller::saa_subsystem* saa_in,
+           ds::dpo_store* store_in)
+        : csel_matrix(csel_matrix_in),
+          saa(saa_in),
           store(store_in) {}
-    controller::saa_subsystem*  saa;
-    ds::dpo_store*              store;
+    /* clang-format off */
+    const controller::cache_sel_matrix *csel_matrix;
+    controller::saa_subsystem*         saa;
+    ds::dpo_store*                     store;
+    /* clang-format on */
   };
 
   explicit base_expstrat(const params* const c_params)

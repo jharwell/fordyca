@@ -1,7 +1,7 @@
 /**
- * @file cache_sel_matrix_parser.cpp
+ * @file cache_factory.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,47 +21,30 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/cache_sel/cache_sel_matrix_parser.hpp"
+#include "fordyca/fsm/expstrat/cache_factory.hpp"
+#include "fordyca/fsm/expstrat/crw.hpp"
+#include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
+#include "fordyca/fsm/expstrat/utility_cache_search.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config, cache_sel);
+NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
- * Global Variables
+ * Class Constants
  ******************************************************************************/
-constexpr char cache_sel_matrix_parser::kXMLRoot[];
+constexpr char cache_factory::kCRW[];
+constexpr char cache_factory::kLikelihoodSearch[];
+constexpr char cache_factory::kUtilitySearch[];
 
 /*******************************************************************************
- * Member Functions
+ * Constructors/Destructors
  ******************************************************************************/
-void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
-  ticpp::Element cnode = node_get(node, kXMLRoot);
+cache_factory::cache_factory(void) {
+  register_type<crw>(kCRW);
+  register_type<likelihood_cache_search>(kLikelihoodSearch);
+  register_type<utility_cache_search>(kUtilitySearch);
+}
 
-  m_pickup_policy.parse(cnode);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-
-  m_config->pickup_policy = *m_pickup_policy.config_get();
-  XML_PARSE_ATTR(cnode, m_config, cache_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, block_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, nest_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, cluster_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, site_xrange);
-  XML_PARSE_ATTR(cnode, m_config, site_yrange);
-} /* parse() */
-
-__rcsw_pure bool cache_sel_matrix_parser::validate(void) const {
-  CHECK(m_pickup_policy.validate());
-  CHECK(m_config->cache_prox_dist > 0.0);
-  CHECK(m_config->block_prox_dist > 0.0);
-  CHECK(m_config->nest_prox_dist > 0.0);
-  CHECK(m_config->cluster_prox_dist > 0.0);
-  return true;
-
-error:
-  return false;
-} /* validate() */
-
-NS_END(cache_sel, config, fordyca);
+NS_END(expstrat, fsm, fordyca);

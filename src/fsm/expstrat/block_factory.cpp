@@ -1,5 +1,5 @@
 /**
- * @file factory.cpp
+ * @file block_factory.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,10 +21,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/factory.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/fsm/expstrat/crw.hpp"
-#include "fordyca/fsm/expstrat/localized_block_search.hpp"
-#include "fordyca/fsm/expstrat/localized_cache_search.hpp"
+#include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,19 +33,15 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Class Constants
  ******************************************************************************/
-constexpr char factory::kCRWBlock[];
-constexpr char factory::kCRWCache[];
-constexpr char factory::kLocalizedSearchBlock[];
-constexpr char factory::kLocalizedSearchCache[];
+constexpr char block_factory::kCRW[];
+constexpr char block_factory::kLikelihoodSearch[];
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-factory::factory(void) {
-  register_type<crw>(kCRWBlock);
-  register_type<crw>(kCRWCache);
-  register_type<localized_cache_search>(kLocalizedSearchCache);
-  register_type<localized_block_search>(kLocalizedSearchBlock);
+block_factory::block_factory(void) {
+  register_type<crw>(kCRW);
+  register_type<likelihood_block_search>(kLikelihoodSearch);
 }
 
 NS_END(expstrat, fsm, fordyca);

@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/crw.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

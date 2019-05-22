@@ -1,7 +1,7 @@
 /**
- * @file exploration_parser.cpp
+ * @file likelihood_cache_search.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,27 +21,24 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/exploration_parser.hpp"
+#include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config);
-
-/*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char exploration_parser::kXMLRoot[];
+NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void exploration_parser::parse(const ticpp::Element& node) {
-  ticpp::Element vnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-  XML_PARSE_ATTR(vnode, m_config, block_strategy);
-  XML_PARSE_ATTR(vnode, m_config, cache_strategy);
-} /* parse() */
+void likelihood_cache_search::task_start(const rta::taskable_argument*) {
+  if (auto loc = mc_store->last_cache_loc()) {
+    tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, *loc);
+    localized_search::task_start(&v);
+  } else {
+    localized_search::task_start(nullptr);
+  }
+} /* task_start() */
 
-NS_END(config, fordyca);
+NS_END(expstrat, fsm, fordyca);

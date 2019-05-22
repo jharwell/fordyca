@@ -24,6 +24,7 @@
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

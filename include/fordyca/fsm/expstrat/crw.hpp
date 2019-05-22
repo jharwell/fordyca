@@ -41,8 +41,8 @@ NS_START(fordyca, fsm, expstrat);
  * @class crw
  * @ingroup fordyca fsm expstrat
  *
- * @brief An exploration behavior in which robots perform correlated random walk
- * exploration: wander force + avoidance force.
+ * @brief Roam around using Correlated Random Walk looking for something until
+ * you happen to stumble across it.
  */
 class crw final
     : public base_expstrat,

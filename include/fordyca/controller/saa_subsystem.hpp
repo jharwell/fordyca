@@ -24,13 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <utility>
+#include <memory>
 
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/nsalias.hpp"
+#include "fordyca/controller/sensor_list.hpp"
+#include "fordyca/controller/actuator_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,6 +43,8 @@ struct sensing_config;
 } // namespace config
 
 NS_START(controller);
+class actuation_subsystem;
+class sensing_subsystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -60,25 +62,14 @@ class saa_subsystem final : public rcppsw::robotics::steer2D::boid,
  public:
   saa_subsystem(const config::actuation_config* aconfig,
                 const config::sensing_config* sconfig,
-                struct actuation_subsystem::actuator_list* actuator_list,
-                struct sensing_subsystem::sensor_list* sensor_list);
+                actuator_list* actuator_list,
+                sensor_list* sensor_list);
 
   /* BOID interface */
-  rmath::vector2d linear_velocity(void) const override {
-    return {m_actuation->differential_drive().current_speed(),
-            m_sensing->heading().angle()};
-  }
-  double angular_velocity(void) const override {
-    return (m_actuation->differential_drive().right_linspeed() -
-            m_actuation->differential_drive().left_linspeed()) /
-           m_actuation->differential_drive().axle_length();
-  }
-  double max_speed(void) const override {
-    return m_actuation->differential_drive().max_speed();
-  }
-  rmath::vector2d position(void) const override {
-    return m_sensing->position();
-  }
+  rmath::vector2d linear_velocity(void) const override;
+  double angular_velocity(void) const override;
+  double max_speed(void) const override;
+  rmath::vector2d position(void) const override;
 
   void sensing(const std::shared_ptr<sensing_subsystem>& sensing) {
     m_sensing = sensing;

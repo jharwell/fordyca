@@ -1,7 +1,7 @@
 /**
- * @file cache_sel_matrix_parser.cpp
+ * @file pickup_policy_parser.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,47 +21,35 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/cache_sel/cache_sel_matrix_parser.hpp"
+#include "fordyca/config/block_sel/pickup_policy_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, config, cache_sel);
+NS_START(fordyca, config, block_sel);
 
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char cache_sel_matrix_parser::kXMLRoot[];
+constexpr char pickup_policy_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
-  ticpp::Element cnode = node_get(node, kXMLRoot);
-
-  m_pickup_policy.parse(cnode);
+void pickup_policy_parser::parse(const ticpp::Element& node) {
+  /*
+   * Needs to be populated always so we get the null trigger when the policy is
+   * disabled.
+   */
   m_config =
       std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config->policy = "Null";
 
-  m_config->pickup_policy = *m_pickup_policy.config_get();
-  XML_PARSE_ATTR(cnode, m_config, cache_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, block_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, nest_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, cluster_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, site_xrange);
-  XML_PARSE_ATTR(cnode, m_config, site_yrange);
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element cnode = node_get(node, kXMLRoot);
+    XML_PARSE_ATTR(cnode, m_config, policy);
+    XML_PARSE_ATTR_DFLT(cnode, m_config, prox_dist, 0.0);
+  }
 } /* parse() */
 
-__rcsw_pure bool cache_sel_matrix_parser::validate(void) const {
-  CHECK(m_pickup_policy.validate());
-  CHECK(m_config->cache_prox_dist > 0.0);
-  CHECK(m_config->block_prox_dist > 0.0);
-  CHECK(m_config->nest_prox_dist > 0.0);
-  CHECK(m_config->cluster_prox_dist > 0.0);
-  return true;
-
-error:
-  return false;
-} /* validate() */
-
-NS_END(cache_sel, config, fordyca);
+NS_END(block_sel, config, fordyca);

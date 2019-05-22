@@ -119,7 +119,8 @@ acquire_free_block_fsm::acquisition_goal_internal(void) const {
 
 bool acquire_free_block_fsm::block_acquisition_valid(const rmath::vector2d& loc,
                                                      uint id) const {
-  return block_acquisition_validator(&mc_store->blocks())(loc, id);
+  return block_acquisition_validator(&mc_store->blocks(),
+                                     mc_matrix)(loc, id);
 } /* block_acquisition_valid() */
 
 NS_END(controller, fordyca);

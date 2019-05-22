@@ -84,14 +84,13 @@ class cache_sel_matrix final
   static constexpr char kDropExceptions[] = "drop_exceptions";
 
   /**
-   * @brief The initial conditions that must be satisfied before a robot will be
+   * @brief The conditions that must be satisfied before a robot will be
    * able to pickup from *ANY* cache.
    */
-  static constexpr char kInitialPickupPolicy[] = "pickup_policy";
-  static constexpr char kInitialPickupPolicyNull[] = "Null";
-  static constexpr char kInitialPickupPolicyTime[] = "time";
-  static constexpr char kInitialPickupPolicyCacheCount[] = "cache_count";
-  static constexpr char kInitialPickupPolicyCacheSize[] = "cache_size";
+  static constexpr char kPickupPolicy[] = "pickup_policy";
+  static constexpr char kPickupPolicyNull[] = "Null";
+  static constexpr char kPickupPolicyTime[] = "time";
+  static constexpr char kPickupPolicyCacheSize[] = "cache_size";
 
   using std::map<std::string, cache_sel_variant>::find;
   cache_sel_matrix(const config::cache_sel::cache_sel_matrix_config* config,

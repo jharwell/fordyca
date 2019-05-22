@@ -106,7 +106,9 @@ class dpo_controller : public crw_controller,
   const base_perception_subsystem* perception(void) const override final {
     return m_perception.get();
   }
-  base_perception_subsystem* perception(void) override { return m_perception.get(); }
+  base_perception_subsystem* perception(void) override final {
+    return m_perception.get();
+  }
 
   dpo_perception_subsystem* dpo_perception(void);
   const dpo_perception_subsystem* dpo_perception(void) const;

@@ -107,7 +107,7 @@ class mdpo_perception_subsystem final
    * @brief Update the aggregate stats on inaccuracies in the robot's perceived
    * arena map for this timestep.
    *
-   * @param los The current LOS
+   * @param c_los The current LOS
    */
   void update_cell_stats(const repr::line_of_sight* c_los);
 

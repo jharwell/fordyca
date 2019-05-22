@@ -1,5 +1,5 @@
 /**
- * @file cache_pickup_config.hpp
+ * @file pickup_policy_config.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *

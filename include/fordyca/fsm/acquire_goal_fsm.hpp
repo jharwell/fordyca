@@ -68,40 +68,40 @@ class acquire_goal_fsm : public base_foraging_fsm,
   using goal_valid_ftype = std::function<bool(const rmath::vector2d&, uint)>;
 
   /**
-   * @param acquisition_goal Function used to tell the FSM what is the ultimate
-   *                         goal of the acquisition. However, the return of
-   *                         \ref acquisition_goal() may not always be the same
-   *                         as the specified goal, depending on what the
-   *                         current FSM state is.
+   * acquisition_goal Function used to tell the FSM what is the ultimate
+   *                  goal of the acquisition. However, the return of
+   *                  \ref acquisition_goal() may not always be the same
+   *                  as the specified goal, depending on what the
+   *                  current FSM state is.
    *
-   * @param goal_select      Function used to select a goal from the list of
-   *                         candidates. Should return the "best" candidate that
-   *                         should be acquired.
+   * goal_select      Function used to select a goal from the list of
+   *                  candidates. Should return the "best" candidate that
+   *                  should be acquired.
    *
-   * @param candidates_exist Function used to determine if any goal candidates
-   *                         are currently available/eligible for acquisition.
+   * candidates_exist Function used to determine if any goal candidates
+   *                  are currently available/eligible for acquisition.
    *
-   * @param goal_acquired_cb Callback used after a goal has been acquired for
-   *                         sanity check/verification of state. Will be passed
-   *                         \c TRUE if the acquired goal was obtained via
-   *                         exploration, rather than vectoring, and false if it
-   *                         was obtained via vectoring. Should return \c TRUE
-   *                         if the goal has REALLY been acquired, and \c FALSE
-   *                         otherwise (the goal may have vanished if it was a
-   *                         block/cache, for example).
+   * goal_acquired_cb Callback used after a goal has been acquired for
+   *                  sanity check/verification of state. Will be passed
+   *                  \c TRUE if the acquired goal was obtained via
+   *                  exploration, rather than vectoring, and false if it
+   *                  was obtained via vectoring. Should return \c TRUE
+   *                  if the goal has REALLY been acquired, and \c FALSE
+   *                  otherwise (the goal may have vanished if it was a
+   *                  block/cache, for example).
    *
-   * @param explore_term_cb Callback for goal detection during exploration. This
-   *                        fsm can't know when a goal has been reached without
-   *                        losing its generality when exploring, so this
-   *                        callback is provided to it for that purpose. Should
-   *                        return \c TRUE if the goal has been detected/reached
-   *                        and exploration should terminate, and \c FALSE
-   *                        otherwise.
+   * explore_term_cb Callback for goal detection during exploration. This
+   *                 fsm can't know when a goal has been reached without
+   *                 losing its generality when exploring, so this
+   *                 callback is provided to it for that purpose. Should
+   *                 return \c TRUE if the goal has been detected/reached
+   *                 and exploration should terminate, and \c FALSE
+   *                 otherwise.
    *
-   * @param goal_valid_cb Callback for verifying goal validity during
-   *                      vectoring/exploration. If for any reason the specific
-   *                      goal becomes invalid before the robot has acquired it,
-   *                      then it should return \c FALSE.
+   * goal_valid_cb Callback for verifying goal validity during
+   *               vectoring/exploration. If for any reason the specific goal
+   *               becomes invalid before the robot has acquired it, then it
+   *               should return \c FALSE.
    */
   struct hook_list {
     /* clang-format off */
@@ -117,7 +117,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
   /**
    * @param saa Handle to sensing and actuation subsystem.
    *
-   * @param exp_behavior The exploration behavior to use; can be NULL if goal
+   * @param behavior The exploration behavior to use; can be NULL if goal
    * acquisition should always be performed via vectoring.
    *
    * @param hooks List of function callbacks that derived classes should pass in

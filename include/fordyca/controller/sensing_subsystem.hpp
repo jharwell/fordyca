@@ -24,16 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <sstream>
 #include <string>
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
+#include "fordyca/controller/sensor_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,7 +40,6 @@ struct sensing_config;
 }
 
 NS_START(controller);
-namespace hal = rcppsw::robotics::hal;
 
 /*******************************************************************************
  * Class Definitions
@@ -60,14 +54,6 @@ namespace hal = rcppsw::robotics::hal;
  */
 class sensing_subsystem {
  public:
-  struct sensor_list {
-    hal::sensors::rab_wifi_sensor rabs;
-    hal::sensors::proximity_sensor proximity;
-    hal::sensors::light_sensor light;
-    hal::sensors::ground_sensor ground;
-    hal::sensors::battery_sensor battery;
-  };
-
   /**
    * @brief Initialize the base sensing subsystem.
    *
@@ -75,25 +61,25 @@ class sensing_subsystem {
    * @param list List of handles to sensing devices.
    */
   sensing_subsystem(const config::sensing_config* config,
-                    const struct sensor_list* list);
+                    const sensor_list* list);
 
   double los_dim(void) const { return mc_los_dim; }
 
   /**
    * @brief Get the list of sensors that the subsystem is managing.
    */
-  const sensor_list& sensor_list(void) const { return m_sensors; }
+  const struct sensor_list& sensor_list(void) const { return m_sensors; }
 
-  const hal::sensors::proximity_sensor& proximity(void) const {
+  const rhal::sensors::proximity_sensor& proximity(void) const {
     return m_sensors.proximity;
   }
-  const hal::sensors::light_sensor& light(void) const {
+  const rhal::sensors::light_sensor& light(void) const {
     return m_sensors.light;
   }
-  const hal::sensors::ground_sensor& ground(void) const {
+  const rhal::sensors::ground_sensor& ground(void) const {
     return m_sensors.ground;
   }
-  const hal::sensors::battery_sensor& battery(void) const {
+  const rhal::sensors::battery_sensor& battery(void) const {
     return m_sensors.battery;
   }
 

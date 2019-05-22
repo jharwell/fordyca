@@ -116,14 +116,14 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   /**
    * @brief Reset all the cells in the percieved arena.
    */
-  RCPPSW_DECORATE_FUNC(reset);
-  RCPPSW_DECORATE_FUNC(xdsize, const);
-  RCPPSW_DECORATE_FUNC(ydsize, const);
-  RCPPSW_DECORATE_FUNC(xrsize, const);
-  RCPPSW_DECORATE_FUNC(yrsize, const);
-  RCPPSW_DECORATE_FUNC(known_cells_inc);
-  RCPPSW_DECORATE_FUNC(known_cells_dec);
-  RCPPSW_DECORATE_FUNC(known_cell_count, const);
+  RCPPSW_DECORATE_FUNC(reset)
+  RCPPSW_DECORATE_FUNC(xdsize, const)
+  RCPPSW_DECORATE_FUNC(ydsize, const)
+  RCPPSW_DECORATE_FUNC(xrsize, const)
+  RCPPSW_DECORATE_FUNC(yrsize, const)
+  RCPPSW_DECORATE_FUNC(known_cells_inc)
+  RCPPSW_DECORATE_FUNC(known_cells_dec)
+  RCPPSW_DECORATE_FUNC(known_cell_count, const)
 
   double grid_resolution(void) const { return decoratee().resolution(); }
 
@@ -140,12 +140,12 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_WRAP_MEMFUNC(block_update, (*store()));
-  RCPPSW_WRAP_MEMFUNC(cache_update, (*store()));
-  RCPPSW_WRAP_MEMFUNC(blocks, (*store()));
-  RCPPSW_WRAP_MEMFUNC(caches, (*store()));
-  RCPPSW_WRAP_MEMFUNC(blocks, (*store()), const);
-  RCPPSW_WRAP_MEMFUNC(caches, (*store()), const);
+  RCPPSW_WRAP_MEMFUNC(block_update, (*store()))
+  RCPPSW_WRAP_MEMFUNC(cache_update, (*store()))
+  RCPPSW_WRAP_MEMFUNC(blocks, (*store()))
+  RCPPSW_WRAP_MEMFUNC(caches, (*store()))
+  RCPPSW_WRAP_MEMFUNC(blocks, (*store()), const)
+  RCPPSW_WRAP_MEMFUNC(caches, (*store()), const)
 };
 
 NS_END(ds, fordyca);
