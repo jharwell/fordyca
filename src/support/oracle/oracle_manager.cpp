@@ -51,7 +51,9 @@ void oracle_manager::update(ds::arena_map* const map) {
   if (m_entities->blocks_enabled()) {
     entities_oracle::variant_vector_type v;
     for (auto& b : map->blocks()) {
-      v.push_back(b);
+      if (-1 == b->robot_id()) { /* don't include blocks robot's are carrying */
+        v.push_back(b);
+      }
     } /* for(&b..) */
     m_entities->set_blocks(v);
   }

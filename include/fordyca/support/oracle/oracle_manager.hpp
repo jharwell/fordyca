@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
@@ -78,7 +79,8 @@ class oracle_manager {
 
   /**
    * @brief Update all oracles each timestep (if necessary). Should be called
-   * from the loop functions before processing any robots for that timestep.
+   * from the loop functions before processing any robots for that timestep (at
+   * a minimum).
    */
   void update(ds::arena_map* map);
 

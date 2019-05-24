@@ -81,11 +81,13 @@ void cache_found::visit(ds::dpo_store& store) {
     density = known->density();
 
     /*
-       * Repeat pheromone deposits only affect caches that are already known and
-       * that we are tracking accurately.
-       */
+     * If repeat pheromon deposits are enabled, make a deposit. Otherwise, just
+     * reset the pheromone density to make because we have seen the cache again.
+     */
     if (store.repeat_deposit()) {
       density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+    } else {
+      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   } else {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
