@@ -34,11 +34,47 @@ NS_START(fordyca, support, depth2);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-template<class ControllerType, class AggregatorType>
-class robot_configurer : public depth1::robot_configurer<ControllerType,
-                                                         AggregatorType> {
-  using depth1::robot_configurer<ControllerType,
-                                 AggregatorType>::robot_configurer;
+/**
+ * @struct robot_configurer
+ * @ingroup fordyca support depth2
+ *
+ * @brief Configure a depth2 controller during initialization:
+ *
+ * - Displaying task text
+ * - Enabled oracles (if applicable)
+ * - Enabling tasking metric aggregation via task executive hooks
+ */
+template<class TController, class TAggregator>
+class robot_configurer : public depth1::robot_configurer<TController,
+                                                         TAggregator> {
+ public:
+  using controller_type = typename depth1::robot_configurer<TController,
+                                                            TAggregator>::controller_type;
+  using depth1::robot_configurer<TController,
+                                 TAggregator>::robot_configurer;
+  using depth1::robot_configurer<TController,
+                                 TAggregator>::controller_config_vis;
+  using depth1::robot_configurer<TController,
+                                 TAggregator>::controller_config_oracle;
+  using depth1::robot_configurer<TController,
+                                 TAggregator>::metric_callbacks_bind;
+
+  template<typename U = TController,
+           RCPPSW_SFINAE_TYPELIST_REJECT(controller::depth2::oracular_typelist,
+                                         U)>
+  void operator()(controller_type* const c) const {
+    controller_config_vis(c);
+    metric_callbacks_bind(c);
+  } /* operator() */
+
+  template<typename U = TController,
+           RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth2::oracular_typelist,
+                                          U)>
+  void operator()(controller_type* const c) const {
+    metric_callbacks_bind(c);
+    controller_config_vis(c);
+    controller_config_oracle(c);
+  } /* operator() */
 };
 NS_END(depth2, support, fordyca);
 

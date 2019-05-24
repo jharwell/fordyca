@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <utility>
 #include <boost/variant/static_visitor.hpp>
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
@@ -45,16 +45,16 @@ NS_START(fordyca, support, depth0);
  *
  * @brief Functor to perform controller configuration during initialization.
  */
-template<typename T>
+template<typename TController>
 class robot_configurer : public boost::static_visitor<void> {
  public:
-  using controller_type = T;
+  using controller_type = TController;
   robot_configurer(const config::visualization_config* const config,
                    oracle::entities_oracle* const oracle)
       : mc_config(config),
         m_oracle(oracle) {}
 
-  template<typename U = T,
+  template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::depth0::oracular_typelist,
                                          U)>
   void operator()(controller_type* const c) const {
@@ -63,7 +63,7 @@ class robot_configurer : public boost::static_visitor<void> {
       c->display_id(mc_config->robot_id);
     }
   }
-  template<typename U = T,
+  template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth0::oracular_typelist,
                                           U)>
   void operator()(controller_type* const c) const {

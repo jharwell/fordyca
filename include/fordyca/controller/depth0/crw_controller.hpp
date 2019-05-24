@@ -24,9 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-
 #include "rcppsw/patterns/state_machine/base_fsm.hpp"
 
 /*******************************************************************************

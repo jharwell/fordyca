@@ -56,6 +56,11 @@ void grp_odpo_controller::ControlStep(void) {
   ndc_pop();
 } /* ControlStep() */
 
+void grp_odpo_controller::oracle_init(
+    std::unique_ptr<oracular_info_receptor> receptor) {
+  m_receptor = std::move(receptor);
+} /* oracle_init() */
+
 using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"

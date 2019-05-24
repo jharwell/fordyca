@@ -71,6 +71,12 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
      * shared_ptr usage.
      */
     auto blocks = m_entities_oracle->ask("entities.blocks");
+    if (!(*blocks).empty()) {
+      ER_DEBUG("Blocks in receptor: [%s]",
+               support::oracle::entities_oracle::result_to_string(*blocks).c_str());
+      ER_DEBUG("Blocks in DPO store: [%s]",
+               rcppsw::to_string(store->blocks()).c_str());
+    }
     for (auto& e : *blocks) {
       boost::apply_visitor(dpo_store_updater(store), e);
     } /* for(&e..) */
@@ -81,6 +87,12 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
      * shared_ptr usage.
      */
     auto caches = m_entities_oracle->ask("entities.caches");
+    if (!(*caches).empty()) {
+      ER_DEBUG("Caches in receptor: [%s]",
+               support::oracle::entities_oracle::result_to_string(*caches).c_str());
+      ER_DEBUG("Caches in DPO store: [%s]",
+               rcppsw::to_string(store->caches()).c_str());
+    }
     for (auto& e : *caches) {
       boost::apply_visitor(dpo_store_updater(store), e);
     } /* for(&e..) */

@@ -24,7 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include <utility>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
@@ -47,24 +48,24 @@ NS_START(fordyca, support, depth1);
  * @brief Configure a depth1 controller during initialization:
  *
  * - Displaying task text
- * - Enabled oracles (if applicable) via task executive hooks
+ * - Enabled oracles (if applicable)
  * - Enabling tasking metric aggregation via task executive hooks
  */
-template <class ControllerType, class AggregatorType>
+template <class TController, class TAggregator>
 class robot_configurer {
  public:
-  using controller_type = ControllerType;
+  using controller_type = TController;
 
   robot_configurer(const config::visualization_config* const config,
                    oracle::entities_oracle* const ent_oracle,
                    oracle::tasking_oracle* const task_oracle,
-                   AggregatorType* const agg)
+                   TAggregator* const agg)
       : mc_config(config),
         m_tasking_oracle(task_oracle),
         m_ent_oracle(ent_oracle),
         m_agg(agg) {}
 
-  template<typename U = ControllerType,
+  template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REJECT(controller::depth1::oracular_typelist,
                                          U)>
   void operator()(controller_type* const c) const {
@@ -72,7 +73,7 @@ class robot_configurer {
     metric_callbacks_bind(c);
   } /* operator() */
 
-  template<typename U = ControllerType,
+  template<typename U = TController,
            RCPPSW_SFINAE_TYPELIST_REQUIRE(controller::depth1::oracular_typelist,
                                           U)>
   void operator()(controller_type* const c) const {
@@ -81,18 +82,18 @@ class robot_configurer {
     controller_config_oracle(c);
   } /* operator() */
 
- private:
+ protected:
   void metric_callbacks_bind(controller_type* const c) const {
     c->executive()->task_finish_notify(
-        std::bind(&AggregatorType::task_finish_or_abort_cb,
+        std::bind(&TAggregator::task_finish_or_abort_cb,
                   m_agg,
                   std::placeholders::_1));
     c->executive()->task_abort_notify(
-        std::bind(&AggregatorType::task_finish_or_abort_cb,
+        std::bind(&TAggregator::task_finish_or_abort_cb,
                   m_agg,
                   std::placeholders::_1));
     c->executive()->task_alloc_notify(
-        std::bind(&AggregatorType::task_alloc_cb,
+        std::bind(&TAggregator::task_alloc_cb,
                   m_agg,
                   std::placeholders::_1,
                   std::placeholders::_2));
@@ -128,11 +129,12 @@ class robot_configurer {
     }
   } /* controller_config_oracle() */
 
+ private:
   /* clang-format off */
   const config::visualization_config* const mc_config;
   oracle::tasking_oracle* const             m_tasking_oracle;
   oracle::entities_oracle* const            m_ent_oracle;
-  AggregatorType* const                     m_agg;
+  TAggregator* const                        m_agg;
   /* clang-format on */
 };
 

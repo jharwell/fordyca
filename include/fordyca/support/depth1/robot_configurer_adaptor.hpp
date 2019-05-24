@@ -54,10 +54,10 @@ class robot_configurer_adaptor {
   robot_configurer_adaptor(controller::base_controller* const c) : controller(c) {}
 
 
-  template<typename ControllerType, typename AggregatorType>
-  void operator()(robot_configurer<ControllerType, AggregatorType>& configurer) const {
+  template<typename TController, typename TAggregator>
+  void operator()(robot_configurer<TController, TAggregator>& configurer) const {
     auto cast = dynamic_cast<
-      typename robot_configurer<ControllerType, AggregatorType>::controller_type*
+      typename robot_configurer<TController, TAggregator>::controller_type*
       >(controller);
     configurer(cast);
   }

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 
 /*******************************************************************************
@@ -58,7 +59,7 @@ class grp_omdpo_controller : public depth2::grp_mdpo_controller,
 
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 
-  void oracle_receptor(std::unique_ptr<oracular_info_receptor> receptor);
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor);
 
  private:
   /* clang-format off */

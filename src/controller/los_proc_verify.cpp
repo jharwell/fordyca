@@ -61,8 +61,8 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
   /*
    * Verify that for each cell that contained a cache in the LOS:
    *
-   * - The corresponding cache exists in the store.
-   * - The store and LOS versions of the cache have the same # of blocks,
+   * - The corresponding cache exists in the DPO store.
+   * - The DPO store and LOS versions of the cache have the same # of blocks,
    *   location, and ID.
    */
   for (auto& c1 : mc_los->caches()) {

@@ -300,6 +300,13 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
                            m_interactor_map->at(controller->type_index()));
   if (nc_drop) {
     if (cache_creation_handle(true)) {
+      /* The oracle does not have up-to-date information about all caches in the
+       * arena now that one has been created, so we need to update the oracle in
+       * the middle of processing robots. This is not an issues in depth1,
+       * because caches are always created AFTER processing all robots for a
+       * timestep */
+      oracle_manager()->update(arena_map());
+
     } else {
       ER_WARN("Unable to create cache after block drop in new cache");
     }

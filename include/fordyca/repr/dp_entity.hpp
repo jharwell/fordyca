@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
@@ -83,4 +85,4 @@ class dp_entity {
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPRSENTATION_DP_ENTITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_DP_ENTITY_HPP_ */

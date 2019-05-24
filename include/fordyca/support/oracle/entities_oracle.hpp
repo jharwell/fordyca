@@ -29,6 +29,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
@@ -64,6 +65,8 @@ class entities_oracle final : public rer::client<entities_oracle> {
   using variant_type = boost::variant<std::shared_ptr<repr::base_block>,
                                       std::shared_ptr<repr::base_cache>>;
   using variant_vector_type = std::vector<variant_type>;
+
+  static std::string result_to_string(const variant_vector_type& v);
 
   explicit entities_oracle(const config::oracle::entities_oracle_config* config);
 

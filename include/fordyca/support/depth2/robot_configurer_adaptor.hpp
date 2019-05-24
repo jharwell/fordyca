@@ -45,7 +45,31 @@ using configurer_map_type = rds::type_map<
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-using robot_configurer_adaptor = depth1::robot_configurer_adaptor;
+/**
+ * @class robot_configurer_adaptor
+ * @ingroup fordyca support depth2
+ *
+ * @brief Wrapping functor to perform robot controller configuration during
+ * initialization.
+ */
+class robot_configurer_adaptor {
+ public:
+  robot_configurer_adaptor(controller::base_controller* const c) : controller(c) {}
+
+
+  template<typename TController, typename TAggregator>
+  void operator()(robot_configurer<TController, TAggregator>& configurer) const {
+    auto cast = dynamic_cast<
+      typename robot_configurer<TController, TAggregator>::controller_type*
+      >(controller);
+    configurer(cast);
+  }
+
+ private:
+  /* clang-format off */
+  controller::base_controller* const controller;
+  /* clang-format on */
+};
 
 NS_END(detail, depth2, support, fordyca);
 
