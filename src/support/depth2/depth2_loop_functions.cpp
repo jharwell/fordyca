@@ -250,7 +250,6 @@ void depth2_loop_functions::PreStep() {
     floor()->SetChanged();
   }
   /* collect metrics from non-robot sources */
-  m_metrics_agg->collect_from_arena(arena_map());
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
@@ -282,10 +281,6 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
       robot, GetSpace().GetSimulationClock());
   boost::apply_visitor(robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
-
-  /* update arena map metrics with robot position */
-  arena_map()->access<arena_grid::kRobotOccupancy>(
-      controller->discrete_position()) = true;
 
   /*
    * Watch the robot interact with its environment!

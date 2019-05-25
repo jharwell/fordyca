@@ -132,7 +132,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
  * compiler).
  */
 using free_block_pickup_visitor_impl =
-    rvisitor::precise_visitor<detail::free_block_pickup,
+    rpvisitor::precise_visitor<detail::free_block_pickup,
                               detail::free_block_pickup::visit_typelist>;
 
 NS_END(detail);

@@ -24,12 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
-#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -45,11 +45,11 @@ NS_START(fordyca, controller);
  * @ingroup fordyca controller
  */
 struct sensor_list {
-  rhal::sensors::rab_wifi_sensor rabs;
-  rhal::sensors::proximity_sensor proximity;
-  rhal::sensors::light_sensor light;
-  rhal::sensors::ground_sensor ground;
-  rhal::sensors::battery_sensor battery;
+  rrhal::sensors::rab_wifi_sensor rabs;
+  rrhal::sensors::proximity_sensor proximity;
+  rrhal::sensors::light_sensor light;
+  rrhal::sensors::ground_sensor ground;
+  rrhal::sensors::battery_sensor battery;
 };
 
 NS_END(controller, fordyca);

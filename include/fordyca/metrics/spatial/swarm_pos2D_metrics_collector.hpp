@@ -1,7 +1,7 @@
 /**
- * @file current_explore_loc_metrics_collector.hpp
+ * @file swarm_pos2D_metrics_collector.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,49 +18,47 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_CURRENT_EXPLORE_LOC_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_CURRENT_EXPLORE_LOC_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_SPATIAL_SWARM_POS2D_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_SPATIAL_SWARM_POS2D_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <list>
+#include <string>
 
-#include "fordyca/metrics/grid2D_avg_metrics_collector.hpp"
+#include "fordyca/metrics/spatial/grid2D_avg_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics, fsm);
+NS_START(fordyca, metrics, spatial);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class current_explore_loc_metrics_collector
- * @ingroup fordyca metrics fsm
+ * @class swarm_pos2D_metrics_collector
+ * @ingroup fordyca metrics spatial
  *
- * @brief Collector for robot exploration trajectories, which is collected as a
- * 2D array, and needs its own collector separate from the \ref
- * goal_acquisition_metrics_collector (1 .csv per collector).
+ * @brief Collector for \ref swarm_dist2D_metrics, robot positions.
  */
-class current_explore_loc_metrics_collector final : public grid2D_avg_metrics_collector {
+class swarm_pos2D_metrics_collector final : public grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
-   * @param dims Dimensions of the arena.
+   * @param dims Dimensions of arena.
    */
-  current_explore_loc_metrics_collector(const std::string& ofname,
-                                    uint interval,
-                                    const rmath::vector2u& dims) :
-      grid2D_avg_metrics_collector(ofname, interval, dims) {}
+  swarm_pos2D_metrics_collector(const std::string& ofname,
+                              uint interval,
+                              const rmath::vector2u& dims)
+      : grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
   uint collect_cell(const rmetrics::base_metrics& metrics,
                     const rmath::vector2u& coord) const override;
 };
 
-NS_END(fsm, metrics, fordyca);
+NS_END(spatial, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_CURRENT_EXPLORE_LOC_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_SPATIAL_SWARM_POS2D_METRICS_COLLECTOR_HPP_ */

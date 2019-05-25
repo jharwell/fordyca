@@ -132,7 +132,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                               const loop_utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in cache site: Block%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
-            controller.position().to_str().c_str(),
+            controller.position2D().to_str().c_str(),
             status.entity_id,
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
@@ -145,7 +145,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                               const loop_utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
-            controller.position().to_str().c_str(),
+            controller.position2D().to_str().c_str(),
             status.entity_id,
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
@@ -203,7 +203,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
   void perform_cache_site_block_drop(T& controller,
                                      const tv::temporal_penalty<T>& penalty) {
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
-                                    rmath::dvec2uvec(controller.position(),
+                                    rmath::dvec2uvec(controller.position2D(),
                                                      m_map->grid_resolution()),
                                     m_map->grid_resolution());
 

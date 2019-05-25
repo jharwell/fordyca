@@ -89,60 +89,52 @@ void cache_finisher::active_interface_update(int) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(
-    cache_finisher::exp_status,
-    cache_finisher,
-    is_exploring_for_goal,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    cache_finisher,
-    is_vectoring_to_goal,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         is_exploring_for_goal,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         is_vectoring_to_goal,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
-    cache_finisher,
-    goal_acquired,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         goal_acquired,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    acq_goal_type,
-    cache_finisher,
-    acquisition_goal,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         acquisition_goal,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    transport_goal_type,
-    cache_finisher,
-    block_transport_goal,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         block_transport_goal,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    rmath::vector2u,
-    cache_finisher,
-    acquisition_loc,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         acquisition_loc,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    rmath::vector2u,
-    cache_finisher,
-    current_explore_loc,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         current_explore_loc,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    rmath::vector2u,
-    cache_finisher,
-    current_vector_loc,
-    static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         current_vector_loc,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
 /*******************************************************************************
  * Event Handling

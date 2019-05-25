@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_GRID2D_AVG_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_GRID2D_AVG_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_SPATIAL_GRID2D_AVG_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_SPATIAL_GRID2D_AVG_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -34,14 +34,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, spatial);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class grid2D_avg_metrics_collector
- * @ingroup fordyca metrics
+ * @ingroup fordyca metrics spatial
  *
  * @brief Base class for collectors using a 2D grid to fill with counts of
  * SOMETHING, to be averaged over the entire simulation.
@@ -76,6 +76,6 @@ class grid2D_avg_metrics_collector : public rmetrics::base_metrics_collector {
   /* clang-format on */
 };
 
-NS_END(metrics, fordyca);
+NS_END(spatial, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_GRID2D_AVG_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_SPATIAL_GRID2D_AVG_METRICS_COLLECTOR_HPP_ */

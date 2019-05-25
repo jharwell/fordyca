@@ -41,7 +41,8 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
   /* loop functions metrics not part of controller XML tree  */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    XML_PARSE_ATTR(mnode, m_config, fsm_collision_fname);
+    XML_PARSE_ATTR(mnode, m_config, fsm_collision_counts_fname);
+    XML_PARSE_ATTR(mnode, m_config, fsm_collision_locs_fname);
     XML_PARSE_ATTR(mnode, m_config, fsm_movement_fname);
 
     XML_PARSE_ATTR(mnode, m_config, block_transport_fname);
@@ -78,7 +79,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
     XML_PARSE_ATTR(mnode, m_config, perception_mdpo_fname);
     XML_PARSE_ATTR(mnode, m_config, perception_dpo_fname);
 
-    XML_PARSE_ATTR(mnode, m_config, arena_robot_locs_fname);
+    XML_PARSE_ATTR(mnode, m_config, swarm_dist_pos2D_fname);
     XML_PARSE_ATTR(mnode, m_config, swarm_convergence_fname);
     XML_PARSE_ATTR(mnode, m_config, temporal_variance_fname);
     XML_PARSE_ATTR(mnode, m_config, collect_interval);

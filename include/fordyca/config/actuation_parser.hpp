@@ -73,7 +73,7 @@ class actuation_parser final : public rconfig::xml::xml_config_parser {
 
   /* clang-format off */
   std::shared_ptr<actuation_config>              m_config{nullptr};
-  rkin2D::config::xml::differential_drive_parser m_differential_drive;
+  rrkin2D::config::xml::differential_drive_parser m_differential_drive;
   steering_force2D_parser                        m_steering;
   /* clang-format on */
 };

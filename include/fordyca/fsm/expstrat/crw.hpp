@@ -28,6 +28,7 @@
 
 #include "fordyca/fsm/expstrat/base_expstrat.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/fsm/collision_tracker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,17 +54,12 @@ class crw final
 
   explicit crw(controller::saa_subsystem* saa)
       : base_expstrat(saa),
-        ER_CLIENT_INIT("fordyca.fsm.expstrat.crw") {}
+        ER_CLIENT_INIT("fordyca.fsm.expstrat.crw"),
+        m_tracker(saa) {}
 
   ~crw(void) override = default;
   crw(const crw&) = delete;
   crw& operator=(const crw&) = delete;
-
-  /* collision metrics */
-  bool in_collision_avoidance(void) const override final;
-  bool entered_collision_avoidance(void) const override final;
-  bool exited_collision_avoidance(void) const override final;
-  uint collision_avoidance_duration(void) const override final;
 
   /* taskable overrides */
   void task_start(const rta::taskable_argument*) override final {
@@ -102,12 +98,17 @@ class crw final
   void ca_exit(void);
 
   /* clang-format off */
-  bool m_task_running{false};
-  bool m_entered_avoidance{false};
-  bool m_exited_avoidance{false};
-  bool m_in_avoidance{false};
-  uint m_avoidance_start{0};
+  bool              m_task_running{false};
+  collision_tracker m_tracker;
   /* clang-format on */
+
+ public:
+  /* collision metrics */
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(in_collision_avoidance, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(entered_collision_avoidance, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(exited_collision_avoidance, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(collision_avoidance_duration, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(avoidance_loc, m_tracker, const)
 };
 
 NS_END(expstrat, fsm, fordyca);

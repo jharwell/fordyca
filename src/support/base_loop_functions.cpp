@@ -234,7 +234,7 @@ std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot->GetControllableEntity().GetController());
-    v.push_back(controller.heading().angle());
+    v.push_back(controller.heading2D().angle());
   } /* for(&entity..) */
   return v;
 } /* calc_robot_headings() */
@@ -248,7 +248,7 @@ std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot->GetControllableEntity().GetController());
-    v.push_back(controller.position());
+    v.push_back(controller.position2D());
   } /* for(&entity..) */
   return v;
 } /* calc_robot_positions() */

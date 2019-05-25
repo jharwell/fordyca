@@ -101,7 +101,7 @@ class cache_vanished : public rer::client<cache_vanished> {
  * compiler).
  */
 using cache_vanished_visitor_impl =
-    rvisitor::precise_visitor<detail::cache_vanished,
+    rpvisitor::precise_visitor<detail::cache_vanished,
                               detail::cache_vanished::visit_typelist>;
 
 NS_END(detail);

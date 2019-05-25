@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
@@ -101,7 +103,7 @@ class cache_found : public cell_op, public rer::client<cache_found> {
  * compiler).
  */
 using cache_found_visitor_impl =
-    rvisitor::precise_visitor<detail::cache_found,
+    rpvisitor::precise_visitor<detail::cache_found,
                               detail::cache_found::visit_typelist>;
 
 NS_END(detail);

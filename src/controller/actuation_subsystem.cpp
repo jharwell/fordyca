@@ -36,7 +36,7 @@ actuation_subsystem::actuation_subsystem(const config::actuation_config* c_confi
                                          struct actuator_list* const list)
     : mc_config(*c_config),
       m_actuators(*list),
-      m_drive(rkin2D::differential_drive::kFSMDrive,
+      m_drive(rrkin2D::differential_drive::kFSMDrive,
               c_config->differential_drive.max_speed,
               c_config->differential_drive.soft_turn_max,
               m_actuators.wheels) {}

@@ -29,9 +29,9 @@
 #include <string>
 #include <vector>
 
+#include "fordyca/config/block_sel/pickup_policy_config.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/config/block_sel/pickup_policy_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,15 +39,14 @@
 NS_START(fordyca);
 namespace config { namespace block_sel {
 struct block_sel_matrix_config;
-}}  // namespace config::block_sel
+}} // namespace config::block_sel
 NS_START(controller);
 
 using block_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
                    std::vector<int>,
-                   config::block_sel::pickup_policy_config
-                   >;
+                   config::block_sel::pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions

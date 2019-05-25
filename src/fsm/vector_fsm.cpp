@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/throttling_differential_drive.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/controller/throttling_differential_drive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,13 +73,13 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     actuators()->differential_drive().set_wheel_speeds(
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
-    collision_avoidance_tracking_end();
+    ca_tracker()->ca_enter();
     internal_event(ekST_COLLISION_RECOVERY);
     return controller::foraging_signal::ekHANDLED;
   }
 
   if (sensors()->threatening_obstacle_exists()) {
-    collision_avoidance_tracking_begin();
+    ca_tracker()->ca_exit();
     if (sensors()->tick() - m_state.last_collision_time <
         kFREQ_COLLISION_THRESH) {
       ER_DEBUG("Frequent collision: last=%u curr=%u",
@@ -113,7 +113,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     actuators()->differential_drive().set_wheel_speeds(
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
-    collision_avoidance_tracking_end();
+    ca_tracker()->ca_exit();
     internal_event(ekST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::ekHANDLED;
@@ -144,7 +144,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
   }
   return controller::foraging_signal::ekHANDLED;
 }
-FSM_STATE_DEFINE(vector_fsm, vector, rfsm::event_data* data) {
+FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
   if (ekST_VECTOR != last_state()) {
     ER_DEBUG("Executing ekST_VECTOR");
   }
@@ -220,6 +220,10 @@ __rcsw_pure bool vector_fsm::exited_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE == last_state() && !in_collision_avoidance();
 } /* exited_collision_avoidance() */
 
+rmath::vector2u vector_fsm::avoidance_loc(void) const {
+  return saa_subsystem()->sensing()->discrete_position();
+} /* avoidance_loc() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
@@ -242,12 +246,12 @@ void vector_fsm::task_start(const rta::taskable_argument* const c_arg) {
 
 void vector_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::ekFSM_RUN,
-               rfsm::event_type::ekNORMAL);
+               rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 void vector_fsm::init(void) {
   actuators()->reset();
-  rfsm::simple_fsm::init();
+  rpfsm::simple_fsm::init();
 } /* init() */
 
 __rcsw_pure rmath::vector2d vector_fsm::calc_vector_to_goal(

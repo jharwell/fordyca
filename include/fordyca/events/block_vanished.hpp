@@ -120,7 +120,7 @@ class block_vanished : public rer::client<block_vanished> {
  * compiler).
  */
 using block_vanished_visitor_impl =
-    rvisitor::precise_visitor<detail::block_vanished,
+    rpvisitor::precise_visitor<detail::block_vanished,
                               detail::block_vanished::visit_typelist>;
 
 NS_END(detail);

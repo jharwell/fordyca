@@ -119,60 +119,52 @@ void harvester::accept(events::detail::block_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(harvester::exp_status,
-                        harvester,
-                        is_exploring_for_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        is_vectoring_to_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         is_exploring_for_goal,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         is_vectoring_to_goal,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(bool,
-                        harvester,
-                        goal_acquired,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         goal_acquired,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(acq_goal_type,
-                        harvester,
-                        acquisition_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         acquisition_goal,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(transport_goal_type,
-                        harvester,
-                        block_transport_goal,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         block_transport_goal,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(rmath::vector2u,
-                        harvester,
-                        acquisition_loc,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         acquisition_loc,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(rmath::vector2u,
-                        harvester,
-                        current_explore_loc,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         current_explore_loc,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINE_PTR(rmath::vector2u,
-                        harvester,
-                        current_vector_loc,
-                        static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
-                            polled_task::mechanism()),
-                        const);
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         current_vector_loc,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
 /*******************************************************************************
  * Task Metrics

@@ -81,19 +81,20 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const final);
-  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const final);
-  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const final);
-  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const final);
+  bool in_collision_avoidance(void) const override final;
+  bool entered_collision_avoidance(void) const override final;
+  bool exited_collision_avoidance(void) const override final;
+  uint collision_avoidance_duration(void) const override final;
+  rmath::vector2u avoidance_loc(void) const override final;
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const final);
-  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const final);
-  FSM_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const final);
-  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const final);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const final);
+  rmath::vector2u acquisition_loc(void) const override final;
+  bool is_vectoring_to_goal(void) const override final;
+  exp_status is_exploring_for_goal(void) const override final;
+  bool goal_acquired(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
+  rmath::vector2u current_explore_loc(void) const override final;
+  rmath::vector2u current_vector_loc(void) const override final;
 
   /**
    * @brief Reset the FSM
@@ -109,7 +110,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
     ekST_ACQUIRE_BLOCK,
 
     /**
-     * A block has been acquired--wait for area to send the block pickup signal.
+ppp     * A block has been acquired--wait for area to send the block pickup signal.
      */
     ekST_WAIT_FOR_BLOCK_PICKUP,
 
@@ -138,11 +139,11 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* block to goal states */
-  HFSM_STATE_DECLARE(block_to_goal_fsm, start, rfsm::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, start, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_block);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rfsm::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, transport_to_goal);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rfsm::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
 
   /**

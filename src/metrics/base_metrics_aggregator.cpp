@@ -25,25 +25,28 @@
 #include <experimental/filesystem>
 
 #include "fordyca/config/metrics_config.hpp"
-#include "fordyca/ds/arena_map.hpp"
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/repr/base_block.hpp"
+
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/acquisition_loc_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/acquisition_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/current_explore_loc_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/current_vector_loc_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/current_explore_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/current_vector_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
-#include "fordyca/metrics/robot_occupancy_metrics.hpp"
-#include "fordyca/metrics/robot_occupancy_metrics_collector.hpp"
+#include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
+#include "fordyca/metrics/spatial/swarm_pos2D_metrics_collector.hpp"
 #include "fordyca/metrics/temporal_variance_metrics.hpp"
 #include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/metrics/fsm/collision_locs_metrics_collector.hpp"
 
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
@@ -74,27 +77,34 @@ base_metrics_aggregator::base_metrics_aggregator(
       mconfig->collect_interval);
 
   register_collector<metrics::fsm::collision_metrics_collector>(
-      "fsm::collision",
-      metrics_path() + "/" + mconfig->fsm_collision_fname,
+      "fsm::collision_counts",
+      metrics_path() + "/" + mconfig->fsm_collision_counts_fname,
       mconfig->collect_interval);
+
+  register_collector<metrics::fsm::collision_locs_metrics_collector>(
+      "fsm::collision_locs",
+      metrics_path() + "/" + mconfig->fsm_collision_locs_fname,
+      mconfig->collect_interval,
+      rmath::dvec2uvec(mconfig->arena_grid.upper,
+                       mconfig->arena_grid.resolution));
 
   register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
       "blocks::acq_counts",
       metrics_path() + "/" + mconfig->block_acq_counts_fname,
       mconfig->collect_interval);
-  register_collector<metrics::fsm::acquisition_loc_metrics_collector>(
+  register_collector<metrics::fsm::acquisition_locs_metrics_collector>(
       "blocks::acq_locs",
       metrics_path() + "/" + mconfig->block_acq_locs_fname,
       mconfig->collect_interval,
       rmath::dvec2uvec(mconfig->arena_grid.upper,
                        mconfig->arena_grid.resolution));
-  register_collector<metrics::fsm::current_explore_loc_metrics_collector>(
+  register_collector<metrics::fsm::current_explore_locs_metrics_collector>(
       "blocks::acq_explore_locs",
       metrics_path() + "/" + mconfig->block_acq_explore_locs_fname,
       mconfig->collect_interval,
       rmath::dvec2uvec(mconfig->arena_grid.upper,
                        mconfig->arena_grid.resolution));
-  register_collector<metrics::fsm::current_vector_loc_metrics_collector>(
+  register_collector<metrics::fsm::current_vector_locs_metrics_collector>(
       "blocks::acq_vector_locs",
       metrics_path() + "/" + mconfig->block_acq_vector_locs_fname,
       mconfig->collect_interval,
@@ -111,9 +121,9 @@ base_metrics_aggregator::base_metrics_aggregator(
       metrics_path() + "/" + mconfig->block_manipulation_fname,
       mconfig->collect_interval);
 
-  register_collector<metrics::robot_occupancy_metrics_collector>(
-      "arena::robot_locs",
-      metrics_path() + "/" + mconfig->arena_robot_locs_fname,
+  register_collector<metrics::spatial::swarm_pos2D_metrics_collector>(
+      "swarm::spatial_dist::pos2D",
+      metrics_path() + "/" + mconfig->swarm_dist_pos2D_fname,
       mconfig->collect_interval,
       rmath::dvec2uvec(mconfig->arena_grid.upper,
                        mconfig->arena_grid.resolution));
@@ -143,9 +153,9 @@ void base_metrics_aggregator::collect_from_block(
   collect("blocks::transport", *block);
 } /* collect_from_block() */
 
-void base_metrics_aggregator::collect_from_arena(
-    const ds::arena_map* const arena) {
-  collect("arena::robot_locs", *arena);
-} /* collect_from_arena() */
+void base_metrics_aggregator::collect_from_controller(
+    const controller::base_controller* const controller) {
+  collect("swarm::spatial_dist::pos2D", *controller);
+} /* collect_from_controller() */
 
 NS_END(metrics, fordyca);

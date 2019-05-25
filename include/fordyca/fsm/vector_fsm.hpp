@@ -102,6 +102,7 @@ class vector_fsm final : public base_foraging_fsm,
   bool in_collision_avoidance(void) const override;
   bool entered_collision_avoidance(void) const override;
   bool exited_collision_avoidance(void) const override;
+  rmath::vector2u avoidance_loc(void) const override;
 
  protected:
   enum fsm_states {
@@ -143,7 +144,7 @@ class vector_fsm final : public base_foraging_fsm,
    * @brief A structure containing all the information needed for the controller
    * to tell the FSM where to travel to next.
    */
-  struct goal_data final : public rfsm::event_data {
+  struct goal_data final : public rpfsm::event_data {
     goal_data(rmath::vector2d loc_in, double tol)
         : tolerance(tol), loc(loc_in) {}
     goal_data(void) = default;
@@ -182,12 +183,12 @@ class vector_fsm final : public base_foraging_fsm,
   rmath::vector2d calc_vector_to_goal(const rmath::vector2d& goal);
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, rfsm::event_data);
+  HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, rpfsm::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_new_direction);
 
   /* vector states */
   HFSM_STATE_DECLARE_ND(vector_fsm, start);
-  HFSM_STATE_DECLARE(vector_fsm, vector, rfsm::event_data);
+  HFSM_STATE_DECLARE(vector_fsm, vector, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(vector_fsm, collision_avoidance);
   HFSM_STATE_DECLARE_ND(vector_fsm, collision_recovery);
   HFSM_STATE_DECLARE(vector_fsm, arrived, struct goal_data);

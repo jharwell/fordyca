@@ -138,7 +138,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
  * compiler).
  */
 using cache_block_drop_visitor_impl =
-    rvisitor::precise_visitor<detail::cache_block_drop,
+    rpvisitor::precise_visitor<detail::cache_block_drop,
                               detail::cache_block_drop::visit_typelist>;
 
 NS_END(detail);

@@ -43,7 +43,8 @@ NS_START(fordyca, config);
  */
 struct metrics_config : public rconfig::base_config {
   std::string fsm_movement_fname{};
-  std::string fsm_collision_fname{};
+  std::string fsm_collision_counts_fname{};
+  std::string fsm_collision_locs_fname{};
 
   std::string block_acq_counts_fname{};
   std::string block_acq_locs_fname{};
@@ -76,7 +77,7 @@ struct metrics_config : public rconfig::base_config {
 
   std::string output_dir{};
 
-  std::string arena_robot_locs_fname{};
+  std::string swarm_dist_pos2D_fname{};
   std::string swarm_convergence_fname{};
   std::string temporal_variance_fname{};
   std::string perception_mdpo_fname{};

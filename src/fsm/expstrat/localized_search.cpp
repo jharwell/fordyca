@@ -65,4 +65,14 @@ uint localized_search::collision_avoidance_duration(void) const {
          (m_crw.task_running() && m_crw.collision_avoidance_duration());
 } /* collision_avoidance_duration() */
 
+rmath::vector2u localized_search::avoidance_loc(void) const {
+  ER_ASSERT(m_vfsm.task_running() || m_crw.task_running(),
+            "In collision avoidance without running task?");
+  if (m_vfsm.task_running()) {
+    return m_vfsm.avoidance_loc();
+  } else {
+    return m_crw.avoidance_loc();
+  }
+} /* collision_avoidance_duration() */
+
 NS_END(expstrat, fsm, fordyca);

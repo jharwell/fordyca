@@ -72,8 +72,9 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
      */
     auto blocks = m_entities_oracle->ask("entities.blocks");
     if (!(*blocks).empty()) {
-      ER_DEBUG("Blocks in receptor: [%s]",
-               support::oracle::entities_oracle::result_to_string(*blocks).c_str());
+      ER_DEBUG(
+          "Blocks in receptor: [%s]",
+          support::oracle::entities_oracle::result_to_string(*blocks).c_str());
       ER_DEBUG("Blocks in DPO store: [%s]",
                rcppsw::to_string(store->blocks()).c_str());
     }
@@ -88,8 +89,9 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
      */
     auto caches = m_entities_oracle->ask("entities.caches");
     if (!(*caches).empty()) {
-      ER_DEBUG("Caches in receptor: [%s]",
-               support::oracle::entities_oracle::result_to_string(*caches).c_str());
+      ER_DEBUG(
+          "Caches in receptor: [%s]",
+          support::oracle::entities_oracle::result_to_string(*caches).c_str());
       ER_DEBUG("Caches in DPO store: [%s]",
                rcppsw::to_string(store->caches()).c_str());
     }

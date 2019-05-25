@@ -104,8 +104,8 @@ class free_block_pickup_interactor
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
   void finish_free_block_pickup(T& controller, uint timestep) {
-    ER_ASSERT(controller.goal_acquired() && acq_goal_type::ekBLOCK ==
-                                                controller.acquisition_goal(),
+    ER_ASSERT(controller.goal_acquired() &&
+                  acq_goal_type::ekBLOCK == controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving pickup penalty");

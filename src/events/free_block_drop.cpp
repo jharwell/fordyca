@@ -236,7 +236,7 @@ void free_block_drop::visit(tasks::depth2::cache_finisher& task) {
 
 void free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 NS_END(detail, events, fordyca);

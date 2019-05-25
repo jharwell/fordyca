@@ -84,7 +84,7 @@ NS_END(detail);
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cell_op_visitor = rvisitor::precise_visitor<detail::cell_op,
+using cell_op_visitor = rpvisitor::precise_visitor<detail::cell_op,
                                                   detail::cell_op::visit_typelist>;
 NS_END(events, fordyca);
 

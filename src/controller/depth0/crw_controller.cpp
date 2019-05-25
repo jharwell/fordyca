@@ -80,37 +80,13 @@ void crw_controller::ControlStep(void) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(bool, crw_controller, goal_acquired, *m_fsm, const);
-
-FSM_OVERRIDE_DEF(crw_controller::exp_status,
-                 crw_controller,
-                 is_exploring_for_goal,
-                 *m_fsm,
-                 const);
-
-FSM_OVERRIDE_DEF(acq_goal_type,
-                 crw_controller,
-                 acquisition_goal,
-                 *m_fsm,
-                 const);
-
-FSM_OVERRIDE_DEF(transport_goal_type,
-                 crw_controller,
-                 block_transport_goal,
-                 *m_fsm,
-                 const);
-
-FSM_OVERRIDE_DEF(rmath::vector2u, crw_controller, acquisition_loc, *m_fsm, const);
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 crw_controller,
-                 current_vector_loc,
-                 *m_fsm,
-                 const);
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 crw_controller,
-                 current_explore_loc,
-                 *m_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_vector_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_explore_loc, *m_fsm, const);
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

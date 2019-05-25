@@ -378,12 +378,12 @@ void cached_block_pickup::visit(tasks::depth1::collector& task) {
 
 void cached_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************

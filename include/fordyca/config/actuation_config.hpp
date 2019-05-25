@@ -43,7 +43,7 @@ NS_START(fordyca, config);
  * @ingroup fordyca config
  */
 struct actuation_config : public rconfig::base_config {
-  rkin2D::config::differential_drive_config differential_drive{};
+  rrkin2D::config::differential_drive_config differential_drive{};
   steering_force2D_config steering{};
 };
 

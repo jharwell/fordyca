@@ -24,10 +24,10 @@
 #include "fordyca/fsm/expstrat/utility_cache_search.hpp"
 #include <numeric>
 
-#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/controller/depth2/cache_site_selector.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/controller/depth2/cache_site_selector.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
@@ -47,7 +47,8 @@ void utility_cache_search::task_start(const rta::taskable_argument*) {
                                rmath::vector2d(),
                                [&](rmath::vector2d& sum, const auto& bent) {
                                  return sum + bent.ent()->real_loc();
-                               }) / boost::size(range);
+                               }) /
+               boost::size(range);
   } else {
     position = saa_subsystem()->sensing()->position();
   }

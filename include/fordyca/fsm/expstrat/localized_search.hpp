@@ -45,12 +45,15 @@ NS_START(fordyca, fsm, expstrat);
  * then begin correlated random walk exploration there via \ref crw. Falls back
  * to vanilla \ref crw if a specific location is not given during at task start.
  */
-class localized_search : public base_expstrat {
+class localized_search : public base_expstrat,
+                         public rer::client<localized_search> {
  public:
   explicit localized_search(const base_expstrat::params* const c_params)
       : localized_search(c_params->saa) {}
+
   explicit localized_search(controller::saa_subsystem* saa)
       : base_expstrat(saa),
+        ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
         m_vfsm(saa),
         m_crw(saa) {}
 
@@ -63,6 +66,7 @@ class localized_search : public base_expstrat {
   bool entered_collision_avoidance(void) const override final;
   bool exited_collision_avoidance(void) const override final;
   uint collision_avoidance_duration(void) const override final;
+  rmath::vector2u avoidance_loc(void) const override final;
 
   /* taskable overrides */
 

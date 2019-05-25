@@ -25,10 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include "fordyca/controller/sensor_list.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/controller/sensor_list.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,16 +70,16 @@ class sensing_subsystem {
    */
   const struct sensor_list& sensor_list(void) const { return m_sensors; }
 
-  const rhal::sensors::proximity_sensor& proximity(void) const {
+  const rrhal::sensors::proximity_sensor& proximity(void) const {
     return m_sensors.proximity;
   }
-  const rhal::sensors::light_sensor& light(void) const {
+  const rrhal::sensors::light_sensor& light(void) const {
     return m_sensors.light;
   }
-  const rhal::sensors::ground_sensor& ground(void) const {
+  const rrhal::sensors::ground_sensor& ground(void) const {
     return m_sensors.ground;
   }
-  const rhal::sensors::battery_sensor& battery(void) const {
+  const rrhal::sensors::battery_sensor& battery(void) const {
     return m_sensors.battery;
   }
 

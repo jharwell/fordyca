@@ -66,13 +66,13 @@ class acquire_existing_cache_fsm
    * @param matrix The matrix of cache selection info.
    * @param saa Handle to sensing/actuation subsystem.
    * @param store Store of known objects in the arena.
-   * @param exp_behavior The exploration behavior to use when acquiring a cache.
+   * @param behavior The exploration behavior to use when acquiring a cache.
    * @param for_pickup Are we acquiring a cache for pickup or block drop?
    */
   acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
                              controller::saa_subsystem* saa,
                              ds::dpo_store* store,
-                             std::unique_ptr<expstrat::base_expstrat> exp_behavior,
+                             std::unique_ptr<expstrat::base_expstrat> behavior,
                              bool for_pickup);
 
   ~acquire_existing_cache_fsm(void) override = default;

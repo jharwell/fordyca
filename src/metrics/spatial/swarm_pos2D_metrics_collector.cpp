@@ -1,5 +1,5 @@
 /**
- * @file robot_occupancy_metrics.hpp
+ * @file swarm_pos2D_metrics_collector.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,44 +18,25 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/math/vector2.hpp"
-#include "rcppsw/metrics/base_metrics.hpp"
+#include "fordyca/metrics/spatial/swarm_pos2D_metrics_collector.hpp"
+#include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, spatial);
 
 /*******************************************************************************
- * Class Definitions
+ * Member Functions
  ******************************************************************************/
+uint swarm_pos2D_metrics_collector::collect_cell(
+    const rmetrics::base_metrics& metrics,
+    const rmath::vector2u& coord) const {
+  auto& m = dynamic_cast<const swarm_dist2D_metrics&>(metrics);
+  return static_cast<uint>(m.discrete_position2D() == coord);
+} /* collect_cell() */
 
-/**
- * @class robot_occupancy_metrics
- * @ingroup fordyca metrics
- *
- * @brief Defines the metrics to be collected regarding robot occupancy in the
- * arena.
- *
- * Metrics are collected every timestep.
- */
-class robot_occupancy_metrics : public virtual rmetrics::base_metrics {
- public:
-  robot_occupancy_metrics(void) = default;
-
-  /**
-   * @brief Should return \c TRUE iff there is currently a robot is the cell at
-   * (i,j) in the robot_occupancy.
-   */
-  virtual bool has_robot(const rmath::vector2u& coord) const = 0;
-};
-
-NS_END(metrics, fordyca);
-
-#endif /* INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_HPP_ */
+NS_END(spatial, metrics, fordyca);

@@ -148,6 +148,7 @@ class acquire_goal_fsm : public base_foraging_fsm,
   bool entered_collision_avoidance(void) const override final;
   bool exited_collision_avoidance(void) const override final;
   uint collision_avoidance_duration(void) const override final;
+  rmath::vector2u avoidance_loc(void) const override final;
 
   /* goal acquisition metrics */
   exp_status is_exploring_for_goal(void) const override final;

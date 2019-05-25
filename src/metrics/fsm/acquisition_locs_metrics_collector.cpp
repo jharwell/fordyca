@@ -1,5 +1,5 @@
 /**
- * @file actuator_list.hpp
+ * @file acquisition_locs_metrics_collector.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,36 +18,26 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/wifi_actuator.hpp"
+#include "fordyca/metrics/fsm/acquisition_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
- * Struct Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * @struct actuator_list
- * @brief The list of actuators used by the footbots in FORDYCA.
- * @ingroup fordyca controller
- */
-struct actuator_list {
-  rrhal::actuators::differential_drive_actuator wheels;
-  rrhal::actuators::led_actuator leds;
-  rrhal::actuators::wifi_actuator wifi;
-};
+uint acquisition_locs_metrics_collector::collect_cell(
+    const rmetrics::base_metrics& metrics,
+    const rmath::vector2u& coord) const {
+  auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
 
-NS_END(controller, fordyca);
+  return static_cast<uint>(m.acquisition_loc() == coord);
+} /* collect_cell() */
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_ */
+NS_END(fsm, metrics, fordyca);

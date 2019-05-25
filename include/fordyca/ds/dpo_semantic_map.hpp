@@ -140,12 +140,12 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_WRAP_MEMFUNC(block_update, (*store()))
-  RCPPSW_WRAP_MEMFUNC(cache_update, (*store()))
-  RCPPSW_WRAP_MEMFUNC(blocks, (*store()))
-  RCPPSW_WRAP_MEMFUNC(caches, (*store()))
-  RCPPSW_WRAP_MEMFUNC(blocks, (*store()), const)
-  RCPPSW_WRAP_MEMFUNC(caches, (*store()), const)
+  RCPPSW_DECLDEF_WRAP(block_update, (*store()))
+  RCPPSW_DECLDEF_WRAP(cache_update, (*store()))
+  RCPPSW_DECLDEF_WRAP(blocks, (*store()))
+  RCPPSW_DECLDEF_WRAP(caches, (*store()))
+  RCPPSW_DECLDEF_WRAP(blocks, (*store()), const)
+  RCPPSW_DECLDEF_WRAP(caches, (*store()), const)
 };
 
 NS_END(ds, fordyca);

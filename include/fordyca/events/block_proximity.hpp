@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/nsalias.hpp"
@@ -94,7 +95,7 @@ class block_proximity : public rer::client<block_proximity> {
  * compiler).
  */
 using block_proximity_visitor_impl =
-    rvisitor::precise_visitor<detail::block_proximity,
+    rpvisitor::precise_visitor<detail::block_proximity,
                               detail::block_proximity::visit_typelist>;
 
 NS_END(detail);

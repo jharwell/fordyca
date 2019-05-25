@@ -38,19 +38,20 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 base_foraging_fsm::base_foraging_fsm(controller::saa_subsystem* const saa,
                                      uint8_t max_states)
-    : rfsm::hfsm(max_states),
+    : rpfsm::hfsm(max_states),
       ER_CLIENT_INIT("fordyca.fsm.base_foraging"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(leaving_nest, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(new_direction, hfsm::top_state()),
       m_rng(argos::CRandom::CreateRNG("argos")),
-      m_saa(saa) {}
+      m_saa(saa),
+      m_tracker(m_saa) {}
 
 /*******************************************************************************
  * States
  ******************************************************************************/
-HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
-  ER_ASSERT(rfsm::event_type::ekNORMAL == data->type(),
+HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rpfsm::event_data* data) {
+  ER_ASSERT(rpfsm::event_type::ekNORMAL == data->type(),
             "ekST_LEAVING_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::ekBLOCK_PICKUP != data->signal(),
             "ekST_LEAVING_NEST should never pickup blocks...");
@@ -68,11 +69,11 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
    * on your own or being pushed out via collision avoidance).
    */
   if (m_saa->sensing()->threatening_obstacle_exists()) {
-    collision_avoidance_tracking_begin();
+    m_tracker.ca_enter();
     rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
     saa_subsystem()->steering_force().avoidance(obs);
   } else {
-    collision_avoidance_tracking_end();
+    m_tracker.ca_exit();
   }
   saa_subsystem()->steering_force().wander();
   m_saa->apply_steering_force(std::make_pair(false, false));
@@ -80,10 +81,10 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rfsm::event_data* data) {
   if (!m_saa->sensing()->in_nest()) {
     return controller::foraging_signal::ekLEFT_NEST;
   }
-  return rfsm::event_signal::ekHANDLED;
+  return rpfsm::event_signal::ekHANDLED;
 }
-HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) {
-  ER_ASSERT(rfsm::event_type::ekNORMAL == data->type(),
+HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data) {
+  ER_ASSERT(rpfsm::event_type::ekNORMAL == data->type(),
             "ekST_TRANSPORT_TO_NEST cannot handle child events");
   ER_ASSERT(controller::foraging_signal::ekBLOCK_PICKUP != data->signal(),
             "ekST_TRANSPORT_TO_NEST should never pickup blocks...");
@@ -112,7 +113,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) 
 
   rmath::vector2d obs = m_saa->sensing()->find_closest_obstacle();
   if (m_saa->sensing()->threatening_obstacle_exists()) {
-    collision_avoidance_tracking_begin();
+    m_tracker.ca_enter();
     m_saa->steering_force().avoidance(obs);
   } else {
     /*
@@ -123,14 +124,14 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rfsm::event_data* data) 
     if (m_saa->linear_velocity().length() <= 0.1) {
       m_saa->steering_force().wander();
     }
-    collision_avoidance_tracking_end();
+    m_tracker.ca_exit();
   }
 
   m_saa->apply_steering_force(std::make_pair(true, false));
-  return rfsm::event_signal::ekHANDLED;
+  return rpfsm::event_signal::ekHANDLED;
 }
 
-HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rfsm::event_data* data) {
+HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rpfsm::event_data* data) {
   rmath::radians current_dir = m_saa->sensing()->heading_angle();
 
   /*
@@ -181,52 +182,6 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_wait_for_signal) {
   actuators()->differential_drive().stop();
   actuators()->leds_set_color(rutils::color::kWHITE);
 }
-
-/*******************************************************************************
- * Collision Metrics
- ******************************************************************************/
-__rcsw_pure bool base_foraging_fsm::in_collision_avoidance(void) const {
-  return m_in_avoidance;
-} /* in_collision_avoidance() */
-
-__rcsw_pure bool base_foraging_fsm::entered_collision_avoidance(void) const {
-  return m_entered_avoidance;
-} /* entered_collision_avoidance() */
-
-__rcsw_pure bool base_foraging_fsm::exited_collision_avoidance(void) const {
-  return m_exited_avoidance;
-} /* exited_collision_avoidance() */
-
-uint base_foraging_fsm::collision_avoidance_duration(void) const {
-  if (m_exited_avoidance) {
-    return saa_subsystem()->sensing()->tick() - m_avoidance_start;
-  }
-  return 0;
-} /* collision_avoidance_duration() */
-
-void base_foraging_fsm::collision_avoidance_tracking_begin(void) {
-  if (!m_in_avoidance) {
-    if (!m_entered_avoidance) {
-      m_entered_avoidance = true;
-      m_avoidance_start = saa_subsystem()->sensing()->tick();
-    }
-  } else {
-    m_entered_avoidance = false;
-  }
-  m_in_avoidance = true;
-} /* collision_avoidance_tracking_begin() */
-
-void base_foraging_fsm::collision_avoidance_tracking_end(void) {
-  if (!m_exited_avoidance) {
-    if (m_in_avoidance) {
-      m_exited_avoidance = true;
-    }
-  } else {
-    m_exited_avoidance = false;
-  }
-  m_in_avoidance = false;
-  m_entered_avoidance = false; /* catches 1 timestep avoidances correctly */
-} /* collision_avoidance_tracking_end() */
 
 /*******************************************************************************
  * General Member Functions

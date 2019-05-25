@@ -39,10 +39,10 @@
 #include "fordyca/config/base_controller_repository.hpp"
 #include "fordyca/config/output_config.hpp"
 #include "fordyca/config/sensing_config.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,17 +74,6 @@ void base_controller::position(const rmath::vector2d& loc) {
 }
 void base_controller::discrete_position(const rmath::vector2u& loc) {
   m_saa->sensing()->discrete_position(loc);
-}
-
-__rcsw_pure const rmath::vector2d& base_controller::position(void) const {
-  return m_saa->sensing()->position();
-}
-__rcsw_pure const rmath::vector2u& base_controller::discrete_position(void) const {
-  return m_saa->sensing()->discrete_position();
-}
-
-__rcsw_pure rmath::vector2d base_controller::heading(void) const {
-  return m_saa->sensing()->heading();
 }
 
 void base_controller::Init(ticpp::Element& node) {
@@ -124,42 +113,42 @@ void base_controller::Reset(void) {
 void base_controller::saa_init(const config::actuation_config* const actuation_p,
                                const config::sensing_config* const sensing_p) {
   actuator_list alist = {
-      .wheels = rhal::actuators::differential_drive_actuator(
+      .wheels = rrhal::actuators::differential_drive_actuator(
           GetActuator<argos::CCI_DifferentialSteeringActuator>(
               "differential_steering")),
 #ifdef FORDYCA_WITH_ROBOT_LEDS
-      .leds = rhal::actuators::led_actuator(
+      .leds = rrhal::actuators::led_actuator(
           GetActuator<argos::CCI_LEDsActuator>("leds")),
 #else
-      .leds = rhal::actuators::led_actuator(nullptr),
+      .leds = rrhal::actuators::led_actuator(nullptr),
 #endif /* FORDYCA_WITH_ROBOT_LEDS */
 
 #ifdef FORDYCA_WITH_ROBOT_RAB
-      .wifi = rhal::actuators::wifi_actuator(
+      .wifi = rrhal::actuators::wifi_actuator(
           GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")),
 #else
-      .wifi = rhal::actuators::wifi_actuator(nullptr)
+      .wifi = rrhal::actuators::wifi_actuator(nullptr)
 #endif /* FORDYCA_WITH_ROBOT_RAB */
   };
   sensor_list slist = {
 #ifdef FORDYCA_WITH_ROBOT_RAB
-      .rabs = rhal::sensors::rab_wifi_sensor(
+      .rabs = rrhal::sensors::rab_wifi_sensor(
           GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
 #else
-      .rabs = rhal::sensors::rab_wifi_sensor(nullptr),
+      .rabs = rrhal::sensors::rab_wifi_sensor(nullptr),
 #endif /* FORDYCA_WITH_ROBOT_RAB */
-      .proximity = rhal::sensors::proximity_sensor(
+      .proximity = rrhal::sensors::proximity_sensor(
           GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
-      .light = rhal::sensors::light_sensor(
+      .light = rrhal::sensors::light_sensor(
           GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
-      .ground = rhal::sensors::ground_sensor(
+      .ground = rrhal::sensors::ground_sensor(
           GetSensor<argos::CCI_FootBotMotorGroundSensor>(
               "footbot_motor_ground")),
 #ifdef FORDYCA_WITH_ROBOT_BATTERY
-      .battery = rhal::sensors::battery_sensor(
+      .battery = rrhal::sensors::battery_sensor(
           GetSensor<argos::CCI_BatterySensor>("battery")),
 #else
-      .battery = rhal::sensors::battery_sensor(nullptr),
+      .battery = rrhal::sensors::battery_sensor(nullptr),
 #endif /* FORDYCA_WITH_ROBOT_BATTERY */
   };
   m_saa = rcppsw::make_unique<controller::saa_subsystem>(
@@ -257,5 +246,19 @@ rmath::vector2d base_controller::velocity(void) const {
   }
   return {0, 0};
 } /* velocity() */
+
+/*******************************************************************************
+ * Swarm Spatial Metrics
+ ******************************************************************************/
+__rcsw_pure const rmath::vector2d& base_controller::position2D(void) const {
+  return m_saa->sensing()->position();
+}
+__rcsw_pure const rmath::vector2u& base_controller::discrete_position2D(void) const {
+  return m_saa->sensing()->discrete_position();
+}
+
+__rcsw_pure rmath::vector2d base_controller::heading2D(void) const {
+  return m_saa->sensing()->heading();
+}
 
 NS_END(controller, fordyca);

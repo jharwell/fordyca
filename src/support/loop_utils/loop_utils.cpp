@@ -35,7 +35,7 @@ NS_START(fordyca, support, loop_utils);
  ******************************************************************************/
 __rcsw_pure int robot_on_block(const controller::base_controller& controller,
                                const ds::arena_map& map) {
-  return map.robot_on_block(controller.position());
+  return map.robot_on_block(controller.position2D());
 } /* robot_on_block() */
 
 __rcsw_pure int robot_on_block(const argos::CFootBotEntity& robot,
@@ -57,7 +57,7 @@ int robot_id(const controller::base_controller& controller) {
 
 __rcsw_pure int robot_on_cache(const controller::base_controller& controller,
                                const ds::arena_map& map) {
-  return map.robot_on_cache(controller.position());
+  return map.robot_on_cache(controller.position2D());
 } /* robot_on_cache() */
 
 __rcsw_pure int robot_on_cache(const argos::CFootBotEntity& robot,
@@ -97,8 +97,8 @@ proximity_status_t cache_site_block_proximity(const controller::base_controller&
                                               const ds::arena_map& map,
                                               double block_prox_dist) {
   for (const auto& b : map.blocks()) {
-    if ((b->real_loc() - c.position()).length() <= block_prox_dist) {
-      return {b->id(), b->real_loc(), b->real_loc() - c.position()};
+    if ((b->real_loc() - c.position2D()).length() <= block_prox_dist) {
+      return {b->id(), b->real_loc(), b->real_loc() - c.position2D()};
     }
   } /* for(&b..) */
   return {-1, rmath::vector2d(), rmath::vector2d()};
@@ -108,8 +108,8 @@ proximity_status_t new_cache_cache_proximity(const controller::base_controller& 
                                              const ds::arena_map& map,
                                              double proximity_dist) {
   for (const auto& cache : map.caches()) {
-    if ((cache->real_loc() - c.position()).length() <= proximity_dist) {
-      return {cache->id(), cache->real_loc(), cache->real_loc() - c.position()};
+    if ((cache->real_loc() - c.position2D()).length() <= proximity_dist) {
+      return {cache->id(), cache->real_loc(), cache->real_loc() - c.position2D()};
     }
   } /* for(&b..) */
   return {-1, rmath::vector2d(), rmath::vector2d()};

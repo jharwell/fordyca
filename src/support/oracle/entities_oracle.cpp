@@ -61,20 +61,21 @@ boost::optional<entities_oracle::variant_vector_type> entities_oracle::ask(
 std::string entities_oracle::result_to_string(const variant_vector_type& v) {
   auto lambda = [&](const std::string& a, const auto& ent) {
     if (0 == ent.which()) {
-      return a + "b" + std::to_string(
-          boost::get<std::shared_ptr<repr::base_block>>(ent)->id()) + ",";
+      return a + "b" +
+             std::to_string(
+                 boost::get<std::shared_ptr<repr::base_block>>(ent)->id()) +
+             ",";
     } else if (1 == ent.which()) {
-      return a + "c" + std::to_string(
-          boost::get<std::shared_ptr<repr::base_cache>>(ent)->id()) + ",";
+      return a + "c" +
+             std::to_string(
+                 boost::get<std::shared_ptr<repr::base_cache>>(ent)->id()) +
+             ",";
     } else {
       return a + "unknown entity type,";
     }
   };
 
-  return std::accumulate(v.begin(),
-                         v.end(),
-                         std::string(),
-                         lambda);
+  return std::accumulate(v.begin(), v.end(), std::string(), lambda);
 } /* result_to_string() */
 
 NS_END(oracle, support, fordyca);

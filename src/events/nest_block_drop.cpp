@@ -98,7 +98,7 @@ void nest_block_drop::visit(controller::depth0::crw_controller& controller) {
 
 void nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
@@ -125,7 +125,7 @@ void nest_block_drop::visit(controller::depth0::odpo_controller& controller) {
 
 void nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
@@ -207,12 +207,12 @@ void nest_block_drop::visit(tasks::depth1::collector& task) {
 
 void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************

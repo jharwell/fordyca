@@ -46,7 +46,7 @@ NS_START(fordyca, fsm);
  * block, has a cache, or unknown, etc.).
  *
  */
-class cell2D_fsm final : public rfsm::simple_fsm,
+class cell2D_fsm final : public rpfsm::simple_fsm,
                          public rer::client<cell2D_fsm> {
  public:
   enum state {
@@ -82,7 +82,7 @@ class cell2D_fsm final : public rfsm::simple_fsm,
   size_t block_count(void) const { return m_block_count; }
 
  private:
-  struct block_data : public rfsm::event_data {
+  struct block_data : public rpfsm::event_data {
     explicit block_data(bool pickup_in) : pickup(pickup_in) {}
     bool pickup;
   };

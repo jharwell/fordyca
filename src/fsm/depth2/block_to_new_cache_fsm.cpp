@@ -45,8 +45,7 @@ block_to_new_cache_fsm::block_to_new_cache_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_pure acq_goal_type
-block_to_new_cache_fsm::acquisition_goal(void) const {
+__rcsw_pure acq_goal_type block_to_new_cache_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acq_goal_type::ekBLOCK;

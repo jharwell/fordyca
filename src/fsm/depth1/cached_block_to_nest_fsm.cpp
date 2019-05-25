@@ -69,11 +69,11 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, rfsm::event_data* data) {
-  if (rfsm::event_type::ekNORMAL == data->type()) {
+HFSM_STATE_DEFINE(cached_block_to_nest_fsm, start, rpfsm::event_data* data) {
+  if (rpfsm::event_type::ekNORMAL == data->type()) {
     internal_event(ekST_ACQUIRE_BLOCK);
     return controller::foraging_signal::ekHANDLED;
-  } else if (rfsm::event_type::ekCHILD == data->type()) {
+  } else if (rpfsm::event_type::ekCHILD == data->type()) {
     if (controller::foraging_signal::ekENTERED_NEST == data->signal()) {
       internal_event(ekST_WAIT_FOR_DROP);
       return controller::foraging_signal::ekHANDLED;
@@ -97,7 +97,7 @@ HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, acquire_block) {
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_pickup,
-                  rfsm::event_data* data) {
+                  rpfsm::event_data* data) {
   if (controller::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ekST_TRANSPORT_TO_NEST);
@@ -110,7 +110,7 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
 
 HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
                   wait_for_drop,
-                  rfsm::event_data* data) {
+                  rpfsm::event_data* data) {
   if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_cache_fsm.task_reset();
     internal_event(ekST_FINISHED);
@@ -152,37 +152,40 @@ cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
   }
 } /* collision_avoidance_duration() */
 
+__rcsw_pure rmath::vector2u cached_block_to_nest_fsm::avoidance_loc(void) const {
+  if (m_cache_fsm.task_running()) {
+    return m_cache_fsm.avoidance_loc();
+  } else {
+    return base_foraging_fsm::avoidance_loc();
+  }
+} /* collision_avoidance_duration() */
+
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(cached_block_to_nest_fsm::exp_status,
-                 cached_block_to_nest_fsm,
-                 is_exploring_for_goal,
-                 m_cache_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
+                         is_exploring_for_goal,
+                         m_cache_fsm,
+                         const);
 
-FSM_OVERRIDE_DEF(bool,
-                 cached_block_to_nest_fsm,
-                 is_vectoring_to_goal,
-                 m_cache_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
+                         is_vectoring_to_goal,
+                         m_cache_fsm,
+                         const);
 
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 cached_block_to_nest_fsm,
-                 acquisition_loc,
-                 m_cache_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
+                         acquisition_loc,
+                         m_cache_fsm,
+                         const);
 
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 cached_block_to_nest_fsm,
-                 current_explore_loc,
-                 m_cache_fsm,
-                 const);
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 cached_block_to_nest_fsm,
-                 current_vector_loc,
-                 m_cache_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
+                         current_explore_loc,
+                         m_cache_fsm,
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
+                         current_vector_loc,
+                         m_cache_fsm,
+                         const);
 
 __rcsw_pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (acq_goal_type::ekEXISTING_CACHE == acquisition_goal()) {
@@ -193,8 +196,7 @@ __rcsw_pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
   return false;
 }
 
-__rcsw_pure acq_goal_type
-cached_block_to_nest_fsm::acquisition_goal(void) const {
+__rcsw_pure acq_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
     return acq_goal_type::ekEXISTING_CACHE;
@@ -224,7 +226,7 @@ void cached_block_to_nest_fsm::init(void) {
 
 void cached_block_to_nest_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::ekFSM_RUN,
-               rfsm::event_type::ekNORMAL);
+               rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 NS_END(depth1, fsm, fordyca);

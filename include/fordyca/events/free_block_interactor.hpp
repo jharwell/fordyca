@@ -49,7 +49,7 @@ class free_block_drop;
  * interact with free blocks in FORDYCA.
  */
 class free_block_interactor
-    : public rvisitor::polymorphic_accept_set<detail::free_block_drop,
+    : public rpvisitor::polymorphic_accept_set<detail::free_block_drop,
                                               detail::free_block_pickup,
                                               detail::block_vanished> {};
 

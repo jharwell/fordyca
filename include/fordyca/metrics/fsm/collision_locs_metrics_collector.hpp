@@ -1,5 +1,5 @@
 /**
- * @file current_vector_loc_metrics_collector.cpp
+ * @file collision_locs_metrics_collector.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,11 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_COLLISION_LOCS_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_COLLISION_LOCS_METRICS_COLLECTOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/current_vector_loc_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include <string>
+#include <list>
+
+#include "fordyca/metrics/spatial/grid2D_avg_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -30,14 +35,31 @@
 NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
- * Member Functions
+ * Class Definitions
  ******************************************************************************/
-uint current_vector_loc_metrics_collector::collect_cell(
-    const rmetrics::base_metrics& metrics,
-    const rmath::vector2u& coord) const {
-  auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
+/**
+ * @class collision_locs_metrics_collector
+ * @ingroup fordyca metrics fsm
+ *
+ * @brief Collector for \ref collision_metrics as a 2D grid of where robots most
+ * frequently encounter other robots.
+ */
+class collision_locs_metrics_collector final : public spatial::grid2D_avg_metrics_collector {
+ public:
+  /**
+   * @param ofname The output file name.
+   * @param interval Collection interval.
+   * @param dims Dimensions of the arena.
+   */
+  collision_locs_metrics_collector(const std::string& ofname,
+                             uint interval,
+                             const rmath::vector2u& dims) :
+      grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  return static_cast<uint>(m.current_vector_loc() == coord);
-} /* collect_cell() */
+  uint collect_cell(const rmetrics::base_metrics& metrics,
+                    const rmath::vector2u& coord) const override;
+};
 
 NS_END(fsm, metrics, fordyca);
+
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_COLLISION_LOCS_METRICS_COLLECTOR_HPP_ */

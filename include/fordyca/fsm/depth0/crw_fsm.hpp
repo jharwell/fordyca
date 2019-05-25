@@ -68,12 +68,11 @@ class crw_fsm final : public base_foraging_fsm,
   crw_fsm& operator=(const crw_fsm& fsm) = delete;
 
   /* collision metrics */
-  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */
   acq_goal_type acquisition_goal(void) const override;
@@ -81,6 +80,9 @@ class crw_fsm final : public base_foraging_fsm,
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override;
   rmath::vector2u acquisition_loc(void) const override;
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;

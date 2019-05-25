@@ -29,7 +29,6 @@
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/metrics/robot_occupancy_metrics.hpp"
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/nest.hpp"
@@ -72,16 +71,12 @@ namespace decorator = rcppsw::patterns::decorator;
  * data in manages from the algorithms that operate on that data.
  */
 class arena_map final : public rer::client<arena_map>,
-                        public metrics::robot_occupancy_metrics,
                         public decorator::decorator<arena_grid> {
  public:
   using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
   using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
 
   explicit arena_map(const config::arena::arena_map_config* config);
-
-  /* robot occupancy metrics */
-  bool has_robot(const rmath::vector2u& coord) const override;
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.

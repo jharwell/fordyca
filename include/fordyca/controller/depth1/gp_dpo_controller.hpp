@@ -78,16 +78,16 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void ControlStep(void) override;
 
   /* task distribution metrics */
-  int current_task_depth(void) const override;
-  int current_task_id(void) const override final;
-  int current_task_tab(void) const override;
+  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_depth, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_id, const final);
+  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_tab, const);
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLARE(bool, goal_acquired, const override final);
-  TASK_WRAPPER_DECLARE(acq_goal_type, acquisition_goal, const override final);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const final);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const final);
 
   /* block transportation */
-  TASK_WRAPPER_DECLARE(transport_goal_type, block_transport_goal, const override final);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const final);
 
   /**
    * @brief Get the current task the controller is executing.

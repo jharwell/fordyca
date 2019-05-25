@@ -135,7 +135,7 @@ void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
 
 void free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -184,7 +184,7 @@ void free_block_pickup::visit(ds::dpo_semantic_map& map) {
 
 void free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
@@ -297,12 +297,12 @@ void free_block_pickup::visit(tasks::depth1::harvester& task) {
 
 void free_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************

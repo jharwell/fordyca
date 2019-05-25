@@ -83,13 +83,14 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
   bool entered_collision_avoidance(void) const override;
   bool exited_collision_avoidance(void) const override;
   uint collision_avoidance_duration(void) const override;
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
-  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   bool goal_acquired(void) const override;
   acq_goal_type acquisition_goal(void) const override;
@@ -118,22 +119,22 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
  private:
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
-                     rfsm::event_data);
+                     rpfsm::event_data);
   HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
-                     rfsm::event_data);
+                     rpfsm::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
-  HFSM_STATE_DECLARE(free_block_to_nest_fsm, start, rfsm::event_data);
+  HFSM_STATE_DECLARE(free_block_to_nest_fsm, start, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(free_block_to_nest_fsm,
                      wait_for_pickup,
-                     rfsm::event_data);
+                     rpfsm::event_data);
 
   /* depth0 foraging states */
   HFSM_STATE_DECLARE(free_block_to_nest_fsm,
                      wait_for_drop,
-                     rfsm::event_data);
+                     rpfsm::event_data);
 
   HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, finished);
 

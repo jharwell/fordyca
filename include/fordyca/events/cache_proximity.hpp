@@ -92,7 +92,7 @@ class cache_proximity : public rer::client<cache_proximity> {
  * compiler).
  */
 using cache_proximity_visitor_impl =
-    rvisitor::precise_visitor<detail::cache_proximity,
+    rpvisitor::precise_visitor<detail::cache_proximity,
                               detail::cache_proximity::visit_typelist>;
 
 NS_END(detail);

@@ -86,7 +86,7 @@ class cell_cache_extent : public cell_op {
  * compiler).
  */
 using cell_cache_extent_visitor_impl =
-    rvisitor::precise_visitor<detail::cell_cache_extent,
+    rpvisitor::precise_visitor<detail::cell_cache_extent,
                               detail::cell_cache_extent::visit_typelist>;
 
 NS_END(detail);

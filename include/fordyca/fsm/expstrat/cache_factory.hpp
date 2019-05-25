@@ -37,7 +37,7 @@ NS_START(fordyca, fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 class cache_factory :
-    public rfactory::releasing_factory<base_expstrat,
+    public rpfactory::releasing_factory<base_expstrat,
                                        const base_expstrat::params*> {
  public:
   static constexpr char kCRW[] = "CRW";

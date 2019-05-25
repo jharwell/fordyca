@@ -76,10 +76,11 @@ class explore_for_goal_fsm final : public base_foraging_fsm,
   ~explore_for_goal_fsm(void) override = default;
 
   /* collision metrics */
-  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* taskable overrides */
   bool task_finished(void) const override {

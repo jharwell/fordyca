@@ -22,11 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,8 +62,8 @@ block_to_goal_fsm::block_to_goal_fsm(acquire_goal_fsm* const goal_fsm,
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(block_to_goal_fsm, start, rfsm::event_data* data) {
-  if (rfsm::event_type::ekNORMAL == data->type()) {
+HFSM_STATE_DEFINE(block_to_goal_fsm, start, rpfsm::event_data* data) {
+  if (rpfsm::event_type::ekNORMAL == data->type()) {
     if (controller::foraging_signal::ekACQUIRE_FREE_BLOCK == data->signal() ||
         controller::foraging_signal::ekACQUIRE_CACHED_BLOCK == data->signal()) {
       internal_event(ekST_ACQUIRE_BLOCK);
@@ -97,7 +97,7 @@ HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
 
 HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_pickup,
-                  rfsm::event_data* data) {
+                  rpfsm::event_data* data) {
   if (controller::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     ER_DEBUG("Block pickup signal received");
     m_block_fsm->task_reset();
@@ -125,7 +125,7 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
 
 HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_drop,
-                  rfsm::event_data* data) {
+                  rpfsm::event_data* data) {
   saa_subsystem()->actuation()->differential_drive().stop();
   if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
     ER_DEBUG("Block drop signal received");
@@ -185,10 +185,21 @@ __rcsw_pure uint block_to_goal_fsm::collision_avoidance_duration(void) const {
   return 0;
 } /* collision_avoidance_duration() */
 
+rmath::vector2u block_to_goal_fsm::avoidance_loc(void) const {
+  ER_ASSERT(m_block_fsm->task_running() || m_goal_fsm->task_running(),
+            "In collision avoidance without running task?");
+  if (m_block_fsm->task_running()) {
+    return m_block_fsm->avoidance_loc();
+  } else { /* goal FSM must be running */
+    return m_goal_fsm->avoidance_loc();
+  }
+} /* avoidance_loc() */
+
 /*******************************************************************************
  * Acquisition Metrics
  ******************************************************************************/
-__rcsw_pure block_to_goal_fsm::exp_status block_to_goal_fsm::is_exploring_for_goal(void) const {
+__rcsw_pure block_to_goal_fsm::exp_status block_to_goal_fsm::is_exploring_for_goal(
+    void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->is_exploring_for_goal();
   } else if (m_goal_fsm->task_running()) {
@@ -239,12 +250,12 @@ void block_to_goal_fsm::init(void) {
 void block_to_goal_fsm::task_start(const rta::taskable_argument* const arg) {
   auto* a = dynamic_cast<const tasks::foraging_signal_argument*>(arg);
   ER_ASSERT(nullptr != a, "Bad argument passed");
-  inject_event(a->signal(), rfsm::event_type::ekNORMAL);
+  inject_event(a->signal(), rpfsm::event_type::ekNORMAL);
 }
 
 void block_to_goal_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::ekFSM_RUN,
-               rfsm::event_type::ekNORMAL);
+               rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

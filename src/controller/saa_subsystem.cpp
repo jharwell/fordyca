@@ -22,10 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/repr/line_of_sight.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-
+#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,11 +34,10 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const config::actuation_config* const aconfig,
-    const config::sensing_config* const sconfig,
-    actuator_list* const actuator_list,
-    sensor_list* const sensor_list)
+saa_subsystem::saa_subsystem(const config::actuation_config* const aconfig,
+                             const config::sensing_config* const sconfig,
+                             actuator_list* const actuator_list,
+                             sensor_list* const sensor_list)
     : ER_CLIENT_INIT("fordyca.controller.saa_subsystem"),
       m_actuation(std::make_shared<actuation_subsystem>(aconfig, actuator_list)),
       m_sensing(std::make_shared<sensing_subsystem>(sconfig, sensor_list)),
@@ -74,13 +72,13 @@ void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
 
 rmath::vector2d saa_subsystem::linear_velocity(void) const {
   return {m_actuation->differential_drive().current_speed(),
-        m_sensing->heading().angle()};
+          m_sensing->heading().angle()};
 } /* linear_velocity() */
 
 __rcsw_pure double saa_subsystem::angular_velocity(void) const {
   return (m_actuation->differential_drive().right_linspeed() -
           m_actuation->differential_drive().left_linspeed()) /
-      m_actuation->differential_drive().axle_length();
+         m_actuation->differential_drive().axle_length();
 } /* angular_velocity() */
 
 __rcsw_pure double saa_subsystem::max_speed(void) const {

@@ -1,7 +1,7 @@
 /**
- * @file robot_occupancy_metrics_collector.hpp
+ * @file current_vector_locs_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,48 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_CURRENT_VECTOR_LOCS_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_CURRENT_VECTOR_LOCS_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
 #include <string>
+#include <list>
 
-#include "fordyca/metrics/grid2D_avg_metrics_collector.hpp"
+#include "fordyca/metrics/spatial/grid2D_avg_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class robot_occupancy_metrics_collector
- * @ingroup fordyca metrics
+ * @class current_vector_locs_metrics_collector
+ * @ingroup fordyca metrics fsm
  *
- * @brief Collector for \ref robot_occupancy_metrics.
+ * @brief Collector for robot exploration trajectories, which is collected as a
+ * 2D array, and needs its own collector separate from the \ref
+ * goal_acquisition_metrics_collector (1 .csv per collector).
  */
-class robot_occupancy_metrics_collector final
-    : public grid2D_avg_metrics_collector {
+class current_vector_locs_metrics_collector final : public spatial::grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
-   * @param dims Dimensions of robot_occupancy.
+   * @param dims Dimensions of the arena.
    */
-  robot_occupancy_metrics_collector(const std::string& ofname,
+  current_vector_locs_metrics_collector(const std::string& ofname,
                                     uint interval,
-                                    const rmath::vector2u& dims)
-      : grid2D_avg_metrics_collector(ofname, interval, dims) {}
+                                    const rmath::vector2u& dims) :
+      grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
   uint collect_cell(const rmetrics::base_metrics& metrics,
                     const rmath::vector2u& coord) const override;
 };
 
-NS_END(metrics, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_ROBOT_OCCUPANCY_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_CURRENT_VECTOR_LOCS_METRICS_COLLECTOR_HPP_ */

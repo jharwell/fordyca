@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/crw.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 
 /*******************************************************************************
@@ -40,7 +40,7 @@ void crw::task_execute(void) {
   saa_subsystem()->steering_force().wander();
 
   if (saa_subsystem()->sensing()->threatening_obstacle_exists()) {
-    ca_enter(saa_subsystem()->sensing()->tick());
+    m_tracker.ca_enter();
 
     ER_DEBUG("Found threatening obstacle: (%f, %f)@%f [%f]",
              obs.x(),
@@ -50,7 +50,7 @@ void crw::task_execute(void) {
     saa_subsystem()->apply_steering_force(std::make_pair(false, false));
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
   } else {
-    ca_exit();
+    m_tracker.ca_exit();
 
     ER_DEBUG("No threatening obstacle found");
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kMAGENTA);
@@ -65,51 +65,5 @@ void crw::task_execute(void) {
     }
   }
 } /* task_execute() */
-
-void crw::ca_enter(uint timestep) {
-  if (!m_in_avoidance) {
-    if (!m_entered_avoidance) {
-      m_entered_avoidance = true;
-      m_avoidance_start = timestep;
-    }
-  } else {
-    m_entered_avoidance = false;
-  }
-  m_in_avoidance = true;
-} /* ca_enter() */
-
-void crw::ca_exit(void) {
-  if (!m_exited_avoidance) {
-    if (m_in_avoidance) {
-      m_exited_avoidance = true;
-    }
-  } else {
-    m_exited_avoidance = false;
-  }
-  m_in_avoidance = false;
-  m_entered_avoidance = false; /* catches 1 timestep avoidances correctly */
-} /* ca_exit() */
-
-/*******************************************************************************
- * Collision Metrics
- ******************************************************************************/
-__rcsw_pure bool crw::in_collision_avoidance(void) const {
-  return m_in_avoidance;
-} /* in_collision_avoidance() */
-
-__rcsw_pure bool crw::entered_collision_avoidance(void) const {
-  return m_entered_avoidance;
-} /* entered_collision_avoidance() */
-
-__rcsw_pure bool crw::exited_collision_avoidance(void) const {
-  return m_exited_avoidance;
-} /* exited_collision_avoidance() */
-
-uint crw::collision_avoidance_duration(void) const {
-  if (m_exited_avoidance) {
-    return saa_subsystem()->sensing()->tick() - m_avoidance_start;
-  }
-  return 0;
-} /* collision_avoidance_duration() */
 
 NS_END(expstrat, fsm, fordyca);

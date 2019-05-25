@@ -186,7 +186,7 @@ void set_robot_los(T* const controller,
                    ds::arena_map& map) {
   controller->los(std::move(compute_robot_los(map,
                                               los_grid_size,
-                                              controller->position())));
+                                              controller->position2D())));
 }
 
 template<typename T>

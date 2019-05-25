@@ -88,6 +88,8 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
 template <class T>
 void depth0_metrics_aggregator::collect_from_controller(
     const T* const controller) {
+  base_metrics_aggregator::collect_from_controller(controller);
+
   /*
    * All depth0 controllers provide these.
    */
@@ -106,7 +108,8 @@ void depth0_metrics_aggregator::collect_from_controller(
   ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
 
   collect("fsm::movement", *mov_m);
-  collect("fsm::collision", *collision_m);
+  collect("fsm::collision_counts", *collision_m);
+  collect("fsm::collision_locs", *collision_m);
   collect("blocks::manipulation", *manip_m);
   collect("blocks::acq_counts", *block_acq_m);
 

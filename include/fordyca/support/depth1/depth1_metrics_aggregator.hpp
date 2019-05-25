@@ -98,6 +98,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    */
     template<class ControllerType>
     void collect_from_controller(const ControllerType* const controller) {
+      base_metrics_aggregator::collect_from_controller(controller);
       collect_controller_common(controller);
       /*
        * Only controllers with MDPO perception provide these.
@@ -163,7 +164,8 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     ER_ASSERT(collision_m, "FSM does not provide collision metrics");
     ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
 
-    collect("fsm::collision", *collision_m);
+    collect("fsm::collision_counts", *collision_m);
+    collect("fsm::collision_locs", *collision_m);
     collect_if(
         "blocks::acq_counts",
         *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(

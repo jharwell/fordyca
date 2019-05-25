@@ -31,6 +31,8 @@
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -72,6 +74,7 @@ class saa_subsystem;
 class base_controller : public argos::CCI_Controller,
                         public metrics::fsm::movement_metrics,
                         public metrics::fsm::goal_acquisition_metrics,
+                        public metrics::spatial::swarm_dist2D_metrics,
                         public rer::client<base_controller> {
  public:
   base_controller(void);
@@ -89,6 +92,11 @@ class base_controller : public argos::CCI_Controller,
   /* movement metrics */
   double distance(void) const override;
   rmath::vector2d velocity(void) const override;
+
+  /* swarm spatial 2D metrics */
+  const rmath::vector2d& position2D(void) const override;
+  const rmath::vector2u& discrete_position2D(void) const override;
+  rmath::vector2d heading2D(void) const override;
 
   /**
    * @brief By default controllers have no perception subsystem, and are
@@ -193,9 +201,6 @@ class base_controller : public argos::CCI_Controller,
    */
   void position(const rmath::vector2d& loc);
   void discrete_position(const rmath::vector2u& loc);
-  const rmath::vector2d& position(void) const;
-  const rmath::vector2u& discrete_position(void) const;
-  rmath::vector2d heading(void) const;
 
   /**
    * @brief Convenience function to add footbot ID to salient messages during

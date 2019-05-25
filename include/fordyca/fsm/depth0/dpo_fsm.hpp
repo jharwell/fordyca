@@ -37,7 +37,6 @@
 NS_START(fordyca);
 
 namespace ds { class dpo_store; }
-namespace rta = rcppsw::ta;
 
 NS_START(fsm, depth0);
 
@@ -71,22 +70,23 @@ class dpo_fsm final : public base_foraging_fsm,
   ~dpo_fsm(void) override = default;
 
   /* collision metrics */
-  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
-  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
-  FSM_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   void init(void) override;
 
@@ -106,12 +106,12 @@ class dpo_fsm final : public base_foraging_fsm,
  private:
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
-                     rfsm::event_data);
+                     rpfsm::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
   /* foraging states */
-  HFSM_STATE_DECLARE(dpo_fsm, start, rfsm::event_data);
-  HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, rfsm::event_data);
+  HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);
+  HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, rpfsm::event_data);
 
   /**
    * @brief Defines the state map for the FSM.

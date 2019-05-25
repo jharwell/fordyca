@@ -159,32 +159,14 @@ void dpo_controller::Reset(void) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(transport_goal_type,
-                 dpo_controller,
-                 block_transport_goal,
-                 *m_fsm,
-                 const);
-
-FSM_OVERRIDE_DEF(acq_goal_type,
-                 dpo_controller,
-                 acquisition_goal,
-                 *m_fsm,
-                 const);
-
-FSM_OVERRIDE_DEF(rmath::vector2u, dpo_controller, acquisition_loc, *m_fsm, const);
-FSM_OVERRIDE_DEF(bool, dpo_controller, goal_acquired, *m_fsm, const);
-FSM_OVERRIDE_DEF(dpo_controller::exp_status, dpo_controller, is_exploring_for_goal, *m_fsm, const);
-FSM_OVERRIDE_DEF(bool, dpo_controller, is_vectoring_to_goal, *m_fsm, const);
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 dpo_controller,
-                 current_vector_loc,
-                 *m_fsm,
-                 const);
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 dpo_controller,
-                 current_explore_loc,
-                 *m_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, is_exploring_for_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, is_vectoring_to_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, current_vector_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, current_explore_loc, *m_fsm, const);
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

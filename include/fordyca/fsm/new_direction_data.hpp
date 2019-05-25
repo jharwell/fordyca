@@ -43,7 +43,7 @@ NS_START(fordyca, fsm);
  * @brief Structure containing randomness to inject into robot motion by having
  * them change their direction.
  */
-struct new_direction_data : public rfsm::event_data {
+struct new_direction_data : public rpfsm::event_data {
   explicit new_direction_data(const rmath::radians& dir_in) : dir(dir_in) {}
 
   rmath::radians dir;

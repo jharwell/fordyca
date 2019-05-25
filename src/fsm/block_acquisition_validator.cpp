@@ -24,9 +24,9 @@
 #include "fordyca/fsm/block_acquisition_validator.hpp"
 #include <numeric>
 
+#include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/repr/base_block.hpp"
-#include "fordyca/controller/block_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -69,13 +69,14 @@ __rcsw_pure bool block_acquisition_validator::operator()(
   if (bselm::kPickupPolicyClusterProx == config.policy) {
     auto range = mc_map->const_values_range();
     if (!range.empty()) {
-      auto avg_position = std::accumulate(range.begin(),
-                                          range.end(),
-                                          rmath::vector2d(),
-                                          [&](rmath::vector2d& sum,
-                                              const auto& bent) {
-                                            return sum + bent.ent()->real_loc();
-                                          }) / boost::size(range);
+      auto avg_position =
+          std::accumulate(range.begin(),
+                          range.end(),
+                          rmath::vector2d(),
+                          [&](rmath::vector2d& sum, const auto& bent) {
+                            return sum + bent.ent()->real_loc();
+                          }) /
+          boost::size(range);
 
       return (loc - avg_position).length() < config.prox_dist;
     }

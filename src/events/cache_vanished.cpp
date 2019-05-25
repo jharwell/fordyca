@@ -108,12 +108,12 @@ void cache_vanished::visit(tasks::depth1::harvester& task) {
 
 void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekCACHE_VANISHED,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekCACHE_VANISHED,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************

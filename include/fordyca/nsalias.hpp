@@ -41,6 +41,8 @@ namespace factory {
 } /* namespace factory */
 namespace prototype {
 } /* namespace prototype */
+namespace decorator {
+} /* namespace decorator */
 } /* namespace patterns */
 namespace swarm {
 } /* namespace swarm */
@@ -74,11 +76,19 @@ namespace hal {
 
 NS_START(fordyca);
 
+/*
+ * Convention: Namespace aliases from rcppsw all start with 'r', and the first
+ * letter of all nested namespaces except the innermost one should be included
+ * before the innermost. For example, rcppsw::patterns::visitor should have the
+ * 'r' from 'rcppsw' and the 'p' from 'patterns' before the target namespace
+ * 'visitor'.
+ */
 namespace rmetrics = rcppsw::metrics;
-namespace rfsm = rcppsw::patterns::state_machine;
-namespace rvisitor = rcppsw::patterns::visitor;
-namespace rfactory = rcppsw::patterns::factory;
-namespace rprototype = rcppsw::patterns::prototype;
+namespace rpfsm = rcppsw::patterns::state_machine;
+namespace rpvisitor = rcppsw::patterns::visitor;
+namespace rpfactory = rcppsw::patterns::factory;
+namespace rpprototype = rcppsw::patterns::prototype;
+namespace rpdecorator = rcppsw::patterns::decorator;
 namespace rswarm = rcppsw::swarm;
 namespace rmath = rcppsw::math;
 namespace rta = rcppsw::ta;
@@ -90,9 +100,9 @@ namespace rconfig = rcppsw::config;
 namespace rds = rcppsw::ds;
 namespace rmpl = rcppsw::mpl;
 namespace rrobotics = rcppsw::robotics;
-namespace rhal = rrobotics::hal;
-namespace rkin2D = rrobotics::kin2D;
-namespace rsteer2D = rrobotics::steer2D;
+namespace rrhal = rrobotics::hal;
+namespace rrkin2D = rrobotics::kin2D;
+namespace rrsteer2D = rrobotics::steer2D;
 
 NS_END(fordyca);
 

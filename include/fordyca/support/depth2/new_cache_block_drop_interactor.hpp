@@ -120,7 +120,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                               const loop_utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
-            controller.position().to_str().c_str(),
+            controller.position2D().to_str().c_str(),
             status.entity_id,
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
@@ -169,7 +169,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
      */
       ER_WARN("%s cannot drop block in new cache %s: Cache%d too close (%f <= %f)",
               controller.GetId().c_str(),
-              controller.position().to_str().c_str(),
+              controller.position2D().to_str().c_str(),
               status.entity_id,
               status.distance.length(),
               m_cache_manager->cache_proximity_dist());
@@ -205,7 +205,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
   void perform_new_cache_block_drop(T& controller,
                                     const tv::temporal_penalty<T>& penalty) {
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
-                                            rmath::dvec2uvec(controller.position(),
+                                            rmath::dvec2uvec(controller.position2D(),
                                                              m_map->grid_resolution()),
                                             m_map->grid_resolution());
 

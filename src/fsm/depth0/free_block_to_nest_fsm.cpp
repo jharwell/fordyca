@@ -64,13 +64,13 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
                                                nullptr),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
-HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rfsm::event_data* data) {
+HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
-  if (rfsm::event_type::ekNORMAL == data->type()) {
+  if (rpfsm::event_type::ekNORMAL == data->type()) {
     internal_event(ekST_ACQUIRE_BLOCK);
     return controller::foraging_signal::ekHANDLED;
   }
-  if (rfsm::event_type::ekCHILD == data->type()) {
+  if (rpfsm::event_type::ekCHILD == data->type()) {
     if (controller::foraging_signal::ekENTERED_NEST == data->signal()) {
       internal_event(ekST_WAIT_FOR_DROP);
       return controller::foraging_signal::ekHANDLED;
@@ -90,7 +90,7 @@ HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
 }
 HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_pickup,
-                  rfsm::event_data* data) {
+                  rpfsm::event_data* data) {
   /**
    * It is possible that robots can be waiting indefinitely for a block
    * pickup signal that will never come once a block has been acquired if they
@@ -110,7 +110,7 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
   }
   return controller::foraging_signal::ekHANDLED;
 }
-HFSM_STATE_DEFINE(free_block_to_nest_fsm, wait_for_drop, rfsm::event_data* data) {
+HFSM_STATE_DEFINE(free_block_to_nest_fsm, wait_for_drop, rpfsm::event_data* data) {
   if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ekST_FINISHED);
@@ -150,39 +150,41 @@ __rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) cons
   }
 } /* collision_avoidance_duration() */
 
+__rcsw_pure rmath::vector2u free_block_to_nest_fsm::avoidance_loc(void) const {
+  if (m_block_fsm.task_running()) {
+    return m_block_fsm.avoidance_loc();
+  } else {
+    return base_foraging_fsm::avoidance_loc();
+  }
+} /* collision_avoidance_duration() */
+
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(free_block_to_nest_fsm::exp_status,
-                 free_block_to_nest_fsm,
-                 is_exploring_for_goal,
-                 m_block_fsm,
-                 const);
-FSM_OVERRIDE_DEF(bool,
-                 free_block_to_nest_fsm,
-                 is_vectoring_to_goal,
-                 m_block_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+                         is_exploring_for_goal,
+                         m_block_fsm,
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+                         is_vectoring_to_goal,
+                         m_block_fsm,
+                         const);
 
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 free_block_to_nest_fsm,
-                 acquisition_loc,
-                 m_block_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+                         acquisition_loc,
+                         m_block_fsm,
+                         const);
 
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 free_block_to_nest_fsm,
-                 current_explore_loc,
-                 m_block_fsm,
-                 const);
-FSM_OVERRIDE_DEF(rmath::vector2u,
-                 free_block_to_nest_fsm,
-                 current_vector_loc,
-                 m_block_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+                         current_explore_loc,
+                         m_block_fsm,
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+                         current_vector_loc,
+                         m_block_fsm,
+                         const);
 
-__rcsw_pure acq_goal_type
-free_block_to_nest_fsm::acquisition_goal(void) const {
+__rcsw_pure acq_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
     return acq_goal_type::ekBLOCK;
@@ -209,7 +211,7 @@ void free_block_to_nest_fsm::init(void) {
 
 void free_block_to_nest_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::ekFSM_RUN,
-               rfsm::event_type::ekNORMAL);
+               rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 __rcsw_pure transport_goal_type

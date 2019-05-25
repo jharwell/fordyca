@@ -196,11 +196,4 @@ void arena_map::cache_extent_clear(
   }   /* for(i..) */
 } /* cache_extent_clear() */
 
-/*******************************************************************************
- * Metrics
- ******************************************************************************/
-bool arena_map::has_robot(const rmath::vector2u& coord) const {
-  return decoratee().access<arena_grid::kRobotOccupancy>(coord);
-} /* has_robot() */
-
 NS_END(ds, fordyca);

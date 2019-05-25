@@ -21,12 +21,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/grid2D_avg_metrics_collector.hpp"
+#include "fordyca/metrics/spatial/grid2D_avg_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, spatial);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -80,4 +80,4 @@ void grid2D_avg_metrics_collector::collect(const rmetrics::base_metrics& metrics
   }   /* for(i..) */
 } /* collect() */
 
-NS_END(metrics, fordyca);
+NS_END(spatial, metrics, fordyca);

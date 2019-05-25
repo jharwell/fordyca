@@ -333,7 +333,6 @@ void depth1_loop_functions::PreStep() {
   } /* for(&entity_pair..) */
 
   /* collect metrics from non-robot sources */
-  m_metrics_agg->collect_from_arena(arena_map());
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
@@ -371,10 +370,6 @@ void depth1_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   auto iadaptor = robot_interactor_adaptor<robot_arena_interactor>(
       controller, GetSpace().GetSimulationClock());
   boost::apply_visitor(iadaptor, m_interactor_map->at(controller->type_index()));
-
-  /* update arena map metrics with robot position */
-  arena_map()->access<arena_grid::kRobotOccupancy>(
-      controller->discrete_position()) = true;
 } /* robot_timestep_process() */
 
 argos::CColor depth1_loop_functions::GetFloorColor(

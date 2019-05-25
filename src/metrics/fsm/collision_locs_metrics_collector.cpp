@@ -1,5 +1,5 @@
 /**
- * @file acquisition_loc_metrics_collector.cpp
+ * @file collision_locs_metrics_collector.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/acquisition_loc_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/collision_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/collision_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,12 +32,16 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-uint acquisition_loc_metrics_collector::collect_cell(
+uint collision_locs_metrics_collector::collect_cell(
     const rmetrics::base_metrics& metrics,
     const rmath::vector2u& coord) const {
-  auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
+  auto& m = dynamic_cast<const collision_metrics&>(metrics);
 
-  return static_cast<uint>(m.acquisition_loc() == coord);
+  if (m.in_collision_avoidance()) {
+    return static_cast<uint>(m.avoidance_loc() == coord);
+  } else {
+    return 0;
+  }
 } /* collect_cell() */
 
 NS_END(fsm, metrics, fordyca);

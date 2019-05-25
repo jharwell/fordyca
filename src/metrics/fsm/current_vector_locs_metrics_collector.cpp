@@ -1,5 +1,5 @@
 /**
- * @file current_explore_loc_metrics_collector.cpp
+ * @file current_vector_locs_metrics_collector.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/current_explore_loc_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/current_vector_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 
 /*******************************************************************************
@@ -32,12 +32,12 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-uint current_explore_loc_metrics_collector::collect_cell(
+uint current_vector_locs_metrics_collector::collect_cell(
     const rmetrics::base_metrics& metrics,
     const rmath::vector2u& coord) const {
   auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
 
-  return static_cast<uint>(m.current_explore_loc() == coord);
+  return static_cast<uint>(m.current_vector_loc() == coord);
 } /* collect_cell() */
 
 NS_END(fsm, metrics, fordyca);

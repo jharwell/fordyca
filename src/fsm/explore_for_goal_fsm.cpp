@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -83,26 +83,27 @@ HFSM_ENTRY_DEFINE_ND(explore_for_goal_fsm, entry_explore) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(bool,
-                 explore_for_goal_fsm,
-                 in_collision_avoidance,
-                 *m_explore_behavior,
-                 const);
-FSM_OVERRIDE_DEF(bool,
-                 explore_for_goal_fsm,
-                 entered_collision_avoidance,
-                 *m_explore_behavior,
-                 const);
-FSM_OVERRIDE_DEF(bool,
-                 explore_for_goal_fsm,
-                 exited_collision_avoidance,
-                 *m_explore_behavior,
-                 const);
-FSM_OVERRIDE_DEF(uint,
-                 explore_for_goal_fsm,
-                 collision_avoidance_duration,
-                 *m_explore_behavior,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(explore_for_goal_fsm,
+                         in_collision_avoidance,
+                         *m_explore_behavior,
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(explore_for_goal_fsm,
+                         entered_collision_avoidance,
+                         *m_explore_behavior,
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(explore_for_goal_fsm,
+                         exited_collision_avoidance,
+                         *m_explore_behavior,
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(explore_for_goal_fsm,
+                         collision_avoidance_duration,
+                         *m_explore_behavior,
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(explore_for_goal_fsm,
+                         avoidance_loc,
+                         *m_explore_behavior,
+                         const);
 
 /*******************************************************************************
  * General Member Functions
@@ -114,7 +115,7 @@ __rcsw_pure bool explore_for_goal_fsm::task_running(void) const {
 
 void explore_for_goal_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::ekFSM_RUN,
-               rfsm::event_type::ekNORMAL);
+               rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

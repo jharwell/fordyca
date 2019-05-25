@@ -24,13 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
 #include <memory>
+#include <utility>
 
+#include "fordyca/controller/actuator_list.hpp"
+#include "fordyca/controller/sensor_list.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/nsalias.hpp"
-#include "fordyca/controller/sensor_list.hpp"
-#include "fordyca/controller/actuator_list.hpp"
 
 /*******************************************************************************
  * Namespaces

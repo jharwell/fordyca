@@ -180,7 +180,8 @@
            />
       <metrics
           output_dir="metrics"
-          fsm_collision_fname="fsm-collision.csv"
+          fsm_collision_counts_fname="fsm-collision-counts.csv"
+          fsm_collision_locs_fname="fsm-collision-locs.csv"
           fsm_movement_fname="fsm-movement.csv"
           block_acq_counts_fname="block-acq-counts.csv"
           block_acq_locs_fname="block-acq-locs.csv"

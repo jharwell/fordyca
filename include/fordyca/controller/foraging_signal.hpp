@@ -42,13 +42,13 @@ NS_START(fordyca, controller);
  * @brief Signals that sub-states can return in order to notify their super
  * states that a condition that they do not know how to handle has arisen.
  */
-class foraging_signal : public rfsm::event_signal {
+class foraging_signal : public rpfsm::event_signal {
  public:
   enum type {
     /**
      * The signal sent to FSMs during nominal operation.
      */
-    ekFSM_RUN = rfsm::event_signal::ekEXTERNAL_SIGNALS,
+    ekFSM_RUN = rpfsm::event_signal::ekEXTERNAL_SIGNALS,
     ekBLOCK_PICKUP, /// A robot has picked up a block
     ekBLOCK_DROP,   /// A robot has dropped a block in {cache, nest, arena}
     ekLEFT_NEST,    /// A robot has left the nest

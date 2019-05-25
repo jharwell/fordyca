@@ -64,7 +64,8 @@ __rcsw_pure double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-__rcsw_pure double cache_transferer::interface_time_calc(__rcsw_unused uint interface,
+__rcsw_pure double cache_transferer::interface_time_calc(__rcsw_unused uint
+                                                             interface,
                                                          double start_time) {
   return current_time() - start_time;
 } /* interface_time_calc() */
@@ -117,59 +118,51 @@ void cache_transferer::accept(events::detail::cache_vanished& visitor) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINE_PTR(
-    cache_transferer::exp_status,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     is_exploring_for_goal,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     is_vectoring_to_goal,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    bool,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     goal_acquired,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    acq_goal_type,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     acquisition_goal,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    transport_goal_type,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     block_transport_goal,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    rmath::vector2u,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     acquisition_loc,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    rmath::vector2u,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     current_vector_loc,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
-TASK_WRAPPER_DEFINE_PTR(
-    rmath::vector2u,
+RCPPSW_WRAP_OVERRIDE_DEF(
     cache_transferer,
     current_explore_loc,
-    static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
 NS_END(depth2, tasks, fordyca);

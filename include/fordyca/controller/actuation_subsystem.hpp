@@ -25,9 +25,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/actuation_config.hpp"
+#include "fordyca/controller/actuator_list.hpp"
 #include "fordyca/controller/steering_force2D.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
-#include "fordyca/controller/actuator_list.hpp"
 
 /*******************************************************************************
  * Namespaces

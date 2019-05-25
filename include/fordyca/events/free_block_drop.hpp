@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
@@ -143,7 +145,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
  * compiler).
  */
 using free_block_drop_visitor_impl =
-    rvisitor::precise_visitor<detail::free_block_drop,
+    rpvisitor::precise_visitor<detail::free_block_drop,
                               detail::free_block_drop::visit_typelist>;
 
 NS_END(detail);

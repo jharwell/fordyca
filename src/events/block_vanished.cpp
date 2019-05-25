@@ -118,12 +118,12 @@ void block_vanished::visit(controller::depth0::omdpo_controller& controller) {
 
 void block_vanished::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -172,12 +172,12 @@ void block_vanished::visit(tasks::depth1::harvester& task) {
 
 void block_vanished::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
-                   rfsm::event_type::ekNORMAL);
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************

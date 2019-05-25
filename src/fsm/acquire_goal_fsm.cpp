@@ -74,7 +74,7 @@ HFSM_STATE_DEFINE_ND(acquire_goal_fsm, fsm_acquire_goal) {
   if (acquire_goal()) {
     internal_event(ekST_FINISHED);
   }
-  return rfsm::event_signal::ekHANDLED;
+  return rpfsm::event_signal::ekHANDLED;
 }
 
 HFSM_EXIT_DEFINE(acquire_goal_fsm, exit_fsm_acquire_goal) {
@@ -86,7 +86,7 @@ HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
     ER_DEBUG("Executing ekST_FINISHED");
   }
 
-  return rfsm::event_signal::ekHANDLED;
+  return rpfsm::event_signal::ekHANDLED;
 }
 
 /*******************************************************************************
@@ -125,9 +125,10 @@ __rcsw_pure bool acquire_goal_fsm::goal_acquired(void) const {
   return current_state() == ekST_FINISHED;
 } /* cache_acquired() */
 
-__rcsw_pure acquire_goal_fsm::exp_status acquire_goal_fsm::is_exploring_for_goal(void) const {
+__rcsw_pure acquire_goal_fsm::exp_status acquire_goal_fsm::is_exploring_for_goal(
+    void) const {
   return std::make_pair(current_state() == ekST_ACQUIRE_GOAL &&
-                        m_explore_fsm.task_running(),
+                            m_explore_fsm.task_running(),
                         !m_hooks.candidates_exist());
 } /* is_exploring_for_goal() */
 
@@ -153,6 +154,10 @@ rmath::vector2u acquire_goal_fsm::current_explore_loc(void) const {
 rmath::vector2u acquire_goal_fsm::current_vector_loc(void) const {
   return saa_subsystem()->sensing()->discrete_position();
 } /* current_vector_loc() */
+
+rmath::vector2u acquire_goal_fsm::avoidance_loc(void) const {
+  return saa_subsystem()->sensing()->discrete_position();
+} /* avoidance_loc() */
 
 /*******************************************************************************
  * General Member Functions
@@ -251,7 +256,7 @@ bool acquire_goal_fsm::acquire_known_goal(void) {
 
 void acquire_goal_fsm::task_execute(void) {
   inject_event(controller::foraging_signal::ekFSM_RUN,
-               rfsm::event_type::ekNORMAL);
+               rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

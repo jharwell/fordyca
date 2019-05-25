@@ -37,16 +37,16 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class throttling_differential_drive : public rkin2D::differential_drive {
+class throttling_differential_drive : public rrkin2D::differential_drive {
  public:
   static constexpr double kWheelRadius = 0.029112741;
   static constexpr double kInterWheelDistance = 0.14;
 
   throttling_differential_drive(
-      rkin2D::differential_drive::drive_type type,
+      rrkin2D::differential_drive::drive_type type,
       double max_speed,
       const rmath::radians& soft_turn_max,
-      const rhal::actuators::differential_drive_actuator& wheels)
+      const rrhal::actuators::differential_drive_actuator& wheels)
       : differential_drive(wheels,
                            type,
                            kWheelRadius,

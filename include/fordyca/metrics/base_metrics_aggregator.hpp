@@ -48,6 +48,9 @@ class base_block;
 namespace ds {
 class arena_map;
 }
+namespace controller {
+class base_controller;
+} /* namespace controller */
 NS_START(metrics);
 
 /*******************************************************************************
@@ -76,9 +79,9 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
   void collect_from_block(const repr::base_block* block);
 
   /**
-   * @brief Collect metrics from the arena each timestep.
+   * @brief Collect metrics from \ref base_controller.
    */
-  void collect_from_arena(const ds::arena_map* arena);
+  void collect_from_controller(const controller::base_controller* controller);
 
  protected:
   const std::string& metrics_path(void) const { return m_metrics_path; }

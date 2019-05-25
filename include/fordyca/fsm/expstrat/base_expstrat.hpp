@@ -55,8 +55,8 @@ NS_START(fsm, expstrat);
  * when looking for stuff.
  */
 class base_expstrat : public metrics::fsm::collision_metrics,
-                              public rta::taskable,
-                              public rprototype::clonable<base_expstrat> {
+                      public rta::taskable,
+                      public rpprototype::clonable<base_expstrat> {
  public:
   struct params {
     params(const controller::cache_sel_matrix* csel_matrix_in,

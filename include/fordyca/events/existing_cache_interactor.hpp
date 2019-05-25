@@ -49,7 +49,7 @@ class cache_vanished;
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor
-    : public rvisitor::polymorphic_accept_set<detail::cache_block_drop,
+    : public rpvisitor::polymorphic_accept_set<detail::cache_block_drop,
                                               detail::cached_block_pickup,
                                               detail::cache_vanished> {};
 
