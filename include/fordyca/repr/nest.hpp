@@ -42,16 +42,20 @@ NS_START(fordyca, repr);
  * @class nest
  * @ingroup fordyca repr
  *
- * @brief Class representing the nest in the arena, which is move multi-cellular
- * and immobile.
+ * @brief Class representing the nest in the arena, which is multi-cellular and
+ * immobile.
+ *
+ * When initializing lights, they will only be detectable by the footbot's light
+ * sensor, NOT the omnidirectional camera, as that can only detect LED entities
+ * that are on the ground (implementation detail).
  */
 class nest : public multicell_entity, public immovable_cell_entity {
  public:
   /**
-   * @brief We use raw pointers to indicate that ARGoS owns the constructed
-   * lights. If we own them, then when ARGoS goes to delete them after the
-   * experiment has ended the arena has already been deconstructed and the
-   * nest lights along with them, and an exception is thrown.
+   * @brief We use raw pointers to indicate we (FORDYCA) do not own the
+   * constructed lights. If we own them, then when ARGoS goes to delete them
+   * after the experiment has ended the arena has already been deconstructed and
+   * the nest lights along with them, and an exception is thrown.
    */
   using light_list = std::list<argos::CLightEntity*>;
 

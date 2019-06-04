@@ -16,18 +16,20 @@
   <!-- *************** -->
   <controllers>
 
-    <grp_dpo_controller id="ffc"
+    <crw_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
-        <leds implementation="default" medium="leds" />
+        <!-- <leds implementation="default" medium="leds" /> -->
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
         <footbot_proximity implementation="default" show_rays="true" />
-        <footbot_light implementation="rot_z_only" show_rays="false" />
+        <!-- <footbot_light implementation="rot_z_only" show_rays="false" /> -->
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
+        <colored_blob_omnidirectional_camera implementation="rot_z_only"
+                                             medium="leds" />
         <battery implementation="default" />
       </sensors>
       <params>
@@ -161,7 +163,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </grp_dpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -169,7 +171,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth0_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -209,7 +211,7 @@
           task_distribution_fname="task-distribution.csv"
           perception_dpo_fname="perception-dpo.csv"
           perception_mdpo_fname="perception-mdpo.csv"
-          arena_robot_locs_fname="arena-robot-locs.csv"
+          swarm_dist_pos2D_fname="swarm-dist-pos2D.csv"
           swarm_convergence_fname="swarm-convergence.csv"
           temporal_variance_fname="temporal-variance.csv"
           collect_interval="1000">
@@ -314,7 +316,7 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="12, 6, 2" center="6,3,1">
+  <arena size="12, 6, 10" center="6,3,5">
 
     <floor id="floor"
            source="loop_functions"
@@ -332,12 +334,11 @@
     <box id="wall_west" size="0.1,6,0.5" movable="false">
       <body position="0,3,0" orientation="0,0,0" />
     </box>
-
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
       <entity quantity="16" max_trials="1000">
-        <foot-bot id="fb">
+        <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->
         </foot-bot>

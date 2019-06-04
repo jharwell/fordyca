@@ -36,8 +36,8 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 void crw::task_execute(void) {
   rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
-  saa_subsystem()->steering_force().avoidance(obs);
-  saa_subsystem()->steering_force().wander();
+  saa_subsystem()->steer2D_force_calc().avoidance(obs);
+  saa_subsystem()->steer2D_force_calc().wander();
 
   if (saa_subsystem()->sensing()->threatening_obstacle_exists()) {
     m_tracker.ca_enter();
@@ -47,21 +47,21 @@ void crw::task_execute(void) {
              obs.y(),
              obs.angle().value(),
              obs.length());
-    saa_subsystem()->apply_steering_force(std::make_pair(false, false));
+    saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
   } else {
     m_tracker.ca_exit();
 
     ER_DEBUG("No threatening obstacle found");
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kMAGENTA);
-    rmath::vector2d force = saa_subsystem()->steering_force().value();
+    rmath::vector2d force = saa_subsystem()->steer2D_force_calc().value();
     /*
      * This can be 0 if the wander force is not active this timestep.
      */
     if (force.length() >= std::numeric_limits<double>::epsilon()) {
-      saa_subsystem()->steering_force().value(
-          saa_subsystem()->steering_force().value() * 0.7);
-      saa_subsystem()->apply_steering_force(std::make_pair(false, false));
+      saa_subsystem()->steer2D_force_calc().value(
+          saa_subsystem()->steer2D_force_calc().value() * 0.7);
+      saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
     }
   }
 } /* task_execute() */

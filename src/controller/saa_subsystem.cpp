@@ -41,12 +41,12 @@ saa_subsystem::saa_subsystem(const config::actuation_config* const aconfig,
     : ER_CLIENT_INIT("fordyca.controller.saa_subsystem"),
       m_actuation(std::make_shared<actuation_subsystem>(aconfig, actuator_list)),
       m_sensing(std::make_shared<sensing_subsystem>(sconfig, sensor_list)),
-      m_steering(*this, &aconfig->steering, m_sensing) {}
+      m_steer2D_calc(*this, &aconfig->steering) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
+void saa_subsystem::steer2D_force_apply(const std::pair<bool, bool>& force) {
   ER_DEBUG("position=(%f, %f)",
            m_sensing->position().x(),
            m_sensing->position().y())
@@ -57,18 +57,18 @@ void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
            linear_velocity().length(),
            angular_velocity());
   ER_DEBUG("steering_force=(%f,%f)@%f [%f]",
-           m_steering.value().x(),
-           m_steering.value().y(),
-           m_steering.value().angle().value(),
-           m_steering.value().length());
+           m_steer2D_calc.value().x(),
+           m_steer2D_calc.value().y(),
+           m_steer2D_calc.value().angle().value(),
+           m_steer2D_calc.value().length());
 
-  double speed = m_steering.value().length() *
+  double speed = m_steer2D_calc.value().length() *
                  (1.0 - m_actuation->differential_drive().active_throttle());
   m_actuation->differential_drive().fsm_drive(speed,
-                                              m_steering.value().angle(),
+                                              m_steer2D_calc.value().angle(),
                                               force);
-  m_steering.reset();
-} /* apply_steering_force() */
+  m_steer2D_calc.reset();
+} /* steer2D_force_apply() */
 
 rmath::vector2d saa_subsystem::linear_velocity(void) const {
   return {m_actuation->differential_drive().current_speed(),

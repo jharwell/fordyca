@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/steering_force2D_config.hpp"
+#include "rcppsw/robotics/steer2D/config/force_calculator_config.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/robotics/kin2D/config/differential_drive_config.hpp"
@@ -44,7 +44,7 @@ NS_START(fordyca, config);
  */
 struct actuation_config : public rconfig::base_config {
   rrkin2D::config::differential_drive_config differential_drive{};
-  steering_force2D_config steering{};
+  rrsteer2D::config::force_calculator_config steering{};
 };
 
 NS_END(config, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file phototaxis_force.hpp
+ * @file saa_xml_names.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,50 +18,35 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_PHOTOTAXIS_FORCE_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_PHOTOTAXIS_FORCE_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_SAA_XML_NAMES_HPP_
+#define INCLUDE_FORDYCA_CONFIG_SAA_XML_NAMES_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/robotics/steer2D/boid.hpp"
+#include <string>
+
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
- * namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-namespace config {
-struct phototaxis_force_config;
-}
-
-NS_START(controller);
-class sensing_subsystem;
-namespace steering = rcppsw::robotics::steer2D;
+NS_START(fordyca, config);
 
 /*******************************************************************************
- * Class Definitions
+ * Struct Definitions
  ******************************************************************************/
-
-/**
- * @class phototaxis_force
- * @ingroup fordyca controller
- *
- * @brief A force pushing the robot away from light sources.
- */
-class phototaxis_force {
- public:
-  phototaxis_force(const config::phototaxis_force_config* config,
-                   const std::shared_ptr<sensing_subsystem>& sensors);
-
-  rmath::vector2d operator()() const;
-
-  /* clang-format off */
-  double                                   m_max;
-  std::shared_ptr<sensing_subsystem>  m_sensors;
-  /* clang-format on */
+struct saa_xml_names {
+  const std::string diff_steering_actuator = "differential_steering";
+  const std::string leds_saa = "leds";
+  const std::string rab_saa = "range_and_bearing";
+  const std::string prox_sensor = "footbot_proximity";
+  const std::string camera_sensor = "colored_blob_omnidirectional_camera";
+  const std::string light_sensor = "footbot_light";
+  const std::string ground_sensor = "footbot_motor_ground";
+  const std::string battery_sensor = "battery";
 };
 
-NS_END(controller, fordyca);
+NS_END(config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_PHOTOTAXIS_FORCE_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_SAA_XML_NAMES_HPP_ */

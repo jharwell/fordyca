@@ -29,7 +29,7 @@
 
 #include "fordyca/controller/actuator_list.hpp"
 #include "fordyca/controller/sensor_list.hpp"
-#include "fordyca/controller/steering_force2D.hpp"
+#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 #include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
@@ -79,10 +79,14 @@ class saa_subsystem final : public rcppsw::robotics::steer2D::boid,
    * @brief Apply the summed steering forces; change wheel speeds. Resets the
    * summed forces.
    */
-  void apply_steering_force(const std::pair<bool, bool>& force);
+  void steer2D_force_apply(const std::pair<bool, bool>& force);
 
-  steering_force2D& steering_force(void) { return m_steering; }
-  const steering_force2D& steering_force(void) const { return m_steering; }
+  rrsteer2D::force_calculator& steer2D_force_calc(void) {
+    return m_steer2D_calc;
+  }
+  const rrsteer2D::force_calculator& steer2D_force_calc(void) const {
+    return m_steer2D_calc;
+  }
 
   std::shared_ptr<sensing_subsystem> sensing(void) { return m_sensing; }
   const std::shared_ptr<const sensing_subsystem> sensing(void) const {
@@ -100,7 +104,7 @@ class saa_subsystem final : public rcppsw::robotics::steer2D::boid,
   /* clang-format off */
   std::shared_ptr<controller::actuation_subsystem> m_actuation;
   std::shared_ptr<sensing_subsystem>               m_sensing;
-  steering_force2D                                 m_steering;
+  rrsteer2D::force_calculator                      m_steer2D_calc;
   /* clang-format on */
 };
 

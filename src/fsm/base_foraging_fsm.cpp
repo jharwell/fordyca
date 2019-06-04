@@ -71,12 +71,12 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rpfsm::event_data* data) {
   if (m_saa->sensing()->threatening_obstacle_exists()) {
     m_tracker.ca_enter();
     rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
-    saa_subsystem()->steering_force().avoidance(obs);
+    saa_subsystem()->steer2D_force_calc().avoidance(obs);
   } else {
     m_tracker.ca_exit();
   }
-  saa_subsystem()->steering_force().wander();
-  m_saa->apply_steering_force(std::make_pair(false, false));
+  saa_subsystem()->steer2D_force_calc().wander();
+  m_saa->steer2D_force_apply(std::make_pair(false, false));
 
   if (!m_saa->sensing()->in_nest()) {
     return controller::foraging_signal::ekLEFT_NEST;
@@ -100,8 +100,8 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data)
    */
   if (m_saa->sensing()->in_nest()) {
     if (m_nest_count++ < kNEST_COUNT_MAX_STEPS) {
-      m_saa->steering_force().wander();
-      m_saa->apply_steering_force(std::make_pair(false, false));
+      m_saa->steer2D_force_calc().wander();
+      m_saa->steer2D_force_apply(std::make_pair(false, false));
       return controller::foraging_signal::ekHANDLED;
     } else {
       m_nest_count = 0;
@@ -109,12 +109,12 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data)
     }
   }
 
-  m_saa->steering_force().phototaxis();
+  m_saa->steer2D_force_calc().phototaxis(m_saa->sensing()->light().readings());
 
   rmath::vector2d obs = m_saa->sensing()->find_closest_obstacle();
   if (m_saa->sensing()->threatening_obstacle_exists()) {
     m_tracker.ca_enter();
-    m_saa->steering_force().avoidance(obs);
+    m_saa->steer2D_force_calc().avoidance(obs);
   } else {
     /*
      * If we are currently spinning in place (hard turn), we have 0 linear
@@ -122,12 +122,12 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data)
      * calculations. To fix this, and a bit of wander force.
      */
     if (m_saa->linear_velocity().length() <= 0.1) {
-      m_saa->steering_force().wander();
+      m_saa->steer2D_force_calc().wander();
     }
     m_tracker.ca_exit();
   }
 
-  m_saa->apply_steering_force(std::make_pair(true, false));
+  m_saa->steer2D_force_apply(std::make_pair(true, false));
   return rpfsm::event_signal::ekHANDLED;
 }
 

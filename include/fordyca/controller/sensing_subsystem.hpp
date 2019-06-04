@@ -73,6 +73,9 @@ class sensing_subsystem {
   const rrhal::sensors::proximity_sensor& proximity(void) const {
     return m_sensors.proximity;
   }
+  const rrhal::sensors::colored_blob_camera_sensor& blobs(void) const {
+    return m_sensors.blobs;
+  }
   const rrhal::sensors::light_sensor& light(void) const {
     return m_sensors.light;
   }

@@ -94,16 +94,16 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
                obs.to_str().c_str(),
                obs.angle().value(),
                obs.length());
-      saa_subsystem()->steering_force().avoidance(obs);
+      saa_subsystem()->steer2D_force_calc().avoidance(obs);
       /*
        * If we are currently spinning in place (hard turn), we have 0 linear
        * velocity, and that does not play well with the arrival force
        * calculations. To fix this, add a bit of wander force.
        */
       if (saa_subsystem()->linear_velocity().length() <= 0.1) {
-        saa_subsystem()->steering_force().wander();
+        saa_subsystem()->steer2D_force_calc().wander();
       }
-      saa_subsystem()->apply_steering_force(std::make_pair(false, false));
+      saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
     }
   } else {
     m_state.last_collision_time = sensors()->tick();
@@ -172,12 +172,12 @@ FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
    * pick up the same block in close quarters.
    */
   if (sensors()->threatening_obstacle_exists() &&
-      !saa_subsystem()->steering_force().within_slowing_radius()) {
+      !saa_subsystem()->steer2D_force_calc().within_slowing_radius()) {
     internal_event(ekST_COLLISION_AVOIDANCE);
   } else {
-    saa_subsystem()->steering_force().seek_to(m_goal_data.loc);
+    saa_subsystem()->steer2D_force_calc().seek_to(m_goal_data.loc);
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kBLUE);
-    saa_subsystem()->apply_steering_force(std::make_pair(true, false));
+    saa_subsystem()->steer2D_force_apply(std::make_pair(true, false));
   }
   return controller::foraging_signal::ekHANDLED;
 }

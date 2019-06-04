@@ -28,7 +28,7 @@
 #include <string>
 
 #include "fordyca/config/actuation_config.hpp"
-#include "fordyca/config/steering_force2D_parser.hpp"
+#include "rcppsw/robotics/steer2D/config/xml/force_calculator_parser.hpp"
 #include "rcppsw/robotics/kin2D/config/xml/differential_drive_parser.hpp"
 
 /*******************************************************************************
@@ -72,9 +72,9 @@ class actuation_parser final : public rconfig::xml::xml_config_parser {
   }
 
   /* clang-format off */
-  std::shared_ptr<actuation_config>              m_config{nullptr};
+  std::shared_ptr<actuation_config>               m_config{nullptr};
   rrkin2D::config::xml::differential_drive_parser m_differential_drive;
-  steering_force2D_parser                        m_steering;
+  rrsteer2D::config::xml::force_calculator_parser m_steering;
   /* clang-format on */
 };
 

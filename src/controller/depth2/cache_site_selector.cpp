@@ -82,9 +82,9 @@ boost::optional<rmath::vector2d> cache_site_selector::operator()(
   return boost::make_optional(site);
 } /* operator()() */
 
-bool cache_site_selector::verify_site(const rmath::vector2d& site,
-                                      const ds::dp_cache_map& known_caches,
-                                      const ds::dp_block_map& known_blocks) const {
+__rcsw_const bool cache_site_selector::verify_site(const rmath::vector2d& site,
+                                                  const ds::dp_cache_map& known_caches,
+                                                  const ds::dp_block_map& known_blocks) const {
   for (auto& c : known_caches.const_values_range()) {
     ER_ASSERT((c.ent()->real_loc() - site).length() >=
                   std::get<0>(m_constraints)[0].cache_prox_dist,
