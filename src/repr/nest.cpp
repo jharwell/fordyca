@@ -69,6 +69,7 @@ nest::light_list nest::init_rect(void) const {
     loc2.Set(real_loc().x(), real_loc().y(), 1.0);
     loc3.Set(real_loc().x(), real_loc().y() + ydim() * 0.25, 5.0);
   }
+
   return {
       new argos::CLightEntity("nest_light0", loc1, argos::CColor::YELLOW, 100.0),
       new argos::CLightEntity("nest_light1", loc2, argos::CColor::YELLOW, 100.0),

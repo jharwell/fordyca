@@ -22,14 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_controller.hpp"
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_battery_sensor.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <experimental/filesystem>
@@ -43,6 +35,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -112,20 +105,21 @@ void base_controller::Reset(void) {
 
 void base_controller::saa_init(const config::actuation_config* const actuation_p,
                                const config::sensing_config* const sensing_p) {
+  auto saa_names = config::saa_xml_names();
   actuator_list alist = {
       .wheels = rrhal::actuators::differential_drive_actuator(
           GetActuator<argos::CCI_DifferentialSteeringActuator>(
-              "differential_steering")),
-#ifdef FORDYCA_WITH_ROBOT_LEDS
-      .leds = rrhal::actuators::led_actuator(
-          GetActuator<argos::CCI_LEDsActuator>("leds")),
-#else
+              saa_names.diff_steering_actuator)),
+/* #ifdef FORDYCA_WITH_ROBOT_LEDS */
+/*       .leds = rrhal::actuators::led_actuator( */
+/*           GetActuator<argos::CCI_LEDsActuator>(saa_names.leds_saa)), */
+/* #else */
       .leds = rrhal::actuators::led_actuator(nullptr),
-#endif /* FORDYCA_WITH_ROBOT_LEDS */
+/* #endif /\* FORDYCA_WITH_ROBOT_LEDS *\/ */
 
 #ifdef FORDYCA_WITH_ROBOT_RAB
       .wifi = rrhal::actuators::wifi_actuator(
-          GetActuator<argos::CCI_RangeAndBearingActuator>("range_and_bearing")),
+          GetActuator<argos::CCI_RangeAndBearingActuator>(saa_names.rab_saa)),
 #else
       .wifi = rrhal::actuators::wifi_actuator(nullptr)
 #endif /* FORDYCA_WITH_ROBOT_RAB */
@@ -133,20 +127,21 @@ void base_controller::saa_init(const config::actuation_config* const actuation_p
   sensor_list slist = {
 #ifdef FORDYCA_WITH_ROBOT_RAB
       .rabs = rrhal::sensors::rab_wifi_sensor(
-          GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
+          GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names.rab_saa)),
 #else
       .rabs = rrhal::sensors::rab_wifi_sensor(nullptr),
 #endif /* FORDYCA_WITH_ROBOT_RAB */
       .proximity = rrhal::sensors::proximity_sensor(
-          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
-      .light = rrhal::sensors::light_sensor(
-          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
+          GetSensor<argos::CCI_FootBotProximitySensor>(saa_names.prox_sensor)),
+      .blobs = rrhal::sensors::colored_blob_camera_sensor(
+          GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
+saa_names.camera_sensor)),
       .ground = rrhal::sensors::ground_sensor(
           GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-              "footbot_motor_ground")),
+              saa_names.ground_sensor)),
 #ifdef FORDYCA_WITH_ROBOT_BATTERY
       .battery = rrhal::sensors::battery_sensor(
-          GetSensor<argos::CCI_BatterySensor>("battery")),
+          GetSensor<argos::CCI_BatterySensor>(saa_names.battery_sensor)),
 #else
       .battery = rrhal::sensors::battery_sensor(nullptr),
 #endif /* FORDYCA_WITH_ROBOT_BATTERY */

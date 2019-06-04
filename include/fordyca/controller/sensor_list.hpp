@@ -27,7 +27,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
+#include "rcppsw/robotics/hal/sensors/colored_blob_camera_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
 
@@ -45,11 +45,13 @@ NS_START(fordyca, controller);
  * @ingroup fordyca controller
  */
 struct sensor_list {
-  rrhal::sensors::rab_wifi_sensor rabs;
-  rrhal::sensors::proximity_sensor proximity;
-  rrhal::sensors::light_sensor light;
-  rrhal::sensors::ground_sensor ground;
-  rrhal::sensors::battery_sensor battery;
+  /* clang-format off */
+  rrhal::sensors::rab_wifi_sensor            rabs;
+  rrhal::sensors::proximity_sensor           proximity;
+  rrhal::sensors::colored_blob_camera_sensor blobs;
+  rrhal::sensors::ground_sensor              ground;
+  rrhal::sensors::battery_sensor             battery;
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

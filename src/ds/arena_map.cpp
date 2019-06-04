@@ -21,6 +21,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+#include <argos3/plugins/simulator/media/led_medium.h>
+
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
@@ -31,6 +33,7 @@
 #include "fordyca/repr/ramp_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,8 +65,21 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
  * Member Functions
  ******************************************************************************/
 bool arena_map::initialize(support::base_loop_functions* loop) {
+  auto& medium = loop->GetSimulator().GetMedium<argos::CLEDMedium>(
+      config::saa_xml_names().leds_saa);
   for (auto& l : m_nest.lights()) {
     loop->AddEntity(*l);
+    ER_ASSERT(l->GetIndex() >= 0, "Entity has no index");
+    /*
+     * By default newly created lights are not put on the LEDs medium, which is
+     * not a problem for footbot light sensors (apparently), but is if you are
+     * trying to detect them with a camera.
+     */
+    l->SetMedium(medium);
+    /* medium.AddEntity(*l); */
+    l->Enable();
+    /* add the light to the arena! */
+
   } /* for(&l..) */
 
   return m_block_dispatcher.initialize();

@@ -1,7 +1,7 @@
 /**
- * @file phototaxis_force.cpp
+ * @file saa_xml_names.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,38 +18,34 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_CONFIG_SAA_XML_NAMES_HPP_
+#define INCLUDE_FORDYCA_CONFIG_SAA_XML_NAMES_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/phototaxis_force.hpp"
-#include "fordyca/config/phototaxis_force_config.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+#include <string>
+
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, config);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Struct Definitions
  ******************************************************************************/
-phototaxis_force::phototaxis_force(
-    const config::phototaxis_force_config* config,
-    const std::shared_ptr<sensing_subsystem>& sensors)
-    : m_max(config->max), m_sensors(sensors) {}
+struct saa_xml_names {
+  const std::string diff_steering_actuator = "differential_steering";
+  const std::string leds_saa = "leds";
+  const std::string rab_saa = "range_and_bearing";
+  const std::string prox_sensor = "footbot_proximity";
+  const std::string camera_sensor = "colored_blob_omnidirectional_camera";
+  const std::string ground_sensor = "footbot_motor_ground";
+  const std::string battery_sensor = "battery";
+};
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-rmath::vector2d phototaxis_force::operator()() const {
-  rmath::vector2d accum;
-  printf("HERE: %zu\n",m_sensors->blobs().readings().size());
-  for (auto& r : m_sensors->blobs().readings()) {
-    printf("length: %f angle: %f\n", r.vec.length(), r.vec.angle().value());
-    accum += rmath::vector2d(r.vec.length(), rmath::radians(r.vec.angle()));
-  } /* for(r..) */
+NS_END(config, fordyca);
 
-  return rmath::vector2d(1.0, accum.angle()) * m_max;
-} /* operator()() */
-
-NS_END(controller, fordyca);
+#endif /* INCLUDE_FORDYCA_CONFIG_SAA_XML_NAMES_HPP_ */

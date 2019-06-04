@@ -56,17 +56,22 @@ set(${target}_SYS_INCLUDE_DIRS
 ################################################################################
 # Libraries                                                                    #
 ################################################################################
-# Define link libraries
-set(${target}_LIBRARIES
-  rcppsw
-  nlopt
-  ${rcppsw_LIBRARIES}
+set(argos3_LIBRARIES
   argos3core_simulator
   argos3plugin_simulator_footbot
   argos3plugin_simulator_entities
   argos3plugin_simulator_dynamics2d
   argos3plugin_simulator_genericrobot
   argos3plugin_simulator_qtopengl
+  argos3plugin_simulator_media
+  )
+
+# Define link libraries
+set(${target}_LIBRARIES
+  rcppsw
+  nlopt
+  ${rcppsw_LIBRARIES}
+  ${argos3_LIBRARIES}
   stdc++fs
   rt)
 
