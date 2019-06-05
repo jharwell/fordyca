@@ -33,30 +33,36 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 nest::nest(const rmath::vector2d& dim,
            const rmath::vector2d& loc,
-           double resolution)
+           double resolution,
+           const rutils::color& light_color)
     : multicell_entity(dim, rcppsw::utils::color::kGRAY70),
       immovable_cell_entity(loc, resolution),
-      m_lights(init_lights()) {}
+      m_lights(init_lights(light_color)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-nest::light_list nest::init_lights(void) const {
+nest::light_list nest::init_lights(const rutils::color& color) const {
   if (std::fabs(dims().x() - dims().y()) <=
       std::numeric_limits<double>::epsilon()) {
-    return init_square();
+    return init_square(color);
   } else {
-    return init_rect();
+    return init_rect(color);
   }
 } /* init_lights() */
 
-nest::light_list nest::init_square(void) const {
+nest::light_list nest::init_square(const rutils::color& color) const {
   argos::CVector3 loc(real_loc().x(), real_loc().y(), 5.0);
   return light_list{
-      new argos::CLightEntity("nest_light0", loc, argos::CColor::YELLOW, 100.0)};
+    new argos::CLightEntity("nest_light0",
+                            loc,
+                            argos::CColor(color.red(),
+                                          color.green(),
+                                          color.blue()),
+                            100.0)};
 } /* init_square() */
 
-nest::light_list nest::init_rect(void) const {
+nest::light_list nest::init_rect(const rutils::color& color) const {
   light_list ret;
   argos::CVector3 loc1, loc2, loc3;
 
@@ -71,9 +77,24 @@ nest::light_list nest::init_rect(void) const {
   }
 
   return {
-      new argos::CLightEntity("nest_light0", loc1, argos::CColor::YELLOW, 100.0),
-      new argos::CLightEntity("nest_light1", loc2, argos::CColor::YELLOW, 100.0),
-      new argos::CLightEntity("nest_light2", loc3, argos::CColor::YELLOW, 100.0)
+      new argos::CLightEntity("nest_light0",
+                              loc1,
+                              argos::CColor(color.red(),
+                                            color.green(),
+                                            color.blue()),
+                              100.0),
+      new argos::CLightEntity("nest_light1",
+                              loc2,
+                              argos::CColor(color.red(),
+                                            color.green(),
+                                            color.blue()),
+                              100.0),
+      new argos::CLightEntity("nest_light2",
+                              loc3,
+                              argos::CColor(color.red(),
+                                            color.green(),
+                                            color.blue()),
+                              100.0)
           };
 } /* init_rect() */
 

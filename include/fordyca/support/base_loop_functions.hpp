@@ -28,12 +28,14 @@
 #include <argos3/core/simulator/loop_functions.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/utils/color.hpp"
 
 /*******************************************************************************
  * Namespaces

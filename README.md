@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-![Amazing Simulation](docs/10000-robots.png?raw=true "10,000 Robot Swarm")
+![Example Simulation](docs/example-ss.png?raw=true "Example Single Source Foraging Scenario")
 
 This is the main entry point for getting started on the project.
 
@@ -18,13 +18,21 @@ This is the main entry point for getting started on the project.
    of Swarm Robotic Principles in a 10,000 Robot Swarm," 2019 Joint Conference
    of Artificial Intelligence (IJCAI), Macau, China, 2019, pp. XXX-XXX.
 
+3. A. Chen, J. Harwell, M. Gini, "Maximizing Energy Efficiency in Swarm
+   Robotics," arXiv:1906.01957 [cs.MA], June 2019.
+   [Link](https://arxiv.org/abs/1906.01957)
+
+4. N. White, J. Harwell, M. Gini, "Socially Inspired Communication in Swarm
+   Robotics," arXiv:1906.01108 [cs.RO], June 2019.
+   [Link](https://arxiv.org/abs/1906.01108)
+
 # Setup
 
 Download `scripts/bootstrap.sh` BEFORE cloning this repo, and run it, with the
 following arguments:
 
-- 1st arg: Is the root directory for the project (all repos will be clone/built in
-  here, which *must* be an absolute path).
+- 1st arg: Is the root directory for the project (all repos will be cloned/built
+  in here, and it *must* be an absolute path).
 - 2nd arg is `YES` if you want to install ARGoS system wide (you probably do)
   and `NO` otherwise.
 - 3rd arg is the location ARGoS should be installed into, and 4th arg is the \#

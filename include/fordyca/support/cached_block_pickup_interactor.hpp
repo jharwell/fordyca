@@ -57,13 +57,15 @@ class cached_block_pickup_interactor
   cached_block_pickup_interactor(ds::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
                                  tv::tv_manager* tv_manager,
-                                 support::base_cache_manager* cache_manager)
+                                 support::base_cache_manager* cache_manager,
+                                 support::base_loop_functions * loop)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
         m_penalty_handler(tv_manager->penalty_handler<T>(
             tv::cache_op_src::ekEXISTING_CACHE_PICKUP)),
-        m_cache_manager(cache_manager) {}
+        m_cache_manager(cache_manager),
+        m_loop(loop) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -161,8 +163,10 @@ class cached_block_pickup_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cached_block_pickup_visitor pickup_op(
-        *it, loop_utils::robot_id(controller), timestep);
+    events::cached_block_pickup_visitor pickup_op(m_loop,
+                                                  *it,
+                                                  loop_utils::robot_id(controller),
+                                                  timestep);
     (*it)->penalty_served(penalty.penalty());
 
     /*
@@ -183,6 +187,7 @@ class cached_block_pickup_interactor
   ds::arena_map* const                   m_map;
   tv::cache_op_penalty_handler<T>* const m_penalty_handler;
   base_cache_manager *                   m_cache_manager;
+  base_loop_functions*                   m_loop;
   /* clang-format on */
 };
 

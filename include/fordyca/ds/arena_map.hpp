@@ -108,17 +108,17 @@ class arena_map final : public rer::client<arena_map>,
    * @brief Add caches that have been created by robots in the arena to the
    * current set of active caches.
    */
-  void caches_add(const cache_vector& caches) {
-    m_caches.insert(m_caches.end(), caches.begin(), caches.end());
-    ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
-  }
+  void caches_add(const cache_vector& caches,
+                  support::base_loop_functions* loop);
 
   /**
    * @brief Remove a cache from the list of caches.
    *
    * @param victim The cache to remove.
+   * @param loop The loop functions (to remove light for cache)
    */
-  void cache_remove(const std::shared_ptr<repr::arena_cache>& victim);
+  void cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
+                    support::base_loop_functions* loop);
 
   /**
    * @brief Clear the cells that a cache covers while in the arena that are in

@@ -1,7 +1,7 @@
 /**
- * @file base_cache.cpp
+ * @file light_type_index.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,45 +21,30 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/support/light_type_index.hpp"
+#include "fordyca/repr/nest.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, repr);
-
-/*******************************************************************************
- * Static Members
- ******************************************************************************/
-int base_cache::m_next_id = 0;
-constexpr size_t base_cache::kMinBlocks;
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_cache::base_cache(const params& p)
-    : multicell_entity(rmath::vector2d(p.dimension, p.dimension),
-                       rcppsw::utils::color::kGRAY40),
-      immovable_cell_entity(p.center, p.resolution),
-      mc_resolution(p.resolution),
-      m_blocks(p.blocks) {
-  if (-1 == p.id) {
-    this->id(m_next_id++);
-  } else {
-    this->id(p.id);
-  }
-}
+light_type_index::light_type_index(void)
+    : m_index({
+        {kNest, rutils::color::kYELLOW},
+        {kCache, rutils::color::kRED}
+  }) {}
 
 /*******************************************************************************
- * Member Functions
+ * Class Constants
  ******************************************************************************/
-void base_cache::block_remove(const std::shared_ptr<base_block>& block) {
-  m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
-} /* block_remove() */
+constexpr char light_type_index::kNest[];
+constexpr char light_type_index::kCache[];
 
-std::unique_ptr<base_cache> base_cache::clone(void) const {
-  return rcppsw::make_unique<base_cache>(
-      params{xsize(), mc_resolution, real_loc(), blocks(), id()});
-} /* clone() */
 
-NS_END(fordyca, repr);
+NS_END(support, fordyca);

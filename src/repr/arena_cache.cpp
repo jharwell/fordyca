@@ -31,12 +31,17 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_cache::arena_cache(double dimension,
-                         double resolution,
-                         rmath::vector2d center,
-                         const ds::block_vector& blocks,
-                         int id)
-    : base_cache(dimension, resolution, center, blocks, id) {}
+arena_cache::arena_cache(const base_cache::params& p,
+                         const rutils::color& light_color)
+    : base_cache(p),
+      m_light(new argos::CLightEntity("cache_light" + std::to_string(id()),
+                                      argos::CVector3(real_loc().x(),
+                                                      real_loc().y(),
+                                                      0.0),
+                                      argos::CColor(light_color.red(),
+                                                    light_color.green(),
+                                                    light_color.blue()),
+                                      1.0)) {}
 
 /*******************************************************************************
  * Member Functions
