@@ -57,6 +57,13 @@ class base_cache : public multicell_entity,
                    public immovable_cell_entity,
                    public prototype::clonable<base_cache> {
  public:
+  struct params {
+    double dimension;
+    double resolution;
+    rmath::vector2d center;
+    const ds::block_vector& blocks;
+    int id;
+  };
   /**
    * @brief The minimum # of blocks required for a cache to exist (less than
    * this and you just have a bunch of blocks)
@@ -74,11 +81,7 @@ class base_cache : public multicell_entity,
    * will generate a new ID, or any positive # to use the same ID as an existing
    * cache (used when cloning a cache into a robot's perception).
    */
-  base_cache(double dimension,
-             double resolution,
-             const rmath::vector2d& center,
-             const ds::block_vector& blocks,
-             int id);
+  explicit base_cache(const params& p);
   ~base_cache(void) override = default;
 
   /**

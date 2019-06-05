@@ -63,6 +63,7 @@ using repr::base_cache;
  * Constructors/Destructor
  ******************************************************************************/
 cached_block_pickup::cached_block_pickup(
+    support::base_loop_functions* loop,
     const std::shared_ptr<repr::arena_cache>& cache,
     uint robot_index,
     uint timestep)
@@ -70,6 +71,7 @@ cached_block_pickup::cached_block_pickup(
       cell_op(cache->discrete_loc()),
       mc_robot_index(robot_index),
       mc_timestep(timestep),
+      m_loop(loop),
       m_real_cache(cache) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
             "< %zu blocks in cache",
@@ -206,7 +208,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
               cell_op::y());
 
     map.cache_extent_clear(m_real_cache);
-    map.cache_remove(m_real_cache);
+    map.cache_remove(m_real_cache, m_loop);
     ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [depleted]",
             mc_robot_index,
             m_pickup_block->id(),
