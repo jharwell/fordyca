@@ -82,13 +82,16 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
   void operator()(const T& controller) const {
+    typename robot_arena_interactor<T>::params p{
+      lf->arena_map(),
+          lf->m_metrics_agg.get(),
+          lf->floor(),
+          lf->tv_manager(),
+          lf->m_cache_manager.get(),
+          lf};
     lf->m_interactor_map->emplace(
         typeid(controller),
-        robot_arena_interactor<T>(lf->arena_map(),
-                                  lf->m_metrics_agg.get(),
-                                  lf->floor(),
-                                  lf->tv_manager(),
-                                  lf->m_cache_manager.get()));
+        robot_arena_interactor<T>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         robot_metric_extractor<depth2_metrics_aggregator, T>(
@@ -368,7 +371,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
                               arena_map()->blocks(),
                               GetSpace().GetSimulationClock());
   if (created) {
-    arena_map()->caches_add(*created);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;
   }

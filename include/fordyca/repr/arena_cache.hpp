@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <algorithm>
 #include <vector>
+#include <argos3/plugins/simulator/entities/light_entity.h>
 
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/utilization_metrics.hpp"
@@ -44,19 +45,21 @@ NS_START(fordyca, repr);
  * @ingroup fordyca repr
  *
  * @brief A repr of an ACTUAL cache within the arena. This differs from \ref
- * dp_entity caches because they handle cache penalties and can collect metrics
- * about their usage.
+ * dp_entity caches because they:
+ *
+ * - Handle cache penalties
+ * - Can collect metrics about their usage
+ * - Have a light/beacon at ground level robots can see.
  */
 class arena_cache final : public base_cache,
                           public metrics::caches::utilization_metrics,
                           public metrics::caches::location_metrics {
  public:
-  arena_cache(double dimension,
-              double resolution,
-              rmath::vector2d center,
-              const ds::block_vector& blocks,
-              int id);
+  explicit arena_cache(const base_cache::params& p);
   ~arena_cache(void) override = default;
+
+  arena_cache(const arena_cache& other) = delete;
+  arena_cache& operator=(const arena_cache& other) = delete;
 
   /* metrics */
   size_t n_blocks(void) const override { return base_cache::n_blocks(); }
@@ -68,12 +71,14 @@ class arena_cache final : public base_cache,
   void has_block_pickup(void) { m_block_pickups = 1; }
   void has_block_drop(void) { m_block_drops = 1; }
   void penalty_served(uint duration) { m_penalty_count += duration; }
+  argos::CLightEntity* light(void) const { return m_light; }
 
  private:
   /* clang-format off */
-  uint   m_block_pickups{0};
-  uint   m_block_drops{0};
-  uint   m_penalty_count{0};
+  uint                 m_block_pickups{0};
+  uint                 m_block_drops{0};
+  uint                 m_penalty_count{0};
+  argos::CLightEntity* m_light;
   /* clang-format on */
 };
 

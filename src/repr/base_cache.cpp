@@ -37,20 +37,16 @@ constexpr size_t base_cache::kMinBlocks;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_cache::base_cache(double dimension,
-                       double resolution,
-                       const rmath::vector2d& center,
-                       const ds::block_vector& blocks,
-                       int id)
-    : multicell_entity(rmath::vector2d(dimension, dimension),
+base_cache::base_cache(const params& p)
+    : multicell_entity(rmath::vector2d(p.dimension, p.dimension),
                        rcppsw::utils::color::kGRAY40),
-      immovable_cell_entity(center, resolution),
-      mc_resolution(resolution),
-      m_blocks(blocks) {
-  if (-1 == id) {
+      immovable_cell_entity(p.center, p.resolution),
+      mc_resolution(p.resolution),
+      m_blocks(p.blocks) {
+  if (-1 == p.id) {
     this->id(m_next_id++);
   } else {
-    this->id(id);
+    this->id(p.id);
   }
 }
 
@@ -63,7 +59,7 @@ void base_cache::block_remove(const std::shared_ptr<base_block>& block) {
 
 std::unique_ptr<base_cache> base_cache::clone(void) const {
   return rcppsw::make_unique<base_cache>(
-      xsize(), mc_resolution, real_loc(), blocks(), id());
+      params{xsize(), mc_resolution, real_loc(), blocks(), id()});
 } /* clone() */
 
 NS_END(fordyca, repr);

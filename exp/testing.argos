@@ -25,7 +25,7 @@
       </actuators>
       <sensors>
         <footbot_proximity implementation="default" show_rays="true" />
-        <!-- <footbot_light implementation="rot_z_only" show_rays="false" /> -->
+        <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
         <colored_blob_omnidirectional_camera implementation="rot_z_only"

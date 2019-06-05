@@ -21,7 +21,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
-#include <argos3/plugins/simulator/media/led_medium.h>
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/ds/cell2D.hpp"
@@ -65,25 +64,24 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
  * Member Functions
  ******************************************************************************/
 bool arena_map::initialize(support::base_loop_functions* loop) {
-  auto& medium = loop->GetSimulator().GetMedium<argos::CLEDMedium>(
-      config::saa_xml_names().leds_saa);
   for (auto& l : m_nest.lights()) {
     loop->AddEntity(*l);
-    ER_ASSERT(l->GetIndex() >= 0, "Entity has no index");
-    /*
-     * By default newly created lights are not put on the LEDs medium, which is
-     * not a problem for footbot light sensors (apparently), but is if you are
-     * trying to detect them with a camera.
-     */
-    l->SetMedium(medium);
-    /* medium.AddEntity(*l); */
-    l->Enable();
-    /* add the light to the arena! */
-
   } /* for(&l..) */
 
   return m_block_dispatcher.initialize();
 } /* initialize() */
+
+void arena_map::caches_add(const cache_vector& caches,
+                support::base_loop_functions* loop) {
+
+  /* Add all lights of caches to the arena */
+  for (auto &c : caches) {
+    loop->AddEntity(*c->light());
+  } /* for(&c..) */
+
+  m_caches.insert(m_caches.end(), caches.begin(), caches.end());
+  ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
+} /* caches_add() */
 
 __rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   /*
@@ -166,7 +164,12 @@ void arena_map::distribute_all_blocks(void) {
   }   /* for(i..) */
 } /* distribute_all_blocks() */
 
-void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim) {
+void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
+                             support::base_loop_functions* loop) {
+  /* Remove light for cache from ARGoS */
+  loop->RemoveEntity(*victim->light());
+
+  /* Remove cache */
   size_t before = caches().size();
   __rcsw_unused int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));

@@ -121,13 +121,15 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
   void operator()(const T& controller) const {
+    typename robot_arena_interactor<T>::params p{lf->arena_map(),
+          lf->m_metrics_agg.get(),
+          lf->floor(),
+          lf->tv_manager(),
+          lf->m_cache_manager.get(),
+          lf};
     lf->m_interactor_map->emplace(
         typeid(controller),
-        robot_arena_interactor<T>(lf->arena_map(),
-                                  lf->m_metrics_agg.get(),
-                                  lf->floor(),
-                                  lf->tv_manager(),
-                                  lf->m_cache_manager.get()));
+        robot_arena_interactor<T>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         robot_metric_extractor<depth1_metrics_aggregator, T>(
@@ -267,7 +269,7 @@ void depth1_loop_functions::cache_handling_init(
 
     if (auto created = m_cache_manager->create(
             arena_map()->blocks(), GetSpace().GetSimulationClock())) {
-      arena_map()->caches_add(*created);
+      arena_map()->caches_add(*created, this);
       floor()->SetChanged();
     }
   }
@@ -415,7 +417,7 @@ void depth1_loop_functions::Reset() {
 
   if (auto created = m_cache_manager->create(arena_map()->blocks(),
                                              GetSpace().GetSimulationClock())) {
-    arena_map()->caches_add(*created);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
   ndc_pop();
@@ -460,7 +462,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
                                           counts.first,
                                           counts.second);
   if (created) {
-    arena_map()->caches_add(*created);
+    arena_map()->caches_add(*created, this);
     __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
         arena_map()->caches()[0]->discrete_loc());
     ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),

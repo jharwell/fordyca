@@ -104,7 +104,10 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
 
   ds::block_vector block_vec(blocks.begin(), blocks.end());
   auto ret = rcppsw::make_unique<repr::arena_cache>(
-      mc_cache_dim, m_grid->resolution(), center, block_vec, -1);
+      repr::arena_cache::params{mc_cache_dim,
+            m_grid->resolution(),
+            center, block_vec,
+            -1});
   ret->creation_ts(timestep);
   ER_INFO("Create cache%d@%s/%s, xspan=%s,yspan=%s with %zu blocks [%s]",
           ret->id(),

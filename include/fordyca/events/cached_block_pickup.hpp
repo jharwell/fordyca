@@ -46,6 +46,7 @@ class arena_cache;
 }
 namespace support {
 class base_cache_manager;
+class base_loop_functions;
 } /* namespace support */
 
 NS_START(events, detail);
@@ -91,7 +92,8 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  cached_block_pickup(const std::shared_ptr<repr::arena_cache>& cache,
+  cached_block_pickup(support::base_loop_functions* loop,
+                      const std::shared_ptr<repr::arena_cache>& cache,
                       uint robot_index,
                       uint timestep);
   ~cached_block_pickup(void) override = default;
@@ -132,6 +134,8 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   /* clang-format off */
   const uint                         mc_robot_index;
   const uint                         mc_timestep;
+
+  support::base_loop_functions       *m_loop;
   std::shared_ptr<repr::arena_cache> m_real_cache;
 
   /**

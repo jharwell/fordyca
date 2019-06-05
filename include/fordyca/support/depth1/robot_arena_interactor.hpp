@@ -35,7 +35,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support);
+class base_loop_functions;
+NS_START(depth1);
 
 /*******************************************************************************
  * Classes
@@ -58,19 +60,26 @@ template <typename T>
 class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
  public:
   using controller_type = T;
-
-  robot_arena_interactor(ds::arena_map* const map,
-                         depth0::depth0_metrics_aggregator *const metrics_agg,
-                         argos::CFloorEntity* const floor,
-                         tv::tv_manager* const tv_manager,
-                         base_cache_manager* cache_manager)
+  struct params {
+    ds::arena_map* const map;
+    depth0::depth0_metrics_aggregator *const metrics_agg;
+    argos::CFloorEntity* const floor;
+    tv::tv_manager* const tv_manager;
+    base_cache_manager* cache_manager;
+    base_loop_functions* loop;
+  };
+  explicit robot_arena_interactor(const params& p)
       : ER_CLIENT_INIT("fordyca.support.depth1.robot_arena_interactor"),
-        m_tv_manager(tv_manager),
-        m_free_pickup_interactor(map, floor, tv_manager),
-        m_nest_drop_interactor(map, metrics_agg, floor, tv_manager),
-        m_task_abort_interactor(map, floor),
-        m_cached_pickup_interactor(map, floor, tv_manager, cache_manager),
-        m_existing_cache_drop_interactor(map, tv_manager) {}
+        m_tv_manager(p.tv_manager),
+        m_free_pickup_interactor(p.map, p.floor, p.tv_manager),
+        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.tv_manager),
+        m_task_abort_interactor(p.map, p.floor),
+        m_cached_pickup_interactor(p.map,
+                                   p.floor,
+                                   p.tv_manager,
+                                   p.cache_manager, p.
+                                   loop),
+        m_existing_cache_drop_interactor(p.map, p.tv_manager) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
