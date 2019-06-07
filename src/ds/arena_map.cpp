@@ -21,6 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+#include <argos3/plugins/simulator/media/led_medium.h>
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/ds/cell2D.hpp"
@@ -77,10 +78,16 @@ bool arena_map::initialize(support::base_loop_functions* loop) {
 
 void arena_map::caches_add(const cache_vector& caches,
                 support::base_loop_functions* loop) {
+  auto& medium = loop->GetSimulator().GetMedium<argos::CLEDMedium>(
+      config::saa_xml_names().leds_saa);
 
-  /* Add all lights of caches to the arena */
+  /*
+   * Add all lights of caches to the arena. Cache lights are added directly to
+   * the LED medium, which is different than what is rendered to the screen, so
+   * they actually are invisible.
+   */
   for (auto &c : caches) {
-    loop->AddEntity(*c->light());
+    medium.AddEntity(*c->light());
   } /* for(&c..) */
 
   m_caches.insert(m_caches.end(), caches.begin(), caches.end());
@@ -153,8 +160,8 @@ void arena_map::distribute_all_blocks(void) {
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been
-   * created via block consolidation, then all cells that do not have blocks or
-   * caches are empty.
+   * created via block consolidation, all cells that do not have blocks or
+   * caches should be empty.
    */
   for (size_t i = 0; i < xdsize(); ++i) {
     for (size_t j = 0; j < ydsize(); ++j) {
@@ -171,7 +178,9 @@ void arena_map::distribute_all_blocks(void) {
 void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
                              support::base_loop_functions* loop) {
   /* Remove light for cache from ARGoS */
-  loop->RemoveEntity(*victim->light());
+  auto& medium = loop->GetSimulator().GetMedium<argos::CLEDMedium>(
+      config::saa_xml_names().leds_saa);
+  medium.RemoveEntity(*victim->light());
 
   /* Remove cache */
   size_t before = caches().size();

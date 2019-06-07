@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
+#include <chrono>
 
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
@@ -162,7 +163,7 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
   }     /* for(cache..) */
 } /* update_host_cells() */
 
-bool base_cache_creator::creation_sanity_checks(
+__rcsw_pure bool base_cache_creator::creation_sanity_checks(
     const ds::cache_vector& caches,
     const ds::block_list& free_blocks) const {
   bool ret = true;

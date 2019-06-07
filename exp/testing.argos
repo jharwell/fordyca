@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="ffc"
+    <gp_dpo_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -132,11 +132,11 @@
           <pickup_policy
               policy="cache_size"
               timestep="20000"
-              cache_size="3"/>
+              cache_size="2"/>
         </cache_sel_matrix>
         <exploration
             block_strategy="CRW"
-            cache_strategy="utility_search"/>
+            cache_strategy="ledtaxis_search"/>
         <sensing
             los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
@@ -163,7 +163,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </crw_controller>
+    </gp_dpo_controller>
 
   </controllers>
 
@@ -171,7 +171,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth0_loop_functions">
+                  label="depth1_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -388,28 +388,31 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!-- <visualization> -->
-  <!--   <qt-opengl autoplay="true"> -->
-  <!--      <frame_grabbing directory="frames" -->
-  <!--                      base_name="frame_" -->
-  <!--                      format="png" -->
-  <!--                      quality="100" /> -->
-  <!--     <camera> -->
-  <!--       <placement idx="0" -->
-  <!--                  position="6,3,6" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--       <placement idx="1" -->
-  <!--                  position="6,0,5" -->
-  <!--                  look_at="6,3,0" -->
-  <!--                  lens_focal_length="20" -->
-  <!--                  up="0,1,0" -->
-  <!--                  /> -->
-  <!--     </camera> -->
-  <!--     <user_functions label="depth0_qt_user_functions" /> -->
-  <!--   </qt-opengl> -->
-  <!-- </visualization> -->
+  <visualization>
+    <qt-opengl autoplay="true">
+       <frame_grabbing directory="frames"
+                       base_name="frame_"
+                       format="png"
+                       quality="100"
+                       headless_grabbing="true"
+                       headless_frame_size="1600x1200"
+                       />
+      <camera>
+        <placement idx="0"
+                   position="6,3,6"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+        <placement idx="1"
+                   position="6,0,5"
+                   look_at="6,3,0"
+                   lens_focal_length="20"
+                   up="0,1,0"
+                   />
+      </camera>
+      <user_functions label="depth0_qt_user_functions" />
+    </qt-opengl>
+  </visualization>
 
 </argos-configuration>

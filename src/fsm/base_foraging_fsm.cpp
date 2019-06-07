@@ -109,6 +109,12 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data)
     }
   }
 
+  /*
+   * Add a bit of wander force when returning to the nest so that we do not
+   * beeline for its center directly to decrease congestion.
+   */
+  m_saa->steer2D_force_calc().wander();
+  m_saa->steer2D_force_calc().value(m_saa->steer2D_force_calc().value() * 0.5);
   m_saa->steer2D_force_calc().phototaxis(m_saa->sensing()->light().readings());
 
   rmath::vector2d obs = m_saa->sensing()->find_closest_obstacle();
@@ -116,14 +122,6 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data)
     m_tracker.ca_enter();
     m_saa->steer2D_force_calc().avoidance(obs);
   } else {
-    /*
-     * If we are currently spinning in place (hard turn), we have 0 linear
-     * velocity, and that does not play well with the arrival force
-     * calculations. To fix this, and a bit of wander force.
-     */
-    if (m_saa->linear_velocity().length() <= 0.1) {
-      m_saa->steer2D_force_calc().wander();
-    }
     m_tracker.ca_exit();
   }
 

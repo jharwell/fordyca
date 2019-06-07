@@ -25,6 +25,7 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/fsm/expstrat/cache_factory.hpp"
+#include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,7 +46,8 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
                       rcppsw::make_unique<expstrat::base_expstrat::params>(
                           c_params->csel_matrix,
                           c_params->saa,
-                          c_params->store)
+                          c_params->store,
+                          support::light_type_index()[support::light_type_index::kCache])
                           .get()),
                   false),
       m_block_fsm(c_params->bsel_matrix,

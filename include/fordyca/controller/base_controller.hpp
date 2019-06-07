@@ -94,9 +94,9 @@ class base_controller : public argos::CCI_Controller,
   rmath::vector2d velocity(void) const override;
 
   /* swarm spatial 2D metrics */
-  const rmath::vector2d& position2D(void) const override;
-  const rmath::vector2u& discrete_position2D(void) const override;
-  rmath::vector2d heading2D(void) const override;
+  const rmath::vector2d& position2D(void) const override final;
+  const rmath::vector2u& discrete_position2D(void) const override final;
+  rmath::vector2d heading2D(void) const override final;
 
   /**
    * @brief By default controllers have no perception subsystem, and are
