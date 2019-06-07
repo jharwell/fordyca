@@ -74,3 +74,9 @@ mkdir -p build && cd build
 cmake ..
 make -j $4
 make documentation
+
+# If installed ARGoS as root, all project repos are also owned by root, so we
+# need to fix that.
+if [ "$YES" = "$2" ]; then
+    sudo chown $SUDO_USER:$SUDO_USER -R $1
+fi;

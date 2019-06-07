@@ -28,6 +28,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/ta/taskable.hpp"
 #include "fordyca/config/exploration_config.hpp"
+#include "rcppsw/utils/color.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 
 /*******************************************************************************
@@ -62,13 +63,22 @@ class base_expstrat : public metrics::fsm::collision_metrics,
     params(const controller::cache_sel_matrix* csel_matrix_in,
            controller::saa_subsystem* saa_in,
            ds::dpo_store* store_in)
+        : params{csel_matrix_in, saa_in, store_in, rutils::color()} {}
+
+    params(const controller::cache_sel_matrix* csel_matrix_in,
+           controller::saa_subsystem* saa_in,
+           ds::dpo_store* store_in,
+           const rutils::color& ledtaxis_target_in)
         : csel_matrix(csel_matrix_in),
           saa(saa_in),
-          store(store_in) {}
+          store(store_in),
+          ledtaxis_target(ledtaxis_target_in) {}
+
     /* clang-format off */
     const controller::cache_sel_matrix *csel_matrix;
     controller::saa_subsystem*         saa;
     ds::dpo_store*                     store;
+    const rutils::color                ledtaxis_target{};
     /* clang-format on */
   };
 

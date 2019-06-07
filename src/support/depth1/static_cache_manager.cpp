@@ -21,6 +21,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_manager.hpp"
+#include <chrono>
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"

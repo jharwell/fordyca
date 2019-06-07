@@ -99,6 +99,11 @@ class localized_search : public base_expstrat,
   bool task_finished(void) const override final { return false; }
   void task_execute(void) override final;
 
+  /* prototype overrides */
+  std::unique_ptr<base_expstrat> clone(void) const override {
+    return rcppsw::make_unique<localized_search>(saa_subsystem());
+  }
+
  private:
   /* clang-format off */
   vector_fsm m_vfsm;

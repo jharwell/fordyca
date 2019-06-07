@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include <vector>
+#include <chrono>
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"

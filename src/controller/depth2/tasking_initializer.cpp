@@ -22,6 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
+#include <chrono>
+
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"

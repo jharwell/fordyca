@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
+#include <chrono>
 
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"

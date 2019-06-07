@@ -103,9 +103,9 @@ void mdpo_controller::private_init(
     const config::depth0::mdpo_controller_repository& param_repo) {
   auto* exp_config = param_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
-  fsm::expstrat::base_expstrat::params p(nullptr,
+  fsm::expstrat::base_expstrat::params p{nullptr,
                                          saa_subsystem(),
-                                         perception()->dpo_store());
+                                         perception()->dpo_store()};
   dpo_controller::fsm(rcppsw::make_unique<fsm::depth0::dpo_fsm>(
       block_sel_matrix(),
       base_controller::saa_subsystem(),
