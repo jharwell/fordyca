@@ -25,7 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <list>
+
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,13 +40,13 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 /**
  * @class collision_metrics_collector
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Collector for \ref collision_metrics.
  *
  * Metrics are written out after the specified interval.
  */
-class collision_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class collision_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
@@ -53,26 +56,28 @@ class collision_metrics_collector : public rcppsw::metrics::base_metrics_collect
                              uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
  private:
   struct stats {
-    uint n_in_avoidance;
-    uint n_entered_avoidance;
-    uint n_exited_avoidance;
-    uint total_avoidance_duration;
+    uint int_n_in_avoidance;
+    uint int_n_entered_avoidance;
+    uint int_n_exited_avoidance;
+    uint int_avoidance_duration;
 
-    uint cum_in_avoidance;
-    uint cum_entered_avoidance;
-    uint cum_exited_avoidance;
+    uint cum_n_in_avoidance;
+    uint cum_n_entered_avoidance;
+    uint cum_n_exited_avoidance;
     uint cum_avoidance_duration;
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
+  /* clang-format off */
   struct stats m_stats;
+  /* clang-format on */
 };
 
 NS_END(fsm, metrics, fordyca);

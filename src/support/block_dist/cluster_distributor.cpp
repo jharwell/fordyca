@@ -25,13 +25,12 @@
 #include <algorithm>
 
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -39,16 +38,15 @@ namespace er = rcppsw::er;
 cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
                                          double arena_resolution,
                                          uint capacity)
-    : base_distributor(),
-      ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
+    : ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
       m_clust(view, capacity),
-      m_dist(view, arena_resolution) {}
+      m_impl(view, arena_resolution) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool cluster_distributor::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
+    std::shared_ptr<repr::base_block>& block,
     ds::const_entity_list& entities) {
   if (m_clust.capacity() == m_clust.block_count()) {
     ER_DEBUG("Could not distribute block%d: Cluster capacity (%u) reached",
@@ -56,7 +54,7 @@ bool cluster_distributor::distribute_block(
              m_clust.capacity());
     return false;
   }
-  return m_dist.distribute_block(block, entities);
+  return m_impl.distribute_block(block, entities);
 } /* distribute_block() */
 
 bool cluster_distributor::distribute_blocks(ds::block_vector& blocks,
@@ -68,7 +66,7 @@ bool cluster_distributor::distribute_blocks(ds::block_vector& blocks,
         m_clust.capacity());
     return false;
   }
-  return m_dist.distribute_blocks(blocks, entities);
+  return m_impl.distribute_blocks(blocks, entities);
 } /* distribute_blocks() */
 
 ds::const_block_cluster_list cluster_distributor::block_clusters(void) const {

@@ -24,15 +24,15 @@
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth2);
-namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -40,19 +40,29 @@ namespace state_machine = rcppsw::patterns::state_machine;
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const controller::cache_sel_matrix* matrix,
     controller::saa_subsystem* saa,
-    ds::dpo_store* const store)
+    ds::dpo_store* const store,
+    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
           saa,
-          std::bind(&acquire_new_cache_fsm::acquisition_goal_internal, this),
-          std::bind(&acquire_new_cache_fsm::candidates_exist, this),
-          std::bind(&acquire_new_cache_fsm::cache_select, this),
-          std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
-                    this,
-                    std::placeholders::_1),
-          std::bind([](void) noexcept {
-            return false;
-          })), /* new caches never acquired via exploration */
+          std::move(exp_behavior),
+          acquire_goal_fsm::hook_list{
+              .acquisition_goal =
+                  std::bind(&acquire_new_cache_fsm::acquisition_goal_internal,
+                            this),
+              .goal_select =
+                  std::bind(&acquire_new_cache_fsm::cache_select, this),
+              .candidates_exist =
+                  std::bind(&acquire_new_cache_fsm::candidates_exist, this),
+              .goal_acquired_cb =
+                  std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
+                            this,
+                            std::placeholders::_1),
+              .explore_term_cb = std::bind([](void) noexcept {
+                return false;
+              }), /* new caches never acquired via exploration */
+              .goal_valid_cb = [](const rmath::vector2d&,
+                                  uint) { return true; }}),
       mc_matrix(matrix),
       mc_store(store) {}
 
@@ -63,33 +73,35 @@ __rcsw_pure bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
-acquire_goal_fsm::candidate_type acquire_new_cache_fsm::cache_select(void) const {
-  /* A "new" cache is the same as a single block  */
-  auto best = controller::depth2::new_cache_selector(
-      mc_matrix)(mc_store->blocks(), mc_store->caches(), sensors()->position());
+boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_select(
+    void) const {
+  controller::depth2::new_cache_selector selector(mc_matrix);
 
-  /*
-   * If this happens, all the blocks we know of are ineligible for us to
-   * vector to (too close or something similar).
-   */
-  if (nullptr == best.ent()) {
-    return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
-  } else {
+  /* A "new" cache is the same as a single block  */
+  if (auto best = selector(
+          mc_store->blocks(), mc_store->caches(), sensors()->position())) {
     ER_INFO("Select new cache%d@%s/%s, utility=%f for acquisition",
-            best.ent()->id(),
-            best.ent()->real_loc().to_str().c_str(),
-            best.ent()->discrete_loc().to_str().c_str(),
-            best.density().last_result());
-    return acquire_goal_fsm::candidate_type(true,
-                                            best.ent()->real_loc(),
-                                            vector_fsm::kCACHE_ARRIVAL_TOL);
+            best->ent()->id(),
+            best->ent()->real_loc().to_str().c_str(),
+            best->ent()->discrete_loc().to_str().c_str(),
+            best->density().last_result());
+    return boost::make_optional(
+        acquire_goal_fsm::candidate_type(best->ent()->real_loc(),
+                                         vector_fsm::kCACHE_ARRIVAL_TOL,
+                                         best->ent()->id()));
+  } else {
+    /*
+     * If this happens, all the blocks we know of are ineligible for us to
+     * vector to (too close or something similar).
+     */
+    return boost::optional<acquire_goal_fsm::candidate_type>();
   }
 } /* cache_select() */
 
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa_subsystem()->sensing()->position();
-  for (auto& b : mc_store->blocks().values_range()) {
+  for (auto& b : mc_store->blocks().const_values_range()) {
     if ((b.ent()->real_loc() - position).length() <=
         vector_fsm::kCACHE_ARRIVAL_TOL) {
       return true;
@@ -103,9 +115,9 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_const acquisition_goal_type
+__rcsw_const acq_goal_type
 acquire_new_cache_fsm::acquisition_goal_internal(void) const {
-  return acquisition_goal_type::kNewCache;
+  return acq_goal_type::ekNEW_CACHE;
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

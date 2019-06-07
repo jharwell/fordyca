@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <stateful_controller id="ffc"
+    <dpo_controller id="ffc"
                                library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -157,7 +157,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </stateful_controller>
+    </dpo_controller>
 
   </controllers>
 
@@ -165,7 +165,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="stateful_loop_functions">
+                  label="depth0_loop_functions">
     <battery
         power_station_amount="0"
         power_station_size="1"
@@ -232,6 +232,11 @@
         <distribution
             arena_resolution="0.2"
             dist_type="single_source">
+          <redist_governor
+              trigger="Null"
+              recurrence_policy="single"
+              timestep="500"
+              block_count="2"/>
           <powerlaw
               pwr_min="0"
               pwr_max="3"
@@ -346,7 +351,7 @@
                    up="0,1,0"
                    />
       </camera>
-      <user_functions label="stateful_qt_user_functions" />
+      <user_functions label="depth0_qt_user_functions" />
     </qt-opengl>
   </visualization>
 

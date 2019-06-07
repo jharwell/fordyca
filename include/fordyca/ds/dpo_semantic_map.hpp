@@ -37,22 +37,20 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace perception {
-struct perception_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct perception_config;
+}} // namespace config::perception
 
 NS_START(ds);
 
 namespace decorator = rcppsw::patterns::decorator;
-namespace visitor = rcppsw::patterns::visitor;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class dpo_semantic_map
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Stores a semantic map of the state of the arena, from the perspective
  * of the robot (i.e. th physical extent of the arena + semantic information
@@ -67,11 +65,10 @@ namespace er = rcppsw::er;
  * Does *NOT* track which cells are in CACHE_EXTENT, as that is irrelevant for
  * what the robots need (as of 9/14/18 anyway).
  */
-class dpo_semantic_map : public er::client<dpo_semantic_map>,
-                         public decorator::decorator<occupancy_grid>,
-                         public visitor::visitable_any<dpo_semantic_map> {
+class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
+                               public decorator::decorator<occupancy_grid> {
  public:
-  dpo_semantic_map(const params::perception::perception_params* c_params,
+  dpo_semantic_map(const config::perception::perception_config* c_config,
                    const std::string& robot_id);
 
   RCPPSW_DECORATE_FUNC(pheromone_repeat_deposit, const);
@@ -86,23 +83,23 @@ class dpo_semantic_map : public er::client<dpo_semantic_map>,
    *
    * @return The cell.
    */
-  template <int Index>
-  typename occupancy_grid::layer_value_type<Index>::value_type& access(uint i,
-                                                                       uint j) {
+  template <size_t Index>
+  typename occupancy_grid::layer_value_type<Index>::value_type& access(size_t i,
+                                                                       size_t j) {
     return decoratee().access<Index>(i, j);
   }
-  template <int Index>
+  template <size_t Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
-      uint i,
-      uint j) const {
+      size_t i,
+      size_t j) const {
     return decoratee().access<Index>(i, j);
   }
-  template <int Index>
+  template <size_t Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) {
     return decoratee().access<Index>(d);
   }
-  template <int Index>
+  template <size_t Index>
   const typename occupancy_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) const {
     return decoratee().access<Index>(d);
@@ -119,19 +116,19 @@ class dpo_semantic_map : public er::client<dpo_semantic_map>,
   /**
    * @brief Reset all the cells in the percieved arena.
    */
-  RCPPSW_DECORATE_FUNC(reset);
-  RCPPSW_DECORATE_FUNC(xdsize, const);
-  RCPPSW_DECORATE_FUNC(ydsize, const);
-  RCPPSW_DECORATE_FUNC(xrsize, const);
-  RCPPSW_DECORATE_FUNC(yrsize, const);
-  RCPPSW_DECORATE_FUNC(known_cells_inc);
-  RCPPSW_DECORATE_FUNC(known_cells_dec);
-  RCPPSW_DECORATE_FUNC(known_cell_count, const);
+  RCPPSW_DECORATE_FUNC(reset)
+  RCPPSW_DECORATE_FUNC(xdsize, const)
+  RCPPSW_DECORATE_FUNC(ydsize, const)
+  RCPPSW_DECORATE_FUNC(xrsize, const)
+  RCPPSW_DECORATE_FUNC(yrsize, const)
+  RCPPSW_DECORATE_FUNC(known_cells_inc)
+  RCPPSW_DECORATE_FUNC(known_cells_dec)
+  RCPPSW_DECORATE_FUNC(known_cell_count, const)
 
   double grid_resolution(void) const { return decoratee().resolution(); }
 
-  bool cache_remove(const std::shared_ptr<representation::base_cache>& victim);
-  bool block_remove(const std::shared_ptr<representation::base_block>& victim);
+  bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
+  bool block_remove(const std::shared_ptr<repr::base_block>& victim);
 
   const dpo_store* store(void) const { return &m_store; }
   dpo_store* store(void) { return &m_store; }
@@ -143,12 +140,12 @@ class dpo_semantic_map : public er::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_WRAP_MEMFUNC(block_update, (*store()));
-  RCPPSW_WRAP_MEMFUNC(cache_update, (*store()));
-  RCPPSW_WRAP_MEMFUNC(blocks, (*store()));
-  RCPPSW_WRAP_MEMFUNC(caches, (*store()));
-  RCPPSW_WRAP_MEMFUNC(blocks, (*store()), const);
-  RCPPSW_WRAP_MEMFUNC(caches, (*store()), const);
+  RCPPSW_DECLDEF_WRAP(block_update, (*store()))
+  RCPPSW_DECLDEF_WRAP(cache_update, (*store()))
+  RCPPSW_DECLDEF_WRAP(blocks, (*store()))
+  RCPPSW_DECLDEF_WRAP(caches, (*store()))
+  RCPPSW_DECLDEF_WRAP(blocks, (*store()), const)
+  RCPPSW_DECLDEF_WRAP(caches, (*store()), const)
 };
 
 NS_END(ds, fordyca);

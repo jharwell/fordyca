@@ -29,36 +29,30 @@
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_cache;
 class base_block;
 class base_cell_entity;
-} // namespace representation
+} // namespace repr
 
 NS_START(ds);
-
-namespace visitor = rcppsw::patterns::visitor;
-namespace decorator = rcppsw::patterns::decorator;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class cell2D
- * @ingroup ds
+ * @ingroup fordyca ds
  *
- * @brief Base representation of a cell on a 2D grid. A combination of FSM +
- * handle to whatever \ref cell_entity the cell contains, if any.
+ * @brief Base repr of a cell on a 2D grid. A combination of FSM +
+ * handle to whatever \ref base_cell_entity the cell contains, if any.
  */
-class cell2D : public visitor::visitable_any<cell2D>,
-               public decorator::decorator<fsm::cell2D_fsm> {
+class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
  public:
   cell2D(void);
 
@@ -73,11 +67,11 @@ class cell2D : public visitor::visitable_any<cell2D>,
   const fsm::cell2D_fsm& fsm(void) const { return decoratee(); }
 
   /* state inquiry */
-  RCPPSW_DECORATE_FUNC(state_is_known, const);
-  RCPPSW_DECORATE_FUNC(state_has_block, const);
-  RCPPSW_DECORATE_FUNC(state_has_cache, const);
-  RCPPSW_DECORATE_FUNC(state_in_cache_extent, const);
-  RCPPSW_DECORATE_FUNC(state_is_empty, const);
+  RCPPSW_DECORATE_FUNC(state_is_known, const)
+  RCPPSW_DECORATE_FUNC(state_has_block, const)
+  RCPPSW_DECORATE_FUNC(state_has_cache, const)
+  RCPPSW_DECORATE_FUNC(state_in_cache_extent, const)
+  RCPPSW_DECORATE_FUNC(state_is_empty, const)
 
   /**
    * @brief Reset the cell to its UNKNOWN state.
@@ -92,10 +86,10 @@ class cell2D : public visitor::visitable_any<cell2D>,
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<representation::base_cell_entity>& entity) {
+  void entity(const std::shared_ptr<repr::base_cell_entity>& entity) {
     m_entity = entity;
   }
-  const std::shared_ptr<representation::base_cell_entity>& entity(void) const {
+  const std::shared_ptr<repr::base_cell_entity>& entity(void) const {
     return m_entity;
   }
 
@@ -108,8 +102,8 @@ class cell2D : public visitor::visitable_any<cell2D>,
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<representation::base_block> block(void) const;
-  std::shared_ptr<representation::base_block> block(void);
+  std::shared_ptr<repr::base_block> block(void) const;
+  std::shared_ptr<repr::base_block> block(void);
 
   /**
    * @brief Get the cache entity associated with this cell.
@@ -117,14 +111,14 @@ class cell2D : public visitor::visitable_any<cell2D>,
    * Will be NULL unless it contains a cache, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<representation::base_cache> cache(void) const;
-  std::shared_ptr<representation::base_cache> cache(void);
+  std::shared_ptr<repr::base_cache> cache(void) const;
+  std::shared_ptr<repr::base_cache> cache(void);
 
  private:
   /* clang-format off */
-  std::string                                       m_robot_id{""};
-  std::shared_ptr<representation::base_cell_entity> m_entity{nullptr};
-  rmath::vector2u                             m_loc;
+  std::string                             m_robot_id{};
+  std::shared_ptr<repr::base_cell_entity> m_entity{nullptr};
+  rmath::vector2u                         m_loc{};
   /* clang-format on */
 };
 

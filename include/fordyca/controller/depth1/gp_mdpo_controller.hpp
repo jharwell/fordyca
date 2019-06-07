@@ -27,7 +27,6 @@
 #include <string>
 
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +40,7 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * @class gp_mdpo_controller
- * @ingroup controller depth1
+ * @ingroup fordyca controller depth1
  *
  * @brief A Greedy Partitioning (GP) controller that switches between \ref generalist,
  * \ref harvester, and \ref collector tasks, according to dynamic changes in the
@@ -54,9 +53,7 @@ NS_START(depth1);
  * Cleaner to do it this way.
  */
 class gp_mdpo_controller : public depth1::gp_dpo_controller,
-                           public er::client<gp_mdpo_controller>,
-                           public visitor::visitable_any<gp_mdpo_controller>,
-                           public metrics::world_model_metrics {
+                           public rer::client<gp_mdpo_controller> {
  public:
   gp_mdpo_controller(void);
   ~gp_mdpo_controller(void) override;
@@ -65,15 +62,8 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
   void Init(ticpp::Element& node) override;
   void ControlStep(void) override;
 
-  /* world model metrics */
-  uint cell_state_inaccuracies(uint state) const override;
-  double known_percentage(void) const override;
-  double unknown_percentage(void) const override;
-
   mdpo_perception_subsystem* mdpo_perception(void);
-  const mdpo_perception_subsystem* mdpo_perception(void) const {
-    return const_cast<gp_mdpo_controller*>(this)->mdpo_perception();
-  }
+  const mdpo_perception_subsystem* mdpo_perception(void) const;
 
  protected:
   /**
@@ -81,15 +71,15 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - Block selection matrix (\ref block_selection_matrix)
-   * - Cache selection matrix (\ref cache_selection_matrix)
-   * - Task executive (\ref ta::bi_tdgraph_executive)
+   * - Block selection matrix (\ref block_sol_matrix)
+   * - Cache selection matrix (\ref cache_sel_matrix)
+   * - Task executive (\ref rta::bi_tdgraph_executive)
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    *
    * @param param_repo Handle to parameter repository for this controller (after
    *                   parsing and validation).
    */
-  void shared_init(const params::depth1::controller_repository& param_repo);
+  void shared_init(const config::depth1::controller_repository& param_repo);
 
  private:
 };

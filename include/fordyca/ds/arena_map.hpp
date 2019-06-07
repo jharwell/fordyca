@@ -29,25 +29,24 @@
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/metrics/robot_occupancy_metrics.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/nest.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
+#include "fordyca/support/block_dist/redist_governor.hpp"
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace arena {
-struct arena_map_params;
-}} // namespace params::arena
+namespace config { namespace arena {
+struct arena_map_config;
+}} // namespace config::arena
 
-namespace representation {
+namespace repr {
 class arena_cache;
 }
 namespace support {
@@ -56,17 +55,14 @@ class base_loop_functions;
 NS_START(ds);
 
 class cell2D;
-namespace visitor = rcppsw::patterns::visitor;
 namespace decorator = rcppsw::patterns::decorator;
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class arena_map
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Combines a 2D grid with sets of objects (blocks, caches, nests, etc.)
  * that populate the grid and move around as the state of the arena
@@ -74,24 +70,13 @@ namespace rmath = rcppsw::math;
  * providing accessors and mutators, but not more complex logic, separating the
  * data in manages from the algorithms that operate on that data.
  */
-class arena_map : public er::client<arena_map>,
-                  public metrics::robot_occupancy_metrics,
-                  public visitor::visitable_any<arena_map>,
-                  public decorator::decorator<arena_grid> {
+class arena_map final : public rer::client<arena_map>,
+                        public decorator::decorator<arena_grid> {
  public:
-  explicit arena_map(const struct params::arena::arena_map_params* params);
+  using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
+  using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
 
-  /* robot occupancy metrics */
-  bool has_robot(uint i, uint j) const override;
-
-  /**
-   * @brief Reset the # of caches that have been removed on a single timestep
-   * from the arena due to depletion.
-   */
-  void caches_removed_reset(void) { m_caches_removed = 0; }
-
-  void caches_removed(uint b) { m_caches_removed += b; }
-  uint caches_removed(void) const { return m_caches_removed; }
+  explicit arena_map(const config::arena::arena_map_config* config);
 
   /**
    * @brief Get the list of all the blocks currently present in the arena.
@@ -123,17 +108,17 @@ class arena_map : public er::client<arena_map>,
    * @brief Add caches that have been created by robots in the arena to the
    * current set of active caches.
    */
-  void caches_add(const cache_vector& caches) {
-    m_caches.insert(m_caches.end(), caches.begin(), caches.end());
-    ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
-  }
+  void caches_add(const cache_vector& caches,
+                  support::base_loop_functions* loop);
 
   /**
    * @brief Remove a cache from the list of caches.
    *
    * @param victim The cache to remove.
+   * @param loop The loop functions (to remove light for cache)
    */
-  void cache_remove(const std::shared_ptr<representation::arena_cache>& victim);
+  void cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
+                    support::base_loop_functions* loop);
 
   /**
    * @brief Clear the cells that a cache covers while in the arena that are in
@@ -142,25 +127,24 @@ class arena_map : public er::client<arena_map>,
    *
    * @param victim The cache about to be deleted.
    */
-  void cache_extent_clear(
-      const std::shared_ptr<representation::arena_cache>& victim);
+  void cache_extent_clear(const std::shared_ptr<repr::arena_cache>& victim);
 
-  template <int Index>
+  template <uint Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) {
     return decoratee().access<Index>(d);
   }
-  template <int Index>
+  template <uint Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
       const rmath::vector2u& d) const {
     return decoratee().access<Index>(d);
   }
-  template <int Index>
+  template <uint Index>
   typename arena_grid::layer_value_type<Index>::value_type& access(size_t i,
                                                                    size_t j) {
     return decoratee().access<Index>(i, j);
   }
-  template <int Index>
+  template <uint Index>
   const typename arena_grid::layer_value_type<Index>::value_type& access(
       size_t i,
       size_t j) const {
@@ -181,8 +165,7 @@ class arena_map : public er::client<arena_map>,
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_single_block(
-      std::shared_ptr<representation::base_block>& block);
+  bool distribute_single_block(std::shared_ptr<repr::base_block>& block);
 
   RCPPSW_DECORATE_FUNC(xdsize, const);
   RCPPSW_DECORATE_FUNC(ydsize, const);
@@ -232,13 +215,20 @@ class arena_map : public er::client<arena_map>,
    *
    * @return The subgrid.
    */
-  rcppsw::ds::base_grid2D<cell2D>::grid_view subgrid(size_t x, size_t y, size_t radius) {
+  grid_view subgrid(size_t x, size_t y, size_t radius) {
+    return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
+  }
+
+  const_grid_view subgrid(size_t x, size_t y, size_t radius) const {
     return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
   double grid_resolution(void) const { return decoratee().resolution(); }
-  const representation::nest& nest(void) const { return m_nest; }
+  const repr::nest& nest(void) const { return m_nest; }
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
+  }
+  support::block_dist::redist_governor* redist_governor(void) {
+    return &m_redist_governor;
   }
 
   /**
@@ -260,11 +250,11 @@ class arena_map : public er::client<arena_map>,
 
  private:
   /* clang-format off */
-  uint                            m_caches_removed{0};
-  block_vector                    m_blocks;
-  cache_vector                    m_caches;
-  representation::nest            m_nest;
-  support::block_dist::dispatcher m_block_dispatcher;
+  block_vector                         m_blocks;
+  cache_vector                         m_caches{};
+  repr::nest                           m_nest;
+  support::block_dist::dispatcher      m_block_dispatcher;
+  support::block_dist::redist_governor m_redist_governor;
   /* clang-format on */
 };
 

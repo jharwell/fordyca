@@ -28,7 +28,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::arena_grid;
 
 /*******************************************************************************
@@ -36,7 +36,7 @@ using ds::arena_grid;
  ******************************************************************************/
 cell_cache_extent::cell_cache_extent(
     const rmath::vector2u& coord,
-    std::shared_ptr<representation::base_cache> cache)
+    const std::shared_ptr<repr::base_cache>& cache)
     : cell_op(coord), m_cache(cache) {}
 
 /*******************************************************************************
@@ -44,7 +44,7 @@ cell_cache_extent::cell_cache_extent(
  ******************************************************************************/
 void cell_cache_extent::visit(ds::cell2D& cell) {
   cell.entity(m_cache);
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
 } /* visit() */
 
 void cell_cache_extent::visit(fsm::cell2D_fsm& fsm) {
@@ -52,7 +52,7 @@ void cell_cache_extent::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cell_cache_extent::visit(ds::arena_map& map) {
-  map.access<arena_grid::kCell>(cell_op::coord()).accept(*this);
+  visit(map.access<arena_grid::kCell>(cell_op::coord()));
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

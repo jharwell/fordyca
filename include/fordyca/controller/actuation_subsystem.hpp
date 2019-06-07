@@ -24,12 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/steering_force2D.hpp"
+#include "fordyca/config/actuation_config.hpp"
+#include "fordyca/controller/actuator_list.hpp"
+#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
-#include "fordyca/params/actuation_params.hpp"
-#include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/wifi_actuator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,21 +35,17 @@
 NS_START(fordyca);
 
 namespace support { namespace tv {
-class tv_controller;
+class tv_manager;
 }} // namespace support::tv
 
 NS_START(controller);
-
-namespace state_machine = rcppsw::patterns::state_machine;
-namespace hal = rcppsw::robotics::hal;
-namespace utils = rcppsw::utils;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class actuation_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Handles the control of all actuators on the robot.
  *
@@ -63,19 +57,13 @@ namespace utils = rcppsw::utils;
  */
 class actuation_subsystem {
  public:
-  struct actuator_list {
-    hal::actuators::differential_drive_actuator wheels;
-    hal::actuators::led_actuator leds;
-    hal::actuators::wifi_actuator wifi;
-  };
-
   /**
    * @brief Initialize the actuation subsystem.
    *
-   * @param c_params Subsystem parameters.
+   * @param c_config Subsystem parameters.
    * @param list List of handles to actuator devices.
    */
-  actuation_subsystem(const struct params::actuation_params* c_params,
+  actuation_subsystem(const config::actuation_config* c_config,
                       struct actuator_list* list);
 
   /**
@@ -83,7 +71,7 @@ class actuation_subsystem {
    *
    * @param color The new color.
    */
-  void leds_set_color(const utils::color& color);
+  void leds_set_color(const rutils::color& color);
 
   throttling_differential_drive& differential_drive(void) { return m_drive; }
   const throttling_differential_drive& differential_drive(void) const {
@@ -106,9 +94,9 @@ class actuation_subsystem {
 
  private:
   /* clang-format off */
-  const struct params::actuation_params    mc_params;
-  struct actuator_list                     m_actuators;
-  throttling_differential_drive            m_drive;
+  const config::actuation_config mc_config;
+  struct actuator_list           m_actuators;
+  throttling_differential_drive  m_drive;
   /* clang-format on */
 };
 

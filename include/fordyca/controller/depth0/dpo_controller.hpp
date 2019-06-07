@@ -24,9 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
-#include "fordyca/tasks/base_foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +32,7 @@
 NS_START(fordyca);
 namespace fsm { namespace depth0 { class dpo_fsm; }}
 
-namespace params {
+namespace config {
 namespace depth0 { class dpo_controller_repository; }
 }
 
@@ -42,7 +40,6 @@ NS_START(controller);
 class base_perception_subsystem;
 class dpo_perception_subsystem;
 class block_sel_matrix;
-namespace depth0 { class sensing_subsystem; }
 
 NS_START(depth0);
 
@@ -51,14 +48,13 @@ NS_START(depth0);
  ******************************************************************************/
 /**
  * @class dpo_controller
- * @ingroup controller depth0
+ * @ingroup fordyca controller depth0
  *
  * @brief A foraging controller that remembers what it has seen for a period of
- * time (knowledge is modeling/decays as \ref pheromone_density objects).
+ * time (knowledge is modeled by pheromone density and decays as such).
  */
 class dpo_controller : public crw_controller,
-                       public er::client<dpo_controller>,
-                       public visitor::visitable_any<dpo_controller> {
+                       public rer::client<dpo_controller> {
  public:
   dpo_controller(void);
   ~dpo_controller(void) override;
@@ -69,28 +65,31 @@ class dpo_controller : public crw_controller,
   void Reset(void) override;
 
   std::type_index type_index(void) const override {
-    return std::type_index(typeid(*this));
+    return {typeid(*this)};
   }
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
-  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   /**
    * @brief Set the robot's current line of sight (LOS).
    */
-  void los(std::unique_ptr<representation::line_of_sight> new_los);
+  void los(std::unique_ptr<repr::line_of_sight> new_los);
   double los_dim(void) const;
 
   /**
    * @brief Get the current LOS for the robot.
    */
-  const representation::line_of_sight* los(void) const;
+  const repr::line_of_sight* los(void) const;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a
@@ -104,18 +103,18 @@ class dpo_controller : public crw_controller,
    */
   bool display_los(void) const { return m_display_los; }
 
-  const base_perception_subsystem* perception(void) const {
+  const base_perception_subsystem* perception(void) const override final {
     return m_perception.get();
   }
-  base_perception_subsystem* perception(void) { return m_perception.get(); }
-
-  dpo_perception_subsystem* dpo_perception(void);
-  const dpo_perception_subsystem* dpo_perception(void) const {
-    return const_cast<dpo_controller*>(this)->dpo_perception();
+  base_perception_subsystem* perception(void) override final {
+    return m_perception.get();
   }
 
-  const fsm::depth0::dpo_fsm* fsm(void) const { return m_fsm.get(); }
+  dpo_perception_subsystem* dpo_perception(void);
+  const dpo_perception_subsystem* dpo_perception(void) const;
+
   fsm::depth0::dpo_fsm* fsm(void) { return m_fsm.get(); }
+  const fsm::depth0::dpo_fsm* fsm(void) const { return m_fsm.get(); }
 
   const class block_sel_matrix* block_sel_matrix(void) const {
     return m_block_sel_matrix.get();
@@ -152,9 +151,9 @@ class dpo_controller : public crw_controller,
    * as-is:
    *
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
-   * - Block selection matrix (\ref block_selection_matrix)
+   * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const params::depth0::dpo_controller_repository& param_repo);
+  void shared_init(const config::depth0::dpo_controller_repository& param_repo);
 
  private:
   /**
@@ -167,11 +166,10 @@ class dpo_controller : public crw_controller,
    *
    * This is called after \ref shared_init() during \ref Init().xo
    */
-  void private_init(void);
+  void private_init(const config::depth0::dpo_controller_repository& param_repo);
 
   /* clang-format off */
   bool                                       m_display_los{false};
-  rmath::vector2d                            m_light_loc;
   std::unique_ptr<class block_sel_matrix>    m_block_sel_matrix;
   std::unique_ptr<base_perception_subsystem> m_perception;
   std::unique_ptr<fsm::depth0::dpo_fsm>      m_fsm;

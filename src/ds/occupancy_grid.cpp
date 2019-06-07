@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/occupancy_grid.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell_unknown.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,15 +34,15 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 occupancy_grid::occupancy_grid(
-    const params::perception::perception_params* c_params,
+    const config::perception::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
-      stacked_grid(c_params->occupancy_grid.resolution,
-                   c_params->occupancy_grid.upper.x(),
-                   c_params->occupancy_grid.upper.y()),
-      m_pheromone_repeat_deposit(c_params->pheromone.repeat_deposit),
+      stacked_grid(c_config->occupancy_grid.resolution,
+                   c_config->occupancy_grid.upper.x(),
+                   c_config->occupancy_grid.upper.y()),
+      m_pheromone_repeat_deposit(c_config->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
-  ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
+  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),
           yrsize(),
           xdsize(),
@@ -51,7 +51,7 @@ occupancy_grid::occupancy_grid(
 
   for (uint i = 0; i < xdsize(); ++i) {
     for (uint j = 0; j < ydsize(); ++j) {
-      cell_init(i, j, c_params->pheromone.rho);
+      cell_init(i, j, c_config->pheromone.rho);
     } /* for(j..) */
   }   /* for(i..) */
 }
@@ -120,8 +120,8 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
              j,
              kEPSILON,
              m_robot_id.c_str());
-    events::cell_unknown op(cell.loc());
-    this->accept(op);
+    events::cell_unknown_visitor op(cell.loc());
+    op.visit(*this);
     density.reset();
   }
 } /* cell_state_update() */

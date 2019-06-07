@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/representation/line_of_sight.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,13 +37,14 @@ class dpo_store;
 }
 
 NS_START(controller);
+class oracular_info_receptor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class base_perception_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  */
 class base_perception_subsystem {
  public:
@@ -56,13 +57,13 @@ class base_perception_subsystem {
   virtual void reset(void) {}
 
   /**
-   * @brief Update the internal data structure/representation of the
+   * @brief Update the internal data structure/repr of the
    * environment/arena, after the LOS has been updated.
    */
-  virtual void update(void) = 0;
+  virtual void update(oracular_info_receptor* receptor) = 0;
 
-  virtual const ds::dpo_store* dpo_store(void) const { return nullptr; }
-  virtual ds::dpo_store* dpo_store(void) { return nullptr; }
+  virtual const ds::dpo_store* dpo_store(void) const = 0;
+  virtual ds::dpo_store* dpo_store(void) = 0;
 
   /**
    * @brief Set the robots LOS for the next timestep.
@@ -74,18 +75,16 @@ class base_perception_subsystem {
    *
    * @param los The new los
    */
-  void los(std::unique_ptr<representation::line_of_sight> los) {
-    m_los = std::move(los);
-  }
+  void los(std::unique_ptr<repr::line_of_sight> los) { m_los = std::move(los); }
 
   /**
    * @brief Get the robot's current line-of-sight (LOS)
    */
-  const representation::line_of_sight* los(void) const { return m_los.get(); }
+  const repr::line_of_sight* los(void) const { return m_los.get(); }
 
  private:
   /* clang-format off */
-  std::unique_ptr<representation::line_of_sight> m_los{nullptr};
+  std::unique_ptr<repr::line_of_sight> m_los{nullptr};
   /* clang-format on */
 };
 

@@ -35,19 +35,18 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class block_selector
- * @ingroup controller depth0
+ * @ingroup fordyca controller depth0
  *
  * @brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.
  */
-class block_selector : public rcppsw::er::client<block_selector> {
+class block_selector : public rer::client<block_selector> {
  public:
   explicit block_selector(const block_sel_matrix* sel_matrix);
 
@@ -60,10 +59,12 @@ class block_selector : public rcppsw::er::client<block_selector> {
    * into an unknown state), compute which is the "best", for use in deciding
    * which block to go attempt to pickup.
    *
-   * @return A pointer to the "best" block, along with its utility value.
+   * @return A pointer to the "best" block, along with its utility value, if a
+   * best block is found, and empty otherwise.
    */
-  ds::dp_block_map::value_type calc_best(const ds::dp_block_map& blocks,
-                                         const rmath::vector2d& position);
+  boost::optional<ds::dp_block_map::value_type> operator()(
+      const ds::dp_block_map& blocks,
+      const rmath::vector2d& position);
 
  private:
   /**
@@ -81,7 +82,7 @@ class block_selector : public rcppsw::er::client<block_selector> {
    * @return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool block_is_excluded(const rmath::vector2d& position,
-                         const representation::base_block* block) const;
+                         const repr::base_block* block) const;
 
   /* clang-format off */
   const block_sel_matrix* const mc_matrix;

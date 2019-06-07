@@ -24,31 +24,32 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace rcppsw { namespace control {
-struct waveform_params;
 class waveform;
+namespace config {
+struct waveform_config;
+} /* namespace config */
 }} // namespace rcppsw::control
 
 NS_START(fordyca, support, tv);
-namespace ct = rcppsw::control;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class motion_throttling_handler
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief Handler for a type of motion_throttling for the robot actuators
  */
 class motion_throttling_handler {
  public:
-  explicit motion_throttling_handler(const ct::waveform_params* params);
+  explicit motion_throttling_handler(const rct::config::waveform_config* config);
   ~motion_throttling_handler(void);
 
   /**
@@ -81,7 +82,7 @@ class motion_throttling_handler {
   bool   m_en{false};
   double m_active{0.0};
   double m_applied{0.0};
-  std::unique_ptr<ct::waveform> m_waveform;
+  std::unique_ptr<rct::waveform> m_waveform;
   /* clang-format off */
 };
 

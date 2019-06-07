@@ -24,7 +24,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -33,25 +33,25 @@
 namespace argos {
 class CQTOpenGLUserFunctions;
 }
-namespace rcppsw { namespace task_allocation {
+namespace rcppsw { namespace ta {
 class logical_task;
-}} // namespace rcppsw::task_allocation
+}} // namespace rcppsw::ta
 
 NS_START(fordyca, support);
 
-namespace ta = rcppsw::task_allocation;
+namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
  * @class task_visualizer
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Renders the task that a robot is currently executing in text above the
  * robot for visualization/debugging purposes.
  */
-class task_visualizer : public rcppsw::er::client<task_visualizer> {
+class task_visualizer : public rer::client<task_visualizer> {
  public:
   task_visualizer(argos::CQTOpenGLUserFunctions* qt, double text_vis_offset)
       : ER_CLIENT_INIT("fordyca.support.task_visualizer"),
@@ -68,7 +68,7 @@ class task_visualizer : public rcppsw::er::client<task_visualizer> {
    *
    * @param current_task The current task the robot is executing.
    */
-  void draw(const ta::logical_task* const current_task);
+  void draw(const rta::logical_task* current_task);
 
   /* clang-format off */
   double                               m_text_vis_offset{0.0};

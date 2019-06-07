@@ -1,8 +1,10 @@
 # FORDYCA (FOraging Robots use DYnamic CAches)
 
-This is the main entry point for getting started on the project.
+[![Build Status](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)](https://travis-ci.org/swarm-robotics/fordyca.svg?branch=devel)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Example Simulation](docs/example-ss.png?raw=true "Example Single Source Foraging Scenario")
 
-To see what's new, take a look at the [release notes](docs/release-notes.md).
+This is the main entry point for getting started on the project.
 
 # Papers
 
@@ -12,84 +14,65 @@ To see what's new, take a look at the [release notes](docs/release-notes.md).
    Australia, 2018, pp. 116-122.
    [Link](http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8376280&isnumber=8376259)
 
-# Pre-cloning Setup
+2. J. Harwell and M. Gini, "Swarm Engineering Through Quantitative Measurement
+   of Swarm Robotic Principles in a 10,000 Robot Swarm," 2019 Joint Conference
+   of Artificial Intelligence (IJCAI), Macau, China, 2019, pp. XXX-XXX.
 
-1. Install development packages for the project:
+3. A. Chen, J. Harwell, M. Gini, "Maximizing Energy Efficiency in Swarm
+   Robotics," arXiv:1906.01957 [cs.MA], June 2019.
+   [Link](https://arxiv.org/abs/1906.01957)
 
-   - Qt5 (`qtbase5-dev` on ubuntu)
-   - NLopt (`libnlopt-dev` on ubuntu)
+4. N. White, J. Harwell, M. Gini, "Socially Inspired Communication in Swarm
+   Robotics," arXiv:1906.01108 [cs.RO], June 2019.
+   [Link](https://arxiv.org/abs/1906.01108)
 
-2. Install ARGoS: http://www.argos-sim.info/index.php, the simulator
-   for the project.
+# Setup
 
-   *IMPORTANT!* If you use one of the pre-packaged versions of ARGoS, then you
-   _MUST_ also use gcc/g++ version < 6.0 (anything 5.4 is known to work) on
-   linux. This is because those packages were compiled with gcc/g++ 5.4, and
-   therefore the core ARGoS libraries that fordyca uses are ABI incompatible
-   with anything compiled with gcc >= 6.0. In addition, when installing ARGoS
-   from a .deb you will likely not have all dependencies met (dpkg does not
-   check them like apt does), so you need to run:
+Download `scripts/bootstrap.sh` BEFORE cloning this repo, and run it, with the
+following arguments:
 
-        sudo apt install -f
+- 1st arg: Is the root directory for the project (all repos will be cloned/built
+  in here, and it *must* be an absolute path).
+- 2nd arg is `YES` if you want to install ARGoS system wide (you probably do)
+  and `NO` otherwise.
+- 3rd arg is the location ARGoS should be installed into, and 4th arg is the \#
+  of cores to use when building ARGoS/FORDYCA (should be set to \# cores on your
+  machine).
 
-   After installing the .deb with dpkg to fix installation issues.
+For example:
 
-   If you are compiling ARGoS from source you can use whatever compiler/compiler
-   version you like, so long as it supports C++14.
+        ./bootstrap.sh $HOME/research YES /usr/local 2
 
-3. Verify that you can run the simple foraging example that comes
-   packaged on the ARGoS website.
+To build the code under `~/research` on a 2 core machine and install ARGoS
+system-wide.
 
-4. This project uses the build scaffolding provided by
-   [cmake-config](https://github.com/jharwell/cmake-config). Please
-   look at the platform requirements for that project and install any
-   needed packages/libraries.
-
-5. Clone `rcppsw` https://github.com/swarm-robotics/rcppsw (Reusable
-   C++ software) somewhere and create a symbolic link to it under ext/rcppsw:
-
-        mkdir ext
-        ln -s /path/to/rcppsw ext/rcppsw
-
-   Follow all pre/post-cloning instructions found in README for the rcppsw repo.
-
-# Post-cloning setup
-
-1. Check out the development branch, as that has not only the latest semi-stable
-   release, but also the most up-to-date documentation, including this README.
-
-        git checkout devel
-
-2. Pull in the cmake project scaffolding:
-
-        git submodule update --init --recursive --remote
-
-3. Build via:
-
-        mkdir build && cd build
-        cmake ..
-        make
-
-   To build the documentation, do the following from the build directory:
-
-        make documentation
+The script assumes you have sudo privileges on the machine you want to install
+the project on. If you do not, you will have to build a *lot* more stuff from
+source manually.
 
 # Configuring Simulations
 
-For parameter configuration see [parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
+For parameter configuration see
+[parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
 
 ## Controller Configuration
 
 
-| Controller Name        | Status   | Required loop/QT user functions | Notes                                                                                                                                               |
-|------------------------|----------|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| crw                    | Usable   | depth0                          | CRW = Correlated Random Walk                                                                                                                        |
-| dpo                    | Usable   | depth0                          | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                                          |
-| mdpo                   | Usable   | depth0                          | MDPO = Mapped Decaying Pheromone Object.Like DPO, but also manages a mapped extent of the arena and tracks relevance of individual cells within it. |
-| greedy\_partitioning   | Usable   | depth1                          | Requires static caches to also be enabled.                                                                                                          |
-| oracular\_partitioning | Usable   | depth1                          | Requires static caches and the oracle to be enabled.                                                                                                |
-| greedy\_recpart        | Unstable | depth2                          | Requires dynamic caches to also be enabled.                                                                                                         |
-| oracular\_recpart      | Unstable | depth2                          | Requires dynamic caches and the oracle to be enabled.                                                                                               |
+| Controller | Status | Loop functions | Notes                                                                                                                                 |
+|------------|--------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| crw        | Stable | depth0         | CRW = Correlated Random Walk.                                                                                                         |
+| dpo        | Stable | depth0         | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                            |
+| mdpo       | Stable | depth0         | MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena tracking relevance of individual cells within it.           |
+| odpo       | Stable | depth0         | ODPO = Oracular DPO. Has perfect information about blocks in the arena.                                                               |
+| omdpo      | Stable | depth0         | OMDPO = Oracular MDPO. Has perfect information about blocks in the arena.                                                             |
+| gp\_dpo    | Stable | depth1         | Greedy task partitioning + DPO. Requires static caches to also be enabled.                                                            |
+| gp\_odpo   | Stable | depth1         | Greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.             |
+| gp\_mdpo   | Stable | depth1         | Greedy task partitioning + MDPO. Requires static caches, oracle to be enabled.                                                        |
+| gp\_omdpo  | Stable | depth1         | Greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.            |
+| grp\_dpo   | Stable | depth2         | Recursive greedy task partitioning + DPO. Requires dynamic caches to be enabled.                                                      |
+| grp\_mdpo  | Stable | depth2         | Recursive greedy task partitioning + MDPO. Requires dynamic caches to be enabled.                                                     |
+| grp\_odpo  | Stable | depth2         | Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled.  |
+| grp\_omdpo | Stable | depth2         | Recursive greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled. |
 
 # Running On Your Laptop
 
@@ -104,7 +87,7 @@ After successful compilation, follow these steps to run a foraging scenario:
    ENTIRE search space for argos to look for libraries (including its own core
    libraries).
 
-2. Unless you disable event reporting, you will need to set the path to the
+2. Unless you compile out event reporting, you will need to set the path to the
    log4cxx configuration file. On bash that is:
 
         export LOG4CXX_CONFIGURATION=/path/to/fordyca/log4cxx.xml
@@ -114,43 +97,15 @@ After successful compilation, follow these steps to run a foraging scenario:
         argos3 -c exp/demo.argos
 
    This should pop up a nice GUI from which you can start the experiment (it
-   runs depth0 stateful foraging by default). If no GUI appears, verify that the
+   runs depth0 dpo foraging by default). If no GUI appears, verify that the
    `<visualization>` subtree of the file is not commented out.
 
 # Running on MSI
 
-ARGoS is installed in `/home/gini/shared/swarm`. You should have read/execute
-access to that directory as part of the gini group.
-
-1. On an MSI login node, run the bash script to clone the project (this is a
-   one-time step):
-
-        fordyca-clone-all.sh /path/to/project/root
-
-   The 1st argument is the path (relative or absolute) to the location where you
-   want the project repos to live (they will all be cloned into that level).
-
-   If you need to checkout a particular branch in the repo you can do that after
-   running the script.
-
-2. On an MSI cluster node (*NOT* a login node), source the build/run
-   environment setup script:
-
-        . /home/gini/shared/swarm/bin/build-env-setup.sh
-
-   If you use a different shell than bash, you will have to look at the script
-   and modify it (in *your* home directory somewhere) so your shell understands
-   the syntax.
-
-3. On an MSI cluster node (*NOT* a login node), run the bash script to build the
-   project (note that you may want to tweak the cmake defines in the script, or
-   use your own script, depending on what types of experiments you are
-   running). If you are not sure if you need to do this, ask!
-
-        /home/gini/shared/swarm/bin/fordyca-build-default.sh /path/to/project/root
-
-   The 1st argument is the path (relative or absolute) to the location where you
-   cloned the project repos.
+Head over to
+[sierra](https://github.com/swarm-robotics/sierra/tree/devel/docs/README.md),
+and follow the MSI setup instructions over there. Don't try to run on MSI
+without it. Just don't.
 
 # Troubleshooting
 
@@ -162,7 +117,7 @@ access to that directory as part of the gini group.
      pull`.
 
   2. Updating the `fordyca`, `rcppsw` cmake submodules by running `git submodule
-     update` in the root of each repository.
+     update --recursive --remote` in the root of each repository.
 
 
   If the problem perists, open an issue.
@@ -186,5 +141,5 @@ access to that directory as part of the gini group.
 
 # Contributing
 
-For contributing to `fordyca`, see
-[CONTRIBUTING](https://github.com/swarm-robotics/rcppsw/blob/master/docs/CONTRIBUTING.md).
+For contributing to `FORDYCA`, see
+[CONTRIBUTING](https://github.com/swarm-robotics/rcppsw/tree/devel/docs/CONTRIBUTING.md).

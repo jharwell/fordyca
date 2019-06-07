@@ -24,7 +24,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -36,7 +36,7 @@ class CQTOpenGLUserFunctions;
 
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class line_of_sight;
 }
 
@@ -47,12 +47,12 @@ NS_START(support);
  ******************************************************************************/
 /**
  * @class los_visualizer
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Renders the LOS for a given robot for visualization/debugging
  * purposes.
  */
-class los_visualizer : public rcppsw::er::client<los_visualizer> {
+class los_visualizer : public rer::client<los_visualizer> {
  public:
   explicit los_visualizer(argos::CQTOpenGLUserFunctions* qt)
       : ER_CLIENT_INIT("fordyca.support.los_visualizer"), m_qt(qt) {}
@@ -63,11 +63,10 @@ class los_visualizer : public rcppsw::er::client<los_visualizer> {
   /**
    * @brief Draw visualizations related to block LOS:
    *
-   * @param block The LOS to visualize.
+   * @param los The LOS to visualize.
    * @param grid_resolution The grid resolution for the arena.
    */
-  void draw(const representation::line_of_sight* const los,
-            double grid_resolution);
+  void draw(const repr::line_of_sight* los, double grid_resolution);
 
   /* clang-format off */
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};

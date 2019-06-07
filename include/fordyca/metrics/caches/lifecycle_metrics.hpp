@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <vector>
+
 #include "rcppsw/metrics/base_metrics.hpp"
 
 /*******************************************************************************
@@ -36,12 +38,12 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 /**
  * @class lifecycle_metrics
- * @ingroup metrics caches
+ * @ingroup fordyca metrics caches
  *
  * @brief Interface defining lifecycle metrics that can be collected on
  * static/dynamic caches in the arena during their lifetime.
  */
-class lifecycle_metrics : public rcppsw::metrics::base_metrics {
+class lifecycle_metrics : public rmetrics::base_metrics {
  public:
   lifecycle_metrics(void) = default;
   ~lifecycle_metrics(void) override = default;
@@ -59,6 +61,12 @@ class lifecycle_metrics : public rcppsw::metrics::base_metrics {
    * this timestep.
    */
   virtual uint caches_depleted(void) const = 0;
+
+  /**
+   * @brief Should return the ages of the caches that were depleted this
+   * timestep (i.e. how many timesteps did they exist before being depleted?).
+   */
+  virtual std::vector<uint> cache_depletion_ages(void) const = 0;
 };
 
 NS_END(caches, metrics, fordyca);

@@ -24,7 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <boost/optional.hpp>
+#include <memory>
 #include <random>
+#include <utility>
+
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -35,7 +39,7 @@ NS_START(fordyca);
 namespace controller {
 class cache_sel_matrix;
 }
-namespace representation {
+namespace repr {
 class cache;
 }
 namespace ds {
@@ -49,42 +53,65 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class acquire_existing_cache_fsm
- * @ingroup fsm depth1
+ * @ingroup fordyca fsm depth1
  *
  * @brief Acquire an existing cache within the arena. Once such a cache has been
  * acquired (always by vectoring), it signals that it has completed its task.
  */
 class acquire_existing_cache_fsm
-    : public er::client<acquire_existing_cache_fsm>,
+    : public rer::client<acquire_existing_cache_fsm>,
       public acquire_goal_fsm {
  public:
+  /**
+   * @param matrix The matrix of cache selection info.
+   * @param saa Handle to sensing/actuation subsystem.
+   * @param store Store of known objects in the arena.
+   * @param behavior The exploration behavior to use when acquiring a cache.
+   * @param for_pickup Are we acquiring a cache for pickup or block drop?
+   */
   acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
-                             bool is_pickup,
                              controller::saa_subsystem* saa,
-                             ds::dpo_store* store);
+                             ds::dpo_store* store,
+                             std::unique_ptr<expstrat::base_expstrat> behavior,
+                             bool for_pickup);
+
   ~acquire_existing_cache_fsm(void) override = default;
 
-  acquire_existing_cache_fsm(const acquire_existing_cache_fsm& fsm) = delete;
-  acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) =
+  acquire_existing_cache_fsm(const acquire_existing_cache_fsm&) = delete;
+  acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm&) =
       delete;
 
+  void by_exploration_ok(bool b) { m_by_exploration_ok = b; }
+
  private:
+  using acquisition_loc_type = std::pair<int, rmath::vector2d>;
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type existing_cache_select(void);
+  acq_goal_type acquisition_goal_internal(void) const;
+  boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const;
-  bool calc_acquisition_location(rmath::vector2d* loc);
+  boost::optional<acquisition_loc_type> calc_acquisition_location(void);
+  bool cache_acquisition_valid(const rmath::vector2d& loc, uint id) const;
 
   bool cache_acquired_cb(bool explore_result) const;
   bool cache_exploration_term_cb(void) const;
 
   /* clang-format off */
-  const bool                                mc_is_pickup;
+  /**
+   * @brief Is it OK to acquire a cache via exploration? Usually you do not want
+   * this because:
+   *
+   * - The cache we just acquired might have been one that was excluded from the
+   *   list of eligible caches for acquisition.
+   * - We might not have meant the criteria for block pickup from this cache
+   *   yet.
+   */
+  bool                                      m_by_exploration_ok{false};
+  const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;
-  std::default_random_engine                m_rd{};
+  std::default_random_engine                m_rd;
   /* clang-format on */
 };
 

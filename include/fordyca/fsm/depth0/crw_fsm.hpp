@@ -24,7 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
+#include <memory>
+
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
@@ -37,11 +38,10 @@
 NS_START(fordyca);
 
 namespace state_machine = rcppsw::patterns::state_machine;
-namespace visitor = rcppsw::patterns::visitor;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -50,34 +50,39 @@ using transport_goal_type = block_transporter::goal_type;
 
 /**
  * @class crw_fsm
- * @ingroup fsm depth0
+ * @ingroup fordyca fsm depth0
  *
  * @brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest, and drops it.
  */
-class crw_fsm : public base_foraging_fsm,
-                               public er::client<crw_fsm>,
-                               public metrics::fsm::goal_acquisition_metrics,
-                               public block_transporter,
-                               public visitor::visitable_any<crw_fsm> {
+class crw_fsm final : public base_foraging_fsm,
+                public rer::client<crw_fsm>,
+                public metrics::fsm::goal_acquisition_metrics,
+                public block_transporter {
  public:
-  explicit crw_fsm(controller::saa_subsystem* saa);
+  explicit crw_fsm(controller::saa_subsystem* saa,
+                   std::unique_ptr<expstrat::base_expstrat> exp_behavior);
 
   crw_fsm(const crw_fsm& fsm) = delete;
   crw_fsm& operator=(const crw_fsm& fsm) = delete;
 
   /* collision metrics */
-  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
-  bool is_exploring_for_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
+  exp_status is_exploring_for_goal(void) const override;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override;
+  rmath::vector2u acquisition_loc(void) const override;
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;
@@ -96,13 +101,13 @@ class crw_fsm : public base_foraging_fsm,
   bool block_detected(void) const;
 
   enum fsm_states {
-    ST_START, /* Initial state */
-    ST_ACQUIRE_BLOCK,
-    ST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
-    ST_LEAVING_NEST,          /* Block dropped in nest--time to go */
-    ST_WAIT_FOR_BLOCK_PICKUP,
-    ST_WAIT_FOR_BLOCK_DROP,
-    ST_MAX_STATES
+    ekST_START, /* Initial state */
+    ekST_ACQUIRE_BLOCK,
+    ekST_TRANSPORT_TO_NEST,        /* Block found--bring it back to the nest */
+    ekST_LEAVING_NEST,          /* Block dropped in nest--time to go */
+    ekST_WAIT_FOR_BLOCK_PICKUP,
+    ekST_WAIT_FOR_BLOCK_DROP,
+    ekST_MAX_STATES
   };
 
   /* inherited states */
@@ -137,7 +142,7 @@ class crw_fsm : public base_foraging_fsm,
   explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, controller, fordyca);

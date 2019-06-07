@@ -27,13 +27,13 @@
 #include <string>
 
 #include "fordyca/ds/dpo_map.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_block;
 }
 NS_START(ds);
@@ -43,16 +43,16 @@ NS_START(ds);
  ******************************************************************************/
 /**
  * @class dp_block_mapp
- * @ingroup ds
- * @brief The block map is a representation of the robot's perception of blocks
+ * @ingroup fordyca ds
+ * @brief The block map is a repr of the robot's perception of blocks
  * in the arena. It uses integers as keys, because blocks are mobile (i.e. can
  * move between instants of time where the robot sees them), and
  * inserting/removing blocks from the map using location comparison will not
  * give correct results.
  */
-class dp_block_map : public dpo_map<int, representation::base_block> {
+class dp_block_map : public dpo_map<int, repr::base_block> {
  public:
-  using dpo_map<int, representation::base_block>::dpo_map;
+  using dpo_map<int, repr::base_block>::dpo_map;
 
   /**
    * @brief Build a string from the list of DP blocks that a robot is tracking

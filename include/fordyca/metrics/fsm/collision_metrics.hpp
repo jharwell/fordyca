@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
+#include "fordyca/nsalias.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,12 +38,12 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 /**
  * @class collision_metrics
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Interface defining what metrics should be collected regarding
  * collision avoidance as robots go about their tasks.
  */
-class collision_metrics : public virtual rcppsw::metrics::base_metrics {
+class collision_metrics : public virtual rmetrics::base_metrics {
  public:
   collision_metrics(void) = default;
   ~collision_metrics(void) override = default;
@@ -70,6 +72,12 @@ class collision_metrics : public virtual rcppsw::metrics::base_metrics {
    * should return the duration of the collision avoidance in timesteps.
    */
   virtual uint collision_avoidance_duration(void) const = 0;
+
+  /**
+   * @brief When \ref in_collision_avoidance() returns \c TRUE, then this should
+   * return the robot's current position as is in collision avoidance.
+   */
+  virtual rmath::vector2u avoidance_loc(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

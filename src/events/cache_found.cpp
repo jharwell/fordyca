@@ -22,29 +22,32 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::occupancy_grid;
-using representation::base_cache;
-namespace rswarm = rcppsw::swarm;
+using repr::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(std::unique_ptr<representation::base_cache> cache)
+cache_found::cache_found(std::unique_ptr<repr::base_cache> cache)
     : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
 
-cache_found::cache_found(const std::shared_ptr<representation::base_cache>& cache)
+cache_found::cache_found(const std::shared_ptr<repr::base_cache>& cache)
     : cell_op(cache->discrete_loc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
@@ -63,7 +66,7 @@ void cache_found::visit(ds::dpo_store& store) {
    * a new cache there, we are tracking blocks that no longer exist in the
    * arena.
    */
-  for (auto&& b : store.blocks().values_range()) {
+  for (auto&& b : store.blocks().const_values_range()) {
     if (m_cache->contains_point(b.ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id(),
@@ -73,16 +76,18 @@ void cache_found::visit(ds::dpo_store& store) {
   } /* while(it..) */
 
   auto known = store.find(m_cache);
-  rswarm::pheromone_density density;
+  rswarm::pheromone_density density(store.pheromone_rho());
   if (nullptr != known) {
     density = known->density();
 
     /*
-       * Repeat pheromone deposits only affect caches that are already known and
-       * that we are tracking accurately.
-       */
+     * If repeat pheromon deposits are enabled, make a deposit. Otherwise, just
+     * reset the pheromone density to make because we have seen the cache again.
+     */
     if (store.repeat_deposit()) {
       density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+    } else {
+      density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   } else {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
@@ -96,7 +101,7 @@ void cache_found::visit(ds::dpo_store& store) {
  ******************************************************************************/
 void cache_found::visit(ds::cell2D& cell) {
   cell.entity(m_cache);
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
   ER_ASSERT(cell.state_has_cache(),
             "Cell does not have cache after cache found event");
 } /* visit() */
@@ -140,7 +145,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   if (!cell.state_is_known()) {
     map.known_cells_inc();
     ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
-              "Known cell count (%u) >= arena dimensions (%ux%u)",
+              "Known cell count (%u) >= arena dimensions (%zux%zu)",
               map.known_cell_count(),
               map.xdsize(),
               map.ydsize());
@@ -156,8 +161,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<const std::shared_ptr<representation::base_block>*> rms;
-  for (auto&& b : map.blocks().values_range()) {
+  std::list<const std::shared_ptr<repr::base_block>*> rms;
+  for (auto&& b : map.blocks().const_values_range()) {
     if (m_cache->contains_point(b.ent()->real_loc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id(),
@@ -167,8 +172,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    events::cell_empty op((*b)->discrete_loc());
-    map.access<occupancy_grid::kCell>((*b)->discrete_loc()).accept(op);
+    events::cell_empty_visitor op((*b)->discrete_loc());
+    op.visit(map.access<occupancy_grid::kCell>((*b)->discrete_loc()));
     map.block_remove(*b);
   } /* for(&&b..) */
 
@@ -207,7 +212,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
     }
   }
   map.cache_update(ds::dp_cache_map::value_type(m_cache, density));
-  cell.accept(*this);
+  visit(cell);
 } /* visit() */
 
 /*******************************************************************************
@@ -216,9 +221,33 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
 void cache_found::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
 
-  c.mdpo_perception()->map()->accept(*this);
+  visit(*c.mdpo_perception()->map());
 
   c.ndc_pop();
 } /* visit() */
 
-NS_END(events, fordyca);
+void cache_found::visit(controller::depth2::grp_dpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
+
+  c.ndc_pop();
+} /* visit() */
+
+void cache_found::visit(controller::depth2::grp_omdpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.mdpo_perception()->map());
+
+  c.ndc_pop();
+} /* visit() */
+
+void cache_found::visit(controller::depth2::grp_odpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
+
+  c.ndc_pop();
+} /* visit() */
+
+NS_END(detail, events, fordyca);

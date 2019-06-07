@@ -24,30 +24,31 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+namespace detail {
 class block_proximity;
 class cache_proximity;
-
-namespace visitor = rcppsw::patterns::visitor;
+} // namespace detail
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
  * @class dynamic_cache_interactor
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with dynamic caches in FORDYCA.
  */
 class dynamic_cache_interactor
-    : public visitor::polymorphic_accept_set<block_proximity>,
-      public visitor::polymorphic_accept_set<cache_proximity> {};
+    : public rpvisitor::polymorphic_accept_set<detail::block_proximity,
+                                              detail::cache_proximity> {};
 
 NS_END(events, fordyca);
 

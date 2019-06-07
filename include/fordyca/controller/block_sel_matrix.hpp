@@ -29,27 +29,31 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/config/block_sel/pickup_policy_config.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
-struct block_sel_matrix_params;
-}
+namespace config { namespace block_sel {
+struct block_sel_matrix_config;
+}} // namespace config::block_sel
 NS_START(controller);
-namespace rmath = rcppsw::math;
+
 using block_sel_variant =
-    boost::variant<double, rmath::vector2d, std::vector<int>>;
+    boost::variant<double,
+                   rmath::vector2d,
+                   std::vector<int>,
+                   config::block_sel::pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class block_sel_matrix
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief A dictionary of information needed by robots using various utility
  * functions to calculate the best:
@@ -57,7 +61,7 @@ using block_sel_variant =
  * - block (of whatever type)
  *
  * This class may be separated into those components in the future if it makes
- * sense. For now, it is cleaner to have all three uses be in the same class.
+ * sense.
  */
 
 class block_sel_matrix : public std::map<std::string, block_sel_variant> {
@@ -67,7 +71,16 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
   static constexpr char kRampPriority[] = "ramp_priority";
   static constexpr char kSelExceptions[] = "sel_exceptions";
 
-  explicit block_sel_matrix(const struct params::block_sel_matrix_params* params);
+  /**
+   * @brief The conditions that must be satisfied before a robot will be
+   * able to pickup a block (if applicable).
+   */
+  static constexpr char kPickupPolicy[] = "pickup_policy";
+  static constexpr char kPickupPolicyNull[] = "Null";
+  static constexpr char kPickupPolicyClusterProx[] = "cluster_proximity";
+
+  explicit block_sel_matrix(
+      const config::block_sel::block_sel_matrix_config* config);
 
   /**
    * @brief Add a block to the exception list, disqualifying it from being

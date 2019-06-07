@@ -24,28 +24,28 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-
+namespace detail {
 class nest_block_drop;
-namespace visitor = rcppsw::patterns::visitor;
-
+}
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
  * @class nest_interactor
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with the nest in FORDYCA.
  */
 class nest_interactor
-    : public visitor::polymorphic_accept_set<nest_block_drop> {};
+    : public rpvisitor::polymorphic_accept_set<detail::nest_block_drop> {};
 
 NS_END(tasks, fordyca);
 

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/support/block_dist/random_distributor.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
-#include "fordyca/representation/block_cluster.hpp"
+#include "fordyca/repr/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,13 +38,13 @@ NS_START(fordyca, support, block_dist);
  ******************************************************************************/
 /**
  * @class cluster_distributor
- * @ingroup support block_dist
+ * @ingroup fordyca support block_dist
  *
  * @brief Distributes a block or set of blocks within the specified cluster
- * bounds randomly, using \ref random_block_distributor.
+ * bounds randomly, using \ref random_distributor.
  */
-class cluster_distributor : public base_distributor,
-                            public er::client<cluster_distributor> {
+class cluster_distributor final : public base_distributor,
+                            public rer::client<cluster_distributor> {
  public:
   cluster_distributor(const ds::arena_grid::view& view,
                       double arena_resolution,
@@ -53,7 +53,7 @@ class cluster_distributor : public base_distributor,
 
   cluster_distributor& operator=(const cluster_distributor& s) = delete;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities) override;
@@ -62,8 +62,8 @@ class cluster_distributor : public base_distributor,
 
  private:
   /* clang-format off */
-  representation::block_cluster m_clust;
-  random_distributor            m_dist;
+  repr::block_cluster m_clust;
+  random_distributor  m_impl;
   /* clang-format on */
 };
 

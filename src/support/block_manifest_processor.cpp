@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_manifest_processor.hpp"
-#include "fordyca/representation/cube_block.hpp"
-#include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/repr/cube_block.hpp"
+#include "fordyca/repr/ramp_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,10 +34,10 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 block_manifest_processor::block_manifest_processor(
-    const params::arena::block_manifest* const m)
+    const config::arena::block_manifest* const m)
     : mc_manifest(*m) {
-  register_type<representation::cube_block>("cube");
-  register_type<representation::ramp_block>("ramp");
+  register_type<repr::cube_block>("cube");
+  register_type<repr::ramp_block>("ramp");
 }
 
 /*******************************************************************************

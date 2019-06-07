@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/expression.hpp"
 
 /*******************************************************************************
@@ -37,7 +37,7 @@ NS_START(fordyca, math);
  ******************************************************************************/
 /**
  * @class cache_respawn_probability
- * @ingroup math
+ * @ingroup fordyca math
  *
  * @brief Calculate the probability that loop functions should respawn a static
  * cache after it has been emptied (turned into a single block that is).

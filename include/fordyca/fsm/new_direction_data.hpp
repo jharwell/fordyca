@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/state_machine/event.hpp"
 
@@ -31,21 +32,19 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
-namespace state_machine = rcppsw::patterns::state_machine;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @struct new_direction_data
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Structure containing randomness to inject into robot motion by having
  * them change their direction.
  */
-struct new_direction_data : public state_machine::event_data {
-  explicit new_direction_data(const rmath::radians& dir_) : dir(dir_) {}
+struct new_direction_data : public rpfsm::event_data {
+  explicit new_direction_data(const rmath::radians& dir_in) : dir(dir_in) {}
 
   rmath::radians dir;
 };

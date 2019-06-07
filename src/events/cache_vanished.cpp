@@ -22,8 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_vanished.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 
@@ -34,7 +40,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -43,21 +49,27 @@ cache_vanished::cache_vanished(uint cache_id)
     : ER_CLIENT_INIT("fordyca.events.cache_vanished"), m_cache_id(cache_id) {}
 
 /*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void cache_vanished::dispatch_cache_interactor(
+    tasks::base_foraging_task* const task) {
+  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
+
+  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
+  ER_ASSERT(
+      nullptr != interactor,
+      "Non existing cache interactor task %s received cache vanished event",
+      dynamic_cast<rta::logical_task*>(task)->name().c_str());
+  interactor->accept(*this);
+} /* dispatch_cache_interactor() */
+
+/*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
 void cache_vanished::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
-
-  auto* task = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-  ER_ASSERT(
-      nullptr != task,
-      "Non existing cache interactor task %s received cache vanished event",
-      dynamic_cast<ta::logical_task*>(task)->name().c_str());
-
-  task->accept(*this);
+  dispatch_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
@@ -65,61 +77,82 @@ void cache_vanished::visit(controller::depth1::gp_dpo_controller& controller) {
 void cache_vanished::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
+  dispatch_cache_interactor(controller.current_task());
 
-  auto* task = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-  ER_ASSERT(
-      nullptr != task,
-      "Non existing cache interactor task %s received cache vanished event",
-      dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  controller.ndc_pop();
+} /* visit() */
 
-  task->accept(*this);
+void cache_vanished::visit(controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_vanished::visit(controller::depth1::gp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
 
 void cache_vanished::visit(tasks::depth1::collector& task) {
-  static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism())
-      ->accept(*this);
+  visit(*static_cast<fsm::depth1::cached_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
 
 void cache_vanished::visit(tasks::depth1::harvester& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekCACHE_VANISHED,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_VANISHED,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekCACHE_VANISHED,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
+void cache_vanished::visit(controller::depth2::grp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
 void cache_vanished::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
+  dispatch_cache_interactor(controller.current_task());
 
-  auto* task = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-  ER_ASSERT(
-      nullptr != task,
-      "Non existing cache interactor task %s received cache vanished event",
-      dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  controller.ndc_pop();
+} /* visit() */
 
-  task->accept(*this);
+void cache_vanished::visit(controller::depth2::grp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_vanished::visit(controller::depth2::grp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_cache_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
 
 void cache_vanished::visit(tasks::depth2::cache_transferer& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

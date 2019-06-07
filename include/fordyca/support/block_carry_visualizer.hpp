@@ -24,7 +24,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -34,7 +34,7 @@ namespace argos {
 class CQTOpenGLUserFunctions;
 }
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_block;
 }
 NS_START(support);
@@ -44,13 +44,12 @@ NS_START(support);
  ******************************************************************************/
 /**
  * @class block_carry_visualizer
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Renders a block in 3D that the robot is carrying for
  * visualization/debugging purposes.
  */
-class block_carry_visualizer
-    : public rcppsw::er::client<block_carry_visualizer> {
+class block_carry_visualizer : public rer::client<block_carry_visualizer> {
  public:
   block_carry_visualizer(argos::CQTOpenGLUserFunctions* qt,
                          double block_vis_offset,
@@ -70,10 +69,8 @@ class block_carry_visualizer
    * - The block ID
    *
    * @param block The block to draw.
-   * @param id_len The length of the robot ID. Used to ensure block ID does not
-   * overlap with robot ID, if both visualizations are enabled.
    */
-  void draw(const representation::base_block* block, uint robot_id);
+  void draw(const repr::base_block* block, uint id_len);
 
   /* clang-format off */
   double                               m_block_vis_offset{0.0};

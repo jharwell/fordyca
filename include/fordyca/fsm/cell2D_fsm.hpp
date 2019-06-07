@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcsw/common/common.h"
 
 /*******************************************************************************
@@ -35,32 +35,27 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-namespace state_machine = rcppsw::patterns::state_machine;
-namespace visitor = rcppsw::patterns::visitor;
-namespace er = rcppsw::er;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class cell2D_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Per-cell FSM containing the current state of the cell (empty, has a
  * block, has a cache, or unknown, etc.).
  *
  */
-class cell2D_fsm : public state_machine::simple_fsm,
-                   public visitor::visitable_any<cell2D_fsm>,
-                   public er::client<cell2D_fsm> {
+class cell2D_fsm final : public rpfsm::simple_fsm,
+                         public rer::client<cell2D_fsm> {
  public:
   enum state {
-    ST_UNKNOWN,
-    ST_EMPTY,
-    ST_HAS_BLOCK,
-    ST_HAS_CACHE,
-    ST_CACHE_EXTENT,
-    ST_MAX_STATES
+    ekST_UNKNOWN,
+    ekST_EMPTY,
+    ekST_HAS_BLOCK,
+    ekST_HAS_CACHE,
+    ekST_CACHE_EXTENT,
+    ekST_MAX_STATES
   };
 
   cell2D_fsm(void);
@@ -69,13 +64,13 @@ class cell2D_fsm : public state_machine::simple_fsm,
 
   void init(void) override;
 
-  bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
-  bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
-  bool state_has_cache(void) const { return current_state() == ST_HAS_CACHE; }
+  bool state_is_known(void) const { return current_state() != ekST_UNKNOWN; }
+  bool state_has_block(void) const { return current_state() == ekST_HAS_BLOCK; }
+  bool state_has_cache(void) const { return current_state() == ekST_HAS_CACHE; }
   bool state_in_cache_extent(void) const {
-    return current_state() == ST_CACHE_EXTENT;
+    return current_state() == ekST_CACHE_EXTENT;
   }
-  bool state_is_empty(void) const { return current_state() == ST_EMPTY; }
+  bool state_is_empty(void) const { return current_state() == ekST_EMPTY; }
 
   /* events */
   void event_unknown(void);
@@ -87,8 +82,8 @@ class cell2D_fsm : public state_machine::simple_fsm,
   size_t block_count(void) const { return m_block_count; }
 
  private:
-  struct block_data : public state_machine::event_data {
-    explicit block_data(bool pickup_) : pickup(pickup_) {}
+  struct block_data : public rpfsm::event_data {
+    explicit block_data(bool pickup_in) : pickup(pickup_in) {}
     bool pickup;
   };
 
@@ -106,7 +101,7 @@ class cell2D_fsm : public state_machine::simple_fsm,
         FSM_STATE_MAP_ENTRY(&state_cache),
         FSM_STATE_MAP_ENTRY(&state_cache_extent),
     };
-    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
+    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ekST_MAX_STATES);
     return &kSTATE_MAP[index];
   }
 

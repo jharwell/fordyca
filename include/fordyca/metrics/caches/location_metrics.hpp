@@ -18,14 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,14 +39,14 @@ NS_START(fordyca, metrics, caches);
 
 /**
  * @class location_metrics
- * @ingroup metrics caches
+ * @ingroup fordyca metrics caches
  *
  * @brief Defines the metrics to be collected from a cache regarding its
  * location in the arena.
  *
  * Metrics are collected every timestep.
  */
-class location_metrics : public virtual rcppsw::metrics::base_metrics {
+class location_metrics : public virtual rmetrics::base_metrics {
  public:
   location_metrics(void) = default;
 
@@ -57,4 +58,4 @@ class location_metrics : public virtual rcppsw::metrics::base_metrics {
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_HPP_ */

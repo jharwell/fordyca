@@ -40,20 +40,24 @@ manipulation_metrics_collector::manipulation_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string manipulation_metrics_collector::csv_header_build(
-    const std::string& header) {
-  /* clang-format off */
-  return base_metrics_collector::csv_header_build(header) +
-      "int_avg_free_pickup_events" + separator() +
-      "int_avg_free_drop_events" + separator() +
-      "int_avg_free_pickup_penalty" + separator() +
-      "int_avg_free_drop_penalty" + separator() +
-      "int_avg_cache_pickup_events" + separator() +
-      "int_avg_cache_drop_events" + separator() +
-      "int_avg_cache_pickup_penalty" + separator() +
-      "int_avg_cache_drop_penalty" + separator();
-  /* clang-format on */
-} /* csv_header_build() */
+std::list<std::string> manipulation_metrics_collector::csv_header_cols(
+    void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+      /* clang-format off */
+    "int_avg_free_pickup_events",
+    "int_avg_free_drop_events",
+    "int_avg_free_pickup_penalty",
+    "int_avg_free_drop_penalty",
+    "int_avg_cache_pickup_events",
+    "int_avg_cache_drop_events",
+    "int_avg_cache_pickup_penalty",
+    "int_avg_cache_drop_penalty"
+      /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void manipulation_metrics_collector::reset(void) {
   base_metrics_collector::reset();
@@ -64,51 +68,39 @@ bool manipulation_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.free_pickup_events) + separator();
-  line += std::to_string(m_stats.free_drop_events) + separator();
+  line += std::to_string(m_stats.int_free_pickup_events) + separator();
+  line += std::to_string(m_stats.int_free_drop_events) + separator();
 
-  line += (m_stats.free_pickup_events > 0)
-              ? std::to_string(m_stats.cum_free_pickup_penalty /
-                               static_cast<double>(m_stats.free_pickup_events))
-              : "0";
-  line += separator();
-  line += (m_stats.free_drop_events > 0)
-              ? std::to_string(m_stats.cum_free_drop_penalty /
-                               static_cast<double>(m_stats.free_drop_events))
-              : "0";
-  line += separator();
+  line += csv_entry_domavg(m_stats.int_free_pickup_penalty,
+                           m_stats.int_free_pickup_events);
+  line += csv_entry_domavg(m_stats.int_free_drop_penalty,
+                           m_stats.int_free_drop_events);
 
-  line += std::to_string(m_stats.cache_pickup_events) + separator();
-  line += std::to_string(m_stats.cache_drop_events) + separator();
+  line += std::to_string(m_stats.int_cache_pickup_events) + separator();
+  line += std::to_string(m_stats.int_cache_drop_events) + separator();
 
-  line += (m_stats.cache_pickup_events > 0)
-              ? std::to_string(m_stats.cum_cache_pickup_penalty /
-                               static_cast<double>(m_stats.cache_pickup_events))
-              : "0";
-  line += separator();
-  line += (m_stats.cache_drop_events > 0)
-              ? std::to_string(m_stats.cum_cache_drop_penalty /
-                               static_cast<double>(m_stats.cache_drop_events))
-              : "0";
-  line += separator();
+  line += csv_entry_domavg(m_stats.int_cache_pickup_penalty,
+                           m_stats.int_cache_pickup_events);
+  line += csv_entry_domavg(m_stats.int_cache_drop_penalty,
+                           m_stats.int_cache_drop_events);
   return true;
 } /* csv_line_build() */
 
 void manipulation_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const manipulation_metrics&>(metrics);
   if (m.free_pickup_event()) {
-    ++m_stats.free_pickup_events;
-    m_stats.cum_free_pickup_penalty += m.penalty_served();
+    ++m_stats.int_free_pickup_events;
+    m_stats.int_free_pickup_penalty += m.penalty_served();
   } else if (m.free_drop_event()) {
-    ++m_stats.free_drop_events;
-    m_stats.cum_free_drop_penalty += m.penalty_served();
+    ++m_stats.int_free_drop_events;
+    m_stats.int_free_drop_penalty += m.penalty_served();
   } else if (m.cache_pickup_event()) {
-    ++m_stats.cache_pickup_events;
-    m_stats.cum_cache_pickup_penalty += m.penalty_served();
+    ++m_stats.int_cache_pickup_events;
+    m_stats.int_cache_pickup_penalty += m.penalty_served();
   } else if (m.cache_drop_event()) {
-    ++m_stats.cache_drop_events;
-    m_stats.cum_cache_drop_penalty += m.penalty_served();
+    ++m_stats.int_cache_drop_events;
+    m_stats.int_cache_drop_penalty += m.penalty_served();
   }
 } /* collect() */
 

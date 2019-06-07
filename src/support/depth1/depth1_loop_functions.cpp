@@ -30,198 +30,349 @@
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
+#include <boost/mpl/for_each.hpp>
 
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/oracle/oracle_manager_config.hpp"
+#include "fordyca/config/output_config.hpp"
+#include "fordyca/config/visualization_config.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/ogp_mdpo_controller.hpp"
-#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/oracle_params.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/visualization_params.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
+#include "fordyca/support/depth1/robot_configurer.hpp"
+#include "fordyca/support/depth1/robot_configurer_adaptor.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
-#include "fordyca/support/tasking_oracle.hpp"
-
-#include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "fordyca/support/oracle/oracle_manager.hpp"
+#include "fordyca/support/robot_interactor_adaptor.hpp"
+#include "fordyca/support/robot_los_updater_adaptor.hpp"
+#include "fordyca/support/robot_metric_extractor_adaptor.hpp"
+#include "fordyca/support/robot_task_extractor.hpp"
+#include "fordyca/support/robot_task_extractor_adaptor.hpp"
+#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
 using ds::arena_grid;
-namespace rmetrics = rcppsw::metrics;
 
 /*******************************************************************************
- * Template Instantiations
+ * Struct Definitions
  ******************************************************************************/
-template void depth1_loop_functions::controller_configure(
-    controller::depth1::gp_dpo_controller& controller);
-template void depth1_loop_functions::controller_configure(
-    controller::depth1::gp_mdpo_controller& controller);
+NS_START(detail);
+
+template <class ControllerType>
+struct d1_subtask_status_extractor
+    : boost::static_visitor<std::pair<bool, bool>> {
+  using controller_type = ControllerType;
+  d1_subtask_status_extractor(void) = default;
+
+  std::pair<bool, bool> operator()(const ControllerType* const c) const {
+    auto task = dynamic_cast<const rta::polled_task*>(c->current_task());
+    return std::make_pair(
+        task->name() == tasks::depth1::foraging_task::kHarvesterName,
+        task->name() == tasks::depth1::foraging_task::kCollectorName);
+  }
+};
+
+/**
+ * @struct d1_subtask_status_extractor_adaptor
+ * @ingroup fordyca support depth1
+ *
+ * @brief Calculate the \ref collector, \ref harvester task counts for depth1
+ * when a static cache is depleted, for use in determining the static cache
+ * respawn probability.
+ */
+struct d1_subtask_status_extractor_adaptor
+    : public boost::static_visitor<std::pair<bool, bool>> {
+  explicit d1_subtask_status_extractor_adaptor(
+      const controller::base_controller* const c)
+      : mc_controller(c) {}
+
+  template <typename ControllerType>
+  std::pair<bool, bool> operator()(
+      const d1_subtask_status_extractor<ControllerType>& extractor) const {
+    auto cast = dynamic_cast<const typename d1_subtask_status_extractor<
+        ControllerType>::controller_type*>(mc_controller);
+    return extractor(cast);
+  }
+  const controller::base_controller* const mc_controller;
+};
+
+/**
+ * @struct functor_maps_initializer
+ * @ingroup fordyca support depth1 detail
+ *
+ * Convenience class containing initialization for all of the typeid ->
+ * boost::variant maps for all controller types that are used throughout
+ * initialization and simulation.
+ */
+struct functor_maps_initializer : public boost::static_visitor<void> {
+  functor_maps_initializer(configurer_map_type* const cmap,
+                           depth1_loop_functions* const lf_in)
+
+      : lf(lf_in), config_map(cmap) {}
+  template <typename T>
+  void operator()(const T& controller) const {
+    typename robot_arena_interactor<T>::params p{lf->arena_map(),
+          lf->m_metrics_agg.get(),
+          lf->floor(),
+          lf->tv_manager(),
+          lf->m_cache_manager.get(),
+          lf};
+    lf->m_interactor_map->emplace(
+        typeid(controller),
+        robot_arena_interactor<T>(p));
+    lf->m_metric_extractor_map->emplace(
+        typeid(controller),
+        robot_metric_extractor<depth1_metrics_aggregator, T>(
+            lf->m_metrics_agg.get()));
+    config_map->emplace(
+        typeid(controller),
+        robot_configurer<T, depth1_metrics_aggregator>(
+            lf->config()->config_get<config::visualization_config>(),
+            lf->oracle_manager()->entities_oracle(),
+            lf->oracle_manager()->tasking_oracle(),
+            lf->m_metrics_agg.get()));
+    lf->m_los_update_map->emplace(typeid(controller),
+                                  robot_los_updater<T>(lf->arena_map()));
+    lf->m_subtask_status_map->emplace(typeid(controller),
+                                      d1_subtask_status_extractor<T>());
+  }
+
+  /* clang-format off */
+  depth1_loop_functions * const lf;
+  configurer_map_type* const    config_map;
+  /* clang-format on */
+};
+
+NS_END(detail);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 depth1_loop_functions::depth1_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.depth1"),
-      m_interactors(nullptr),
-      m_tasking_oracle(nullptr),
+      m_interactor_map(nullptr),
+      m_metric_extractor_map(nullptr),
+      m_los_update_map(nullptr),
+      m_task_extractor_map(nullptr),
+      m_subtask_status_map(nullptr),
       m_metrics_agg(nullptr),
       m_cache_manager(nullptr) {}
 
 depth1_loop_functions::~depth1_loop_functions(void) = default;
 
 /*******************************************************************************
- * Member Functions
+ * Initialization Functions
  ******************************************************************************/
 void depth1_loop_functions::Init(ticpp::Element& node) {
-  depth0::depth0_loop_functions::Init(node);
-
   ndc_push();
   ER_INFO("Initializing...");
 
+  shared_init(node);
+  private_init();
+
+  ER_INFO("Initialization finished");
+  ndc_pop();
+} /* Init() */
+
+void depth1_loop_functions::shared_init(ticpp::Element& node) {
+  depth0_loop_functions::shared_init(node);
+
   /* initialize stat collecting */
-  auto* arenap = params()->parse_results<params::arena::arena_map_params>();
-  params::output_params output =
-      *params()->parse_results<const struct params::output_params>();
-  auto* conv = params()->parse_results<rswc::convergence_params>();
+  auto* arenap = config()->config_get<config::arena::arena_map_config>();
+  config::output_config output =
+      *config()->config_get<const config::output_config>();
   output.metrics.arena_grid = arenap->grid;
-  m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(
-      &output.metrics, conv, output_root());
-
-  /* initialize cache handling and create initial cache */
-  auto* cachep = params()->parse_results<params::caches::caches_params>();
-  cache_handling_init(cachep);
-
-  /* intitialize robot interactions with environment */
-  m_interactors = rcppsw::make_unique<interactor_map>();
-  m_interactors->emplace(
-      typeid(controller::depth1::gp_dpo_controller),
-      gp_dpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
-  m_interactors->emplace(
-      typeid(controller::depth1::gp_mdpo_controller),
-      gp_mdpo_itype(arena_map(), m_metrics_agg.get(), floor(), tv_controller()));
-
-  /* initialize oracles */
+  m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(&output.metrics,
+                                                                 output_root());
+  /* initialize tasking oracle */
   oracle_init();
+} /* shared_init() */
+
+void depth1_loop_functions::private_init(void) {
+  /* initialize cache handling and create initial cache */
+  cache_handling_init(config()->config_get<config::caches::caches_config>());
+
+  /*
+   * Initialize convergence calculations to include task distribution (not
+   * included by default).
+   */
+  conv_calculator()->task_dist_init(std::bind(
+      &depth1_loop_functions::robot_tasks_extract, this, std::placeholders::_1));
+
+  /*
+   * Intitialize robot interactions with environment via various functors/type
+   * maps.
+   */
+  m_interactor_map = rcppsw::make_unique<interactor_map_type>();
+  m_metric_extractor_map = rcppsw::make_unique<metric_extractor_map_type>();
+  m_los_update_map = rcppsw::make_unique<los_updater_map_type>();
+  m_task_extractor_map = rcppsw::make_unique<task_extractor_map_type>();
+  m_subtask_status_map =
+      rcppsw::make_unique<detail::d1_subtask_status_map_type>();
+
+  /* only needed for initialization, so not a member */
+  auto config_map = configurer_map_type();
+
+  detail::functor_maps_initializer f_initializer(&config_map, this);
+  boost::mpl::for_each<controller::depth1::typelist>(f_initializer);
 
   /* configure robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
         *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto gp_dpo = dynamic_cast<controller::depth1::gp_dpo_controller*>(
+    auto base = dynamic_cast<controller::base_controller*>(
         &robot.GetControllableEntity().GetController());
-    auto gp_mdpo = dynamic_cast<controller::depth1::gp_mdpo_controller*>(
-        &robot.GetControllableEntity().GetController());
-    controller_configure((nullptr != gp_mdpo) ? *gp_mdpo : *gp_dpo);
-  } /* for(&entity..) */
-
-  ER_INFO("Initialization finished");
-  ndc_pop();
-}
+    boost::apply_visitor(robot_configurer_adaptor(base),
+                         config_map.at(base->type_index()));
+  } /* for(entity_pair..) */
+} /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
-  auto* oraclep = params()->parse_results<params::oracle_params>();
-  if (oraclep->enabled) {
-    ER_INFO("Creating oracle");
+  auto* oraclep = config()->config_get<config::oracle::oracle_manager_config>();
+  if (oraclep->tasking.enabled) {
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
     const auto& controller0 =
         dynamic_cast<controller::depth1::gp_mdpo_controller&>(
             robot0.GetControllableEntity().GetController());
     auto* bigraph =
-        dynamic_cast<const ta::bi_tdgraph*>(controller0.executive()->graph());
-    m_tasking_oracle = std::make_unique<support::tasking_oracle>(bigraph);
+        dynamic_cast<const rta::bi_tdgraph*>(controller0.executive()->graph());
+    oracle_manager()->tasking_oracle(
+        std::make_unique<support::oracle::tasking_oracle>(&oraclep->tasking,
+                                                          bigraph));
   }
 } /* oracle_init() */
 
-void depth1_loop_functions::pre_step_iter(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::depth1::gp_dpo_controller*>(
+void depth1_loop_functions::cache_handling_init(
+    const config::caches::caches_config* cachep) {
+  if (nullptr != cachep && cachep->static_.enable) {
+    /*
+     * Regardless of how many foragers/etc there are, always create an
+     * initial cache.
+     */
+    rmath::vector2d cache_loc = rmath::vector2d(
+        (arena_map()->xrsize() + arena_map()->nest().real_loc().x()) / 2.0,
+        arena_map()->nest().real_loc().y());
+
+    m_cache_manager = rcppsw::make_unique<static_cache_manager>(
+        cachep, &arena_map()->decoratee(), cache_loc);
+
+    if (auto created = m_cache_manager->create(
+            arena_map()->blocks(), GetSpace().GetSimulationClock())) {
+      arena_map()->caches_add(*created, this);
+      floor()->SetChanged();
+    }
+  }
+} /* cache_handling_init() */
+
+/*******************************************************************************
+ * Convergence Calculations Callbacks
+ ******************************************************************************/
+std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
+  std::vector<int> v;
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
+
+  for (auto& entity_pair : robots) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto base = dynamic_cast<controller::base_controller*>(
+        &robot->GetControllableEntity().GetController());
+    v.push_back(
+        boost::apply_visitor(robot_task_extractor_adaptor(base),
+                             m_task_extractor_map->at(base->type_index())));
+  } /* for(&entity..) */
+  return v;
+} /* robot_tasks_extract() */
+
+/*******************************************************************************
+ * General Member Functions
+ ******************************************************************************/
+void depth1_loop_functions::PreStep() {
+  ndc_push();
+  base_loop_functions::PreStep();
+
+  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+      *(*m_metrics_agg)["blocks::transport"]);
+  arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
+                                         collector.cum_collected(),
+                                         conv_calculator()->converged());
+
+  /* Collect metrics from/about caches */
+  for (auto& c : arena_map()->caches()) {
+    m_metrics_agg->collect_from_cache(c.get());
+    c->reset_metrics();
+  } /* for(&c..) */
+  m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
+  m_cache_manager->reset_metrics();
+
+  /*
+   * Manage the static cache. Must be before per-robot processing, so each robot
+   * gets their internal object store updated with (potentially)new cache
+   * information.
+   */
+  static_cache_monitor();
+  if (m_cache_manager->caches_depleted() > 0) {
+    floor()->SetChanged();
+  }
+
+  /* Before processing all robots, update the oracles */
+  oracle_manager()->update(arena_map());
+
+  /* Process all robots */
+  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
+    argos::CFootBotEntity& robot =
+        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    robot_timestep_process(robot);
+  } /* for(&entity_pair..) */
+
+  /* collect metrics from non-robot sources */
+  m_metrics_agg->collect_from_loop(this);
+
+  /* Not a clean way to do this in the convergence metrics collector... */
+  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock())) {
+    conv_calculator()->reset_metrics();
+  }
+
+  m_metrics_agg->timestep_inc_all();
+  m_metrics_agg->timestep_reset_all();
+  m_metrics_agg->interval_reset_all();
+
+  ndc_pop();
+} /* PreStep() */
+
+void depth1_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot) {
+  auto controller = dynamic_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
-  m_metrics_agg->collect_from_controller(controller);
-  controller->free_pickup_event(false);
-  controller->free_drop_event(false);
+  auto madaptor =
+      robot_metric_extractor_adaptor<depth1_metrics_aggregator>(controller);
+  boost::apply_visitor(madaptor,
+                       m_metric_extractor_map->at(controller->type_index()));
+  controller->block_manip_collator()->reset();
 
-  /* send the robot its view of the world: what it sees and where it is */
-  loop_utils::set_robot_pos<decltype(*controller)>(robot);
-  ER_ASSERT(std::fmod(controller->los_dim(), arena_map()->grid_resolution()) <=
-                std::numeric_limits<double>::epsilon(),
-            "LOS dimension (%f) not an even multiple of grid resolution (%f)",
-            controller->los_dim(),
-            arena_map()->grid_resolution());
-  uint los_grid_size = controller->los_dim() / arena_map()->grid_resolution();
-  loop_utils::set_robot_los<decltype(*controller)>(robot,
-                                                   los_grid_size,
-                                                   *arena_map());
-  set_robot_tick<decltype(*controller)>(robot);
+  /* Set robot position, time, and send it its new LOS */
+  loop_utils::set_robot_pos<decltype(*controller)>(
+      robot, arena_map()->grid_resolution());
+  loop_utils::set_robot_tick<decltype(*controller)>(
+      robot, GetSpace().GetSimulationClock());
+  boost::apply_visitor(robot_los_updater_adaptor(controller),
+                       m_los_update_map->at(controller->type_index()));
 
-  /* update arena map metrics with robot position */
-  auto coord =
-      rmath::dvec2uvec(controller->position(), arena_map()->grid_resolution());
-  arena_map()->access<arena_grid::kRobotOccupancy>(coord) = true;
-
-  /*
-   * The MAGIC of boost so that we can avoid a series of if()/else if() for each
-   * of the types of controllers in depth0 for robot-arena interactions.
-   *
-   * We use the runtime type of the controller we have to index into a map
-   * containing a boost::variant of robot_arena_interactor<T>'s. The variant we
-   * access in the map will be one with the active type being
-   * robot_arena_interactor<runtime-type-of-current-controller>.
-   *
-   * We then just use a simple visitor to perform all robot-arena interactions.
-   */
-  boost::apply_visitor(
-      controller_interactor_mapper(controller, GetSpace().GetSimulationClock()),
-      m_interactors->at(controller->type_index()));
-} /* pre_step_iter() */
-
-template <class ControllerType>
-void depth1_loop_functions::controller_configure(ControllerType& controller) {
-  /*
-   * If NULL, then visualization has been disabled.
-   */
-  auto* vparams = params()->parse_results<struct params::visualization_params>();
-  if (nullptr != vparams) {
-    controller.display_task(vparams->robot_task);
-  }
-
-  auto* oraclep = params()->parse_results<params::oracle_params>();
-  if (oraclep->enabled) {
-    auto& oracular =
-        dynamic_cast<controller::depth1::ogp_mdpo_controller&>(controller);
-    oracular.executive()->task_finish_notify(
-        std::bind(&tasking_oracle::task_finish_cb,
-                  m_tasking_oracle.get(),
-                  std::placeholders::_1));
-    oracular.executive()->task_abort_notify(
-        std::bind(&tasking_oracle::task_abort_cb,
-                  m_tasking_oracle.get(),
-                  std::placeholders::_1));
-    oracular.tasking_oracle(m_tasking_oracle.get());
-  }
-  controller.executive()->task_finish_notify(
-      std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
-                m_metrics_agg.get(),
-                std::placeholders::_1));
-  controller.executive()->task_abort_notify(
-      std::bind(&depth1_metrics_aggregator::task_finish_or_abort_cb,
-                m_metrics_agg.get(),
-                std::placeholders::_1));
-  controller.executive()->task_alloc_notify(
-      std::bind(&depth1_metrics_aggregator::task_alloc_cb,
-                m_metrics_agg.get(),
-                std::placeholders::_1,
-                std::placeholders::_2));
-} /* controller_configure() */
+  /* Watch the robot interact with its environment! */
+  auto iadaptor = robot_interactor_adaptor<robot_arena_interactor>(
+      controller, GetSpace().GetSimulationClock());
+  boost::apply_visitor(iadaptor, m_interactor_map->at(controller->type_index()));
+} /* robot_timestep_process() */
 
 argos::CColor depth1_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
@@ -233,7 +384,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
   }
   /*
    * Blocks are inside caches, so display the cache the point is inside FIRST,
-   * so that you don't have blocks renderin inside of caches.
+   * so that you don't have blocks render inside of caches.
    */
   for (auto& cache : arena_map()->caches()) {
     if (cache->contains_point(tmp)) {
@@ -259,78 +410,20 @@ argos::CColor depth1_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void depth1_loop_functions::PreStep() {
-  ndc_push();
-
-  base_loop_functions::PreStep();
-  /* Get metrics from caches */
-  for (auto& c : arena_map()->caches()) {
-    m_metrics_agg->collect_from_cache(c.get());
-    c->reset_metrics();
-  } /* for(&c..) */
-  m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
-  m_cache_manager->reset_metrics();
-
-  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity& robot =
-        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    pre_step_iter(robot);
-  } /* for(&entity..) */
-  m_metrics_agg->collect_from_arena(arena_map());
-  m_metrics_agg->collect_from_loop(this);
-  pre_step_final();
-
-  ndc_pop();
-} /* PreStep() */
-
 void depth1_loop_functions::Reset() {
   ndc_push();
   base_loop_functions::Reset();
   m_metrics_agg->reset_all();
 
-  auto ret = m_cache_manager->create(arena_map()->blocks());
-  if (ret.status) {
-    arena_map()->caches_add(ret.caches);
+  if (auto created = m_cache_manager->create(arena_map()->blocks(),
+                                             GetSpace().GetSimulationClock())) {
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
   ndc_pop();
-}
+} /* Reset() */
 
-std::pair<uint, uint> depth1_loop_functions::d1_task_counts(void) const {
-  /*
-   * Homogeneous swarm, so we can just take the first robot to get a handle on
-   * the task IDs for the tasks we are interested in. We also assume that all
-   * controllers in depth1 are derived from the DPO controller.
-   */
-  argos::CFootBotEntity& robot = *argos::any_cast<argos::CFootBotEntity*>(
-      (*const_cast<depth1_loop_functions*>(this)
-            ->GetSpace()
-            .GetEntitiesByType("foot-bot")
-            .begin())
-          .second);
-  auto gp_dpo = dynamic_cast<controller::depth1::gp_dpo_controller*>(
-      &robot.GetControllableEntity().GetController());
-  ER_ASSERT(nullptr != gp_dpo, "Controller not derived from GP_DPO");
-  auto& collector = static_cast<rmetrics::tasks::bi_tdgraph_metrics_collector&>(
-      *(*m_metrics_agg)["tasks::distribution"]);
-
-  /*
-   * These are interval counts, which means they are likely much greater than
-   * the current actual # of harvesters/collectors in the swarm, so we have to
-   * correct for that.
-   */
-  uint n_harvesters = collector.int_task_counts()[gp_dpo->task_id(
-      tasks::depth1::foraging_task::kHarvesterName)];
-  n_harvesters =
-      n_harvesters / std::max(collector.timestep() % collector.interval(), 1U);
-  uint n_collectors = collector.int_task_counts()[gp_dpo->task_id(
-      tasks::depth1::foraging_task::kCollectorName)];
-  n_collectors =
-      n_collectors / std::max(collector.timestep() % collector.interval(), 1U);
-  return std::make_pair(n_harvesters, n_collectors);
-} /* d1_task_counts() */
-
-uint depth1_loop_functions::n_free_blocks(void) const {
+__rcsw_pure uint depth1_loop_functions::n_free_blocks(void) const {
   auto accum = [&](uint sum, const auto& b) {
     return sum + (-1 == b->robot_id());
   };
@@ -339,7 +432,10 @@ uint depth1_loop_functions::n_free_blocks(void) const {
       arena_map()->blocks().begin(), arena_map()->blocks().end(), 0, accum);
 } /* n_free_blocks() */
 
-void depth1_loop_functions::pre_step_final(void) {
+void depth1_loop_functions::static_cache_monitor(void) {
+  if (!arena_map()->caches().empty()) {
+    return;
+  }
   /*
    * The cache is recreated with a probability that depends on the relative
    * ratio between the # foragers and the # collectors. If there are more
@@ -348,63 +444,41 @@ void depth1_loop_functions::pre_step_final(void) {
    * recreated immediately. And if there are no foragers, there is no chance
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
-  auto pair = d1_task_counts();
-  if (arena_map()->caches().empty()) {
-    auto ret = m_cache_manager->create_conditional(arena_map()->blocks(),
-                                                   pair.first,
-                                                   pair.second);
+  std::pair<uint, uint> counts{0, 0};
+  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
+    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
+    auto base = dynamic_cast<controller::base_controller*>(
+        &robot->GetControllableEntity().GetController());
+    auto res =
+        boost::apply_visitor(detail::d1_subtask_status_extractor_adaptor(base),
+                             m_subtask_status_map->at(base->type_index()));
+    counts.first += res.first;
+    counts.second += res.second;
+  } /* for(&entity..) */
 
-    if (ret.status) {
-      arena_map()->caches_add(ret.caches);
-      __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
-          arena_map()->caches()[0]->discrete_loc());
-      ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-                "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
-                arena_map()->caches()[0]->n_blocks(),
-                cell.block_count());
-      m_cache_manager->cache_created();
-      floor()->SetChanged();
-    } else {
-      ER_INFO(
-          "Could not create static cache: n_harvesters=%u,n_collectors=%u,free "
-          "blocks=%u",
-          pair.first,
-          pair.second,
-          n_free_blocks());
-    }
-  }
-
-  if (arena_map()->caches_removed() > 0) {
-    m_cache_manager->cache_depleted();
+  auto created =
+      m_cache_manager->create_conditional(arena_map()->blocks(),
+                                          GetSpace().GetSimulationClock(),
+                                          counts.first,
+                                          counts.second);
+  if (created) {
+    arena_map()->caches_add(*created, this);
+    __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
+        arena_map()->caches()[0]->discrete_loc());
+    ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
+              "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+              arena_map()->caches()[0]->n_blocks(),
+              cell.block_count());
     floor()->SetChanged();
-    arena_map()->caches_removed_reset();
+  } else {
+    ER_INFO(
+        "Could not create static cache: n_harvesters=%u,n_collectors=%u,free "
+        "blocks=%u",
+        counts.first,
+        counts.second,
+        n_free_blocks());
   }
-
-  m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock());
-  m_metrics_agg->timestep_inc_all();
-  m_metrics_agg->timestep_reset_all();
-  m_metrics_agg->interval_reset_all();
-} /* pre_step_final() */
-
-void depth1_loop_functions::cache_handling_init(
-    const struct params::caches::caches_params* cachep) {
-  if (nullptr != cachep && cachep->static_.enable) {
-    /*
-     * Regardless of how many foragers/etc there are, always create an
-     * initial cache.
-     */
-    rmath::vector2d cache_loc = rmath::vector2d(
-        (arena_map()->xrsize() + arena_map()->nest().real_loc().x()) / 2.0,
-        arena_map()->nest().real_loc().y());
-
-    m_cache_manager = rcppsw::make_unique<static_cache_manager>(
-        cachep, &arena_map()->decoratee(), cache_loc);
-
-    /* return value ignored at this level (for now...) */
-    auto ret = m_cache_manager->create(arena_map()->blocks());
-    arena_map()->caches_add(ret.caches);
-  }
-} /* cache_handling_init() */
+} /* static_cache_monitor() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

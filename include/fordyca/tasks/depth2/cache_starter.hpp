@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"
@@ -35,25 +36,23 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
 
-namespace task_allocation = rcppsw::task_allocation;
-
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
  * @class cache_starter
- * @ingroup tasks depth2
+ * @ingroup fordyca tasks depth2
  *
  * @brief Task in which robots locate a free block and drop it somewhere to
  * start a new cache. It is abortable, and has one task interface.
  */
-class cache_starter : public foraging_task,
+class cache_starter final : public foraging_task,
                       public events::free_block_interactor,
                       public events::dynamic_cache_interactor,
-                      public rcppsw::er::client<cache_starter> {
+                      public rer::client<cache_starter> {
  public:
-  cache_starter(const struct ta::task_allocation_params* params,
-                std::unique_ptr<task_allocation::taskable> mechanism);
+  cache_starter(const struct rta::config::task_alloc_config* config,
+                std::unique_ptr<rta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -62,26 +61,29 @@ class cache_starter : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::free_block_drop& visitor) override;
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::block_vanished& visitor) override;
-  void accept(events::block_proximity& visitor) override;
-  void accept(events::cache_proximity&) override {};
+  void accept(events::detail::free_block_drop& visitor) override;
+  void accept(events::detail::free_block_pickup& visitor) override;
+  void accept(events::detail::block_vanished& visitor) override;
+  void accept(events::detail::block_proximity& visitor) override;
+  void accept(events::detail::cache_proximity&) override;
 
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const task_allocation::taskable_argument*) override;
+  void task_start(const rta::taskable_argument*) override;
   double abort_prob_calc(void) override;
   double interface_time_calc(uint interface,
                              double start_time) override;

@@ -22,31 +22,31 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace kinematics = rcppsw::robotics::kinematics;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-saa_subsystem::saa_subsystem(
-    const struct params::actuation_params* const aparams,
-    const struct params::sensing_params* const sparams,
-    struct actuation_subsystem::actuator_list* const actuator_list,
-    struct sensing_subsystem::sensor_list* const sensor_list)
+saa_subsystem::saa_subsystem(const config::actuation_config* const aconfig,
+                             const config::sensing_config* const sconfig,
+                             actuator_list* const actuator_list,
+                             sensor_list* const sensor_list)
     : ER_CLIENT_INIT("fordyca.controller.saa_subsystem"),
-      m_actuation(std::make_shared<actuation_subsystem>(aparams, actuator_list)),
-      m_sensing(std::make_shared<sensing_subsystem>(sparams, sensor_list)),
-      m_steering(*this, &aparams->steering, m_sensing) {}
+      m_actuation(std::make_shared<actuation_subsystem>(aconfig, actuator_list)),
+      m_sensing(std::make_shared<sensing_subsystem>(sconfig, sensor_list)),
+      m_steer2D_calc(*this, &aconfig->steering) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
+void saa_subsystem::steer2D_force_apply(const std::pair<bool, bool>& force) {
   ER_DEBUG("position=(%f, %f)",
            m_sensing->position().x(),
            m_sensing->position().y())
@@ -57,16 +57,35 @@ void saa_subsystem::apply_steering_force(const std::pair<bool, bool>& force) {
            linear_velocity().length(),
            angular_velocity());
   ER_DEBUG("steering_force=(%f,%f)@%f [%f]",
-           m_steering.value().x(),
-           m_steering.value().y(),
-           m_steering.value().angle().value(),
-           m_steering.value().length());
+           m_steer2D_calc.value().x(),
+           m_steer2D_calc.value().y(),
+           m_steer2D_calc.value().angle().value(),
+           m_steer2D_calc.value().length());
 
-  double speed = m_steering.value().length() *
+  double speed = m_steer2D_calc.value().length() *
                  (1.0 - m_actuation->differential_drive().active_throttle());
   m_actuation->differential_drive().fsm_drive(speed,
-                                              m_steering.value().angle(),
+                                              m_steer2D_calc.value().angle(),
                                               force);
-  m_steering.reset();
-}
+  m_steer2D_calc.reset();
+} /* steer2D_force_apply() */
+
+rmath::vector2d saa_subsystem::linear_velocity(void) const {
+  return {m_actuation->differential_drive().current_speed(),
+          m_sensing->heading().angle()};
+} /* linear_velocity() */
+
+__rcsw_pure double saa_subsystem::angular_velocity(void) const {
+  return (m_actuation->differential_drive().right_linspeed() -
+          m_actuation->differential_drive().left_linspeed()) /
+         m_actuation->differential_drive().axle_length();
+} /* angular_velocity() */
+
+__rcsw_pure double saa_subsystem::max_speed(void) const {
+  return m_actuation->differential_drive().max_speed();
+} /* max_speed() */
+
+__rcsw_pure rmath::vector2d saa_subsystem::position(void) const {
+  return m_sensing->position();
+} /* position() */
 NS_END(controller, fordyca);

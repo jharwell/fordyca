@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -35,23 +36,23 @@
 NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
 /**
  * @class cache_transferer
- * @ingroup tasks depth2
+ * @ingroup fordyca tasks depth2
  *
  * @brief Task in which robots locate an existing cache, pickup a block from it,
  * and then transfer the block to a cache with higher utility (presumably one
  * that is closer to the nest). It is abortable, and has two task interfaces:
  * one at each cache it interacts with.
  */
-class cache_transferer : public foraging_task,
+class cache_transferer final : public foraging_task,
                          public events::existing_cache_interactor,
-                         rcppsw::er::client<cache_transferer> {
+                         rer::client<cache_transferer> {
  public:
-  cache_transferer(const struct ta::task_allocation_params* params,
-                   std::unique_ptr<ta::taskable> mechanism);
+  cache_transferer(const struct rta::config::task_alloc_config* config,
+                   std::unique_ptr<rta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -60,23 +61,26 @@ class cache_transferer : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::cache_block_drop& visitor) override;
-  void accept(events::cached_block_pickup& visitor) override;
-  void accept(events::cache_vanished& visitor) override;
+  void accept(events::detail::cache_block_drop& visitor) override;
+  void accept(events::detail::cached_block_pickup& visitor) override;
+  void accept(events::detail::cache_vanished& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const ta::taskable_argument*) override;
+  void task_start(const rta::taskable_argument*) override;
   double abort_prob_calc(void) override;
   double interface_time_calc(uint interface,
                              double start_time) override;

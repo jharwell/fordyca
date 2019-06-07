@@ -40,22 +40,23 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-collector::collector(const struct ta::task_allocation_params* const params,
-                     std::unique_ptr<ta::taskable> mechanism)
-    : collector{params, kCollectorName, std::move(mechanism)} {}
+collector::collector(const rta::config::task_alloc_config* const config,
+                     std::unique_ptr<rta::taskable> mechanism)
+    : collector(config, kCollectorName, std::move(mechanism)) {}
 
-collector::collector(const struct ta::task_allocation_params* const params,
+collector::collector(const rta::config::task_alloc_config* const config,
                      const std::string& name,
-                     std::unique_ptr<ta::taskable> mechanism)
-    : foraging_task(name, params, std::move(mechanism)),
+                     std::unique_ptr<rta::taskable> mechanism)
+    : foraging_task(name, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.collector") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void collector::task_start(const ta::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::ACQUIRE_CACHED_BLOCK);
-  ta::polled_task::mechanism()->task_start(&a);
+void collector::task_start(const rta::taskable_argument* const) {
+  foraging_signal_argument a(
+      controller::foraging_signal::ekACQUIRE_CACHED_BLOCK);
+  rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
 __rcsw_pure double collector::abort_prob_calc(void) {
@@ -66,7 +67,7 @@ __rcsw_pure double collector::abort_prob_calc(void) {
    * tasks.
    */
   if (-1 == active_interface()) {
-    return ta::abort_probability::kMIN_ABORT_PROB;
+    return rta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }
@@ -79,7 +80,7 @@ double collector::interface_time_calc(uint interface, double start_time) {
 
 void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (acquisition_goal_type::kExistingCache != fsm->acquisition_goal()) {
+  if (acq_goal_type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
     return;
   }
 
@@ -102,54 +103,72 @@ void collector::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void collector::accept(events::cached_block_pickup& visitor) {
+void collector::accept(events::detail::cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::nest_block_drop& visitor) {
+void collector::accept(events::detail::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::cache_vanished& visitor) {
+void collector::accept(events::detail::cache_vanished& visitor) {
   visitor.visit(*this);
 }
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         collector,
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
                          is_exploring_for_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         collector,
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
                          is_vectoring_to_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         collector,
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
                          goal_acquired,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
-                         collector,
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
                          acquisition_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                         collector,
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
                          block_transport_goal,
-                         static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
+                         acquisition_loc,
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
+                         current_vector_loc,
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
+                         current_explore_loc,
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
 __rcsw_pure bool collector::task_at_interface(void) const {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  return !(transport_goal_type::kNest == fsm->block_transport_goal());
+  return !(transport_goal_type::ekNEST == fsm->block_transport_goal());
 } /* task_at_interface() */
 
 NS_END(depth1, tasks, fordyca);

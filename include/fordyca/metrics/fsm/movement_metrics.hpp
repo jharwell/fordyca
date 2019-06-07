@@ -26,24 +26,24 @@
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, fsm);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class movement_metrics
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Interface defining what metrics regarding movement traveled should be
  * collected from all robots.
  */
-class movement_metrics : virtual public rcppsw::metrics::base_metrics {
+class movement_metrics : virtual public rmetrics::base_metrics {
  public:
   movement_metrics(void) = default;
   ~movement_metrics(void) override = default;

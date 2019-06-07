@@ -22,30 +22,37 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::occupancy_grid;
-namespace rswarm = rcppsw::swarm;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(std::unique_ptr<representation::base_block> block)
+block_found::block_found(std::unique_ptr<repr::base_block> block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
       cell_op(block->discrete_loc()),
       m_block(std::move(block)) {}
 
-block_found::block_found(const std::shared_ptr<representation::base_block>& block)
+block_found::block_found(const std::shared_ptr<repr::base_block>& block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
       cell_op(block->discrete_loc()),
       m_block(block) {}
@@ -58,7 +65,7 @@ void block_found::visit(ds::dpo_store& store) {
    * If the cell in the arena that we thought contained a cache now contains a
    * block, remove the out-of-date cache.
    */
-  for (auto&& c : store.caches().values_range()) {
+  for (auto& c : store.caches().values_range()) {
     if (m_block->discrete_loc() == c.ent()->discrete_loc()) {
       store.cache_remove(c.ent_obj());
 
@@ -67,11 +74,11 @@ void block_found::visit(ds::dpo_store& store) {
        * given cell has changed. This is regardless of the status repeat
        * deposits, which only affect repeated sightings of KNOWN objects.
        */
-      const_cast<ds::dp_cache_map::value_type&>(c).density().reset();
+      c.density().reset();
     }
   } /* for(&&c..) */
 
-  rswarm::pheromone_density density;
+  rswarm::pheromone_density density(store.pheromone_rho());
   auto known = store.find(m_block);
   if (nullptr != known) {
     /*
@@ -86,15 +93,18 @@ void block_found::visit(ds::dpo_store& store) {
               m_block->discrete_loc().to_str().c_str());
       store.block_remove(known->ent_obj());
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
-    } else {
+    } else { /* block has not moved */
       density = known->density();
 
       /*
-       * Repeat pheromone deposits only affect blocks that are already known and
-       * that we are tracking accurately.
+       * If repeat pheromon deposits are enabled, make a deposit. Otherwise,
+       * just reset the pheromone density to make because we have seen the block
+       * again.
        */
       if (store.repeat_deposit()) {
         density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+      } else {
+        density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
       }
     }
   } else {
@@ -109,7 +119,7 @@ void block_found::visit(ds::dpo_store& store) {
  ******************************************************************************/
 void block_found::visit(ds::cell2D& cell) {
   cell.entity(m_block);
-  cell.fsm().accept(*this);
+  this->visit(cell.fsm());
 } /* visit() */
 
 void block_found::visit(fsm::cell2D_fsm& fsm) {
@@ -132,7 +142,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
   if (!cell.state_is_known()) {
     map.known_cells_inc();
     ER_ASSERT(map.known_cell_count() <= map.xdsize() * map.ydsize(),
-              "Known cell count (%u) >= arena dimensions (%ux%u)",
+              "Known cell count (%u) >= arena dimensions (%zux%zu)",
               map.known_cell_count(),
               map.xdsize(),
               map.ydsize());
@@ -158,6 +168,22 @@ void block_found::visit(ds::dpo_semantic_map& map) {
     density.reset();
   }
 
+  pheromone_update(map);
+
+  ER_ASSERT(cell.state_has_block(),
+            "Cell@%s not in HAS_BLOCK",
+            cell.loc().to_str().c_str());
+  ER_ASSERT(cell.block()->id() == m_block->id(),
+            "Block for cell@%s ID mismatch: %d/%d",
+            cell.loc().to_str().c_str(),
+            m_block->id(),
+            cell.block()->id());
+} /* visit() */
+
+void block_found::pheromone_update(ds::dpo_semantic_map& map) {
+  rswarm::pheromone_density& density =
+      map.access<occupancy_grid::kPheromone>(x(), y());
+  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   if (map.pheromone_repeat_deposit()) {
     density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
   } else {
@@ -179,16 +205,16 @@ void block_found::visit(ds::dpo_semantic_map& map) {
    */
   auto res = map.block_update(ds::dp_block_map::value_type(m_block, density));
   if (res.status) {
-    if (ds::dpo_store::update_status::kBlockMoved == res.reason) {
+    if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
                res.old_loc.to_str().c_str(),
                m_block->id(),
                res.old_loc.to_str().c_str(),
                m_block->discrete_loc().to_str().c_str());
-      events::cell_empty op(res.old_loc);
-      map.access<occupancy_grid::kCell>(res.old_loc).accept(op);
+      events::cell_empty_visitor op(res.old_loc);
+      op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {
-      ER_ASSERT(ds::dpo_store::update_status::kNewBlockAdded == res.reason,
+      ER_ASSERT(ds::dpo_store::update_status::kNEW_BLOCK_ADDED == res.reason,
                 "Bad reason for DPO store update: %d",
                 res.reason);
     }
@@ -198,17 +224,9 @@ void block_found::visit(ds::dpo_semantic_map& map) {
      * host cell has been updated and the block updated in the store, so we are
      * good to update the NEW host cell to point to the block.
      */
-    cell.accept(*this);
+    visit(cell);
   }
-  ER_ASSERT(cell.state_has_block(),
-            "Cell@%s not in HAS_BLOCK",
-            cell.loc().to_str().c_str());
-  ER_ASSERT(cell.block()->id() == m_block->id(),
-            "Block for cell@%s ID mismatch: %d/%d",
-            cell.loc().to_str().c_str(),
-            m_block->id(),
-            cell.block()->id());
-} /* visit() */
+} /* pheromone_update() */
 
 /*******************************************************************************
  * Depth2 Foraging
@@ -216,9 +234,33 @@ void block_found::visit(ds::dpo_semantic_map& map) {
 void block_found::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
 
-  c.mdpo_perception()->map()->accept(*this);
+  visit(*c.mdpo_perception()->map());
 
   c.ndc_pop();
 } /* visit() */
 
-NS_END(events, fordyca);
+void block_found::visit(controller::depth2::grp_dpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
+
+  c.ndc_pop();
+} /* visit() */
+
+void block_found::visit(controller::depth2::grp_omdpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.mdpo_perception()->map());
+
+  c.ndc_pop();
+} /* visit() */
+
+void block_found::visit(controller::depth2::grp_odpo_controller& c) {
+  c.ndc_push();
+
+  visit(*c.dpo_perception()->dpo_store());
+
+  c.ndc_pop();
+} /* visit() */
+
+NS_END(detail, events, fordyca);

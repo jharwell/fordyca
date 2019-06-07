@@ -24,6 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <boost/variant/static_visitor.hpp>
+
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
@@ -32,8 +35,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
-namespace rmath = rcppsw::math;
 namespace ds {
 class cell2D;
 }
@@ -41,14 +42,14 @@ namespace fsm {
 class cell2D_fsm;
 }
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class cell_op
- * @ingroup events
+ * @ingroup fordyca events detail
  *
  * @brief Non-abstract interface specifying the minimum set of classes that all
  * events that operate on cells within an occupany grid need to visit.
@@ -56,21 +57,35 @@ NS_START(events);
  * Also provided are the (x, y) coordinates of the cell to which the event is
  * directed. Not all derived events may need them, but they are there.
  */
-class cell_op : public visitor::visitor,
-                public visitor::visit_set<ds::cell2D, fsm::cell2D_fsm> {
+class cell_op {
  public:
+  using visit_typelist = rmpl::typelist<ds::cell2D, fsm::cell2D_fsm>;
+
   explicit cell_op(const rmath::vector2u& coord) : m_coord(coord) {}
 
-  ~cell_op(void) override = default;
+  virtual ~cell_op(void) = default;
 
   uint x(void) const { return m_coord.x(); }
   uint y(void) const { return m_coord.y(); }
+
   const rmath::vector2u& coord(void) const { return m_coord; }
 
  private:
+  /* clang-format on */
   rmath::vector2u m_coord;
+  /* clang-format off */
 };
 
+NS_END(detail);
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cell_op_visitor = rpvisitor::precise_visitor<detail::cell_op,
+                                                  detail::cell_op::visit_typelist>;
 NS_END(events, fordyca);
 
 #endif /* INCLUDE_FORDYCA_EVENTS_CELL_OP_HPP_ */

@@ -28,19 +28,14 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-namespace visitor = rcppsw::patterns::visitor;
-namespace rfsm = rcppsw::patterns::state_machine;
-namespace er = rcppsw::er;
-namespace ta = rcppsw::task_allocation;
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 class acquire_goal_fsm;
@@ -51,7 +46,7 @@ class acquire_free_block_fsm;
  ******************************************************************************/
 /**
  * @class block_to_goal_fsm
- * @ingroup fsm depth1
+ * @ingroup fordyca fsm depth1
  *
  * @brief Base FSM for acquiring, picking up a block, and then bringing it
  * somewhere and dropping it.
@@ -60,77 +55,80 @@ class acquire_free_block_fsm;
  * or via random exploration), pickup the block and bring it to its chosen
  * goal. Once it has done that it will signal that its task is complete.
  */
-class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
+class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
                           public base_foraging_fsm,
-                          public ta::taskable,
+                          public rta::taskable,
                           public metrics::fsm::goal_acquisition_metrics,
-                          public fsm::block_transporter,
-                          public visitor::visitable_any<block_to_goal_fsm> {
+                          public fsm::block_transporter {
  public:
   block_to_goal_fsm(acquire_goal_fsm* goal_fsm,
                     acquire_goal_fsm* block_fsm,
                     controller::saa_subsystem* saa);
   ~block_to_goal_fsm(void) override = default;
 
-  block_to_goal_fsm(const block_to_goal_fsm& fsm) = delete;
-  block_to_goal_fsm& operator=(const block_to_goal_fsm& fsm) = delete;
+  block_to_goal_fsm(const block_to_goal_fsm&) = delete;
+  block_to_goal_fsm& operator=(const block_to_goal_fsm&) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const ta::taskable_argument* arg) override;
+  void task_start(const rta::taskable_argument* arg) override;
   bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
+    return ekST_FINISHED == current_state();
   }
   bool task_running(void) const override {
-    return !(ST_FINISHED == current_state() || ST_START == current_state());
+    return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
+  bool in_collision_avoidance(void) const override final;
+  bool entered_collision_avoidance(void) const override final;
+  bool exited_collision_avoidance(void) const override final;
+  uint collision_avoidance_duration(void) const override final;
+  rmath::vector2u avoidance_loc(void) const override final;
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
+  rmath::vector2u acquisition_loc(void) const override final;
+  bool is_vectoring_to_goal(void) const override final;
+  exp_status is_exploring_for_goal(void) const override final;
   bool goal_acquired(void) const override;
-  acquisition_goal_type acquisition_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
+  rmath::vector2u current_explore_loc(void) const override final;
+  rmath::vector2u current_vector_loc(void) const override final;
 
   /**
    * @brief Reset the FSM
    */
-  void init(void) override;
+  void init(void) override final;
 
  protected:
   enum fsm_states {
-    ST_START,
+    ekST_START,
     /**
      * Superstate for acquiring a block (free or from a cache).
      */
-    ST_ACQUIRE_BLOCK,
+    ekST_ACQUIRE_BLOCK,
 
     /**
-     * A block has been acquired--wait for area to send the block pickup signal.
+ppp     * A block has been acquired--wait for area to send the block pickup signal.
      */
-    ST_WAIT_FOR_BLOCK_PICKUP,
+    ekST_WAIT_FOR_BLOCK_PICKUP,
 
     /**
      * We are transporting a carried block to our goal.
      */
-    ST_TRANSPORT_TO_GOAL,
+    ekST_TRANSPORT_TO_GOAL,
 
     /**
      * We have acquired our goal--wait for arena to send the block drop signal.
      */
-    ST_WAIT_FOR_BLOCK_DROP,
+    ekST_WAIT_FOR_BLOCK_DROP,
 
     /**
      * Block has been successfully dropped at our goal/in our goal.
      */
-    ST_FINISHED,
-    ST_MAX_STATES,
+    ekST_FINISHED,
+    ekST_MAX_STATES,
   };
 
   const acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
@@ -141,11 +139,11 @@ class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
   /* block to goal states */
-  HFSM_STATE_DECLARE(block_to_goal_fsm, start, rfsm::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, start, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, acquire_block);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rfsm::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_pickup, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, transport_to_goal);
-  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rfsm::event_data);
+  HFSM_STATE_DECLARE(block_to_goal_fsm, wait_for_block_drop, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
 
   /**
@@ -163,7 +161,7 @@ class block_to_goal_fsm : public er::client<block_to_goal_fsm>,
   acquire_goal_fsm * const m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

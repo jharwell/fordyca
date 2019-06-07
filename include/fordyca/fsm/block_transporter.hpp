@@ -36,10 +36,11 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 /**
  * @class block_transporter
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief Interface defining what classes directly involved in transporting
- * blocks need to implement in order to successfully interact with the loop functions.
+ * blocks need to implement in order to successfully interact with the loop
+ * functions.
  */
 class block_transporter {
  public:
@@ -47,31 +48,31 @@ class block_transporter {
     /**
      * @brief No goal--robot is probably not carrying a block.
      */
-    kNone,
+    ekNONE,
 
     /**
-       * @brief A robot has acquired a block and is currently taking it back to
-       * the nest.
-       */
-    kNest,
+     * @brief A robot has acquired a block and is currently taking it back to
+     * the nest.
+     */
+    ekNEST,
 
     /**
-       * @brief A robot is currently transporting an acquired block to its
-       * existing cache of choice.
-       */
-    kExistingCache,
+     * @brief A robot is currently transporting an acquired block to its
+     * existing cache of choice.
+     */
+    ekEXISTING_CACHE,
 
     /**
-       * @brief A robot is currently transporting an acquired block to its new
-       * cache of choice.
-       */
-    kNewCache,
+     * @brief A robot is currently transporting an acquired block to its new
+     * cache of choice.
+     */
+    ekNEW_CACHE,
 
     /**
-       * @brief A robot is currently transporting an acquired block to its cache
-       * site of choice.
-       */
-    kCacheSite
+     * @brief A robot is currently transporting an acquired block to its cache
+     * site of choice.
+     */
+    ekCACHE_SITE
   };
   block_transporter(void) = default;
   virtual ~block_transporter(void) = default;

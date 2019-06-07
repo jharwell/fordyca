@@ -32,15 +32,14 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-namespace er = rcppsw::er;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Classes
@@ -48,23 +47,23 @@ namespace er = rcppsw::er;
 
 /**
  * @class free_block_pickup_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Handle's a robot's (possible) \ref free_block_pickup event on a given
  * timestep.
  */
 template <typename T>
 class free_block_pickup_interactor
-    : public er::client<free_block_pickup_interactor<T>> {
+    : public rer::client<free_block_pickup_interactor<T>> {
  public:
   free_block_pickup_interactor(ds::arena_map* const map,
                                argos::CFloorEntity* const floor,
-                               tv::tv_controller* tv_controller)
+                               tv::tv_manager* tv_manager)
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
         m_floor(floor),
         m_map(map),
-        m_penalty_handler(tv_controller->penalty_handler<T>(
-            tv::block_op_src::kSrcFreePickup)) {}
+        m_penalty_handler(
+            tv_manager->penalty_handler<T>(tv::block_op_src::ekFREE_PICKUP)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -94,8 +93,8 @@ class free_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                     tv::block_op_src::kSrcFreePickup,
-                                     timestep);
+                                      tv::block_op_src::ekFREE_PICKUP,
+                                      timestep);
     }
   }
 
@@ -105,8 +104,8 @@ class free_block_pickup_interactor
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
   void finish_free_block_pickup(T& controller, uint timestep) {
-    ER_ASSERT(controller.goal_acquired() && acquisition_goal_type::kBlock ==
-                                                controller.acquisition_goal(),
+    ER_ASSERT(controller.goal_acquired() &&
+                  acq_goal_type::ekBLOCK == controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving pickup penalty");
@@ -137,8 +136,8 @@ class free_block_pickup_interactor
       ER_WARN("%s cannot pickup block%d: No such block",
               controller.GetId().c_str(),
               m_penalty_handler->find(controller)->id());
-      events::block_vanished vanished(p.id());
-      controller.visitor::template visitable_any<T>::accept(vanished);
+      events::block_vanished_visitor vanished_op(p.id());
+      vanished_op.visit(controller);
     } else {
       perform_free_block_pickup(controller, p, timestep);
       m_floor->SetChanged();
@@ -163,7 +162,7 @@ class free_block_pickup_interactor
     ER_ASSERT(it != m_map->blocks().end(),
               "Block%d from penalty does not exist",
               penalty.id());
-    ER_ASSERT((*it)->real_loc() != representation::base_block::kOutOfSightRLoc,
+    ER_ASSERT((*it)->real_loc() != repr::base_block::kOutOfSightRLoc,
               "Attempt to pick up out of sight block%d",
               (*it)->id());
     /*
@@ -171,13 +170,12 @@ class free_block_pickup_interactor
      * event, because the penalty is generic, and the event handles concrete
      * classes--no clean way to mix the two.
      */
-    controller.penalty_served(penalty.penalty());
-    events::free_block_pickup pickup_op(*it,
-                                        loop_utils::robot_id(controller),
-                                        timestep);
+    controller.block_manip_collator()->penalty_served(penalty.penalty());
+    events::free_block_pickup_visitor pickup_op(
+        *it, loop_utils::robot_id(controller), timestep);
 
-    controller.visitor::template visitable_any<T>::accept(pickup_op);
-    m_map->accept(pickup_op);
+    pickup_op.visit(controller);
+    pickup_op.visit(*m_map);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();

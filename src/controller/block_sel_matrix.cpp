@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
+#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,16 +36,20 @@ constexpr char block_sel_matrix::kNestLoc[];
 constexpr char block_sel_matrix::kCubePriority[];
 constexpr char block_sel_matrix::kRampPriority[];
 constexpr char block_sel_matrix::kSelExceptions[];
+constexpr char block_sel_matrix::kPickupPolicy[];
+constexpr char block_sel_matrix::kPickupPolicyNull[];
+constexpr char block_sel_matrix::kPickupPolicyClusterProx[];
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 block_sel_matrix::block_sel_matrix(
-    const struct params::block_sel_matrix_params* params) {
-  this->insert(std::make_pair(kNestLoc, params->nest));
-  this->insert(std::make_pair(kCubePriority, params->priorities.cube));
-  this->insert(std::make_pair(kRampPriority, params->priorities.ramp));
+    const config::block_sel::block_sel_matrix_config* config) {
+  this->insert(std::make_pair(kNestLoc, config->nest));
+  this->insert(std::make_pair(kCubePriority, config->priorities.cube));
+  this->insert(std::make_pair(kRampPriority, config->priorities.ramp));
   this->insert(std::make_pair(kSelExceptions, std::vector<int>()));
+  this->insert(std::make_pair(kPickupPolicy, config->pickup_policy));
 }
 
 /*******************************************************************************

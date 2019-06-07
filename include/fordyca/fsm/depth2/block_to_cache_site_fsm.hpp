@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
@@ -38,29 +40,31 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 /**
  * @class block_to_cache_site_fsm
- * @ingroup fsm depth2
+ * @ingroup fordyca fsm depth2
  *
  * @brief The FSM for the block-to-cache-site subtask.
  *
  * Each robot executing this FSM will locate a free block (either a known block
- * or via random exploration), pickup the block and bring it to the location in
- * the arena that it has computed as being the best place to start a new cache,
- * and then drop the block there. Once it has done that it will signal that its
- * task is complete.
+ * or via exploration), pickup the block and bring it to the location in the
+ * arena that it has computed as being the best place to start a new cache, and
+ * then drop the block there. Once it has done that it will signal that its task
+ * is complete.
  */
-class block_to_cache_site_fsm : public block_to_goal_fsm {
+class block_to_cache_site_fsm final : public block_to_goal_fsm {
  public:
-  block_to_cache_site_fsm(const controller::block_sel_matrix* bsel_matrix,
-                          const controller::cache_sel_matrix* csel_matrix,
-                          controller::saa_subsystem* saa,
-                          ds::dpo_store* store);
-  ~block_to_cache_site_fsm(void) override = default;
+  block_to_cache_site_fsm(
+      const controller::block_sel_matrix* bsel_matrix,
+      const controller::cache_sel_matrix* csel_matrix,
+      controller::saa_subsystem* saa,
+      ds::dpo_store* store,
+      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
 
-  block_to_cache_site_fsm(const block_to_cache_site_fsm& fsm) = delete;
-  block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm& fsm) = delete;
+  ~block_to_cache_site_fsm(void) override = default;
+  block_to_cache_site_fsm(const block_to_cache_site_fsm&) = delete;
+  block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override;
 
   /* block transportation */
   transport_goal_type block_transport_goal(void) const override;

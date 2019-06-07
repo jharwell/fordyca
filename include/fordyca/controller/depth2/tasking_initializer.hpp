@@ -1,5 +1,5 @@
 /**
- * @file tasking_initializer.hpp
+ * @file depth2/tasking_initializer.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -32,26 +32,24 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
+namespace config {
 namespace depth2 { class controller_repository; }
 }
 
 NS_START(controller, depth2);
-namespace er = rcppsw::er;
-namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class tasking_initializer
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief A helper class to offload initialization of the task tree for depth2
  * foraging.
  */
 class tasking_initializer : public depth1::tasking_initializer,
-                            public er::client<tasking_initializer> {
+                            public rer::client<tasking_initializer> {
  public:
   tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
@@ -59,16 +57,18 @@ class tasking_initializer : public depth1::tasking_initializer,
                       base_perception_subsystem* perception);
   ~tasking_initializer(void) override;
 
-  std::unique_ptr<ta::bi_tdgraph_executive>
-  operator()(const params::depth2::controller_repository& param_repo);
+  std::unique_ptr<rta::bi_tdgraph_executive>
+  operator()(const config::depth2::controller_repository& param_repo);
 
   using depth1::tasking_initializer::tasking_map;
 
  protected:
   tasking_map depth2_tasks_create(
-      const params::depth2::controller_repository& task_repo);
-  void depth2_exec_est_init(const params::depth2::controller_repository& task_repo,
-                            const tasking_map& map);
+      const config::depth2::controller_repository& param_repo,
+      rta::bi_tdgraph* graph);
+  void depth2_exec_est_init(const config::depth2::controller_repository& param_repo,
+                            const tasking_map& map,
+                            rta::bi_tdgraph* graph);
 };
 
 NS_END(depth2, controller, fordyca);

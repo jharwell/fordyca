@@ -27,12 +27,12 @@
 #include <string>
 #include <vector>
 
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -52,17 +52,17 @@ NS_START(controller);
  ******************************************************************************/
 /**
  * @class mdpo_perception_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
- * into a useful internal representation: a \ref dpo_semantic_map.
+ * into a useful internal repr: a \ref dpo_semantic_map.
  */
-class mdpo_perception_subsystem
-    : public rcppsw::er::client<mdpo_perception_subsystem>,
+class mdpo_perception_subsystem final
+    : public rer::client<mdpo_perception_subsystem>,
       public base_perception_subsystem,
-      public metrics::world_model_metrics {
+      public metrics::perception::mdpo_perception_metrics {
  public:
-  mdpo_perception_subsystem(const params::perception::perception_params* params,
+  mdpo_perception_subsystem(const config::perception::perception_config* config,
                             const std::string& id);
   ~mdpo_perception_subsystem(void) override = default;
 
@@ -78,7 +78,7 @@ class mdpo_perception_subsystem
    * @brief Update the robot's perception of the environment, passing it its
    * current line of sight.
    */
-  void update(void) override;
+  void update(oracular_info_receptor* receptor) override;
 
   /**
    * @brief Reset the robot's perception of the environment to an initial state
@@ -87,9 +87,7 @@ class mdpo_perception_subsystem
 
   const ds::dpo_semantic_map* map(void) const { return m_map.get(); }
   ds::dpo_semantic_map* map(void) { return m_map.get(); }
-  const ds::dpo_store* dpo_store(void) const override {
-    return const_cast<mdpo_perception_subsystem*>(this)->dpo_store();
-  }
+  const ds::dpo_store* dpo_store(void) const override;
   ds::dpo_store* dpo_store(void) override;
 
  private:
@@ -100,32 +98,23 @@ class mdpo_perception_subsystem
    *
    * @param c_los The LOS to process.
    */
-  void process_los(const representation::line_of_sight* const c_los);
-  void process_los_blocks(const representation::line_of_sight* const c_los);
-  void process_los_caches(const representation::line_of_sight* const c_los);
+  void process_los(const repr::line_of_sight* c_los,
+                   oracular_info_receptor* const receptor);
+  void process_los_blocks(const repr::line_of_sight* c_los);
+  void process_los_caches(const repr::line_of_sight* c_los);
 
-  /**
-   * @brief The processing of the current LOS after processing (i.e. does the
-   * PAM now accurately reflect what was in the LOS)?
-   *
-   * @param c_los Current LOS.
-   */
-  void processed_los_verify(
-      const representation::line_of_sight* const c_los) const;
-
- private:
   /**
    * @brief Update the aggregate stats on inaccuracies in the robot's perceived
    * arena map for this timestep.
    *
-   * @param los The current LOS
+   * @param c_los The current LOS
    */
-  void update_cell_stats(const representation::line_of_sight* const los);
+  void update_cell_stats(const repr::line_of_sight* c_los);
 
   /* clang-format off */
-  std::vector<uint>                              m_cell_stats;
-  std::unique_ptr<representation::line_of_sight> m_los;
-  std::unique_ptr<ds::dpo_semantic_map>          m_map;
+  std::vector<uint>                     m_cell_stats;
+  std::unique_ptr<repr::line_of_sight>  m_los;
+  std::unique_ptr<ds::dpo_semantic_map> m_map;
   /* clang-format on */
 };
 

@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
@@ -41,20 +43,22 @@ NS_START(fsm, depth2);
  ******************************************************************************/
 /**
  * @class acquire_new_cache_fsm
- * @ingroup fsm depth2
+ * @ingroup fordyca fsm depth2
  *
  * @brief The FSM for an acquiring a NEW cache within the arena.
  *
  * Each robot executing this FSM will look for a new cache (either a known new
- * cache or via random exploration). Once the chosen new cache has been
- * acquired, it signals that it has completed its task.
+ * cache or via exploration). Once the chosen new cache has been acquired, it
+ * signals that it has completed its task.
  */
-class acquire_new_cache_fsm : public er::client<acquire_new_cache_fsm>,
+class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
                               public acquire_goal_fsm {
  public:
-  acquire_new_cache_fsm(const controller::cache_sel_matrix* matrix,
-                        controller::saa_subsystem* actuators,
-                        ds::dpo_store* store);
+  acquire_new_cache_fsm(
+      const controller::cache_sel_matrix* matrix,
+      controller::saa_subsystem* saa,
+      ds::dpo_store* store,
+      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
   ~acquire_new_cache_fsm(void) override = default;
 
   acquire_new_cache_fsm(const acquire_new_cache_fsm& fsm) = delete;
@@ -64,8 +68,8 @@ class acquire_new_cache_fsm : public er::client<acquire_new_cache_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type cache_select(void) const;
+  acq_goal_type acquisition_goal_internal(void) const;
+  boost::optional<acquire_goal_fsm::candidate_type> cache_select(void) const;
   bool candidates_exist(void) const;
   bool cache_acquired_cb(bool explore_result) const;
 

@@ -24,11 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,8 +40,8 @@ NS_START(fordyca);
 namespace ds {
 class dpo_store;
 }
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-namespace ta = rcppsw::task_allocation;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+namespace rta = rcppsw::ta;
 
 NS_START(fsm);
 
@@ -48,7 +50,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class acquire_free_block_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief The FSM for an acquiring a free (i.e. not in a cache) block in the
  * arena.
@@ -57,12 +59,13 @@ NS_START(fsm);
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
+class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public acquire_goal_fsm {
  public:
   acquire_free_block_fsm(const controller::block_sel_matrix* matrix,
                          controller::saa_subsystem* saa,
-                         ds::dpo_store* store);
+                         ds::dpo_store* store,
+                         std::unique_ptr<expstrat::base_expstrat> exp_behavior);
 
   ~acquire_free_block_fsm(void) override = default;
 
@@ -73,11 +76,12 @@ class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type block_select(void) const;
+  acq_goal_type acquisition_goal_internal(void) const;
+  boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
   bool candidates_exist(void) const;
   bool block_exploration_term_cb(void) const;
   bool block_acquired_cb(bool explore_result) const;
+  bool block_acquisition_valid(const rmath::vector2d& loc, uint id) const;
 
   /* clang-format off */
   const controller::block_sel_matrix* const mc_matrix;

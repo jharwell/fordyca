@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
+#include <memory>
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
@@ -37,12 +37,10 @@
 NS_START(fordyca);
 
 namespace ds { class dpo_store; }
-namespace visitor = rcppsw::patterns::visitor;
-namespace task_allocation = rcppsw::task_allocation;
 
 NS_START(fsm, depth0);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -50,40 +48,45 @@ using transport_goal_type = block_transporter::goal_type;
  ******************************************************************************/
 /**
  * @class dpo_fsm
- * @ingroup fsm depth0
+ * @ingroup fordyca fsm depth0
  *
  * @brief The FSM for an unpartitioned foraging task. Each robot executing this
- * FSM will locate for a block (either a known block or via random exploration),
- * pickup the block and bring it all the way back to the nest.
+ * FSM will locate for a block (either a known block or via exploration), pickup
+ * the block and bring it all the way back to the nest.
  *
  * This FSM will only pickup free blocks. Once it has brought a block all the
  * way to the nest and dropped it in the nest, it will repeat the same sequence
  * (i.e. it loops indefinitely).
  */
-class dpo_fsm : public base_foraging_fsm,
-                     er::client<dpo_fsm>,
+class dpo_fsm final : public base_foraging_fsm,
+                     rer::client<dpo_fsm>,
                      public metrics::fsm::goal_acquisition_metrics,
-                     public block_transporter,
-                     public visitor::visitable_any<depth0::dpo_fsm> {
+                     public block_transporter {
  public:
   dpo_fsm(const controller::block_sel_matrix* sel_matrix,
-               controller::saa_subsystem* saa,
-               ds::dpo_store* store);
+          controller::saa_subsystem* saa,
+          ds::dpo_store* store,
+          std::unique_ptr<expstrat::base_expstrat> exp_behavior);
+  ~dpo_fsm(void) override = default;
 
   /* collision metrics */
-  FSM_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  FSM_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
-  FSM_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   void init(void) override;
 
@@ -94,21 +97,21 @@ class dpo_fsm : public base_foraging_fsm,
 
  protected:
   enum fsm_states {
-    ST_START,
-    ST_BLOCK_TO_NEST,     /* Find a block and bring it to the nest */
-    ST_LEAVING_NEST,      /* Block dropped in nest--time to go */
-    ST_MAX_STATES
+    ekST_START,
+    ekST_BLOCK_TO_NEST,     /* Find a block and bring it to the nest */
+    ekST_LEAVING_NEST,      /* Block dropped in nest--time to go */
+    ekST_MAX_STATES
   };
 
  private:
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
-                     state_machine::event_data);
+                     rpfsm::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
 
   /* foraging states */
-  HFSM_STATE_DECLARE(dpo_fsm, start, state_machine::event_data);
-  HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, state_machine::event_data);
+  HFSM_STATE_DECLARE(dpo_fsm, start, rpfsm::event_data);
+  HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, rpfsm::event_data);
 
   /**
    * @brief Defines the state map for the FSM.
@@ -124,7 +127,7 @@ class dpo_fsm : public base_foraging_fsm,
   free_block_to_nest_fsm m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, fsm, fordyca);

@@ -24,8 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <boost/optional.hpp>
 #include <functional>
 #include <list>
+#include <memory>
 #include <tuple>
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
@@ -33,23 +35,21 @@
 #include "fordyca/fsm/vector_fsm.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-namespace rmath = rcppsw::math;
-namespace ta = rcppsw::task_allocation;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class acquire_goal_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief The base FSM for an acquiring a goal in the arena.
  *
@@ -58,96 +58,118 @@ namespace ta = rcppsw::task_allocation;
  * acquired, it signals that it has completed its task.
  */
 class acquire_goal_fsm : public base_foraging_fsm,
-                         public er::client<acquire_goal_fsm>,
+                         public rer::client<acquire_goal_fsm>,
                          public metrics::fsm::goal_acquisition_metrics,
-                         public ta::taskable {
+                         public rta::taskable {
  public:
-  using candidate_type = std::tuple<bool, rmath::vector2d, double>;
-  using goal_select_ftype = std::function<candidate_type(void)>;
-  using goal_candidates_ftype = std::function<bool(void)>;
-  using acquisition_goal_ftype = std::function<acquisition_goal_type(void)>;
+  using candidate_type = std::tuple<rmath::vector2d, double, int>;
+  using goal_select_ftype = std::function<boost::optional<candidate_type>(void)>;
+  using acquisition_goal_ftype = std::function<acq_goal_type(void)>;
+  using goal_valid_ftype = std::function<bool(const rmath::vector2d&, uint)>;
 
   /**
+   * acquisition_goal Function used to tell the FSM what is the ultimate
+   *                  goal of the acquisition. However, the return of
+   *                  \ref acquisition_goal() may not always be the same
+   *                  as the specified goal, depending on what the
+   *                  current FSM state is.
    *
+   * goal_select      Function used to select a goal from the list of
+   *                  candidates. Should return the "best" candidate that
+   *                  should be acquired.
    *
-   * @param saa              Handle to sensing and actuation subsystem.
+   * candidates_exist Function used to determine if any goal candidates
+   *                  are currently available/eligible for acquisition.
    *
-   * @param acquisition_goal Function used to tell the FSM what is the ultimate
-   *                         goal of the acquisition. However, the return of
-   *                         \ref acquisition_goal() may not always be the same
-   *                         as the specified goal, depending on what the
-   *                         current FSM state is.
+   * goal_acquired_cb Callback used after a goal has been acquired for
+   *                  sanity check/verification of state. Will be passed
+   *                  \c TRUE if the acquired goal was obtained via
+   *                  exploration, rather than vectoring, and false if it
+   *                  was obtained via vectoring. Should return \c TRUE
+   *                  if the goal has REALLY been acquired, and \c FALSE
+   *                  otherwise (the goal may have vanished if it was a
+   *                  block/cache, for example).
    *
-   * @param candidates_exist_cb Function used to determine if any goal
-   *                            candidates are currently available/eligible
-   *                            for acquisition.
+   * explore_term_cb Callback for goal detection during exploration. This
+   *                 fsm can't know when a goal has been reached without
+   *                 losing its generality when exploring, so this
+   *                 callback is provided to it for that purpose. Should
+   *                 return \c TRUE if the goal has been detected/reached
+   *                 and exploration should terminate, and \c FALSE
+   *                 otherwise.
    *
-   * @param goal_select      Function used to select a goal from the list of
-   *                         candidates. Should return the "best" candidate that
-   *                         should be acquired.
+   * goal_valid_cb Callback for verifying goal validity during
+   *               vectoring/exploration. If for any reason the specific goal
+   *               becomes invalid before the robot has acquired it, then it
+   *               should return \c FALSE.
+   */
+  struct hook_list {
+    /* clang-format off */
+    acquisition_goal_ftype    acquisition_goal{nullptr};
+    goal_select_ftype         goal_select{nullptr};
+    std::function<bool(void)> candidates_exist{nullptr};
+    std::function<bool(bool)> goal_acquired_cb{nullptr};
+    std::function<bool(void)> explore_term_cb{nullptr};
+    goal_valid_ftype          goal_valid_cb{nullptr};
+    /* clang-format on */
+  };
+
+  /**
+   * @param saa Handle to sensing and actuation subsystem.
    *
-   * @param goal_acquired_cb Callback used after a goal has been acquired for
-   *                         sanity check/verification of state. Will be passed
-   *                         \c TRUE if the acquired goal was obtained via
-   *                         exploration, rather than vectoring, and false if it
-   *                         was obtained via vectoring. Should return \c TRUE
-   *                         if the goal has REALLY been acquired, and \c FALSE
-   *                         otherwise (the goal may have vanished if it was a
-   *                         block/cache, for example).
+   * @param behavior The exploration behavior to use; can be NULL if goal
+   * acquisition should always be performed via vectoring.
    *
-   * @param explore_term_cb Callback for goal detection during exploration. This
-   *                        fsm can't know when a goal has been reached without
-   *                        losing its generality when exploring, so this
-   *                        callback is provided to it for that purpose. Should
-   *                        return \c TRUE if the goal has been detected/reached
-   *                        and exploration should terminate, and \c FALSE
-   *                        otherwise.
+   * @param hooks List of function callbacks that derived classes should pass in
+   *              ordr to make use of the general purpose machinery in this
+   *              class.
    */
   acquire_goal_fsm(controller::saa_subsystem* saa,
-                   const acquisition_goal_ftype& acquisition_goal,
-                   const goal_candidates_ftype& candidates_exist_cb,
-                   const goal_select_ftype& goal_select,
-                   const std::function<bool(bool)>& goal_acquired_cb,
-                   const std::function<bool(void)>& explore_term_cb);
+                   std::unique_ptr<expstrat::base_expstrat> behavior,
+                   const struct hook_list& hooks);
   ~acquire_goal_fsm(void) override = default;
 
   acquire_goal_fsm(const acquire_goal_fsm& fsm) = delete;
   acquire_goal_fsm& operator=(const acquire_goal_fsm& fsm) = delete;
 
   /* taskable overrides */
-  void task_execute(void) override;
-  void task_start(const ta::taskable_argument*) override {}
-  bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
+  void task_execute(void) override final;
+  void task_start(const rta::taskable_argument*) override {}
+  bool task_finished(void) const override final {
+    return ekST_FINISHED == current_state();
   }
-  bool task_running(void) const override {
-    return ST_ACQUIRE_GOAL == current_state();
+  bool task_running(void) const override final {
+    return ekST_ACQUIRE_GOAL == current_state();
   }
-  void task_reset(void) override { init(); }
+  void task_reset(void) override final { init(); }
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
+  bool in_collision_avoidance(void) const override final;
+  bool entered_collision_avoidance(void) const override final;
+  bool exited_collision_avoidance(void) const override final;
+  uint collision_avoidance_duration(void) const override final;
+  rmath::vector2u avoidance_loc(void) const override final;
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override;
-  bool is_vectoring_to_goal(void) const override;
-  bool goal_acquired(void) const override;
-  acquisition_goal_type acquisition_goal(void) const override;
+  exp_status is_exploring_for_goal(void) const override final;
+  bool is_vectoring_to_goal(void) const override final;
+  bool goal_acquired(void) const override final;
+  acq_goal_type acquisition_goal(void) const override final;
+  rmath::vector2u acquisition_loc(void) const override final;
+  rmath::vector2u current_explore_loc(void) const override final;
+  rmath::vector2u current_vector_loc(void) const override final;
 
   /**
    * @brief Reset the FSM
    */
-  void init(void) override;
+  void init(void) override final;
 
  protected:
   enum fsm_states {
-    ST_START,
-    ST_ACQUIRE_GOAL, /* superstate for finding a goal */
-    ST_FINISHED,
-    ST_MAX_STATES
+    ekST_START,
+    ekST_ACQUIRE_GOAL, /* superstate for finding a goal */
+    ekST_FINISHED,
+    ekST_MAX_STATES
   };
 
  private:
@@ -184,15 +206,13 @@ class acquire_goal_fsm : public base_foraging_fsm,
   }
 
   /* clang-format off */
+  int                       m_acq_id{-1};
+  struct hook_list          m_hooks;
   vector_fsm                m_vector_fsm;
   explore_for_goal_fsm      m_explore_fsm;
-  acquisition_goal_ftype    m_acquisition_goal;
-  goal_candidates_ftype     m_candidates_exist;
-  goal_select_ftype         m_goal_select;
-  std::function<bool(bool)> m_goal_acquired_cb;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

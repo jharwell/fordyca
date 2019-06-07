@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/math/existing_cache_utility.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces

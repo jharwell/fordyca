@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/expression.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -32,14 +32,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, math);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class existing_cache_utility
- * @ingroup math
+ * @ingroup fordyca math
  *
  * @brief Calculates the utility associated with an existing cache that the
  * robot knows about.

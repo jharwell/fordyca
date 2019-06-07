@@ -24,6 +24,8 @@
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
@@ -31,19 +33,33 @@
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
+#include "fordyca/tasks/depth2/cache_starter.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_proximity::cache_proximity(std::shared_ptr<representation::base_cache> cache)
+cache_proximity::cache_proximity(const std::shared_ptr<repr::base_cache>& cache)
     : ER_CLIENT_INIT("fordyca.events.cache_proximity"), m_cache(cache) {}
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void cache_proximity::dispatch_cache_interactor(
+    tasks::base_foraging_task* const task) {
+  auto* interactor = dynamic_cast<events::dynamic_cache_interactor*>(task);
+  ER_ASSERT(
+      nullptr != interactor,
+      "Non dynamic cache interactor task '%s' received cache proximity event",
+      dynamic_cast<rta::logical_task*>(task)->name().c_str());
+  interactor->accept(*this);
+} /* dispatch_cache_interactor() */
 
 /*******************************************************************************
  * Depth2 Foraging
@@ -53,15 +69,10 @@ void cache_proximity::visit(controller::depth2::grp_dpo_controller& c) {
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
 
-  events::cache_found found(m_cache);
-  c.dpo_perception()->dpo_store()->accept(found);
+  events::cache_found_visitor found(m_cache);
+  found.visit(*c.dpo_perception()->dpo_store());
 
-  auto* task = dynamic_cast<tasks::depth2::cache_finisher*>(c.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non cache finisher task '%s' received cache proximity event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
-
-  task->accept(*this);
+  dispatch_cache_interactor(c.current_task());
 
   c.ndc_pop();
 } /* visit() */
@@ -71,26 +82,51 @@ void cache_proximity::visit(controller::depth2::grp_mdpo_controller& c) {
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
 
-  events::cache_found found(m_cache);
-  c.mdpo_perception()->map()->accept(found);
+  events::cache_found_visitor found(m_cache);
+  found.visit(*c.mdpo_perception()->map());
 
-  auto* task = dynamic_cast<tasks::depth2::cache_finisher*>(c.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non cache finisher task '%s' received cache proximity event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
+  dispatch_cache_interactor(c.current_task());
 
-  task->accept(*this);
+  c.ndc_pop();
+} /* visit() */
+
+void cache_proximity::visit(controller::depth2::grp_odpo_controller& c) {
+  c.ndc_push();
+
+  ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
+
+  events::cache_found_visitor found(m_cache);
+  found.visit(*c.dpo_perception()->dpo_store());
+
+  dispatch_cache_interactor(c.current_task());
+
+  c.ndc_pop();
+} /* visit() */
+
+void cache_proximity::visit(controller::depth2::grp_omdpo_controller& c) {
+  c.ndc_push();
+
+  ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
+
+  events::cache_found_visitor found(m_cache);
+  found.visit(*c.mdpo_perception()->map());
+
+  dispatch_cache_interactor(c.current_task());
 
   c.ndc_pop();
 } /* visit() */
 
 void cache_proximity::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
+} /* visit() */
+
+void cache_proximity::visit(tasks::depth2::cache_starter& task) {
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 void cache_proximity::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::CACHE_PROXIMITY,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekCACHE_PROXIMITY,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

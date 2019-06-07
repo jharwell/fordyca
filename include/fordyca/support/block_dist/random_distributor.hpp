@@ -27,8 +27,9 @@
 #include <list>
 #include <vector>
 #include <random>
+#include <boost/optional.hpp>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
@@ -38,21 +39,18 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class multicell_entity;
-class cell2D;
-} // namespace representation
+} // namespace repr
 
 NS_START(support, block_dist);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class random_distributor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Distributes a set of blocks randomly within a specified 2D area, such
  * that no blocks overlap with each other or other entities already present in
@@ -63,8 +61,8 @@ namespace rmath = rcppsw::math;
  *   the arena map the blocks are being distributed into some part of (this is
  *   not checked).
  */
-class random_distributor : public base_distributor,
-                           public er::client<random_distributor> {
+class random_distributor final : public base_distributor,
+                           public rer::client<random_distributor> {
  public:
   random_distributor(const ds::arena_grid::view& grid,
                      double resolution);
@@ -74,7 +72,7 @@ class random_distributor : public base_distributor,
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities) override;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
   ds::const_block_cluster_list block_clusters(void) const override {
     return ds::const_block_cluster_list();
@@ -82,9 +80,8 @@ class random_distributor : public base_distributor,
 
  private:
   struct coord_search_res_t {
-    bool            status;
-    rmath::vector2u rel;
-    rmath::vector2u abs;
+    rmath::vector2u rel{};
+    rmath::vector2u abs{};
   };
   /**
    * @brief The maxmimum # of times the distribution will be attempted before
@@ -98,16 +95,19 @@ class random_distributor : public base_distributor,
    *
    * @param entities The entities to avoid.
    */
-  coord_search_res_t avail_coord_search(const ds::const_entity_list& entities,
-                                         const rmath::vector2d& block_dim);
-  bool verify_block_dist(const representation::base_block* block,
+  boost::optional<coord_search_res_t> avail_coord_search(
+      const ds::const_entity_list& entities,
+      const rmath::vector2d& block_dim);
+  bool verify_block_dist(const repr::base_block* block,
                          const ds::const_entity_list& entities,
                          const ds::cell2D* cell);
 
   /* clang-format off */
-  double                     m_resolution;
-  std::default_random_engine m_rng{std::random_device {}()};
-  ds::arena_grid::view       m_grid;
+  const double          mc_resolution;
+  const rmath::vector2u mc_origin;
+  const rmath::rangeu   mc_xspan;
+  const rmath::rangeu   mc_yspan;
+  ds::arena_grid::view  m_grid;
   /* clang-format on */
 };
 

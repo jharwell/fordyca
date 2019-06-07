@@ -28,28 +28,26 @@
 #include <list>
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
-#include "rcppsw/task_allocation/logical_task.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
+#include "rcppsw/ta/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace ta = rcppsw::task_allocation;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
  * @class task_abort_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Handles a robot's (possible) aborting of its current task on a given
  * timestep.
  */
 template <typename T>
-class task_abort_interactor : public er::client<task_abort_interactor<T>> {
+class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
  public:
   using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
 
@@ -95,7 +93,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     if (controller.is_carrying_block()) {
       ER_INFO("%s aborted task '%s' while carrying block%d",
               controller.GetId().c_str(),
-              dynamic_cast<ta::logical_task*>(controller.current_task())
+              dynamic_cast<rta::logical_task*>(controller.current_task())
                   ->name()
                   .c_str(),
               controller.block()->id());
@@ -103,7 +101,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     } else {
       ER_INFO("%s aborted task '%s' (no block)",
               controller.GetId().c_str(),
-              dynamic_cast<ta::logical_task*>(controller.current_task())
+              dynamic_cast<rta::logical_task*>(controller.current_task())
                   ->name()
                   .c_str());
     }
@@ -116,7 +114,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
         aborted = true;
         ER_INFO("%s aborted task '%s' while serving '%s' penalty",
                 controller.GetId().c_str(),
-                dynamic_cast<ta::logical_task*>(controller.current_task())
+                dynamic_cast<rta::logical_task*>(controller.current_task())
                     ->name()
                     .c_str(),
                 h->name().c_str());
@@ -136,7 +134,7 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
     bool conflict = false;
     for (auto& cache : m_map->caches()) {
       if (loop_utils::block_drop_overlap_with_cache(
-              controller.block(), cache, controller.position())) {
+              controller.block(), cache, controller.position2D())) {
         conflict = true;
       }
     } /* for(cache..) */
@@ -153,22 +151,22 @@ class task_abort_interactor : public er::client<task_abort_interactor<T>> {
      * is the only one a robot knows about (see #242).
      */
     if (loop_utils::block_drop_overlap_with_nest(
-            controller.block(), m_map->nest(), controller.position()) ||
+            controller.block(), m_map->nest(), controller.position2D()) ||
         loop_utils::block_drop_near_arena_boundary(
-            *m_map, controller.block(), controller.position())) {
+            *m_map, controller.block(), controller.position2D())) {
       conflict = true;
     }
-    events::free_block_drop drop_op(controller.block(),
-                                    rmath::dvec2uvec(controller.position(),
-                                                     m_map->grid_resolution()),
-                                    m_map->grid_resolution());
+    events::free_block_drop_visitor drop_op(
+        controller.block(),
+        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution()),
+        m_map->grid_resolution());
     if (!conflict) {
-      controller.visitor::template visitable_any<T>::accept(drop_op);
-      m_map->accept(drop_op);
+      drop_op.visit(controller);
+      drop_op.visit(*m_map);
     } else {
       auto b = controller.block();
       m_map->distribute_single_block(b);
-      controller.visitor::template visitable_any<T>::accept(drop_op);
+      drop_op.visit(controller);
     }
     m_floor->SetChanged();
   }

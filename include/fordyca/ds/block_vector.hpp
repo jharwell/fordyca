@@ -27,18 +27,18 @@
 #include <string>
 #include <vector>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_block;
 }
 NS_START(ds);
 
-using block_vector_type = std::shared_ptr<representation::base_block>;
+using block_vector_type = std::shared_ptr<repr::base_block>;
 
 /*******************************************************************************
  * Type Definitions

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <boost/optional.hpp>
 #include <list>
 #include <random>
 #include <utility>
@@ -40,25 +41,23 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class arena_cache;
 class base_block;
 class multicell_entity;
-} // namespace representation
+} // namespace repr
 NS_START(support);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class base_cache_creator
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Base class for creating static/dynamic caches in the arena.
  */
-class base_cache_creator : public er::client<base_cache_creator> {
+class base_cache_creator : public rer::client<base_cache_creator> {
  public:
   /**
    * @brief Initialize a new cache creator.
@@ -66,6 +65,7 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * @param grid Reference to arena grid.
    * @param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
+   * @param timestep The current timestep.
    */
   base_cache_creator(ds::arena_grid* grid, double cache_dim);
 
@@ -79,16 +79,13 @@ class base_cache_creator : public er::client<base_cache_creator> {
    *                        avoiding overlaps during new cache creation.
    * @param candidate_blocks The vector of free blocks that may be used in cache
    *                         creation.
-   * @param cache_dim The dimensions of the caches to create. Possibly needed
-   *                  for deconflicting the new cache's location with arena
-   *                  boundaries in the cache where there are no existing
-   *                  caches that can be used to obtain cache dimensions
+   * @param timestep The current timestep.
    *
    * @return A vector of created caches.
    */
   virtual ds::cache_vector create_all(const ds::cache_vector& existing_caches,
                                       ds::block_vector& candidate_blocks,
-                                      double cache_dim) = 0;
+                                      uint timestep) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact
@@ -100,8 +97,8 @@ class base_cache_creator : public er::client<base_cache_creator> {
 
  protected:
   struct deconflict_res_t {
-    bool status;
-    rmath::vector2u loc;
+    bool status{false};
+    rmath::vector2u loc{};
   };
 
   const ds::arena_grid* grid(void) const { return m_grid; }
@@ -113,9 +110,10 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * they are (possibly) modified by this function in a way that callers
    * probably do not want.
    */
-  std::unique_ptr<representation::arena_cache> create_single_cache(
+  std::unique_ptr<repr::arena_cache> create_single_cache(
       ds::block_list blocks,
-      const rmath::vector2d& center);
+      const rmath::vector2d& center,
+      uint timestep);
 
   /**
    * @brief Basic sanity checks on newly created caches:
@@ -130,32 +128,18 @@ class base_cache_creator : public er::client<base_cache_creator> {
    * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
    * otherwise.
    */
-  bool creation_sanity_checks(const ds::cache_vector& new_caches,
+  bool creation_sanity_checks(const ds::cache_vector& caches,
                               const ds::block_list& free_blocks) const;
 
-  /**
-   * @brief Given the size of the cache-to-be and its tentative location in the
-   * arena, return a new location that guarantees that the cache will not
-   * overlap arena boundaries.
-   *
-   * This function is provided for derived classes to use when they implement
-   * \ref create_all().
-   */
-  deconflict_res_t deconflict_loc_boundaries(double cache_dim,
-                                             const rmath::vector2u& center) const;
-
-  deconflict_res_t deconflict_loc_entity(
-      const representation::multicell_entity* ent,
-      const rmath::vector2d& ent_loc,
-      const rmath::vector2u& center) const;
+  double cache_dim(void) const { return mc_cache_dim; }
 
  private:
   /* clang-format off */
-  double                             m_cache_dim;
+  double                             mc_cache_dim;
   ds::arena_grid*                    m_grid;
-  mutable std::default_random_engine m_rng{};
+  mutable std::default_random_engine m_rng;
   /* clang-format on */
 };
-NS_END(fordyca, depth1);
+NS_END(support, fordyca);
 
 #endif // INCLUDE_FORDYCA_SUPPORT_BASE_CACHE_CREATOR_HPP_

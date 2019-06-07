@@ -26,8 +26,9 @@
  ******************************************************************************/
 #include <boost/range/adaptor/map.hpp>
 #include <map>
+#include <utility>
 
-#include "fordyca/representation/dp_entity.hpp"
+#include "fordyca/repr/dp_entity.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -39,7 +40,7 @@ NS_START(fordyca, ds);
  ******************************************************************************/
 /**
  * @class dpo_map
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief The Decaying Pheromone Object (DPO) map stores objects in the arena
  * SEPARATELY from the \ref arena_map where they actually live (clone not
@@ -49,7 +50,7 @@ NS_START(fordyca, ds);
 template <typename key_type, typename obj_type>
 class dpo_map {
  public:
-  using value_type = typename representation::dp_entity<obj_type>;
+  using value_type = typename repr::dp_entity<obj_type>;
   using map_type = std::map<key_type, value_type>;
 
   template <typename T, typename Adaptor>
@@ -65,8 +66,8 @@ class dpo_map {
    * when one unit of time has passed (e.g. every timestep).
    */
   void decay_all(void) {
-    for (auto&& o : this->values_range()) {
-      const_cast<value_type&>(o).density().update();
+    for (std::pair<const key_type, value_type>& o : m_obj) {
+      o.second.density().update();
     } /* for(&o..) */
   }
 
@@ -75,6 +76,10 @@ class dpo_map {
    * nullptr if the key is not found in themap.
    */
   __rcsw_pure const value_type* find(const key_type& key) const {
+    auto it = m_obj.find(key);
+    return (it == m_obj.end()) ? nullptr : &(it->second);
+  }
+  __rcsw_pure value_type* find(const key_type& key) {
     auto it = m_obj.find(key);
     return (it == m_obj.end()) ? nullptr : &(it->second);
   }
@@ -93,25 +98,21 @@ class dpo_map {
    * version is replaced.
    */
   void obj_add(const std::pair<key_type, value_type>& obj) {
-    auto r = m_obj.insert(obj);
-    if (!r.second) {
-      m_obj.erase(r.first);
-      m_obj.insert(obj);
-    }
+    m_obj.erase(obj.first);
+    m_obj.insert(obj);
   }
 
   /**
-   * @brief Return an iterator for examining, but not modifying, the values of
+   * @brief Return an iterator for examining, but not modifying the values of
    * the map.
    */
-  iterator_type<const map_type, decltype(boost::adaptors::map_values)> values_range(
-      void) const {
-    return boost::make_iterator_range(m_obj.begin(), m_obj.end()) |
-           boost::adaptors::map_values;
+  auto const_values_range(void) const
+      -> decltype(std::declval<map_type>() | boost::adaptors::map_values) {
+    return m_obj | boost::adaptors::map_values;
   }
 
   /**
-   * @brief Return an iterator for examining, but not modifying. the keys of
+   * @brief Return an iterator for examining, but not modifying, the keys of
    * the map.
    */
   iterator_type<const map_type, decltype(boost::adaptors::map_keys)> keys_range(
@@ -131,16 +132,28 @@ class dpo_map {
   /* clang-format off */
   /**
    * @brief Needed for compiler to correctly deduce wrapped function return
-   * types for const qualified contexts.
+   * types for const qualified contexts (must be BEFORE the wrapping macros in
+   * the file).
    */
   const map_type& mc_obj_ref;
   map_type        m_obj{};
   /* clang-format on */
 
  public:
-  RCPPSW_WRAP_MEMFUNC(size, mc_obj_ref, const);
-  RCPPSW_WRAP_MEMFUNC(empty, mc_obj_ref, const);
-  RCPPSW_WRAP_MEMFUNC(clear, m_obj);
+  RCPPSW_DECLDEF_WRAP(size, mc_obj_ref, const)
+  RCPPSW_DECLDEF_WRAP(empty, mc_obj_ref, const)
+  RCPPSW_DECLDEF_WRAP(clear, m_obj)
+
+  /**
+   * @brief Iterate over mutable values of the map.
+   *
+   * @todo This has to be AFTER the member variable is declared, because I can't
+   * figure out how to get std:declval<map_type>() to be non-const (I think) and
+   * have the non-const map_values iterator as the chosen function overload.
+   */
+  auto values_range(void) -> decltype(m_obj | boost::adaptors::map_values) {
+    return m_obj | boost::adaptors::map_values;
+  }
 };
 
 NS_END(ds, fordyca);

@@ -24,19 +24,20 @@
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include <fstream>
 
+#include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
+#include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
+#include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/params/block_sel_matrix_params.hpp"
-#include "fordyca/params/cache_sel_matrix_params.hpp"
-#include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/tasks/base_foraging_task.hpp"
 
-#include "rcppsw/task_allocation/bi_tdgraph.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,15 +59,12 @@ gp_dpo_controller::~gp_dpo_controller(void) = default;
  ******************************************************************************/
 void gp_dpo_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
 
-  dpo_perception()->update();
-  m_task_aborted = false;
+  dpo_perception()->update(nullptr);
   executive()->run();
 
   ndc_pop();
@@ -77,7 +75,7 @@ void gp_dpo_controller::Init(ticpp::Element& node) {
 
   ndc_push();
   ER_INFO("Initializing...");
-  params::depth1::controller_repository param_repo;
+  config::depth1::controller_repository param_repo;
 
   param_repo.parse_all(node);
   if (!param_repo.validate_all()) {
@@ -86,22 +84,29 @@ void gp_dpo_controller::Init(ticpp::Element& node) {
   }
 
   shared_init(param_repo);
+  private_init(param_repo);
+
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void gp_dpo_controller::shared_init(
-    const params::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& param_repo) {
   /* DPO perception subsystem, block selection matrix */
   dpo_controller::shared_init(param_repo);
 
-  auto* cache_mat = param_repo.parse_results<params::cache_sel_matrix_params>();
-  auto* block_mat = param_repo.parse_results<params::block_sel_matrix_params>();
+  auto* cache_mat =
+      param_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
+  auto* block_mat =
+      param_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* cache selection matrix */
   m_cache_sel_matrix =
       rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
+} /* shared_init() */
 
+void gp_dpo_controller::private_init(
+    const config::depth1::controller_repository& param_repo) {
   /* task executive */
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
@@ -109,60 +114,69 @@ void gp_dpo_controller::shared_init(
                                     perception())(param_repo);
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
-} /* shared_init() */
+} /* private_init() */
 
-void gp_dpo_controller::task_abort_cb(const ta::polled_task*) {
+void gp_dpo_controller::task_abort_cb(const rta::polled_task*) {
   m_task_aborted = true;
 } /* task_abort_cb() */
 
-__rcsw_pure const ta::bi_tab* gp_dpo_controller::active_tab(void) const {
+__rcsw_pure const rta::bi_tab* gp_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
 __rcsw_pure tasks::base_foraging_task* gp_dpo_controller::current_task(void) {
-  return dynamic_cast<tasks::base_foraging_task*>(
-      m_executive.get()->current_task());
+  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
 __rcsw_pure const tasks::base_foraging_task* gp_dpo_controller::current_task(
     void) const {
-  return const_cast<gp_dpo_controller*>(this)->current_task();
+  return dynamic_cast<const tasks::base_foraging_task*>(
+      m_executive->current_task());
 } /* current_task() */
 
 void gp_dpo_controller::executive(
-    std::unique_ptr<ta::bi_tdgraph_executive> executive) {
+    std::unique_ptr<rta::bi_tdgraph_executive> executive) {
   m_executive = std::move(executive);
 }
 
 /*******************************************************************************
  * Block Transportation
  ******************************************************************************/
-TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                         gp_dpo_controller,
-                         block_transport_goal,
-                         current_task());
+RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
+                          block_transport_goal,
+                          current_task(),
+                          transport_goal_type::ekNONE,
+                          const);
 
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
-                         gp_dpo_controller,
-                         acquisition_goal,
-                         current_task());
+RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
+                          acquisition_goal,
+                          current_task(),
+                          acq_goal_type::ekNONE,
+                          const);
 
-TASK_WRAPPER_DEFINEC_PTR(bool, gp_dpo_controller, goal_acquired, current_task());
+RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
+                          goal_acquired,
+                          current_task(),
+                          false,
+                         const);
 
 /*******************************************************************************
  * Task Distribution Metrics
  ******************************************************************************/
 int gp_dpo_controller::current_task_depth(void) const {
   return executive()->graph()->vertex_depth(
-      dynamic_cast<const ta::polled_task*>(current_task()));
+      dynamic_cast<const rta::polled_task*>(current_task()));
 } /* current_task_depth() */
 
 int gp_dpo_controller::current_task_id(void) const {
-  return executive()->graph()->vertex_id(
-      dynamic_cast<const ta::polled_task*>(current_task()));
+  auto task = dynamic_cast<const rta::polled_task*>(current_task());
+  if (nullptr != task) {
+    return executive()->graph()->vertex_id(task);
+  }
+  return -1;
 } /* current_task_id() */
 
 int gp_dpo_controller::task_id(const std::string& task_name) const {
@@ -171,7 +185,7 @@ int gp_dpo_controller::task_id(const std::string& task_name) const {
 } /* task_id() */
 
 __rcsw_pure int gp_dpo_controller::current_task_tab(void) const {
-  return dynamic_cast<const ta::bi_tdgraph*>(executive()->graph())
+  return dynamic_cast<const rta::bi_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */
 

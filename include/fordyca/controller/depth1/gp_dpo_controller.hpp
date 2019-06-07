@@ -28,32 +28,22 @@
 
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
+#include "rcppsw/ta/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
+namespace rcppsw { namespace ta {
 class bi_tdgraph_executive;
 class bi_tab;
 class executable_task;
 class polled_task;
 }}
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
 
 NS_START(fordyca);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
 
-namespace tasks {
-namespace depth0 { class generalist; }
-namespace depth1 {
-class harvester;
-class collector;
-class foraging_task;
-}
-}
-namespace params {
+namespace config {
 namespace depth1 { class controller_repository; }
 }
 
@@ -67,17 +57,16 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * @class gp_dpo_controller
- * @ingroup controller depth1
+ * @ingroup fordyca controller depth1
  *
- * @brief A Greedy Partitioning (GP) controller that switches between \ref generalist,
- * \ref harvester, and \ref collector tasks, according to dynamic changes in the
- * environment and/or execution/interface times of the tasks, and uses a DPO
- * data store for tracking arena state and object relavance.
+ * @brief A Greedy Partitioning (GP) controller that switches between \ref
+ * generalist, \ref harvester, and \ref collector tasks, according to dynamic
+ * changes in the environment and/or execution/interface times of the tasks, and
+ * uses a DPO data store for tracking arena state and object relavance.
  */
 class gp_dpo_controller : public depth0::dpo_controller,
-                          public er::client<gp_dpo_controller>,
-                          public visitor::visitable_any<gp_dpo_controller>,
-                          public rcppsw::metrics::tasks::bi_tdgraph_metrics {
+                          public rer::client<gp_dpo_controller>,
+                          public rmetrics::tasks::bi_tdgraph_metrics {
  public:
   using dpo_controller::perception;
 
@@ -89,16 +78,16 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void ControlStep(void) override;
 
   /* task distribution metrics */
-  int current_task_depth(void) const override;
-  int current_task_id(void) const override;
-  int current_task_tab(void) const override;
+  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_depth, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_id, const final);
+  RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_tab, const);
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const final);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const final);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const final);
 
   /**
    * @brief Get the current task the controller is executing.
@@ -120,13 +109,13 @@ class gp_dpo_controller : public depth0::dpo_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  const ta::bi_tab* active_tab(void) const;
+  const rta::bi_tab* active_tab(void) const;
 
   /*
    * Public to setup metric collection from tasks.
    */
-  const ta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  ta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+  const rta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  rta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
 
   /**
    * @brief Get whether or not a task has been aborted this timestep.
@@ -146,23 +135,23 @@ class gp_dpo_controller : public depth0::dpo_controller,
     return m_cache_sel_matrix.get();
   }
 
- protected:
   void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
 
+ protected:
   /**
    * @brief Initialization that derived classes may also need to perform, if
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - Block selection matrix (\ref block_selection_matrix)
-   * - Cache selection matrix (\ref cache_selection_matrix)
-   * - Task executive (\ref ta::bi_tdgraph_executive)
+   * - Block selection matrix (\ref block_sel_matrix)
+   * - Cache selection matrix (\ref cache_sel_matrix)
+   * - Task executive (\ref rta::bi_tdgraph_executive)
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    *
    * @param param_repo Handle to parameter repository for this controller (after
    *                   parsing and validation).
    */
-  void shared_init(const params::depth1::controller_repository& param_repo);
+  void shared_init(const config::depth1::controller_repository& param_repo);
 
   /*
    * The \ref gp_dpo_controller owns the executive, but derived classes can
@@ -170,20 +159,22 @@ class gp_dpo_controller : public depth0::dpo_controller,
    * to reduce the amount of function overriding that would have to be performed
    * otherwise if derived controllers each had private executives.
    */
-  void executive(std::unique_ptr<ta::bi_tdgraph_executive> executive);
+  void executive(std::unique_ptr<rta::bi_tdgraph_executive> executive);
 
   /**
    * @brief Callback for task abort. Task argument unused for now--only need to
    * know that a task WAS aborted. \see \ref task_aborted().
    */
-  void task_abort_cb(const ta::polled_task*);
+  void task_abort_cb(const rta::polled_task*);
 
  private:
+  void private_init(const config::depth1::controller_repository& param_repo);
+
   /* clang-format off */
   bool                                      m_display_task{false};
   bool                                      m_task_aborted{false};
   std::unique_ptr<class cache_sel_matrix>   m_cache_sel_matrix;
-  std::unique_ptr<ta::bi_tdgraph_executive> m_executive;
+  std::unique_ptr<rta::bi_tdgraph_executive> m_executive;
   /* clang-format on */
 };
 

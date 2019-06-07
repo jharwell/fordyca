@@ -31,18 +31,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
+namespace rcppsw { namespace rta {
 class bi_tdgraph_executive;
 }}
 
 NS_START(fordyca);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
 
-namespace tasks { namespace depth2 {
-class foraging_task;
-}}
-namespace params { namespace depth2 { class controller_repository; }}
+namespace config { namespace depth2 { class controller_repository; }}
 NS_START(controller, depth2);
 
 /*******************************************************************************
@@ -50,7 +45,7 @@ NS_START(controller, depth2);
  ******************************************************************************/
 /**
  * @class grp_dpo_controller
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief A Greedy Recursive Partitioning controller that moves through a depth2
  * recursive task decomposition graph, changing task according to dynamic
@@ -58,8 +53,7 @@ NS_START(controller, depth2);
  * using a DPO data store for tracking arena state and object relevance.
  */
 class grp_dpo_controller : public depth1::gp_dpo_controller,
-                            public er::client<grp_dpo_controller>,
-                            public visitor::visitable_any<grp_dpo_controller> {
+                           public rer::client<grp_dpo_controller> {
  public:
   grp_dpo_controller(void);
   ~grp_dpo_controller(void) override = default;
@@ -71,11 +65,11 @@ class grp_dpo_controller : public depth1::gp_dpo_controller,
   void bsel_exception_added(bool b) { m_bsel_exception_added = b; }
   void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
-  void shared_init(const params::depth2::controller_repository& param_repo);
-
  private:
-  void task_alloc_cb(const ta::polled_task* const task,
-                     const ta::bi_tab* const);
+  void task_alloc_cb(const rta::polled_task* task,
+                     const rta::bi_tab*);
+  void private_init(const config::depth2::controller_repository& param_repo);
+
 
   /* clang-format off */
   /**

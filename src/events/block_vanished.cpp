@@ -23,9 +23,18 @@
  ******************************************************************************/
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth0/odpo_controller.hpp"
+#include "fordyca/controller/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
@@ -39,13 +48,25 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 block_vanished::block_vanished(uint block_id)
     : ER_CLIENT_INIT("fordyca.events.block_vanished"), m_block_id(block_id) {}
+
+void block_vanished::dispatch_free_block_interactor(
+    tasks::base_foraging_task* const task) {
+  ER_INFO("Abort pickup executing task %s: block%d vanished",
+          dynamic_cast<rta::logical_task*>(task)->name().c_str(),
+          m_block_id);
+  auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
+  ER_ASSERT(nullptr != interactor,
+            "Non-free block interactor task %s triggered block vanished event",
+            dynamic_cast<rta::logical_task*>(task)->name().c_str());
+  interactor->accept(*this);
+} /* dispatch_free_block_interactor() */
 
 /*******************************************************************************
  * Depth0 Foraging
@@ -54,7 +75,7 @@ void block_vanished::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
 
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
-  controller.fsm()->accept(*this);
+  visit(*controller.fsm());
 
   controller.ndc_pop();
 } /* visit() */
@@ -63,7 +84,7 @@ void block_vanished::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_push();
 
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
-  controller.fsm()->accept(*this);
+  visit(*controller.fsm());
 
   controller.ndc_pop();
 } /* visit() */
@@ -72,19 +93,37 @@ void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_push();
 
   ER_INFO("Abort pickup: block%d vanished", m_block_id);
-  controller.fsm()->accept(*this);
+  visit(*controller.fsm());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth0::odpo_controller& controller) {
+  controller.ndc_push();
+
+  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  visit(*controller.fsm());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth0::omdpo_controller& controller) {
+  controller.ndc_push();
+
+  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  visit(*controller.fsm());
 
   controller.ndc_pop();
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::crw_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -93,16 +132,7 @@ void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
 void block_vanished::visit(controller::depth1::gp_dpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO(
-      "Abort pickup executing task %s: block%d vanished",
-      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
-      m_block_id);
-  auto* task =
-      dynamic_cast<events::free_block_interactor*>(controller.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non-free block interactor task %s triggered block vanished event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
-  task->accept(*this);
+  dispatch_free_block_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
@@ -110,37 +140,44 @@ void block_vanished::visit(controller::depth1::gp_dpo_controller& controller) {
 void block_vanished::visit(controller::depth1::gp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO(
-      "Abort pickup executing task %s: block%d vanished",
-      dynamic_cast<ta::logical_task*>(controller.current_task())->name().c_str(),
-      m_block_id);
-  auto* task =
-      dynamic_cast<events::free_block_interactor*>(controller.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non-free block interactor task %s triggered block vanished event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
-  task->accept(*this);
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth1::gp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth1::gp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
 
 void block_vanished::visit(tasks::depth0::generalist& task) {
-  static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism())
-      ->accept(*this);
+  this->visit(
+      *static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
 
 void block_vanished::visit(tasks::depth1::harvester& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  this->visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 void block_vanished::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_VANISHED,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 /*******************************************************************************
@@ -149,23 +186,41 @@ void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 void block_vanished::visit(controller::depth2::grp_mdpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup/drop from/in block: block%d vanished", m_block_id);
-  auto* task =
-      dynamic_cast<events::free_block_interactor*>(controller.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non-free block interactor task %s triggered block vanished event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
-  task->accept(*this);
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth2::grp_dpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth2::grp_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void block_vanished::visit(controller::depth2::grp_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_free_block_interactor(controller.current_task());
 
   controller.ndc_pop();
 } /* visit() */
 
 void block_vanished::visit(tasks::depth2::cache_starter& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 void block_vanished::visit(tasks::depth2::cache_finisher& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

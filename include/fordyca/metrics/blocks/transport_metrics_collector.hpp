@@ -25,29 +25,28 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, blocks);
 
-namespace rmetrics = rcppsw::metrics;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class transport_metrics_collector
- * @ingroup metrics blocks
+ * @ingroup fordyca metrics blocks
  *
  * @brief Collector for \ref transport_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
-class transport_metrics_collector : public rmetrics::base_metrics_collector {
+class transport_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
@@ -56,10 +55,12 @@ class transport_metrics_collector : public rmetrics::base_metrics_collector {
   transport_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
- private:
+  uint cum_collected(void) const { return m_stats.cum_collected; }
+
+  private:
   struct stats {
     /**
      * @brief  Total # blocks collected in interval.
@@ -102,10 +103,12 @@ class transport_metrics_collector : public rmetrics::base_metrics_collector {
     double cum_initial_wait_time{0.0};
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
+  /* clang-format off */
   struct stats m_stats{};
+  /* clang-format on */
 };
 
 NS_END(blocks, metrics, fordyca);

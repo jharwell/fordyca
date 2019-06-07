@@ -24,6 +24,8 @@
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include <fstream>
 
+#include "fordyca/config/depth2/controller_repository.hpp"
+#include "fordyca/config/sensing_config.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
@@ -31,12 +33,10 @@
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/params/depth2/controller_repository.hpp"
-#include "fordyca/params/sensing_params.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,15 +54,12 @@ grp_dpo_controller::grp_dpo_controller(void)
  ******************************************************************************/
 void grp_dpo_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
-  dpo_perception()->update();
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
+  dpo_perception()->update(nullptr);
 
-  task_aborted(false);
   executive()->run();
   ndc_pop();
 } /* ControlStep() */
@@ -72,7 +69,7 @@ void grp_dpo_controller::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing");
 
-  params::depth2::controller_repository param_repo;
+  config::depth2::controller_repository param_repo;
   param_repo.parse_all(node);
   if (!param_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
@@ -80,19 +77,14 @@ void grp_dpo_controller::Init(ticpp::Element& node) {
   }
 
   shared_init(param_repo);
+  private_init(param_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
-void grp_dpo_controller::shared_init(
-    const params::depth2::controller_repository& param_repo) {
-  /*
-   * Create initial executive, binding the task abort callback to determine task
-   * abort in loop functions.
-   */
-  gp_dpo_controller::shared_init(param_repo);
-
+void grp_dpo_controller::private_init(
+    const config::depth2::controller_repository& param_repo) {
   /*
    * Rebind executive to use depth2 task decomposition graph instead of depth1
    * version.
@@ -112,10 +104,10 @@ void grp_dpo_controller::shared_init(
                                            std::placeholders::_2));
   executive()->task_abort_notify(std::bind(
       &grp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
-} /* shared_init() */
+} /* private_init() */
 
-void grp_dpo_controller::task_alloc_cb(const ta::polled_task* const task,
-                                       const ta::bi_tab* const) {
+void grp_dpo_controller::task_alloc_cb(const rta::polled_task* const task,
+                                       const rta::bi_tab* const) {
   if (!m_bsel_exception_added) {
     block_sel_matrix()->sel_exceptions_clear();
   }

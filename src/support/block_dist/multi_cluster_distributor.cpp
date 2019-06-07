@@ -25,13 +25,12 @@
 #include <random>
 
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -41,8 +40,8 @@ multi_cluster_distributor::multi_cluster_distributor(
     double arena_resolution,
     uint maxsize)
     : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster") {
-  for (size_t i = 0; i < grids.size(); ++i) {
-    m_dists.emplace_back(grids[i], arena_resolution, maxsize);
+  for (auto& g : grids) {
+    m_dists.emplace_back(g, arena_resolution, maxsize);
   } /* for(i..) */
 }
 
@@ -50,18 +49,27 @@ multi_cluster_distributor::multi_cluster_distributor(
  * Member Functions
  ******************************************************************************/
 bool multi_cluster_distributor::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
+    std::shared_ptr<repr::base_block>& block,
     ds::const_entity_list& entities) {
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
-    uint idx = std::rand() % m_dists.size();
+    /* -1 because we are working with array indices */
+    std::uniform_int_distribution<size_t> rng_dist(0, m_dists.size() - 1);
+    uint idx = rng_dist(rng());
     cluster_distributor& dist = m_dists[idx];
-    const auto* clust = dist.block_clusters().front(); /* only 1 */
+
+    /* Always/only 1 cluster per cluster distributor, so this is safe to do */
+    auto* clust = dist.block_clusters().front();
     if (clust->capacity() == clust->block_count()) {
-      ER_DEBUG("block%d to cluster%u failed: Cluster capacity (%u) reached",
+      ER_DEBUG("Block%d to cluster%u failed: capacity (%u) reached",
                block->id(),
                idx,
                clust->capacity());
     } else {
+      ER_DEBUG("Block%d to cluster%u: capacity=%u,size=%zu",
+               block->id(),
+               idx,
+               clust->capacity(),
+               clust->block_count());
       return dist.distribute_block(block, entities);
     }
   } /* for(i..) */

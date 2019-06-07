@@ -26,41 +26,46 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
  * @class cached_block_pickup_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Handles a robot's (possible) \ref cached_block_pickup event on a given
  * timestep.
  */
 template <typename T>
 class cached_block_pickup_interactor
-    : public er::client<cached_block_pickup_interactor<T>> {
+    : public rer::client<cached_block_pickup_interactor<T>> {
  public:
   cached_block_pickup_interactor(ds::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
-                                 tv::tv_controller* tv_controller)
+                                 tv::tv_manager* tv_manager,
+                                 support::base_cache_manager* cache_manager,
+                                 support::base_loop_functions * loop)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
-        m_penalty_handler(tv_controller->penalty_handler<T>(
-            tv::cache_op_src::kSrcExistingCachePickup)) {}
+        m_penalty_handler(tv_manager->penalty_handler<T>(
+            tv::cache_op_src::ekEXISTING_CACHE_PICKUP)),
+        m_cache_manager(cache_manager),
+        m_loop(loop) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -89,8 +94,8 @@ class cached_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                     tv::cache_op_src::kSrcExistingCachePickup,
-                                     timestep);
+                                      tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
+                                      timestep);
     }
   }
 
@@ -107,7 +112,7 @@ class cached_block_pickup_interactor
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
-    ER_ASSERT(tv::acquisition_goal_type::kExistingCache ==
+    ER_ASSERT(tv::acq_goal_type::ekEXISTING_CACHE ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
 
@@ -116,7 +121,7 @@ class cached_block_pickup_interactor
      * same/successive/close together timesteps, then the first robot to serve
      * their penalty will get a block just fine. The second robot, however, may
      * not, depending on if the arena has decided to re-create the static cache
-     * yet.
+     * yet (for depth 1 simulations).
      *
      * This results in a \ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
@@ -133,8 +138,8 @@ class cached_block_pickup_interactor
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
-      events::cache_vanished vanished(p.id());
-      controller.visitor::template visitable_any<T>::accept(vanished);
+      events::cache_vanished_visitor vanished_op(p.id());
+      vanished_op.visit(controller);
     } else {
       perform_cached_block_pickup(controller, p, timestep);
       m_floor->SetChanged();
@@ -158,16 +163,22 @@ class cached_block_pickup_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cached_block_pickup pickup_op(*it,
-                                          loop_utils::robot_id(controller),
-                                          timestep);
+    events::cached_block_pickup_visitor pickup_op(m_loop,
+                                                  *it,
+                                                  loop_utils::robot_id(controller),
+                                                  timestep);
     (*it)->penalty_served(penalty.penalty());
 
     /*
-     * Map must be called before controller for proper cache block decrement!
+     * Visitation order must be:
+     *
+     * static cache manager (update metrics)
+     * Map (actually remove the cache/ensure proper block decrement)
+     * Controller
      */
-    m_map->accept(pickup_op);
-    controller.visitor::template visitable_any<T>::accept(pickup_op);
+    pickup_op.visit(*m_cache_manager);
+    pickup_op.visit(*m_map);
+    pickup_op.visit(controller);
   }
 
  private:
@@ -175,6 +186,8 @@ class cached_block_pickup_interactor
   argos::CFloorEntity* const             m_floor;
   ds::arena_map* const                   m_map;
   tv::cache_op_penalty_handler<T>* const m_penalty_handler;
+  base_cache_manager *                   m_cache_manager;
+  base_loop_functions*                   m_loop;
   /* clang-format on */
 };
 

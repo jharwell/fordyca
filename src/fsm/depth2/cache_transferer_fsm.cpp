@@ -34,39 +34,38 @@ NS_START(fordyca, fsm, depth2);
 cache_transferer_fsm::cache_transferer_fsm(
     const controller::cache_sel_matrix* const matrix,
     controller::saa_subsystem* const saa,
-    ds::dpo_store* const store)
+    ds::dpo_store* const store,
+    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
     : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa),
-      m_src_cache_fsm(matrix, true, saa, store),
-      m_dest_cache_fsm(matrix, false, saa, store) {}
+      m_src_cache_fsm(matrix, saa, store, exp_behavior->clone(), true),
+      m_dest_cache_fsm(matrix, saa, store, exp_behavior->clone(), false) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acquisition_goal_type cache_transferer_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return acquisition_goal_type::kExistingCache;
+__rcsw_pure acq_goal_type cache_transferer_fsm::acquisition_goal(void) const {
+  if (ekST_START != current_state() && ekST_FINISHED != current_state()) {
+    return acq_goal_type::ekEXISTING_CACHE;
   }
-  return acquisition_goal_type::kNone;
+  return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
-transport_goal_type cache_transferer_fsm::block_transport_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::kExistingCache;
+__rcsw_pure transport_goal_type
+cache_transferer_fsm::block_transport_goal(void) const {
+  if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return transport_goal_type::ekEXISTING_CACHE;
   }
-  return transport_goal_type::kNone;
+  return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
-bool cache_transferer_fsm::is_acquiring_dest_cache(void) const {
-  return transport_goal_type::kCacheSite == block_transport_goal() &&
+__rcsw_pure bool cache_transferer_fsm::is_acquiring_dest_cache(void) const {
+  return transport_goal_type::ekEXISTING_CACHE == block_transport_goal() &&
          m_dest_cache_fsm.task_running();
 } /* is_acquiring_dest_cache() */
 
-bool cache_transferer_fsm::is_acquiring_src_cache(void) const {
-  return transport_goal_type::kCacheSite == block_transport_goal() &&
+__rcsw_pure bool cache_transferer_fsm::is_acquiring_src_cache(void) const {
+  return transport_goal_type::ekEXISTING_CACHE == block_transport_goal() &&
          m_src_cache_fsm.task_running();
 } /* is_acquiring_src_cache() */
 

@@ -27,19 +27,19 @@
 #include <list>
 #include <string>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_cache;
 }
 NS_START(ds);
 
-using cache_list_type = std::shared_ptr<representation::base_cache>;
-using const_cache_list_type = std::shared_ptr<const representation::base_cache>;
+using cache_list_type = std::shared_ptr<repr::base_cache>;
+using const_cache_list_type = std::shared_ptr<const repr::base_cache>;
 
 /*******************************************************************************
  * Type Definitions

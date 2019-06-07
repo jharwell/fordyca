@@ -41,7 +41,7 @@ NS_START(fsm, depth2);
  ******************************************************************************/
 /**
  * @class acquire_cache_site_fsm
- * @ingroup fsm depth2
+ * @ingroup fordyca fsm depth2
  *
  * @brief The FSM for acquiring a site to start a new cache at within the
  * arena.
@@ -49,12 +49,8 @@ NS_START(fsm, depth2);
  * Each robot executing this FSM will compute the "best" site to start a new
  * cache at, and then acquire that location within the arena. Once this has been
  * done, it signals that it has completed its task.
- *
- * @bug There is not currently any handling for what needs to happen if the
- * robot arrives at its chosen site and there is already a cache there or there
- * is one very close by.
  */
-class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
+class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
                                public acquire_goal_fsm {
  public:
   acquire_cache_site_fsm(const controller::cache_sel_matrix* matrix,
@@ -69,8 +65,8 @@ class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type site_select(void) const;
+  acq_goal_type acquisition_goal_internal(void) const;
+  boost::optional<acquire_goal_fsm::candidate_type> site_select(void) const;
   bool candidates_exist(void) const { return true; }
   bool site_exploration_term_cb(void) const;
   bool site_acquired_cb(bool explore_result) const;

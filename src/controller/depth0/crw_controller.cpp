@@ -27,7 +27,8 @@
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,9 +39,7 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 crw_controller::crw_controller(void)
-    : depth0_controller(),
-      ER_CLIENT_INIT("fordyca.controller.depth0.crw"),
-      m_fsm() {}
+    : ER_CLIENT_INIT("fordyca.controller.depth0.crw"), m_fsm() {}
 
 crw_controller::~crw_controller(void) = default;
 
@@ -51,8 +50,12 @@ void crw_controller::Init(ticpp::Element& node) {
   base_controller::Init(node);
   ndc_push();
   ER_INFO("Initializing...");
+
+  fsm::expstrat::base_expstrat::params p(nullptr, saa_subsystem(), nullptr);
   m_fsm = rcppsw::make_unique<fsm::depth0::crw_fsm>(
-      base_controller::saa_subsystem());
+      saa_subsystem(),
+      fsm::expstrat::block_factory().create(fsm::expstrat::block_factory::kCRW,
+                                            &p));
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -66,13 +69,10 @@ void crw_controller::Reset(void) {
 
 void crw_controller::ControlStep(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
-
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
   m_fsm->run();
   ndc_pop();
 } /* ControlStep() */
@@ -80,21 +80,13 @@ void crw_controller::ControlStep(void) {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(bool, crw_controller, goal_acquired, *m_fsm, const);
-
-FSM_OVERRIDE_DEF(bool, crw_controller, is_exploring_for_goal, *m_fsm, const);
-
-FSM_OVERRIDE_DEF(acquisition_goal_type,
-                 crw_controller,
-                 acquisition_goal,
-                 *m_fsm,
-                 const);
-
-FSM_OVERRIDE_DEF(transport_goal_type,
-                 crw_controller,
-                 block_transport_goal,
-                 *m_fsm,
-                 const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_vector_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_explore_loc, *m_fsm, const);
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

@@ -36,14 +36,14 @@ NS_START(fordyca, support, depth1);
  ******************************************************************************/
 /**
  * @class static_cache_creator
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief Creates a static cache in the arena by taking a specified number of
  * free blocks and grouping them together into a cache at the specified
  * location.
  */
 class static_cache_creator : public base_cache_creator,
-                             public er::client<static_cache_creator> {
+                             public rer::client<static_cache_creator> {
  public:
   static_cache_creator(ds::arena_grid* grid,
                        const rmath::vector2d& center,
@@ -51,7 +51,7 @@ class static_cache_creator : public base_cache_creator,
 
   ds::cache_vector create_all(const ds::cache_vector& existing_caches,
                               ds::block_vector& blocks,
-                              double) override;
+                              uint timestep) override;
 
  private:
   /* clang-format off */

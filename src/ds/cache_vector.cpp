@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/cache_vector.hpp"
 #include <numeric>
-#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,8 @@ std::string cache_vector::to_str(void) const {
                          this->end(),
                          std::string(),
                          [&](const std::string& a, const auto& b) {
-                           return a + "b" + std::to_string(b->id()) + ",";
+                           return a + "c" + std::to_string(b->id()) + "@" +
+                                  b->discrete_loc().to_str() + ",";
                          });
 } /* to_string() */
 

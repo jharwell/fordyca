@@ -25,8 +25,8 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 
 /*******************************************************************************
@@ -39,18 +39,19 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_manager::static_cache_manager(
-    const struct params::caches::caches_params* params,
+    const config::caches::caches_config* config,
     ds::arena_grid* const arena_grid,
     const rmath::vector2d& cache_loc)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_manager"),
-      mc_cache_params(*params),
-      mc_cache_loc(cache_loc) {}
+      mc_cache_config(*config),
+      mc_cache_loc(cache_loc),
+      m_reng(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creation(
+boost::optional<ds::block_vector> static_cache_manager::calc_blocks_for_creation(
     ds::block_vector& blocks) {
   /*
    * Only blocks that are not:
@@ -67,13 +68,12 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
     if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
       to_use.push_back(b);
     }
-    if (to_use.size() >= mc_cache_params.static_.size) {
+    if (to_use.size() >= mc_cache_config.static_.size) {
       break;
     }
   } /* for(b..) */
 
-  bool ret = true;
-  if (to_use.size() < representation::base_cache::kMinBlocks) {
+  if (to_use.size() < repr::base_cache::kMinBlocks) {
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
@@ -98,99 +98,100 @@ base_cache_manager::block_calc_res_t static_cache_manager::calc_blocks_for_creat
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
-    ER_ASSERT(to_use.size() - count < representation::base_cache::kMinBlocks,
+    ER_ASSERT(to_use.size() - count < repr::base_cache::kMinBlocks,
               "For new cache @%s/%s: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
               mc_cache_loc.to_str().c_str(),
               dcenter.to_str().c_str(),
               to_use.size() - count,
               to_use.size(),
-              representation::base_cache::kMinBlocks);
-    ret = false;
+              repr::base_cache::kMinBlocks);
+    return boost::optional<ds::block_vector>();
   }
-  if (to_use.size() < mc_cache_params.static_.size) {
+  if (to_use.size() < mc_cache_config.static_.size) {
     ER_WARN(
         "Not enough free blocks to meet min size for new cache@%s/%s (%zu < "
         "%u)",
         mc_cache_loc.to_str().c_str(),
         dcenter.to_str().c_str(),
         to_use.size(),
-        mc_cache_params.static_.size);
-    ret = false;
+        mc_cache_config.static_.size);
+    return boost::optional<ds::block_vector>();
   }
-  return block_calc_res_t{ret, to_use};
+  return boost::make_optional(to_use);
 } /* calc_blocks_for_creation() */
 
-base_cache_manager::creation_res_t static_cache_manager::create_conditional(
+boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
     ds::block_vector& blocks,
+    uint timestep,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
-      mc_cache_params.static_.respawn_scale_factor);
-  if (p.calc(n_harvesters, n_collectors) >=
-      static_cast<double>(std::rand()) / RAND_MAX) {
-    return create(blocks);
+      mc_cache_config.static_.respawn_scale_factor);
+  std::uniform_real_distribution<> dist(0.0, 1.0);
+  if (p.calc(n_harvesters, n_collectors) >= dist(m_reng)) {
+    return create(blocks, timestep);
   } else {
-    return creation_res_t{false, ds::cache_vector()};
+    return boost::optional<ds::cache_vector>();
   }
 } /* create_conditional() */
 
-base_cache_manager::creation_res_t static_cache_manager::create(
-    ds::block_vector& blocks) {
+boost::optional<ds::cache_vector> static_cache_manager::create(
+    ds::block_vector& blocks,
+    uint timestep) {
   ER_DEBUG("(Re)-Creating static cache");
-  ER_ASSERT(mc_cache_params.static_.size >=
-                representation::base_cache::kMinBlocks,
+  ER_ASSERT(mc_cache_config.static_.size >= repr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
-            mc_cache_params.static_.size,
-            representation::base_cache::kMinBlocks);
+            mc_cache_config.static_.size,
+            repr::base_cache::kMinBlocks);
+
+  auto to_use = calc_blocks_for_creation(blocks);
+  if (!to_use) {
+    ER_WARN("Unable to create static cache @%s: Not enough free blocks",
+            mc_cache_loc.to_str().c_str());
+    return boost::optional<ds::cache_vector>();
+  }
+  ds::cache_vector created;
 
   support::depth1::static_cache_creator creator(arena_grid(),
                                                 mc_cache_loc,
-                                                mc_cache_params.dimension);
-  auto ret = calc_blocks_for_creation(blocks);
-  if (!ret.status) {
-    ER_WARN("Unable to create static cache @%s: Not enough free blocks",
-            mc_cache_loc.to_str().c_str());
-    return creation_res_t{false, ds::cache_vector()};
-  }
-  ds::cache_vector created;
+                                                mc_cache_config.dimension);
+
   /* no existing caches, so empty vector */
-  created = creator.create_all(ds::cache_vector(), ret.blocks, -1);
+  created = creator.create_all(ds::cache_vector(), *to_use, timestep);
   ER_ASSERT(1 == created.size(),
             "Wrong # caches after static create: %zu",
             created.size());
+  caches_created(1);
 
   /*
-   * Any blocks that are under where the cache currently is (i.e. will be
-   * hidden by it) need to be added to the cache so that there all blocks in the
-   * arena are accessible. This is generally only an issue at the start of
-   * simulation if random block distribution is used, but weird cases can arise
-   * due to task abort+block drop as well, so it is best to be safe.
+   * Fix hidden blocks and update host cells. Host cell updating must be second,
+   * otherwise the cache host cell will have a block as its entity!
    */
+  post_creation_blocks_adjust(created, blocks);
+  creator.update_host_cells(created);
+  return boost::make_optional(created);
+} /* create() */
+
+void static_cache_manager::post_creation_blocks_adjust(
+    const ds::cache_vector& caches,
+    const ds::block_vector& blocks) {
   for (auto& b : blocks) {
-    for (auto& c : created) {
+    for (auto& c : caches) {
       if (!c->contains_block(b) &&
           c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
           c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
-        events::cell_empty empty(b->discrete_loc());
-        arena_grid()->access<arena_grid::kCell>(b->discrete_loc()).accept(empty);
-        events::free_block_drop op(b,
-                                   rmath::dvec2uvec(c->real_loc(),
-                                                    arena_grid()->resolution()),
-                                   arena_grid()->resolution());
-        arena_grid()->access<arena_grid::kCell>(op.x(), op.y()).accept(op);
+        events::cell_empty_visitor empty(b->discrete_loc());
+        empty.visit(arena_grid()->access<arena_grid::kCell>(b->discrete_loc()));
+        events::free_block_drop_visitor op(
+            b,
+            rmath::dvec2uvec(c->real_loc(), arena_grid()->resolution()),
+            arena_grid()->resolution());
+        op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());
       }
     } /* for(&c..) */
   }   /* for(&b..) */
-
-  /*
-   * Must be after fixing hidden blocks, otherwise the cache host cell will
-   * have a block as its entity!
-   */
-  creator.update_host_cells(created);
-  return creation_res_t{true, created};
-} /* create() */
-
+} /* post_creation_blocks_adjust() */
 NS_END(depth1, support, fordyca);

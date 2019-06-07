@@ -1,5 +1,5 @@
 /**
- * @file robot_arena_interactor.hpp
+ * @file depth1/robot_arena_interactor.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -30,18 +30,21 @@
 #include "fordyca/support/existing_cache_block_drop_interactor.hpp"
 #include "fordyca/support/free_block_pickup_interactor.hpp"
 #include "fordyca/support/nest_block_drop_interactor.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth1);
+NS_START(fordyca, support);
+class base_loop_functions;
+NS_START(depth1);
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
  * @class robot_arena_interactor
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief Handles a robot's interactions with the environment on each timestep.
  *
@@ -54,21 +57,29 @@ NS_START(fordyca, support, depth1);
  * - Free block drop due to task abort.
  */
 template <typename T>
-class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
  public:
   using controller_type = T;
-
-  robot_arena_interactor(ds::arena_map* const map,
-                         depth0::depth0_metrics_aggregator *const metrics_agg,
-                         argos::CFloorEntity* const floor,
-                         tv::tv_controller* const tv_controller)
+  struct params {
+    ds::arena_map* const map;
+    depth0::depth0_metrics_aggregator *const metrics_agg;
+    argos::CFloorEntity* const floor;
+    tv::tv_manager* const tv_manager;
+    base_cache_manager* cache_manager;
+    base_loop_functions* loop;
+  };
+  explicit robot_arena_interactor(const params& p)
       : ER_CLIENT_INIT("fordyca.support.depth1.robot_arena_interactor"),
-        m_tv_controller(tv_controller),
-        m_free_pickup_interactor(map, floor, tv_controller),
-        m_nest_drop_interactor(map, metrics_agg, floor, tv_controller),
-        m_task_abort_interactor(map, floor),
-        m_cached_pickup_interactor(map, floor, tv_controller),
-        m_existing_cache_drop_interactor(map, tv_controller) {}
+        m_tv_manager(p.tv_manager),
+        m_free_pickup_interactor(p.map, p.floor, p.tv_manager),
+        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.tv_manager),
+        m_task_abort_interactor(p.map, p.floor),
+        m_cached_pickup_interactor(p.map,
+                                   p.floor,
+                                   p.tv_manager,
+                                   p.cache_manager, p.
+                                   loop),
+        m_existing_cache_drop_interactor(p.map, p.tv_manager) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -91,7 +102,14 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
    */
   void operator()(T& controller, uint timestep) {
     if (m_task_abort_interactor(controller,
-                                m_tv_controller->template all_penalty_handlers<T>())) {
+                                m_tv_manager->template all_penalty_handlers<T>())) {
+      /*
+       * This needs to be here, rather than in each robot's control step
+       * function, in order to avoid triggering erroneous handling of an aborted
+       * task in the loop functions when the executive has not aborted the newly
+       * allocated task. See #532.
+       */
+      controller.task_aborted(false);
       return;
     }
 
@@ -106,7 +124,7 @@ class robot_arena_interactor : public er::client<robot_arena_interactor<T>> {
 
  private:
   /* clang-format off */
-  tv::tv_controller* const                m_tv_controller;
+  tv::tv_manager* const                m_tv_manager;
   free_block_pickup_interactor<T>         m_free_pickup_interactor;
   nest_block_drop_interactor<T>           m_nest_drop_interactor;
   task_abort_interactor<T>                m_task_abort_interactor;

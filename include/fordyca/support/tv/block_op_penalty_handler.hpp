@@ -37,10 +37,8 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
-namespace er = rcppsw::er;
-namespace rct = rcppsw::control;
 
 /*******************************************************************************
  * Classes
@@ -48,24 +46,24 @@ namespace rct = rcppsw::control;
 
 /**
  * @class block_op_penalty_handler
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
-class block_op_penalty_handler
+class block_op_penalty_handler final
     : public temporal_penalty_handler<T>,
-      public er::client<block_op_penalty_handler<T>> {
+      public rer::client<block_op_penalty_handler<T>> {
  public:
   using temporal_penalty_handler<T>::is_serving_penalty;
   using temporal_penalty_handler<T>::deconflict_penalty_finish;
   using temporal_penalty_handler<T>::original_penalty;
 
   block_op_penalty_handler(ds::arena_map* const map,
-                           const rct::waveform_params* const params,
+                           const rct::config::waveform_config* const config,
                            const std::string& name)
-      : temporal_penalty_handler<T>(params, name),
+      : temporal_penalty_handler<T>(config, name),
         ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
         m_map(map) {}
 
@@ -74,11 +72,9 @@ class block_op_penalty_handler
       delete;
   block_op_penalty_handler(const block_op_penalty_handler& other) = delete;
 
-  using filter_status = typename block_op_filter<T>::filter_status;
-
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
-   * trying to drop/pickup a block. If so, create a \ref block_op_penalty object
+   * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
    *
    * @param robot The robot to check.
@@ -87,19 +83,16 @@ class block_op_penalty_handler
    * @param timestep The current timestep.
    * @param cache_prox_dist The minimum distance that the cache site needs to
    *                        be from all caches in the arena.n
-   *
-   * @return \ref kStatusOK if a penalty has been initialized for a robot, a
-   * non-zero code if it has not indicating why.
    */
-  filter_status penalty_init(T& controller,
-                             block_op_src src,
-                             uint timestep,
-                             double cache_prox_dist = -1,
-                             double block_prox_dist = -1) {
+  op_filter_status penalty_init(T& controller,
+                                block_op_src src,
+                                uint timestep,
+                                double cache_prox_dist = -1,
+                                double block_prox_dist = -1) {
     auto filter = block_op_filter<T>(
         m_map)(controller, src, cache_prox_dist, block_prox_dist);
-    if (filter.status) {
-      return filter.reason;
+    if (filter != op_filter_status::ekSATISFIED) {
+      return filter;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot already serving block penalty?");
@@ -112,11 +105,11 @@ class block_op_penalty_handler
             timestep,
             original_penalty(),
             penalty,
-            src);
+            static_cast<int>(src));
 
     penalty_list().push_back(
         temporal_penalty<T>(&controller, id, penalty, timestep));
-    return filter_status::kStatusOK;
+    return filter;
   }
 
  protected:
@@ -129,17 +122,17 @@ class block_op_penalty_handler
                       double block_prox_dist) const {
     int id = -1;
     switch (src) {
-      case kSrcFreePickup:
+      case block_op_src::ekFREE_PICKUP:
         id = loop_utils::robot_on_block(controller, *m_map);
         ER_ASSERT(-1 != id, "Robot not on block?");
         break;
-      case kSrcNestDrop:
+      case block_op_src::ekNEST_DROP:
         ER_ASSERT(nullptr != controller.block() &&
                       -1 != controller.block()->id(),
                   "Robot not carrying block?");
         id = controller.block()->id();
         break;
-      case kSrcCacheSiteDrop:
+      case block_op_src::ekCACHE_SITE_DROP:
         ER_ASSERT(nullptr != controller.block() &&
                       -1 != controller.block()->id(),
                   "Robot not carrying block?");
@@ -147,7 +140,7 @@ class block_op_penalty_handler
                   "Block proximity distance not specified for cache site drop");
         id = controller.block()->id();
         break;
-      case kSrcNewCacheDrop:
+      case block_op_src::ekNEW_CACHE_DROP:
         ER_ASSERT(nullptr != controller.block() &&
                       -1 != controller.block()->id(),
                   "Robot not carrying block?");

@@ -31,14 +31,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class depth0_metrics_aggregator
- * @ingroup support depth0
+ * @ingroup fordyca support depth0
  *
  * @brief Aggregates and metrics metric collection for depth0 foraging. That
  * includes:
@@ -47,15 +46,12 @@ namespace er = rcppsw::er;
  */
 
 class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
-                                  public er::client<depth0_metrics_aggregator> {
+                                  public rer::client<depth0_metrics_aggregator> {
  public:
-  depth0_metrics_aggregator(const params::metrics_params* mparams,
-                            const rswc::convergence_params * cparams,
+  depth0_metrics_aggregator(const config::metrics_config* mconfig,
                             const std::string& output_root);
 
-  /*
-   * Collect metrics from a depth 0 controller.
-   */
+
   template<class T>
   void collect_from_controller(const T* controller);
 };

@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 
 /*******************************************************************************
@@ -36,7 +38,7 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 /**
  * @class generalist
- * @ingroup tasks
+ * @ingroup fordyca tasks
  *
  * @brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
@@ -47,31 +49,34 @@ NS_START(fordyca, tasks, depth0);
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */
-class generalist : public foraging_task {
+class generalist final : public foraging_task {
  public:
-  generalist(const ta::task_allocation_params* params,
-             std::unique_ptr<ta::taskable> mechanism);
+  generalist(const rta::config::task_alloc_config* config,
+             std::unique_ptr<rta::taskable> mechanism);
 
   /* event handling */
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::free_block_drop&) override {}
-  void accept(events::nest_block_drop& visitor) override;
-  void accept(events::block_vanished& visitor) override;
+  void accept(events::detail::free_block_pickup& visitor) override;
+  void accept(events::detail::free_block_drop&) override {}
+  void accept(events::detail::nest_block_drop& visitor) override;
+  void accept(events::detail::block_vanished& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   /* task metrics */
   bool task_at_interface(void) const override { return false; }
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const ta::taskable_argument* const) override {}
+  void task_start(const rta::taskable_argument* const) override {}
 
   double current_time(void) const override;
   double interface_time_calc(uint, double) override { return 0.0; }

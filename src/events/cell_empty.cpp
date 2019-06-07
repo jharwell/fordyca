@@ -30,7 +30,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::arena_grid;
 using ds::occupancy_grid;
 
@@ -39,7 +39,7 @@ using ds::occupancy_grid;
  ******************************************************************************/
 void cell_empty::visit(ds::cell2D& cell) {
   cell.entity(nullptr);
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
 } /* visit() */
 
 void cell_empty::visit(fsm::cell2D_fsm& fsm) {
@@ -47,7 +47,7 @@ void cell_empty::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cell_empty::visit(ds::arena_map& map) {
-  map.access<arena_grid::kCell>(x(), y()).accept(*this);
+  visit(map.access<arena_grid::kCell>(x(), y()));
 } /* visit() */
 
 void cell_empty::visit(ds::occupancy_grid& grid) {
@@ -56,16 +56,16 @@ void cell_empty::visit(ds::occupancy_grid& grid) {
     grid.known_cells_inc();
   }
   ER_ASSERT(grid.known_cell_count() <= grid.xdsize() * grid.ydsize(),
-            "Known cell count (%u) >= arena dimensions (%ux%u)",
+            "Known cell count (%u) >= arena dimensions (%zux%zu)",
             grid.known_cell_count(),
             grid.xdsize(),
             grid.ydsize());
   grid.access<occupancy_grid::kPheromone>(x(), y()).reset();
-  cell.accept(*this);
+  visit(cell);
 } /* visit() */
 
 void cell_empty::visit(ds::dpo_semantic_map& map) {
-  map.decoratee().accept(*this);
+  visit(map.decoratee());
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

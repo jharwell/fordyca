@@ -24,7 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
+
 #include "rcppsw/metrics/base_metrics.hpp"
+#include "rcppsw/math/vector2.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,44 +40,55 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 /**
  * @class goal_acquisition_metrics
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Interface defining what metrics that should be collected from FSMs as
  * they attempt to acquire a goal (site/object of interest) in SOME way (driving
  * to it directly, exploring for it, etc).
  */
-class goal_acquisition_metrics : public virtual rcppsw::metrics::base_metrics {
+class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
  public:
   enum class goal_type {
-    kNone,
-    kCacheSite,
-    kNewCache,
-    kExistingCache,
-    kBlock
+    ekNONE,
+    ekCACHE_SITE,
+    ekNEW_CACHE,
+    ekEXISTING_CACHE,
+    ekBLOCK
   };
   goal_acquisition_metrics(void) = default;
   ~goal_acquisition_metrics(void) override = default;
 
   /**
+   * @brief A pair of booleans, with the first one indicating that the robot is
+   * exploring for its goal, and the second one (only valid if the first is \c
+   * TRUE) indicating if it is a "true" exploring (i.e. the robot truly does not
+   * know of any instances of its target goal type), as opposed to exploring
+   * because all of the known instances of its goal type are deemed unsuitable
+   * for whatever reason.
+   */
+  using exp_status = std::pair<bool, bool>;
+
+  /**
    * @brief Return the type of acquisition that is currently being
    * performed.
    *
-   * @return The acquisition type, or \ref kNone if no acquisition is currently
-   * in progress.
+   * @return The acquisition type, or \ref goal_type::kNone if no acquisition is
+   * currently in progress.
    */
   virtual goal_type acquisition_goal(void) const = 0;
 
   /**
-   * @brief Output only defined if \ref goal_type() is not \ref kNone. If
-   * \c TRUE, then the robot is currently exploring for its goal (i.e. it does
-   * not know where it is).
+   * @brief Output only defined if \ref goal_type() is not \ref
+   * goal_type::ekNone.
+   *
+   * @return \ref exp_status.
    */
-  virtual bool is_exploring_for_goal(void) const = 0;
+  virtual exp_status is_exploring_for_goal(void) const = 0;
 
   /**
-   * @brief Output only defined if \ref goal_type() is not \ref kNone. If
-   * \c TRUE, then the robot is vectoring towards its goal (i.e. it knows where
-   * it is).
+   * @brief Output only defined if \ref goal_type() is not \ref
+   * goal_type::kNone. If \c TRUE, then the robot is vectoring towards its goal
+   * (i.e. it knows where it is).
    */
   virtual bool is_vectoring_to_goal(void) const = 0;
 
@@ -83,6 +98,24 @@ class goal_acquisition_metrics : public virtual rcppsw::metrics::base_metrics {
    * the next part of its current FSM as part of its current task.
    */
   virtual bool goal_acquired(void) const = 0;
+
+  /**
+   * @brief When \ref goal_acquired() returns \c TRUE, then this should return
+   * the location of the goal that was acquired.
+   */
+  virtual rmath::vector2u acquisition_loc(void) const = 0;
+
+  /**
+   * @brief When \ref is_exploring_for_goal() returns \c TRUE, then this should
+   * return the robot's current position as it explores for its goal.
+   */
+  virtual rmath::vector2u current_explore_loc(void) const = 0;
+
+  /**
+   * @brief When \ref is_vectoring_to_goal() returns \c TRUE, then this should
+   * return the robot's current position as it vectors to its goal.
+   */
+  virtual rmath::vector2u current_vector_loc(void) const = 0;
 };
 
 NS_END(fsm, metrics, fordyca);

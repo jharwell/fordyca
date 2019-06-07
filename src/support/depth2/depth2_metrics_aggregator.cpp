@@ -24,13 +24,13 @@
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include <vector>
 
-#include "fordyca/params/metrics_params.hpp"
+#include "fordyca/config/metrics_config.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/task_allocation/bi_tab.hpp"
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tab.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
@@ -42,7 +42,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
 using task2 = tasks::depth2::foraging_task;
@@ -51,43 +51,40 @@ using task2 = tasks::depth2::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth2_metrics_aggregator::depth2_metrics_aggregator(
-    const params::metrics_params* const mparams,
-    const rswc::convergence_params* const cparams,
+    const config::metrics_config* const mconfig,
     const std::string& output_root)
-    : depth1_metrics_aggregator(mparams, cparams, output_root),
+    : depth1_metrics_aggregator(mconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
-  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
+  register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::harvester",
-      metrics_path() + "/" + mparams->task_tab_collector_fname,
-      mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::bi_tab_metrics_collector>(
+      metrics_path() + "/" + mconfig->task_tab_collector_fname,
+      mconfig->collect_interval);
+  register_collector<rmetrics::tasks::bi_tab_metrics_collector>(
       "tasks::tab::collector",
-      metrics_path() + "/" + mparams->task_tab_harvester_fname,
-      mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      metrics_path() + "/" + mconfig->task_tab_harvester_fname,
+      mconfig->collect_interval);
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheStarterName),
-      metrics_path() + "/" + mparams->task_execution_cache_starter_fname,
-      mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      metrics_path() + "/" + mconfig->task_execution_cache_starter_fname,
+      mconfig->collect_interval);
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheFinisherName),
-      metrics_path() + "/" + mparams->task_execution_cache_finisher_fname,
-      mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      metrics_path() + "/" + mconfig->task_execution_cache_finisher_fname,
+      mconfig->collect_interval);
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheTransfererName),
-      metrics_path() + "/" + mparams->task_execution_cache_transferer_fname,
-      mparams->collect_interval);
-  register_collector<rcppsw::metrics::tasks::execution_metrics_collector>(
+      metrics_path() + "/" + mconfig->task_execution_cache_transferer_fname,
+      mconfig->collect_interval);
+  register_collector<rmetrics::tasks::execution_metrics_collector>(
       "tasks::execution::" + std::string(task2::kCacheCollectorName),
-      metrics_path() + "/" + mparams->task_execution_cache_collector_fname,
-      mparams->collect_interval);
+      metrics_path() + "/" + mconfig->task_execution_cache_collector_fname,
+      mconfig->collect_interval);
 
-  /*
-   * Overwrite depth1; we have a deeper decomposition now
-   */
-  register_collector<rcppsw::metrics::tasks::bi_tdgraph_metrics_collector>(
+  /* Overwrite depth1; we have a deeper decomposition now */
+  register_collector<rmetrics::tasks::bi_tdgraph_metrics_collector>(
       "tasks::distribution",
-      metrics_path() + "/" + mparams->task_distribution_fname,
-      mparams->collect_interval,
+      metrics_path() + "/" + mconfig->task_distribution_fname,
+      mconfig->collect_interval,
       2);
   reset_all();
 }
@@ -95,8 +92,9 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth2_metrics_aggregator::task_alloc_cb(const ta::polled_task* const task,
-                                              const ta::bi_tab* const tab) {
+void depth2_metrics_aggregator::task_alloc_cb(
+    __rcsw_unused const rta::polled_task* const task,
+    const rta::bi_tab* const tab) {
   if (task0::kGeneralistName == tab->root()->name()) {
     collect("tasks::tab::generalist", *tab);
   } else if (task1::kHarvesterName == tab->root()->name()) {
@@ -109,9 +107,9 @@ void depth2_metrics_aggregator::task_alloc_cb(const ta::polled_task* const task,
 } /* task_alloc_cb() */
 
 void depth2_metrics_aggregator::task_finish_or_abort_cb(
-    const ta::polled_task* const task) {
+    const rta::polled_task* const task) {
   collect("tasks::execution::" + task->name(),
-          dynamic_cast<const rcppsw::metrics::tasks::execution_metrics&>(*task));
+          dynamic_cast<const rmetrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
 NS_END(depth2, support, fordyca);

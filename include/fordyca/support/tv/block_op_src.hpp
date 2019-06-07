@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,11 +34,11 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-enum block_op_src {
-  kSrcFreePickup,
-  kSrcNestDrop,
-  kSrcCacheSiteDrop,
-  kSrcNewCacheDrop,
+enum class block_op_src {
+  ekFREE_PICKUP,
+  ekNEST_DROP,
+  ekCACHE_SITE_DROP,
+  ekNEW_CACHE_DROP,
 };
 
 NS_END(tv, support, fordyca);

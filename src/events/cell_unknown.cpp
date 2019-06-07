@@ -28,7 +28,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::occupancy_grid;
 
 /*******************************************************************************
@@ -36,7 +36,7 @@ using ds::occupancy_grid;
  ******************************************************************************/
 void cell_unknown::visit(ds::cell2D& cell) {
   cell.entity(nullptr);
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
 } /* visit() */
 
 void cell_unknown::visit(ds::occupancy_grid& grid) {
@@ -49,11 +49,11 @@ void cell_unknown::visit(ds::occupancy_grid& grid) {
 
     grid.known_cells_dec();
   }
-  cell.accept(*this);
+  visit(cell);
 } /* visit() */
 
 void cell_unknown::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_unknown();
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

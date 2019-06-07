@@ -3,6 +3,7 @@
 ################################################################################
 set(WITH_FOOTBOT_LEDS "YES" CACHE STRING "Enable footbot robots to control their LEDS via actuators")
 set(WITH_FOOTBOT_RAB "YES" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
+set(WITH_FOOTBOT_BATTERY "YES" CACHE STRING "Enable footbot robots to use the battery.")
 
 define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_LEDS"
   BRIEF_DOCS "Enable footbot robots to control their LEDS"
@@ -10,15 +11,24 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_LEDS"
 define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_RAB"
   BRIEF_DOCS "Enable footbot robots to use the RAB medium"
   FULL_DOCS "Default=yes.")
+define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
+  BRIEF_DOCS "Enable footbot robots to use the battery"
+  FULL_DOCS "Default=yes.")
 
 ################################################################################
 # External Projects                                                            #
 ################################################################################
 set(${target}_CHECK_LANGUAGE "CXX")
 
-if(BUILD_ON_MSI)
+if(BUILD_FOR_MSI)
   set(LOCAL_INSTALL_PREFIX /home/gini/shared/swarm)
+elseif(BUILD_FOR_TRAVIS) # General case or BUILD_FOR_TRAVIS
+  set(LOCAL_INSTALL_PREFIX /usr/local)
 else()
+    set(LOCAL_INSTALL_PREFIX /opt/data/local)
+endif()
+
+if(NOT BUILD_FOR_MSI)
   # Qt (not reliably available on MSI)
   set(CMAKE_AUTOMOC ON)
   find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
@@ -46,17 +56,22 @@ set(${target}_SYS_INCLUDE_DIRS
 ################################################################################
 # Libraries                                                                    #
 ################################################################################
-# Define link libraries
-set(${target}_LIBRARIES
-  rcppsw
-  nlopt
-  ${rcppsw_LIBRARIES}
+set(argos3_LIBRARIES
   argos3core_simulator
   argos3plugin_simulator_footbot
   argos3plugin_simulator_entities
   argos3plugin_simulator_dynamics2d
   argos3plugin_simulator_genericrobot
   argos3plugin_simulator_qtopengl
+  argos3plugin_simulator_media
+  )
+
+# Define link libraries
+set(${target}_LIBRARIES
+  rcppsw
+  nlopt
+  ${rcppsw_LIBRARIES}
+  ${argos3_LIBRARIES}
   stdc++fs
   rt)
 
@@ -68,7 +83,7 @@ set(${target}_LIBRARY_DIRS
   ${rcppsw_LIBRARY_DIRS})
 
 # Qt not reliably available on MSI
-if (NOT BUILD_ON_MSI)
+if (NOT BUILD_FOR_MSI)
   set(${target}_LIBRARIES ${${target}_LIBRARIES}
     Qt5::Widgets
     Qt5::Core
@@ -79,7 +94,7 @@ endif()
 # Force failures at build time rather than runtime
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
 
-if (BUILD_ON_MSI)
+if (BUILD_FOR_MSI)
   # For nlopt
   set(${target}_LIBRARY_DIRS ${${target}_LIBRARY_DIRS}
     ${LOCAL_INSTALL_PREFIX}/lib
@@ -122,8 +137,11 @@ endif()
 if (WITH_FOOTBOT_RAB)
   target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_RAB)
 endif()
+if (WITH_FOOTBOT_BATTERY)
+  target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_BATTERY)
+endif()
 
-if (BUILD_ON_MSI)
+if (BUILD_FOR_MSI)
   target_compile_options(${target} PUBLIC
     -Wno-missing-include-dirs
     -fno-new-inheriting-ctors)

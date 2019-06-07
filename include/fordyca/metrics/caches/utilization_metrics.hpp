@@ -36,12 +36,12 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 /**
  * @class utilization_metrics
- * @ingroup metrics caches
+ * @ingroup fordyca metrics caches
  *
  * @brief Interface defining utilization metrics that can be collected on
  * static/dynamic caches in the arena during their lifetime.
  */
-class utilization_metrics : virtual public rcppsw::metrics::base_metrics {
+class utilization_metrics : virtual public rmetrics::base_metrics {
  public:
   utilization_metrics(void) = default;
   ~utilization_metrics(void) override = default;
@@ -71,11 +71,6 @@ class utilization_metrics : virtual public rcppsw::metrics::base_metrics {
    * block drop events.
    */
   virtual uint total_block_drops(void) const = 0;
-
-  /**
-   * @brief Get the ID of the cache for use in metric collection.
-   */
-  virtual int cache_id(void) const = 0;
 };
 
 NS_END(caches, metrics, fordyca);

@@ -25,7 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/utility/math/rng.h>
+#include <memory>
 #include <string>
+
+#include "fordyca/fsm/collision_tracker.hpp"
 #include "fordyca/fsm/new_direction_data.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -41,9 +44,6 @@ class saa_subsystem;
 class sensing_subsystem;
 class actuation_subsystem;
 } // namespace controller
-namespace state_machine = rcppsw::patterns::state_machine;
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 NS_START(fsm);
 
@@ -52,7 +52,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * @class base_foraging_fsm
- * @ingroup fsm
+ * @ingroup fordyca fsm
  *
  * @brief A collection of base states/common functionality that foraging FSMs
  * can use if they choose.
@@ -60,8 +60,8 @@ NS_START(fsm);
  * This class cannot be instantiated on its own, as does not define an FSM
  * per-se.
  */
-class base_foraging_fsm : public state_machine::hfsm,
-                          public er::client<base_foraging_fsm>,
+class base_foraging_fsm : public rpfsm::hfsm,
+                          public rer::client<base_foraging_fsm>,
                           public metrics::fsm::collision_metrics {
  public:
   base_foraging_fsm(controller::saa_subsystem* saa, uint8_t max_states);
@@ -92,12 +92,6 @@ class base_foraging_fsm : public state_machine::hfsm,
       void) const;
   const std::shared_ptr<controller::actuation_subsystem> actuators(void);
 
-  /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
-
  protected:
   /**
    * @brief Randomize the angle of a vector, for use in change robot heading
@@ -110,45 +104,33 @@ class base_foraging_fsm : public state_machine::hfsm,
 
   const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
-
-  /**
-   * @brief Start tracking the state necessary for correctly gathering collision
-   * avoidance metrics.
-   */
-  void collision_avoidance_tracking_begin(void);
-
-  /**
-   * @brief Stop tracking the state necessary for correctly gathering collision
-   * avoidance metrics.
-   */
-  void collision_avoidance_tracking_end(void);
+  collision_tracker* ca_tracker(void) { return &m_tracker; }
+  const collision_tracker* ca_tracker(void) const { return &m_tracker; }
 
   /**
    * @brief Robots entering this state will return to the nest.
    *
    * This state MUST have a parent state defined that is not
-   * \ref task_allocation::hfsm::top_state().
+   * \ref rcppsw::patterns::state_machine::hfsm::top_state().
    *
-   * Upon return to the nest, a \ref foraging_signal::BLOCK_DROP
+   * Upon return to the nest, a \ref foraging_signal::kBLOCK_DROP
    * signal will be returned to the parent state. No robot should return to the
    * nest unless it has a block (duh).
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm,
-                     transport_to_nest,
-                     state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, transport_to_nest, rpfsm::event_data);
 
   /**
    * @brief Robots entering this state will leave the nest (they are assumed to
    * already be in the nest when this state is entered).
    *
    * This state MUST have a parent state defined that is not \ref
-   * \ref task_allocation.hfsm::top_state().
+   * rcppsw::patterns::state_machine::hfsm::top_state().
    *
    * When the robot has actually left the nest, according to sensor readings, a
-   * \ref foraging_signal::LEFT_NEST signal is returned to the
+   * \ref foraging_signal::kLEFT_NEST signal is returned to the
    * parent state.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, leaving_nest, rpfsm::event_data);
 
   /**
    * @brief Robots entering this state will randomly change their exploration
@@ -156,7 +138,7 @@ class base_foraging_fsm : public state_machine::hfsm,
    * state. Once the direction change has been accomplished, the robot will
    * transition back to its previous state.
    */
-  HFSM_STATE_DECLARE(base_foraging_fsm, new_direction, state_machine::event_data);
+  HFSM_STATE_DECLARE(base_foraging_fsm, new_direction, rpfsm::event_data);
 
   /**
    * @brief A simple entry state for returning to nest, used to set LED colors
@@ -213,16 +195,21 @@ class base_foraging_fsm : public state_machine::hfsm,
   static constexpr uint kNEST_COUNT_MAX_STEPS = 25;
 
   /* clang-format off */
-  bool                             m_entered_avoidance{false};
-  bool                             m_exited_avoidance{false};
-  bool                             m_in_avoidance{false};
-  uint                             m_avoidance_start{0};
   uint                             m_nest_count{0};
   uint                             m_new_dir_count{0};
-  rmath::radians                   m_new_dir;
+  rmath::radians                   m_new_dir{};
   argos::CRandom::CRNG*            m_rng;
   controller::saa_subsystem* const m_saa;
+  collision_tracker                m_tracker;
   /* clang-format on */
+
+ public:
+  /* collision metrics */
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(in_collision_avoidance, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(entered_collision_avoidance, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(exited_collision_avoidance, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(collision_avoidance_duration, m_tracker, const)
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(avoidance_loc, m_tracker, const)
 };
 
 NS_END(fsm, fordyca);

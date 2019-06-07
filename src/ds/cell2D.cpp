@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,25 +33,25 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cell2D::cell2D(void) : m_loc() { decoratee().init(); }
+cell2D::cell2D(void) { decoratee().init(); }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure std::shared_ptr<representation::base_block> cell2D::block(void) const {
-  return std::dynamic_pointer_cast<representation::base_block>(m_entity);
+__rcsw_pure std::shared_ptr<repr::base_block> cell2D::block(void) const {
+  return std::dynamic_pointer_cast<repr::base_block>(m_entity);
 } /* block() */
 
-__rcsw_pure std::shared_ptr<representation::base_block> cell2D::block(void) {
-  return std::dynamic_pointer_cast<representation::base_block>(m_entity);
+__rcsw_pure std::shared_ptr<repr::base_block> cell2D::block(void) {
+  return std::dynamic_pointer_cast<repr::base_block>(m_entity);
 } /* block() */
 
-__rcsw_pure std::shared_ptr<representation::base_cache> cell2D::cache(void) {
-  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
+__rcsw_pure std::shared_ptr<repr::base_cache> cell2D::cache(void) {
+  return std::dynamic_pointer_cast<repr::base_cache>(m_entity);
 } /* cache() */
 
-__rcsw_pure std::shared_ptr<representation::base_cache> cell2D::cache(void) const {
-  return std::dynamic_pointer_cast<representation::base_cache>(m_entity);
+__rcsw_pure std::shared_ptr<repr::base_cache> cell2D::cache(void) const {
+  return std::dynamic_pointer_cast<repr::base_cache>(m_entity);
 } /* cache() */
 
 NS_END(ds, fordyca);

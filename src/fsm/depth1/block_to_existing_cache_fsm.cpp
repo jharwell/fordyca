@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
+#include "fordyca/fsm/expstrat/cache_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,41 +35,59 @@ NS_START(fordyca, fsm, depth1);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_existing_cache_fsm::block_to_existing_cache_fsm(
-    const controller::block_sel_matrix* bsel_matrix,
-    const controller::cache_sel_matrix* csel_matrix,
-    controller::saa_subsystem* const saa,
-    ds::dpo_store* const store)
-    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
-      m_cache_fsm(csel_matrix, false, saa, store),
-      m_block_fsm(bsel_matrix, saa, store) {}
+    const params* const c_params)
+    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, c_params->saa),
+      m_cache_fsm(c_params->csel_matrix,
+                  c_params->saa,
+                  c_params->store,
+                  expstrat::cache_factory().create(
+                      c_params->exp_config.cache_strategy,
+                      rcppsw::make_unique<expstrat::base_expstrat::params>(
+                          c_params->csel_matrix,
+                          c_params->saa,
+                          c_params->store)
+                          .get()),
+                  false),
+      m_block_fsm(c_params->bsel_matrix,
+                  c_params->saa,
+                  c_params->store,
+                  expstrat::block_factory().create(
+                      c_params->exp_config.block_strategy,
+                      rcppsw::make_unique<expstrat::base_expstrat::params>(
+                          nullptr,
+                          c_params->saa,
+                          c_params->store)
+                          .get())) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acquisition_goal_type block_to_existing_cache_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acquisition_goal_type::kBlock;
-  } else if (ST_TRANSPORT_TO_GOAL == current_state() ||
-             ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return acquisition_goal_type::kExistingCache;
+__rcsw_pure acq_goal_type
+block_to_existing_cache_fsm::acquisition_goal(void) const {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+    return acq_goal_type::ekBLOCK;
+  } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+             ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return acq_goal_type::ekEXISTING_CACHE;
   }
-  return acquisition_goal_type::kNone;
+  return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
-transport_goal_type block_to_existing_cache_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_GOAL == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::kExistingCache;
+__rcsw_pure transport_goal_type
+block_to_existing_cache_fsm::block_transport_goal(void) const {
+  if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return transport_goal_type::ekEXISTING_CACHE;
   }
-  return transport_goal_type::kNone;
+  return transport_goal_type::ekNONE;
 } /* acquisition_goal() */
 
-bool block_to_existing_cache_fsm::goal_acquired(void) const {
-  if (acquisition_goal_type::kBlock == acquisition_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_PICKUP;
-  } else if (transport_goal_type::kExistingCache == block_transport_goal()) {
-    return current_state() == ST_WAIT_FOR_BLOCK_DROP;
+__rcsw_pure bool block_to_existing_cache_fsm::goal_acquired(void) const {
+  if (acq_goal_type::ekBLOCK == acquisition_goal()) {
+    return current_state() == ekST_WAIT_FOR_BLOCK_PICKUP;
+  } else if (transport_goal_type::ekEXISTING_CACHE == block_transport_goal()) {
+    return current_state() == ekST_WAIT_FOR_BLOCK_DROP;
   }
   return false;
 } /* goal_acquired() */

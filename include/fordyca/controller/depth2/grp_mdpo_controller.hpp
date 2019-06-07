@@ -38,7 +38,7 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * @class grp_mdpo_controller
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief A Greedy Recursive Partitioning controller that moves through a depth2
  * recursive task decomposition graph, changing task according to dynamic
@@ -46,8 +46,7 @@ NS_START(depth2);
  * using a Mapped DPO data store for tracking arena state and object relevance.
  */
 class grp_mdpo_controller : public depth2::grp_dpo_controller,
-                            public er::client<grp_mdpo_controller>,
-                            public visitor::visitable_any<grp_mdpo_controller> {
+                            public rer::client<grp_mdpo_controller> {
  public:
   grp_mdpo_controller(void);
   ~grp_mdpo_controller(void) override = default;
@@ -55,12 +54,10 @@ class grp_mdpo_controller : public depth2::grp_dpo_controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
 
-  void shared_init(const params::depth2::controller_repository& param_repo);
+  void shared_init(const config::depth2::controller_repository& param_repo);
 
   mdpo_perception_subsystem* mdpo_perception(void);
-  const mdpo_perception_subsystem* mdpo_perception(void) const {
-    return const_cast<grp_mdpo_controller*>(this)->mdpo_perception();
-  }
+  const mdpo_perception_subsystem* mdpo_perception(void) const;
 };
 
 NS_END(depth2, controller, fordyca);

@@ -31,7 +31,7 @@
 #include "fordyca/support/tv/temporal_penalty.hpp"
 #include "rcppsw/control/periodic_waveform.hpp"
 #include "rcppsw/control/waveform_generator.hpp"
-#include "rcppsw/control/waveform_params.hpp"
+#include "rcppsw/control/config/waveform_config.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -39,16 +39,13 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-namespace rct = rcppsw::control;
-namespace er = rcppsw::er;
-
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 
 /**
  * @class temporal_penalty_handler
- * @ingroup support tv
+ * @ingroup fordyca support tv
  *
  * @brief The penalty handler for penalties for robots (e.g. how long they have
  * to wait when they pickup/drop a block).
@@ -58,20 +55,22 @@ namespace er = rcppsw::er;
  */
 template <typename T>
 class temporal_penalty_handler
-    : public er::client<temporal_penalty_handler<T>> {
+    : public rer::client<temporal_penalty_handler<T>> {
  public:
   using iterator_type = typename std::list<temporal_penalty<T>>::iterator;
 
   /**
    * @brief Initialize the penalty handler.
    *
-   * @param params Parameters for penalty waveform generation.
+   * @param config Parameters for penalty waveform generation.
+   * @param name The name of the handler, for differentiating handler instancces
+   * in logging statements.
    */
-  explicit temporal_penalty_handler(const rct::waveform_params* const params,
-                                    const std::string& name)
+  explicit temporal_penalty_handler(const rct::config::waveform_config* const config,
+                                    std::string name)
       : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
-        mc_name(name),
-        m_penalty(rct::waveform_generator()(params->type, params)) {}
+        mc_name(std::move(name)),
+        m_penalty(rct::waveform_generator()(config->type, config)) {}
 
 
   ~temporal_penalty_handler(void) override = default;
@@ -98,8 +97,8 @@ class temporal_penalty_handler
    * @brief Determine if a robot has satisfied the \ref temporal_penalty
    * it is currently serving yet.
    *
-   * @param robot The robot to check. If the robot is not currently serving a
-   * penalty, \c FALSE will be returned.
+   * @param controller The robot to check. If the robot is not currently serving
+   * a penalty, \c FALSE will be returned.
    * @param timestep The current timestep.
    *
    * @return \c TRUE If the robot is currently waiting AND it has satisfied its
@@ -193,7 +192,7 @@ class temporal_penalty_handler
    * @param timestep The current timestep.
    */
   uint deconflict_penalty_finish(uint timestep) const {
-    uint penalty = static_cast<uint>(m_penalty->value(timestep));
+    auto penalty = static_cast<uint>(m_penalty->value(timestep));
     if (0 == penalty) {
       ++penalty;
     }

@@ -26,23 +26,19 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller { namespace depth2 { class grp_mdpo_controller; }}
-
-NS_START(support, depth2);
-namespace er = rcppsw::er;
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class depth2_metrics_aggregator
- * @ingroup support depth2
+ * @ingroup fordyca support depth2
  *
  * @brief Aggregates and metrics collection for depth2 foraging. That
  * includes everything from \ref depth1_metrics_aggregator, and also:
@@ -50,16 +46,15 @@ namespace er = rcppsw::er;
  * - TAB metrics (rooted at harvester)
  * - TAB metrics (rooted at collector)
  */
-class depth2_metrics_aggregator : public depth1::depth1_metrics_aggregator,
-                                  public er::client<depth2_metrics_aggregator> {
+class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator,
+                                  public rer::client<depth2_metrics_aggregator> {
  public:
-  depth2_metrics_aggregator(const params::metrics_params* params,
-                            const rswc::convergence_params * const cparams,
+  depth2_metrics_aggregator(const config::metrics_config* mconfig,
                             const std::string& output_root);
 
-  void task_alloc_cb(const ta::polled_task* task,
-                     const ta::bi_tab* tab);
-  void task_finish_or_abort_cb(const ta::polled_task* const task);
+  void task_alloc_cb(const rta::polled_task* task,
+                     const rta::bi_tab* tab);
+  void task_finish_or_abort_cb(const rta::polled_task* task);
 
   /**
    * @brief Collect metrics from the depth2 controller.

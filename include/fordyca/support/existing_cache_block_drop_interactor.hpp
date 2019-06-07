@@ -26,40 +26,39 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace ta = rcppsw::task_allocation;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
  * @class existing_cache_block_drop_interactor
- * @ingroup support
+ * @ingroup fordyca support
  *
- * @brief Handles a robot's (possible) \ref cached_block_drop event for existing
+ * @brief Handles a robot's (possible) \ref cache_block_drop event for existing
  * caches on a given timestep.
  */
 template <typename T>
 class existing_cache_block_drop_interactor
-    : public er::client<existing_cache_block_drop_interactor<T>> {
+    : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
   existing_cache_block_drop_interactor(ds::arena_map* const map_in,
-                                       tv::tv_controller* tv_controller)
+                                       tv::tv_manager* tv_manager)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
-        m_penalty_handler(tv_controller->penalty_handler<T>(
-            tv::cache_op_src::kSrcExistingCacheDrop)) {}
+        m_penalty_handler(tv_manager->penalty_handler<T>(
+            tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
 
   /**
    * @brief Interactors should generally NOT be copy constructable/assignable,
@@ -88,8 +87,8 @@ class existing_cache_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                     tv::cache_op_src::kSrcExistingCacheDrop,
-                                     timestep);
+                                      tv::cache_op_src::ekEXISTING_CACHE_DROP,
+                                      timestep);
     }
   }
 
@@ -106,7 +105,7 @@ class existing_cache_block_drop_interactor
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  tv::acquisition_goal_type::kExistingCache ==
+                  tv::acq_goal_type::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
 
@@ -134,9 +133,8 @@ class existing_cache_block_drop_interactor
       ER_WARN("%s cannot drop in cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
-      events::cache_vanished vanished(p.id());
-
-      controller.visitor::template visitable_any<T>::accept(vanished);
+      events::cache_vanished_visitor vanished_op(p.id());
+      vanished_op.visit(controller);
     } else {
       perform_cache_block_drop(controller, p);
     }
@@ -158,14 +156,14 @@ class existing_cache_block_drop_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cache_block_drop drop_op(controller.block(),
-                                     *it,
-                                     m_map->grid_resolution());
+    events::cache_block_drop_visitor drop_op(controller.block(),
+                                             *it,
+                                             m_map->grid_resolution());
     (*it)->penalty_served(penalty.penalty());
 
     /* Update arena map state due to a cache drop */
-    m_map->accept(drop_op);
-    controller.visitor::template visitable_any<T>::accept(drop_op);
+    drop_op.visit(*m_map);
+    drop_op.visit(controller);
   }
 
   /* clang-format off */

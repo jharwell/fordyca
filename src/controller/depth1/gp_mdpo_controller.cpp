@@ -22,14 +22,15 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/config/depth1/controller_repository.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/params/depth1/controller_repository.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
+#include "fordyca/repr/base_block.hpp"
 
-#include "rcppsw/task_allocation/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +53,7 @@ void gp_mdpo_controller::Init(ticpp::Element& node) {
 
   ndc_push();
   ER_INFO("Initializing...");
-  params::depth1::controller_repository param_repo;
+  config::depth1::controller_repository param_repo;
 
   param_repo.parse_all(node);
   if (!param_repo.validate_all()) {
@@ -67,21 +68,25 @@ void gp_mdpo_controller::Init(ticpp::Element& node) {
 
 void gp_mdpo_controller::ControlStep(void) {
   ndc_pusht();
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
 
-  perception()->update();
+  perception()->update(nullptr);
   task_aborted(false);
   executive()->run();
   ndc_pop();
 } /* ControlStep() */
 
 void gp_mdpo_controller::shared_init(
-    const params::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& param_repo) {
   /* block/cache selection matrices, executive  */
   gp_dpo_controller::shared_init(param_repo);
 
   /* MDPO perception subsystem */
-  params::perception::perception_params p =
-      *param_repo.parse_results<params::perception::perception_params>();
+  config::perception::perception_config p =
+      *param_repo.config_get<config::perception::perception_config>();
   p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
@@ -106,20 +111,11 @@ __rcsw_pure mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void)
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-/*******************************************************************************
- * World Model Metrics
- ******************************************************************************/
-uint gp_mdpo_controller::cell_state_inaccuracies(uint state) const {
-  return mdpo_perception()->cell_state_inaccuracies(state);
-} /* cell_state_inaccuracies() */
-
-double gp_mdpo_controller::known_percentage(void) const {
-  return mdpo_perception()->known_percentage();
-} /* known_percentage() */
-
-double gp_mdpo_controller::unknown_percentage(void) const {
-  return mdpo_perception()->unknown_percentage();
-} /* unknown_percentage() */
+__rcsw_pure const mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(
+    void) const {
+  return static_cast<const mdpo_perception_subsystem*>(
+      dpo_controller::perception());
+} /* perception() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

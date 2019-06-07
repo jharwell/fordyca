@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
 
@@ -32,58 +33,86 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class base_block;
 }
-namespace controller { namespace depth2 {
-class grp_mdpo_controller;
-}} // namespace controller::depth2
 
 namespace ds {
 class dpo_semantic_map;
 class dpo_store;
 } // namespace ds
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class block_found
- * @ingroup events
+ * @ingroup fordyca events detail
  *
  * @brief Event that is created whenever a block (possibly known, possibly
  * unknown) appears in a robot's LOS.
  */
-class block_found : public rcppsw::er::client<block_found>,
-                    public cell_op,
-                    visitor::visit_set<controller::depth2::grp_mdpo_controller,
-                                       ds::dpo_store,
-                                       ds::dpo_semantic_map> {
+class block_found : public rer::client<block_found>, public cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using controllers = controller::depth2::typelist;
+    using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
+
+    using value = boost::mpl::joint_view<
+        boost::mpl::joint_view<inherited::type, controllers::type>::type,
+        others::type>;
+  };
+
  public:
-  explicit block_found(std::unique_ptr<representation::base_block> block);
-  explicit block_found(const std::shared_ptr<representation::base_block>& block);
+  using visit_typelist = visit_typelist_impl::value;
+
+  explicit block_found(std::unique_ptr<repr::base_block> block);
+  explicit block_found(const std::shared_ptr<repr::base_block>& block);
   ~block_found(void) override = default;
 
   block_found(const block_found& op) = delete;
   block_found& operator=(const block_found& op) = delete;
 
   /* DPO foraging */
-  void visit(ds::dpo_store& store) override;
+  void visit(ds::dpo_store& store);
 
   /* MDPO foraging */
-  void visit(ds::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::dpo_semantic_map& map) override;
+  void visit(ds::cell2D& cell);
+  void visit(fsm::cell2D_fsm& fsm);
+  void visit(ds::dpo_semantic_map& map);
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_mdpo_controller& controller) override;
+  void visit(controller::depth2::grp_dpo_controller& c);
+  void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(controller::depth2::grp_odpo_controller& c);
+  void visit(controller::depth2::grp_omdpo_controller& c);
 
  private:
+  void pheromone_update(ds::dpo_semantic_map& map);
+
   /* clang-format off */
-  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using block_found_visitor_impl =
+    rpvisitor::precise_visitor<detail::block_found,
+                              detail::block_found::visit_typelist>;
+
+NS_END(detail);
+
+class block_found_visitor : public detail::block_found_visitor_impl {
+  using detail::block_found_visitor_impl::block_found_visitor_impl;
 };
 
 NS_END(events, fordyca);

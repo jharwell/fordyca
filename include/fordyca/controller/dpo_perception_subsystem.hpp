@@ -27,7 +27,8 @@
 #include <string>
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "rcppsw/common/common.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -38,9 +39,9 @@ NS_START(fordyca);
 namespace ds {
 class dpo_store;
 }
-namespace params { namespace perception {
-struct perception_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct perception_config;
+}} // namespace config::perception
 
 NS_START(controller);
 
@@ -49,26 +50,31 @@ NS_START(controller);
  ******************************************************************************/
 /**
  * @class dpo_perception_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
- * into a useful internal representation: a \ref dpo_store.
+ * into a useful internal repr: a \ref dpo_store.
  */
-class dpo_perception_subsystem
-    : public rcppsw::er::client<dpo_perception_subsystem>,
-      public base_perception_subsystem {
+class dpo_perception_subsystem final
+    : public rer::client<dpo_perception_subsystem>,
+      public base_perception_subsystem,
+      public metrics::perception::dpo_perception_metrics {
  public:
   explicit dpo_perception_subsystem(
-      const struct params::perception::perception_params* params);
+      const config::perception::perception_config* config);
   ~dpo_perception_subsystem(void) override;
+
+  /* DPO perception metrics */
+  uint n_known_blocks(void) const override;
+  uint n_known_caches(void) const override;
+  rswarm::pheromone_density avg_block_density(void) const override;
+  rswarm::pheromone_density avg_cache_density(void) const override;
 
   /**
    * @brief Update the robot's perception of the environment, passing it its
    * current line of sight.
-   *
-   * @param los The current line of sight.
    */
-  void update(void) override;
+  void update(oracular_info_receptor* receptor) override;
 
   /**
    * @brief Reset the robot's perception of the environment to an initial state
@@ -86,28 +92,20 @@ class dpo_perception_subsystem
    *
    * @param c_los The LOS to process.
    */
-  void process_los(const representation::line_of_sight* const c_los);
+  void process_los(const repr::line_of_sight* c_los,
+                   oracular_info_receptor* receptor);
 
-  void process_los_blocks(const representation::line_of_sight* const c_los);
-  void process_los_caches(const representation::line_of_sight* const c_los);
+  void process_los_blocks(const repr::line_of_sight* c_los);
+  void process_los_caches(const repr::line_of_sight* c_los);
 
-  void los_tracking_sync(const representation::line_of_sight* const c_los,
+  void los_tracking_sync(const repr::line_of_sight* c_los,
                          const ds::cache_list& los_caches);
-  void los_tracking_sync(const representation::line_of_sight* const c_los,
-                         const ds::block_list& los_blocks);
-
-  /**
-   * @brief The processing of the current LOS after processing (i.e. does the
-   * PAM now accurately reflect what was in the LOS)?
-   *
-   * @param c_los Current LOS.
-   */
-  void processed_los_verify(
-      const representation::line_of_sight* const c_los) const;
+  void los_tracking_sync(const repr::line_of_sight* c_los,
+                         const ds::block_list& blocks);
 
  private:
   /* clang-format off */
-  std::unique_ptr<ds::dpo_store>                 m_store;
+  std::unique_ptr<ds::dpo_store> m_store;
   /* clang-format on */
 };
 

@@ -25,31 +25,28 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
-
-namespace collectible_metrics { namespace fsm { class movement_metrics; } }
-
-NS_START(fsm);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class movement_metrics_collector
- * @ingroup metrics fsm
+ * @ingroup fordyca metrics fsm
  *
  * @brief Collector for \ref movement_metrics.
  *
  * Metrics are written out every timestep.
  */
-class movement_metrics_collector : public rcppsw::metrics::base_metrics_collector {
+class movement_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
@@ -58,21 +55,21 @@ class movement_metrics_collector : public rcppsw::metrics::base_metrics_collecto
   movement_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
  private:
   struct stats {
     double int_distance{0.0};
-    uint int_robot_count{0};
-    double cum_distance{0.0};
-
+    uint   int_robot_count{0};
     double int_velocity{0.0};
-    uint cum_robot_count{0};
+
+    double cum_distance{0.0};
+    uint   cum_robot_count{0};
     double cum_velocity{0.0};
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   struct stats m_stats{};

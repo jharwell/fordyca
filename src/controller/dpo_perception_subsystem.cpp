@@ -22,12 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
+#include "fordyca/controller/los_proc_verify.hpp"
+#include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/params/perception/perception_params.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,40 +39,58 @@ NS_START(fordyca, controller);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_perception_subsystem::dpo_perception_subsystem(
-    const struct params::perception::perception_params* const params)
+    const config::perception::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.controller.dpo_perception"),
-      m_store(rcppsw::make_unique<ds::dpo_store>(&params->pheromone)) {}
+      m_store(rcppsw::make_unique<ds::dpo_store>(&config->pheromone)) {}
 
 dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void dpo_perception_subsystem::update(void) {
-  process_los(los());
-  processed_los_verify(los());
+void dpo_perception_subsystem::update(oracular_info_receptor* const receptor) {
+  process_los(los(), receptor);
+  ER_ASSERT(los_proc_verify(los())(dpo_store()), "LOS verification failed");
   m_store->decay_all();
 } /* update() */
 
 void dpo_perception_subsystem::reset(void) { m_store->clear_all(); }
 
 void dpo_perception_subsystem::process_los(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los,
+    oracular_info_receptor* const receptor) {
   ER_TRACE("LOS LL=%s, LR=%s, UL=%s UR=%s",
            c_los->abs_ll().to_str().c_str(),
            c_los->abs_lr().to_str().c_str(),
            c_los->abs_ul().to_str().c_str(),
            c_los->abs_ur().to_str().c_str());
 
-  process_los_blocks(c_los);
-  process_los_caches(c_los);
+  /* If we are in an oracular controller, process the updates from the oracle */
+  if (nullptr != receptor) {
+    receptor->dpo_store_update(m_store.get());
+  }
+
+  /*
+   * Depending on oracle configuration, we may be able to skip processing parts
+   * of our LOS, as they will be a subset of the updates we get from the oracle.
+   */
+  if (nullptr == receptor ||
+      (nullptr != receptor && !receptor->entities_blocks_enabled())) {
+    process_los_blocks(c_los);
+  }
+  if (nullptr == receptor ||
+      (nullptr != receptor && !receptor->entities_caches_enabled())) {
+    process_los_caches(c_los);
+  }
 } /* process_los() */
 
 void dpo_perception_subsystem::process_los_caches(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   ds::cache_list los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
+    ER_DEBUG("Caches in DPO store: [%s]",
+             rcppsw::to_string(m_store->caches()).c_str());
   }
 
   /* Fix our tracking of caches that no longer exist in our perception */
@@ -83,6 +102,12 @@ void dpo_perception_subsystem::process_los_caches(
               cache->id(),
               cache->real_loc().to_str().c_str(),
               cache->discrete_loc().to_str().c_str());
+    } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
+      ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
+              cache->id(),
+              cache->discrete_loc().to_str().c_str(),
+              m_store->find(cache)->ent()->n_blocks(),
+              cache->n_blocks());
     }
     /*
      * The cache we get a handle to is owned by the simulation, and we don't
@@ -96,13 +121,13 @@ void dpo_perception_subsystem::process_los_caches(
      *
      * Cloning is definitely necessary here.
      */
-    events::cache_found op(cache->clone());
-    m_store->accept(op);
+    events::cache_found_visitor op(cache->clone());
+    op.visit(*m_store);
   } /* for(cache..) */
 } /* process_los_caches() */
 
 void dpo_perception_subsystem::process_los_blocks(
-    const representation::line_of_sight* const c_los) {
+    const repr::line_of_sight* const c_los) {
   /*
    * Because this is computed, rather than a returned reference to a member
    * variable, we can't use separate begin()/end() calls with it, and need to
@@ -111,6 +136,8 @@ void dpo_perception_subsystem::process_los_blocks(
   ds::block_list los_blocks = c_los->blocks();
   if (!los_blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
+    ER_DEBUG("Blocks in DPO store: [%s]",
+             rcppsw::to_string(m_store->blocks()).c_str());
   }
 
   /*
@@ -135,28 +162,30 @@ void dpo_perception_subsystem::process_los_blocks(
                block->real_loc().to_str().c_str(),
                block->discrete_loc().to_str().c_str());
     }
-    events::block_found op(block->clone());
-    m_store->accept(op);
+    events::block_found_visitor op(block->clone());
+    op.visit(*m_store);
   } /* for(block..) */
 } /* process_los() */
 
 void dpo_perception_subsystem::los_tracking_sync(
-    const representation::line_of_sight* const c_los,
+    const repr::line_of_sight* const c_los,
     const ds::cache_list& los_caches) {
   /*
    * If the location of one of the caches we are tracking is in our LOS, then
    * the corresponding cache should also be in our LOS. If it is not, then our
    * tracked version is out of date and needs to be removed.
    */
-  for (auto& cache : m_store->caches().values_range()) {
+  for (auto& cache : m_store->caches().const_values_range()) {
     if (c_los->contains_loc(cache.ent()->discrete_loc())) {
-      auto it = std::find_if(los_caches.begin(),
-                             los_caches.end(),
-                             [&](const auto& c) {
-        return c->loccmp(*cache.ent_obj());
-      });
+      auto it =
+          std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
+            return c->loccmp(*cache.ent_obj());
+          });
 
       if (los_caches.end() == it) {
+        ER_INFO("Remove tracked cache%d@%s: not in LOS caches",
+                cache.ent()->id(),
+                cache.ent()->discrete_loc().to_str().c_str());
         m_store->cache_remove(cache.ent_obj());
         ER_ASSERT(nullptr == m_store->find(cache.ent_obj()),
                   "Cache%d still exists in store after removal",
@@ -167,7 +196,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 } /* los_tracking_sync() */
 
 void dpo_perception_subsystem::los_tracking_sync(
-    const representation::line_of_sight* const c_los,
+    const repr::line_of_sight* const c_los,
     const ds::block_list& blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
@@ -178,7 +207,7 @@ void dpo_perception_subsystem::los_tracking_sync(
    * has moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  for (auto&& block : m_store->blocks().values_range()) {
+  for (auto& block : m_store->blocks().const_values_range()) {
     if (c_los->contains_loc(block.ent()->discrete_loc())) {
       auto it = std::find_if(blocks.begin(), blocks.end(), [&](const auto& b) {
         return b->idcmp(*block.ent_obj());
@@ -198,38 +227,43 @@ void dpo_perception_subsystem::los_tracking_sync(
   } /* for(&&block..) */
 } /* los_tracking_sync() */
 
-void dpo_perception_subsystem::processed_los_verify(
-    const representation::line_of_sight* const c_los) const {
-  /*
-   * Verify that for each cell that contained a block in the LOS, that the block
-   * is also contained in the store after processing.
-   */
-  for (auto& block : c_los->blocks()) {
-    ER_ASSERT(m_store->contains(block),
-              "Store does not contain block%d@%s",
-              block->id(),
-              block->discrete_loc().to_str().c_str());
-  } /* for(&block..) */
+/*******************************************************************************
+ * DPO Perception Metrics
+ ******************************************************************************/
+__rcsw_pure uint dpo_perception_subsystem::n_known_blocks(void) const {
+  return m_store->blocks().size();
+} /* n_known_blocks() */
 
-  /*
-   * Verify that for each cell that contained a cache in the LOS:
-   *
-   * - The corresponding cache exists in the store.
-   * - The store and LOS versions of the cache have the same # of blocks
-   */
-  for (auto& c1 : c_los->caches()) {
-    auto exists = m_store->find(c1);
-    ER_ASSERT(nullptr != exists,
-              "LOS Cache%d@%s does not exist in DPO store",
-              c1->id(),
-              c1->discrete_loc().to_str().c_str());
-    ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
-              "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
-              c1->id(),
-              c1->discrete_loc().to_str().c_str(),
-              c1->n_blocks(),
-              exists->ent()->n_blocks());
-  } /* for(c1..) */
-} /* processed_los_verify() */
+__rcsw_pure uint dpo_perception_subsystem::n_known_caches(void) const {
+  return m_store->caches().size();
+} /* n_known_caches() */
+
+rswarm::pheromone_density dpo_perception_subsystem::avg_block_density(void) const {
+  auto range = m_store->blocks().const_values_range();
+  if (m_store->blocks().empty()) {
+    return rswarm::pheromone_density();
+  }
+  return std::accumulate(range.begin(),
+                         range.end(),
+                         rswarm::pheromone_density(),
+                         [&](const auto& accum, const auto& block) {
+                           return accum + block.density();
+                         }) /
+         m_store->blocks().size();
+} /* avg_block_density() */
+
+rswarm::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
+  auto range = m_store->caches().const_values_range();
+  if (m_store->caches().empty()) {
+    return rswarm::pheromone_density();
+  }
+  return std::accumulate(range.begin(),
+                         range.end(),
+                         rswarm::pheromone_density(),
+                         [&](const auto& accum, const auto& cache) {
+                           return accum + cache.density();
+                         }) /
+         m_store->caches().size();
+} /* avg_cache_density() */
 
 NS_END(controller, fordyca);

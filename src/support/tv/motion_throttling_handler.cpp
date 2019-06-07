@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/tv/motion_throttling_handler.hpp"
+#include "rcppsw/control/config/waveform_config.hpp"
 #include "rcppsw/control/waveform.hpp"
 #include "rcppsw/control/waveform_generator.hpp"
-#include "rcppsw/control/waveform_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,8 +35,8 @@ NS_START(fordyca, support, tv);
  * Constructors/Destructor
  ******************************************************************************/
 motion_throttling_handler::motion_throttling_handler(
-    const ct::waveform_params* const params)
-    : m_waveform(ct::waveform_generator()(params->type, params)) {}
+    const rct::config::waveform_config* const config)
+    : m_waveform(rct::waveform_generator()(config->type, config)) {}
 
 motion_throttling_handler::~motion_throttling_handler(void) = default;
 

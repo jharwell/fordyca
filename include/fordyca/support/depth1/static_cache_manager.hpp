@@ -26,8 +26,10 @@
  ******************************************************************************/
 #include <vector>
 #include <utility>
+#include <random>
+#include <boost/optional.hpp>
 
-#include "fordyca/params/caches/caches_params.hpp"
+#include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
@@ -40,28 +42,26 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace ds { class arena_grid; }
-namespace representation {
+namespace repr {
 class base_block;
 class arena_cache;
 }
 NS_START(support, depth1);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class static_cache_manager
- * @ingroup support depth1
+ * @ingroup fordyca support depth1
  *
  * @brief Manager for creation, depletion, and metric gathering for the static
  * cache in the arena, when it is employed.
  */
-class static_cache_manager : public base_cache_manager,
-                             public er::client<static_cache_manager> {
+class static_cache_manager final : public base_cache_manager,
+                             public rer::client<static_cache_manager> {
  public:
-  static_cache_manager(const struct params::caches::caches_params* params,
+  static_cache_manager(const config::caches::caches_config* config,
                        ds::arena_grid* arena_grid,
                        const rmath::vector2d& cache_loc);
 
@@ -71,17 +71,19 @@ class static_cache_manager : public base_cache_manager,
    * @brief (Re)-create the static cache in the arena (depth 1 only).
    *
    * @param blocks The total block vector for the arena.
+   * @param timestep The current timestep.
    *
    * @return \c TRUE iff a static cache was actually created. Non-fatal failures
    * to create the static cache can occur if, for example, all blocks are
    * currently being carried by robots and there are not enough free blocks with
    * which to create a cache of the specified minimum size.
    */
-  creation_res_t create(ds::block_vector& blocks);
+  boost::optional<ds::cache_vector> create(ds::block_vector& blocks, uint timestep);
 
-  creation_res_t create_conditional(ds::block_vector& blocks,
-                                     uint n_harvesters,
-                                     uint n_collectors);
+  boost::optional<ds::cache_vector> create_conditional(ds::block_vector& blocks,
+                                                       uint timestep,
+                                                       uint n_harvesters,
+                                                       uint n_collectors);
 
  private:
   /**
@@ -97,11 +99,25 @@ class static_cache_manager : public base_cache_manager,
    * size of the cache. If it returns \c TRUE, then the second parameter of the
    * pair is the vector of blocks to use for cache creation.
    */
-  block_calc_res_t calc_blocks_for_creation(ds::block_vector& blocks);
+  boost::optional<ds::block_vector> calc_blocks_for_creation(
+      ds::block_vector& blocks);
 
+  /**
+   * @brief Perform adjustments to blocks in the arena after creating caches.
+   *
+   * Any blocks that are under where the cache currently is (i.e. will be hidden
+   * by it) need to be added to the cache so that all blocks in the arena are
+   * accessible. This is generally only an issue at the start of simulation if
+   * random block distribution is used, but weird cases can arise due to task
+   * abort+block drop as well, so it is best to be safe and do it
+   * unconditionally after creation.
+   */
+  void post_creation_blocks_adjust(const ds::cache_vector& caches,
+                                   const ds::block_vector& blocks);
   /* clang-format off */
-  const params::caches::caches_params mc_cache_params;
+  const config::caches::caches_config mc_cache_config;
   const rmath::vector2d               mc_cache_loc;
+  std::default_random_engine          m_reng;
   /* clang-format on */
 };
 

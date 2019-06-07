@@ -40,11 +40,11 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class block;
-} // namespace representation
+} // namespace repr
 
-namespace params { namespace arena { struct block_dist_params; }}
+namespace config { namespace arena { struct block_dist_config; }}
 
 NS_START(support, block_dist);
 
@@ -53,7 +53,7 @@ NS_START(support, block_dist);
  ******************************************************************************/
 /**
  * @class powerlaw_distributor
- * @ingroup support
+ * @ingroup fordyca support
  *
  * @brief Distributes a block, or set of blocks, within the arena as randomly
  * placed clusters with sizes ranging [minsize, maxsize], with a power law based
@@ -62,18 +62,18 @@ NS_START(support, block_dist);
  * - Blocks are assumed to be the same size as arena resolution (this is not
  *   checked).
  */
-class powerlaw_distributor : public base_distributor,
-                             public er::client<powerlaw_distributor> {
+class powerlaw_distributor final : public base_distributor,
+                             public rer::client<powerlaw_distributor> {
  public:
   /**
    * @brief Initialize the distributor.
    */
-  explicit powerlaw_distributor(const struct params::arena::block_dist_params* params);
+  explicit powerlaw_distributor(const config::arena::block_dist_config* config);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
 
   ds::const_block_cluster_list block_clusters(void) const override;
@@ -87,15 +87,15 @@ class powerlaw_distributor : public base_distributor,
    *
    * @return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
    */
-  bool map_clusters(const ds::arena_grid* grid);
+  bool map_clusters(ds::arena_grid* grid);
 
  private:
-  struct cluster_params {
+  struct cluster_config {
     ds::arena_grid::view view;
     uint                 capacity;
   };
 
-  using cluster_paramvec = std::vector<cluster_params>;
+  using cluster_paramvec = std::vector<cluster_config>;
 
   /**
    * @brief Assign cluster centers randomly, with the only restriction that the
@@ -105,7 +105,7 @@ class powerlaw_distributor : public base_distributor,
    * @param clust_sizes Vector of powers of 2 for the cluster sizes.
    */
   cluster_paramvec guess_cluster_placements(
-      const ds::arena_grid* grid,
+      ds::arena_grid* grid,
       const std::vector<uint>& clust_sizes);
 
   /**
@@ -125,14 +125,13 @@ class powerlaw_distributor : public base_distributor,
    *
    * Cluster sizes are drawn from the internally stored power law distribution.
    */
-  cluster_paramvec compute_cluster_placements(const ds::arena_grid* grid,
+  cluster_paramvec compute_cluster_placements(ds::arena_grid* grid,
                                              uint n_clusters);
 
   /* clang-format off */
   double                                         m_arena_resolution{0.0};
   uint                                           m_n_clusters{0};
   std::map<uint, std::list<cluster_distributor>> m_dist_map{};
-  std::default_random_engine                     m_rng {std::random_device {}()};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;
   /* clang-format on */
 };

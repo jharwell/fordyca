@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
@@ -31,26 +32,26 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 
+namespace detail {
 class cached_block_pickup;
 class cache_block_drop;
 class cache_vanished;
-
-namespace visitor = rcppsw::patterns::visitor;
+} // namespace detail
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
  * @class existing_cache_interactor
- * @ingroup tasks depth1
+ * @ingroup fordyca tasks depth1
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor
-    : public visitor::polymorphic_accept_set<cache_block_drop,
-                                             cached_block_pickup,
-                                             cache_vanished> {};
+    : public rpvisitor::polymorphic_accept_set<detail::cache_block_drop,
+                                              detail::cached_block_pickup,
+                                              detail::cache_vanished> {};
 
 NS_END(events, fordyca);
 

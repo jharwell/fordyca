@@ -27,9 +27,9 @@
 #include <list>
 #include <string>
 
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/params/arena/block_dist_params.hpp"
+#include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/entity_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
 
@@ -38,10 +38,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class base_block;
 class multicell_entity;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class arena_grid;
@@ -55,7 +55,7 @@ class base_distributor;
  ******************************************************************************/
 /**
  * @class dispatcher
- * @ingroup block_dist support
+ * @ingroup fordyca block_dist support
  *
  * @brief Dispatches call to distribute blocks (or a single block), as
  * configured in simulation input file.
@@ -65,14 +65,14 @@ class base_distributor;
  */
 class dispatcher {
  public:
-  static constexpr char kDIST_SINGLE_SRC[] = "single_source";
-  static constexpr char kDIST_RANDOM[] = "random";
-  static constexpr char kDIST_DUAL_SRC[] = "dual_source";
-  static constexpr char kDIST_QUAD_SRC[] = "quad_source";
-  static constexpr char kDIST_POWERLAW[] = "powerlaw";
+  static constexpr char kDistSingleSrc[] = "single_source";
+  static constexpr char kDistRandom[] = "random";
+  static constexpr char kDistDualSrc[] = "dual_source";
+  static constexpr char kDistQuadSrc[] = "quad_source";
+  static constexpr char kDistPowerlaw[] = "powerlaw";
 
   dispatcher(ds::arena_grid* grid,
-             const params::arena::block_dist_params* params,
+             const config::arena::block_dist_config* config,
              double arena_padding);
   ~dispatcher(void);
 
@@ -97,7 +97,7 @@ class dispatcher {
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities);
 
   /**
@@ -117,11 +117,11 @@ class dispatcher {
    * repeatedly running into the walls of the arena as they try to acquire a
    * block that is too close and triggers their obstacle avoidance.
    */
-  static uint constexpr kINDEX_MIN = 2;
+  static size_t constexpr kINDEX_MIN = 2;
 
   /* clang-format off */
   const double                                  mc_padding;
-  const struct params::arena::block_dist_params mc_params;
+  const config::arena::block_dist_config mc_config;
 
   std::string                                   m_dist_type;
   ds::arena_grid*                               m_grid{nullptr};

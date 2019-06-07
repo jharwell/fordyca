@@ -24,30 +24,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <set>
+#include <list>
 #include <string>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
 
-namespace rmetrics = rcppsw::metrics;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class utilization_metrics_collector
- * @ingroup metrics caches
+ * @ingroup fordyca metrics caches
  *
  * @brief Collector for \ref utilization_metrics.
  *
  * Metrics are output at the specified interval.
  */
-class utilization_metrics_collector : public rmetrics::base_metrics_collector {
+class utilization_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
@@ -57,7 +56,7 @@ class utilization_metrics_collector : public rmetrics::base_metrics_collector {
 
   void reset(void) override;
   void reset_after_interval(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
   /**
@@ -67,19 +66,19 @@ class utilization_metrics_collector : public rmetrics::base_metrics_collector {
     uint int_blocks{0};
     uint int_pickups{0};
     uint int_drops{0};
+    uint int_cache_count{0};
+
     uint cum_blocks{0};
     uint cum_pickups{0};
     uint cum_drops{0};
+    uint cum_cache_count{0};
   };
 
-  std::string csv_header_build(const std::string& header) override;
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats   m_stats{};
-
-  uint  m_int_cache_count{0};
-  uint  m_cum_cache_count{0};
+  struct stats m_stats{};
   /* clang-format on */
 };
 

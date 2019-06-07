@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
 /*******************************************************************************
@@ -31,26 +32,26 @@
  ******************************************************************************/
 NS_START(fordyca, events);
 
+namespace detail {
+class block_vanished;
 class free_block_pickup;
 class free_block_drop;
-class block_vanished;
-
-namespace visitor = rcppsw::patterns::visitor;
+} // namespace detail
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
  * @class free_block_interactor
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Interactor specifying the event visit set for all foraging tasks that
  * interact with free blocks in FORDYCA.
  */
 class free_block_interactor
-    : public visitor::polymorphic_accept_set<free_block_drop,
-                                             free_block_pickup,
-                                             block_vanished> {};
+    : public rpvisitor::polymorphic_accept_set<detail::free_block_drop,
+                                              detail::free_block_pickup,
+                                              detail::block_vanished> {};
 
 NS_END(events, fordyca);
 

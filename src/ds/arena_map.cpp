@@ -21,16 +21,19 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+
+#include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/cube_block.hpp"
-#include "fordyca/representation/ramp_block.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/cube_block.hpp"
+#include "fordyca/repr/ramp_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
+#include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,17 +43,20 @@ NS_START(fordyca, ds);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-arena_map::arena_map(const struct params::arena::arena_map_params* params)
+arena_map::arena_map(const config::arena::arena_map_config* config)
     : ER_CLIENT_INIT("fordyca.ds.arena_map"),
-      decorator(params->grid.resolution,
-                static_cast<uint>(params->grid.upper.x() + arena_padding()),
-                static_cast<uint>(params->grid.upper.y() + arena_padding())),
-      m_blocks(support::block_manifest_processor(&params->blocks.dist.manifest)
+      decorator(config->grid.resolution,
+                static_cast<uint>(config->grid.upper.x() + arena_padding()),
+                static_cast<uint>(config->grid.upper.y() + arena_padding())),
+      m_blocks(support::block_manifest_processor(&config->blocks.dist.manifest)
                    .create_blocks()),
-      m_caches(),
-      m_nest(params->nest.dims, params->nest.center, params->grid.resolution),
-      m_block_dispatcher(&decoratee(), &params->blocks.dist, arena_padding()) {
-  ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
+      m_nest(config->nest.dims,
+             config->nest.center,
+             config->grid.resolution,
+             support::light_type_index()[support::light_type_index::kNest]),
+      m_block_dispatcher(&decoratee(), &config->blocks.dist, arena_padding()),
+      m_redist_governor(&config->blocks.dist.redist_governor) {
+  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),
           yrsize(),
           xdsize(),
@@ -68,6 +74,18 @@ bool arena_map::initialize(support::base_loop_functions* loop) {
 
   return m_block_dispatcher.initialize();
 } /* initialize() */
+
+void arena_map::caches_add(const cache_vector& caches,
+                support::base_loop_functions* loop) {
+
+  /* Add all lights of caches to the arena */
+  for (auto &c : caches) {
+    loop->AddEntity(*c->light());
+  } /* for(&c..) */
+
+  m_caches.insert(m_caches.end(), caches.begin(), caches.end());
+  ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
+} /* caches_add() */
 
 __rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   /*
@@ -95,12 +113,22 @@ __rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
   return -1;
 } /* robot_on_cache() */
 
-bool arena_map::distribute_single_block(
-    std::shared_ptr<representation::base_block>& block) {
+bool arena_map::distribute_single_block(std::shared_ptr<repr::base_block>& block) {
+  /* return TRUE because the distribution of nothing is ALWAYS successful */
+  if (!m_redist_governor.dist_status()) {
+    return true;
+  }
+  /* Entities that need to be avoided during block distribution are:
+   *
+   * - All existing caches
+   * - All existing blocks
+   * - Nest
+   */
   ds::const_entity_list entities;
   for (auto& cache : m_caches) {
     entities.push_back(cache.get());
   } /* for(&cache..) */
+
   for (auto& b : m_blocks) {
     if (b != block) {
       entities.push_back(b.get());
@@ -133,15 +161,19 @@ void arena_map::distribute_all_blocks(void) {
       cell2D& cell = decoratee().access<arena_grid::kCell>(i, j);
       if (!cell.state_has_block() && !cell.state_has_cache() &&
           !cell.state_in_cache_extent()) {
-        events::cell_empty op(cell.loc());
-        cell.accept(op);
+        events::cell_empty_visitor op(cell.loc());
+        op.visit(cell);
       }
     } /* for(j..) */
   }   /* for(i..) */
 } /* distribute_all_blocks() */
 
-void arena_map::cache_remove(
-    const std::shared_ptr<representation::arena_cache>& victim) {
+void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
+                             support::base_loop_functions* loop) {
+  /* Remove light for cache from ARGoS */
+  loop->RemoveEntity(*victim->light());
+
+  /* Remove cache */
   size_t before = caches().size();
   __rcsw_unused int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
@@ -149,7 +181,7 @@ void arena_map::cache_remove(
 } /* cache_remove() */
 
 void arena_map::cache_extent_clear(
-    const std::shared_ptr<representation::arena_cache>& victim) {
+    const std::shared_ptr<repr::arena_cache>& victim) {
   auto xspan = victim->xspan(victim->real_loc());
   auto yspan = victim->yspan(victim->real_loc());
 
@@ -159,10 +191,10 @@ void arena_map::cache_extent_clear(
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  uint xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
-  uint xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
-  uint ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
-  uint ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
+  auto xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
+  auto xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
+  auto ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
+  auto ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
 
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {
@@ -180,18 +212,11 @@ void arena_map::cache_extent_clear(
                   i,
                   j,
                   cell.fsm().current_state());
-        events::cell_empty e(c);
-        cell.accept(e);
+        events::cell_empty_visitor e(c);
+        e.visit(cell);
       }
     } /* for(j..) */
   }   /* for(i..) */
 } /* cache_extent_clear() */
-
-/*******************************************************************************
- * Metrics
- ******************************************************************************/
-bool arena_map::has_robot(uint i, uint j) const {
-  return decoratee().access<arena_grid::kRobotOccupancy>(i, j);
-} /* has_robot() */
 
 NS_END(ds, fordyca);

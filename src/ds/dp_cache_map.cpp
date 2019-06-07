@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/dp_cache_map.hpp"
 #include <numeric>
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,12 +34,13 @@ NS_START(fordyca, ds);
  * Member Functions
  ******************************************************************************/
 std::string dp_cache_map::to_str(void) const {
-  auto range = values_range();
+  auto range = const_values_range();
   return std::accumulate(range.begin(),
                          range.end(),
                          std::string(),
                          [&](const std::string& a, const auto& pair) {
                            return a + "c" + std::to_string(pair.ent()->id()) +
+                                  "@" + pair.ent()->discrete_loc().to_str() +
                                   ",";
                          });
 } /* to_str() */

@@ -24,6 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
+#include "fordyca/nsalias.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
@@ -31,57 +36,72 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace controller { namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-}} // namespace controller::depth2
-namespace representation {
+
+namespace repr {
 class base_block;
 }
-namespace fsm {
-class block_to_goal_fsm;
-} // namespace fsm
-namespace tasks { namespace depth2 {
-class cache_starter;
-}} // namespace tasks::depth2
 
-NS_START(events);
-namespace visitor = rcppsw::patterns::visitor;
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
  * @class block_proximity
- * @ingroup events
+ * @ingroup fordyca events
  *
  * @brief Event that is created whenever a block that a robot is not currently
  * aware of blocks its ability to complete its current task.
  */
-class block_proximity
-    : public visitor::visit_set<controller::depth2::grp_dpo_controller,
-                                controller::depth2::grp_mdpo_controller,
-                                fsm::block_to_goal_fsm,
-                                tasks::depth2::cache_starter>,
-      public rcppsw::er::client<block_proximity> {
+class block_proximity : public rer::client<block_proximity> {
+ private:
+  struct visit_typelist_impl {
+    using controllers = controller::depth2::typelist;
+    using others =
+        rmpl::typelist<fsm::block_to_goal_fsm, tasks::depth2::cache_starter>;
+    using value = boost::mpl::joint_view<controllers, others::type>;
+  };
+
  public:
-  explicit block_proximity(
-      const std::shared_ptr<representation::base_block>& block);
+  using visit_typelist = visit_typelist_impl::value;
+
+  explicit block_proximity(const std::shared_ptr<repr::base_block>& block);
   ~block_proximity(void) override = default;
 
   block_proximity(const block_proximity& op) = delete;
   block_proximity& operator=(const block_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& controller) override;
-  void visit(controller::depth2::grp_mdpo_controller& controller) override;
-  void visit(fsm::block_to_goal_fsm& task) override;
-  void visit(tasks::depth2::cache_starter& task) override;
+  void visit(controller::depth2::grp_dpo_controller& c);
+  void visit(controller::depth2::grp_mdpo_controller& c);
+  void visit(controller::depth2::grp_odpo_controller& c);
+  void visit(controller::depth2::grp_omdpo_controller& c);
+  void visit(fsm::block_to_goal_fsm& fsm);
+  void visit(tasks::depth2::cache_starter& task);
 
  private:
+  void dispatch_cache_starter(tasks::base_foraging_task* task);
+
   /* clang-format off */
-  std::shared_ptr<representation::base_block> m_block;
+  std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using block_proximity_visitor_impl =
+    rpvisitor::precise_visitor<detail::block_proximity,
+                              detail::block_proximity::visit_typelist>;
+
+NS_END(detail);
+
+class block_proximity_visitor : public detail::block_proximity_visitor_impl {
+  using detail::block_proximity_visitor_impl::block_proximity_visitor_impl;
 };
 
 NS_END(events, fordyca);

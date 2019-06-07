@@ -51,6 +51,7 @@ build
 docs/html
 docs/latex
 ext/rcppsw
+node_modules
 
 # Runtime
 *.txt

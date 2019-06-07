@@ -24,8 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/depth0/depth0_controller.hpp"
+#include <memory>
+
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 #include "rcppsw/patterns/state_machine/base_fsm.hpp"
 
 /*******************************************************************************
@@ -33,11 +35,10 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth0 { class crw_fsm; }}
 
 NS_START(controller);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 NS_START(depth0);
 
@@ -46,14 +47,14 @@ NS_START(depth0);
  ******************************************************************************/
 /**
  * @class crw_controller
- * @ingroup controller depth0
+ * @ingroup fordyca controller depth0
  *
  * @brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.
  */
-class crw_controller : public depth0_controller,
-                       public er::client<crw_controller>,
-                       public visitor::visitable_any<crw_controller> {
+class crw_controller : public base_controller,
+                       public fsm::block_transporter,
+                       public rer::client<crw_controller> {
  public:
   crw_controller(void);
   ~crw_controller(void) override;
@@ -64,17 +65,20 @@ class crw_controller : public depth0_controller,
   void Reset(void) override;
 
   std::type_index type_index(void) const override {
-    return std::type_index(typeid(*this));
+    return {typeid(*this)};
   }
 
   /* goal acquisition metrics */
   bool is_vectoring_to_goal(void) const override { return false; }
-  FSM_OVERRIDE_DECL(bool, is_exploring_for_goal, const);
-  FSM_OVERRIDE_DECL(bool, goal_acquired, const);
-  FSM_OVERRIDE_DECL(acquisition_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  FSM_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }

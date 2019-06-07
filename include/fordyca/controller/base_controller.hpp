@@ -28,8 +28,11 @@
 #include <string>
 #include <typeindex>
 
+#include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
+#include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -38,31 +41,29 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace support { namespace tv {
-class tv_controller;
+class tv_manager;
 }} // namespace support::tv
 
-namespace representation {
+namespace repr {
 class base_block;
 class line_of_sight;
-} // namespace representation
-namespace params {
-struct output_params;
-struct sensing_params;
-struct actuation_params;
-} // namespace params
+} // namespace repr
+namespace config {
+struct output_config;
+struct sensing_config;
+struct actuation_config;
+} // namespace config
 
 NS_START(controller);
-
+class base_perception_subsystem;
 class saa_subsystem;
-namespace rmath = rcppsw::math;
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class base_controller
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief The base controller foraging class that all FORDYCA controllers derive
  * from. It holds all functionality common to all controllers, as well that some
@@ -73,10 +74,11 @@ namespace er = rcppsw::er;
 class base_controller : public argos::CCI_Controller,
                         public metrics::fsm::movement_metrics,
                         public metrics::fsm::goal_acquisition_metrics,
-                        public rcppsw::er::client<base_controller> {
+                        public metrics::spatial::swarm_dist2D_metrics,
+                        public rer::client<base_controller> {
  public:
   base_controller(void);
-  ~base_controller(void) override = default;
+  ~base_controller(void) override;
 
   base_controller(const base_controller& other) = delete;
   base_controller& operator=(const base_controller& other) = delete;
@@ -90,6 +92,25 @@ class base_controller : public argos::CCI_Controller,
   /* movement metrics */
   double distance(void) const override;
   rmath::vector2d velocity(void) const override;
+
+  /* swarm spatial 2D metrics */
+  const rmath::vector2d& position2D(void) const override;
+  const rmath::vector2u& discrete_position2D(void) const override;
+  rmath::vector2d heading2D(void) const override;
+
+  /**
+   * @brief By default controllers have no perception subsystem, and are
+   * basically blind centipedes.
+   */
+  virtual const base_perception_subsystem* perception(void) const {
+    return nullptr;
+  }
+
+  /**
+   * @brief By default controllers have no perception subsystem, and are
+   * basically blind centipedes.
+   */
+  virtual base_perception_subsystem* perception(void) { return nullptr; }
 
   /**
    * @brief Return the applied motion throttling for the robot. This is not
@@ -130,18 +151,16 @@ class base_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<representation::base_block> block(void) const {
-    return m_block;
-  }
+  std::shared_ptr<repr::base_block> block(void) const { return m_block; }
 
   /**
    * @brief Set the block that the robot is carrying.
    */
-  void block(const std::shared_ptr<representation::base_block>& block) {
+  void block(const std::shared_ptr<repr::base_block>& block) {
     m_block = block;
   }
 
-  void tv_init(const support::tv::tv_controller* tv_controller);
+  void tv_init(const support::tv::tv_manager* tv_manager);
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
@@ -164,6 +183,13 @@ class base_controller : public argos::CCI_Controller,
    */
   void tick(uint tick);
 
+  const class block_manip_collator* block_manip_collator(void) const {
+    return &m_block_manip;
+  }
+  class block_manip_collator* block_manip_collator(void) {
+    return &m_block_manip;
+  }
+
   /**
    * @brief Set the current location of the robot.
    *
@@ -174,8 +200,7 @@ class base_controller : public argos::CCI_Controller,
    * the loop functions.
    */
   void position(const rmath::vector2d& loc);
-  const rmath::vector2d& position(void) const;
-  rmath::vector2d heading(void) const;
+  void discrete_position(const rmath::vector2u& loc);
 
   /**
    * @brief Convenience function to add footbot ID to salient messages during
@@ -185,7 +210,7 @@ class base_controller : public argos::CCI_Controller,
 
   /**
    * @brief Convenience function to add footbot ID+timestep to messages during
-   * \ref ControlStep().
+   * the control step.
    */
   void ndc_pusht(void);
 
@@ -201,14 +226,16 @@ class base_controller : public argos::CCI_Controller,
   const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
 
  private:
-  void output_init(const struct params::output_params* params);
-  void saa_init(const params::actuation_params*, const params::sensing_params*);
+  void output_init(const config::output_config* config);
+  void saa_init(const config::actuation_config* actuation_p,
+                const config::sensing_config* sensing_p);
 
   /* clang-format off */
-  const support::tv::tv_controller*           m_tv_controller{nullptr};
-  bool                                        m_display_id{false};
-  std::shared_ptr<representation::base_block> m_block{nullptr};
-  std::unique_ptr<controller::saa_subsystem>  m_saa;
+  const support::tv::tv_manager*             m_tv_manager{nullptr};
+  bool                                       m_display_id{false};
+  std::shared_ptr<repr::base_block>          m_block{nullptr};
+  std::unique_ptr<controller::saa_subsystem> m_saa;
+  class block_manip_collator                 m_block_manip{};
   /* clang-format on */
 };
 

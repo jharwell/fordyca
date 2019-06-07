@@ -24,30 +24,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <set>
 #include <string>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
 
-namespace rmetrics = rcppsw::metrics;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class lifecycle_metrics_collector
- * @ingroup metrics caches
+ * @ingroup fordyca metrics caches
  *
  * @brief Collector for \ref lifecycle_metrics.
  *
  * Metrics are output at the specified interval.
  */
-class lifecycle_metrics_collector : public rmetrics::base_metrics_collector {
+class lifecycle_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
    * @param ofname Output file name.
@@ -57,18 +56,24 @@ class lifecycle_metrics_collector : public rmetrics::base_metrics_collector {
 
   void reset(void) override;
   void reset_after_interval(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
   /**
    * @brief All stats are cumulative within an interval.
    */
   struct stats {
-    uint n_created;
-    uint n_depleted;
+    uint int_created;
+    uint int_depleted;
+    uint int_depletion_sum;
+
+    uint cum_created;
+    uint cum_depleted;
+    uint cum_depletion_sum;
   };
 
-  std::string csv_header_build(const std::string& header) override;
+
+  std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */

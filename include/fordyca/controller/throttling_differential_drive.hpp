@@ -24,33 +24,29 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "fordyca/support/tv/motion_throttling_handler.hpp"
-#include "rcppsw/common/common.hpp"
 #include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
-#include "rcppsw/robotics/kinematics2D/differential_drive.hpp"
+#include "rcppsw/robotics/kin2D/differential_drive.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
 
-namespace kinematics2D = rcppsw::robotics::kinematics2D;
-namespace hal = rcppsw::robotics::hal;
-namespace rmath = rcppsw::math;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-class throttling_differential_drive : public kinematics2D::differential_drive {
+class throttling_differential_drive : public rrkin2D::differential_drive {
  public:
   static constexpr double kWheelRadius = 0.029112741;
   static constexpr double kInterWheelDistance = 0.14;
 
   throttling_differential_drive(
-      kinematics2D::differential_drive::drive_type type,
+      rrkin2D::differential_drive::drive_type type,
       double max_speed,
       const rmath::radians& soft_turn_max,
-      const hal::actuators::differential_drive_actuator& wheels)
+      const rrhal::actuators::differential_drive_actuator& wheels)
       : differential_drive(wheels,
                            type,
                            kWheelRadius,

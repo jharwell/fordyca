@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,7 +37,7 @@ NS_START(fordyca, support, depth0);
  ******************************************************************************/
 /**
  * @class depth0_qt_user_functions
- * @ingroup support depth0
+ * @ingroup fordyca support depth0
  *
  * @brief Contains hooks for Qt to draw the robot's LOS if so configured.
  */

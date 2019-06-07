@@ -25,24 +25,27 @@
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/oracle/oracle_manager_config.hpp"
+#include "fordyca/config/output_config.hpp"
+#include "fordyca/config/tv/tv_manager_config.hpp"
+#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/params/arena/arena_map_params.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/tv/tv_controller_params.hpp"
-#include "fordyca/params/visualization_params.hpp"
-#include "fordyca/support/tv/tv_controller.hpp"
+#include "fordyca/support/oracle/entities_oracle.hpp"
+#include "fordyca/support/oracle/oracle_manager.hpp"
+#include "fordyca/support/oracle/tasking_oracle.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 #include "fordyca/ds/arena_map.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/swarm/convergence/convergence_params.hpp"
+#include "rcppsw/swarm/convergence/config/convergence_config.hpp"
+#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace ralg = rcppsw::algorithm;
-namespace rmath = rcppsw::math;
 namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
@@ -51,13 +54,16 @@ namespace rswc = rcppsw::swarm::convergence;
 base_loop_functions::base_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.base"),
       m_arena_map(nullptr),
-      m_tv_controller(nullptr) {}
+      m_tv_manager(nullptr),
+      m_conv_calc(nullptr),
+      m_oracle_manager(nullptr) {}
+
+base_loop_functions::~base_loop_functions(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_loop_functions::output_init(
-    const struct params::output_params* const output) {
+void base_loop_functions::output_init(const config::output_config* const output) {
   if ("__current_date__" == output->output_dir) {
     boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
     m_output_root = output->output_root + "/" +
@@ -87,49 +93,64 @@ void base_loop_functions::output_init(
 void base_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
   /* parse simulation input file */
-  m_params.parse_all(node);
+  m_config.parse_all(node);
 
   /* initialize output and metrics collection */
-  output_init(m_params.parse_results<params::output_params>());
+  output_init(m_config.config_get<config::output_config>());
 
   /* initialize arena map and distribute blocks */
-  arena_map_init(params());
+  arena_map_init(config());
 
   /* initialize convergence calculations */
-  m_loop_threads = m_params.parse_results<rswc::convergence_params>()->n_threads;
+  convergence_init(m_config.config_get<rswc::config::convergence_config>());
 
   /* initialize temporal variance injection */
-  tv_init(params()->parse_results<params::tv::tv_controller_params>());
+  tv_init(config()->config_get<config::tv::tv_manager_config>());
+
+  /* initialize oracle, if configured */
+  oracle_init(config()->config_get<config::oracle::oracle_manager_config>());
 
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
   ndc_pop();
 } /* Init() */
 
+void base_loop_functions::convergence_init(
+    const rswc::config::convergence_config* const config) {
+  m_conv_calc = rcppsw::make_unique<rswc::convergence_calculator>(
+      config,
+      std::bind(&base_loop_functions::calc_robot_headings,
+                this,
+                std::placeholders::_1),
+      std::bind(&base_loop_functions::calc_robot_nn, this, std::placeholders::_1),
+      std::bind(&base_loop_functions::calc_robot_positions,
+                this,
+                std::placeholders::_1));
+} /* convergence_init() */
+
 void base_loop_functions::PreStep(void) {
-  m_tv_controller->update();
+  m_tv_manager->update();
+  m_conv_calc->update();
 } /* PreStep() */
 
-void base_loop_functions::tv_init(
-    const params::tv::tv_controller_params* const tvp) {
-  m_tv_controller =
-      rcppsw::make_unique<tv::tv_controller>(tvp, this, arena_map());
+void base_loop_functions::tv_init(const config::tv::tv_manager_config* const tvp) {
+  m_tv_manager = rcppsw::make_unique<tv::tv_manager>(tvp, this, arena_map());
 
   for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot->GetControllableEntity().GetController());
-    m_tv_controller->register_controller(controller.entity_id());
-    controller.tv_init(m_tv_controller.get());
+    m_tv_manager->register_controller(controller.entity_id());
+    controller.tv_init(m_tv_manager.get());
   } /* for(&pair..) */
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
-    const params::loop_function_repository* const repo) {
-  auto* aparams = repo->parse_results<params::arena::arena_map_params>();
-  auto* vparams = repo->parse_results<params::visualization_params>();
+    const config::loop_function_repository* const repo) {
+  auto* aconfig = repo->config_get<config::arena::arena_map_config>();
+  auto* vconfig = repo->config_get<config::visualization_config>();
 
-  m_arena_map = rcppsw::make_unique<ds::arena_map>(aparams);
+  m_arena_map = rcppsw::make_unique<ds::arena_map>(aconfig);
   if (!m_arena_map->initialize(this)) {
     ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
@@ -140,12 +161,18 @@ void base_loop_functions::arena_map_init(
   /*
    * If null, visualization has been disabled.
    */
-  if (nullptr != vparams) {
+  if (nullptr != vconfig) {
     for (auto& block : m_arena_map->blocks()) {
-      block->display_id(vparams->block_id);
+      block->display_id(vconfig->block_id);
     } /* for(&block..) */
   }
 } /* arena_map_init() */
+
+void base_loop_functions::oracle_init(
+    const config::oracle::oracle_manager_config* const oraclep) {
+  ER_INFO("Creating oracle manager");
+  m_oracle_manager = rcppsw::make_unique<oracle::oracle_manager>(oraclep);
+} /* oracle_init() */
 
 void base_loop_functions::Reset(void) {
   m_arena_map->distribute_all_blocks();
@@ -154,23 +181,15 @@ void base_loop_functions::Reset(void) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-std::vector<double> base_loop_functions::robot_nearest_neighbors(void) const {
+std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots =
-      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     rmath::vector2d pos;
-    pos.set(const_cast<argos::CFootBotEntity&>(robot)
-                .GetEmbodiedEntity()
-                .GetOriginAnchor()
-                .Position.GetX(),
-            const_cast<argos::CFootBotEntity&>(robot)
-                .GetEmbodiedEntity()
-                .GetOriginAnchor()
-                .Position.GetY());
+    pos.set(robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+            robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
     v.push_back(pos);
   } /* for(&entity..) */
 
@@ -181,7 +200,7 @@ std::vector<double> base_loop_functions::robot_nearest_neighbors(void) const {
    * algorithm).
    */
   std::vector<double> res;
-#pragma omp parallel for num_threads(m_loop_threads)
+#pragma omp parallel for num_threads(n_threads)
   for (size_t i = 0; i < robots.size() / 2; ++i) {
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
@@ -205,36 +224,33 @@ std::vector<double> base_loop_functions::robot_nearest_neighbors(void) const {
   } /* for(i..) */
 
   return res;
-} /* nearest_neighbors() */
+} /* calc_robot_nn() */
 
-std::vector<rmath::radians> base_loop_functions::robot_headings(void) const {
+std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const {
   std::vector<rmath::radians> v;
-  auto& robots =
-      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot->GetControllableEntity().GetController());
-    v.push_back(controller.heading().angle());
+    v.push_back(controller.heading2D().angle());
   } /* for(&entity..) */
   return v;
-} /* robot_headings() */
+} /* calc_robot_headings() */
 
-std::vector<rmath::vector2d> base_loop_functions::robot_positions(void) const {
+std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
+    uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots =
-      const_cast<base_loop_functions*>(this)->GetSpace().GetEntitiesByType(
-          "foot-bot");
+  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
   for (auto& entity_pair : robots) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
     auto& controller = dynamic_cast<controller::base_controller&>(
         robot->GetControllableEntity().GetController());
-    v.push_back(controller.position());
+    v.push_back(controller.position2D());
   } /* for(&entity..) */
   return v;
-} /* robot_headings() */
+} /* calc_robot_positions() */
 
 NS_END(support, fordyca);

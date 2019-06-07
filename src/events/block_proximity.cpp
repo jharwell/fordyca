@@ -24,26 +24,39 @@
 #include "fordyca/events/block_proximity.hpp"
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
+#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_proximity::block_proximity(
-    const std::shared_ptr<representation::base_block>& block)
+block_proximity::block_proximity(const std::shared_ptr<repr::base_block>& block)
     : ER_CLIENT_INIT("fordyca.events.block_proximity"), m_block(block) {}
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void block_proximity::dispatch_cache_starter(
+    tasks::base_foraging_task* const task) {
+  auto* starter = dynamic_cast<tasks::depth2::cache_starter*>(task);
+  ER_ASSERT(nullptr != starter,
+            "Non cache starter task %s received block proximity event",
+            dynamic_cast<rta::logical_task*>(task)->name().c_str());
+  starter->accept(*this);
+} /* dispatch_cache_starter() */
 
 /*******************************************************************************
  * Depth2 Foraging
@@ -52,14 +65,9 @@ void block_proximity::visit(controller::depth2::grp_dpo_controller& c) {
   c.ndc_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id());
-  events::block_found found(m_block);
-  c.dpo_perception()->dpo_store()->accept(found);
-
-  auto* task = dynamic_cast<tasks::depth2::cache_starter*>(c.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non cache starter task %s received block proximity event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
-  task->accept(*this);
+  events::block_found_visitor found_op(m_block);
+  found_op.visit(*c.dpo_perception()->dpo_store());
+  dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();
 } /* visit() */
@@ -68,25 +76,42 @@ void block_proximity::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_push();
 
   ER_INFO("Abort block drop: block%d proximity", m_block->id());
-  events::block_found found(m_block);
-  c.mdpo_perception()->map()->accept(found);
+  events::block_found_visitor found_op(m_block);
+  found_op.visit(*c.mdpo_perception()->map());
+  dispatch_cache_starter(c.current_task());
 
-  auto* task = dynamic_cast<tasks::depth2::cache_starter*>(c.current_task());
-  ER_ASSERT(nullptr != task,
-            "Non cache starter task %s received block proximity event",
-            dynamic_cast<ta::logical_task*>(task)->name().c_str());
-  task->accept(*this);
+  c.ndc_pop();
+} /* visit() */
+
+void block_proximity::visit(controller::depth2::grp_odpo_controller& c) {
+  c.ndc_push();
+
+  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  events::block_found_visitor found_op(m_block);
+  found_op.visit(*c.dpo_perception()->dpo_store());
+  dispatch_cache_starter(c.current_task());
+
+  c.ndc_pop();
+} /* visit() */
+
+void block_proximity::visit(controller::depth2::grp_omdpo_controller& c) {
+  c.ndc_push();
+
+  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  events::block_found_visitor found_op(m_block);
+  found_op.visit(*c.mdpo_perception()->map());
+  dispatch_cache_starter(c.current_task());
 
   c.ndc_pop();
 } /* visit() */
 
 void block_proximity::visit(tasks::depth2::cache_starter& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 void block_proximity::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_PROXIMITY,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(controller::foraging_signal::ekBLOCK_PROXIMITY,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

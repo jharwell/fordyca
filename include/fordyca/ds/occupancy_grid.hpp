@@ -37,13 +37,9 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace events {
-class cell_unknown;
-class cell_empty;
-} // namespace events
-namespace params { namespace perception {
-struct perception_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct perception_config;
+}} // namespace config::perception
 
 NS_START(ds);
 using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
@@ -53,16 +49,13 @@ using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
  ******************************************************************************/
 /**
  * @class occupancy_grid
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Multilayered grid of cells and associated information
  * density/relevance on the state of those cells. Used by robots in making
  * decisions in how they execute their tasks.
  */
-class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
-                       public visitor::accept_set<occupancy_grid,
-                                                  events::cell_unknown,
-                                                  events::cell_empty>,
+class occupancy_grid : public rer::client<occupancy_grid>,
                        public rcppsw::ds::stacked_grid<robot_layer_stack> {
  public:
   /**
@@ -75,7 +68,7 @@ class occupancy_grid : public rcppsw::er::client<occupancy_grid>,
    */
   constexpr static uint kCell = 1;
 
-  occupancy_grid(const params::perception::perception_params* c_params,
+  occupancy_grid(const config::perception::perception_config* c_config,
                  const std::string& robot_id);
 
   /**

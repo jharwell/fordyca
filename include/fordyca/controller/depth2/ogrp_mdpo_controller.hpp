@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/controller/depth1/ogp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,7 +34,7 @@ NS_START(fordyca);
 namespace support {
 class tasking_oracle;
 }
-namespace params { namespace depth2 { class controller_repository; }}
+namespace config { namespace depth2 { class controller_repository; }}
 
 NS_START(controller, depth2);
 
@@ -44,7 +44,7 @@ NS_START(controller, depth2);
  ******************************************************************************/
 /**
  * @class ogrp_mdpo_controller
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief A Greedy Recursive Partitioning controller which also has perfect
  * information about:
@@ -53,9 +53,8 @@ NS_START(controller, depth2);
  *
  * for use in task allocation.
  */
-class ogrp_mdpo_controller : public depth1::ogp_mdpo_controller,
-                             public er::client<ogrp_mdpo_controller>,
-                             public visitor::visitable_any<ogrp_mdpo_controller> {
+class ogrp_mdpo_controller : public depth1::gp_omdpo_controller,
+                             public rer::client<ogrp_mdpo_controller> {
  public:
   ogrp_mdpo_controller(void)
       : ER_CLIENT_INIT("fordyca.controller.depth2.ogrp_mdpo") {}
@@ -64,7 +63,7 @@ class ogrp_mdpo_controller : public depth1::ogp_mdpo_controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
 
-  void shared_init(const params::depth2::controller_repository& param_repo);
+  void shared_init(const config::depth2::controller_repository& param_repo);
 };
 
 NS_END(depth2, controller, fordyca);

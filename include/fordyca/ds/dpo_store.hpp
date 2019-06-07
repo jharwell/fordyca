@@ -29,27 +29,22 @@
 #include "fordyca/ds/dpo_map.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace params { namespace perception {
-struct pheromone_params;
-}} // namespace params::perception
+namespace config { namespace perception {
+struct pheromone_config;
+}} // namespace config::perception
 NS_START(ds);
-
-namespace visitor = rcppsw::patterns::visitor;
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class dpo_store
- * @ingroup ds
+ * @ingroup fordyca ds
  *
  * @brief Stores sets of caches and blocks the robot encounters in the arena,
  * along with the pheromone-based relevance for each. Also contains the logic
@@ -57,18 +52,17 @@ namespace rmath = rcppsw::math;
  * an entity are encountered (e.g. the real version has vanished and the tracked
  * version is out of date).
  */
-class dpo_store : public er::client<dpo_store>,
-                  public visitor::visitable_any<dpo_store> {
+class dpo_store final : public rer::client<dpo_store> {
  public:
   template <typename T>
-  using dp_entity = representation::dp_entity<T>;
+  using dp_entity = repr::dp_entity<T>;
 
   enum update_status {
-    kNoChange,
-    kNewBlockAdded,
-    kBlockMoved,
-    kNewCacheAdded,
-    kCacheUpdated /* # blocks can change */
+    kNO_CHANGE,
+    kNEW_BLOCK_ADDED,
+    kBLOCK_MOVED,
+    kNEW_CACHE_ADDED,
+    kCACHE_UPDATED /* # blocks can change */
   };
 
   /**
@@ -81,9 +75,9 @@ class dpo_store : public er::client<dpo_store>,
    */
 
   struct update_res_t {
-    bool status;
-    update_status reason;
-    rmath::vector2u old_loc;
+    bool status{false};
+    update_status reason{kNO_CHANGE};
+    rmath::vector2u old_loc{};
   };
 
   /**
@@ -92,7 +86,7 @@ class dpo_store : public er::client<dpo_store>,
    */
   static constexpr double kNRD_MAX_PHEROMONE = 1.0;
 
-  explicit dpo_store(const params::perception::pheromone_params* params);
+  explicit dpo_store(const config::perception::pheromone_config* config);
 
   /**
    * @brief Get all blocks the robot is currently aware of, and their
@@ -109,7 +103,6 @@ class dpo_store : public er::client<dpo_store>,
   const ds::dp_cache_map& caches(void) const { return m_caches; }
 
   bool repeat_deposit(void) const { return mc_repeat_deposit; }
-  double rho(void) const { return mc_rho; }
 
   /**
    * @brief Update the densities of all objects in the store (i.e. decay
@@ -120,14 +113,14 @@ class dpo_store : public er::client<dpo_store>,
 
   void clear_all(void);
 
-  bool contains(const std::shared_ptr<representation::base_block>& block) const;
-  bool contains(const std::shared_ptr<representation::base_cache>& cache) const;
+  bool contains(const std::shared_ptr<repr::base_block>& block) const;
+  bool contains(const std::shared_ptr<repr::base_cache>& cache) const;
 
   const dp_block_map::value_type* find(
-      const std::shared_ptr<representation::base_block>& block) const;
+      const std::shared_ptr<repr::base_block>& block) const;
 
   const dp_cache_map::value_type* find(
-      const std::shared_ptr<representation::base_cache>& cache) const;
+      const std::shared_ptr<repr::base_cache>& cache) const;
 
   /**
    * @brief Update the known caches set with the new cache.
@@ -137,7 +130,7 @@ class dpo_store : public er::client<dpo_store>,
    *
    * @param cache Cache to add.
    */
-  update_res_t cache_update(const dp_entity<representation::base_cache>& cache);
+  update_res_t cache_update(const dp_entity<repr::base_cache>& cache);
 
   /*
    * @brief Update the known blocks set with the new block.
@@ -149,12 +142,12 @@ class dpo_store : public er::client<dpo_store>,
    *
    * @return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(const dp_entity<representation::base_block>& block);
+  update_res_t block_update(const dp_entity<repr::base_block>& block_in);
 
   /**
    * @brief Remove a cache from the set of of known caches.
    */
-  bool cache_remove(const std::shared_ptr<representation::base_cache>& victim);
+  bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
 
   /*
    * @brief Remove a block from the set of known blocks. If the victim is not
@@ -162,7 +155,16 @@ class dpo_store : public er::client<dpo_store>,
    *
    * @return \c TRUE if a block was removed, \c FALSE otherwise.
    */
-  bool block_remove(const std::shared_ptr<representation::base_block>& victim);
+  bool block_remove(const std::shared_ptr<repr::base_block>& victim);
+
+  double pheromone_rho(void) const { return mc_pheromone_rho; }
+
+  boost::optional<rmath::vector2d> last_block_loc(void) const {
+    return m_last_block_loc;
+  }
+  boost::optional<rmath::vector2d> last_cache_loc(void) const {
+    return m_last_cache_loc;
+  }
 
  private:
   /*
@@ -170,10 +172,12 @@ class dpo_store : public er::client<dpo_store>,
    * among the known blocks/caches.
    */
   /* clang-format off */
-  bool             mc_repeat_deposit;
-  double           mc_rho;
-  ds::dp_block_map m_blocks{};
-  ds::dp_cache_map m_caches{};
+  const bool                       mc_repeat_deposit;
+  const double                     mc_pheromone_rho;
+  ds::dp_block_map                 m_blocks{};
+  ds::dp_cache_map                 m_caches{};
+  boost::optional<rmath::vector2d> m_last_block_loc{};
+  boost::optional<rmath::vector2d> m_last_cache_loc{};
   /* clang-format on */
 };
 

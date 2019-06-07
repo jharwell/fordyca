@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "fordyca/metrics/world_model_metrics.hpp"
@@ -36,7 +35,13 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params { namespace depth0 { class mdpo_controller_repository; }}
+namespace config
+{
+namespace depth0
+{
+class mdpo_controller_repository;
+}
+} // namespace config
 
 NS_START(controller);
 
@@ -49,52 +54,46 @@ NS_START(depth0);
  ******************************************************************************/
 /**
  * @class mdpo_controller
- * @ingroup controller depth0
+ * @ingroup fordyca controller depth0
  *
- * @brief A foraging controller that remembers what it has seen for a period of
- * time (knowledge is modeling/decays as \ref pheromone_density objects). It
- * models the state of the environment (empty, unknown, contains object, etc.)
- * AND the objects within the environment.
+ * @brief A foraging controller that:
+ *
+ * - Models/tracks the state of the environment (empty, unknown, contains
+ *   object, etc.)
+ * - Models/tracks the seen objects in the environment.
  *
  * It shares the underlying FSM with the \ref dpo_controller so that the metrics
  * collection functions can be reused.
  */
 class mdpo_controller : public dpo_controller,
-                        public er::client<mdpo_controller>,
-                        public metrics::world_model_metrics,
-                        public visitor::visitable_any<mdpo_controller> {
- public:
+                        public rer::client<mdpo_controller>
+{
+public:
   mdpo_controller(void);
   ~mdpo_controller(void) override;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element &node) override;
   void ControlStep(void) override;
 
-  std::type_index type_index(void) const override {
-    return std::type_index(typeid(*this));
+  std::type_index type_index(void) const override
+  {
+    return {typeid(*this)};
   }
 
-  /* world model metrics */
-  uint cell_state_inaccuracies(uint state) const override;
-  double known_percentage(void) const override;
-  double unknown_percentage(void) const override;
-
-  mdpo_perception_subsystem* mdpo_perception(void);
-  const mdpo_perception_subsystem* mdpo_perception(void) const {
-    return const_cast<mdpo_controller*>(this)->mdpo_perception();
-  }
+  mdpo_perception_subsystem *mdpo_perception(void);
+  const mdpo_perception_subsystem *mdpo_perception(void) const;
 
   /**
    * @brief Initialization that derived classes may also need to perform, if the
    * want to use any of the following parts of this class's functionality as-is:
    *
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
-   * - Block selection matrix (\ref block_selection_matrix)
+   * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const params::depth0::mdpo_controller_repository& param_repo);
+  void shared_init(const config::depth0::mdpo_controller_repository &param_repo);
 
- private:
+private:
   /**
    * @brief Perform initialization private to this class:
    *
@@ -141,6 +140,8 @@ class mdpo_controller : public dpo_controller,
   /* clang-format off */
   struct params::communication_params        m_communication_params;
   /* clang-format on */
+
+  void private_init(const config::depth0::mdpo_controller_repository &param_repo);
 };
 
 NS_END(depth0, controller, fordyca);

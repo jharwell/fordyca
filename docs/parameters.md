@@ -10,21 +10,21 @@ The following root XML tags are defined:
 
 - `output` - Paramaters for simulation outputs across all runs.
 
-- `occupancy_grid` - Parameters pertaining to a robotas discretization of the
-                     continuous world into a grid, and the objects it tracks
-                     within the grid.
+- `perception` - Parameters pertaining to a robots discretization of the
+                 continuous world into a grid, and/or the objects it tracks
+                 within it.
 
 - `task_executive` - Parameters pertaining to the task executive (the entitity
                      responsible for managing/running tasks after they have been
                      allocated).
 
-- `task_allocation` - Parameters pertaining to task allocation.
+- `task_alloc` - Parameters pertaining to task allocation.
 
-- `block_selection_matrix` - Parameters used by robots when selecting which
+- `block_sel_matrix` - Parameters used by robots when selecting which
                              block to acquire/obtain as part of the task they
                              are currently executing.
 
-- `cache_selection_matrix` - Parameters used by robots when selecting which
+- `cache_sel_matrix` - Parameters used by robots when selecting which
                              cache to acquire/obtain as part of the task they
                              are currently executing.
 
@@ -44,17 +44,17 @@ The following root XML tags are defined:
                  `__current_date__` here, the simulation will get a unique
                  output directory in the form YYYY-MM-DD:HH-MM.
 
-### `occupancy_grid`
+### `perception`
 
 #### `pheromone`
 
 - `rho` How fast the relevance of information about a particular cell within a
         robot's 2D map of the world loses relevance.
 
-- `repeat_deposit` - If TRUE, then repeated pheromone deposits for cells
-                     containing blocks/caches a robot already knows about will
-                     be enabled. `rho` should be updated accordingly, probably
-                     to a larger value to enable faster decay.
+- `repeat_deposit` - If TRUE, then repeated pheromone deposits for blocks/caches
+                     a robot already knows about will be enabled. `rho` should
+                     be updated accordingly, probably to a larger value to
+                     enable faster decay.
 
 #### `grid`
 
@@ -95,7 +95,7 @@ The following root XML tags are defined:
     This parameter is current experimental, and only affects depth2
     simulations.
 
-### `task_allocation`
+### `task_alloc`
 
 Several subsections in this section sigmoid based functions for choosing between
 alternatives, with the input src and sigmoid method varying.
@@ -141,7 +141,7 @@ Uses `src_sigmoid_sel` with a `method` tag that can be one of [`pini2011`] for
 performing the stochastic partitioning decision. Calculated once upon each task
 allocation, after the previous task is finished or aborted.
 
-#### `subtask_selection`
+#### `subtask_sel`
 
 Uses `src_sigmoid_sel` with a `method` tag that can be one of [`harwell2018`,
 `random`] to perform stochastic subtask selection if partitioning is employed.
@@ -153,15 +153,13 @@ Uses `src_sigmoid_sel` with a `method` tag that can be one of [`harwell2018`,
                    with zero, in order to avoid any possibly weird behavior on
                    system startup. Has no effect if `false`.
 
-- `<task name>_range` - Takes a pair like so: `100:200` specifying the range of
-                        the uniform random distribution over which a robots'
-                        initial estimation of the duration of the specified task
-                        will be drawn. Only used if `enabled` is `true`. Valid
-                        values for `<task_namne>` are: [`generalist`, `collector`,
-                        `harvester`]. Experimental values that may or may not
-                        work as expected are [`cache_starter`, `cache_finisher`,
-                        `cache_transferer` `cache_collector`] for the depth2
-                        tasks.
+- `<task name>` - Takes a pair like so: `100:200` specifying the range of the
+                  uniform random distribution over which a robots' initial
+                  estimation of the duration of the specified task will be
+                  drawn. Only used if `enabled` is `true`. Valid values for
+                  `<task_namne>` are: [`generalist`, `collector`,
+                  `harvester`, `cache_starter`, `cache_finisher`,
+                  `cache_transferer` `cache_collector`].
 
 ##### `ema` - Exponential Moving Average
 
@@ -174,7 +172,7 @@ Uses `src_sigmoid_sel` to select which TAB to switch to (if applicable) during
 task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 
-### `block_selection_matrix`
+### `block_sel_matrix`
 
 `nest` - The location of the nest.
 
@@ -186,7 +184,25 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 - `ramp` - The priority value used as part of block utility calculation for ramp
            blocks during block selection.
 
-### `cache_selection_matrix`
+#### `pickup_policy`
+
+- `policy` - The policy to use to restrict (1) the conditions under which robots
+             can pick up a block that they encounter, (2) which blocks are
+             considered valid for acquisition. Valid values are:
+
+    - `cluster_proximity` - Only allow blocks which are within `prox_dist` from
+      the average of the positions of the blocks currently known to a robot to
+      be picked up. Only makes sense for object distributions in which objects
+      are clumped into clusters; used to help depth2 robots not to pickup the
+      blocks other robots have dropped in order to start caches.
+
+    - `Null` - No policy--robots can pickup any blocks the know about/all known
+      blocks are eligible for acquisition
+
+- `prox_dist` - The minimum distance measure for usage with `cluster_proximity`
+                pickup policy.
+
+### `cache_sel_matrix`
 
 - `cache_prox_dist` - When executing the Cache Finisher task, the constraint
                       applied to new cache selection for how close the chosen
@@ -211,6 +227,44 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
                   of the full arena Y size, to avoid robots being able to select
                   locations by arena boundaries).
 
+#### `pickup_policy`
+
+- `policy` - The policy to use to restrict (1) the conditions under which robots
+             can pick up from a cache that they encounter, (2) which caches are
+             considered valid for acquisition. Valid values are:
+
+  - `cache_size` - Only allow robots to pickup from caches with at least
+    `cache_size` blocks in them. Robots intending to drop blocks in caches are
+    not restricted.
+
+  - `timestep` - Only allow robots to pickup from caches after `timestep`
+    timesteps have elapsed during simulation. Robots intending to drop blocks in
+    caches are not restricted.
+
+### `exploration`
+
+- `block_strategy` - The strategy robots should use to located blocks when they
+                     do not currently know of any and need to find one for the
+                     task they are currently doing. Valid values are:
+  - `CRW` - Correlated Random Walk
+
+  - `likelihood_search` - Go to the location of the last known block and then
+                          begin performing CRW there.
+
+- `cache_strategy` - The strategy robots should use to located caches when they
+                     do not currently know of any and need to find one for the
+                     task they are currently doing.
+
+  - `CRW` - Correlated Random Walk
+
+  - `likelihood_search` - Go to the location of the last known block and then
+                          begin performing CRW there.
+
+  - `utility_search` - Use the average location of the known blocks/robot's
+                       current location as input into the cache site selection
+                       algorithm, then go to the location it returns and begin
+                       performing CRW there.
+
 ### `sensing`
 
 #### `proximity_sensor`
@@ -225,11 +279,6 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
             considered.
 
 ### `actuation`
-
-#### `block_carry_throttle`
-
-- `waveform` - Parameters defining the waveform of throttling. Can be no
-  throttling.
 
 #### `steering2D`
 
@@ -283,20 +332,23 @@ The following root XML tags are defined:
 
 - `output` - Parameters relating to logging simulation metrics/results.
 
+- `convergence` - Parameters relating to computing swarm convergence.
+
 - `arena_map` - Parameters relating to discretization of the arena.
 
 - `oracle` - Parameters related to the all knowing oracle, which allows
              robots/swarms to make decisions based on perfect information, to
              provide an upper bound on performance.
 
+- `temporal_variance` - Parameters relating to the various types of temporal
+                        waveforms that can be applied to swarm/environmental
+                        state during simulation.
+
 - `caches` - Parameters related to the use of caches in the arena.
 
 ### `output`
 
 #### `sim`
-
-- `sim_log_fname` - The name of the simulation log output file in
-                    `output_root`/`output_dir`.
 
 - `output_root` - The root output directory in which the directories of
                   different simulation runs will be placed.
@@ -308,28 +360,95 @@ The following root XML tags are defined:
 
 #### `metrics`
 
-- `output_dir` - Name of directory within the output directory for the
-  simulation run that metrics will be placed in.
+- `output_dir` - Name of directory within the output root that metrics will be
+                 placed in.
 
 - `collect_interval` - The timestep interval after which statistics will be
                        reset. Gathering statistics on a single timestep of a
                        long simulation is generally not useful; hence this
                        field.
 
-### oracle
+### `convergence`
 
-- `enabled` - Is the oracle enabled or not? Only affects `oracular_controllers`.
+- `n_threads` - How many threads will be used for convergence calculations
+                during loop functions.
 
-- `task_exec_est` - If the oracle is enabled, then this will inject perfect
-                    estimates of task execution time based on the performance of
-                    the entire swarm into each robot when it performs task
-                    allocation.
+- `epsilon` - Threshold < 1.0 that a convergence measure will be considered
+              to have converged when its normalized value is above.
 
-- `task_interface_est` - If the oracle is enabled, then this will inject perfect
-                         estimates of task interface time based on the
-                         performance of the entire swarm into each robot when it
-                         performs task allocation.
+- `epsilon_delta` - # of timesteps the swarm must maintain its normalized
+                    convergence measure score of >= `epsilon` in order to be
+                    considered converged.
 
+#### `positional_entropy`
+
+A measure of convergence using robot positions, Shannon's entropy definition,
+and Balch2000's social entropy measure.
+
+- `enable` - If this measure is enabled or not. Very expensive to compute in
+             large swarms.
+
+- `horizon` - A `min:max` pair of distances specifying the min and max spatail
+              cluster size that will be used to compute the entropy of robot
+              positions.
+
+- `horizon_delta` - Step size for traversing the horizon from min to max.
+
+#### `interactivity`
+
+A measure of convergence using nearest neighbor distances.
+
+- `enable` - If this measure is enabled or not. Relatively cheap to compute in
+             large swarms.
+
+#### `angular_order`
+
+A measure of convergence using congruence of robot orientations.
+
+- `enable` - If this measure is enabled or not. Relatively cheap to compute in
+             large swarms.
+
+### `oracle`
+
+#### `tasking_oracle`
+
+- `task_exec_est` - If enabled, then this will inject perfect estimates of task
+                    execution time based on the performance of the entire swarm
+                    into each robot when it performs task allocation.
+
+- `task_interface_est` - If enabled, then this will inject perfect estimates of
+                         task interface time based on the performance of the
+                         entire swarm into each robot when it performs task
+                         allocation.
+
+#### `entities_oracle`
+
+- `blocks_enabled` - Inject perfect knowledge of all block locations into the
+                     swarm every timestep.
+
+- `caches_enabled` - Inject perfect knowledge of all cache locations into the
+                     swarm every timestep.
+
+### `temporal_variance`
+
+#### `blocks`
+
+##### `manipulation_penalty`
+
+- `waveform` - Parameters defining the waveform of block manipulation penalty
+               (picking up/dropping that does not involve caches).
+
+##### `carry_throttle`
+
+- `waveform` - Parameters defining the waveform of block carry penalty
+               (how much slower robots move when carrying a block).
+
+### `caches`
+
+##### `usage_penalty`
+
+- `waveform` - Parameters defining the waveform of cache usage penalty (picking
+               up/dropping).
 
 ### `arena_map`
 
@@ -342,11 +461,6 @@ The following root XML tags are defined:
 - `size` - The size of the arena.
 
 #### `blocks`
-
-##### `manipulation_penalty`
-
-- `waveform` - Parameters defining the waveform of block manipulation penalty
-  (picking up, dropping that does not involve caches).
 
 ##### `distribution`
 
@@ -430,7 +544,9 @@ The following root XML tags are defined:
 - `min_blocks` - The minimum # of blocks that need to within `min_dist` from
                  each other to trigger dynamic cache creation.
 
-- `usage_penalty` - Waveform params again.
+- `robot_drop_only` - If TRUE, then caches will only be created by intential
+                      robot block drops rather than drops due to abort/block
+                      distribution after collection.
 
 ### `visualization`
 

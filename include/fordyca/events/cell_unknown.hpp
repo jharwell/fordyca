@@ -33,7 +33,6 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace rmath = rcppsw::math;
 namespace ds {
 class cell2D;
 class occupancy_grid;
@@ -42,14 +41,14 @@ namespace fsm {
 class perceived_cell2D_fsm;
 }
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class cell_unknown
- * @ingroup events
+ * @ingroup fordyca events detail
  *
  * @brief Created whenever a cell within an occupancy grid needs to go into an
  * unknown state.
@@ -59,17 +58,39 @@ NS_START(events);
  * 1. After its relevance expires.
  * 2. Before the robot sees it for the first time (ala Fog of War).
  */
-class cell_unknown : public cell_op,
-                     public visitor::can_visit<ds::occupancy_grid>,
-                     public rcppsw::er::client<cell_unknown> {
+class cell_unknown : public cell_op, public rer::client<cell_unknown> {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using others = rmpl::typelist<ds::occupancy_grid>;
+    using value = boost::mpl::joint_view<inherited::type, others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   explicit cell_unknown(const rmath::vector2u& coord)
       : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_unknown") {}
 
-  /* stateful foraging */
-  void visit(ds::cell2D& cell) override;
-  void visit(ds::occupancy_grid& grid) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
+  void visit(ds::cell2D& cell);
+  void visit(ds::occupancy_grid& grid);
+  void visit(fsm::cell2D_fsm& fsm);
+};
+
+/**
+ * @brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cell_unknown_visitor_impl =
+    rpvisitor::precise_visitor<detail::cell_unknown,
+                              detail::cell_unknown::visit_typelist>;
+
+NS_END(detail);
+
+class cell_unknown_visitor : public detail::cell_unknown_visitor_impl {
+  using detail::cell_unknown_visitor_impl::cell_unknown_visitor_impl;
 };
 
 NS_END(events, fordyca);

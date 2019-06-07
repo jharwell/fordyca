@@ -29,102 +29,82 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
-namespace state_machine = rcppsw::patterns::state_machine;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const controller::block_sel_matrix* const sel_matrix,
                  controller::saa_subsystem* const saa,
-                 ds::dpo_store* const store)
-    : base_foraging_fsm(saa, ST_MAX_STATES),
+                 ds::dpo_store* const store,
+                 std::unique_ptr<expstrat::base_expstrat> exp_behavior)
+    : base_foraging_fsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.dpo"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
-      entry_leaving_nest(),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
-      m_block_fsm(sel_matrix, saa, store),
+      m_block_fsm(sel_matrix, saa, store, std::move(exp_behavior)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                                nullptr,
                                                &entry_leaving_nest,
                                                nullptr)} {
-  hfsm::change_parent(ST_LEAVING_NEST, &start);
+  hfsm::change_parent(ekST_LEAVING_NEST, &start);
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, start, state_machine::event_data) {
+HFSM_STATE_DEFINE(dpo_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
-  if (state_machine::event_type::NORMAL == data->type()) {
-    internal_event(ST_BLOCK_TO_NEST);
-    return controller::foraging_signal::HANDLED;
+  if (rpfsm::event_type::ekNORMAL == data->type()) {
+    internal_event(ekST_BLOCK_TO_NEST);
+    return controller::foraging_signal::ekHANDLED;
   }
-  if (state_machine::event_type::CHILD == data->type()) {
-    if (controller::foraging_signal::LEFT_NEST == data->signal()) {
-      internal_event(ST_BLOCK_TO_NEST);
-      return controller::foraging_signal::HANDLED;
+  if (rpfsm::event_type::ekCHILD == data->type()) {
+    if (controller::foraging_signal::ekLEFT_NEST == data->signal()) {
+      internal_event(ekST_BLOCK_TO_NEST);
+      return controller::foraging_signal::ekHANDLED;
     }
   }
   ER_FATAL_SENTINEL("Unhandled signal");
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
-HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, state_machine::event_data) {
+HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
   if (nullptr != data &&
-      controller::foraging_signal::FSM_RUN != data->signal() &&
-      state_machine::event_signal::IGNORED != data->signal()) {
-    m_block_fsm.inject_event(data->signal(), state_machine::event_type::NORMAL);
-    return controller::foraging_signal::HANDLED;
+      controller::foraging_signal::ekFSM_RUN != data->signal() &&
+      rpfsm::event_signal::ekIGNORED != data->signal()) {
+    m_block_fsm.inject_event(data->signal(), rpfsm::event_type::ekNORMAL);
+    return controller::foraging_signal::ekHANDLED;
   }
   if (m_block_fsm.task_finished()) {
     m_block_fsm.task_reset();
-    internal_event(ST_LEAVING_NEST);
+    internal_event(ekST_LEAVING_NEST);
   } else {
     m_block_fsm.task_execute();
   }
-  return controller::foraging_signal::HANDLED;
+  return controller::foraging_signal::ekHANDLED;
 }
 
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure FSM_OVERRIDE_DEF(bool,
-                             dpo_fsm,
-                             in_collision_avoidance,
-                             m_block_fsm,
-                             const);
-__rcsw_pure FSM_OVERRIDE_DEF(bool,
-                             dpo_fsm,
-                             entered_collision_avoidance,
-                             m_block_fsm,
-                             const);
-__rcsw_pure FSM_OVERRIDE_DEF(bool,
-                             dpo_fsm,
-                             exited_collision_avoidance,
-                             m_block_fsm,
-                             const);
-__rcsw_pure FSM_OVERRIDE_DEF(uint,
-                             dpo_fsm,
-                             collision_avoidance_duration,
-                             m_block_fsm,
-                             const);
+RCPPSW_WRAP_DEF(dpo_fsm, in_collision_avoidance, m_block_fsm, const)
+RCPPSW_WRAP_DEF(dpo_fsm, entered_collision_avoidance, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, exited_collision_avoidance, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, collision_avoidance_duration, m_block_fsm, const);
+
+RCPPSW_WRAP_DEF(dpo_fsm, avoidance_loc, m_block_fsm, const);
 
 /*******************************************************************************
  * Goal Acquisition Metrics
  ******************************************************************************/
-FSM_OVERRIDE_DEF(bool, dpo_fsm, is_exploring_for_goal, m_block_fsm, const);
-FSM_OVERRIDE_DEF(bool, dpo_fsm, is_vectoring_to_goal, m_block_fsm, const);
-FSM_OVERRIDE_DEF(acquisition_goal_type,
-                 dpo_fsm,
-                 acquisition_goal,
-                 m_block_fsm,
-                 const);
-FSM_OVERRIDE_DEF(transport_goal_type,
-                 dpo_fsm,
-                 block_transport_goal,
-                 m_block_fsm,
-                 const);
-FSM_OVERRIDE_DEF(bool, dpo_fsm, goal_acquired, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, is_exploring_for_goal, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, is_vectoring_to_goal, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, acquisition_goal, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, block_transport_goal, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, goal_acquired, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, acquisition_loc, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, current_explore_loc, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, current_vector_loc, m_block_fsm, const);
 
 /*******************************************************************************
  * General Member Functions
@@ -135,8 +115,8 @@ void dpo_fsm::init(void) {
 } /* init() */
 
 void dpo_fsm::run(void) {
-  inject_event(controller::foraging_signal::FSM_RUN,
-               state_machine::event_type::NORMAL);
+  inject_event(controller::foraging_signal::ekFSM_RUN,
+               rpfsm::event_type::ekNORMAL);
 } /* run() */
 
 NS_END(depth0, fsm, fordyca);

@@ -27,6 +27,8 @@
 #include <list>
 #include <algorithm>
 #include <vector>
+#include <random>
+#include <chrono>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/ds/block_vector.hpp"
@@ -43,7 +45,7 @@ NS_START(fordyca, support, block_dist);
  ******************************************************************************/
 /**
  * @class base_distributor
- * @ingroup support block_dist
+ * @ingroup fordyca support block_dist
  *
  * @brief Base class for block distributors to enable use of strategy pattern.
  */
@@ -55,7 +57,8 @@ class base_distributor {
    */
   static constexpr uint kMAX_DIST_TRIES = 100;
 
-  base_distributor(void) = default;
+  base_distributor(void) :
+      m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
   virtual ~base_distributor(void) = default;
 
   /**
@@ -70,9 +73,13 @@ class base_distributor {
    * @return \c TRUE if the block distribution was successful, \c FALSE
    * otherwise.
    */
-  virtual bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  virtual bool distribute_block(std::shared_ptr<repr::base_block>& block,
                                 ds::const_entity_list& entities) = 0;
 
+  /**
+   * @brief Return a read-only list of \ref block_clusters for capacity checking
+   * by external classes.
+   */
   virtual ds::const_block_cluster_list block_clusters(void) const = 0;
 
   /**
@@ -85,10 +92,16 @@ class base_distributor {
                                  ds::const_entity_list& entities) {
     return std::all_of(blocks.begin(),
                        blocks.end(),
-                       [&](std::shared_ptr<representation::base_block>& b) {
+                       [&](std::shared_ptr<repr::base_block>& b) {
                          return distribute_block(b, entities);
                        });
   }
+  std::default_random_engine& rng(void) { return m_rng; }
+
+ private:
+  /* clang-format off */
+  std::default_random_engine m_rng;
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/sigmoid.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -32,14 +33,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, math);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class cache_site_utility
- * @ingroup math
+ * @ingroup fordyca math
  *
  * @brief Calculates the utility associated with a cache to a robot as part
  * of its decision process for what to do with a block once it has picked it up.
@@ -57,7 +57,7 @@ namespace rmath = rcppsw::math;
  * point. We do this via exponential falloff on either side of the arc.
  */
 class cache_site_utility : public rcppsw::math::sigmoid,
-                           public rcppsw::er::client<cache_site_utility> {
+                           public rer::client<cache_site_utility> {
  public:
   cache_site_utility(const rmath::vector2d& position,
                      const rmath::vector2d& nest_loc);

@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/params/sensing_params.hpp"
+#include "fordyca/config/sensing_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,14 +32,10 @@ NS_START(fordyca, controller);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-sensing_subsystem::sensing_subsystem(
-    const struct params::sensing_params* const params,
-    const struct sensor_list* const list)
-    : mc_obstacle_delta(params->proximity.delta),
-      mc_los_dim(params->los_dim),
-      m_tick(0),
-      m_position(),
-      m_prev_position(),
+sensing_subsystem::sensing_subsystem(const config::sensing_config* const config,
+                                     const struct sensor_list* const list)
+    : mc_obstacle_delta(config->proximity.delta),
+      mc_los_dim(config->los_dim),
       m_sensors(*list),
       m_fov(rmath::radians(-5 * M_PI / 6), rmath::radians(5 * M_PI / 6)) {}
 

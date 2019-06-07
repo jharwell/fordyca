@@ -24,7 +24,7 @@
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
-#include "fordyca/representation/base_cache.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +43,7 @@ new_cache_selector::new_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::dp_block_map::value_type new_cache_selector::operator()(
+boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
     const ds::dp_block_map& new_caches,
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position) const {
@@ -51,7 +51,7 @@ ds::dp_block_map::value_type new_cache_selector::operator()(
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
-  for (auto& c : new_caches.values_range()) {
+  for (auto& c : new_caches.const_values_range()) {
     if (new_cache_is_excluded(existing_caches, new_caches, c.ent())) {
       continue;
     }
@@ -80,23 +80,23 @@ ds::dp_block_map::value_type new_cache_selector::operator()(
             best.ent()->real_loc().to_str().c_str(),
             best.ent()->discrete_loc().to_str().c_str(),
             max_utility);
+    return boost::make_optional(best);
   } else {
     ER_WARN("No best new cache found: all known new caches excluded!");
+    return boost::optional<ds::dp_block_map::value_type>();
   }
-
-  return best;
 } /* operator() */
 
 bool new_cache_selector::new_cache_is_excluded(
     const ds::dp_cache_map& existing_caches,
     const ds::dp_block_map& blocks,
-    const representation::base_block* const new_cache) const {
+    const repr::base_block* const new_cache) const {
   double cache_prox =
       boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second);
   double cluster_prox =
       boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
 
-  for (auto& ec : existing_caches.values_range()) {
+  for (auto& ec : existing_caches.const_values_range()) {
     double dist = (ec.ent()->real_loc() - new_cache->real_loc()).length();
     if (dist <= cache_prox) {
       ER_DEBUG(
@@ -123,7 +123,7 @@ bool new_cache_selector::new_cache_is_excluded(
    * So, we approximate a block distribution as a single block, and only choose
    * new caches that are sufficiently far from any potential clusters.
    */
-  for (auto& b : blocks.values_range()) {
+  for (auto& b : blocks.const_values_range()) {
     if (b.ent() == new_cache) {
       continue;
     }

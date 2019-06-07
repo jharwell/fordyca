@@ -26,32 +26,31 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace swarm { namespace convergence {
-struct convergence_params;
-}}} // namespace rcppsw::swarm::convergence
-
 NS_START(fordyca);
-namespace rswc = rcppsw::swarm::convergence;
 
-namespace params {
-struct metrics_params;
+namespace config {
+struct metrics_config;
 }
 
 namespace support {
 class base_loop_functions;
 }
-namespace representation {
+namespace repr {
 class base_block;
 }
 namespace ds {
 class arena_map;
 }
+namespace controller {
+class base_controller;
+} /* namespace controller */
 NS_START(metrics);
 
 /*******************************************************************************
@@ -59,32 +58,30 @@ NS_START(metrics);
  ******************************************************************************/
 /**
  * @class base_metrics_aggregator
- * @ingroup metrics
+ * @ingroup fordyca metrics
  *
  * @brief Base class for aggregating collection of metrics for various
- * sources. Extends \ref rcppsw::metrics::collector_group to include
+ * sources. Extends \ref rmetrics::collector_group to include
  * initialization bits to make loop functions simpler/clearer.
  */
-class base_metrics_aggregator
-    : public rcppsw::er::client<base_metrics_aggregator>,
-      public rcppsw::metrics::collector_group {
+class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
+                                public rmetrics::collector_group {
  public:
-  base_metrics_aggregator(const params::metrics_params* mparams,
-                          const rswc::convergence_params* cparams,
+  base_metrics_aggregator(const config::metrics_config* mconfig,
                           const std::string& output_root);
-  virtual ~base_metrics_aggregator(void) = default;
+  ~base_metrics_aggregator(void) override = default;
 
-  void collect_from_loop(const support::base_loop_functions* const loop);
+  void collect_from_loop(const support::base_loop_functions* loop);
 
   /**
    * @brief Collect metrics from a block right before it is dropped in the nest.
    */
-  void collect_from_block(const representation::base_block* block);
+  void collect_from_block(const repr::base_block* block);
 
   /**
-   * @brief Collect metrics from the arena each timestep.
+   * @brief Collect metrics from \ref base_controller.
    */
-  void collect_from_arena(const ds::arena_map* arena);
+  void collect_from_controller(const controller::base_controller* controller);
 
  protected:
   const std::string& metrics_path(void) const { return m_metrics_path; }
@@ -93,7 +90,7 @@ class base_metrics_aggregator
   static constexpr uint kPOS_ENTROPY_ITER = 10;
 
   /* clang-format off */
-  std::string m_metrics_path{""};
+  std::string m_metrics_path;
   /* clang-format on */
 };
 

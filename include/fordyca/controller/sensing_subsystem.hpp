@@ -24,80 +24,76 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <sstream>
 #include <string>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/controller/sensor_list.hpp"
+#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace params {
-struct sensing_params;
+namespace config
+{
+struct sensing_config;
 }
 
 NS_START(controller);
-namespace hal = rcppsw::robotics::hal;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class sensing_subsystem
- * @ingroup controller
+ * @ingroup fordyca controller
  *
  * @brief The base sensing subsystem for all sensors used by the different
  * foraging controllers.  Contains common sensor functionality for all
  * controllers.
  */
-class sensing_subsystem {
- public:
-  struct sensor_list {
-    hal::sensors::rab_wifi_sensor rabs;
-    hal::sensors::proximity_sensor proximity;
-    hal::sensors::light_sensor light;
-    hal::sensors::ground_sensor ground;
-    hal::sensors::battery_sensor battery;
-  };
-
+class sensing_subsystem
+{
+public:
   /**
    * @brief Initialize the base sensing subsystem.
    *
-   * @param params Subsystem parameters.
+   * @param config Subsystem parameters.
    * @param list List of handles to sensing devices.
    */
-  sensing_subsystem(const struct params::sensing_params* params,
-                    const struct sensor_list* list);
+  sensing_subsystem(const config::sensing_config *config,
+                    const sensor_list *list);
 
   double los_dim(void) const { return mc_los_dim; }
 
   /**
    * @brief Get the list of sensors that the subsystem is managing.
    */
-  const sensor_list& sensor_list(void) const { return m_sensors; }
+  const struct sensor_list &sensor_list(void) const { return m_sensors; }
 
-  const hal::sensors::proximity_sensor& proximity(void) const {
+  const rrhal::sensors::proximity_sensor &proximity(void) const
+  {
     return m_sensors.proximity;
   }
-  const hal::sensors::light_sensor& light(void) const {
+  const rrhal::sensors::colored_blob_camera_sensor &blobs(void) const
+  {
+    return m_sensors.blobs;
+  }
+  const rrhal::sensors::light_sensor &light(void) const
+  {
     return m_sensors.light;
   }
-  const hal::sensors::ground_sensor& ground(void) const {
+  const rrhal::sensors::ground_sensor &ground(void) const
+  {
     return m_sensors.ground;
   }
-  const hal::sensors::rab_wifi_sensor& rabs(void) const {
+  const rrhal::sensors::rab_wifi_sensor &rabs(void) const
+  {
     return m_sensors.rabs;
   }
-  const hal::sensors::battery_sensor& battery(void) const {
+  const rrhal::sensors::battery_sensor &battery(void) const
+  {
     return m_sensors.battery;
   }
 
@@ -124,14 +120,24 @@ class sensing_subsystem {
    * of self-localizing. That's not the point of this project, and this was much
    * faster/easier.
    */
-  const rmath::vector2d& position(void) const { return m_position; }
+  const rmath::vector2d &position(void) const { return m_position; }
+  const rmath::vector2u &discrete_position(void) const
+  {
+    return m_discrete_position;
+  }
 
   /**
    * @brief Set the robot's current location.
    */
-  void position(rmath::vector2d position) {
+  void position(const rmath::vector2d &position)
+  {
     m_prev_position = m_position;
     m_position = position;
+  }
+
+  void discrete_position(const rmath::vector2u &position)
+  {
+    m_discrete_position = position;
   }
 
   /**
@@ -183,14 +189,15 @@ class sensing_subsystem {
 
   std::vector<std::vector<uint8_t>> recieve_message();
 
- private:
+private:
   /* clang-format off */
   const double                                   mc_obstacle_delta;
   const double                                   mc_los_dim;
 
-  uint                                           m_tick;
-  rmath::vector2d                                m_position;
-  rmath::vector2d                                m_prev_position;
+  uint                                           m_tick{0};
+  rmath::vector2d                                m_position{};
+  rmath::vector2d                                m_prev_position{};
+  rmath::vector2u                                m_discrete_position{};
   struct sensor_list                             m_sensors;
   rmath::range<rmath::radians>                   m_fov;
   /* clang-format off */

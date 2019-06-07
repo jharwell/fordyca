@@ -37,7 +37,6 @@
  ******************************************************************************/
 NS_START(fordyca, controller);
 class cache_sel_matrix;
-namespace rmath = rcppsw::math;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -45,13 +44,13 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * @class new_cache_selector
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief Selects from among "new" caches (which are the same as blocks in the
  * arena) which are presumed to still exist at this point, although that may not
  * be true as a robot's knowledge of the arena is imperfect).
  */
-class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
+class new_cache_selector: public rer::client<new_cache_selector> {
  public:
   explicit new_cache_selector(const controller::cache_sel_matrix* csel_matrix);
 
@@ -66,7 +65,7 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
    *
    * @return The "best" new cache.
    */
-  ds::dp_block_map::value_type operator()(
+  boost::optional<ds::dp_block_map::value_type> operator()(
       const ds::dp_block_map& new_caches,
       const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position) const;
@@ -74,7 +73,7 @@ class new_cache_selector: public rcppsw::er::client<new_cache_selector> {
  private:
   bool new_cache_is_excluded(const ds::dp_cache_map& existing_caches,
                              const ds::dp_block_map& blocks,
-                             const representation::base_block* const new_cache) const;
+                             const repr::base_block* new_cache) const;
 
   /* clang-format off */
   const controller::cache_sel_matrix* const mc_matrix;

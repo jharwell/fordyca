@@ -28,6 +28,8 @@
 #include <tuple>
 #include <functional>
 #include <vector>
+#include <random>
+#include <string>
 #include <nlopt.hpp>
 
 #include "rcppsw/er/client.hpp"
@@ -40,7 +42,6 @@
  ******************************************************************************/
 NS_START(fordyca, controller);
 class cache_sel_matrix;
-namespace rmath = rcppsw::math;
 NS_START(depth2);
 
 /*******************************************************************************
@@ -48,23 +49,23 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * @class cache_site_selector
- * @ingroup controller depth2
+ * @ingroup fordyca controller depth2
  *
  * @brief Selects the best cache site between the location of the block pickup
  * and the nest (ideally the halfway point), subject to constraints such as it
  * can't be too near other known blocks, known caches, or the nest.
  */
-class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
+class cache_site_selector: public rer::client<cache_site_selector> {
  public:
   struct cache_constraint_data {
-    const representation::base_cache* mc_cache{nullptr};
-    cache_site_selector*        selector{nullptr};
-    double                      cache_prox_dist{0.0};
+    const repr::base_cache* mc_cache{nullptr};
+    cache_site_selector*    selector{nullptr};
+    double                  cache_prox_dist{0.0};
   };
   struct block_constraint_data {
-    const representation::base_block* mc_block{nullptr};
-    cache_site_selector*        selector{nullptr};
-    double                      block_prox_dist{0.0};
+    const repr::base_block* mc_block{nullptr};
+    cache_site_selector*    selector{nullptr};
+    double                  block_prox_dist{0.0};
   };
   struct nest_constraint_data {
     rmath::vector2d      nest_loc{};
@@ -83,8 +84,8 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
   explicit cache_site_selector(const controller::cache_sel_matrix* matrix);
 
   ~cache_site_selector(void) override = default;
-  cache_site_selector& operator=(const cache_site_selector& other) = delete;
-  cache_site_selector(const cache_site_selector& other) = delete;
+  cache_site_selector& operator=(const cache_site_selector&) = delete;
+  cache_site_selector(const cache_site_selector&) = delete;
 
   /**
    * @brief Given a list of existing caches/blocks that a robot knows about
@@ -94,9 +95,10 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
    * @return The location of the best cache site, or (-1, -1) if no best cache
    * site could be found (can happen if NLopt mysteriously fails).
    */
-  rmath::vector2d calc_best(const ds::dp_cache_map& known_caches,
-                            const ds::dp_block_map& known_blocks,
-                            rmath::vector2d position);
+  boost::optional<rmath::vector2d> operator()(
+      const ds::dp_cache_map& known_caches,
+      const ds::dp_block_map& known_blocks,
+      rmath::vector2d position);
 
  private:
   /*
@@ -154,10 +156,13 @@ class cache_site_selector: public rcppsw::er::client<cache_site_selector> {
                    const ds::dp_cache_map& known_caches,
                    const ds::dp_block_map& known_blocks) const;
 
+  std::string nlopt_ret_str(nlopt::result res) const;
+
   /* clang-format off */
-  const controller::cache_sel_matrix* const mc_matrix;
-  nlopt::opt     m_alg{nlopt::algorithm::GN_ORIG_DIRECT, 2};
-  constraint_set m_constraints{};
+  const controller::cache_sel_matrix* const              mc_matrix;
+  nlopt::opt     m_alg{nlopt::algorithm::GN_ISRES, 2};
+  constraint_set                                         m_constraints{};
+  std::default_random_engine                             m_reng;
   /* clang-format on */
 };
 
