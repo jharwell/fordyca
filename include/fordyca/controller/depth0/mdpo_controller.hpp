@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
-#include "fordyca/params/communication_params.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/config/communication_config.hpp"
 #include "rcppsw/robotics/hal/wifi_packet.hpp"
 
 /*******************************************************************************
@@ -138,7 +138,7 @@ private:
   rcppsw::math::vector2u get_most_valuable_cell(void);
 
   /* clang-format off */
-  struct params::communication_params        m_communication_params;
+  struct config::communication_config        m_communication_params;
   /* clang-format on */
 
   void private_init(const config::depth0::mdpo_controller_repository &param_repo);

@@ -26,7 +26,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, config);
 
 /*******************************************************************************
  * Global Variables
@@ -49,19 +49,6 @@ void communication_parser::parse(const ticpp::Element &node)
   XML_PARSE_ATTR(anode, m_params, prob_receive);
 } /* parse() */
 
-void communication_parser::show(std::ostream &stream) const
-{
-  stream << build_header();
-
-  stream << XML_ATTR_STR(m_params, on)
-         << XML_ATTR_STR(m_params, mode)
-         << XML_ATTR_STR(m_params, max_message_length)
-         << XML_ATTR_STR(m_params, prob_send)
-         << XML_ATTR_STR(m_params, prob_receive)
-         << std::endl
-         << build_footer();
-} /* show() */
-
 __rcsw_pure bool communication_parser::validate(void) const
 {
   return m_params->max_message_length >= 0 &&
@@ -72,4 +59,4 @@ __rcsw_pure bool communication_parser::validate(void) const
          m_params->prob_receive <= 1.0;
 } /* validate() */
 
-NS_END(params, fordyca);
+NS_END(config, fordyca);

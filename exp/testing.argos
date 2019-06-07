@@ -20,7 +20,7 @@
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
-        <!-- <leds implementation="default" medium="leds" /> -->
+        <leds implementation="default" medium="leds" />
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>

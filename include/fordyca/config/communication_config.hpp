@@ -29,7 +29,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, config);
 
 /*******************************************************************************
  * Structure Definitions
@@ -39,8 +39,7 @@ NS_START(fordyca, params);
  * @struct actuation_params
  * @ingroup params
  */
-struct communication_params : public rcppsw::config::base_params
-{
+struct communication_config : public rcppsw::config::base_config {
   double prob_send{0.0};
   double prob_receive{0.0};
   int max_message_length{0};
@@ -48,6 +47,6 @@ struct communication_params : public rcppsw::config::base_params
   bool on{false};
 };
 
-NS_END(params, fordyca);
+NS_END(config, fordyca);
 
 #endif /* INCLUDE_FORDYCA_CONFIG_ACTUATION_CONFIG_HPP_ */

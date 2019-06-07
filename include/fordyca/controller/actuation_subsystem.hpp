@@ -83,7 +83,7 @@ class actuation_subsystem {
    */
   void reset(void);
 
-  void start_sending_message(struct hal::wifi_packet packet) {
+  void start_sending_message(struct rrhal::wifi_packet packet) {
     m_actuators.wifi.broadcast_start(packet);
   }
 

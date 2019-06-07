@@ -27,10 +27,12 @@
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/ramp_block.hpp"
-#include "fordyca/representation/cube_block.hpp"
+#include "fordyca/repr/ramp_block.hpp"
+#include "fordyca/repr/cube_block.hpp"
 #include "fordyca/events/block_found.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/repr/base_block.hpp"
 /*******************************************************************************
@@ -92,7 +94,7 @@ void mdpo_controller::Init(ticpp::Element &node)
   shared_init(param_repo);
   private_init(param_repo);
 
-  auto *comm_params = param_repo.parse_results<params::communication_params>();
+  auto *comm_params = param_repo.config_get<config::communication_config>();
   m_communication_params = *comm_params;
 
   ER_INFO("Initialization finished");
@@ -116,7 +118,7 @@ void mdpo_controller::communication_check(void)
   if (!recieved_packet_data.empty() && prob_receive >=
                                            (1 - m_communication_params.prob_receive))
   {
-    hal::wifi_packet packet = hal::wifi_packet();
+    rrhal::wifi_packet packet = rrhal::wifi_packet();
 
     // Iterate over every message and integrate its contents with the robot's
     // internal mapping
@@ -143,7 +145,7 @@ void mdpo_controller::communication_check(void)
 
 void mdpo_controller::fill_packet(void)
 {
-  hal::wifi_packet packet = hal::wifi_packet();
+  rrhal::wifi_packet packet = rrhal::wifi_packet();
   int x_coord;
   int y_coord;
 
@@ -201,7 +203,7 @@ void mdpo_controller::fill_packet(void)
     if (state == 3)
     {
       // Ramp block
-      if (cell.block()->type() == metrics::blocks::transport_metrics::kRamp)
+      if (cell.block()->type() == repr::block_type::ekRAMP)
       {
         type = 2;
         // Cube block
@@ -225,7 +227,7 @@ void mdpo_controller::fill_packet(void)
   saa_subsystem()->actuation()->start_sending_message(packet);
 }
 
-void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet)
+void mdpo_controller::integrate_recieved_packet(rrhal::wifi_packet packet)
 {
   // Data extraction
   int x_coord = static_cast<int>(packet.data[0]);
@@ -238,7 +240,7 @@ void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet)
   auto rcoord_vector = uvec2dvec(disc_loc,
                                  mdpo_perception()->map()->grid_resolution());
 
-  // type of block (if it's not a block it will be -1)
+  // type of block (if it's not a bl->acceock it will be -1)
   int type = static_cast<int>(packet.data[4]);
 
   double pheromone_density = static_cast<double>(packet.data[5]) / 10;
@@ -260,22 +262,24 @@ void mdpo_controller::integrate_recieved_packet(hal::wifi_packet packet)
       // ramp block
       if (type == 2)
       {
-        std::shared_ptr<representation::ramp_block> block_ptr(new representation::ramp_block(rcppsw::math::vector2d(2, 1), ent_id));
+        std::shared_ptr<repr::ramp_block> block_ptr(new repr::ramp_block(rcppsw::math::vector2d(2, 1), ent_id));
         block_ptr->real_loc(rcoord_vector);
         block_ptr->discrete_loc(disc_loc);
 
-        mdpo_perception()->map()->accept(*(
-            new fordyca::events::block_found(block_ptr)));
+
+        events::block_found_visitor found_block(block_ptr);
+        found_block.visit(*(mdpo_perception()->dpo_store()));
         // cube block
       }
       else if (type == 3)
       {
-        std::shared_ptr<representation::cube_block> block_ptr(new representation::cube_block(rcppsw::math::vector2d(1, 1), ent_id));
+        std::shared_ptr<repr::cube_block> block_ptr(new repr::cube_block(rcppsw::math::vector2d(1, 1), ent_id));
         block_ptr->real_loc(rcoord_vector);
         block_ptr->discrete_loc(disc_loc);
 
-        mdpo_perception()->map()->accept(*(
-            new fordyca::events::block_found(block_ptr)));
+
+        events::block_found_visitor found_block(block_ptr);
+        found_block.visit(*(mdpo_perception()->dpo_store()));
       } /* if type */
 
       // density.pheromone_set(pheromone_density);
@@ -295,8 +299,8 @@ rcppsw::math::vector2u mdpo_controller::get_most_valuable_cell(void)
   // Get information regarding the location of the nest
   rcppsw::math::vector2d nest_loc = boost::get<rcppsw::math::vector2d>(
       block_sel_matrix()->find("nest_loc")->second);
-  int nest_x_coord = nest_loc.x();
-  int nest_y_coord = nest_loc.y();
+  int nest_x_coord = static_cast<int>(nest_loc.x());
+  int nest_y_coord = static_cast<int>(nest_loc.y());
 
   // Initialize variables for keeping track of most valuable location
   int communicated_cell_value = 0;
@@ -320,11 +324,11 @@ rcppsw::math::vector2u mdpo_controller::get_most_valuable_cell(void)
         rcppsw::swarm::pheromone_density &density = mdpo_perception()->map()->access<ds::occupancy_grid::kPheromone>(i, j);
 
         // Distance from the nest * number of blocks * pheromone density
-        current_cell_value = (1 / ((((i - nest_x_coord) ^ 2) +
+        current_cell_value = static_cast<int>((1 / ((((i - nest_x_coord) ^ 2) +
                                     ((j - nest_y_coord) ^ 2)) ^
                                    (1 / 2))) *
                              current_cell.block_count() *
-                             density.last_result();
+                             density.last_result());
 
         // Update variables
         if (current_cell_value > communicated_cell_value)

@@ -26,30 +26,25 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/config/xml/xml_config_parser.hpp"
 #include "fordyca/config/communication_config.hpp"
-
+#include "fordyca/nsalias.hpp"
+#include "rcppsw/config/xml/xml_config_parser.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, params);
+NS_START(fordyca, config);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 
 /**
- * @class actuation_parser
- * @ingroup params
- *
- * @brief Parses XML parameters for \ref actuation_subsystem into
- * \ref actuation_params.
+ * @class communication_parser
+ * @ingroup config
  */
-class communication_parser : public rcppsw::params::xml_param_parser
-{
-public:
-  communication_parser(uint level)
-      : xml_param_parser(level) {}
+class communication_parser : public rconfig::xml::xml_config_parser {
+ public:
+  explicit communication_parser(uint level) : xml_config_parser(level) {}
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the
@@ -57,28 +52,24 @@ public:
    */
   static constexpr char kXMLRoot[] = "communication";
 
-  void show(std::ostream &stream) const override;
   bool validate(void) const override;
   void parse(const ticpp::Element &node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<communication_params> parse_results(void) const
-  {
+  std::shared_ptr<communication_config> config_get(void) const {
     return m_params;
   }
 
 private:
-  std::shared_ptr<rcppsw::params::base_params> parse_results_impl(
-      void) const override
-  {
+  std::shared_ptr<rcppsw::config::base_config> config_get_impl(void) const override {
     return m_params;
   }
 
   // clang-format off
-  std::shared_ptr<communication_params>           m_params{nullptr};
+  std::shared_ptr<communication_config>           m_params{nullptr};
   // clang-format on
 };
 
-NS_END(params, fordyca);
+NS_END(config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_PARAMS_ACTUATION_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_PARAMS_COMMUNICATION_PARSER_HPP_ */

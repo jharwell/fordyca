@@ -44,7 +44,7 @@ base_controller_repository::base_controller_repository(void)
       actuation_parser::kXMLRoot, actuation_parser::kHeader1);
   parser_register<sensing_parser, sensing_config>(sensing_parser::kXMLRoot,
                                                   sensing_parser::kHeader1);
-  register_parser<communication_parser, communication_params>(
+  parser_register<communication_parser, communication_config>(
       communication_parser::kXMLRoot, communication_parser::kHeader1);
   parser_register<exploration_parser, exploration_config>(
       exploration_parser::kXMLRoot, exploration_parser::kHeader1);
