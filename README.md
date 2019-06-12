@@ -1,8 +1,9 @@
 # FORDYCA (FOraging Robots use DYnamic CAches)
 
-This is the main entry point for getting started on the project.
+This is the main entry point for getting started on the project. Switch to the
+README for the devel branch for the most up to date code, README, and setup
+instructions.
 
-To see what's new, take a look at the [release notes](docs/release-notes.md).
 
 # Papers
 
