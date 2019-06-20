@@ -58,7 +58,7 @@ class cached_block_pickup_interactor
                                  argos::CFloorEntity* const floor_in,
                                  tv::tv_manager* tv_manager,
                                  support::base_cache_manager* cache_manager,
-                                 support::base_loop_functions * loop)
+                                 support::base_loop_functions* loop)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
@@ -163,10 +163,8 @@ class cached_block_pickup_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cached_block_pickup_visitor pickup_op(m_loop,
-                                                  *it,
-                                                  loop_utils::robot_id(controller),
-                                                  timestep);
+    events::cached_block_pickup_visitor pickup_op(
+        m_loop, *it, loop_utils::robot_id(controller), timestep);
     (*it)->penalty_served(penalty.penalty());
 
     /*

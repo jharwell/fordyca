@@ -79,7 +79,7 @@ class mdpo_controller : public dpo_controller,
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const config::depth0::mdpo_controller_repository& param_repo);
+  void shared_init(const config::depth0::mdpo_controller_repository& config_repo);
 
  private:
   /**
@@ -89,7 +89,7 @@ class mdpo_controller : public dpo_controller,
    *
    * Called after \ref shared_init() in \ref Init().
    */
-  void private_init(const config::depth0::mdpo_controller_repository& param_repo);
+  void private_init(const config::depth0::mdpo_controller_repository& config_repo);
 };
 
 NS_END(depth0, controller, fordyca);

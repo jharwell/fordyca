@@ -54,7 +54,7 @@ class grp_mdpo_controller : public depth2::grp_dpo_controller,
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override;
 
-  void shared_init(const config::depth2::controller_repository& param_repo);
+  void shared_init(const config::depth2::controller_repository& config_repo);
 
   mdpo_perception_subsystem* mdpo_perception(void);
   const mdpo_perception_subsystem* mdpo_perception(void) const;

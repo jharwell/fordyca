@@ -38,26 +38,36 @@ constexpr char caches_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void caches_parser::parse(const ticpp::Element& node) {
-  if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element cnode = node_get(node, kXMLRoot);
-    m_config =
-        std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-
-    m_static.parse(cnode);
-    m_dynamic.parse(cnode);
-    m_config->static_ = *m_static.config_get();
-    m_config->dynamic = *m_dynamic.config_get();
-
-    XML_PARSE_ATTR(cnode, m_config, dimension);
-    m_parsed = true;
+  /* caches not used */
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
   }
+  ticpp::Element cnode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
+
+  m_static.parse(cnode);
+  if (m_static.is_parsed()) {
+    m_config->static_ = *m_static.config_get<static_cache_parser::config_type>();
+  }
+
+  m_dynamic.parse(cnode);
+  if (m_dynamic.is_parsed()) {
+    m_config->dynamic =
+        *m_dynamic.config_get<dynamic_cache_parser::config_type>();
+  }
+
+  XML_PARSE_ATTR(cnode, m_config, dimension);
 } /* parse() */
 
 __rcsw_pure bool caches_parser::validate(void) const {
-  if (m_parsed) {
-    CHECK(m_config->dimension > 0.0);
-    return m_dynamic.validate() && m_static.validate();
+  if (!is_parsed()) {
+    return true;
   }
+
+  CHECK(m_config->dimension > 0.0);
+  CHECK(m_dynamic.validate());
+  CHECK(m_static.validate());
+  return true;
 
 error:
   return false;

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
 #include "fordyca/config/proximity_sensor_config.hpp"
@@ -46,7 +47,7 @@ NS_START(fordyca, config);
  */
 class proximity_sensor_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit proximity_sensor_parser(uint level) : xml_config_parser(level) {}
+  using config_type = proximity_sensor_config;
 
   ~proximity_sensor_parser(void) override = default;
 
@@ -56,22 +57,19 @@ class proximity_sensor_parser : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "proximity_sensor";
 
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
 
-  std::shared_ptr<proximity_sensor_config> config_get(void) const {
-    return m_config;
-  }
-
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
-  std::shared_ptr<proximity_sensor_config> m_config{nullptr};
+  /* clang-format off */
+  std::unique_ptr<config_type> m_config{nullptr};
+  /* clang-format on */
 };
 
 NS_END(config, fordyca);

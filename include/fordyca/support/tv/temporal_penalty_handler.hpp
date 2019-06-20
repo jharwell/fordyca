@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <list>
 #include <string>
+#include <memory>
 
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/tv/temporal_penalty.hpp"
@@ -66,12 +67,11 @@ class temporal_penalty_handler
    * @param name The name of the handler, for differentiating handler instancces
    * in logging statements.
    */
-  explicit temporal_penalty_handler(const rct::config::waveform_config* const config,
-                                    std::string name)
+  temporal_penalty_handler(const rct::config::waveform_config* const config,
+                           const std::string& name)
       : ER_CLIENT_INIT("fordyca.support.temporal_penalty_handler"),
-        mc_name(std::move(name)),
+        mc_name(name),
         m_penalty(rct::waveform_generator()(config->type, config)) {}
-
 
   ~temporal_penalty_handler(void) override = default;
   temporal_penalty_handler& operator=(const temporal_penalty_handler& other) =
@@ -192,7 +192,13 @@ class temporal_penalty_handler
    * @param timestep The current timestep.
    */
   uint deconflict_penalty_finish(uint timestep) const {
-    auto penalty = static_cast<uint>(m_penalty->value(timestep));
+    uint penalty = 0;
+
+    /* can be NULL if penalty handling is disabled */
+    if (nullptr != m_penalty) {
+      penalty = static_cast<uint>(m_penalty->value(timestep));
+    }
+
     if (0 == penalty) {
       ++penalty;
     }

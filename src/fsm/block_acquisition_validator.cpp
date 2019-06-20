@@ -59,7 +59,7 @@ __rcsw_pure bool block_acquisition_validator::operator()(
             loc.to_str().c_str());
     return false;
   }
-  auto& config = boost::get<config::block_sel::pickup_policy_config>(
+  auto& config = boost::get<config::block_sel::block_pickup_policy_config>(
       mc_matrix->find(bselm::kPickupPolicy)->second);
 
   /*

@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/plugins/simulator/entities/light_entity.h>
 #include <algorithm>
 #include <vector>
-#include <argos3/plugins/simulator/entities/light_entity.h>
 
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/utilization_metrics.hpp"

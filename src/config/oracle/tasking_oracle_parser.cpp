@@ -37,14 +37,12 @@ constexpr char tasking_oracle_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void tasking_oracle_parser::parse(const ticpp::Element& node) {
-  ticpp::Element tonode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    if (m_config->enabled) {
-      XML_PARSE_ATTR(tonode, m_config, task_exec_ests);
-      XML_PARSE_ATTR(tonode, m_config, task_interface_ests);
-    }
+    ticpp::Element tonode = node_get(node, kXMLRoot);
+    m_config = std::make_unique<config_type>();
+
+    XML_PARSE_ATTR_DFLT(tonode, m_config, task_exec_ests, false);
+    XML_PARSE_ATTR_DFLT(tonode, m_config, task_interface_ests, false);
   }
 } /* parse() */
 

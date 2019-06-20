@@ -68,10 +68,10 @@ tasking_initializer::~tasking_initializer(void) = default;
  * Member Functions
  ******************************************************************************/
 tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
-    const config::depth2::controller_repository& param_repo,
+    const config::depth2::controller_repository& config_repo,
     rta::bi_tdgraph* const graph) {
-  auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
-  auto* exp_config = param_repo.config_get<config::exploration_config>();
+  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
+  auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
   fsm::expstrat::base_expstrat::params expbp(cache_sel_matrix(),
@@ -148,10 +148,10 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
 } /* depth2_tasks_create() */
 
 void tasking_initializer::depth2_exec_est_init(
-    const config::depth2::controller_repository& param_repo,
+    const config::depth2::controller_repository& config_repo,
     const tasking_map& map,
     rta::bi_tdgraph* graph) {
-  auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
+  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
 
   auto cache_starter = map.find("cache_starter")->second;
   auto cache_finisher = map.find("cache_finisher")->second;
@@ -209,16 +209,16 @@ void tasking_initializer::depth2_exec_est_init(
 } /* depth2_exec_est_init() */
 
 std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
-    const config::depth2::controller_repository& param_repo) {
-  auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
+    const config::depth2::controller_repository& config_repo) {
+  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   auto graph = rcppsw::make_unique<rta::bi_tdgraph>(task_config);
-  auto* execp = param_repo.config_get<rta::config::task_executive_config>();
+  auto* execp = config_repo.config_get<rta::config::task_executive_config>();
 
-  auto map1 = depth1_tasks_create(param_repo, graph.get());
-  depth1_exec_est_init(param_repo, map1, graph.get());
+  auto map1 = depth1_tasks_create(config_repo, graph.get());
+  depth1_exec_est_init(config_repo, map1, graph.get());
 
-  auto map2 = depth2_tasks_create(param_repo, graph.get());
-  depth2_exec_est_init(param_repo, map2, graph.get());
+  auto map2 = depth2_tasks_create(config_repo, graph.get());
+  depth2_exec_est_init(config_repo, map2, graph.get());
 
   graph->active_tab_init(execp->tab_init_method);
   return rcppsw::make_unique<rta::bi_tdgraph_executive>(execp, std::move(graph));

@@ -50,9 +50,7 @@ NS_START(fordyca, config, arena);
  */
 class blocks_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit blocks_parser(uint level)
-      : xml_config_parser(level),
-        m_dist(level + 1) {}
+  using config_type = blocks_config;
 
   /**
    * @brief The root tag that all block parameters should lie under in the
@@ -64,17 +62,15 @@ class blocks_parser : public rconfig::xml::xml_config_parser {
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<blocks_config> config_get(void) const { return m_config; }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  block_dist_parser              m_dist;
-  std::shared_ptr<blocks_config> m_config{nullptr};
+  block_dist_parser            m_dist{};
+  std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 

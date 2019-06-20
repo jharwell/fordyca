@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <boost/optional.hpp>
 #include <list>
+#include <memory>
 #include <random>
 #include <utility>
 #include <vector>

@@ -32,6 +32,7 @@
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/acquisition_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/collision_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/current_explore_locs_metrics_collector.hpp"
@@ -46,7 +47,6 @@
 #include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/metrics/fsm/collision_locs_metrics_collector.hpp"
 
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
@@ -144,7 +144,9 @@ base_metrics_aggregator::base_metrics_aggregator(
  ******************************************************************************/
 void base_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
-  collect("swarm::convergence", *loop->conv_calculator());
+  if (nullptr != loop->conv_calculator()) {
+    collect("swarm::convergence", *loop->conv_calculator());
+  }
   collect("loop::temporal_variance", *loop->tv_manager());
 } /* collect_from_loop() */
 

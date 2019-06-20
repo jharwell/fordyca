@@ -75,30 +75,30 @@ void gp_dpo_controller::Init(ticpp::Element& node) {
 
   ndc_push();
   ER_INFO("Initializing...");
-  config::depth1::controller_repository param_repo;
+  config::depth1::controller_repository config_repo;
 
-  param_repo.parse_all(node);
-  if (!param_repo.validate_all()) {
+  config_repo.parse_all(node);
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
-  shared_init(param_repo);
-  private_init(param_repo);
+  shared_init(config_repo);
+  private_init(config_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void gp_dpo_controller::shared_init(
-    const config::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& config_repo) {
   /* DPO perception subsystem, block selection matrix */
-  dpo_controller::shared_init(param_repo);
+  dpo_controller::shared_init(config_repo);
 
   auto* cache_mat =
-      param_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
+      config_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
   auto* block_mat =
-      param_repo.config_get<config::block_sel::block_sel_matrix_config>();
+      config_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* cache selection matrix */
   m_cache_sel_matrix =
@@ -106,12 +106,12 @@ void gp_dpo_controller::shared_init(
 } /* shared_init() */
 
 void gp_dpo_controller::private_init(
-    const config::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& config_repo) {
   /* task executive */
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
                                     saa_subsystem(),
-                                    perception())(param_repo);
+                                    perception())(config_repo);
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* private_init() */
@@ -161,7 +161,7 @@ RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
                           goal_acquired,
                           current_task(),
                           false,
-                         const);
+                          const);
 
 /*******************************************************************************
  * Task Distribution Metrics

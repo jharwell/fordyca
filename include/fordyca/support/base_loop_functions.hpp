@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/simulator/loop_functions.h>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/nsalias.hpp"

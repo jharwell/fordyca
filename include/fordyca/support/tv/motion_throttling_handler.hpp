@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
@@ -79,9 +81,9 @@ class motion_throttling_handler {
 
  private:
   /* clang-format off */
-  bool   m_en{false};
-  double m_active{0.0};
-  double m_applied{0.0};
+  bool                           m_en{false};
+  double                         m_active{0.0};
+  double                         m_applied{0.0};
   std::unique_ptr<rct::waveform> m_waveform;
   /* clang-format off */
 };

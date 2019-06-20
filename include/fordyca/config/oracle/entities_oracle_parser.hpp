@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/config/oracle/entities_oracle_config.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
@@ -46,7 +47,7 @@ NS_START(fordyca, config, oracle);
  */
 class entities_oracle_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit entities_oracle_parser(uint level) : xml_config_parser(level) {}
+  using config_type = entities_oracle_config;
 
   /**
    * @brief The root tag that all entity oracle parameters should lie under in
@@ -57,18 +58,13 @@ class entities_oracle_parser : public rconfig::xml::xml_config_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<entities_oracle_config> config_get(void) const {
-    return m_config;
-  }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
-
   /* clang-format off */
-  std::shared_ptr<entities_oracle_config> m_config{nullptr};
+  std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 

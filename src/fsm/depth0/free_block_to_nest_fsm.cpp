@@ -110,7 +110,9 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
   }
   return controller::foraging_signal::ekHANDLED;
 }
-HFSM_STATE_DEFINE(free_block_to_nest_fsm, wait_for_drop, rpfsm::event_data* data) {
+HFSM_STATE_DEFINE(free_block_to_nest_fsm,
+                  wait_for_drop,
+                  rpfsm::event_data* data) {
   if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ekST_FINISHED);

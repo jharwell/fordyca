@@ -39,6 +39,7 @@
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
@@ -82,27 +83,36 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
   void operator()(const T& controller) const {
-    typename robot_arena_interactor<T>::params p{
-      lf->arena_map(),
-          lf->m_metrics_agg.get(),
-          lf->floor(),
-          lf->tv_manager(),
-          lf->m_cache_manager.get(),
-          lf};
-    lf->m_interactor_map->emplace(
-        typeid(controller),
-        robot_arena_interactor<T>(p));
+    typename robot_arena_interactor<T>::params p{lf->arena_map(),
+                                                 lf->m_metrics_agg.get(),
+                                                 lf->floor(),
+                                                 lf->tv_manager(),
+                                                 lf->m_cache_manager.get(),
+                                                 lf};
+    lf->m_interactor_map->emplace(typeid(controller),
+                                  robot_arena_interactor<T>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         robot_metric_extractor<depth2_metrics_aggregator, T>(
             lf->m_metrics_agg.get()));
-    config_map->emplace(
-        typeid(controller),
-        robot_configurer<T, depth2_metrics_aggregator>(
-            lf->config()->config_get<config::visualization_config>(),
-            lf->oracle_manager()->entities_oracle(),
-            lf->oracle_manager()->tasking_oracle(),
-            lf->m_metrics_agg.get()));
+    if (nullptr != lf->oracle_manager()) {
+      config_map->emplace(
+          typeid(controller),
+          robot_configurer<T, depth2_metrics_aggregator>(
+              lf->config()->config_get<config::visualization_config>(),
+              lf->oracle_manager()->entities_oracle(),
+              lf->oracle_manager()->tasking_oracle(),
+              lf->m_metrics_agg.get()));
+    } else {
+      config_map->emplace(
+          typeid(controller),
+          robot_configurer<T, depth2_metrics_aggregator>(
+              lf->config()->config_get<config::visualization_config>(),
+              nullptr,
+              nullptr,
+              lf->m_metrics_agg.get()));
+    }
+
     lf->m_los_update_map->emplace(typeid(controller),
                                   robot_los_updater<T>(lf->arena_map()));
   }
@@ -165,8 +175,12 @@ void depth2_loop_functions::private_init(void) {
    * Initialize convergence calculations to include task distribution (not
    * included by default).
    */
-  conv_calculator()->task_dist_init(std::bind(
-      &depth2_loop_functions::robot_tasks_extract, this, std::placeholders::_1));
+  if (nullptr != conv_calculator()) {
+    conv_calculator()->task_dist_init(
+        std::bind(&depth2_loop_functions::robot_tasks_extract,
+                  this,
+                  std::placeholders::_1));
+  }
 
   /*
    * Intitialize robot interactions with environment wth various functors/type
@@ -196,9 +210,10 @@ void depth2_loop_functions::private_init(void) {
 
 void depth2_loop_functions::cache_handling_init(
     const config::caches::caches_config* const cachep) {
+  ER_ASSERT(nullptr != cachep && cachep->dynamic.enable,
+            "FATAL: Caches not enabled in depth2 loop functions");
   m_cache_manager =
-      rcppsw::make_unique<dynamic_cache_manager>(cachep,
-                                                 &arena_map()->decoratee());
+      std::make_unique<dynamic_cache_manager>(cachep, &arena_map()->decoratee());
 
   cache_creation_handle(false);
 } /* cache_handlng_init() */
@@ -229,6 +244,14 @@ void depth2_loop_functions::PreStep() {
 
   base_loop_functions::PreStep();
 
+  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+      *(*m_metrics_agg)["blocks::transport"]);
+  arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
+                                         collector.cum_collected(),
+                                         nullptr != conv_calculator()
+                                             ? conv_calculator()->converged()
+                                             : false);
+
   /* Collect metrics from/about caches */
   for (auto& c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c.get());
@@ -237,9 +260,6 @@ void depth2_loop_functions::PreStep() {
 
   m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
   m_cache_manager->reset_metrics();
-
-  /* Before processing all robots, update the oracles */
-  oracle_manager()->update(arena_map());
 
   /* Process all robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -256,7 +276,8 @@ void depth2_loop_functions::PreStep() {
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
-  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock())) {
+  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock()) &&
+      nullptr != conv_calculator()) {
     conv_calculator()->reset_metrics();
   }
   m_metrics_agg->timestep_inc_all();
@@ -296,18 +317,20 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   bool nc_drop =
       boost::apply_visitor(iadaptor,
                            m_interactor_map->at(controller->type_index()));
-  if (nc_drop) {
-    if (cache_creation_handle(true)) {
-      /* The oracle does not have up-to-date information about all caches in the
-       * arena now that one has been created, so we need to update the oracle in
-       * the middle of processing robots. This is not an issues in depth1,
-       * because caches are always created AFTER processing all robots for a
-       * timestep */
+  if (!nc_drop) {
+    return;
+  }
+  if (cache_creation_handle(true)) {
+    /* The oracle does not have up-to-date information about all caches in the
+     * arena now that one has been created, so we need to update the oracle in
+     * the middle of processing robots. This is not an issues in depth1,
+     * because caches are always created AFTER processing all robots for a
+     * timestep */
+    if (nullptr != oracle_manager()) {
       oracle_manager()->update(arena_map());
-
-    } else {
-      ER_WARN("Unable to create cache after block drop in new cache");
     }
+  } else {
+    ER_WARN("Unable to create cache after block drop in new cache");
   }
 } /* robot_timestep_process() */
 

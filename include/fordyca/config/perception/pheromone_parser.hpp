@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/config/perception/pheromone_config.hpp"
 #include "fordyca/nsalias.hpp"
@@ -47,7 +48,7 @@ NS_START(fordyca, config, perception);
  */
 class pheromone_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit pheromone_parser(uint level) : xml_config_parser(level) {}
+  using config_type = pheromone_config;
 
   /**
    * @brief The root tag that all pheromone parameters should lie under in the
@@ -57,20 +58,17 @@ class pheromone_parser : public rconfig::xml::xml_config_parser {
 
   bool validate(void) const override;
   void parse(const ticpp::Element& node) override;
-
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<pheromone_config> config_get(void) const {
-    return m_config;
+
+ private:
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
-  }
-
- private:
-  std::shared_ptr<pheromone_config> m_config{nullptr};
+  /* clang-format off */
+  std::shared_ptr<config_type> m_config{nullptr};
+  /* clang-format on */
 };
 
 NS_END(perception, config, fordyca);

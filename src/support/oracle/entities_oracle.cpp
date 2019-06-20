@@ -39,8 +39,8 @@ NS_START(fordyca, support, oracle);
 entities_oracle::entities_oracle(
     const config::oracle::entities_oracle_config* const config)
     : ER_CLIENT_INIT("fordyca.support.entities_oracle"),
-      mc_blocks(config->blocks_enabled),
-      mc_caches(config->caches_enabled) {}
+      mc_blocks(config->blocks),
+      mc_caches(config->caches) {}
 
 /*******************************************************************************
  * Member Functions

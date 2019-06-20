@@ -155,10 +155,10 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundar
    * We need to be sure the center of the new cache is not near the arena
    * boundaries, in order to avoid all sorts of weird corner cases.
    */
-  double x_max = m_grid->xrsize() - m_cache_dim * 2;
-  double x_min = m_cache_dim * 2;
-  double y_max = m_grid->yrsize() - m_cache_dim * 2;
-  double y_min = m_cache_dim * 2;
+  double x_max = m_grid->xrsize() - m_cache_dim;
+  double x_min = m_cache_dim;
+  double y_max = m_grid->yrsize() - m_cache_dim;
+  double y_min = m_cache_dim;
 
   rmath::rangeu xbounds(static_cast<uint>(std::ceil(x_min)),
                         static_cast<uint>(std::floor(x_max)));

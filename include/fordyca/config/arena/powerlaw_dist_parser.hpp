@@ -24,6 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+#include <memory>
+
 #include "fordyca/config/arena/powerlaw_dist_config.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
@@ -45,7 +48,7 @@ NS_START(fordyca, config, arena);
  */
 class powerlaw_dist_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit powerlaw_dist_parser(uint level) : xml_config_parser(level) {}
+  using config_type = powerlaw_dist_config;
 
   /**
    * @brief The root tag that all powerlaw dist parameters should lie
@@ -54,24 +57,17 @@ class powerlaw_dist_parser : public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "powerlaw";
 
   void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
   bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<powerlaw_dist_config> config_get(void) const {
-    return m_config;
-  }
-  bool parsed(void) const override { return m_parsed; }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  bool                                  m_parsed{false};
-  std::shared_ptr<powerlaw_dist_config> m_config{nullptr};
+  std::unique_ptr<powerlaw_dist_config> m_config{nullptr};
   /* clang-format on */
 };
 

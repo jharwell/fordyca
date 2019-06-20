@@ -28,7 +28,7 @@
 #include <memory>
 
 #include "fordyca/config/block_sel/block_priorities_parser.hpp"
-#include "fordyca/config/block_sel/pickup_policy_parser.hpp"
+#include "fordyca/config/block_sel/block_pickup_policy_parser.hpp"
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 
 #include "rcppsw/config/xml/xml_config_parser.hpp"
@@ -50,10 +50,7 @@ NS_START(fordyca, config, block_sel);
  */
 class block_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
  public:
-  explicit block_sel_matrix_parser(uint level)
-      : xml_config_parser(level),
-        m_priorities(level + 1),
-        m_pickup_policy(level + 1) {}
+  using config_type = block_sel_matrix_config;
 
   /**
    * @brief The root tag that all block sel matrix parameters should lie
@@ -62,22 +59,19 @@ class block_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "block_sel_matrix";
 
   void parse(const ticpp::Element& node) override;
+  bool validate(void) const override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<block_sel_matrix_config> config_get(void) const {
-    return m_config;
-  }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  std::shared_ptr<block_sel_matrix_config> m_config{nullptr};
-  block_priorities_parser                  m_priorities;
-  pickup_policy_parser                     m_pickup_policy;
+  std::unique_ptr<config_type> m_config{nullptr};
+  block_priorities_parser      m_priorities{};
+  block_pickup_policy_parser   m_pickup_policy{};
   /* clang-format on */
 };
 

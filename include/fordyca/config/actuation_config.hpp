@@ -24,10 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/robotics/steer2D/config/force_calculator_config.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/robotics/kin2D/config/differential_drive_config.hpp"
+#include "rcppsw/robotics/steer2D/config/force_calculator_config.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -1,5 +1,5 @@
 /**
- * @file pickup_policy_parser.cpp
+ * @file block_pickup_policy_parser.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/block_sel/pickup_policy_parser.hpp"
+#include "fordyca/config/block_sel/block_pickup_policy_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -31,22 +31,16 @@ NS_START(fordyca, config, block_sel);
 /*******************************************************************************
  * Global Variables
  ******************************************************************************/
-constexpr char pickup_policy_parser::kXMLRoot[];
+constexpr char block_pickup_policy_parser::kXMLRoot[];
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void pickup_policy_parser::parse(const ticpp::Element& node) {
-  /*
-   * Needs to be populated always so we get the null trigger when the policy is
-   * disabled.
-   */
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-  m_config->policy = "Null";
-
+void block_pickup_policy_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element cnode = node_get(node, kXMLRoot);
+    m_config = std::make_unique<config_type>();
+
     XML_PARSE_ATTR(cnode, m_config, policy);
     XML_PARSE_ATTR_DFLT(cnode, m_config, prox_dist, 0.0);
   }

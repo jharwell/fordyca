@@ -44,12 +44,12 @@ void grid_parser::parse(const ticpp::Element& node) {
    */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element gnode = node_get(node, kXMLRoot);
+    m_config = std::make_unique<config_type>();
+
     std::vector<std::string> res;
     rcppsw::utils::line_parser parser(' ');
     res = parser.parse(gnode.GetAttribute("size"));
 
-    m_config =
-        std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
     XML_PARSE_ATTR(gnode, m_config, resolution);
     m_config->lower.set(0, 0);
     m_config->upper.set(std::atoi(res[0].c_str()), std::atoi(res[1].c_str()));

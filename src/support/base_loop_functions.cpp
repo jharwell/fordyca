@@ -95,6 +95,11 @@ void base_loop_functions::Init(ticpp::Element& node) {
   /* parse simulation input file */
   m_config.parse_all(node);
 
+  if (!m_config.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
+
   /* initialize output and metrics collection */
   output_init(m_config.config_get<config::output_config>());
 
@@ -117,6 +122,9 @@ void base_loop_functions::Init(ticpp::Element& node) {
 
 void base_loop_functions::convergence_init(
     const rswc::config::convergence_config* const config) {
+  if (nullptr == config) {
+    return;
+  }
   m_conv_calc = rcppsw::make_unique<rswc::convergence_calculator>(
       config,
       std::bind(&base_loop_functions::calc_robot_headings,
@@ -129,12 +137,31 @@ void base_loop_functions::convergence_init(
 } /* convergence_init() */
 
 void base_loop_functions::PreStep(void) {
-  m_tv_manager->update();
-  m_conv_calc->update();
+  if (nullptr != m_tv_manager) {
+    m_tv_manager->update();
+  }
+  if (nullptr != m_conv_calc) {
+    m_conv_calc->update();
+  }
+  if (nullptr != m_oracle_manager) {
+    m_oracle_manager->update(arena_map());
+  }
 } /* PreStep() */
 
-void base_loop_functions::tv_init(const config::tv::tv_manager_config* const tvp) {
-  m_tv_manager = rcppsw::make_unique<tv::tv_manager>(tvp, this, arena_map());
+void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
+  /*
+   * Even if temporal variance is not requested in teh input file, we still
+   * need to create the manager in order to deconflict pickups/drops/etc
+   */
+  if (nullptr == tvp) {
+    m_tv_manager = std::make_unique<tv::tv_manager>(
+        std::make_unique<config::tv::tv_manager_config>().get(),
+        this,
+        arena_map());
+  } else {
+    ER_INFO("Creating temporal variance manager");
+    m_tv_manager = std::make_unique<tv::tv_manager>(tvp, this, arena_map());
+  }
 
   for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
     auto* robot = argos::any_cast<argos::CFootBotEntity*>(pair.second);
@@ -170,8 +197,10 @@ void base_loop_functions::arena_map_init(
 
 void base_loop_functions::oracle_init(
     const config::oracle::oracle_manager_config* const oraclep) {
-  ER_INFO("Creating oracle manager");
-  m_oracle_manager = rcppsw::make_unique<oracle::oracle_manager>(oraclep);
+  if (nullptr != oraclep) {
+    ER_INFO("Creating oracle manager");
+    m_oracle_manager = rcppsw::make_unique<oracle::oracle_manager>(oraclep);
+  }
 } /* oracle_init() */
 
 void base_loop_functions::Reset(void) {

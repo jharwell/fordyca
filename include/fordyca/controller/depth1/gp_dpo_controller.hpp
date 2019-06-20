@@ -148,10 +148,10 @@ class gp_dpo_controller : public depth0::dpo_controller,
    * - Task executive (\ref rta::bi_tdgraph_executive)
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    *
-   * @param param_repo Handle to parameter repository for this controller (after
+   * @param config_repo Handle to parameter repository for this controller (after
    *                   parsing and validation).
    */
-  void shared_init(const config::depth1::controller_repository& param_repo);
+  void shared_init(const config::depth1::controller_repository& config_repo);
 
   /*
    * The \ref gp_dpo_controller owns the executive, but derived classes can
@@ -168,7 +168,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void task_abort_cb(const rta::polled_task*);
 
  private:
-  void private_init(const config::depth1::controller_repository& param_repo);
+  void private_init(const config::depth1::controller_repository& config_repo);
 
   /* clang-format off */
   bool                                      m_display_task{false};

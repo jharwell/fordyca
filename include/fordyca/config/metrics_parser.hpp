@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
 #include "fordyca/config/metrics_config.hpp"
@@ -47,11 +48,8 @@ NS_START(fordyca, config);
  */
 class metrics_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit metrics_parser(uint level)
-      : xml_config_parser(level),
-        m_config(
-            std::make_shared<std::remove_reference<decltype(*m_config)>::type>()) {
-  }
+  using config_type = metrics_config;
+
   ~metrics_parser(void) override = default;
 
   /**
@@ -65,16 +63,12 @@ class metrics_parser : public rconfig::xml::xml_config_parser {
 
   std::string xml_root(void) const override { return kXMLRoot; }
 
-  std::shared_ptr<metrics_config> config_get(void) const { return m_config; }
-
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
-
   /* clang-format off */
-  bool                                   m_parsed{false};
-  std::shared_ptr<metrics_config>        m_config;
+  std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
 #include "fordyca/config/visualization_config.hpp"
@@ -47,7 +48,7 @@ NS_START(fordyca, config);
  */
 class visualization_parser final : public rconfig::xml::xml_config_parser {
  public:
-  explicit visualization_parser(uint level) : xml_config_parser(level) {}
+  using config_type = visualization_config;
 
   /**
    * @brief The root tag that all visualization loop functions parameters should
@@ -55,22 +56,17 @@ class visualization_parser final : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "visualization";
 
-  void show(std::ostream& stream) const override;
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<visualization_config> config_get(void) const {
-    return m_config;
-  }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  bool                                  m_parsed{false};
-  std::shared_ptr<visualization_config> m_config{nullptr};
+  std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 

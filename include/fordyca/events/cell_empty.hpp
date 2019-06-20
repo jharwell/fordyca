@@ -85,7 +85,7 @@ class cell_empty : public cell_op, public rer::client<cell_empty> {
  */
 using cell_empty_visitor_impl =
     rpvisitor::precise_visitor<detail::cell_empty,
-                              detail::cell_empty::visit_typelist>;
+                               detail::cell_empty::visit_typelist>;
 
 NS_END(detail);
 

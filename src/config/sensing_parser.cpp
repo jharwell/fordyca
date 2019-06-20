@@ -38,18 +38,14 @@ constexpr char sensing_parser::kXMLRoot[];
  ******************************************************************************/
 void sensing_parser::parse(const ticpp::Element& node) {
   ticpp::Element snode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
 
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-  XML_PARSE_ATTR(snode, m_config, los_dim);
   m_proximity_parser.parse(snode);
-  m_config->proximity = *m_proximity_parser.config_get();
-} /* parse() */
+  m_config->proximity =
+      *m_proximity_parser.config_get<proximity_sensor_parser::config_type>();
 
-void sensing_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_config, los_dim) << std::endl
-         << m_proximity_parser << build_footer();
-} /* show() */
+  XML_PARSE_ATTR(snode, m_config, los_dim);
+} /* parse() */
 
 __rcsw_pure bool sensing_parser::validate(void) const {
   CHECK(m_config->los_dim > 0.0);

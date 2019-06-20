@@ -39,22 +39,33 @@ constexpr char block_dist_parser::kXMLRoot[];
  ******************************************************************************/
 void block_dist_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode = node_get(node, kXMLRoot);
-  m_powerlaw.parse(bnode);
-  m_manifest.parse(bnode);
-  m_redist_governor.parse(bnode);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
+
   XML_PARSE_ATTR(bnode, m_config, arena_resolution);
   XML_PARSE_ATTR(bnode, m_config, dist_type);
-  m_config->powerlaw = *m_powerlaw.config_get();
-  m_config->manifest = *m_manifest.config_get();
-  m_config->redist_governor = *m_redist_governor.config_get();
+
+  if ("powerlaw" == m_config->dist_type) {
+    m_powerlaw.parse(bnode);
+    m_config->powerlaw =
+        *m_powerlaw.config_get<powerlaw_dist_parser::config_type>();
+  }
+
+  m_manifest.parse(bnode);
+  m_config->manifest =
+      *m_manifest.config_get<block_manifest_parser::config_type>();
+
+  m_redist_governor.parse(bnode);
+  if (m_redist_governor.is_parsed()) {
+    m_config->redist_governor =
+        *m_redist_governor.config_get<block_redist_governor_parser::config_type>();
+  }
 } /* parse() */
 
 __rcsw_pure bool block_dist_parser::validate(void) const {
   CHECK(true == m_powerlaw.validate());
   CHECK(true == m_manifest.validate());
   CHECK(true == m_redist_governor.validate());
+  CHECK(m_config->arena_resolution > 0.0);
   return true;
 
 error:

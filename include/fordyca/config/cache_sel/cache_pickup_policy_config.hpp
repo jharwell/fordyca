@@ -1,5 +1,5 @@
 /**
- * @file block_pickup_config.hpp
+ * @file cache_pickup_policy_config.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * RCPPSW.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_BLOCK_SEL_PICKUP_POLICY_CONFIG_HPP_
-#define INCLUDE_FORDYCA_CONFIG_BLOCK_SEL_PICKUP_POLICY_CONFIG_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_CACHE_SEL_CACHE_PICKUP_POLICY_CONFIG_HPP_
+#define INCLUDE_FORDYCA_CONFIG_CACHE_SEL_CACHE_PICKUP_POLICY_CONFIG_HPP_
 
 /*******************************************************************************
  * Includes
@@ -31,16 +31,18 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config, block_sel);
+NS_START(fordyca, config, cache_sel);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-struct pickup_policy_config : public rconfig::base_config {
+struct cache_pickup_policy_config : public rconfig::base_config {
   std::string policy{};
-  double      prox_dist{0};
+  uint        timestep{0};
+  uint        cache_count{0};
+  uint        cache_size{0};
 };
 
-NS_END(block_sel, config, fordyca);
+NS_END(cache_sel, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_BLOCK_SEL_PICKUP_POLICY_CONFIG_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_CACHE_SEL_CACHE_PICKUP_POLICY_CONFIG_HPP_ */

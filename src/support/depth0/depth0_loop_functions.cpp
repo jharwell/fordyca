@@ -94,7 +94,9 @@ struct functor_maps_initializer {
         typeid(controller),
         robot_configurer<T>(
             lf->config()->config_get<config::visualization_config>(),
-            lf->oracle_manager()->entities_oracle()));
+            nullptr != lf->oracle_manager()
+                ? lf->oracle_manager()->entities_oracle()
+                : nullptr));
     lf->m_los_update_map->emplace(typeid(controller),
                                   robot_los_updater<T>(lf->arena_map()));
   }
@@ -230,10 +232,9 @@ void depth0_loop_functions::PreStep(void) {
       *(*m_metrics_agg)["blocks::transport"]);
   arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
                                          collector.cum_collected(),
-                                         conv_calculator()->converged());
-
-  /* Before processing all robots, update the oracles */
-  oracle_manager()->update(arena_map());
+                                         nullptr != conv_calculator()
+                                             ? conv_calculator()->converged()
+                                             : false);
 
   /* Process all robots */
   for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
@@ -246,7 +247,8 @@ void depth0_loop_functions::PreStep(void) {
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
-  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock())) {
+  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock()) &&
+      nullptr != conv_calculator()) {
     conv_calculator()->reset_metrics();
   }
   /* write out all metrics */

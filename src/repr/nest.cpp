@@ -53,13 +53,11 @@ nest::light_list nest::init_lights(const rutils::color& color) const {
 
 nest::light_list nest::init_square(const rutils::color& color) const {
   argos::CVector3 loc(real_loc().x(), real_loc().y(), 5.0);
-  return light_list{
-    new argos::CLightEntity("nest_light0",
-                            loc,
-                            argos::CColor(color.red(),
-                                          color.green(),
-                                          color.blue()),
-                            100.0)};
+  return light_list{new argos::CLightEntity(
+      "nest_light0",
+      loc,
+      argos::CColor(color.red(), color.green(), color.blue()),
+      100.0)};
 } /* init_square() */
 
 nest::light_list nest::init_rect(const rutils::color& color) const {
@@ -76,26 +74,21 @@ nest::light_list nest::init_rect(const rutils::color& color) const {
     loc3.Set(real_loc().x(), real_loc().y() + ydim() * 0.25, 5.0);
   }
 
-  return {
-      new argos::CLightEntity("nest_light0",
-                              loc1,
-                              argos::CColor(color.red(),
-                                            color.green(),
-                                            color.blue()),
-                              100.0),
-      new argos::CLightEntity("nest_light1",
-                              loc2,
-                              argos::CColor(color.red(),
-                                            color.green(),
-                                            color.blue()),
-                              100.0),
-      new argos::CLightEntity("nest_light2",
-                              loc3,
-                              argos::CColor(color.red(),
-                                            color.green(),
-                                            color.blue()),
-                              100.0)
-          };
+  return {new argos::CLightEntity(
+              "nest_light0",
+              loc1,
+              argos::CColor(color.red(), color.green(), color.blue()),
+              100.0),
+          new argos::CLightEntity(
+              "nest_light1",
+              loc2,
+              argos::CColor(color.red(), color.green(), color.blue()),
+              100.0),
+          new argos::CLightEntity(
+              "nest_light2",
+              loc3,
+              argos::CColor(color.red(), color.green(), color.blue()),
+              100.0)};
 } /* init_rect() */
 
 NS_END(repr, fordyca);

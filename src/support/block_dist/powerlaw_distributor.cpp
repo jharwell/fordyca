@@ -24,7 +24,6 @@
 #include "fordyca/support/block_dist/powerlaw_distributor.hpp"
 #include <algorithm>
 #include <cmath>
-#include <parallel/algorithm>
 #include <random>
 
 #include "fordyca/config/arena/block_dist_config.hpp"

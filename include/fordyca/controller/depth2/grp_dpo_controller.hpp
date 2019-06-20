@@ -68,7 +68,7 @@ class grp_dpo_controller : public depth1::gp_dpo_controller,
  private:
   void task_alloc_cb(const rta::polled_task* task,
                      const rta::bi_tab*);
-  void private_init(const config::depth2::controller_repository& param_repo);
+  void private_init(const config::depth2::controller_repository& config_repo);
 
 
   /* clang-format off */

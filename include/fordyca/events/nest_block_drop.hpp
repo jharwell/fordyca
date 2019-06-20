@@ -127,7 +127,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
  */
 using nest_block_drop_visitor_impl =
     rpvisitor::precise_visitor<detail::nest_block_drop,
-                              detail::nest_block_drop::visit_typelist>;
+                               detail::nest_block_drop::visit_typelist>;
 
 NS_END(detail);
 

@@ -29,8 +29,8 @@
 
 #include "fordyca/controller/actuator_list.hpp"
 #include "fordyca/controller/sensor_list.hpp"
-#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces

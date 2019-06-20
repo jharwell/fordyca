@@ -30,12 +30,12 @@
 #include "fordyca/config/actuation_config.hpp"
 #include "fordyca/config/base_controller_repository.hpp"
 #include "fordyca/config/output_config.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/config/sensing_config.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,22 +79,22 @@ void base_controller::Init(ticpp::Element& node) {
   }
 #endif
 
-  config::base_controller_repository param_repo;
-  param_repo.parse_all(node);
+  config::base_controller_repository config_repo;
+  config_repo.parse_all(node);
 
   ndc_push();
-  if (!param_repo.validate_all()) {
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
   /* initialize output */
-  auto* config = param_repo.config_get<config::output_config>();
+  auto* config = config_repo.config_get<config::output_config>();
   output_init(config);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  saa_init(param_repo.config_get<config::actuation_config>(),
-           param_repo.config_get<config::sensing_config>());
+  saa_init(config_repo.config_get<config::actuation_config>(),
+           config_repo.config_get<config::sensing_config>());
   ndc_pop();
 } /* Init() */
 
@@ -214,9 +214,10 @@ double base_controller::applied_motion_throttle(void) const {
 } /* applied_motion_throttle() */
 
 void base_controller::tv_init(const support::tv::tv_manager* tv_manager) {
-  m_tv_manager = tv_manager;
-  saa_subsystem()->actuation()->differential_drive().throttling(
-      tv_manager->movement_throttling_handler(entity_id()));
+  if (tv_manager->movement_throttling_enabled()) {
+    saa_subsystem()->actuation()->differential_drive().throttling(
+        tv_manager->movement_throttling_handler(entity_id()));
+  }
 } /* tv_init() */
 
 /*******************************************************************************
@@ -250,7 +251,8 @@ rmath::vector2d base_controller::velocity(void) const {
 __rcsw_pure const rmath::vector2d& base_controller::position2D(void) const {
   return m_saa->sensing()->position();
 }
-__rcsw_pure const rmath::vector2u& base_controller::discrete_position2D(void) const {
+__rcsw_pure const rmath::vector2u& base_controller::discrete_position2D(
+    void) const {
   return m_saa->sensing()->discrete_position();
 }
 

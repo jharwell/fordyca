@@ -37,13 +37,31 @@ constexpr char oracle_manager_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void oracle_manager_parser::parse(const ticpp::Element& node) {
+  /* oracles not used */
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
   ticpp::Element enode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
+
   m_entities.parse(enode);
   m_tasking.parse(enode);
-  m_config->tasking = *m_tasking.config_get();
-  m_config->entities = *m_entities.config_get();
+
+  if (m_entities.is_parsed()) {
+    m_config->entities =
+        *m_entities.config_get<entities_oracle_parser::config_type>();
+  }
+  if (m_tasking.is_parsed()) {
+    m_config->tasking =
+        *m_tasking.config_get<tasking_oracle_parser::config_type>();
+  }
 } /* parse() */
+
+bool oracle_manager_parser::validate(void) const {
+  if (!is_parsed()) {
+    return true;
+  }
+  return m_entities.validate() && m_tasking.validate();
+} /* validate() */
 
 NS_END(oracle, config, fordyca);

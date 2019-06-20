@@ -37,16 +37,12 @@ constexpr char entities_oracle_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void entities_oracle_parser::parse(const ticpp::Element& node) {
-  /*
-   * Needs to be populated always so we it is disabled by default rather than a
-   * nullptr and a segfault.
-   */
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element cnode = node_get(node, kXMLRoot);
-    XML_PARSE_ATTR(cnode, m_config, caches_enabled);
-    XML_PARSE_ATTR(cnode, m_config, blocks_enabled);
+    m_config = std::make_unique<config_type>();
+
+    XML_PARSE_ATTR_DFLT(cnode, m_config, caches, false);
+    XML_PARSE_ATTR_DFLT(cnode, m_config, blocks, false);
   }
 } /* parse() */
 

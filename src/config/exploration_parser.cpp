@@ -37,9 +37,12 @@ constexpr char exploration_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void exploration_parser::parse(const ticpp::Element& node) {
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
   ticpp::Element vnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
+
   XML_PARSE_ATTR(vnode, m_config, block_strategy);
   XML_PARSE_ATTR(vnode, m_config, cache_strategy);
 } /* parse() */

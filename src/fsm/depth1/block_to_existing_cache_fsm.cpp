@@ -38,18 +38,19 @@ NS_START(fordyca, fsm, depth1);
 block_to_existing_cache_fsm::block_to_existing_cache_fsm(
     const params* const c_params)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, c_params->saa),
-      m_cache_fsm(c_params->csel_matrix,
+      m_cache_fsm(
+          c_params->csel_matrix,
+          c_params->saa,
+          c_params->store,
+          expstrat::cache_factory().create(
+              c_params->exp_config.cache_strategy,
+              rcppsw::make_unique<expstrat::base_expstrat::params>(
+                  c_params->csel_matrix,
                   c_params->saa,
                   c_params->store,
-                  expstrat::cache_factory().create(
-                      c_params->exp_config.cache_strategy,
-                      rcppsw::make_unique<expstrat::base_expstrat::params>(
-                          c_params->csel_matrix,
-                          c_params->saa,
-                          c_params->store,
-                          support::light_type_index()[support::light_type_index::kCache])
-                          .get()),
-                  false),
+                  support::light_type_index()[support::light_type_index::kCache])
+                  .get()),
+          false),
       m_block_fsm(c_params->bsel_matrix,
                   c_params->saa,
                   c_params->store,

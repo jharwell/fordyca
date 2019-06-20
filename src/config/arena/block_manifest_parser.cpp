@@ -39,22 +39,16 @@ constexpr char block_manifest_parser::kXMLRoot[];
  ******************************************************************************/
 void block_manifest_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-  XML_PARSE_ATTR(bnode, m_config, n_cube);
-  XML_PARSE_ATTR(bnode, m_config, n_ramp);
+  m_config = std::make_unique<config_type>();
+
+  XML_PARSE_ATTR_DFLT(bnode, m_config, n_cube, 0U);
+  XML_PARSE_ATTR_DFLT(bnode, m_config, n_ramp, 0U);
   XML_PARSE_ATTR(bnode, m_config, unit_dim);
 } /* parse() */
 
-void block_manifest_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_config, n_cube) << std::endl
-         << XML_ATTR_STR(m_config, n_ramp) << std::endl
-         << XML_ATTR_STR(m_config, unit_dim) << std::endl
-         << build_footer();
-} /* show() */
-
 __rcsw_pure bool block_manifest_parser::validate(void) const {
   CHECK(m_config->unit_dim > 0);
+  CHECK(m_config->n_cube > 0 || m_config->n_ramp > 0);
   return true;
 
 error:

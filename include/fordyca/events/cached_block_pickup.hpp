@@ -159,7 +159,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
  */
 using cached_block_pickup_visitor_impl =
     rpvisitor::precise_visitor<detail::cached_block_pickup,
-                              detail::cached_block_pickup::visit_typelist>;
+                               detail::cached_block_pickup::visit_typelist>;
 
 NS_END(detail);
 

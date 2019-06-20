@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/cache_factory.hpp"
 #include "fordyca/fsm/expstrat/crw.hpp"
+#include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
 #include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
 #include "fordyca/fsm/expstrat/utility_cache_search.hpp"
-#include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

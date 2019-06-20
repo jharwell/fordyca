@@ -56,7 +56,7 @@ class redist_governor : public rer::client<redist_governor> {
  public:
   static constexpr char kStatusSwitchPolicySingle[] = "single";
   static constexpr char kStatusSwitchPolicyMulti[] = "multi";
-  static constexpr char kTriggerNull[] = "Null";
+  static constexpr char kTriggerNull[] = "";
   static constexpr char kTriggerTime[] = "timestep";
   static constexpr char kTriggerBlockCount[] = "block_count";
   static constexpr char kTriggerConvergence[] = "convergence";

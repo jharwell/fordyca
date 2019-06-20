@@ -24,6 +24,7 @@
 #include <argos3/plugins/simulator/media/led_medium.h>
 
 #include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -33,7 +34,6 @@
 #include "fordyca/repr/ramp_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
@@ -77,7 +77,7 @@ bool arena_map::initialize(support::base_loop_functions* loop) {
 } /* initialize() */
 
 void arena_map::caches_add(const cache_vector& caches,
-                support::base_loop_functions* loop) {
+                           support::base_loop_functions* loop) {
   auto& medium = loop->GetSimulator().GetMedium<argos::CLEDMedium>(
       config::saa_xml_names().leds_saa);
 
@@ -86,7 +86,7 @@ void arena_map::caches_add(const cache_vector& caches,
    * the LED medium, which is different than what is rendered to the screen, so
    * they actually are invisible.
    */
-  for (auto &c : caches) {
+  for (auto& c : caches) {
     medium.AddEntity(*c->light());
   } /* for(&c..) */
 

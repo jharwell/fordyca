@@ -104,9 +104,11 @@ class penalty_handler_initializer : public boost::static_visitor<void> {
 tv_manager::tv_manager(const config::tv::tv_manager_config* config,
                        const support::base_loop_functions* const lf,
                        ds::arena_map* const map)
-    : ER_CLIENT_INIT("fordyca.support.tv.tv_manager"),
-      mc_lf(lf),
-      mc_motion_throttle_config(config->block_carry_throttle) {
+    : ER_CLIENT_INIT("fordyca.support.tv.tv_manager"), mc_lf(lf) {
+  if (!config->block_carry_throttle.type.empty()) {
+    mc_motion_throttle_config =
+        boost::make_optional(config->block_carry_throttle);
+  }
   /* All controllers can drop blocks in the nest */
   boost::mpl::for_each<controller::typelist>(
       penalty_handler_initializer<block_handler_typelist,
@@ -186,12 +188,18 @@ double tv_manager::env_cache_usage(void) const {
 } /* env_cache_usage() */
 
 void tv_manager::register_controller(int robot_id) {
-  m_motion_throttling.emplace(std::piecewise_construct,
-                              std::forward_as_tuple(robot_id),
-                              std::forward_as_tuple(&mc_motion_throttle_config));
+  if (mc_motion_throttle_config) {
+    m_motion_throttling.emplace(std::piecewise_construct,
+                                std::forward_as_tuple(robot_id),
+                                std::forward_as_tuple(
+                                    &mc_motion_throttle_config.get()));
+  }
 } /* register_controller() */
 
 void tv_manager::update(void) {
+  if (!mc_motion_throttle_config) {
+    return;
+  }
   auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");
   uint timestep = mc_lf->GetSpace().GetSimulationClock();
 

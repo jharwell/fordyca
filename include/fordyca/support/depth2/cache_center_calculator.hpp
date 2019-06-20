@@ -92,7 +92,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * far away to be considered part of our new cache will overlap it if it moves
    * around to deconflict with existing caches.
    *
-   * @param candidate_blocks The list of blocks to create a new cache from.
+   * @param cache_i_blocks The list of blocks to create a new cache from.
    * @param existing_caches Vector of existing caches in the arena.
    * @param nc_blocks List of free (non-candidate) blocks in the arena that are
    *                  NOT going to be part of the new cache.

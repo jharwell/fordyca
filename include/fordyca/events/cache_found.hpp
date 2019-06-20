@@ -104,7 +104,7 @@ class cache_found : public cell_op, public rer::client<cache_found> {
  */
 using cache_found_visitor_impl =
     rpvisitor::precise_visitor<detail::cache_found,
-                              detail::cache_found::visit_typelist>;
+                               detail::cache_found::visit_typelist>;
 
 NS_END(detail);
 

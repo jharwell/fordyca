@@ -44,7 +44,8 @@ NS_START(support);
  * Class Definitions
  ******************************************************************************/
 class block_manifest_processor
-    : public rpfactory::sharing_factory<repr::base_block, const rmath::vector2d&, int> {
+    : public rpfactory::
+          sharing_factory<repr::base_block, const rmath::vector2d&, int> {
  public:
   explicit block_manifest_processor(const config::arena::block_manifest* m);
 

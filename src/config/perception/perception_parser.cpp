@@ -42,22 +42,22 @@ void perception_parser::parse(const ticpp::Element& node) {
    */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element onode = node_get(node, kXMLRoot);
-    m_config =
-        std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+    m_config = std::make_unique<config_type>();
 
     m_occupancy.parse(onode);
     m_pheromone.parse(onode);
-    m_config->occupancy_grid = *m_occupancy.config_get();
-    m_config->pheromone = *m_pheromone.config_get();
-    m_parsed = true;
+    m_config->occupancy_grid =
+        *m_occupancy.config_get<grid_parser::config_type>();
+    m_config->pheromone =
+        *m_pheromone.config_get<pheromone_parser::config_type>();
   }
 } /* parse() */
 
 __rcsw_pure bool perception_parser::validate(void) const {
-  if (m_parsed) {
-    return m_occupancy.validate() && m_pheromone.validate();
+  if (!is_parsed()) {
+    return true;
   }
-  return true;
+  return m_occupancy.validate() && m_pheromone.validate();
 } /* validate() */
 
 NS_END(perception, config, fordyca);

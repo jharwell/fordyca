@@ -28,7 +28,7 @@
 
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/config/base_config.hpp"
-#include "fordyca/config/cache_sel/pickup_policy_config.hpp"
+#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ struct cache_sel_matrix_config : public rconfig::base_config {
   double cluster_prox_dist{0.0};
   rcppsw::math::rangeu site_xrange{0, 0};
   rcppsw::math::rangeu site_yrange{0, 0};
-  pickup_policy_config pickup_policy{};
+  cache_pickup_policy_config pickup_policy{};
 };
 
 NS_END(cache_sel, config, fordyca);

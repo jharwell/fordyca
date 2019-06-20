@@ -37,13 +37,18 @@ constexpr char cache_sel_matrix_parser::kXMLRoot[];
  * Member Functions
  ******************************************************************************/
 void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
+  /* block selection matrix not used */
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
+
+  m_config = std::make_unique<config_type>();
   ticpp::Element cnode = node_get(node, kXMLRoot);
 
   m_pickup_policy.parse(cnode);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config->pickup_policy =
+      *m_pickup_policy.config_get<cache_pickup_policy_parser::config_type>();
 
-  m_config->pickup_policy = *m_pickup_policy.config_get();
   XML_PARSE_ATTR(cnode, m_config, cache_prox_dist);
   XML_PARSE_ATTR(cnode, m_config, block_prox_dist);
   XML_PARSE_ATTR(cnode, m_config, nest_prox_dist);
@@ -53,6 +58,9 @@ void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 __rcsw_pure bool cache_sel_matrix_parser::validate(void) const {
+  if (!is_parsed()) {
+    return true;
+  }
   CHECK(m_pickup_policy.validate());
   CHECK(m_config->cache_prox_dist > 0.0);
   CHECK(m_config->block_prox_dist > 0.0);

@@ -22,10 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
+#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
-
 
 /*******************************************************************************
  * Namespaces/Decls

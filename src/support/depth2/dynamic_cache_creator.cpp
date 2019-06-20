@@ -84,7 +84,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * creation, which can happen otherwise.
          */
         auto cache_p = std::shared_ptr<repr::arena_cache>(create_single_cache(
-            cache_i_blocks, rmath::uvec2dvec(center.get()), timestep));
+            cache_i_blocks, rmath::uvec2dvec(*center), timestep));
         created_caches.push_back(cache_p);
       }
 

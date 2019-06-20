@@ -36,14 +36,12 @@ NS_START(fordyca, config);
  * Constructors/Destructor
  ******************************************************************************/
 base_controller_repository::base_controller_repository(void) {
-  parser_register<output_parser, output_config>(output_parser::kXMLRoot,
-                                                output_parser::kHeader1);
+  parser_register<output_parser, output_config>(output_parser::kXMLRoot);
   parser_register<actuation_parser, actuation_config>(
-      actuation_parser::kXMLRoot, actuation_parser::kHeader1);
-  parser_register<sensing_parser, sensing_config>(sensing_parser::kXMLRoot,
-                                                  sensing_parser::kHeader1);
+      actuation_parser::kXMLRoot);
+  parser_register<sensing_parser, sensing_config>(sensing_parser::kXMLRoot);
   parser_register<exploration_parser, exploration_config>(
-      exploration_parser::kXMLRoot, exploration_parser::kHeader1);
+      exploration_parser::kXMLRoot);
 }
 
 NS_END(config, fordyca);

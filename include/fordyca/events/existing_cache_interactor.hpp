@@ -50,8 +50,8 @@ class cache_vanished;
  */
 class existing_cache_interactor
     : public rpvisitor::polymorphic_accept_set<detail::cache_block_drop,
-                                              detail::cached_block_pickup,
-                                              detail::cache_vanished> {};
+                                               detail::cached_block_pickup,
+                                               detail::cache_vanished> {};
 
 NS_END(events, fordyca);
 

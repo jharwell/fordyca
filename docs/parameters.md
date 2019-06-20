@@ -1,38 +1,28 @@
 # Parameters
 
 I have extended the base `.argos` file with a set of new parameters, documented
-below. Parameters *should* that you are not using should be able to be omitted
-from the XML file; please open an issue if this is not the case.
+below. Optional vs. mandatory parameters are documented as such.
 
 ## Controller
 
-The following root XML tags are defined:
+The following root XML tags are defined under the `<params>` tag for all
+controller types:
 
-- `output` - Paramaters for simulation outputs across all runs.
 
-- `perception` - Parameters pertaining to a robots discretization of the
-                 continuous world into a grid, and/or the objects it tracks
-                 within it.
-
-- `task_executive` - Parameters pertaining to the task executive (the entitity
-                     responsible for managing/running tasks after they have been
-                     allocated).
-
-- `task_alloc` - Parameters pertaining to task allocation.
-
-- `block_sel_matrix` - Parameters used by robots when selecting which
-                             block to acquire/obtain as part of the task they
-                             are currently executing.
-
-- `cache_sel_matrix` - Parameters used by robots when selecting which
-                             cache to acquire/obtain as part of the task they
-                             are currently executing.
-
-- `sensing` -  Parameters for robot sensors.
-
-- `actuation` - Parameters for robot actuators.
+| Root XML tag       | Mandatory For?      | Description                                                                                                                       |
+|--------------------|---------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `output`           | All controllers     | Paramaters for simulation outputs across all runs.                                                                                |
+| `perception`       | All but CRW         | Parameters pertaining to a robots discretization of the continuous world into a grid, and/or the objects it tracks within it.     |
+| `task_executive`   | [`depth1`,`depth2`] | Parameters pertaining to the task executive (the entitity responsible for managing/running tasks after they have been allocated). |
+| `task_alloc`       | [`depth1`,`depth2`] | Parameters pertaining to task allocation.                                                                                         |
+| `block_sel_matrix` | All but CRW         | Parameters used by robots when selecting which block to acquire/obtain as part of the task they are currently executing.          |
+| `cache_sel_matrix` | [`depth1`,`depth2`] | Parameters used by robots when selecting which cache to acquire/obtain as part of the task they are currently executing.          |
+| `sensing`          | All controllers     | Parameters for robot sensors.                                                                                                     |
+| `actuation`        | All controllers     | Parameters for robot actuators.                                                                                                   |
 
 ### `output`
+
+All nested tags and attributes under this tag are required.
 
 #### `sim`
 
@@ -46,6 +36,9 @@ The following root XML tags are defined:
 
 ### `perception`
 
+This tag is optional, but must be defined for all non-CRW controllers. If this
+tag is defined, then all nested tags and attributes are required.
+
 #### `pheromone`
 
 - `rho` How fast the relevance of information about a particular cell within a
@@ -58,6 +51,10 @@ The following root XML tags are defined:
 
 #### `grid`
 
+This tag is optional, but must be defined for all controllers that use MDPO
+perception. If this tag is defined, then all nested tags and attributes are
+required.
+
 - `resolution` - The size of the cells the arena is broken up (discretized)
                  into. Should probably be the same as whatever the block size
                  is, to make things easy.
@@ -67,6 +64,9 @@ The following root XML tags are defined:
            with searching through an XML tree in C++.
 
 ### `task_executive`
+
+This tag is optional, but must be defined for all controllers that use the task
+executive [`depth1`,`depth2`].
 
 - `update_exec_ests` - If TRUE, then the executive will use the elapsed time
                        since a task started to update the task time
@@ -82,7 +82,8 @@ The following root XML tags are defined:
                       Allocation Block (TAB), consisting of a root has and two
                       sequentially interdependent subtasks has to be
                       selected. This parameter controls the selection
-                      method. Valid values are:
+                      method. This tag is only required for depth2
+                      controllers. Valid values are:
 
     - `root` - Use the root TAB as the initially active TAB.
 
@@ -91,9 +92,6 @@ The following root XML tags are defined:
     - `max_depth` - Choose a random TAB from among those at the greatest depth
                     within the task decomposition graph that is passed to the
                     executive.
-
-    This parameter is current experimental, and only affects depth2
-    simulations.
 
 ### `task_alloc`
 
@@ -124,12 +122,17 @@ alternatives, with the input src and sigmoid method varying.
 - `gamma` - A scaling factor that is applied to the overall calculated
             probability.
 
+This tag is required if the task executive is used.
+
 #### `task_abort`
 
 Uses `src_sigmoid_sel`, with an empty `method` tag to perform the stochastic
-abort decision, which is calculated each timestep.
+abort decision, which is calculated each timestep. This tag is required if the
+task executive is used.
 
 #### `task_partition`
+
+This tag is required if the task executive is used.
 
 - `always_partition` - If `true`, then robots will always choose to partition a
                        task, given the chance. Has no effect if `false`.
@@ -144,9 +147,12 @@ allocation, after the previous task is finished or aborted.
 #### `subtask_sel`
 
 Uses `src_sigmoid_sel` with a `method` tag that can be one of [`harwell2018`,
-`random`] to perform stochastic subtask selection if partitioning is employed.
+`random`] to perform stochastic subtask selection if partitioning is
+employed. This tag is required if the task executive is used.
 
 #### `task_exec_estimates`
+
+This tag is optional if the task executive is used.
 
 - `seed_enabled` - If `true`, then all estimates of task execution times are
                    initialized randomly within the specified ranges, rather than
@@ -163,20 +169,26 @@ Uses `src_sigmoid_sel` with a `method` tag that can be one of [`harwell2018`,
 
 ##### `ema` - Exponential Moving Average
 
+This tag is required if `task_exec_estimates` is present.
+
 `alpha`- Parameter for exponential weighting of a moving time estimate of the
          true execution/interface time of a task.
 
 #### `tab_sel`
 
 Uses `src_sigmoid_sel` to select which TAB to switch to (if applicable) during
-task allocation, with a `method` tag that can be one of [`harwell2019`].
-
+task allocation, with a `method` tag that can be one of [`harwell2019`]. It is
+required if the task executive is used.
 
 ### `block_sel_matrix`
+
+This tag is optional, but must be defined for all non-CRW controllers.
 
 `nest` - The location of the nest.
 
 #### `block_priorities`
+
+This tag is optional. If a priority is omitted, it defaults to 1.0.
 
 - `cube` - The priority value used as part of block utility calculation for cube
            blocks during block selection.
@@ -185,6 +197,8 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
            blocks during block selection.
 
 #### `pickup_policy`
+
+This tag is optional, but if it is included `policy` must be specified.
 
 - `policy` - The policy to use to restrict (1) the conditions under which robots
              can pick up a block that they encounter, (2) which blocks are
@@ -196,13 +210,14 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
       are clumped into clusters; used to help depth2 robots not to pickup the
       blocks other robots have dropped in order to start caches.
 
-    - `Null` - No policy--robots can pickup any blocks the know about/all known
-      blocks are eligible for acquisition
-
 - `prox_dist` - The minimum distance measure for usage with `cluster_proximity`
                 pickup policy.
 
 ### `cache_sel_matrix`
+
+This tag is optional, but must be defined for [`depth1`, `depth2`]
+controllers. If this tag is defined, then all nested tags and attributes are
+required.
 
 - `cache_prox_dist` - When executing the Cache Finisher task, the constraint
                       applied to new cache selection for how close the chosen
@@ -243,9 +258,12 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 ### `exploration`
 
+This tag is optional, but must be defined for all non-CRW controllers.
+
 - `block_strategy` - The strategy robots should use to located blocks when they
                      do not currently know of any and need to find one for the
                      task they are currently doing. Valid values are:
+
   - `CRW` - Correlated Random Walk
 
   - `likelihood_search` - Go to the location of the last known block and then
@@ -253,7 +271,8 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 - `cache_strategy` - The strategy robots should use to located caches when they
                      do not currently know of any and need to find one for the
-                     task they are currently doing.
+                     task they are currently doing. Required for [`depth1,
+                     depth2`] controllers, ignored otherwise.
 
   - `CRW` - Correlated Random Walk
 
@@ -267,6 +286,8 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 ### `sensing`
 
+This tag, and all nested tags and attributes are required for all controllers.
+
 #### `proximity_sensor`
 
 - `angle_range` - The angle range to the left/right of center (90 degrees on a
@@ -279,6 +300,8 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
             considered.
 
 ### `actuation`
+
+This tag, and all nested tags and attributes are required for all controllers.
 
 #### `steering2D`
 
@@ -296,10 +319,6 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 - `slowing_speed_min` - The minimum speed robotics will linearly ramp down
   to. Should be > 0.
-
-- `max` - Max value for the force.
-
-##### `polar_force`
 
 - `max` - Max value for the force.
 
@@ -330,23 +349,18 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
 
 The following root XML tags are defined:
 
-- `output` - Parameters relating to logging simulation metrics/results.
-
-- `convergence` - Parameters relating to computing swarm convergence.
-
-- `arena_map` - Parameters relating to discretization of the arena.
-
-- `oracle` - Parameters related to the all knowing oracle, which allows
-             robots/swarms to make decisions based on perfect information, to
-             provide an upper bound on performance.
-
-- `temporal_variance` - Parameters relating to the various types of temporal
-                        waveforms that can be applied to swarm/environmental
-                        state during simulation.
-
-- `caches` - Parameters related to the use of caches in the arena.
+| Root XML tag        | Mandatory For? | Description                                                                                                                              |
+|---------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| `output`            |                | Parameters for logging simulation metrics/results.                                                                                       |
+| `convergence`       |                | Parameters for computing swarm convergence.                                                                                              |
+| `arena_map`         |                | Parameters for discretization of the arena.                                                                                              |
+| `oracle`            |                | Parameters for the oracle, which allows swarms to make decisions based on perfect information, to provide an upper bound on performance. |
+| `temporal_variance` |                | Parameters for the various types of temporal waveforms that can be applied to swarm/environmental state during simulation.               |
+| `caches`            |                | Parameters for the use of caches in the arena.                                                                                           |
 
 ### `output`
+
+All nested tags and attributes under this tag are required.
 
 #### `sim`
 
@@ -360,6 +374,8 @@ The following root XML tags are defined:
 
 #### `metrics`
 
+The following attributes under this tag are required:
+
 - `output_dir` - Name of directory within the output root that metrics will be
                  placed in.
 
@@ -368,7 +384,48 @@ The following root XML tags are defined:
                        long simulation is generally not useful; hence this
                        field.
 
+The following attributes under this tag are optional. Not defining them does not
+disable metric collection of the given type, but redirects it to a `NULL.csv`
+file in the `output_dir` (all excluded tags can overwrite each other in this
+file). This is a temporary fix until I have time to do this properly with
+/dev/null.
+
+- `fsm_collision_counts_fname`
+- `fsm_collision_locs_fname`
+- `fsm_movement_fname`
+- `block_acq_counts_fname`
+- `block_acq_locs_fname`
+- `block_acq_explore_locs_fname`
+- `block_acq_vector_locs_fname`
+- `block_transport_fname`
+- `block_manipulation_fname`
+- `cache_acq_counts_fname`
+- `cache_acq_locs_fname`
+- `cache_acq_explore_locs_fname`
+- `cache_acq_vector_locs_fname`
+- `cache_utilization_fname`
+- `cache_lifecycle_fname`
+- `cache_locations_fname`
+- `task_execution_generalist_fname`
+- `task_execution_collector_fname`
+- `task_execution_harvester_fname`
+- `task_execution_cache_starter_fname`
+- `task_execution_cache_finisher_fname`
+- `task_execution_cache_transferer_fname`
+- `task_execution_cache_collector_fname`
+- `task_tab_generalist_fname`
+- `task_tab_collector_fname`
+- `task_tab_harvester_fname`
+- `task_distribution_fname`
+- `perception_dpo_fname`
+- `perception_mdpo_fname`
+- `swarm_dist_pos2D_fname`
+- `swarm_convergence_fname`
+- `temporal_variance_fname`
+
 ### `convergence`
+
+This tag is optional.
 
 - `n_threads` - How many threads will be used for convergence calculations
                 during loop functions.
@@ -383,7 +440,9 @@ The following root XML tags are defined:
 #### `positional_entropy`
 
 A measure of convergence using robot positions, Shannon's entropy definition,
-and Balch2000's social entropy measure.
+and Balch2000's social entropy measure. This tag is optional, but if it is
+defined, only the `enable` attribute is required. All other attributes are
+parsed iff `enable` is `true`.
 
 - `enable` - If this measure is enabled or not. Very expensive to compute in
              large swarms.
@@ -396,21 +455,26 @@ and Balch2000's social entropy measure.
 
 #### `interactivity`
 
-A measure of convergence using nearest neighbor distances.
+A measure of convergence using nearest neighbor distances. This tag is optional.
 
 - `enable` - If this measure is enabled or not. Relatively cheap to compute in
              large swarms.
 
 #### `angular_order`
 
-A measure of convergence using congruence of robot orientations.
+A measure of convergence using congruence of robot orientations. This tag is
+optional.
 
 - `enable` - If this measure is enabled or not. Relatively cheap to compute in
              large swarms.
 
 ### `oracle`
 
+This tag is optional.
+
 #### `tasking_oracle`
+
+This tag is optional. All attributes default to `false` if they are omitted.
 
 - `task_exec_est` - If enabled, then this will inject perfect estimates of task
                     execution time based on the performance of the entire swarm
@@ -423,6 +487,9 @@ A measure of convergence using congruence of robot orientations.
 
 #### `entities_oracle`
 
+This tag is optional, but if it is defined, all nested tags and attributes are
+required.
+
 - `blocks_enabled` - Inject perfect knowledge of all block locations into the
                      swarm every timestep.
 
@@ -431,26 +498,44 @@ A measure of convergence using congruence of robot orientations.
 
 ### `temporal_variance`
 
+This tag is optional.
+
 #### `blocks`
 
+This tag is optional.
+
 ##### `manipulation_penalty`
+
+This tag is optional, but if it is defined, then all nested tags and attributes
+are required.
 
 - `waveform` - Parameters defining the waveform of block manipulation penalty
                (picking up/dropping that does not involve caches).
 
 ##### `carry_throttle`
 
+This tag is optional, but if it is defined, then all nested tags and attributes
+are required.
+
 - `waveform` - Parameters defining the waveform of block carry penalty
                (how much slower robots move when carrying a block).
 
 ### `caches`
 
+This tag is optional.
+
 ##### `usage_penalty`
+
+This tag is optional, but if it is defined, then all nested tags and attributes
+are required.
 
 - `waveform` - Parameters defining the waveform of cache usage penalty (picking
                up/dropping).
 
 ### `arena_map`
+
+This tag is required. Some nested tags and/or attributes can be omitted,
+depending.
 
 #### `grid`
 
@@ -461,6 +546,8 @@ A measure of convergence using congruence of robot orientations.
 - `size` - The size of the arena.
 
 #### `blocks`
+
+This tag and all nested tags and attributes are required.
 
 ##### `distribution`
 
@@ -488,7 +575,46 @@ A measure of convergence using congruence of robot orientations.
   - `quad_source` - Placed in 4 sources at each cardinal direction in the
                     arena. Assumes a square arena.
 
+###### `redist_governor`
+
+This tag is optional. If it is defined, then the [`trigger`,
+`recurrence_policy`] attributes are required. Other attributes are only required
+depending on configuration.
+
+- `trigger` - The trigger for (possibly) stopping block redistribution:
+
+  - `timestep` - Blocks will be redistributed until the specified timestep. This
+                 trigger type can be used with the [`single`] recurrence policy.
+
+  - `block_count` - Blocks will be redistributed until the specified # of blocks
+                    have been collected. This trigger type can be used with the
+                    [`single`] recurrence policy.
+
+  - `convergence` - Blocks will be redistributed until the swarm has
+                    converged. This trigger type can be used with the
+                    [`single`,`multi`] recurrence policies.
+
+- `recurrence_policy` - The policy for determining how block redistribution
+                        status can change as the simulation progresses.
+
+  - `single` - Once the specified trigger is tripped, then block redistribution
+               will stop permanently.
+
+  - `multi` - Blocks will be redistributed as long as the specified trigger has
+              not been tripped. Once it has been tripped, block distribution
+              will stop until the trigger is no longer tripped, in which case it
+              will resume.
+
+- `timestep` - The timestep to stop block redistribution at. Only required if
+               `trigger` is `timestep`.
+
+- `block_count`- The collection count to stop block redistribution at. Only
+                 required if `trigger` is `block_count`.
+
 ###### `manifest`
+
+This tag is required. At least one of [`n_cube`, `n_ramp`] must be defined. The
+`unit_dim` attribute is required.
 
 - `n_cube` - # Cube blocks that should be used.
 
@@ -499,6 +625,8 @@ A measure of convergence using congruence of robot orientations.
 
 ######  `powerlaw`
 
+This tag is only required if the `dist_model` is `powerlaw`.
+
 - `pwr_min` - Minimum power of 2 for cluster sizes.
 
 - `pwr_max` - Maximum power of 2 for cluster sizes.
@@ -506,6 +634,8 @@ A measure of convergence using congruence of robot orientations.
 - `n_clusters` - Max # of clusters the arena.
 
 #### `nest`
+
+This tag and all nested tags and attributes are required.
 
 - `size` - The size of the nest. Must be specified in a tuple like so:
   `0.5, 0.5`. Note the space--parsing does not work if it is omitted.
@@ -516,15 +646,20 @@ A measure of convergence using congruence of robot orientations.
 
 ### `caches`
 
+This tag is required for [`depth1`, `depth2`] loop functions.
+
 - `dimension` - The dimension of the cache. Should be greater than the dimension
                 for blocks.
 
 #### `static`
 
+This tag is required for [`depth1`] loop functions. If the tag is present, only
+the `enable` attribute is required; all other attributes are parsed iff `enable`
+is `true`.
+
 - `enable` - If true, then a single static cache will be created in the center
-             of the arena (assumed to be horizontal). The cache will be
-             replenished by the loop functions if robots deplete it, under
-             certain conditions.
+             of the arena. The cache will be replenished by the loop functions
+             if robots deplete it, under certain conditions.
 
 - `size` - The number of blocks to use when (re)-creating the static cache. Must
            be >= 2.
@@ -535,8 +670,11 @@ A measure of convergence using congruence of robot orientations.
 
 #### `dynamic`
 
-- `enable` - If `true`, then the creation of dynamic caches will be enabled
-             (depth2 only).
+This tag is required for [`depth2`] loop functions. If the tag is present, only
+the `enable` attribute is required; all other attributes are parsed iff `enable`
+is `true`.
+
+- `enable` - If `true`, then the creation of dynamic caches will be enabled.
 
 - `min_dist` - The minimum distance between blocks to be considered for
                cache creation from said blocks.
@@ -549,6 +687,9 @@ A measure of convergence using congruence of robot orientations.
                       distribution after collection.
 
 ### `visualization`
+
+This tag and its attributes are optional (attributes default to `false` if they
+are omitted).
 
 - `robot_id` - Set to `true` or `false`. If true, robot id is displayed above
                each robot during simulation.

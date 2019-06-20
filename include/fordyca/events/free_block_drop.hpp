@@ -146,7 +146,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
  */
 using free_block_drop_visitor_impl =
     rpvisitor::precise_visitor<detail::free_block_drop,
-                              detail::free_block_drop::visit_typelist>;
+                               detail::free_block_drop::visit_typelist>;
 
 NS_END(detail);
 

@@ -153,7 +153,7 @@ class dpo_controller : public crw_controller,
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const config::depth0::dpo_controller_repository& param_repo);
+  void shared_init(const config::depth0::dpo_controller_repository& config_repo);
 
  private:
   /**
@@ -166,7 +166,7 @@ class dpo_controller : public crw_controller,
    *
    * This is called after \ref shared_init() during \ref Init().xo
    */
-  void private_init(const config::depth0::dpo_controller_repository& param_repo);
+  void private_init(const config::depth0::dpo_controller_repository& config_repo);
 
   /* clang-format off */
   bool                                       m_display_los{false};

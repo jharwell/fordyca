@@ -69,29 +69,29 @@ void mdpo_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */
-  config::depth0::mdpo_controller_repository param_repo;
-  param_repo.parse_all(node);
+  config::depth0::mdpo_controller_repository config_repo;
+  config_repo.parse_all(node);
 
-  if (!param_repo.validate_all()) {
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
-  shared_init(param_repo);
-  private_init(param_repo);
+  shared_init(config_repo);
+  private_init(config_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void mdpo_controller::shared_init(
-    const config::depth0::mdpo_controller_repository& param_repo) {
+    const config::depth0::mdpo_controller_repository& config_repo) {
   /* block selection matrix and DPO subsystem */
-  dpo_controller::shared_init(param_repo);
+  dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
   config::perception::perception_config p =
-      *param_repo.config_get<config::perception::perception_config>();
+      *config_repo.config_get<config::perception::perception_config>();
   p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
@@ -100,8 +100,8 @@ void mdpo_controller::shared_init(
 } /* shared_init() */
 
 void mdpo_controller::private_init(
-    const config::depth0::mdpo_controller_repository& param_repo) {
-  auto* exp_config = param_repo.config_get<config::exploration_config>();
+    const config::depth0::mdpo_controller_repository& config_repo) {
+  auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
   fsm::expstrat::base_expstrat::params p{nullptr,
                                          saa_subsystem(),

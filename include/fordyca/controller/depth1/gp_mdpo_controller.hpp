@@ -76,10 +76,10 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
    * - Task executive (\ref rta::bi_tdgraph_executive)
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    *
-   * @param param_repo Handle to parameter repository for this controller (after
+   * @param config_repo Handle to parameter repository for this controller (after
    *                   parsing and validation).
    */
-  void shared_init(const config::depth1::controller_repository& param_repo);
+  void shared_init(const config::depth1::controller_repository& config_repo);
 
  private:
 };

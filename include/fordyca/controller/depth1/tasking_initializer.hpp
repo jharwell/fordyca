@@ -77,7 +77,7 @@ class tasking_initializer : public rer::client<tasking_initializer> {
   tasking_initializer(const tasking_initializer& other) = delete;
 
   std::unique_ptr<rta::bi_tdgraph_executive>
-  operator()(const config::depth1::controller_repository& param_repo);
+  operator()(const config::depth1::controller_repository& config_repo);
 
  protected:
   using tasking_map = std::map<std::string, rta::polled_task*>;
@@ -89,10 +89,10 @@ class tasking_initializer : public rer::client<tasking_initializer> {
   const class block_sel_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
 
   tasking_map depth1_tasks_create(
-      const config::depth1::controller_repository& param_repo,
+      const config::depth1::controller_repository& config_repo,
       rta::bi_tdgraph* graph);
   void depth1_exec_est_init(
-      const config::depth1::controller_repository& param_repo,
+      const config::depth1::controller_repository& config_repo,
       const tasking_map& map,
       rta::bi_tdgraph* graph);
   const class cache_sel_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }

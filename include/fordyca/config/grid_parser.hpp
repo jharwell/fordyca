@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
 #include "fordyca/config/grid_config.hpp"
@@ -48,7 +49,7 @@ NS_START(fordyca, config);
 
 class grid_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit grid_parser(uint level) : xml_config_parser(level) {}
+  using config_type = grid_config;
 
   /**
    * @brief The root tag that all grid parameters should lie under in the
@@ -60,15 +61,14 @@ class grid_parser : public rconfig::xml::xml_config_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<grid_config> config_get(void) const { return m_config; }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  std::shared_ptr<grid_config> m_config{nullptr};
+  std::unique_ptr<grid_config> m_config{nullptr};
   /* clang-format on */
 };
 

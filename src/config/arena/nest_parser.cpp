@@ -45,8 +45,7 @@ void nest_parser::parse(const ticpp::Element& node) {
 
   res = parser.parse(nnode.GetAttribute("center"));
 
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
   m_config->center =
       rmath::vector2d(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
   res = parser.parse(nnode.GetAttribute("size"));
@@ -54,17 +53,9 @@ void nest_parser::parse(const ticpp::Element& node) {
   m_config->dims.y(std::atof(res[1].c_str()));
 } /* parse() */
 
-void nest_parser::show(std::ostream& stream) const {
-  stream << build_header() << "dims=" << m_config->dims << std::endl
-         << "center=" << m_config->center << std::endl
-         << build_footer();
-} /* show() */
-
 __rcsw_pure bool nest_parser::validate(void) const {
-  CHECK(m_config->center.x() > 0);
-  CHECK(m_config->center.y() > 0);
-  CHECK(m_config->dims.x() > 0);
-  CHECK(m_config->dims.y() > 0);
+  CHECK(m_config->center.is_pd());
+  CHECK(m_config->dims.is_pd());
   return true;
 
 error:

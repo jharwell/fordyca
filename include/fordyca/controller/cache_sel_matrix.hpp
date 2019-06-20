@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/config/cache_sel/pickup_policy_config.hpp"
+#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_exception.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
@@ -44,12 +44,13 @@ namespace config { namespace cache_sel {
 struct cache_sel_matrix_config;
 }} // namespace config::cache_sel
 NS_START(controller);
+
 using cache_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
                    rmath::rangeu,
                    std::vector<int>,
-                   config::cache_sel::pickup_policy_config>;
+                   config::cache_sel::cache_pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions

@@ -47,11 +47,7 @@ NS_START(fordyca, config, tv);
  */
 class tv_manager_parser final : public rconfig::xml::xml_config_parser {
  public:
-  explicit tv_manager_parser(uint level)
-      : xml_config_parser(level),
-        m_block_manip(level + 1),
-        m_block_carry(level + 1),
-        m_cache_usage(level + 1) {}
+  using config_type = tv_manager_config;
 
   /**
    * @brief The root tag that all temporal variance parameters should lie under
@@ -64,21 +60,16 @@ class tv_manager_parser final : public rconfig::xml::xml_config_parser {
 
   std::string xml_root(void) const override { return kXMLRoot; }
 
-  std::shared_ptr<tv_manager_config> config_get(void) const {
-    return m_config;
-  }
-
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  std::shared_ptr<tv_manager_config> m_config{nullptr};
-  rct::config::xml::waveform_parser  m_block_manip;
-  rct::config::xml::waveform_parser  m_block_carry;
-  rct::config::xml::waveform_parser  m_cache_usage;
+  std::unique_ptr<config_type>      m_config{nullptr};
+  rct::config::xml::waveform_parser m_block_manip{};
+  rct::config::xml::waveform_parser m_block_carry{};
+  rct::config::xml::waveform_parser m_cache_usage{};
   /* clang-format on */
 };
 

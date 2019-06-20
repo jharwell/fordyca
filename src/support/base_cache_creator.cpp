@@ -29,8 +29,8 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/light_type_index.hpp"
+#include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -106,10 +106,8 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
 
   ds::block_vector block_vec(blocks.begin(), blocks.end());
   auto ret = rcppsw::make_unique<repr::arena_cache>(
-      repr::arena_cache::params{mc_cache_dim,
-            m_grid->resolution(),
-            center, block_vec,
-            -1},
+      repr::arena_cache::params{
+          mc_cache_dim, m_grid->resolution(), center, block_vec, -1},
       light_type_index()[light_type_index::kCache]);
   ret->creation_ts(timestep);
   ER_INFO("Create cache%d@%s/%s, xspan=%s,yspan=%s with %zu blocks [%s]",

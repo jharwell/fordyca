@@ -68,7 +68,7 @@ bool ledtaxis::task_finished(void) const {
     return true;
   }
 
-  for (auto &r : saa_subsystem()->sensing()->blobs().readings()) {
+  for (auto& r : saa_subsystem()->sensing()->blobs().readings()) {
     if (r.color == m_target) {
       accum += r.vec;
       ++count;

@@ -66,7 +66,7 @@ For parameter configuration see
 | crw        | Stable | depth0         | CRW = Correlated Random Walk.                                                                                                         |
 | dpo        | Stable | depth0         | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                            |
 | mdpo       | Stable | depth0         | MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena tracking relevance of individual cells within it.           |
-| odpo       | Stable | depth0         | ODPO = Oracular DPO. Has perfect information about blocks in thye arena.                                                               |
+| odpo       | Stable | depth0         | ODPO = Oracular DPO. Has perfect information about blocks in thye arena.                                                              |
 | omdpo      | Stable | depth0         | OMDPO = Oracular MDPO. Has perfect information about blocks in the arena.                                                             |
 | gp\_dpo    | Stable | depth1         | Greedy task partitioning + DPO. Requires static caches to also be enabled.                                                            |
 | gp\_odpo   | Stable | depth1         | Greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.             |

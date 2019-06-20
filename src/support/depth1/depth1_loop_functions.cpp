@@ -122,25 +122,34 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
   template <typename T>
   void operator()(const T& controller) const {
     typename robot_arena_interactor<T>::params p{lf->arena_map(),
-          lf->m_metrics_agg.get(),
-          lf->floor(),
-          lf->tv_manager(),
-          lf->m_cache_manager.get(),
-          lf};
-    lf->m_interactor_map->emplace(
-        typeid(controller),
-        robot_arena_interactor<T>(p));
+                                                 lf->m_metrics_agg.get(),
+                                                 lf->floor(),
+                                                 lf->tv_manager(),
+                                                 lf->m_cache_manager.get(),
+                                                 lf};
+    lf->m_interactor_map->emplace(typeid(controller),
+                                  robot_arena_interactor<T>(p));
     lf->m_metric_extractor_map->emplace(
         typeid(controller),
         robot_metric_extractor<depth1_metrics_aggregator, T>(
             lf->m_metrics_agg.get()));
-    config_map->emplace(
-        typeid(controller),
-        robot_configurer<T, depth1_metrics_aggregator>(
-            lf->config()->config_get<config::visualization_config>(),
-            lf->oracle_manager()->entities_oracle(),
-            lf->oracle_manager()->tasking_oracle(),
-            lf->m_metrics_agg.get()));
+    if (nullptr != lf->oracle_manager()) {
+      config_map->emplace(
+          typeid(controller),
+          robot_configurer<T, depth1_metrics_aggregator>(
+              lf->config()->config_get<config::visualization_config>(),
+              lf->oracle_manager()->entities_oracle(),
+              lf->oracle_manager()->tasking_oracle(),
+              lf->m_metrics_agg.get()));
+    } else {
+      config_map->emplace(
+          typeid(controller),
+          robot_configurer<T, depth1_metrics_aggregator>(
+              lf->config()->config_get<config::visualization_config>(),
+              nullptr,
+              nullptr,
+              lf->m_metrics_agg.get()));
+    }
     lf->m_los_update_map->emplace(typeid(controller),
                                   robot_los_updater<T>(lf->arena_map()));
     lf->m_subtask_status_map->emplace(typeid(controller),
@@ -206,8 +215,12 @@ void depth1_loop_functions::private_init(void) {
    * Initialize convergence calculations to include task distribution (not
    * included by default).
    */
-  conv_calculator()->task_dist_init(std::bind(
-      &depth1_loop_functions::robot_tasks_extract, this, std::placeholders::_1));
+  if (nullptr != conv_calculator()) {
+    conv_calculator()->task_dist_init(
+        std::bind(&depth1_loop_functions::robot_tasks_extract,
+                  this,
+                  std::placeholders::_1));
+  }
 
   /*
    * Intitialize robot interactions with environment via various functors/type
@@ -239,6 +252,9 @@ void depth1_loop_functions::private_init(void) {
 
 void depth1_loop_functions::oracle_init(void) {
   auto* oraclep = config()->config_get<config::oracle::oracle_manager_config>();
+  if (nullptr == oraclep || nullptr == oracle_manager()) {
+    return;
+  }
   if (oraclep->tasking.enabled) {
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
@@ -255,23 +271,23 @@ void depth1_loop_functions::oracle_init(void) {
 
 void depth1_loop_functions::cache_handling_init(
     const config::caches::caches_config* cachep) {
-  if (nullptr != cachep && cachep->static_.enable) {
-    /*
-     * Regardless of how many foragers/etc there are, always create an
-     * initial cache.
-     */
-    rmath::vector2d cache_loc = rmath::vector2d(
-        (arena_map()->xrsize() + arena_map()->nest().real_loc().x()) / 2.0,
-        arena_map()->nest().real_loc().y());
+  ER_ASSERT(nullptr != cachep && cachep->static_.enable,
+            "FATAL: Caches not enabled in depth1 loop functions");
+  /*
+   * Regardless of how many foragers/etc there are, always create an
+   * initial cache.
+   */
+  rmath::vector2d cache_loc = rmath::vector2d(
+      (arena_map()->xrsize() + arena_map()->nest().real_loc().x()) / 2.0,
+      arena_map()->nest().real_loc().y());
 
-    m_cache_manager = rcppsw::make_unique<static_cache_manager>(
-        cachep, &arena_map()->decoratee(), cache_loc);
+  m_cache_manager = rcppsw::make_unique<static_cache_manager>(
+      cachep, &arena_map()->decoratee(), cache_loc);
 
-    if (auto created = m_cache_manager->create(
-            arena_map()->blocks(), GetSpace().GetSimulationClock())) {
-      arena_map()->caches_add(*created, this);
-      floor()->SetChanged();
-    }
+  if (auto created = m_cache_manager->create(arena_map()->blocks(),
+                                             GetSpace().GetSimulationClock())) {
+    arena_map()->caches_add(*created, this);
+    floor()->SetChanged();
   }
 } /* cache_handling_init() */
 
@@ -304,7 +320,9 @@ void depth1_loop_functions::PreStep() {
       *(*m_metrics_agg)["blocks::transport"]);
   arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
                                          collector.cum_collected(),
-                                         conv_calculator()->converged());
+                                         nullptr != conv_calculator()
+                                             ? conv_calculator()->converged()
+                                             : false);
 
   /* Collect metrics from/about caches */
   for (auto& c : arena_map()->caches()) {
@@ -324,9 +342,6 @@ void depth1_loop_functions::PreStep() {
     floor()->SetChanged();
   }
 
-  /* Before processing all robots, update the oracles */
-  oracle_manager()->update(arena_map());
-
   /* Process all robots */
   for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
     argos::CFootBotEntity& robot =
@@ -338,7 +353,8 @@ void depth1_loop_functions::PreStep() {
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
-  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock())) {
+  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock()) &&
+      nullptr != conv_calculator()) {
     conv_calculator()->reset_metrics();
   }
 

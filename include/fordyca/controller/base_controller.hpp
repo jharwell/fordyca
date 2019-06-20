@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
+#include <memory>
 #include <string>
 #include <typeindex>
 
@@ -231,7 +232,6 @@ class base_controller : public argos::CCI_Controller,
                 const config::sensing_config* sensing_p);
 
   /* clang-format off */
-  const support::tv::tv_manager*             m_tv_manager{nullptr};
   bool                                       m_display_id{false};
   std::shared_ptr<repr::base_block>          m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem> m_saa;

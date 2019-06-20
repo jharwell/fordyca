@@ -22,8 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
-#include <vector>
 #include <chrono>
+#include <vector>
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
@@ -72,10 +72,10 @@ tasking_initializer::~tasking_initializer(void) = default;
  * Member Functions
  ******************************************************************************/
 tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
-    const config::depth1::controller_repository& param_repo,
+    const config::depth1::controller_repository& config_repo,
     rta::bi_tdgraph* const graph) {
-  auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
-  auto* exp_config = param_repo.config_get<config::exploration_config>();
+  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
+  auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
   fsm::expstrat::base_expstrat::params expbp(mc_csel_matrix,
@@ -136,10 +136,10 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
 } /* depth1_tasks_create() */
 
 void tasking_initializer::depth1_exec_est_init(
-    const config::depth1::controller_repository& param_repo,
+    const config::depth1::controller_repository& config_repo,
     const tasking_map& map,
     rta::bi_tdgraph* const graph) {
-  auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
+  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   if (!task_config->exec_est.seed_enabled) {
     return;
   }
@@ -186,15 +186,15 @@ void tasking_initializer::depth1_exec_est_init(
 } /* depth1_exec_est_init() */
 
 std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
-    const config::depth1::controller_repository& param_repo) {
-  auto* task_config = param_repo.config_get<rta::config::task_alloc_config>();
+    const config::depth1::controller_repository& config_repo) {
+  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   auto graph = rcppsw::make_unique<rta::bi_tdgraph>(task_config);
-  auto* execp = param_repo.config_get<rta::config::task_executive_config>();
+  auto* execp = config_repo.config_get<rta::config::task_executive_config>();
 
-  auto map = depth1_tasks_create(param_repo, graph.get());
+  auto map = depth1_tasks_create(config_repo, graph.get());
 
   graph->active_tab_init(execp->tab_init_method);
-  depth1_exec_est_init(param_repo, map, graph.get());
+  depth1_exec_est_init(config_repo, map, graph.get());
 
   return rcppsw::make_unique<rta::bi_tdgraph_executive>(execp, std::move(graph));
 } /* initialize() */

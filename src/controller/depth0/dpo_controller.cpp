@@ -99,27 +99,27 @@ void dpo_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */
-  config::depth0::dpo_controller_repository param_repo;
-  param_repo.parse_all(node);
+  config::depth0::dpo_controller_repository config_repo;
+  config_repo.parse_all(node);
 
-  if (!param_repo.validate_all()) {
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
-  shared_init(param_repo);
-  private_init(param_repo);
+  shared_init(config_repo);
+  private_init(config_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void dpo_controller::shared_init(
-    const config::depth0::dpo_controller_repository& param_repo) {
+    const config::depth0::dpo_controller_repository& config_repo) {
   auto perception =
-      param_repo.config_get<config::perception::perception_config>();
+      config_repo.config_get<config::perception::perception_config>();
   auto block_matrix =
-      param_repo.config_get<config::block_sel::block_sel_matrix_config>();
+      config_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* DPO perception subsystem */
   m_perception = rcppsw::make_unique<dpo_perception_subsystem>(perception);
@@ -129,12 +129,12 @@ void dpo_controller::shared_init(
 } /* shared_init() */
 
 void dpo_controller::private_init(
-    const config::depth0::dpo_controller_repository& param_repo) {
-  auto* exp_config = param_repo.config_get<config::exploration_config>();
+    const config::depth0::dpo_controller_repository& config_repo) {
+  auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
   fsm::expstrat::base_expstrat::params p{nullptr,
-        saa_subsystem(),
-        perception()->dpo_store()};
+                                         saa_subsystem(),
+                                         perception()->dpo_store()};
   m_fsm = rcppsw::make_unique<fsm::depth0::dpo_fsm>(
       m_block_sel_matrix.get(),
       base_controller::saa_subsystem(),

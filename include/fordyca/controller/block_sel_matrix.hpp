@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/config/block_sel/pickup_policy_config.hpp"
+#include "fordyca/config/block_sel/block_pickup_policy_config.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -46,7 +46,7 @@ using block_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
                    std::vector<int>,
-                   config::block_sel::pickup_policy_config>;
+                   config::block_sel::block_pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions
@@ -76,7 +76,7 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
    * able to pickup a block (if applicable).
    */
   static constexpr char kPickupPolicy[] = "pickup_policy";
-  static constexpr char kPickupPolicyNull[] = "Null";
+  static constexpr char kPickupPolicyNull[] = "";
   static constexpr char kPickupPolicyClusterProx[] = "cluster_proximity";
 
   explicit block_sel_matrix(

@@ -50,8 +50,8 @@ class free_block_drop;
  */
 class free_block_interactor
     : public rpvisitor::polymorphic_accept_set<detail::free_block_drop,
-                                              detail::free_block_pickup,
-                                              detail::block_vanished> {};
+                                               detail::free_block_pickup,
+                                               detail::block_vanished> {};
 
 NS_END(events, fordyca);
 
