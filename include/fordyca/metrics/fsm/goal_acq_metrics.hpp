@@ -1,5 +1,5 @@
 /**
- * @file goal_acquisition_metrics.hpp
+ * @file goal_acq_metrics.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQUISITION_METRICS_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQUISITION_METRICS_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_METRICS_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_METRICS_HPP_
 
 /*******************************************************************************
  * Includes
@@ -39,14 +39,14 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class goal_acquisition_metrics
+ * @class goal_acq_metrics
  * @ingroup fordyca metrics fsm
  *
  * @brief Interface defining what metrics that should be collected from FSMs as
  * they attempt to acquire a goal (site/object of interest) in SOME way (driving
  * to it directly, exploring for it, etc).
  */
-class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
+class goal_acq_metrics : public virtual rmetrics::base_metrics {
  public:
   enum class goal_type {
     ekNONE,
@@ -55,8 +55,8 @@ class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
     ekEXISTING_CACHE,
     ekBLOCK
   };
-  goal_acquisition_metrics(void) = default;
-  ~goal_acquisition_metrics(void) override = default;
+  goal_acq_metrics(void) = default;
+  ~goal_acq_metrics(void) override = default;
 
   /**
    * @brief A pair of booleans, with the first one indicating that the robot is
@@ -69,10 +69,10 @@ class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
   using exp_status = std::pair<bool, bool>;
 
   /**
-   * @brief Return the type of acquisition that is currently being
+   * @brief Return the type of acq that is currently being
    * performed.
    *
-   * @return The acquisition type, or \ref goal_type::kNone if no acquisition is
+   * @return The acq type, or \ref goal_type::kNone if no acq is
    * currently in progress.
    */
   virtual goal_type acquisition_goal(void) const = 0;
@@ -120,4 +120,4 @@ class goal_acquisition_metrics : public virtual rmetrics::base_metrics {
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQUISITION_METRICS_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_METRICS_HPP_ */

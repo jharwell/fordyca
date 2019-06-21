@@ -1,5 +1,5 @@
 /**
- * @file powerlaw_dist_parser.hpp
+ * @file goal_acq_locs_metrics_collector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,59 +18,50 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_ARENA_POWERLAW_DIST_PARSER_HPP_
-#define INCLUDE_FORDYCA_CONFIG_ARENA_POWERLAW_DIST_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_LOCS_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_LOCS_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <memory>
+#include <list>
 
-#include "fordyca/config/arena/powerlaw_dist_config.hpp"
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/config/xml/xml_config_parser.hpp"
+#include "fordyca/metrics/spatial/grid2D_avg_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, config, arena);
+NS_START(fordyca, metrics, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class powerlaw_dist_parser
- * @ingroup fordyca config arena
+ * @class goal_acq_locs_metrics_collector
+ * @ingroup fordyca metrics fsm
  *
- * @brief Parses XML parameters for related to \ref powerlaw_distributor
- * objects into \ref powerlaw_dist_config.
+ * @brief Collector for \ref goal_acq_metrics goal locations, which is
+ * collected as a 2D array, and needs its own collector separate from the \ref
+ * goal_acq_metrics_collector (1 .csv per collector).
  */
-class powerlaw_dist_parser final : public rconfig::xml::xml_config_parser {
+class goal_acq_locs_metrics_collector final :
+    public spatial::grid2D_avg_metrics_collector {
  public:
-  using config_type = powerlaw_dist_config;
-
   /**
-   * @brief The root tag that all powerlaw dist parameters should lie
-   * under in the XML tree.
+   * @param ofname The output file name.
+   * @param interval Collection interval.
+   * @param dims Dimensions of the arena.
    */
-  static constexpr char kXMLRoot[] = "powerlaw";
+  goal_acq_locs_metrics_collector(const std::string& ofname,
+                                    uint interval,
+                                    const rmath::vector2u& dims) :
+      grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  void parse(const ticpp::Element& node) override;
-  bool validate(void) const override;
-
-  std::string xml_root(void) const override { return kXMLRoot; }
-
- private:
-  const rconfig::base_config* config_get_impl(void) const override {
-    return m_config.get();
-  }
-
-  /* clang-format off */
-  std::unique_ptr<powerlaw_dist_config> m_config{nullptr};
-  /* clang-format on */
+  uint collect_cell(const rmetrics::base_metrics& metrics,
+                    const rmath::vector2u& coord) const override;
 };
 
-NS_END(arena, config, fordyca);
+NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_ARENA_POWERLAW_DIST_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_LOCS_METRICS_COLLECTOR_HPP_ */

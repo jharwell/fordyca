@@ -33,7 +33,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
 #include "fordyca/fsm/vector_fsm.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/ta/taskable.hpp"
 
@@ -42,7 +42,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Class Definitions
@@ -59,7 +59,7 @@ using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
  */
 class acquire_goal_fsm : public base_foraging_fsm,
                          public rer::client<acquire_goal_fsm>,
-                         public metrics::fsm::goal_acquisition_metrics,
+                         public metrics::fsm::goal_acq_metrics,
                          public rta::taskable {
  public:
   using candidate_type = std::tuple<rmath::vector2d, double, int>;

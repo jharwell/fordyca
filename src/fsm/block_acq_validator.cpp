@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/block_acquisition_validator.hpp"
+#include "fordyca/fsm/block_acq_validator.hpp"
 #include <numeric>
 
 #include "fordyca/controller/block_sel_matrix.hpp"
@@ -37,19 +37,18 @@ using bselm = controller::block_sel_matrix;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-block_acquisition_validator::block_acquisition_validator(
+block_acq_validator::block_acq_validator(
     const ds::dp_block_map* map,
     const controller::block_sel_matrix* matrix)
-    : ER_CLIENT_INIT("fordyca.fsm.block_acquisition_validator"),
+    : ER_CLIENT_INIT("fordyca.fsm.block_acq_validator"),
       mc_map(map),
       mc_matrix(matrix) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure bool block_acquisition_validator::operator()(
-    const rmath::vector2d& loc,
-    uint id) const {
+__rcsw_pure bool block_acq_validator::operator()(const rmath::vector2d& loc,
+                                                 uint id) const {
   auto block = mc_map->find(id);
 
   /* Sanity checks for acqusition */

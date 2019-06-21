@@ -28,7 +28,7 @@
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
@@ -41,7 +41,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -58,7 +58,7 @@ using transport_goal_type = block_transporter::goal_type;
  */
 class crw_fsm final : public base_foraging_fsm,
                 public rer::client<crw_fsm>,
-                public metrics::fsm::goal_acquisition_metrics,
+                public metrics::fsm::goal_acq_metrics,
                 public block_transporter {
  public:
   explicit crw_fsm(controller::saa_subsystem* saa,

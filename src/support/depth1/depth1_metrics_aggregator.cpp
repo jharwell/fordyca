@@ -29,12 +29,12 @@
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/location_metrics_collector.hpp"
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/acquisition_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/current_explore_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/current_vector_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
@@ -66,11 +66,11 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
     const std::string& output_root)
     : depth0_metrics_aggregator(mconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
-  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
+  register_collector<metrics::fsm::goal_acq_metrics_collector>(
       "caches::acq_counts",
       metrics_path() + "/" + mconfig->cache_acq_counts_fname,
       mconfig->collect_interval);
-  register_collector<metrics::fsm::acquisition_locs_metrics_collector>(
+  register_collector<metrics::fsm::goal_acq_locs_metrics_collector>(
       "caches::acq_locs",
       metrics_path() + "/" + mconfig->cache_acq_locs_fname,
       mconfig->collect_interval,

@@ -84,15 +84,15 @@ class acquire_existing_cache_fsm
   void by_exploration_ok(bool b) { m_by_exploration_ok = b; }
 
  private:
-  using acquisition_loc_type = std::pair<int, rmath::vector2d>;
+  using acq_loc_type = std::pair<int, rmath::vector2d>;
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acq_goal_type acquisition_goal_internal(void) const;
+  acq_goal_type acq_goal_internal(void) const;
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const;
-  boost::optional<acquisition_loc_type> calc_acquisition_location(void);
-  bool cache_acquisition_valid(const rmath::vector2d& loc, uint id) const;
+  boost::optional<acq_loc_type> calc_acq_location(void);
+  bool cache_acq_valid(const rmath::vector2d& loc, uint id) const;
 
   bool cache_acquired_cb(bool explore_result) const;
   bool cache_exploration_term_cb(void) const;

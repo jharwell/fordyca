@@ -1,5 +1,5 @@
 /**
- * @file cache_acquisition_validator.hpp
+ * @file cache_acq_validator.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_CACHE_ACQUISITION_VALIDATOR_HPP_
-#define INCLUDE_FORDYCA_FSM_CACHE_ACQUISITION_VALIDATOR_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_
+#define INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -42,29 +42,27 @@ class cache_sel_matrix;
 } /* namespace controller */
 
 NS_START(fsm);
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_acquisition_validator
+ * @class cache_acq_validator
  * @ingroup fordyca fsm
  *
  * @brief Determine if the acquisition of a cache at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and
  * current simulation state.
  */
-class cache_acquisition_validator
-    : public rer::client<cache_acquisition_validator> {
+class cache_acq_validator : public rer::client<cache_acq_validator> {
  public:
-  cache_acquisition_validator(const ds::dp_cache_map* map,
-                              const controller::cache_sel_matrix* csel_matrix,
-                              bool for_pickup);
+  cache_acq_validator(const ds::dp_cache_map* map,
+                      const controller::cache_sel_matrix* csel_matrix,
+                      bool for_pickup);
 
-  cache_acquisition_validator(const cache_acquisition_validator& v) = delete;
-  cache_acquisition_validator& operator=(const cache_acquisition_validator& v) =
-      delete;
+  cache_acq_validator(const cache_acq_validator& v) = delete;
+  cache_acq_validator& operator=(const cache_acq_validator& v) = delete;
 
   bool operator()(const rmath::vector2d& loc, int id, uint timestep) const;
 
@@ -77,4 +75,4 @@ class cache_acquisition_validator
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_CACHE_ACQUISITION_VALIDATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_CACHE_ACQ_VALIDATOR_HPP_ */

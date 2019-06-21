@@ -24,11 +24,12 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include <chrono>
 
-#include "fordyca/controller/existing_cache_selector.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_store.hpp"
-#include "fordyca/fsm/cache_acquisition_validator.hpp"
+#include "fordyca/fsm/cache_acq_point_selector.hpp"
+#include "fordyca/fsm/cache_acq_validator.hpp"
+#include "fordyca/fsm/existing_cache_selector.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
@@ -51,9 +52,8 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
           saa,
           std::move(exp_behavior),
           acquire_goal_fsm::hook_list{
-              .acquisition_goal = std::bind(
-                  &acquire_existing_cache_fsm::acquisition_goal_internal,
-                  this),
+              .acquisition_goal =
+                  std::bind(&acquire_existing_cache_fsm::acq_goal_internal, this),
               .goal_select =
                   std::bind(&acquire_existing_cache_fsm::existing_cache_select,
                             this),
@@ -70,7 +70,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 
                   this),
               .goal_valid_cb =
-                  std::bind(&acquire_existing_cache_fsm::cache_acquisition_valid,
+                  std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
                             this,
                             std::placeholders::_1,
                             std::placeholders::_2)}),
@@ -82,48 +82,31 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<acquire_existing_cache_fsm::acquisition_loc_type>
-acquire_existing_cache_fsm::calc_acquisition_location(void) {
-  controller::existing_cache_selector selector(mc_for_pickup,
-                                               mc_matrix,
-                                               &mc_store->caches());
+boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache_fsm::
+    calc_acq_location(void) {
+  existing_cache_selector selector(mc_for_pickup, mc_matrix, &mc_store->caches());
 
   if (auto best = selector(mc_store->caches(),
                            saa_subsystem()->sensing()->position(),
                            saa_subsystem()->sensing()->tick())) {
-    ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
+    ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acq",
             best->ent()->id(),
             best->ent()->real_loc().to_str().c_str(),
             best->ent()->discrete_loc().to_str().c_str(),
             best->density().last_result());
-    /*
-     * Now that we have the location of the best cache, we need to pick a random
-     * point inside it to vector to. This helps a LOT with maximimizing caches'
-     * potential for traffic/congestion regulation, because it does not require
-     * that all robots be able to make it to the center/near center of the cache
-     * in order to utilize it (this is more realistic too).
-     */
-    auto xrange = best->ent()->xspan(best->ent()->real_loc());
-    auto yrange = best->ent()->yspan(best->ent()->real_loc());
-    std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
-    std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
 
-    rmath::vector2d loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
-    ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
-            loc.to_str().c_str(),
-            best->ent()->id(),
-            xrange.to_str().c_str(),
-            yrange.to_str().c_str());
-    return boost::make_optional(std::make_pair(best->ent()->id(), loc));
+    rmath::vector2d point = cache_acq_point_selector()(
+        saa_subsystem()->sensing()->position(), best->ent(), m_rd);
 
+    return boost::make_optional(std::make_pair(best->ent()->id(), point));
   } else {
     /*
      * If this happens, all the caches we know of are too close for us to vector
      * to, or otherwise unsuitable.
      */
-    return boost::optional<acquisition_loc_type>();
+    return boost::optional<acq_loc_type>();
   }
-} /* calc_acquisition_location() */
+} /* calc_acq_location() */
 
 bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
   return saa_subsystem()->sensing()->cache_detected();
@@ -131,7 +114,7 @@ bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
 
 boost::optional<acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
     existing_cache_select(void) {
-  if (auto selection = calc_acquisition_location()) {
+  if (auto selection = calc_acq_location()) {
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(selection.get().second,
                                          vector_fsm::kCACHE_ARRIVAL_TOL,
@@ -157,17 +140,14 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
 } /* cache_acquired_cb() */
 
 __rcsw_const acq_goal_type
-acquire_existing_cache_fsm::acquisition_goal_internal(void) const {
+acquire_existing_cache_fsm::acq_goal_internal(void) const {
   return acq_goal_type::ekEXISTING_CACHE;
-} /* acquisition_goal() */
+} /* acq_goal() */
 
-bool acquire_existing_cache_fsm::cache_acquisition_valid(
-    const rmath::vector2d& loc,
-    uint id) const {
-  return cache_acquisition_validator(&mc_store->caches(),
-                                     mc_matrix,
-                                     mc_for_pickup)(
+bool acquire_existing_cache_fsm::cache_acq_valid(const rmath::vector2d& loc,
+                                                 uint id) const {
+  return cache_acq_validator(&mc_store->caches(), mc_matrix, mc_for_pickup)(
       loc, id, saa_subsystem()->sensing()->tick());
-} /* cache_acquisition_valid() */
+} /* cache_acq_valid() */
 
 NS_END(controller, fordyca);

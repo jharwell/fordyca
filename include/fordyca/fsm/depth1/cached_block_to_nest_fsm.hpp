@@ -28,7 +28,7 @@
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/ta/taskable.hpp"
 
 /*******************************************************************************
@@ -66,7 +66,7 @@ using transport_goal_type = block_transporter::goal_type;
  */
 class cached_block_to_nest_fsm final : public base_foraging_fsm,
                                        public rer::client<cached_block_to_nest_fsm>,
-                                       public metrics::fsm::goal_acquisition_metrics,
+                                       public metrics::fsm::goal_acq_metrics,
                                        public block_transporter,
                                        public rta::taskable {
  public:

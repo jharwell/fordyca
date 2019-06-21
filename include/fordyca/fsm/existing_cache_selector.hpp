@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_EXISTING_CACHE_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_FSM_EXISTING_CACHE_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -34,24 +34,28 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-NS_START(controller);
+
+namespace controller {
 class cache_sel_matrix;
+} /* namespace controller */
+
+NS_START(fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class existing_cache_selector
- * @ingroup fordyca controller
+ * @ingroup fordyca fsm
  *
  * @brief Selects from among known caches (which are presumed to still exist at
  * this point, although that may not be true as a robot's knowledge of the arena
- * is imperfect).
+ * is imperfect), using an internal utility function.
  */
 class existing_cache_selector : public rer::client<existing_cache_selector> {
  public:
   existing_cache_selector(bool is_pickup,
-                          const cache_sel_matrix* matrix,
+                          const controller::cache_sel_matrix* matrix,
                           const ds::dp_cache_map* cache_map);
 
   ~existing_cache_selector(void) override = default;
@@ -85,12 +89,12 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
                          const repr::base_cache* cache) const;
 
   /* clang-format off */
-  const bool                    mc_is_pickup;
-  const cache_sel_matrix* const mc_matrix;
-  const ds::dp_cache_map* const mc_cache_map;
+  const bool                                mc_is_pickup;
+  const controller::cache_sel_matrix* const mc_matrix;
+  const ds::dp_cache_map* const             mc_cache_map;
   /* clang-format on */
 };
 
-NS_END(controller, fordyca);
+NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_EXISTING_CACHE_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_EXISTING_CACHE_SELECTOR_HPP_ */

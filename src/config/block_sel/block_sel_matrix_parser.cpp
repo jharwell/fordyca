@@ -64,7 +64,7 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-bool block_sel_matrix_parser::validate(void) const {
+__rcsw_pure bool block_sel_matrix_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }

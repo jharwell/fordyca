@@ -1,5 +1,5 @@
 /**
- * @file cache_acquisition_validator.cpp
+ * @file cache_acq_validator.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/cache_acquisition_validator.hpp"
+#include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -36,11 +36,11 @@ using cselm = controller::cache_sel_matrix;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-cache_acquisition_validator::cache_acquisition_validator(
+cache_acq_validator::cache_acq_validator(
     const ds::dp_cache_map* map,
     const controller::cache_sel_matrix* csel_matrix,
     bool for_pickup)
-    : ER_CLIENT_INIT("fordyca.fsm.cache_acquisition_validator"),
+    : ER_CLIENT_INIT("fordyca.fsm.cache_acq_validator"),
       mc_for_pickup(for_pickup),
       mc_csel_matrix(csel_matrix),
       mc_map(map) {}
@@ -48,9 +48,9 @@ cache_acquisition_validator::cache_acquisition_validator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool cache_acquisition_validator::operator()(const rmath::vector2d& loc,
-                                             int id,
-                                             uint timestep) const {
+bool cache_acq_validator::operator()(const rmath::vector2d& loc,
+                                     int id,
+                                     uint timestep) const {
   /*
    * We can't just lookup the cache by the location key we are passed directly,
    * as it is for a point somewhere *inside* the cache, and thus probably not at

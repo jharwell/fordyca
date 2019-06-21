@@ -21,26 +21,26 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/existing_cache_selector.hpp"
+#include "fordyca/fsm/existing_cache_selector.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/fsm/cache_acquisition_validator.hpp"
+#include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
-using cselm = cache_sel_matrix;
+NS_START(fordyca, fsm);
+using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 existing_cache_selector::existing_cache_selector(
     bool is_pickup,
-    const cache_sel_matrix* const matrix,
+    const controller::cache_sel_matrix* const matrix,
     const ds::dp_cache_map* cache_map)
-    : ER_CLIENT_INIT("fordyca.controller.depth1.existing_cache_selector"),
+    : ER_CLIENT_INIT("fordyca.fsm.depth1.existing_cache_selector"),
       mc_is_pickup(is_pickup),
       mc_matrix(matrix),
       mc_cache_map(cache_map) {}
@@ -57,9 +57,7 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
 
   double max_utility = 0.0;
   for (auto& c : existing_caches.const_values_range()) {
-    fsm::cache_acquisition_validator validator(mc_cache_map,
-                                               mc_matrix,
-                                               mc_is_pickup);
+    fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
     if (!validator(c.ent()->real_loc(), c.ent()->id(), timestep) ||
         cache_is_excluded(position, c.ent())) {
@@ -141,4 +139,4 @@ bool existing_cache_selector::cache_is_excluded(
   return false;
 } /* cache_is_excluded() */
 
-NS_END(controller, fordyca);
+NS_END(fsm, fordyca);

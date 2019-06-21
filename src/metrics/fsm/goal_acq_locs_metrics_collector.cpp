@@ -1,5 +1,5 @@
 /**
- * @file acquisition_locs_metrics_collector.cpp
+ * @file goal_acq_locs_metrics_collector.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,8 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/acquisition_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,10 +32,10 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-uint acquisition_locs_metrics_collector::collect_cell(
+uint goal_acq_locs_metrics_collector::collect_cell(
     const rmetrics::base_metrics& metrics,
     const rmath::vector2u& coord) const {
-  auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
+  auto& m = dynamic_cast<const fsm::goal_acq_metrics&>(metrics);
 
   return static_cast<uint>(m.acquisition_loc() == coord);
 } /* collect_cell() */
