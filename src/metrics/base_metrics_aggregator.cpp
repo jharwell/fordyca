@@ -31,14 +31,14 @@
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/acquisition_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/current_explore_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/current_vector_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
 #include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
@@ -88,11 +88,11 @@ base_metrics_aggregator::base_metrics_aggregator(
       rmath::dvec2uvec(mconfig->arena_grid.upper,
                        mconfig->arena_grid.resolution));
 
-  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
+  register_collector<metrics::fsm::goal_acq_metrics_collector>(
       "blocks::acq_counts",
       metrics_path() + "/" + mconfig->block_acq_counts_fname,
       mconfig->collect_interval);
-  register_collector<metrics::fsm::acquisition_locs_metrics_collector>(
+  register_collector<metrics::fsm::goal_acq_locs_metrics_collector>(
       "blocks::acq_locs",
       metrics_path() + "/" + mconfig->block_acq_locs_fname,
       mconfig->collect_interval,

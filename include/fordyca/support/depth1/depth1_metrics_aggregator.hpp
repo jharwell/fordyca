@@ -31,7 +31,7 @@
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
 #include "rcppsw/ta/polled_task.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
@@ -71,7 +71,7 @@ NS_START(support, depth1);
 class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
-  using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+  using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
   depth1_metrics_aggregator(const config::metrics_config* mconfig,
                             const std::string& output_root);
@@ -152,7 +152,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         dynamic_cast<const rta::polled_task*>(controller->current_task())
         ->mechanism());
     auto acq_m =
-        dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+        dynamic_cast<const metrics::fsm::goal_acq_metrics*>(
             dynamic_cast<const rta::polled_task*>(controller->current_task())
             ->mechanism());
 
@@ -165,22 +165,27 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
 
     collect("fsm::collision_counts", *collision_m);
-    collect("fsm::collision_locs", *collision_m);
+    collect_if("fsm::collision_locs",
+               *collision_m,
+               [&](const rmetrics::base_metrics& metrics) {
+                 auto& m = dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
+                 return m.in_collision_avoidance();
+               });
     collect_if(
         "blocks::acq_counts",
-        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+        *dynamic_cast<const metrics::fsm::goal_acq_metrics*>(
             controller->current_task()),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekBLOCK == m.acquisition_goal();
         });
     collect_if(
         "blocks::acq_locs",
-        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
+        *dynamic_cast<const metrics::fsm::goal_acq_metrics*>(
             controller->current_task()),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
               m.goal_acquired();
@@ -194,7 +199,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "blocks::acq_explore_locs",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
@@ -203,7 +208,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "blocks::acq_vector_locs",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
@@ -213,7 +218,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_counts",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal();
         });
@@ -221,7 +226,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_locs",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.goal_acquired();
@@ -235,7 +240,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_explore_locs",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
@@ -244,7 +249,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_vector_locs",
         *acq_m,
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
+          auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();

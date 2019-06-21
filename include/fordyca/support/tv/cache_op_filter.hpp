@@ -27,7 +27,7 @@
 #include <string>
 
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/tv/op_filter_status.hpp"
@@ -37,7 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************

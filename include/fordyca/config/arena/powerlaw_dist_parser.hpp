@@ -46,7 +46,7 @@ NS_START(fordyca, config, arena);
  * @brief Parses XML parameters for related to \ref powerlaw_distributor
  * objects into \ref powerlaw_dist_config.
  */
-class powerlaw_dist_parser : public rconfig::xml::xml_config_parser {
+class powerlaw_dist_parser final : public rconfig::xml::xml_config_parser {
  public:
   using config_type = powerlaw_dist_config;
 

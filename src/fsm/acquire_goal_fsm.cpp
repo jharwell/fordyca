@@ -81,7 +81,8 @@ HFSM_EXIT_DEFINE(acquire_goal_fsm, exit_fsm_acquire_goal) {
   m_vector_fsm.task_reset();
   m_explore_fsm.task_reset();
 }
-HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
+
+__rcsw_const HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
   if (ekST_FINISHED != last_state()) {
     ER_DEBUG("Executing ekST_FINISHED");
   }

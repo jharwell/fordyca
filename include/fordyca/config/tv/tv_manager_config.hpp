@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/control/config/waveform_config.hpp"
 #include "fordyca/nsalias.hpp"

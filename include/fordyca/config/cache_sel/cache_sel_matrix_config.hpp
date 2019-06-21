@@ -49,7 +49,6 @@ struct cache_sel_matrix_config : public rconfig::base_config {
   double cache_prox_dist{0.0};
   double block_prox_dist{0.0};
   double nest_prox_dist{0.0};
-  double cluster_prox_dist{0.0};
   rcppsw::math::rangeu site_xrange{0, 0};
   rcppsw::math::rangeu site_yrange{0, 0};
   cache_pickup_policy_config pickup_policy{};

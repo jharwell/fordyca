@@ -189,9 +189,14 @@ std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
     const config::depth1::controller_repository& config_repo) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   auto graph = rcppsw::make_unique<rta::bi_tdgraph>(task_config);
-  auto* execp = config_repo.config_get<rta::config::task_executive_config>();
-
   auto map = depth1_tasks_create(config_repo, graph.get());
+  const auto* execp =
+      std::make_unique<rta::config::task_executive_config>().get();
+
+  /* can be omitted if the user wants the default values */
+  if (nullptr != execp) {
+    execp = config_repo.config_get<rta::config::task_executive_config>();
+  }
 
   graph->active_tab_init(execp->tab_init_method);
   depth1_exec_est_init(config_repo, map, graph.get());

@@ -69,7 +69,6 @@
             <arrival_force slowing_radius="0.2"
                            slowing_speed_min="1.0"
                            max="8"/>
-            <polar_force max="8"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
                           max_angle_delta="5"

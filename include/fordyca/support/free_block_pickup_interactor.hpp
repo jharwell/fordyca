@@ -30,7 +30,7 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
@@ -39,7 +39,7 @@
  ******************************************************************************/
 NS_START(fordyca, support);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Classes

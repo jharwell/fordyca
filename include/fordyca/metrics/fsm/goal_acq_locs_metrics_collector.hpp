@@ -1,7 +1,7 @@
 /**
- * @file current_explore_locs_metrics_collector.hpp
+ * @file goal_acq_locs_metrics_collector.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_CURRENT_EXPLORE_LOCS_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_CURRENT_EXPLORE_LOCS_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_LOCS_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_LOCS_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,21 +38,22 @@ NS_START(fordyca, metrics, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class current_explore_locs_metrics_collector
+ * @class goal_acq_locs_metrics_collector
  * @ingroup fordyca metrics fsm
  *
- * @brief Collector for robot exploration trajectories, which is collected as a
- * 2D array, and needs its own collector separate from the \ref
+ * @brief Collector for \ref goal_acq_metrics goal locations, which is
+ * collected as a 2D array, and needs its own collector separate from the \ref
  * goal_acq_metrics_collector (1 .csv per collector).
  */
-class current_explore_locs_metrics_collector final : public spatial::grid2D_avg_metrics_collector {
+class goal_acq_locs_metrics_collector final :
+    public spatial::grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.
    * @param interval Collection interval.
    * @param dims Dimensions of the arena.
    */
-  current_explore_locs_metrics_collector(const std::string& ofname,
+  goal_acq_locs_metrics_collector(const std::string& ofname,
                                     uint interval,
                                     const rmath::vector2u& dims) :
       grid2D_avg_metrics_collector(ofname, interval, dims) {}
@@ -62,4 +63,4 @@ class current_explore_locs_metrics_collector final : public spatial::grid2D_avg_
 
 NS_END(fsm, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_CURRENT_EXPLORE_LOCS_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FSM_GOAL_ACQ_LOCS_METRICS_COLLECTOR_HPP_ */

@@ -44,7 +44,7 @@ void exploration_parser::parse(const ticpp::Element& node) {
   m_config = std::make_unique<config_type>();
 
   XML_PARSE_ATTR(vnode, m_config, block_strategy);
-  XML_PARSE_ATTR(vnode, m_config, cache_strategy);
+  XML_PARSE_ATTR_DFLT(vnode, m_config, cache_strategy, std::string());
 } /* parse() */
 
 NS_END(config, fordyca);

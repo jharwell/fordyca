@@ -1,5 +1,5 @@
 /**
- * @file block_acquisition_validator.hpp
+ * @file cache_acq_point_selector.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,14 +18,16 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_BLOCK_ACQUISITION_VALIDATOR_HPP_
-#define INCLUDE_FORDYCA_FSM_BLOCK_ACQUISITION_VALIDATOR_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_CACHE_ACQ_POINT_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_FSM_CACHE_ACQ_POINT_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include <random>
+
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -33,46 +35,48 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
-namespace ds {
-class dp_block_map;
-} /* namespace ds */
-namespace controller {
-class block_sel_matrix;
-} /* namespace controller */
+namespace repr {
+class base_cache;
+} /* namespace repr */
 
 NS_START(fsm);
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @lockclass _acquisition_validator
+ * @class cache_acq_point_selector
  * @ingroup fordyca fsm
  *
- * @brief Determine if the acquisition of a block at a specific location/with a
- * specific ID is currently valid, according to simulation parameters and
- * current simulation state.
+ * @brief Once an existing cache has been selected, select a point within the
+ * cache to acquire.
+ *
+ * This helps a LOT with maximimizing caches' potential for traffic/congestion
+ * regulation, because it does not require that all robots be able to make it to
+ * the center/near center of the cache in order to utilize it (this is more
+ * realistic too).
+ *
+ * We also do not just want to pick a point randomly inside the ENTIRE cache,
+ * as we might be trying to go to a point that is on the far side of the
+ * cache, rather than the side that we are closest to. So we randomly pick a
+ * point in the closest quadrant to the robot's current location.
  */
-class block_acquisition_validator
-    : public rer::client<block_acquisition_validator> {
+class cache_acq_point_selector : public rer::client<cache_acq_point_selector> {
  public:
-  block_acquisition_validator(const ds::dp_block_map* map,
-                              const controller::block_sel_matrix* matrix);
+  explicit cache_acq_point_selector(double arrival_tol)
+      : ER_CLIENT_INIT("fordyca.fsm.cache_acq_point_selector"),
+        m_arrival_tol(arrival_tol) {}
 
-  block_acquisition_validator(const block_acquisition_validator& v) = delete;
-  block_acquisition_validator& operator=(const block_acquisition_validator& v) =
-      delete;
-
-  bool operator()(const rmath::vector2d& loc, uint id) const;
+  rmath::vector2d operator()(const rmath::vector2d& robot_loc,
+                             const repr::base_cache* cache,
+                             std::default_random_engine& rd);
 
  private:
   /* clang-format off */
-  const ds::dp_block_map* const              mc_map;
-  const controller::block_sel_matrix * const mc_matrix;
+  const double m_arrival_tol;
   /* clang-format on */
 };
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_BLOCK_ACQUISITION_VALIDATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_CACHE_ACQ_POINT_SELECTOR_HPP_ */

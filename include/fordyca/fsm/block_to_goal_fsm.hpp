@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/ta/taskable.hpp"
 
@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 class acquire_goal_fsm;
@@ -58,7 +58,7 @@ class acquire_free_block_fsm;
 class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
                           public base_foraging_fsm,
                           public rta::taskable,
-                          public metrics::fsm::goal_acquisition_metrics,
+                          public metrics::fsm::goal_acq_metrics,
                           public fsm::block_transporter {
  public:
   block_to_goal_fsm(acquire_goal_fsm* goal_fsm,

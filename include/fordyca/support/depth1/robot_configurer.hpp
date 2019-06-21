@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
-
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"

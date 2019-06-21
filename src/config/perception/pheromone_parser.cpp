@@ -41,7 +41,7 @@ void pheromone_parser::parse(const ticpp::Element& node) {
   m_config = std::make_unique<config_type>();
 
   XML_PARSE_ATTR(pnode, m_config, rho);
-  XML_PARSE_ATTR(pnode, m_config, repeat_deposit);
+  XML_PARSE_ATTR_DFLT(pnode, m_config, repeat_deposit, false);
 } /* parse() */
 
 __rcsw_pure bool pheromone_parser::validate(void) const {

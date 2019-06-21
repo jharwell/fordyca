@@ -43,16 +43,13 @@ void output_parser::parse(const ticpp::Element& node) {
 
   std::vector<std::string> res, res2;
 
-  /* only present for loop functions */
-  if (nullptr != onode.FirstChild(metrics_parser::kXMLRoot, false)) {
-    m_metrics_parser.parse(onode);
-    m_config->metrics =
-        *m_metrics_parser.config_get<metrics_parser::config_type>();
+  m_metrics_parser.parse(onode);
+  if (m_metrics_parser.is_parsed()) {
+    m_config->metrics = *m_metrics_parser.config_get<metrics_parser::config_type>();
   }
 
-  ticpp::Element snode = node_get(onode, "sim");
-  XML_PARSE_ATTR(snode, m_config, output_root);
-  XML_PARSE_ATTR(snode, m_config, output_dir);
+  XML_PARSE_ATTR(onode, m_config, output_root);
+  XML_PARSE_ATTR(onode, m_config, output_dir);
 } /* parse() */
 
 __rcsw_pure bool output_parser::validate(void) const {

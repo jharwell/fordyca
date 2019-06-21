@@ -42,7 +42,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
 using task2 = tasks::depth2::foraging_task;

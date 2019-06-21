@@ -33,11 +33,10 @@
         <battery implementation="default" />
       </sensors>
       <params>
-        <output>
-          <sim output_root="output"
-               output_dir="__current_date__"
-               />
-        </output>
+        <output
+          output_root="output"
+          output_dir="__current_date__"
+          />
         <perception>
           <grid resolution="0.2"
                 size="12, 6, 2"/>
@@ -62,7 +61,7 @@
               </src_sigmoid_sel>
           </task_abort>
           <task_partition
-              always_partition="false"
+              always_partition="true"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -126,13 +125,12 @@
             cache_prox_dist="1.6"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
-            cluster_prox_dist="1.0"
             site_xrange="2:10"
             site_yrange="2.5:3">
           <pickup_policy
               policy="cache_size"
               timestep="20000"
-              cache_size="2"/>
+              cache_size="3"/>
         </cache_sel_matrix>
         <exploration
             block_strategy="CRW"
@@ -149,7 +147,6 @@
             <arrival_force slowing_radius="0.2"
                            slowing_speed_min="1.0"
                            max="8"/>
-            <polar_force max="8"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
                           max_angle_delta="5"
@@ -172,14 +169,9 @@
   <!-- ****************** -->
   <loop_functions library="libfordyca"
                   label="depth1_loop_functions">
-    <battery
-        power_station_amount="0"
-        power_station_size="1"
-        power_station_distrubtion="normal"/>
-    <output>
-      <sim output_root="output"
-           output_dir="__current_date__"
-           />
+    <output
+        output_root="output"
+        output_dir="__current_date__">
       <metrics
           output_dir="metrics"
           fsm_collision_counts_fname="fsm-collision-counts.csv"
@@ -215,7 +207,7 @@
           swarm_convergence_fname="swarm-convergence.csv"
           temporal_variance_fname="temporal-variance.csv"
           collect_interval="1000">
-          </metrics>
+      </metrics>
     </output>
     <!-- <convergence -->
     <!--     n_threads="0" -->

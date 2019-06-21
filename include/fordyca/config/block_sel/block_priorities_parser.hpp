@@ -46,7 +46,7 @@ NS_START(fordyca, config, block_sel);
  * @brief Parses XML parameters related to block priorties into \ref
  * block_priority_config.
  */
-class block_priorities_parser : public rconfig::xml::xml_config_parser {
+class block_priorities_parser final : public rconfig::xml::xml_config_parser {
  public:
   using config_type = block_priority_config;
 

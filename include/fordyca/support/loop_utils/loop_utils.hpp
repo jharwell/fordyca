@@ -29,7 +29,6 @@
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include <utility>
 #include "fordyca/repr/line_of_sight.hpp"
 #include "rcppsw/math/vector2.hpp"
 

@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
 #include <boost/variant/static_visitor.hpp>
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/controller_fwd.hpp"

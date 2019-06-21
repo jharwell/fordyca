@@ -34,6 +34,8 @@
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/fsm/cache_acq_validator.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -141,8 +143,30 @@ class cached_block_pickup_interactor
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
-      perform_cached_block_pickup(controller, p, timestep);
-      m_floor->SetChanged();
+      /*
+       * If the cache still exists after a robot serves its penalty we still
+       * need to double check that it does not violate the robot's cache pickup
+       * policy, because it is possible that two robots entering a cache on the
+       * same/successive/close together timesteps to both be able to start
+       * serving their respective penalties (and not violate their respective
+       * pickup policies), but that the one who picks up a block first would
+       * cause f* the second one to violate THEIR pickup policy if they picked
+       * up a block (i.e. the cache now has too few blocks for pickup).
+       *
+       * In this case, you don't need to do anything, as the change in the
+       * cache's status will be picked up by the robot's LOS next timestep.
+       */
+      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
+                                 controller.cache_sel_matrix(),
+                                 true);
+      if (v(controller.position2D(), p.id(), timestep)) {
+        perform_cached_block_pickup(controller, p, timestep);
+        m_floor->SetChanged();
+      } else {
+        ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
+                controller.GetId().c_str(),
+                p.id());
+      }
     }
     m_penalty_handler->remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),

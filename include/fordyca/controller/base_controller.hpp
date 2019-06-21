@@ -30,7 +30,7 @@
 #include <typeindex>
 
 #include "fordyca/controller/block_manip_collator.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
 
@@ -74,7 +74,7 @@ class saa_subsystem;
  */
 class base_controller : public argos::CCI_Controller,
                         public metrics::fsm::movement_metrics,
-                        public metrics::fsm::goal_acquisition_metrics,
+                        public metrics::fsm::goal_acq_metrics,
                         public metrics::spatial::swarm_dist2D_metrics,
                         public rer::client<base_controller> {
  public:

@@ -52,7 +52,6 @@ void cache_sel_matrix_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(cnode, m_config, cache_prox_dist);
   XML_PARSE_ATTR(cnode, m_config, block_prox_dist);
   XML_PARSE_ATTR(cnode, m_config, nest_prox_dist);
-  XML_PARSE_ATTR(cnode, m_config, cluster_prox_dist);
   XML_PARSE_ATTR(cnode, m_config, site_xrange);
   XML_PARSE_ATTR(cnode, m_config, site_yrange);
 } /* parse() */
@@ -65,7 +64,6 @@ __rcsw_pure bool cache_sel_matrix_parser::validate(void) const {
   CHECK(m_config->cache_prox_dist > 0.0);
   CHECK(m_config->block_prox_dist > 0.0);
   CHECK(m_config->nest_prox_dist > 0.0);
-  CHECK(m_config->cluster_prox_dist > 0.0);
   return true;
 
 error:

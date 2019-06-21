@@ -56,8 +56,7 @@ class collision_locs_metrics_collector final : public spatial::grid2D_avg_metric
                              const rmath::vector2u& dims) :
       grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  uint collect_cell(const rmetrics::base_metrics& metrics,
-                    const rmath::vector2u& coord) const override;
+    void collect(const rmetrics::base_metrics& metrics) override;
 };
 
 NS_END(fsm, metrics, fordyca);

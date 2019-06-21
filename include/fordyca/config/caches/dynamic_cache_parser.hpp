@@ -46,7 +46,7 @@ NS_START(fordyca, config, caches);
  * @brief Parses XML parameters for relating to dynamic caches into \ref
  * dynamic_cache_config.
  */
-class dynamic_cache_parser: public rconfig::xml::xml_config_parser {
+class dynamic_cache_parser final: public rconfig::xml::xml_config_parser {
  public:
   using config_type = dynamic_cache_config;
 

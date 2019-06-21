@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include "rcppsw/config/base_config.hpp"
 #include "fordyca/config/arena/block_dist_config.hpp"
 
