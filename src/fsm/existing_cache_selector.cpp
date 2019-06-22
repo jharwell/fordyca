@@ -84,10 +84,11 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
   } /* for(existing_cache..) */
 
   if (nullptr != best.ent()) {
-    ER_INFO("Best utility: existing_cache%d@%s/%s: %f",
+    ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
             best.ent()->id(),
             best.ent()->real_loc().to_str().c_str(),
             best.ent()->discrete_loc().to_str().c_str(),
+            best.ent()->n_blocks(),
             max_utility);
     return boost::make_optional(best);
   } else {

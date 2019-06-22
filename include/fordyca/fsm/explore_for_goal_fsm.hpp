@@ -100,15 +100,6 @@ class explore_for_goal_fsm final : public base_foraging_fsm,
   }
   void task_execute(void) override;
 
-  /**
-   * @brief Set callback for determining if the goal has been detected (i.e. the
-   * robot is either on top of it, or is otherwise near enough so that the next
-   * stage of whatever it is currently doing can happen).
-   */
-  void set_goal_detection(const std::function<bool(void)>& cb) {
-    m_goal_detect = cb;
-  }
-
  private:
   /* exploration states */
 

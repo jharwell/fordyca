@@ -65,10 +65,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 
                             this,
                             std::placeholders::_1),
-              .explore_term_cb = std::bind(
-                  &acquire_existing_cache_fsm::cache_exploration_term_cb,
-
-                  this),
+                .explore_term_cb = std::bind([] () noexcept { return false; }),
               .goal_valid_cb =
                   std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
                             this,
@@ -89,13 +86,13 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
   if (auto best = selector(mc_store->caches(),
                            saa_subsystem()->sensing()->position(),
                            saa_subsystem()->sensing()->tick())) {
-    ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acq",
+    ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
             best->ent()->id(),
             best->ent()->real_loc().to_str().c_str(),
             best->ent()->discrete_loc().to_str().c_str(),
             best->density().last_result());
 
-    rmath::vector2d point = cache_acq_point_selector()(
+    rmath::vector2d point = cache_acq_point_selector(0.3)(
         saa_subsystem()->sensing()->position(), best->ent(), m_rd);
 
     return boost::make_optional(std::make_pair(best->ent()->id(), point));
@@ -107,10 +104,6 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
     return boost::optional<acq_loc_type>();
   }
 } /* calc_acq_location() */
-
-bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
-  return saa_subsystem()->sensing()->cache_detected();
-} /* cache_exploration_term_cb() */
 
 boost::optional<acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
     existing_cache_select(void) {
@@ -145,9 +138,14 @@ acquire_existing_cache_fsm::acq_goal_internal(void) const {
 } /* acq_goal() */
 
 bool acquire_existing_cache_fsm::cache_acq_valid(const rmath::vector2d& loc,
-                                                 uint id) const {
-  return cache_acq_validator(&mc_store->caches(), mc_matrix, mc_for_pickup)(
-      loc, id, saa_subsystem()->sensing()->tick());
+                                                 uint id) {
+  m_acq_valid = cache_acq_validator(&mc_store->caches(),
+                                    mc_matrix,
+                                    mc_for_pickup)(
+                                        loc,
+                                        id,
+                                        saa_subsystem()->sensing()->tick());
+  return m_acq_valid;
 } /* cache_acq_valid() */
 
 NS_END(controller, fordyca);

@@ -89,7 +89,7 @@ class cache_sel_matrix final
    * able to pickup from *ANY* cache.
    */
   static constexpr char kPickupPolicy[] = "pickup_policy";
-  static constexpr char kPickupPolicyNull[] = "Null";
+  static constexpr char kPickupPolicyNull[] = "";
   static constexpr char kPickupPolicyTime[] = "time";
   static constexpr char kPickupPolicyCacheSize[] = "cache_size";
 

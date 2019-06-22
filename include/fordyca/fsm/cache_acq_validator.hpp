@@ -69,7 +69,7 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
   /* clang-format off */
   const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_csel_matrix;
-  const ds::dp_cache_map*      const        mc_map;
+  const ds::dp_cache_map*             const mc_map;
   /* clang-format on */
 };
 

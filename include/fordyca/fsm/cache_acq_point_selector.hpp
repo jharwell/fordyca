@@ -63,8 +63,9 @@ NS_START(fsm);
  */
 class cache_acq_point_selector : public rer::client<cache_acq_point_selector> {
  public:
-  cache_acq_point_selector(void)
-      : ER_CLIENT_INIT("fordyca.fsm.cache_acq_point_selector") {}
+  explicit cache_acq_point_selector(double arrival_tol)
+      : ER_CLIENT_INIT("fordyca.fsm.cache_acq_point_selector"),
+        m_arrival_tol(arrival_tol) {}
 
   rmath::vector2d operator()(const rmath::vector2d& robot_loc,
                              const repr::base_cache* cache,
@@ -72,6 +73,7 @@ class cache_acq_point_selector : public rer::client<cache_acq_point_selector> {
 
  private:
   /* clang-format off */
+  const double m_arrival_tol;
   /* clang-format on */
 };
 

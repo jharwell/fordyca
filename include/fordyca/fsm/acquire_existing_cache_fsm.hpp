@@ -92,12 +92,15 @@ class acquire_existing_cache_fsm
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const;
   boost::optional<acq_loc_type> calc_acq_location(void);
-  bool cache_acq_valid(const rmath::vector2d& loc, uint id) const;
+  bool cache_acq_valid(const rmath::vector2d& loc, uint id);
 
   bool cache_acquired_cb(bool explore_result) const;
-  bool cache_exploration_term_cb(void) const;
 
   /* clang-format off */
+  const bool                                mc_for_pickup;
+  const controller::cache_sel_matrix* const mc_matrix;
+  const ds::dpo_store*      const           mc_store;
+
   /**
    * @brief Is it OK to acquire a cache via exploration? Usually you do not want
    * this because:
@@ -108,9 +111,16 @@ class acquire_existing_cache_fsm
    *   yet.
    */
   bool                                      m_by_exploration_ok{false};
-  const bool                                mc_for_pickup;
-  const controller::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const           mc_store;
+
+  /**
+   * @brief Is the current cache acquisition valid? We need to save this when it
+   * is computed, because it is computed using a callback from the \ref
+   * acquire_goal_fsm and we get passed information we cannot get internally. We
+   * save it so that if we happen to be exploring for a cache because all known
+   * caches are invalid, we don't signal "goal acquired" via \ref
+   * cache_exploration_term_cb() and acquire a cache erroneously.
+   */
+  bool                                      m_acq_valid{false};
   std::default_random_engine                m_rd;
   /* clang-format on */
 };

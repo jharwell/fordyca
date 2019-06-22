@@ -212,7 +212,12 @@ std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
     const config::depth2::controller_repository& config_repo) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   auto graph = rcppsw::make_unique<rta::bi_tdgraph>(task_config);
-  auto* execp = config_repo.config_get<rta::config::task_executive_config>();
+  const auto* execp = std::make_unique<rta::config::task_executive_config>().get();
+
+  /* can be omitted if the user wants the default values */
+  if (nullptr != execp) {
+    execp = config_repo.config_get<rta::config::task_executive_config>();
+  }
 
   auto map1 = depth1_tasks_create(config_repo, graph.get());
   depth1_exec_est_init(config_repo, map1, graph.get());

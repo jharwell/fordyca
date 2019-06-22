@@ -68,35 +68,33 @@ class acquire_goal_fsm : public base_foraging_fsm,
   using goal_valid_ftype = std::function<bool(const rmath::vector2d&, uint)>;
 
   /**
-   * acquisition_goal Function used to tell the FSM what is the ultimate
-   *                  goal of the acquisition. However, the return of
-   *                  \ref acquisition_goal() may not always be the same
-   *                  as the specified goal, depending on what the
-   *                  current FSM state is.
+   * acquisition_goal Function used to tell the FSM what is the ultimate goal of
+   *                  the acquisition. However, the return of \ref
+   *                  acquisition_goal() may not always be the same as the
+   *                  specified goal, depending on what the current FSM state
+   *                  is.
    *
    * goal_select      Function used to select a goal from the list of
-   *                  candidates. Should return the "best" candidate that
-   *                  should be acquired.
+   *                  candidates. Should return the "best" candidate that should
+   *                  be acquired.
    *
-   * candidates_exist Function used to determine if any goal candidates
-   *                  are currently available/eligible for acquisition.
+   * candidates_exist Function used to determine if any goal candidates are
+   *                  currently available/eligible for acquisition.
    *
-   * goal_acquired_cb Callback used after a goal has been acquired for
-   *                  sanity check/verification of state. Will be passed
-   *                  \c TRUE if the acquired goal was obtained via
-   *                  exploration, rather than vectoring, and false if it
-   *                  was obtained via vectoring. Should return \c TRUE
-   *                  if the goal has REALLY been acquired, and \c FALSE
-   *                  otherwise (the goal may have vanished if it was a
-   *                  block/cache, for example).
+   * goal_acquired_cb Callback used after a goal has been acquired for sanity
+   *                  check/verification of state. Will be passed \c TRUE if the
+   *                  acquired goal was obtained via exploration, rather than
+   *                  vectoring, and false if it was obtained via
+   *                  vectoring. Should return \c TRUE if the goal has REALLY
+   *                  been acquired, and \c FALSE otherwise (the goal may have
+   *                  vanished if it was a block/cache, for example).
    *
-   * explore_term_cb Callback for goal detection during exploration. This
-   *                 fsm can't know when a goal has been reached without
-   *                 losing its generality when exploring, so this
-   *                 callback is provided to it for that purpose. Should
-   *                 return \c TRUE if the goal has been detected/reached
-   *                 and exploration should terminate, and \c FALSE
-   *                 otherwise.
+   * explore_term_cb Callback for goal detection during exploration. This fsm
+   *                 can't know when a goal has been reached without losing its
+   *                 generality when exploring, so this callback is provided to
+   *                 it for that purpose. Should return \c TRUE if the goal has
+   *                 been detected/reached and exploration should terminate, and
+   *                 \c FALSE otherwise.
    *
    * goal_valid_cb Callback for verifying goal validity during
    *               vectoring/exploration. If for any reason the specific goal
@@ -187,6 +185,11 @@ class acquire_goal_fsm : public base_foraging_fsm,
    */
   bool acquire_unknown_goal(void);
 
+  /**
+   * @brief Acquire a known goal via exploration.
+   *
+   * @return \c TRUE if a goal has been acquired \c FALSE otherwise.
+   */
   bool acquire_known_goal(void);
 
   HFSM_STATE_DECLARE_ND(acquire_goal_fsm, start);

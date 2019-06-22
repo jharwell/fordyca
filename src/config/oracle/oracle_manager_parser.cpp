@@ -57,7 +57,7 @@ void oracle_manager_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_pure bool oracle_manager_parser::validate(void) const {
+__rcsw_const bool oracle_manager_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }

@@ -50,9 +50,8 @@ void output_parser::parse(const ticpp::Element& node) {
         *m_metrics_parser.config_get<metrics_parser::config_type>();
   }
 
-  ticpp::Element snode = node_get(onode, "sim");
-  XML_PARSE_ATTR(snode, m_config, output_root);
-  XML_PARSE_ATTR(snode, m_config, output_dir);
+  XML_PARSE_ATTR(onode, m_config, output_root);
+  XML_PARSE_ATTR(onode, m_config, output_dir);
 } /* parse() */
 
 __rcsw_pure bool output_parser::validate(void) const {

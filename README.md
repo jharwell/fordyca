@@ -53,13 +53,7 @@ The script assumes you have sudo privileges on the machine you want to install
 the project on. If you do not, you will have to build a *lot* more stuff from
 source manually.
 
-# Configuring Simulations
-
-For parameter configuration see
-[parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
-
-## Controller Configuration
-
+# Available Controllers
 
 | Controller | Status | Loop functions | Notes                                                                                                                                 |
 |------------|--------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
@@ -77,6 +71,17 @@ For parameter configuration see
 | grp\_odpo  | Stable | depth2         | Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled.  |
 | grp\_omdpo | Stable | depth2         | Recursive greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled. |
 
+# Configuring Simulations
+
+This project extends the base `.argos` file (XML file really) with a set of new
+parameters for controllers and loop functions.
+
+For controller configuration, see
+[controller](https://github.com/swarm-robotics/fordyca/tree/devel/docs/controller-xml-configuration.md).
+
+For loop functions configuration, see
+[loop functions](https://github.com/swarm-robotics/fordyca/tree/devel/docs/loop-functions-xml-configuration.md).
+
 # Running On Your Laptop
 
 After successful compilation, follow these steps to run a foraging scenario:
@@ -86,9 +91,9 @@ After successful compilation, follow these steps to run a foraging scenario:
 
         export ARGOS_PLUGIN_PATH=/path/to/where/argos/lib/dir:/path/to/fordyca/build/lib
 
-   Note that you need BOTH of these terms in the path, because this defines the
-   ENTIRE search space for argos to look for libraries (including its own core
-   libraries).
+   Where you replace both `/path/to` entries to actual paths.  Note that you
+   need BOTH of these terms in the path, because this defines the ENTIRE search
+   space for argos to look for libraries (including its own core libraries).
 
 2. Unless you compile out event reporting, you will need to set the path to the
    log4cxx configuration file. On bash that is:
