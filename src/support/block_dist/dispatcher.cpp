@@ -49,8 +49,10 @@ constexpr char dispatcher::kDistPowerlaw[];
  ******************************************************************************/
 dispatcher::dispatcher(ds::arena_grid* const grid,
                        const config::arena::block_dist_config* const config,
+                       double arena_resolution,
                        double arena_padding)
-    : mc_padding(arena_padding),
+    : mc_resolution(arena_resolution),
+      mc_padding(arena_padding),
       mc_config(*config),
       m_dist_type(config->dist_type),
       m_grid(grid),
@@ -71,7 +73,7 @@ bool dispatcher::initialize(void) {
       m_grid->ydsize() - kINDEX_MIN - padding);
   if (kDistRandom == m_dist_type) {
     m_dist = rcppsw::make_unique<random_distributor>(arena,
-                                                     mc_config.arena_resolution);
+                                                     mc_resolution);
   } else if (kDistSingleSrc == m_dist_type) {
     ds::arena_grid::view area = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.80),
@@ -80,7 +82,7 @@ bool dispatcher::initialize(void) {
         m_grid->ydsize() - kINDEX_MIN - padding);
     m_dist = rcppsw::make_unique<cluster_distributor>(
         area,
-        mc_config.arena_resolution,
+        mc_resolution,
         std::numeric_limits<uint>::max());
   } else if (kDistDualSrc == m_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
@@ -96,7 +98,7 @@ bool dispatcher::initialize(void) {
     std::vector<ds::arena_grid::view> grids{area_l, area_r};
     m_dist = rcppsw::make_unique<multi_cluster_distributor>(
         grids,
-        mc_config.arena_resolution,
+        mc_resolution,
         std::numeric_limits<uint>::max());
   } else if (kDistQuadSrc == m_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
@@ -122,10 +124,11 @@ bool dispatcher::initialize(void) {
     std::vector<ds::arena_grid::view> grids{area_l, area_r, area_b, area_u};
     m_dist = rcppsw::make_unique<multi_cluster_distributor>(
         grids,
-        mc_config.arena_resolution,
+        mc_resolution,
         std::numeric_limits<uint>::max());
   } else if (kDistPowerlaw == m_dist_type) {
-    auto p = rcppsw::make_unique<powerlaw_distributor>(&mc_config);
+    auto p = rcppsw::make_unique<powerlaw_distributor>(&mc_config.powerlaw,
+                                                       mc_resolution);
     if (!p->map_clusters(m_grid)) {
       return false;
     }

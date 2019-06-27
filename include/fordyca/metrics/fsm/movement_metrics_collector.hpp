@@ -72,7 +72,9 @@ class movement_metrics_collector final : public rmetrics::base_metrics_collector
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
+  /* clang-format off */
   struct stats m_stats{};
+  /* clang-format on */
 };
 
 NS_END(fsm, metrics, fordyca);

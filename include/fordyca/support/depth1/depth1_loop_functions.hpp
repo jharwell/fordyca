@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include <memory>
 
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include "fordyca/support/robot_los_updater.hpp"
@@ -76,6 +77,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   void Init(ticpp::Element& node) override;
   void PreStep() override;
   void Reset(void) override;
+  void Destroy(void) override;
 
  protected:
   /**

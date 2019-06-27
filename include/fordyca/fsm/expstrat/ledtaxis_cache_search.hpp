@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-
+#include <memory>
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
 #include "fordyca/fsm/expstrat/crw.hpp"
 #include "fordyca/fsm/expstrat/base_expstrat.hpp"

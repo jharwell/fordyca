@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <list>
 #include <string>
+#include <memory>
 
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
@@ -73,6 +74,7 @@ class dispatcher {
 
   dispatcher(ds::arena_grid* grid,
              const config::arena::block_dist_config* config,
+             double arena_resolution,
              double arena_padding);
   ~dispatcher(void);
 
@@ -120,12 +122,13 @@ class dispatcher {
   static size_t constexpr kINDEX_MIN = 2;
 
   /* clang-format off */
-  const double                                  mc_padding;
+  const double                           mc_resolution;
+  const double                           mc_padding;
   const config::arena::block_dist_config mc_config;
 
-  std::string                                   m_dist_type;
-  ds::arena_grid*                               m_grid{nullptr};
-  std::unique_ptr<base_distributor>             m_dist;
+  std::string                            m_dist_type;
+  ds::arena_grid*                        m_grid{nullptr};
+  std::unique_ptr<base_distributor>      m_dist;
 
   /* clang-format on */
 };

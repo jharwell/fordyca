@@ -48,33 +48,35 @@ rmath::vector2d cache_acq_point_selector::operator()(
    * the center to pick a random point in. Each quadrant is cache_dim / 2.0, so
    * quadrant center needs to be computed using cache_dim / 4.0.
    */
-  auto ul_center = rmath::vector2d(
-      cache->real_loc().x() - cache->xsize() / 4.0 + m_arrival_tol,
-      cache->real_loc().y() + cache->ysize() / 4.0 - m_arrival_tol);
+  /* auto ul_center = rmath::vector2d(cache->real_loc().x() - cache->xsize() / 4.0, */
+  /*                                  cache->real_loc().y() + cache->ysize() / 4.0); */
 
-  auto ur_center = rmath::vector2d(
-      cache->real_loc().x() + cache->xsize() / 4.0 - m_arrival_tol,
-      cache->real_loc().y() + cache->ysize() / 4.0 - m_arrival_tol);
+  /* auto ur_center = rmath::vector2d(cache->real_loc().x() + cache->xsize() / 4.0, */
+  /*                                  cache->real_loc().y() + cache->ysize() / 4.0); */
 
-  auto lr_center = rmath::vector2d(
-      cache->real_loc().x() + cache->xsize() / 4.0 - m_arrival_tol,
-      cache->real_loc().y() - cache->ysize() / 4.0 + m_arrival_tol);
-  auto ll_center = rmath::vector2d(
-      cache->real_loc().x() - cache->xsize() / 4.0 + m_arrival_tol,
-      cache->real_loc().y() - cache->ysize() / 4.0 + m_arrival_tol);
+  /* auto lr_center = rmath::vector2d(cache->real_loc().x() + cache->xsize() / 4.0, */
+  /*                                  cache->real_loc().y() - cache->ysize() / 4.0); */
+  /* auto ll_center = rmath::vector2d(cache->real_loc().x() - cache->xsize() / 4.0, */
+  /*                                  cache->real_loc().y() - cache->ysize() / 4.0); */
 
-  /* find closest center */
-  std::list<rmath::vector2d> centers = {
-      ul_center, ur_center, lr_center, ll_center};
-  auto closest = *std::min_element(
-      centers.begin(), centers.end(), [&](const auto& c1, const auto& c2) {
-        return (c1 - robot_loc).length() < (c2 - robot_loc).length();
-      });
+  /* /\* find closest center *\/ */
+  /* std::list<rmath::vector2d> centers = { */
+  /*     ul_center, ur_center, lr_center, ll_center}; */
+  /* auto closest = *std::min_element( */
+  /*     centers.begin(), centers.end(), [&](const auto& c1, const auto& c2) { */
+  /*       return (c1 - robot_loc).length() < (c2 - robot_loc).length(); */
+  /*     }); */
 
-  auto xrange = rmath::ranged(closest.x() - cache->xsize() / 4.0,
-                              closest.x() + cache->xsize() / 4.0);
-  auto yrange = rmath::ranged(closest.y() - cache->ysize() / 4.0,
-                              closest.y() + cache->ysize() / 4.0);
+  /* auto xrange = rmath::ranged(closest.x() - cache->xsize() / 4.0 + m_arrival_tol, */
+  /*                             closest.x() + cache->xsize() / 4.0 - m_arrival_tol); */
+  /* auto yrange = rmath::ranged(closest.y() - cache->ysize() / 4.0 + m_arrival_tol, */
+  /*                             closest.y() + cache->ysize() / 4.0 - m_arrival_tol); */
+  auto xspan = cache->xspan(cache->real_loc());
+  auto yspan = cache->yspan(cache->real_loc());
+  auto xrange =
+      rmath::ranged(xspan.lb() + m_arrival_tol, xspan.ub() - m_arrival_tol);
+  auto yrange =
+      rmath::ranged(yspan.lb() + m_arrival_tol, yspan.ub() - m_arrival_tol);
 
   std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
   std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());

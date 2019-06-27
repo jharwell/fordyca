@@ -32,7 +32,8 @@ NS_START(fordyca, metrics, spatial);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void swarm_pos2D_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
+void swarm_pos2D_metrics_collector::collect(
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const swarm_dist2D_metrics&>(metrics);
   inc_total_count();
 

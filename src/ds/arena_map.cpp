@@ -55,7 +55,10 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
              config->nest.center,
              config->grid.resolution,
              support::light_type_index()[support::light_type_index::kNest]),
-      m_block_dispatcher(&decoratee(), &config->blocks.dist, arena_padding()),
+      m_block_dispatcher(&decoratee(),
+                         &config->blocks.dist,
+                         config->grid.resolution,
+                         arena_padding()),
       m_redist_governor(&config->blocks.dist.redist_governor) {
   ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),

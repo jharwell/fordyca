@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <algorithm>
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/repr/base_block.hpp"

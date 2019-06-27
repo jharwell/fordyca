@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include <memory>
+
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 #include "fordyca/support/robot_los_updater.hpp"
 #include "fordyca/support/robot_metric_extractor.hpp"
@@ -64,6 +66,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void Init(ticpp::Element& node) override;
   void PreStep() override;
   void Reset(void) override;
+  void Destroy(void) override;
 
   /**
    * @brief Initialize depth2 support to be shared with derived classes

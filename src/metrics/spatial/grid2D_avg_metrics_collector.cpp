@@ -61,9 +61,9 @@ bool grid2D_avg_metrics_collector::csv_line_build(std::string& line) {
   }
   for (size_t i = 0; i < m_stats.xsize(); ++i) {
     for (size_t j = 0; j < m_stats.ysize(); ++j) {
-      line +=
-          std::to_string(m_stats.access(i, j) / static_cast<double>(m_total_count)) +
-          separator();
+      line += std::to_string(m_stats.access(i, j) /
+                             static_cast<double>(m_total_count)) +
+              separator();
     } /* for(j..) */
     line += "\n";
   } /* for(i..) */

@@ -45,7 +45,8 @@ void output_parser::parse(const ticpp::Element& node) {
 
   m_metrics_parser.parse(onode);
   if (m_metrics_parser.is_parsed()) {
-    m_config->metrics = *m_metrics_parser.config_get<metrics_parser::config_type>();
+    m_config->metrics =
+        *m_metrics_parser.config_get<metrics_parser::config_type>();
   }
 
   XML_PARSE_ATTR(onode, m_config, output_root);

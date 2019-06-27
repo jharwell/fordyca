@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <gp_dpo_controller id="ffc"
+    <grp_dpo_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -160,7 +160,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </gp_dpo_controller>
+    </grp_dpo_controller>
 
   </controllers>
 
@@ -168,44 +168,42 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth2_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
       <metrics
           output_dir="metrics"
-          fsm_collision_counts_fname="fsm-collision-counts.csv"
-          fsm_collision_locs_fname="fsm-collision-locs.csv"
-          fsm_movement_fname="fsm-movement.csv"
-          block_acq_counts_fname="block-acq-counts.csv"
-          block_acq_locs_fname="block-acq-locs.csv"
-          block_acq_explore_locs_fname="block-acq-explore-locs.csv"
-          block_acq_vector_locs_fname="block-acq-vector-locs.csv"
-          block_transport_fname="block-transport.csv"
-          block_manipulation_fname="block-manipulation.csv"
-          cache_acq_counts_fname="cache-acq-counts.csv"
-          cache_acq_locs_fname="cache-acq-locs.csv"
-          cache_acq_explore_locs_fname="cache-acq-explore-locs.csv"
-          cache_acq_vector_locs_fname="cache-acq-vector-locs.csv"
-          cache_utilization_fname="cache-utilization.csv"
-          cache_lifecycle_fname="cache-lifecycle.csv"
-          cache_locations_fname="cache-locations.csv"
-          task_execution_generalist_fname="task-execution-generalist.csv"
-          task_execution_collector_fname="task-execution-collector.csv"
-          task_execution_harvester_fname="task-execution-harvester.csv"
-          task_execution_cache_starter_fname="task-execution-cache_starter.csv"
-          task_execution_cache_finisher_fname="task-execution-cache_finisher.csv"
-          task_execution_cache_transferer_fname="task-execution-cache_transferer.csv"
-          task_execution_cache_collector_fname="task-execution-cache_collector.csv"
-          task_tab_generalist_fname="task-tab-generalist.csv"
-          task_tab_collector_fname="task-tab-collector.csv"
-          task_tab_harvester_fname="task-tab-harvester.csv"
-          task_distribution_fname="task-distribution.csv"
-          perception_dpo_fname="perception-dpo.csv"
-          perception_mdpo_fname="perception-mdpo.csv"
-          swarm_dist_pos2D_fname="swarm-dist-pos2D.csv"
-          swarm_convergence_fname="swarm-convergence.csv"
-          temporal_variance_fname="temporal-variance.csv"
+
+          block_acq_counts="block-acq-counts.csv"
+          block_acq_locs="block-acq-locs.csv"
+          block_acq_explore_locs="block-acq-explore-locs.csv"
+          block_acq_vector_locs="block-acq-vector-locs.csv"
+          block_transport="block-transport.csv"
+          block_manipulation="block-manipulation.csv"
+          cache_acq_counts="cache-acq-counts.csv"
+          cache_acq_locs="cache-acq-locs.csv"
+          cache_acq_explore_locs="cache-acq-explore-locs.csv"
+          cache_acq_vector_locs="cache-acq-vector-locs.csv"
+          cache_utilization="cache-utilization.csv"
+          cache_lifecycle="cache-lifecycle.csv"
+          cache_locations="cache-locations.csv"
+          task_execution_generalist="task-execution-generalist.csv"
+          task_execution_collector="task-execution-collector.csv"
+          task_execution_harvester="task-execution-harvester.csv"
+          task_execution_cache_starter="task-execution-cache_starter.csv"
+          task_execution_cache_finisher="task-execution-cache_finisher.csv"
+          task_execution_cache_transferer="task-execution-cache_transferer.csv"
+          task_execution_cache_collector="task-execution-cache_collector.csv"
+          task_tab_generalist="task-tab-generalist.csv"
+          task_tab_collector="task-tab-collector.csv"
+          task_tab_harvester="task-tab-harvester.csv"
+          task_distribution="task-distribution.csv"
+          perception_dpo="perception-dpo.csv"
+          perception_mdpo="perception-mdpo.csv"
+          swarm_dist_pos2D="swarm-dist-pos2D.csv"
+          swarm_convergence="swarm-convergence.csv"
+          temporal_variance="temporal-variance.csv"
           collect_interval="1000">
       </metrics>
     </output>
@@ -267,7 +265,6 @@
             size="12, 6, 2"/>
       <blocks>
         <distribution
-            arena_resolution="0.2"
             dist_type="single_source">
           <!-- <redist_governor -->
           <!--     trigger="Null" -->

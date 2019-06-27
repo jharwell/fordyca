@@ -20,7 +20,7 @@ separated by a `|` in example XML, and attributes that should be floating point
 are specified as `FLOAT` (acceptable range, if applicable, is documented for
 each individual attribute).
 
-### `output`
+## `output`
 
 - Required by: all controllers.
 - Required child attributes if present: all.
@@ -51,7 +51,7 @@ XML configuration:
                  `__current_date__` here, the simulation will get a unique
                  output directory in the form YYYY-MM-DD:HH-MM.
 
-### `perception`
+## `perception`
 
 - Required by: All but the CRW controller.
 - Required child attributes if present: none.
@@ -77,7 +77,7 @@ XML configuration:
 </params>
 ```
 
-#### `pheromone`
+### `pheromone`
 
 - Required child attributes if present: `rho`.
 - Required child tags if present: none.
@@ -105,7 +105,7 @@ XML configuration:
                      be omitted).
 
 
-#### `grid`
+### `grid`
 
 - Required by: [`MDPO`, `GP-MDPO`, `GRP-MDPO`] controllers.
 - Required child attributes if present: [`resolution`, `size`]
@@ -129,7 +129,7 @@ XML configuration:
 - `size` - The size of the arena, specified as "X, Y, Z" (the spaces are
            mandatory).
 
-### `task_executive`
+## `task_executive`
 
 - Required by: none. Used by all [depth1, depth2] controllers with the default
                values shown below if it is omitted.
@@ -177,7 +177,7 @@ XML configuration:
                     within the task decomposition graph that is passed to the
                     executive.
 
-### `task_alloc`
+## `task_alloc`
 
 XML configuration:
 
@@ -251,7 +251,7 @@ tags, all child attributes and tags are required.
             probability.
 
 
-#### `task_abort`
+### `task_abort`
 
 - Required by: [depth1, depth2] controllers.
 - Required child attributes if present: none.
@@ -283,7 +283,7 @@ XML configuration:
 </params>
 ```
 
-#### `task_partition`
+### `task_partition`
 
 - Required by: [depth1, depth2[] controllers.
 - Required child attributes if present: none.
@@ -322,7 +322,7 @@ XML configuration:
 partitioning decision. Calculated once upon each task allocation, after the
 previous task is finished or aborted.
 
-#### `subtask_sel`
+### `subtask_sel`
 
 - Required by: [depth1, depth2] controllers.
 - Required child attributes if present: none.
@@ -352,7 +352,7 @@ XML configuration:
 `method` tag can be one of [`harwell2018`,`random`] to perform stochastic
 subtask selection if partitioning is employed.
 
-#### `task_exec_estimates`
+### `task_exec_estimates`
 
 - Required by: none.
 - Required child attributes if present: None.
@@ -390,7 +390,7 @@ subtask selection if partitioning is employed.
 - `alpha`- Parameter for exponential weighting of a moving time estimate of the
            true execution/interface time of a task. Must be < 1.0.
 
-#### `tab_sel`
+### `tab_sel`
 
 - Required by: Depth2 controllers.
 - Required child attributes if present: `src_sigmoid_sel`.
@@ -420,7 +420,7 @@ XML configuration:
 
 `method` tag that can be one of [`harwell2019`].
 
-### `block_sel_matrix`
+## `block_sel_matrix`
 
 - Required by: all but CRW controller.
 - Required child attributes if present: `nest`.
@@ -448,7 +448,7 @@ XML configuration:
 
 `nest` - The location of the nest.
 
-#### `block_priorities`
+### `block_priorities`
 
 - Required by: none.
 - Required child attributes if present: `nest`.
@@ -474,7 +474,7 @@ XML configuration:
 - `ramp` - The priority value used as part of block utility calculation for ramp
            blocks during block selection. Default = 1.0
 
-#### `pickup_policy`
+### `pickup_policy`
 
 - Required by: none.
 - Required child attributes if present: `policy`.
@@ -512,7 +512,7 @@ XML configuration:
 - `prox_dist` - The minimum distance measure for usage with `cluster_proximity`
                 pickup policy.
 
-### `cache_sel_matrix`
+## `cache_sel_matrix`
 
 - Required by: [depth1, depth2] controllers.
 - Required child attributes if present: all.
@@ -561,7 +561,7 @@ XML configuration:
                   of the full arena Y size, to avoid robots being able to select
                   locations by arena boundaries).
 
-#### `pickup_policy`
+### `pickup_policy`
 
 - Required by: [depth1, depth2] controllers.
 - Required child attributes if present: `policy`.
@@ -599,7 +599,7 @@ XML configuration:
   - Can also be an empty string to disable the cache pickup policy if the
     `pickup_policy` tag is present.
 
-### `exploration`
+## `exploration`
 
 - Required by: all but CRW controller.
 - Required child attributes if present: `block_strategy`.
@@ -648,7 +648,7 @@ XML configuration:
                         perform LEDtaxis towards it, and then perform CRW once a
                         robot is sufficiently close.
 
-### `sensing`
+## `sensing`
 
 - Required by: all.
 - Required child attributes if present: `los_dim`.
@@ -669,7 +669,7 @@ XML configuration:
 </params>
 ```
 
-#### `proximity_sensor`
+### `proximity_sensor`
 
 - Required by: all.
 - Required child attributes if present: `los_dim`.
@@ -694,7 +694,7 @@ XML configuration:
 - `delta` - Tripping threshold for exponential distance calculations for
             obstacle detection.
 
-### `actuation`
+## `actuation`
 
 - Required by: all.
 - Required child attributes if present: none.
@@ -717,7 +717,7 @@ XML configuration:
 </params>
 ```
 
-#### `steering2D`
+### `steering2D`
 
 - Required by: all.
 - Required child attributes if present: none.
@@ -747,14 +747,14 @@ XML configuration:
 </actuation>
 
 ```
-##### `avoidance_force`
+#### `avoidance_force`
 
 - `lookahead` - How far ahead of the robot to look for obstacles. Currently
   unused, but may be used in the future.
 
 - `max` - Max value for the force.
 
-##### `arrival_force`
+#### `arrival_force`
 
 - `slowing_radius` - Radius around target inside which robots will slow down
   linearly to not overshoot their target.
@@ -764,7 +764,7 @@ XML configuration:
 
 - `max` - Max value for the force.
 
-##### `wander_force`
+#### `wander_force`
 
 - `circle_distance` - Scaling factor for force; applied to current velocity.
 
@@ -781,11 +781,11 @@ XML configuration:
 - `normal_dist` - Should the deviations be drawn from a uniform distribution
   (default), or from a normal distribution?
 
-##### `phototaxis_force`
+#### `phototaxis_force`
 
 - `max` - Max value for the force.
 
-#### `differential_drive`
+### `differential_drive`
 
 - Required by: all.
 - Required child attributes if present: none.

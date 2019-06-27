@@ -196,6 +196,11 @@ void depth1_loop_functions::Init(ticpp::Element& node) {
 void depth1_loop_functions::shared_init(ticpp::Element& node) {
   depth0_loop_functions::shared_init(node);
 
+  /* initialize tasking oracle */
+  oracle_init();
+} /* shared_init() */
+
+void depth1_loop_functions::private_init(void) {
   /* initialize stat collecting */
   auto* arenap = config()->config_get<config::arena::arena_map_config>();
   config::output_config output =
@@ -203,11 +208,7 @@ void depth1_loop_functions::shared_init(ticpp::Element& node) {
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth1_metrics_aggregator>(&output.metrics,
                                                                  output_root());
-  /* initialize tasking oracle */
-  oracle_init();
-} /* shared_init() */
 
-void depth1_loop_functions::private_init(void) {
   /* initialize cache handling and create initial cache */
   cache_handling_init(config()->config_get<config::caches::caches_config>());
 
@@ -438,6 +439,12 @@ void depth1_loop_functions::Reset() {
   }
   ndc_pop();
 } /* Reset() */
+
+void depth1_loop_functions::Destroy(void) {
+  if (nullptr != m_metrics_agg) {
+    m_metrics_agg->finalize_all();
+  }
+} /* Destroy() */
 
 __rcsw_pure uint depth1_loop_functions::n_free_blocks(void) const {
   auto accum = [&](uint sum, const auto& b) {

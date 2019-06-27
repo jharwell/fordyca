@@ -29,6 +29,7 @@
 #include <map>
 #include <utility>
 #include <list>
+#include <memory>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
@@ -44,7 +45,7 @@ namespace repr {
 class block;
 } // namespace repr
 
-namespace config { namespace arena { struct block_dist_config; }}
+namespace config { namespace arena { struct powerlaw_dist_config; }}
 
 NS_START(support, block_dist);
 
@@ -68,7 +69,8 @@ class powerlaw_distributor final : public base_distributor,
   /**
    * @brief Initialize the distributor.
    */
-  explicit powerlaw_distributor(const config::arena::block_dist_config* config);
+  powerlaw_distributor(const config::arena::powerlaw_dist_config* config,
+                       double arena_resolution);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
@@ -129,7 +131,8 @@ class powerlaw_distributor final : public base_distributor,
                                              uint n_clusters);
 
   /* clang-format off */
-  double                                         m_arena_resolution{0.0};
+  const double                                   mc_arena_resolution{0.0};
+
   uint                                           m_n_clusters{0};
   std::map<uint, std::list<cluster_distributor>> m_dist_map{};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;

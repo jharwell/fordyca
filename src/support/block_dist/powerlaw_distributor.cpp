@@ -40,11 +40,12 @@ using fordyca::ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 powerlaw_distributor::powerlaw_distributor(
-    const config::arena::block_dist_config* const config)
+    const config::arena::powerlaw_dist_config* const config,
+    double arena_resolution)
     : ER_CLIENT_INIT("fordyca.support.block_dist.powerlaw"),
-      m_arena_resolution(config->arena_resolution),
-      m_n_clusters(config->powerlaw.n_clusters),
-      m_pwrdist(config->powerlaw.pwr_min, config->powerlaw.pwr_max, 2) {}
+      mc_arena_resolution(arena_resolution),
+      m_n_clusters(config->n_clusters),
+      m_pwrdist(config->pwr_min, config->pwr_max, 2) {}
 
 /*******************************************************************************
  * Member Functions
@@ -183,7 +184,7 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
   for (auto& bclustp : config) {
     m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
                                               bclustp.capacity,
-                                              m_arena_resolution);
+                                              mc_arena_resolution);
   } /* for(i..) */
   for (auto& it : m_dist_map) {
     ER_INFO("Mapped %zu clusters of capacity %u", it.second.size(), it.first);

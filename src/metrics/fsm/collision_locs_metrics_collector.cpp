@@ -32,12 +32,13 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void collision_locs_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
+void collision_locs_metrics_collector::collect(
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const collision_metrics&>(metrics);
   inc_total_count();
   for (size_t i = 0; i < xsize(); ++i) {
     for (size_t j = 0; j < ysize(); ++j) {
-        inc_cell_count(i, j, m.avoidance_loc() == rmath::vector2u(i, j));
+      inc_cell_count(i, j, m.avoidance_loc() == rmath::vector2u(i, j));
     } /* for(j..) */
   }   /* for(i..) */
 } /* collect() */

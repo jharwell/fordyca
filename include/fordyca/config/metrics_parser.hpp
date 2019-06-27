@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
 #include <memory>
 #include <string>
 
@@ -50,6 +51,11 @@ class metrics_parser final : public rconfig::xml::xml_config_parser {
  public:
   using config_type = metrics_config;
 
+  /**
+   * @brief The XML attributes specifying supported metric collectors.
+   */
+  static const std::list<std::string> xml_attr;
+
   ~metrics_parser(void) override = default;
 
   /**
@@ -67,6 +73,7 @@ class metrics_parser final : public rconfig::xml::xml_config_parser {
   const rconfig::base_config* config_get_impl(void) const override {
     return m_config.get();
   }
+
   /* clang-format off */
   std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */

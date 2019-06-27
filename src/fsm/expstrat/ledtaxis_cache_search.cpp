@@ -45,27 +45,22 @@ void ledtaxis_cache_search::task_execute(void) {
     if (m_taxis.task_running()) {
       m_taxis.task_reset();
     }
-    if (!m_crw.task_running()) {
-      m_crw.task_reset();
-      m_crw.task_start(nullptr);
-    }
-    m_crw.task_execute();
   } else {
-    /*
-     * Otherwise, we are not inside a cache, so taxis to one. If there are no
-     * cache lights to be seen, then we fall back to wandering again.
-     */
+    /* Otherwise, we are not inside a cache, so taxis to one */
     if (m_taxis.task_running()) {
       m_taxis.task_execute();
-    }
-    if (m_taxis.task_finished()) {
-      if (!m_crw.task_running()) {
-        m_crw.task_reset();
-        m_crw.task_start(nullptr);
-      }
-      m_crw.task_execute();
+      return;
     }
   }
+  /*
+   * If we get here, then we are probably inside an unsuitable cache, so just
+   * fall back to wandering.
+   */
+  if (!m_crw.task_running()) {
+    m_crw.task_reset();
+    m_crw.task_start(nullptr);
+  }
+  m_crw.task_execute();
 } /* task_execute() */
 
 /*******************************************************************************

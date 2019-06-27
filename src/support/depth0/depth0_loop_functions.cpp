@@ -127,15 +127,19 @@ depth0_loop_functions::~depth0_loop_functions(void) = default;
 void depth0_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
+
   shared_init(node);
   private_init();
+
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void depth0_loop_functions::shared_init(ticpp::Element& node) {
   base_loop_functions::Init(node);
+} /* shared_init() */
 
+void depth0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
   auto* arena = config()->config_get<config::arena::arena_map_config>();
   config::output_config output = *config()->config_get<config::output_config>();
@@ -143,9 +147,6 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
 
   m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,
                                                                  output_root());
-} /* shared_init() */
-
-void depth0_loop_functions::private_init(void) {
   m_interactor_map = rcppsw::make_unique<interactor_map_type>();
   m_metrics_map = rcppsw::make_unique<metric_extraction_map_type>();
   m_los_update_map = rcppsw::make_unique<detail::los_updater_map_type>();
@@ -259,7 +260,12 @@ void depth0_loop_functions::PreStep(void) {
   ndc_pop();
 } /* PreStep() */
 
-void depth0_loop_functions::Destroy(void) { m_metrics_agg->finalize_all(); }
+void depth0_loop_functions::Destroy(void) {
+  if (nullptr != m_metrics_agg) {
+    m_metrics_agg->finalize_all();
+  }
+} /* Destroy() */
+
 void depth0_loop_functions::Reset(void) {
   ndc_push();
   base_loop_functions::Reset();

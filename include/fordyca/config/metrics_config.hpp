@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <map>
 #include <string>
 
 #include "fordyca/config/grid_config.hpp"
@@ -40,51 +41,18 @@ NS_START(fordyca, config);
 /**
  * @struct metrics_config
  * @ingroup fordyca config
+ *
+ * Each member represents the filename to which a specific type of metrics
+ * should be logged. Empty filename=no metrics of that type will be collected.
  */
 struct metrics_config : public rconfig::base_config {
-  std::string fsm_movement_fname{};
-  std::string fsm_collision_counts_fname{};
-  std::string fsm_collision_locs_fname{};
-
-  std::string block_acq_counts_fname{};
-  std::string block_acq_locs_fname{};
-  std::string block_acq_explore_locs_fname{};
-  std::string block_acq_vector_locs_fname{};
-  std::string block_transport_fname{};
-  std::string block_manipulation_fname{};
-
-  std::string cache_acq_counts_fname{};
-  std::string cache_acq_locs_fname{};
-  std::string cache_acq_explore_locs_fname{};
-  std::string cache_acq_vector_locs_fname{};
-  std::string cache_utilization_fname{};
-  std::string cache_lifecycle_fname{};
-  std::string cache_locations_fname{};
-
-  std::string task_execution_generalist_fname{};
-  std::string task_execution_collector_fname{};
-  std::string task_execution_harvester_fname{};
-  std::string task_execution_cache_starter_fname{};
-  std::string task_execution_cache_finisher_fname{};
-  std::string task_execution_cache_transferer_fname{};
-  std::string task_execution_cache_collector_fname{};
-
-  std::string task_tab_generalist_fname{};
-  std::string task_tab_harvester_fname{};
-  std::string task_tab_collector_fname{};
-
-  std::string task_distribution_fname{};
+  using enabled_map_type = std::map<std::string, std::string>;
 
   std::string output_dir{};
-
-  std::string swarm_dist_pos2D_fname{};
-  std::string swarm_convergence_fname{};
-  std::string temporal_variance_fname{};
-  std::string perception_mdpo_fname{};
-  std::string perception_dpo_fname{};
-
   grid_config arena_grid{};
   uint collect_interval{0};
+
+  enabled_map_type enabled{};
 };
 
 NS_END(config, fordyca);

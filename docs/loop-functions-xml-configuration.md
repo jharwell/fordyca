@@ -2,33 +2,73 @@
 
 The following root XML tags are defined:
 
-| Root XML tag        | Mandatory For? | Description                                                                                                                              |
-|---------------------|----------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| `output`            |                | Parameters for logging simulation metrics/results.                                                                                       |
-| `convergence`       |                | Parameters for computing swarm convergence.                                                                                              |
-| `arena_map`         |                | Parameters for discretization of the arena.                                                                                              |
-| `oracle`            |                | Parameters for the oracle, which allows swarms to make decisions based on perfect information, to provide an upper bound on performance. |
-| `temporal_variance` |                | Parameters for the various types of temporal waveforms that can be applied to swarm/environmental state during simulation.               |
-| `caches`            |                | Parameters for the use of caches in the arena.                                                                                           |
+| Root XML tag        | Mandatory For?             | Description                                                                                                                |
+|---------------------|----------------------------|----------------------------------------------------------------------------------------------------------------------------|
+| `output`            | All controllers            | Parameters for logging simulation metrics/results.                                                                         |
+| `convergence`       | None                       | Parameters for computing swarm convergence.                                                                                |
+| `arena_map`         | All controllers            | Parameters for discretization of the arena.                                                                                |
+| `oracle_manager`    | None                       | Parameters for the oracle, which allows swarms to make decisions based on perfect information (performance upper bound).   |
+| `temporal_variance` | None                       | Parameters for the various types of temporal waveforms that can be applied to swarm/environmental state during simulation. |
+| `caches`            | Depth1, depth2 controllers | Parameters for the use of caches in the arena.                                                                             |
 
-### `output`
+In the subsections below, multiple choices for an XML attribute value are
+separated by a `|` in example XML, and attributes that should be floating point
+are specified as `FLOAT` (acceptable range, if applicable, is documented for
+each individual attribute).
 
-All nested tags and attributes under this tag are required.
+## `output`
 
-#### `sim`
+- Required by: all controllers.
+- Required child attributes if present: all.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<loop_functions>
+    ...
+    <output>
+        <output_root="output">
+        <output_dir="__current_date__">
+    </output>
+    ...
+</loop_functions>
+```
 
 - `output_root` - The root output directory in which the directories of
-                  different simulation runs will be placed.
+                  different simulation runs will be placed. The path specified
+                  can be relative or absolute, and will be created if it does
+                  not exist.
 
 - `output_dir` - The output directory for the current simulation under
-                 `output_root`. If you put the special field `__current_date__`
-                 here, the simulation will get a unique output directory in the
-                 form YYYY-MM-DD:HH-MM.
+                 `output_root`. If you put the special field
+                 `__current_date__` here, the simulation will get a unique
+                 output directory in the form YYYY-MM-DD:HH-MM.
+### `metrics`
 
-#### `metrics`
+- Required by: all controllers.
+- Required child attributes if present: [`output_dir`, `collect_interval`].
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
 
-The following attributes under this tag are required:
-
+XML configuration:
+```xml
+<output>
+    ...
+    <metrics>
+        <output_dir="metrics">
+        <collect_interval="INTEGER">
+        <...>
+        <...>
+        <...>
+        <...>
+    </metrics>
+    ...
+</output
+```
 - `output_dir` - Name of directory within the output root that metrics will be
                  placed in.
 
@@ -37,97 +77,235 @@ The following attributes under this tag are required:
                        long simulation is generally not useful; hence this
                        field.
 
-The following attributes under this tag are optional. Not defining them does not
-disable metric collection of the given type, but redirects it to a `NULL.csv`
-file in the `output_dir` (all excluded tags can overwrite each other in this
-file). This is a temporary fix until I have time to do this properly with
-/dev/null.
+Any of the attributes can be added under the `metrics` tag in place of one of
+the `<...>` above. Not defining them disables metric collection of the given
+type.
 
-- `fsm_collision_counts_fname`
-- `fsm_collision_locs_fname`
-- `fsm_movement_fname`
-- `block_acq_counts_fname`
-- `block_acq_locs_fname`
-- `block_acq_explore_locs_fname`
-- `block_acq_vector_locs_fname`
-- `block_transport_fname`
-- `block_manipulation_fname`
-- `cache_acq_counts_fname`
-- `cache_acq_locs_fname`
-- `cache_acq_explore_locs_fname`
-- `cache_acq_vector_locs_fname`
-- `cache_utilization_fname`
-- `cache_lifecycle_fname`
-- `cache_locations_fname`
-- `task_execution_generalist_fname`
-- `task_execution_collector_fname`
-- `task_execution_harvester_fname`
-- `task_execution_cache_starter_fname`
-- `task_execution_cache_finisher_fname`
-- `task_execution_cache_transferer_fname`
-- `task_execution_cache_collector_fname`
-- `task_tab_generalist_fname`
-- `task_tab_collector_fname`
-- `task_tab_harvester_fname`
-- `task_distribution_fname`
-- `perception_dpo_fname`
-- `perception_mdpo_fname`
-- `swarm_dist_pos2D_fname`
-- `swarm_convergence_fname`
-- `temporal_variance_fname`
+| XML attribute                     | Description                                                                   | Additional Notes                                 |
+|-----------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------|
+| `fsm_collision_counts`            | Counts of robots entering, are in, and exiting the collision avoidance state. |                                                  |
+| `fsm_collision_locs`              | Spatial distribution of collision avoidance locations in the arena.           |                                                  |
+| `fsm_movement`                    | Swarm average distance traveled/velocity.                                     |                                                  |
+| `block_acq_counts`                | Counts of robots exploring for, vectoring to, and acquiring blocks.           |                                                  |
+| `block_acq_locs`                  | Spatial distribution of where robots acquire blocks.                          |                                                  |
+| `block_acq_explore_locs`          | Spatial distribution of robots exploring for blocks.                          |                                                  |
+| `block_acq_vector_locs`           | Spatial distribution of robots vectoring to blocks.                           |                                                  |
+| `block_transport`                 | # blocks collected/ # transporters.                                           |                                                  |
+| `block_manipulation`              | Free block pickup/drop counts/penalties.                                      |                                                  |
+| `cache_acq_counts`                | Counts of robots exploring for, vectoring to, and acquiring caches.           |                                                  |
+| `cache_acq_locs`                  | Spatial distribution of where robots acquire caches.                          |                                                  |
+| `cache_acq_explore_locs`          | Spatial distribution of robots exploring for caches.                          |                                                  |
+| `cache_acq_vector_locs`           | Spatial distribution of robots vectoring to caches.                           |                                                  |
+| `cache_utilization`               | Average block pickup/drop rates within caches.                                |                                                  |
+| `cache_lifecycle`                 | Depletion/creation rates of caches in the arena.                              |                                                  |
+| `cache_locations`                 | Spatial distribution of the locations of caches in the arena.                 |                                                  |
+| `task_execution_generalist`       | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
+| `task_execution_collector`        | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
+| `task_execution_harvester`        | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
+| `task_execution_cache_starter`    | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
+| `task_execution_cache_finisher`   | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
+| `task_execution_cache_transferer` | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
+| `task_execution_cache_collector`  | Execution time/estimate, interface time/estimate, completion/abort counts.    |                                                  |
+| `task_tab_generalist`             | TAB task allocation probabilities/counts.                                     |                                                  |
+| `task_tab_collector`              | TAB task allocation probabilities/counts.                                     |                                                  |
+| `task_tab_harvester`              | TAB task allocation probabilities/counts.                                     |                                                  |
+| `task_distribution`               | TAB task allocation probabilities/counts.                                     |                                                  |
+| `perception_dpo`                  | Metrics from each robots' decaying pheromone store.                           |                                                  |
+| `perception_mdpo`                 | Metrics from each robot's internal map of the arena.                          |                                                  |
+| `swarm_dist_pos2D`                | Swarm distribution in 2D space.                                               |                                                  |
+| `swarm_convergence`               | Results of swarm convergence calculations.                                    | Requires convergence calculations to be enabled. |
+| `temporal_variance`               | Waveforms of the penalties applied to the swarm.                              | Collected every timestep.                        |
 
-### `convergence`
+## `convergence`
 
-This tag is optional.
+- Required by: none.
+- Required child attributes if present: all.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [`postional_entropy`, `task_dist_entropy`,
+  `interactivity`, `angular_order`].
 
+XML configuration:
+
+```xml
+<loop_functions>
+    ...
+    <convergence>
+        <postional_entropy>
+        ...
+        </positional_entropy>
+        <task_dist_entropy>
+        ...
+        </task_dist_entropy>
+        <interactivity>
+        ...
+        </interactivity>
+        <angular_order>
+        ...
+        </angular_order>
+    </convergence>
+    ...
+</loop_functions>
+```
 - `n_threads` - How many threads will be used for convergence calculations
                 during loop functions.
 
 - `epsilon` - Threshold < 1.0 that a convergence measure will be considered
               to have converged when its normalized value is above.
 
-- `epsilon_delta` - # of timesteps the swarm must maintain its normalized
-                    convergence measure score of >= `epsilon` in order to be
-                    considered converged.
-
-#### `positional_entropy`
+### `positional_entropy`
 
 A measure of convergence using robot positions, Shannon's entropy definition,
-and Balch2000's social entropy measure. This tag is optional, but if it is
-defined, only the `enable` attribute is required. All other attributes are
-parsed iff `enable` is `true`.
+and Balch2000's social entropy measure. If it is defined, only the `enable`
+attribute is required. All other attributes are parsed iff `enable` is `true`.
+
+- Required by: none.
+- Required child attributes if present: `enable`.
+- Required child tags if present: none.
+- Optional child attributes: [`horizon`, `horizon_delta`].
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<convergence>
+    ...
+    <postional_entropy
+        enable="false"
+        horizon="FLOAT:FLOAT"
+        horizon_delta="FLOAT:FLOAT"/>
+    </positional_entropy>
+    ...
+</convergence>
+```
 
 - `enable` - If this measure is enabled or not. Very expensive to compute in
              large swarms.
 
-- `horizon` - A `min:max` pair of distances specifying the min and max spatail
+- `horizon` - A `min:max` pair of distances specifying the min and max spatial
               cluster size that will be used to compute the entropy of robot
-              positions.
+              positions. Should be <= arena X,Y dimensions.
 
 - `horizon_delta` - Step size for traversing the horizon from min to max.
 
-#### `interactivity`
+### `interactivity`
 
-A measure of convergence using nearest neighbor distances. This tag is optional.
+A measure of convergence using nearest neighbor distances.
 
+- Required by: none.
+- Required child attributes if present: `enable`.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<convergence>
+    ...
+    <interactivity
+        enable="false"/>
+    </interactivity>
+    ...
+</convergence>
+```
 - `enable` - If this measure is enabled or not. Relatively cheap to compute in
              large swarms.
 
-#### `angular_order`
+### `angular_order`
 
-A measure of convergence using congruence of robot orientations. This tag is
-optional.
+A measure of convergence using congruence of robot orientations.
 
+- Required by: none.
+- Required child attributes if present: `enable`.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<convergence>
+    ...
+    <angular_order
+        enable="false"/>
+    </angular_order>
+    ...
+</convergence>
+```
 - `enable` - If this measure is enabled or not. Relatively cheap to compute in
              large swarms.
 
-### `oracle`
+### `angular_order`
 
-This tag is optional.
+A measure of convergence using stability of robot task allocations over time.
 
-#### `tasking_oracle`
+- Required by: none.
+- Required child attributes if present: `enable`.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
 
-This tag is optional. All attributes default to `false` if they are omitted.
+XML configuration:
+
+```xml
+<convergence>
+    ...
+    <task_dist_entropy
+        enable="false"/>
+    </task_dist_entropy>
+    ...
+</convergence>
+```
+- `enable` - If this measure is enabled or not. Relatively cheap to compute in
+             large swarms.
+
+## `oracle_manager`
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [`tasking_oracle`, `entities_oracle`].
+
+XML configuration:
+
+```xml
+<loop_functions>
+    ...
+    <oracle_manager>
+        <tasking_oracle>
+        ...
+        <tasking_oracle/>
+        <entities_oracle>
+        ...
+        <entities_oracle/>
+    </oracle_manager>
+    ...
+</loop_functions>
+```
+
+### `tasking_oracle`
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: [`task_exec_est`,`task_interface_est`].
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<oracle_manager>
+    ...
+    <tasking_oracle
+        task_exec_est="false"
+        task_interface_est="false"/>
+    ...
+</oracle_manager>
+```
+
+All attributes default as shown above if omitted.
 
 - `task_exec_est` - If enabled, then this will inject perfect estimates of task
                     execution time based on the performance of the entire swarm
@@ -138,77 +316,282 @@ This tag is optional. All attributes default to `false` if they are omitted.
                          entire swarm into each robot when it performs task
                          allocation.
 
-#### `entities_oracle`
+### `entities_oracle`
 
-This tag is optional, but if it is defined, all nested tags and attributes are
-required.
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: [`blocks`,`caches`].
+- Optional child tags: none.
 
-- `blocks_enabled` - Inject perfect knowledge of all block locations into the
-                     swarm every timestep.
+XML configuration:
 
-- `caches_enabled` - Inject perfect knowledge of all cache locations into the
-                     swarm every timestep.
+```xml
+<oracle_manager>
+    ...
+    <entities_oracle
+        blocks="false"
+        caches="false"/>
+    ...
+</oracle_manager>
+```
+- `blocks` - Inject perfect knowledge of all block locations into the
+             swarm every timestep.
 
-### `temporal_variance`
+- `caches` - Inject perfect knowledge of all cache locations into the
+             swarm every timestep.
 
-This tag is optional.
+## `temporal_variance`
 
-#### `blocks`
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [`blocks`, `caches`].
 
-This tag is optional.
+XML configuration:
 
-##### `manipulation_penalty`
+```xml
+<loop_functions>
+    ...
+    <temporal_variance>
+        <blocks>
+        ...
+        </blocks>
+        <caches>
+        ...
+        </caches>
+    </temporal_variance>
+    ...
+</loop_functions>
+```
+Subsections in this section make use of the `waveform` XML configuration block:
 
-This tag is optional, but if it is defined, then all nested tags and attributes
-are required.
+```xml
+<waveform
+    type="Null|Sine|Square|Sawtooth|Constant"
+    frequency="FLOAT"
+    amplitude="FLOAT"
+    offset="FLOAT"
+    phase="FLOAT"
+/>
+```
 
+- `type` - The type of the waveform. `Null` disables the waveform.
+
+Other parameters are self explanatory. `phase` is specified in radians.
+
+### `blocks`
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [`manipulation_penalty`, `carry_throttle`].
+
+XML configuration:
+
+```xml
+<temporal_variance>
+    ...
+    <blocks>
+        <manipulation_penalty>
+        ...
+        </manipulation_penalty>
+        <carry_throttle>
+        ...
+        </carry_throttle>
+        </blocks>
+    ...
+</temporal_variance>
+```
+#### `manipulation_penalty`
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: `waveform`.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<blocks>
+    ...
+    <manipulation_penalty>
+    <waveform
+        .../>
+    </manipulation_penalty>
+    ...
+</blocks>
+```
 - `waveform` - Parameters defining the waveform of block manipulation penalty
                (picking up/dropping that does not involve caches).
 
-##### `carry_throttle`
+#### `carry_throttle`
 
-This tag is optional, but if it is defined, then all nested tags and attributes
-are required.
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: `waveform`.
+- Optional child attributes: none.
+- Optional child tags: none.
 
+XML configuration:
+
+```xml
+<blocks>
+    ...
+    <carry_throttle>
+    <waveform
+        .../>
+    </carry_throttle>
+    ...
+</blocks>
+```
 - `waveform` - Parameters defining the waveform of block carry penalty
                (how much slower robots move when carrying a block).
 
-### `caches`
+## `caches`
 
-This tag is optional.
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [`usage_penalty`].
 
-##### `usage_penalty`
+XML configuration:
 
-This tag is optional, but if it is defined, then all nested tags and attributes
-are required.
+```xml
+<temporal_variance>
+    ...
+    <caches>
+        <usage_penalty>
+        ...
+        </usage_penalty>
+    </caches>
+    ...
+</temporal_variance>
+```
+#### `usage_penalty`
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: `waveform`.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<caches>
+    ...
+    <usage_penalty>
+    <waveform
+        .../>
+    </usage_penalty>
+    ...
+</caches>
+```
 
 - `waveform` - Parameters defining the waveform of cache usage penalty (picking
                up/dropping).
 
-### `arena_map`
+## `arena_map`
 
-This tag is required. Some nested tags and/or attributes can be omitted,
-depending.
+- Required by: all.
+- Required child attributes if present: none.
+- Required child tags if present: [`grid`, `blocks`, `nest`].
+- Optional child attributes: none.
+- Optional child tags: none.
 
-#### `grid`
+XML configuration:
 
+```xml
+<loop_functions>
+    ...
+    <arena_map>
+        <grid>
+        ...
+        </grid>
+        <blocks>
+        ...
+        </blocks>
+        <nest>
+        ...
+        </nest>
+    </arena_map>
+    ...
+</loop_functions>
+```
+### `grid`
+
+- Required by: all.
+- Required child attributes if present: [`resolution`, `size`].
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<arena_map>
+    <grid
+        resolution="FLOAT"
+        size="X, Y, Z"/>
+    ...
+</arena_map>
+```
 - `resolution` - The resolution that the arena will be represented at, in terms
                  of the size of grid cells. Must be the same as the value passed
                  to the robot controllers.
 
 - `size` - The size of the arena.
 
-#### `blocks`
+### `blocks`
 
-This tag and all nested tags and attributes are required.
+- Required by: all.
+- Required child attributes if present: none.
+- Required child tags if present: [`distribution`, `manifest`].
+- Optional child attributes: none.
+- Optional child tags: none.
 
-##### `distribution`
+XML configuration:
 
-- `arena_resolution` - The size of the cells the arena is broken up
-                       (discretized) into. Should probably be the same as
-                       whatever the block size is, to make things easy.
+```xml
+<arena_map>
+    ...
+    <blocks>
+        <distribution>
+        ...
+        </distribution>
+        <manifest>
+        ...
+        </manifest>
+    </blocks>
+    ...
+</arena_map>
+```
+#### `distribution`
 
-- `dist_model` - The distribution model for the blocks. When blocks are
+- Required by: all.
+- Required child attributes if present: `dist_type`.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [`redist_governor`, `powerlaw`].
+
+XML configuration:
+
+```xml
+<blocks>
+    ...
+    <distribution
+    dist_type="random|powerlaw|single_source|dual_source|quad_source">
+    ...
+    </distribution>
+    ...
+</blocks>
+```
+- `dist_type` - The distribution model for the blocks. When blocks are
                  distributed to a new location in the arena and made available
                  for robots to pickup (either initially or after a block is
                  deposited in the nest), they are placed in the arena in one of
@@ -228,13 +611,31 @@ This tag and all nested tags and attributes are required.
   - `quad_source` - Placed in 4 sources at each cardinal direction in the
                     arena. Assumes a square arena.
 
-###### `redist_governor`
+##### `redist_governor`
 
-This tag is optional. If it is defined, then the [`trigger`,
-`recurrence_policy`] attributes are required. Other attributes are only required
-depending on configuration.
+- Required by: none.
+- Required child attributes if present: `trigger`.
+- Required child tags if present: none.
+- Optional child attributes: [`recurrence_policy`, `timestep`, `block_count`].
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<distribution>
+    ...
+    <redist_governor
+    trigger="Null"
+    recurrence_policy="mult|single"
+    timestep="INTEGER"
+    block_count="INTEGER"/>
+    ...
+</distribution>
+```
 
 - `trigger` - The trigger for (possibly) stopping block redistribution:
+
+  - `Null` - Disables the governor.
 
   - `timestep` - Blocks will be redistributed until the specified timestep. This
                  trigger type can be used with the [`single`] recurrence policy.
@@ -264,10 +665,27 @@ depending on configuration.
 - `block_count`- The collection count to stop block redistribution at. Only
                  required if `trigger` is `block_count`.
 
-###### `manifest`
+##### `manifest`
 
-This tag is required. At least one of [`n_cube`, `n_ramp`] must be defined. The
-`unit_dim` attribute is required.
+- Required by: all.
+- Required child attributes if present: At least one of [`n_cube`, `n_ramp`],
+  `unit_dimm`.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: At most one of [`n_cube`, `n_ramp`].
+
+XML configuration:
+
+```xml
+<distribution>
+    ...
+    <manifest
+    n_cube="INTEGER"
+    n_ramp="INTEGER"
+    unit_dim="FLOAT"/>
+    ...
+</distribution>
+```
 
 - `n_cube` - # Cube blocks that should be used.
 
@@ -276,19 +694,51 @@ This tag is required. At least one of [`n_cube`, `n_ramp`] must be defined. The
 - `unit_dim` - Unit dimension of blocks. Cube are 1x1 of this, ramp are 2x1 of
                this.
 
-######  `powerlaw`
+#####  `powerlaw`
 
-This tag is only required if the `dist_model` is `powerlaw`.
+- Required by: all iff `dist_type` is `powerlaw`.
+- Required child attributes if present: [`pwr_min`, `pwr_max`, `n_clusters`].
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
 
+XML configuration:
+
+```xml
+<distribution>
+    ...
+    <powerlaw
+    pwr_min="INTEGER"
+    pwr_max="INTEGER"
+    n_clusters="INTEGER"/>
+    ...
+</distribution>
+```
 - `pwr_min` - Minimum power of 2 for cluster sizes.
 
 - `pwr_max` - Maximum power of 2 for cluster sizes.
 
 - `n_clusters` - Max # of clusters the arena.
 
-#### `nest`
+### `nest`
 
-This tag and all nested tags and attributes are required.
+- Required by: all.
+- Required child attributes if present: [`size`, `center`].
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<arena_map>
+    ...
+    <nest
+    size="X, Y"
+    center="X, Y"/>
+    ...
+</arena_map>
+```
 
 - `size` - The size of the nest. Must be specified in a tuple like so:
   `0.5, 0.5`. Note the space--parsing does not work if it is omitted.
@@ -297,14 +747,49 @@ This tag and all nested tags and attributes are required.
              specified in a tuple like so: `1.5, 1.5`. Note the space--parsing
              does not work if it is omitted.
 
-### `caches`
+## `caches`
 
-This tag is required for [`depth1`, `depth2`] loop functions.
+- Required by: [depth1, depth2 controllers].
+- Required child attributes if present: [`dimension`].
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [`static`, `dynamic`].
 
+XML configuration:
+
+```xml
+<arena_map>
+    ...
+    <caches
+    dimension="FLOAT">
+    <static .../>
+    <dynamic .../>
+    </caches>
+</arena_map>
+```
 - `dimension` - The dimension of the cache. Should be greater than the dimension
                 for blocks.
 
-#### `static`
+### `static`
+
+- Required by: [depth1 controllers].
+- Required child attributes if present: [`enable`].
+- Required child tags if present: none.
+- Optional child attributes: [`size`, `respawn_scale_factor`].
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<caches>
+    ...
+    <static
+    enable="false"
+    size="INTEGER"
+    respawn_scale_factor="FLOAT"/>
+    ...
+</caches>
+```
 
 This tag is required for [`depth1`] loop functions. If the tag is present, only
 the `enable` attribute is required; all other attributes are parsed iff `enable`
@@ -321,12 +806,27 @@ is `true`.
                            probability of static cache respawn will grow once
                            the conditions for respawning are met.
 
-#### `dynamic`
+### `dynamic`
 
-This tag is required for [`depth2`] loop functions. If the tag is present, only
-the `enable` attribute is required; all other attributes are parsed iff `enable`
-is `true`.
+- Required by: [depth2 controllers].
+- Required child attributes if present: [`enable`].
+- Required child tags if present: none.
+- Optional child attributes: [`min_dist`, `min_blocks`, `robot_drop_only`].
+- Optional child tags: none.
 
+XML configuration:
+
+```xml
+<caches>
+    ...
+    <dynamic
+    enable="false"
+    min_dist="FLOAT"
+    min_blocks="INTEGER"
+    robot_drop_only="false"/>
+    ...
+</caches>
+```
 - `enable` - If `true`, then the creation of dynamic caches will be enabled.
 
 - `min_dist` - The minimum distance between blocks to be considered for
@@ -339,10 +839,29 @@ is `true`.
                       robot block drops rather than drops due to abort/block
                       distribution after collection.
 
-### `visualization`
+## `visualization`
 
-This tag and its attributes are optional (attributes default to `false` if they
-are omitted).
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: [`robot_id`, `robot_los`, `robot_task`, `block_id`].
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<loop_furnctions>
+    ...
+    <visulation
+    robot_id="false"
+    robot_los="false"
+    robot_task="false"
+    block_id="false"/>
+    ...
+</loop_functions>
+```
+
+Omitted attributes default to the values shown above.
 
 - `robot_id` - Set to `true` or `false`. If true, robot id is displayed above
                each robot during simulation.

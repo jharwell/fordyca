@@ -27,15 +27,15 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/fsm/cache_acq_validator.hpp"
-#include "fordyca/ds/dpo_store.hpp"
 
 /*******************************************************************************
  * Namespaces

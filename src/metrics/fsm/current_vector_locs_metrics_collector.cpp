@@ -32,7 +32,8 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void current_vector_locs_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
+void current_vector_locs_metrics_collector::collect(
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const goal_acq_metrics&>(metrics);
   inc_total_count();
 

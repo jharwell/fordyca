@@ -22,14 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/config/metrics_config.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
-#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
-#include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
+#include <boost/mpl/for_each.hpp>
 
+#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -40,14 +35,29 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
+#include "fordyca/metrics/collector_registerer.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
+#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
 #include "fordyca/repr/base_block.hpp"
+
+#include "rcppsw/mpl/typelist.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca, support, depth0, detail);
+
+using collector_typelist =
+    rmpl::typelist<metrics::collector_registerer::type_wrap<
+                       metrics::perception::mdpo_perception_metrics_collector>,
+                   metrics::collector_registerer::type_wrap<
+                       metrics::perception::dpo_perception_metrics_collector> >;
+
+NS_END(detail);
 
 /*******************************************************************************
  * Template Instantiations
@@ -71,14 +81,17 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
     const std::string& output_root)
     : base_metrics_aggregator(mconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
-  register_collector<metrics::perception::mdpo_perception_metrics_collector>(
-      "perception::mdpo",
-      metrics_path() + "/" + mconfig->perception_mdpo_fname,
-      mconfig->collect_interval);
-  register_collector<metrics::perception::dpo_perception_metrics_collector>(
-      "perception::dpo",
-      metrics_path() + "/" + mconfig->perception_dpo_fname,
-      mconfig->collect_interval);
+  metrics::collector_registerer::creatable_set creatable_set = {
+      {typeid(metrics::perception::mdpo_perception_metrics_collector),
+       "perception_mdpo",
+       "perception:mdpo"},
+      {typeid(metrics::perception::dpo_perception_metrics_collector),
+       "perception_dpo",
+       "perception::dpo"}};
+
+  metrics::collector_registerer registerer(mconfig, creatable_set, this);
+  boost::mpl::for_each<detail::collector_typelist>(registerer);
+
   reset_all();
 }
 
@@ -115,7 +128,8 @@ void depth0_metrics_aggregator::collect_from_controller(
   collect_if("fsm::collision_locs",
              *collision_m,
              [&](const rmetrics::base_metrics& metrics) {
-               auto& m = dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
+               auto& m =
+                   dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
                return m.in_collision_avoidance();
              });
 

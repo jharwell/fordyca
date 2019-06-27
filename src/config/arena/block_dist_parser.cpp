@@ -41,7 +41,6 @@ void block_dist_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
-  XML_PARSE_ATTR(bnode, m_config, arena_resolution);
   XML_PARSE_ATTR(bnode, m_config, dist_type);
 
   if ("powerlaw" == m_config->dist_type) {
@@ -65,7 +64,6 @@ __rcsw_pure bool block_dist_parser::validate(void) const {
   CHECK(true == m_powerlaw.validate());
   CHECK(true == m_manifest.validate());
   CHECK(true == m_redist_governor.validate());
-  CHECK(m_config->arena_resolution > 0.0);
   return true;
 
 error:

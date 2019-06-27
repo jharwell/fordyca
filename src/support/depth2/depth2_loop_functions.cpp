@@ -155,7 +155,9 @@ void depth2_loop_functions::Init(ticpp::Element& node) {
 
 void depth2_loop_functions::shared_init(ticpp::Element& node) {
   depth1_loop_functions::shared_init(node);
+} /* shared_init() */
 
+void depth2_loop_functions::private_init(void) {
   /* initialize stat collecting */
   auto* arenap = config()->config_get<config::arena::arena_map_config>();
 
@@ -164,9 +166,7 @@ void depth2_loop_functions::shared_init(ticpp::Element& node) {
   output.metrics.arena_grid = arenap->grid;
   m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
                                                                  output_root());
-} /* shared_init() */
 
-void depth2_loop_functions::private_init(void) {
   /* initialize cache handling */
   auto* cachep = config()->config_get<config::caches::caches_config>();
   cache_handling_init(cachep);
@@ -377,6 +377,12 @@ void depth2_loop_functions::Reset(void) {
   cache_creation_handle(false);
   ndc_pop();
 }
+
+void depth2_loop_functions::Destroy(void) {
+  if (nullptr != m_metrics_agg) {
+    m_metrics_agg->finalize_all();
+  }
+} /* Destroy() */
 
 bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
   auto* cachep = config()->config_get<config::caches::caches_config>();
