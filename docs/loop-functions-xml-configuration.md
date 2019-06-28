@@ -868,7 +868,7 @@ Omitted attributes default to the values shown above.
 
 - `robot_los` - Set to `true` or `false`. If true, each robot's approximate line
                 of sight is displayed as a red wireframe square during
-                simulation.
+                simulation. Only applicable to MDPO controllers.
 
 - `robot_task` - Set to `true` or `false`. If `true`, the current task each robot
               is executing is displayed above it.

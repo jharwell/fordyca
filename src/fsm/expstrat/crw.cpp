@@ -47,7 +47,6 @@ void crw::task_execute(void) {
              obs.y(),
              obs.angle().value(),
              obs.length());
-    saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
   } else {
     m_tracker.ca_exit();
@@ -61,8 +60,8 @@ void crw::task_execute(void) {
     if (force.length() >= std::numeric_limits<double>::epsilon()) {
       saa_subsystem()->steer2D_force_calc().value(
           saa_subsystem()->steer2D_force_calc().value() * 0.7);
-      saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
     }
+    saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
   }
 } /* task_execute() */
 

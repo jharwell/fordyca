@@ -55,16 +55,16 @@ depth0_qt_user_functions::depth0_qt_user_functions(void) {
 void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   auto* mdpo = dynamic_cast<const controller::depth0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
-  auto* crw = dynamic_cast<const controller::depth0::crw_controller*>(
+  auto* base = dynamic_cast<const controller::base_controller*>(
       &c_entity.GetControllableEntity().GetController());
 
-  if (crw->display_id()) {
+  if (base->display_id()) {
     DrawText(argos::CVector3(0.0, 0.0, 0.5), c_entity.GetId());
   }
 
-  if (crw->is_carrying_block()) {
+  if (base->is_carrying_block()) {
     block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
-        .draw(crw->block().get(), crw->GetId().size());
+        .draw(base->block().get(), base->GetId().size());
   }
   if (nullptr != mdpo && mdpo->display_los()) {
     los_visualizer(this).draw(mdpo->los(),
