@@ -34,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth2);
+using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -69,18 +70,6 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
 __rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
     bool explore_result) const {
   ER_ASSERT(!explore_result, "Found cache site by exploring?");
-  rmath::vector2d position = saa_subsystem()->sensing()->position();
-  for (auto& b : mc_store->blocks().const_values_range()) {
-    if ((position - b.ent()->real_loc()).length() <=
-        boost::get<double>(mc_matrix->find("block_prox_dist")->second)) {
-      ER_WARN("Cannot acquire cache site@%s: Block%d@%s too close",
-              position.to_str().c_str(),
-              b.ent()->id(),
-              b.ent()->real_loc().to_str().c_str());
-      return false;
-    }
-  } /* for(&b..) */
-
   return true;
 } /* site_acquired_cb() */
 
