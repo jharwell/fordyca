@@ -114,6 +114,13 @@ class base_cache : public multicell_entity,
     return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
            m_blocks.end();
   }
+  __rcsw_pure bool contains_block(const base_block* const c_block) const {
+    return std::find_if(m_blocks.begin(),
+                        m_blocks.end(),
+                        [&](const auto&b) {
+                          return b->id() == c_block->id();
+                        }) != m_blocks.end();
+  }
   virtual size_t n_blocks(void) const { return blocks().size(); }
 
   /**
@@ -167,9 +174,9 @@ class base_cache : public multicell_entity,
 
  private:
   /* clang-format off */
-  static int       m_next_id;
-
   const double     mc_resolution;
+
+  static int       m_next_id;
 
   uint             m_creation_ts{0};
   ds::block_vector m_blocks;

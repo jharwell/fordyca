@@ -335,8 +335,8 @@ void depth1_loop_functions::PreStep() {
 
   /*
    * Manage the static cache. Must be before per-robot processing, so each robot
-   * gets their internal object store updated with (potentially)new cache
-   * information.
+   * gets their internal object store updated with (potentially) new cache
+   * information (oracular robots and non).
    */
   static_cache_monitor();
   if (m_cache_manager->caches_depleted() > 0) {
@@ -386,9 +386,30 @@ void depth1_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
                        m_los_update_map->at(controller->type_index()));
 
   /* Watch the robot interact with its environment! */
-  auto iadaptor = robot_interactor_adaptor<robot_arena_interactor>(
+  auto iadaptor = robot_interactor_adaptor<robot_arena_interactor,
+                                           interactor_status>(
       controller, GetSpace().GetSimulationClock());
-  boost::apply_visitor(iadaptor, m_interactor_map->at(controller->type_index()));
+  auto status = boost::apply_visitor(iadaptor,
+                                     m_interactor_map->at(controller->type_index()));
+  /*
+   * The oracle does not necessarily have up-to-date information about all
+   * blocks in the arena, as a robot could have dropped a block in the nest or
+   * picked one up, so its version of the set of free blocks in the arena is out
+   * of date. Robots processed *after* the robot that caused the event need
+   * the correct free block set to be available from the oracle upon request, to
+   * avoid asserts during on debug builds. On optimized builds the asserts are
+   * ignored/compiled out, which is not a problem, because they LOS processing
+   * errors that can result are transient and are corrected the next
+   * timestep.
+   *
+   * This is not a problem for caches, because caches are created (if needed)
+   * after *all* robots have been processed for the given timestep.
+   *
+   * See #577.
+   */
+  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
+    oracle_manager()->update(arena_map());
+  }
 } /* robot_timestep_process() */
 
 argos::CColor depth1_loop_functions::GetFloorColor(

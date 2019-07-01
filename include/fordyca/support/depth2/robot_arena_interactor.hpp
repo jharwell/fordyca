@@ -31,6 +31,7 @@
 #include "fordyca/support/existing_cache_block_drop_interactor.hpp"
 #include "fordyca/support/free_block_pickup_interactor.hpp"
 #include "fordyca/support/nest_block_drop_interactor.hpp"
+#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -110,39 +111,37 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    *
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
-   *
-   * @return \c TRUE if a block was dropped to create a new cache, \c FALSE
-   * otherwise.
    */
-  bool operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, uint timestep) {
     if (m_task_abort_interactor(controller,
                                 m_tv_manager->template all_penalty_handlers<T>())) {
       /*
        * This needs to be here, rather than in each robot's control step
        * function, in order to avoid triggering erroneous handling of an aborted
        * task in the loop functions when the executive has not aborted the newly
-       * allocated task. See #532.
+       * allocated task *after* the previous task was aborted. See #532.
        */
       controller.task_aborted(false);
-      return false;
+      return interactor_status::ekTaskAbort;
     }
 
+    auto status = interactor_status::ekNoEvent;
     if (controller.is_carrying_block()) {
-      m_nest_drop_interactor(controller, timestep);
+      status |= m_nest_drop_interactor(controller, timestep);
       m_existing_cache_drop_interactor(controller, timestep);
-      m_cache_site_drop_interactor(controller, timestep);
-      return m_new_cache_drop_interactor(controller, timestep);
+      status |= m_cache_site_drop_interactor(controller, timestep);
+      status |= m_new_cache_drop_interactor(controller, timestep);
     } else { /* The foot-bot has no block item */
-      m_free_pickup_interactor(controller, timestep);
-      m_cached_pickup_interactor(controller, timestep);
-      return false;
+      status |= m_free_pickup_interactor(controller, timestep);
+      status |= m_cached_pickup_interactor(controller, timestep);
     }
+    return status;
   }
 
 
  private:
   /* clang-format off */
-  tv::tv_manager* const                m_tv_manager;
+  tv::tv_manager* const                   m_tv_manager;
 
   free_block_pickup_interactor<T>         m_free_pickup_interactor;
   nest_block_drop_interactor<T>           m_nest_drop_interactor;

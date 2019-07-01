@@ -50,11 +50,23 @@ void oracle_manager::tasking_oracle(std::unique_ptr<class tasking_oracle> o) {
 void oracle_manager::update(ds::arena_map* const map) {
   if (m_entities->blocks_enabled()) {
     entities_oracle::variant_vector_type v;
-    for (auto& b : map->blocks()) {
-      if (-1 == b->robot_id()) { /* don't include blocks robot's are carrying */
-        v.push_back(b);
-      }
-    } /* for(&b..) */
+    std::copy_if(map->blocks().begin(),
+                 map->blocks().end(),
+                 std::back_inserter(v),
+                 [&](const auto& b) {
+                   /* don't include blocks robot's are carrying */
+                   return -1 == b->robot_id() &&
+                       /*
+                        * Don't include blocks that are currently in a cache
+                        * (harmless, but causes repeated "removed block hidden
+                        * behind cache" warnings)
+                        */
+                       std::none_of(map->caches().begin(),
+                                    map->caches().end(),
+                                    [&](const auto& c) {
+                                      return c->contains_block(b);
+                                    });
+                 });
     m_entities->set_blocks(v);
   }
   if (m_entities->caches_enabled()) {

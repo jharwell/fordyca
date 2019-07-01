@@ -312,25 +312,33 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
    * If said interaction results in a block being dropped in a new cache, then
    * we need to re-run dynamic cache creation.
    */
-  auto iadaptor = robot_interactor_adaptor<robot_arena_interactor, bool>(
-      controller, GetSpace().GetSimulationClock());
-  bool nc_drop =
-      boost::apply_visitor(iadaptor,
-                           m_interactor_map->at(controller->type_index()));
-  if (!nc_drop) {
-    return;
-  }
-  if (cache_creation_handle(true)) {
-    /* The oracle does not have up-to-date information about all caches in the
+  auto iadaptor = robot_interactor_adaptor<robot_arena_interactor,
+                                           interactor_status>(
+                                               controller,
+                                               GetSpace().GetSimulationClock());
+  auto status = boost::apply_visitor(iadaptor,
+                                     m_interactor_map->at(controller->type_index()));
+  if (interactor_status::ekNoEvent != status) {
+    if (interactor_status::ekNewCacheBlockDrop & status) {
+      bool ret = cache_creation_handle(true);
+      if (!ret) {
+        ER_WARN("Unable to create cache after block drop in new cache");
+      }
+    }
+
+    /*
+     * The oracle does not have up-to-date information about all caches in the
      * arena now that one has been created, so we need to update the oracle in
-     * the middle of processing robots. This is not an issues in depth1,
-     * because caches are always created AFTER processing all robots for a
-     * timestep */
+     * the middle of processing robots. This is not an issue in depth1, because
+     * caches are always created AFTER processing all robots for a timestep.
+     *
+     * It also does not necessarily have up-to-date information about all blocks
+     * in the arena, as a robot could have dropped a block when it aborted its
+     * current task.
+     */
     if (nullptr != oracle_manager()) {
       oracle_manager()->update(arena_map());
     }
-  } else {
-    ER_WARN("Unable to create cache after block drop in new cache");
   }
 } /* robot_timestep_process() */
 

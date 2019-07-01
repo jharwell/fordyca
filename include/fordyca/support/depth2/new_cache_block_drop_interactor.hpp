@@ -32,6 +32,7 @@
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -84,7 +85,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    *
    * @return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
-  bool operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, uint timestep) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
         return finish_new_cache_block_drop(controller);
@@ -101,8 +102,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
       auto status = m_penalty_handler->penalty_init(controller,
                                                    tv::block_op_src::ekNEW_CACHE_DROP,
                                                    timestep,
-                                                   m_cache_manager->cache_proximity_dist(),
-                                                   m_cache_manager->block_proximity_dist());
+                                                   m_cache_manager->cache_proximity_dist());
       if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
         auto prox_status = loop_utils::new_cache_cache_proximity(controller,
                                                                  *m_map,
@@ -112,7 +112,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
         cache_proximity_notify(controller, prox_status);
       }
     }
-    return false;
+    return interactor_status::ekNoEvent;
   }
 
  private:
@@ -146,7 +146,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    * @brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache site and is looking to drop an object on it.
    */
-  bool finish_new_cache_block_drop(T& controller) {
+  interactor_status finish_new_cache_block_drop(T& controller) {
     const tv::temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
@@ -188,13 +188,13 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                 status.entity_id);
       events::cache_proximity_visitor prox_op(*it);
       prox_op.visit(controller);
-      return false;
+      return interactor_status::ekNoEvent;
     } else {
       perform_new_cache_block_drop(controller, p);
       m_penalty_handler->remove(p);
       ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
-      return true;
+      return interactor_status::ekNewCacheBlockDrop;
     }
   }
 

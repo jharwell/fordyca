@@ -32,6 +32,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -86,16 +87,18 @@ class nest_block_drop_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep The current timestep.
    */
-  void operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, uint timestep) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
         finish_nest_block_drop(controller, timestep);
+        return interactor_status::ekNestBlockDrop;
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::block_op_src::ekNEST_DROP,
                                       timestep);
     }
+    return interactor_status::ekNoEvent;
   }
 
  private:

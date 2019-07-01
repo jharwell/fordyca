@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "fordyca/support/free_block_pickup_interactor.hpp"
 #include "fordyca/support/nest_block_drop_interactor.hpp"
+#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,11 +78,11 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * @param timestep The current timestep.
    */
   template<typename C = T>
-  void operator()(C& controller, uint timestep) {
+  interactor_status operator()(C& controller, uint timestep) {
     if (controller.is_carrying_block()) {
-      m_nest_drop_interactor(controller, timestep);
+      return m_nest_drop_interactor(controller, timestep);
     } else { /* The foot-bot has no block item */
-      m_free_pickup_interactor(controller, timestep);
+      return m_free_pickup_interactor(controller, timestep);
     }
   }
 
