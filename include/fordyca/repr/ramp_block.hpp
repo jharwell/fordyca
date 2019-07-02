@@ -57,8 +57,8 @@ class ramp_block final : public base_block {
   }
   std::unique_ptr<base_block> clone(void) const override {
     auto tmp = rcppsw::make_unique<ramp_block>(dims(), id());
-    tmp->discrete_loc(this->discrete_loc());
-    tmp->real_loc(this->real_loc());
+    tmp->dloc(this->dloc());
+    tmp->rloc(this->rloc());
     tmp->reset_robot_id();
     return tmp;
   } /* clone() */

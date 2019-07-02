@@ -31,8 +31,8 @@
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces

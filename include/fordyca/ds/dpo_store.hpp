@@ -55,7 +55,7 @@ NS_START(ds);
 class dpo_store final : public rer::client<dpo_store> {
  public:
   template <typename T>
-  using dp_entity = repr::dp_entity<T>;
+  using dpo_entity = repr::dpo_entity<T>;
 
   enum update_status {
     kNO_CHANGE,
@@ -130,7 +130,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * @param cache Cache to add.
    */
-  update_res_t cache_update(const dp_entity<repr::base_cache>& cache);
+  update_res_t cache_update(const dpo_entity<repr::base_cache>& cache);
 
   /*
    * @brief Update the known blocks set with the new block.
@@ -142,7 +142,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * @return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(const dp_entity<repr::base_block>& block_in);
+  update_res_t block_update(const dpo_entity<repr::base_block>& block_in);
 
   /**
    * @brief Remove a cache from the set of of known caches.

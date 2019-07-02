@@ -195,11 +195,12 @@ void depth0_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
                        m_los_update_map->at(controller->type_index()));
 
   /* Watch the robot interact with the environment! */
-  auto iadaptor = robot_interactor_adaptor<depth0::robot_arena_interactor,
-                                           interactor_status>(
-      controller, GetSpace().GetSimulationClock());
-  auto status = boost::apply_visitor(iadaptor,
-                                     m_interactor_map->at(controller->type_index()));
+  auto iadaptor =
+      robot_interactor_adaptor<depth0::robot_arena_interactor, interactor_status>(
+          controller, GetSpace().GetSimulationClock());
+  auto status =
+      boost::apply_visitor(iadaptor,
+                           m_interactor_map->at(controller->type_index()));
 
   /*
    * The oracle does not necessarily have up-to-date information about all

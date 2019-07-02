@@ -98,10 +98,8 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
 
   if (auto best = selector(mc_store->blocks(),
                            saa_subsystem()->sensing()->position())) {
-    return boost::make_optional(
-        acquire_goal_fsm::candidate_type(best->ent()->real_loc(),
-                                         vector_fsm::kBLOCK_ARRIVAL_TOL,
-                                         best->ent()->id()));
+    return boost::make_optional(acquire_goal_fsm::candidate_type(
+        best->ent()->rloc(), vector_fsm::kBLOCK_ARRIVAL_TOL, best->ent()->id()));
   } else {
     return boost::optional<acquire_goal_fsm::candidate_type>();
   }

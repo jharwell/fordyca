@@ -46,7 +46,7 @@ void utility_cache_search::task_start(const rta::taskable_argument*) {
                                range.end(),
                                rmath::vector2d(),
                                [&](rmath::vector2d& sum, const auto& bent) {
-                                 return sum + bent.ent()->real_loc();
+                                 return sum + bent.ent()->rloc();
                                }) /
                boost::size(range);
   } else {

@@ -70,7 +70,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   } else if (!it->ent()->contains_point(loc)) {
     ER_WARN("Cache%d@%s invalid for acquisition: does not contain %s",
             id,
-            it->ent()->discrete_loc().to_str().c_str(),
+            it->ent()->dloc().to_str().c_str(),
             loc.to_str().c_str());
     return false;
   }

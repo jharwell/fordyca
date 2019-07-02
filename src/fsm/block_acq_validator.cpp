@@ -73,13 +73,13 @@ __rcsw_pure bool block_acq_validator::operator()(const rmath::vector2d& loc,
                           range.end(),
                           rmath::vector2d(),
                           [&](rmath::vector2d& sum, const auto& bent) {
-                            return sum + bent.ent()->real_loc();
+                            return sum + bent.ent()->rloc();
                           }) /
           boost::size(range);
 
       return (loc - avg_position).length() < config.prox_dist;
     }
-  } /* for(&bent..) */
+  }
   return true;
 } /* operator()() */
 

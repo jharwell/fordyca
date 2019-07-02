@@ -106,27 +106,13 @@ void depth0_metrics_aggregator::collect_from_controller(
   /*
    * All depth0 controllers provide these.
    */
-  auto collision_m =
-      dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
-  auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
-  auto block_acq_m =
-      dynamic_cast<const metrics::fsm::goal_acq_metrics*>(controller);
-  auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(
-      controller->block_manip_collator());
-
-  ER_ASSERT(mov_m, "FSM does not provide movement metrics");
-  ER_ASSERT(block_acq_m,
-            "Controller does not provide block acquisition metrics");
-  ER_ASSERT(collision_m, "Controller does not provide collision metrics");
-  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
-
-  collect("fsm::movement", *mov_m);
-  collect("fsm::collision_counts", *collision_m);
-  collect("blocks::acq_counts", *block_acq_m);
-  collect("blocks::manipulation", *manip_m);
+  collect("fsm::movement", *controller);
+  collect("fsm::collision_counts", *controller->fsm());
+  collect("blocks::acq_counts", *controller);
+  collect("blocks::manipulation", *controller->block_manip_collator());
 
   collect_if("fsm::collision_locs",
-             *collision_m,
+             *controller->fsm(),
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
                    dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
@@ -134,7 +120,7 @@ void depth0_metrics_aggregator::collect_from_controller(
              });
 
   collect_if("blocks::acq_locs",
-             *block_acq_m,
+             *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
                    dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
@@ -147,14 +133,14 @@ void depth0_metrics_aggregator::collect_from_controller(
    * explore.
    */
   collect_if("blocks::acq_explore_locs",
-             *block_acq_m,
+             *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
                    dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
                return m.is_exploring_for_goal().first;
              });
   collect_if("blocks::acq_vector_locs",
-             *block_acq_m,
+             *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
                    dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);

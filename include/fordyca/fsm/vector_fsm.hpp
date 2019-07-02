@@ -70,6 +70,14 @@ class vector_fsm final : public base_foraging_fsm,
 
   /**
    * @brief The tolerance within which a robot's location has to be in order to
+   * be considered having arrived at the specified new cache's location. More
+   * relaxed than the tolerance for cache arrivals, as we are creating a cache,
+   * and things can be much more approximate.
+   */
+  constexpr static double kNEW_CACHE_ARRIVAL_TOL = 0.4;
+
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
    * be considered to have arrived at the specified cache site.
    */
   constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;

@@ -27,6 +27,7 @@
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/nsalias.hpp"
+#include "fordyca/repr/grid_view_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,22 +49,21 @@ NS_START(fordyca, repr);
  * - The blocks distributed in that area.
  * - The maximum capacity of the cluster.
  */
-class block_cluster : public rer::client<block_cluster> {
+class block_cluster : public grid_view_entity<ds::arena_grid::const_view>,
+                      public rer::client<block_cluster> {
  public:
   block_cluster(const ds::arena_grid::const_view& view, uint capacity)
-      : ER_CLIENT_INIT("fordyca.repr.block_cluster"),
-        m_view(view),
+      : grid_view_entity<ds::arena_grid::const_view>(view),
+        ER_CLIENT_INIT("fordyca.repr.block_cluster"),
         m_capacity(capacity) {}
 
   uint capacity(void) const { return m_capacity; }
   size_t block_count(void) const { return blocks().size(); }
   ds::const_block_list blocks(void) const;
-  const ds::arena_grid::const_view& view(void) const { return m_view; }
 
  private:
   /* clang-format off */
-  ds::arena_grid::const_view m_view;
-  uint                       m_capacity;
+  uint m_capacity;
   /* clang-format on */
 };
 

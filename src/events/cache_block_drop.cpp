@@ -59,7 +59,7 @@ cache_block_drop::cache_block_drop(
     const std::shared_ptr<repr::arena_cache>& cache,
     double resolution)
     : ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
-      cell_op(cache->discrete_loc()),
+      cell_op(cache->dloc()),
       m_resolution(resolution),
       m_block(block),
       m_cache(cache) {}
@@ -90,7 +90,7 @@ bool cache_block_drop::dispatch_d2_cache_interactor(
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
     ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
             m_block->id(),
-            m_block->real_loc().to_str().c_str(),
+            m_block->rloc().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
         {m_cache->id(), controller::cache_sel_exception::kPickup});

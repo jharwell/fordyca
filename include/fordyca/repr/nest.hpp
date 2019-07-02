@@ -27,8 +27,8 @@
 #include <argos3/plugins/simulator/entities/light_entity.h>
 #include <list>
 
-#include "fordyca/repr/immovable_cell_entity.hpp"
-#include "fordyca/repr/multicell_entity.hpp"
+#include "fordyca/repr/colored_entity.hpp"
+#include "fordyca/repr/unicell_immovable_entity.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +49,7 @@ NS_START(fordyca, repr);
  * sensor, NOT the omnidirectional camera, as that can only detect LED entities
  * that are on the ground (implementation detail).
  */
-class nest : public multicell_entity, public immovable_cell_entity {
+class nest : public unicell_immovable_entity, public colored_entity {
  public:
   /**
    * @brief We use raw pointers to indicate we (FORDYCA) do not own the
@@ -76,8 +76,7 @@ class nest : public multicell_entity, public immovable_cell_entity {
    * @return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const rmath::vector2d& point) const {
-    return xspan(real_loc()).contains(point.x()) &&
-           yspan(real_loc()).contains(point.y());
+    return xspan().contains(point.x()) && yspan().contains(point.y());
   }
 
   light_list& lights(void) { return m_lights; }

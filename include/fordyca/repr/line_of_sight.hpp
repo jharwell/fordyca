@@ -131,6 +131,7 @@ class line_of_sight final : public rer::client<line_of_sight> {
   /* clang-format off */
   const rmath::vector2u mc_center;
   const const_grid_view mc_view;
+
   ds::cache_list        m_caches{};
   /* clang-format on */
 };

@@ -38,7 +38,7 @@
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.dynamic_cache_creator" >
-    <priority value ="info" />
+    <priority value ="trace" />
   </category>
     <category name="fordyca.tasks.depth2.cache_starter" >
     <priority value ="info" />
@@ -47,7 +47,7 @@
     <priority value ="trace" />
   </category>
   <category name="fordyca.support.base_cache_creator" >
-    <priority value ="info" />
+    <priority value ="trace" />
   </category>
 
   <category name="fordyca.controller.perception" >

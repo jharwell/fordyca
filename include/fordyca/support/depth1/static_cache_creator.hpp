@@ -49,7 +49,8 @@ class static_cache_creator : public base_cache_creator,
                        const rmath::vector2d& center,
                        double cache_dim);
 
-  ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+  ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
+                              const ds::block_cluster_vector&,
                               ds::block_vector& blocks,
                               uint timestep) override;
 

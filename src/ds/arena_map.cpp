@@ -194,8 +194,8 @@ void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
 
 void arena_map::cache_extent_clear(
     const std::shared_ptr<repr::arena_cache>& victim) {
-  auto xspan = victim->xspan(victim->real_loc());
-  auto yspan = victim->yspan(victim->real_loc());
+  auto xspan = victim->xspan();
+  auto yspan = victim->yspan();
 
   /*
    * To reset all cells covered by the cache's extent, we simply send them a
@@ -211,7 +211,7 @@ void arena_map::cache_extent_clear(
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {
       rmath::vector2u c = rmath::vector2u(i, j);
-      if (c != victim->discrete_loc()) {
+      if (c != victim->dloc()) {
         ER_ASSERT(victim->contains_point(rmath::uvec2dvec(c, grid_resolution())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   victim->id(),

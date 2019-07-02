@@ -70,8 +70,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    */
   op_filter_status operator()(T& controller,
                           block_op_src src,
-                          double cache_prox_dist,
-                          double block_prox_dist) {
+                          double cache_prox_dist) {
     /*
      * If the robot has not acquired a block, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a block but is still
@@ -84,7 +83,6 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
         return nest_drop_filter(controller);
       case block_op_src::ekCACHE_SITE_DROP:
         return cache_site_drop_filter(controller,
-                                      block_prox_dist,
                                       cache_prox_dist);
       case block_op_src::ekNEW_CACHE_DROP:
         return new_cache_drop_filter(controller, cache_prox_dist);
@@ -129,20 +127,13 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    * block/cache is too close.
    */
   op_filter_status cache_site_drop_filter(const T& controller,
-                                      double block_prox_dist,
                                       double cache_prox_dist) const {
     if (!(controller.goal_acquired() &&
           acq_goal_type::ekCACHE_SITE == controller.acquisition_goal() &&
           transport_goal_type::ekCACHE_SITE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
-    int block_id = loop_utils::cache_site_block_proximity(controller,
-                                                          *m_map,
-                                                          block_prox_dist)
-                       .entity_id;
-    if (-1 != block_id) {
-      return op_filter_status::ekBLOCK_PROXIMITY;
-    }
+
     int cache_id = loop_utils::new_cache_cache_proximity(controller,
                                                          *m_map,
                                                          cache_prox_dist)

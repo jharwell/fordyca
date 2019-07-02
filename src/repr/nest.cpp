@@ -35,8 +35,8 @@ nest::nest(const rmath::vector2d& dim,
            const rmath::vector2d& loc,
            double resolution,
            const rutils::color& light_color)
-    : multicell_entity(dim, rcppsw::utils::color::kGRAY70),
-      immovable_cell_entity(loc, resolution),
+    : unicell_immovable_entity(dim, loc, resolution),
+      colored_entity(rcppsw::utils::color::kGRAY70),
       m_lights(init_lights(light_color)) {}
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ nest::light_list nest::init_lights(const rutils::color& color) const {
 } /* init_lights() */
 
 nest::light_list nest::init_square(const rutils::color& color) const {
-  argos::CVector3 loc(real_loc().x(), real_loc().y(), 5.0);
+  argos::CVector3 loc(rloc().x(), rloc().y(), 5.0);
   return light_list{new argos::CLightEntity(
       "nest_light0",
       loc,
@@ -65,13 +65,13 @@ nest::light_list nest::init_rect(const rutils::color& color) const {
   argos::CVector3 loc1, loc2, loc3;
 
   if (xdim() > ydim()) {
-    loc1.Set(real_loc().x() - xdim() * 0.25, real_loc().y(), 5.0);
-    loc2.Set(real_loc().x(), real_loc().y(), 5.0);
-    loc3.Set(real_loc().x() + xdim() * 0.25, real_loc().y(), 5.0);
+    loc1.Set(rloc().x() - xdim() * 0.25, rloc().y(), 5.0);
+    loc2.Set(rloc().x(), rloc().y(), 5.0);
+    loc3.Set(rloc().x() + xdim() * 0.25, rloc().y(), 5.0);
   } else {
-    loc1.Set(real_loc().x(), real_loc().y() - ydim() * 0.25, 5.0);
-    loc2.Set(real_loc().x(), real_loc().y(), 5.0);
-    loc3.Set(real_loc().x(), real_loc().y() + ydim() * 0.25, 5.0);
+    loc1.Set(rloc().x(), rloc().y() - ydim() * 0.25, 5.0);
+    loc2.Set(rloc().x(), rloc().y(), 5.0);
+    loc3.Set(rloc().x(), rloc().y() + ydim() * 0.25, 5.0);
   }
 
   return {new argos::CLightEntity(

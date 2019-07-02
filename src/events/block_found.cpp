@@ -49,12 +49,12 @@ using ds::occupancy_grid;
  ******************************************************************************/
 block_found::block_found(std::unique_ptr<repr::base_block> block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
-      cell_op(block->discrete_loc()),
+      cell_op(block->dloc()),
       m_block(std::move(block)) {}
 
 block_found::block_found(const std::shared_ptr<repr::base_block>& block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
-      cell_op(block->discrete_loc()),
+      cell_op(block->dloc()),
       m_block(block) {}
 
 /*******************************************************************************
@@ -66,7 +66,7 @@ void block_found::visit(ds::dpo_store& store) {
    * block, remove the out-of-date cache.
    */
   for (auto& c : store.caches().values_range()) {
-    if (m_block->discrete_loc() == c.ent()->discrete_loc()) {
+    if (m_block->dloc() == c.ent()->dloc()) {
       store.cache_remove(c.ent_obj());
 
       /*
@@ -86,11 +86,11 @@ void block_found::visit(ds::dpo_store& store) {
      * location than we think it should, then our tracked version is out of date
      * and needs to be removed.
      */
-    if (!known->ent()->loccmp(*m_block)) {
+    if (!known->ent()->dloccmp(*m_block)) {
       ER_INFO("Removing block%d@%s: Moved to %s",
               known->ent()->id(),
-              known->ent()->discrete_loc().to_str().c_str(),
-              m_block->discrete_loc().to_str().c_str());
+              known->ent()->dloc().to_str().c_str(),
+              m_block->dloc().to_str().c_str());
       store.block_remove(known->ent_obj());
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     } else { /* block has not moved */
@@ -210,7 +210,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
                res.old_loc.to_str().c_str(),
                m_block->id(),
                res.old_loc.to_str().c_str(),
-               m_block->discrete_loc().to_str().c_str());
+               m_block->dloc().to_str().c_str());
       events::cell_empty_visitor op(res.old_loc);
       op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {

@@ -48,7 +48,8 @@ dynamic_cache_creator::dynamic_cache_creator(const struct params* const p)
  * Member Functions
  ******************************************************************************/
 ds::cache_vector dynamic_cache_creator::create_all(
-    const ds::cache_vector& previous_caches,
+    const ds::cache_vector& c_previous_caches,
+    const ds::block_cluster_vector& c_clusters,
     ds::block_vector& candidate_blocks,
     uint timestep) {
   ds::cache_vector created_caches;
@@ -70,13 +71,23 @@ ds::cache_vector dynamic_cache_creator::create_all(
      */
     if (cache_i_blocks.size() >= m_min_blocks) {
       ds::cache_vector c_avoid =
-          avoidance_caches_calc(previous_caches, created_caches);
-
-      ds::block_list b_avoid =
-          avoidance_blocks_calc(candidate_blocks, used_blocks, cache_i_blocks);
+          avoidance_caches_calc(c_previous_caches, created_caches);
 
       if (auto center = cache_center_calculator(grid(), cache_dim())(
-              cache_i_blocks, b_avoid, c_avoid)) {
+              cache_i_blocks, c_avoid, c_clusters)) {
+        /*
+         * If we found a conflict free cache center, we need to check if there
+         * are free blocks that are now within the extent of the cache to be due
+         * to the center moving. If so, we absorb them into the block list for
+         * the new cache.
+         */
+        auto absorb_blocks = absorb_blocks_calc(
+            candidate_blocks, cache_i_blocks, used_blocks, *center, cache_dim());
+        ER_DEBUG("Absorb blocks=[%s]", rcppsw::to_string(absorb_blocks).c_str());
+
+        cache_i_blocks.insert(cache_i_blocks.end(),
+                              absorb_blocks.begin(),
+                              absorb_blocks.end());
         /*
          * We convert to discrete and then back to real coordinates so that our
          * cache's real location is always on an even multiple of the grid size,
@@ -96,8 +107,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  ds::block_list free_blocks =
-      avoidance_blocks_calc(candidate_blocks, used_blocks, ds::block_list());
+  ds::block_list free_blocks = free_blocks_calc(candidate_blocks, used_blocks);
 
   ER_ASSERT(creation_sanity_checks(created_caches, free_blocks),
             "One or more bad caches on creation");
@@ -105,42 +115,67 @@ ds::cache_vector dynamic_cache_creator::create_all(
 } /* create_all() */
 
 ds::cache_vector dynamic_cache_creator::avoidance_caches_calc(
-    const ds::cache_vector& previous_caches,
-    const ds::cache_vector& created_caches) const {
-  ds::cache_vector avoid = previous_caches;
-  avoid.insert(avoid.end(), created_caches.begin(), created_caches.end());
+    const ds::cache_vector& c_previous_caches,
+    const ds::cache_vector& c_created_caches) const {
+  ds::cache_vector avoid = c_previous_caches;
+  avoid.insert(avoid.end(), c_created_caches.begin(), c_created_caches.end());
   return avoid;
 } /* avoidance_caches_calc() */
 
-ds::block_list dynamic_cache_creator::avoidance_blocks_calc(
-    const ds::block_vector& candidate_blocks,
-    const ds::block_list& used_blocks,
-    const ds::block_list& cache_i_blocks) const {
-  ds::block_list avoidance_blocks;
-  std::copy_if(
-      candidate_blocks.begin(),
-      candidate_blocks.end(),
-      std::back_inserter(avoidance_blocks),
-      [&](const auto& b) __rcsw_pure {
-        return used_blocks.end() ==
-                   std::find(used_blocks.begin(), used_blocks.end(), b) &&
-               cache_i_blocks.end() ==
-                   std::find(cache_i_blocks.begin(), cache_i_blocks.end(), b);
-      });
-  return avoidance_blocks;
-} /* avoidance_blocks_calc() */
+ds::block_list dynamic_cache_creator::absorb_blocks_calc(
+    const ds::block_vector& c_candidate_blocks,
+    const ds::block_list& c_cache_i_blocks,
+    const ds::block_list& c_used_blocks,
+    const rmath::vector2u& c_center,
+    double cache_dim) const {
+  ds::block_list absorb_blocks;
+  std::copy_if(c_candidate_blocks.begin(),
+               c_candidate_blocks.end(),
+               std::back_inserter(absorb_blocks),
+               [&](const auto& b) __rcsw_pure {
+                 auto xspan = rmath::ranged(c_center.x() - cache_dim / 2.0,
+                                            c_center.x() + cache_dim / 2.0);
+                 auto yspan = rmath::ranged(c_center.y() - cache_dim / 2.0,
+                                            c_center.y() + cache_dim / 2.0);
+                 return c_used_blocks.end() == std::find(c_used_blocks.begin(),
+                                                         c_used_blocks.end(),
+                                                         b) &&
+                        c_cache_i_blocks.end() ==
+                            std::find(c_cache_i_blocks.begin(),
+                                      c_cache_i_blocks.end(),
+                                      b) &&
+                        xspan.overlaps_with(b->xspan()) &&
+                        yspan.overlaps_with(b->yspan());
+               });
+  return absorb_blocks;
+} /* absorb_blocks_calc() */
+
+ds::block_list dynamic_cache_creator::free_blocks_calc(
+    const ds::block_vector& c_candidate_blocks,
+    const ds::block_list& c_used_blocks) const {
+  ds::block_list free_blocks;
+  std::copy_if(c_candidate_blocks.begin(),
+               c_candidate_blocks.end(),
+               std::back_inserter(free_blocks),
+               [&](const auto& b) __rcsw_pure {
+                 return c_used_blocks.end() ==
+                        std::find(c_used_blocks.begin(), c_used_blocks.end(), b);
+               });
+  return free_blocks;
+} /* free_blocks_calc() */
 
 ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
-    const ds::block_list& used_blocks,
-    const ds::block_vector& candidates,
+    const ds::block_list& c_used_blocks,
+    const ds::block_vector& c_candidates,
     uint index) const {
   ds::block_list src_blocks;
 
   /*
    * Block already in a new cache, so bail out.
    */
-  if (std::find(used_blocks.begin(), used_blocks.end(), candidates[index]) !=
-      used_blocks.end()) {
+  if (std::find(c_used_blocks.begin(),
+                c_used_blocks.end(),
+                c_candidates[index]) != c_used_blocks.end()) {
     return src_blocks;
   }
   /*
@@ -150,26 +185,28 @@ ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
    * anyway.
    */
   ER_TRACE("Add anchor block%d@%s to src list",
-           candidates[index]->id(),
-           candidates[index]->real_loc().to_str().c_str());
-  src_blocks.push_back(candidates[index]);
-  for (size_t i = index + 1; i < candidates.size(); ++i) {
+           c_candidates[index]->id(),
+           c_candidates[index]->rloc().to_str().c_str());
+  src_blocks.push_back(c_candidates[index]);
+  for (size_t i = index + 1; i < c_candidates.size(); ++i) {
     /*
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
      */
-    if ((candidates[index]->real_loc() - candidates[i]->real_loc()).length() <=
+    if ((c_candidates[index]->rloc() - c_candidates[i]->rloc()).length() <=
         m_min_dist) {
-      ER_ASSERT(std::find(src_blocks.begin(), src_blocks.end(), candidates[i]) ==
-                    src_blocks.end(),
+      ER_ASSERT(std::find(src_blocks.begin(),
+                          src_blocks.end(),
+                          c_candidates[i]) == src_blocks.end(),
                 "Block%d already on src list",
-                candidates[i]->id());
-      if (std::find(used_blocks.begin(), used_blocks.end(), candidates[i]) ==
-          used_blocks.end()) {
+                c_candidates[i]->id());
+      if (std::find(c_used_blocks.begin(),
+                    c_used_blocks.end(),
+                    c_candidates[i]) == c_used_blocks.end()) {
         ER_TRACE("Add block %d@%s to src list",
-                 candidates[i]->id(),
-                 candidates[i]->real_loc().to_str().c_str());
-        src_blocks.push_back(candidates[i]);
+                 c_candidates[i]->id(),
+                 c_candidates[i]->rloc().to_str().c_str());
+        src_blocks.push_back(c_candidates[i]);
       }
     }
   } /* for(i..) */

@@ -74,8 +74,8 @@ class random_distributor final : public base_distributor,
 
   bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
-  ds::const_block_cluster_list block_clusters(void) const override {
-    return ds::const_block_cluster_list();
+  ds::block_cluster_vector block_clusters(void) const override {
+    return ds::block_cluster_vector();
   }
 
  private:
@@ -87,7 +87,7 @@ class random_distributor final : public base_distributor,
    * @brief The maxmimum # of times the distribution will be attempted before
    * giving up.
    */
-  static constexpr uint kMAX_DIST_TRIES = 100;
+  static constexpr uint kMAX_DIST_TRIES = 1000;
 
   /**
    * @brief Find coordinates for distribution that are outside the extent of the

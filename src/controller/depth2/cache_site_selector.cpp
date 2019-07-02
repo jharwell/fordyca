@@ -87,22 +87,22 @@ __rcsw_const bool cache_site_selector::verify_site(
     const ds::dp_cache_map& known_caches,
     const ds::dp_block_map& known_blocks) const {
   for (auto& c : known_caches.const_values_range()) {
-    ER_ASSERT((c.ent()->real_loc() - site).length() >=
+    ER_ASSERT((c.ent()->rloc() - site).length() >=
                   std::get<0>(m_constraints)[0].cache_prox_dist,
               "Cache site@%s too close to cache%d (%f <= %f)",
               site.to_str().c_str(),
               c.ent()->id(),
-              (c.ent()->real_loc() - site).length(),
+              (c.ent()->rloc() - site).length(),
               std::get<0>(m_constraints)[0].cache_prox_dist);
   } /* for(&c..) */
 
   for (auto& b : known_blocks.const_values_range()) {
-    ER_ASSERT((b.ent()->real_loc() - site).length() >=
+    ER_ASSERT((b.ent()->rloc() - site).length() >=
                   std::get<1>(m_constraints)[0].block_prox_dist,
               "Cache site@%s too close to block%d (%f <= %f)",
               site.to_str().c_str(),
               b.ent()->id(),
-              (b.ent()->real_loc() - site).length(),
+              (b.ent()->rloc() - site).length(),
               std::get<1>(m_constraints)[0].block_prox_dist);
   } /* for(&b..) */
   const nest_constraint_data* ndata = &std::get<2>(m_constraints)[0];
@@ -248,7 +248,7 @@ __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
   }
   auto* c = reinterpret_cast<cache_site_selector::cache_constraint_data*>(data);
   double val = c->cache_prox_dist -
-               (rmath::vector2d(x[0], x[1]) - c->mc_cache->real_loc()).length();
+               (rmath::vector2d(x[0], x[1]) - c->mc_cache->rloc()).length();
   return val;
 } /* __cache_constraint_func() */
 
@@ -272,7 +272,7 @@ __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
   }
   auto* b = reinterpret_cast<cache_site_selector::block_constraint_data*>(data);
   double val = b->block_prox_dist -
-               (rmath::vector2d(x[0], x[1]) - b->mc_block->real_loc()).length();
+               (rmath::vector2d(x[0], x[1]) - b->mc_block->rloc()).length();
   return val;
 } /* __block_constraint_func() */
 

@@ -279,8 +279,8 @@ void depth1_loop_functions::cache_handling_init(
    * initial cache.
    */
   rmath::vector2d cache_loc = rmath::vector2d(
-      (arena_map()->xrsize() + arena_map()->nest().real_loc().x()) / 2.0,
-      arena_map()->nest().real_loc().y());
+      (arena_map()->xrsize() + arena_map()->nest().rloc().x()) / 2.0,
+      arena_map()->nest().rloc().y());
 
   m_cache_manager = rcppsw::make_unique<static_cache_manager>(
       cachep, &arena_map()->decoratee(), cache_loc);
@@ -386,11 +386,12 @@ void depth1_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
                        m_los_update_map->at(controller->type_index()));
 
   /* Watch the robot interact with its environment! */
-  auto iadaptor = robot_interactor_adaptor<robot_arena_interactor,
-                                           interactor_status>(
-      controller, GetSpace().GetSimulationClock());
-  auto status = boost::apply_visitor(iadaptor,
-                                     m_interactor_map->at(controller->type_index()));
+  auto iadaptor =
+      robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
+          controller, GetSpace().GetSimulationClock());
+  auto status =
+      boost::apply_visitor(iadaptor,
+                           m_interactor_map->at(controller->type_index()));
   /*
    * The oracle does not necessarily have up-to-date information about all
    * blocks in the arena, as a robot could have dropped a block in the nest or
@@ -507,8 +508,8 @@ void depth1_loop_functions::static_cache_monitor(void) {
                                           counts.second);
   if (created) {
     arena_map()->caches_add(*created, this);
-    __rcsw_unused ds::cell2D& cell = arena_map()->access<arena_grid::kCell>(
-        arena_map()->caches()[0]->discrete_loc());
+    __rcsw_unused ds::cell2D& cell =
+        arena_map()->access<arena_grid::kCell>(arena_map()->caches()[0]->dloc());
     ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
               "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
               arena_map()->caches()[0]->n_blocks(),

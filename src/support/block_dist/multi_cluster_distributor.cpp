@@ -76,9 +76,9 @@ bool multi_cluster_distributor::distribute_block(
   return false;
 } /* distribute_block() */
 
-ds::const_block_cluster_list multi_cluster_distributor::block_clusters(
-    void) const {
-  ds::const_block_cluster_list ret;
+ds::block_cluster_vector multi_cluster_distributor::block_clusters(void) const {
+  ds::block_cluster_vector ret;
+
   for (auto& dist : m_dists) {
     auto bclusts = dist.block_clusters();
     ret.insert(ret.end(), bclusts.begin(), bclusts.end());

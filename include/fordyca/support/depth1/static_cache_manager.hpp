@@ -57,7 +57,7 @@ NS_START(support, depth1);
  * cache in the arena, when it is employed.
  */
 class static_cache_manager final : public base_cache_manager,
-                             public rer::client<static_cache_manager> {
+                                   public rer::client<static_cache_manager> {
  public:
   static_cache_manager(const config::caches::caches_config* config,
                        ds::arena_grid* arena_grid,

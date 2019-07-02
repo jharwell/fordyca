@@ -55,7 +55,7 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
     if (new_cache_is_excluded(existing_caches, new_caches, c.ent())) {
       continue;
     }
-    math::new_cache_utility u(c.ent()->real_loc(),
+    math::new_cache_utility u(c.ent()->rloc(),
                               boost::get<rmath::vector2d>(
                                   mc_matrix->find(cselm::kNestLoc)->second));
 
@@ -63,8 +63,8 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
              c.ent()->id(),
-             best.ent()->real_loc().to_str().c_str(),
-             best.ent()->discrete_loc().to_str().c_str(),
+             best.ent()->rloc().to_str().c_str(),
+             best.ent()->dloc().to_str().c_str(),
              c.density().last_result(),
              utility);
 
@@ -77,8 +77,8 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
   if (nullptr != best.ent()) {
     ER_INFO("Best utility: new cache%d@%s/%s: %f",
             best.ent()->id(),
-            best.ent()->real_loc().to_str().c_str(),
-            best.ent()->discrete_loc().to_str().c_str(),
+            best.ent()->rloc().to_str().c_str(),
+            best.ent()->dloc().to_str().c_str(),
             max_utility);
     return boost::make_optional(best);
   } else {
@@ -97,16 +97,16 @@ bool new_cache_selector::new_cache_is_excluded(
       boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
 
   for (auto& ec : existing_caches.const_values_range()) {
-    double dist = (ec.ent()->real_loc() - new_cache->real_loc()).length();
+    double dist = (ec.ent()->rloc() - new_cache->rloc()).length();
     if (dist <= cache_prox) {
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
           new_cache->id(),
-          new_cache->real_loc().to_str().c_str(),
-          new_cache->discrete_loc().to_str().c_str(),
+          new_cache->rloc().to_str().c_str(),
+          new_cache->dloc().to_str().c_str(),
           ec.ent()->id(),
-          ec.ent()->real_loc().to_str().c_str(),
-          ec.ent()->discrete_loc().to_str().c_str(),
+          ec.ent()->rloc().to_str().c_str(),
+          ec.ent()->dloc().to_str().c_str(),
           dist,
           cache_prox);
       return true;
@@ -127,17 +127,17 @@ bool new_cache_selector::new_cache_is_excluded(
     if (b.ent() == new_cache) {
       continue;
     }
-    double dist = (b.ent()->real_loc() - new_cache->real_loc()).length();
+    double dist = (b.ent()->rloc() - new_cache->rloc()).length();
 
     if (dist <= cluster_prox) {
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to potential block "
           "cluster@%s/%s (%f <= %f)",
           new_cache->id(),
-          new_cache->real_loc().to_str().c_str(),
-          new_cache->discrete_loc().to_str().c_str(),
-          b.ent()->real_loc().to_str().c_str(),
-          b.ent()->discrete_loc().to_str().c_str(),
+          new_cache->rloc().to_str().c_str(),
+          new_cache->dloc().to_str().c_str(),
+          b.ent()->rloc().to_str().c_str(),
+          b.ent()->dloc().to_str().c_str(),
           dist,
           cluster_prox);
       return true;

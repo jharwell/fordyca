@@ -49,11 +49,11 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    */
   for (auto& cache : c_dpo->caches().const_values_range()) {
     for (auto& block : mc_los->blocks()) {
-      if (!cache.ent()->contains_point(block->real_loc())) {
+      if (!cache.ent()->contains_point(block->rloc())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
                   block->id(),
-                  block->discrete_loc().to_str().c_str());
+                  block->dloc().to_str().c_str());
       }
     } /* for(&block..) */
   }   /* for(&cache..) */
@@ -70,21 +70,21 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
     ER_ASSERT(nullptr != exists,
               "LOS Cache%d@%s does not exist in DPO store",
               c1->id(),
-              c1->discrete_loc().to_str().c_str());
-    ER_ASSERT(c1->discrete_loc() == exists->ent()->discrete_loc(),
+              c1->dloc().to_str().c_str());
+    ER_ASSERT(c1->dloc() == exists->ent()->dloc(),
               "LOS/DPO store disagree on cache%d location: %s/%s",
               c1->id(),
-              c1->discrete_loc().to_str().c_str(),
-              exists->ent()->discrete_loc().to_str().c_str());
+              c1->dloc().to_str().c_str(),
+              exists->ent()->dloc().to_str().c_str());
     ER_ASSERT(c1->id() == exists->ent()->id(),
               "DPO store/LOS disagree on cache ID @%s: %d/%d",
-              c1->discrete_loc().to_str().c_str(),
+              c1->dloc().to_str().c_str(),
               exists->ent()->id(),
               c1->id());
     ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
               "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
               c1->id(),
-              c1->discrete_loc().to_str().c_str(),
+              c1->dloc().to_str().c_str(),
               c1->n_blocks(),
               exists->ent()->n_blocks());
   } /* for(c1..) */
@@ -99,13 +99,13 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
    * corresponding cell in the map also contains the same block.
    */
   for (auto& block : mc_los->blocks()) {
-    auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->discrete_loc());
+    auto& cell = c_map->access<ds::occupancy_grid::kCell>(block->dloc());
     ER_ASSERT(cell.state_has_block(),
               "Cell@%s not in HAS_BLOCK state",
-              block->discrete_loc().to_str().c_str());
+              block->dloc().to_str().c_str());
     ER_ASSERT(cell.block()->id() == block->id(),
               "Cell@%s has wrong block ID (%u vs %u)",
-              block->discrete_loc().to_str().c_str(),
+              block->dloc().to_str().c_str(),
               block->id(),
               cell.block()->id());
   } /* for(&block..) */

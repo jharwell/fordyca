@@ -46,10 +46,11 @@ static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
  * Member Functions
  ******************************************************************************/
 ds::cache_vector static_cache_creator::create_all(
-    const ds::cache_vector& existing_caches,
+    const ds::cache_vector& c_existing_caches,
+    const ds::block_cluster_vector&,
     ds::block_vector& blocks,
     uint timestep) {
-  ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
+  ER_ASSERT(c_existing_caches.empty(), "Static cache already exists in arena!");
 
   ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
             "Cannot create static cache from < %zu blocks",

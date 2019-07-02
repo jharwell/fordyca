@@ -48,16 +48,16 @@ rmath::vector2d cache_acq_point_selector::operator()(
    * the center to pick a random point in. Each quadrant is cache_dim / 2.0, so
    * quadrant center needs to be computed using cache_dim / 4.0.
    */
-  /* auto ul_center = rmath::vector2d(cache->real_loc().x() - cache->xsize() / 4.0, */
-  /*                                  cache->real_loc().y() + cache->ysize() / 4.0); */
+  /* auto ul_center = rmath::vector2d(cache->rloc().x() - cache->xsize() / 4.0, */
+  /*                                  cache->rloc().y() + cache->ysize() / 4.0); */
 
-  /* auto ur_center = rmath::vector2d(cache->real_loc().x() + cache->xsize() / 4.0, */
-  /*                                  cache->real_loc().y() + cache->ysize() / 4.0); */
+  /* auto ur_center = rmath::vector2d(cache->rloc().x() + cache->xsize() / 4.0, */
+  /*                                  cache->rloc().y() + cache->ysize() / 4.0); */
 
-  /* auto lr_center = rmath::vector2d(cache->real_loc().x() + cache->xsize() / 4.0, */
-  /*                                  cache->real_loc().y() - cache->ysize() / 4.0); */
-  /* auto ll_center = rmath::vector2d(cache->real_loc().x() - cache->xsize() / 4.0, */
-  /*                                  cache->real_loc().y() - cache->ysize() / 4.0); */
+  /* auto lr_center = rmath::vector2d(cache->rloc().x() + cache->xsize() / 4.0, */
+  /*                                  cache->rloc().y() - cache->ysize() / 4.0); */
+  /* auto ll_center = rmath::vector2d(cache->rloc().x() - cache->xsize() / 4.0, */
+  /*                                  cache->rloc().y() - cache->ysize() / 4.0); */
 
   /* /\* find closest center *\/ */
   /* std::list<rmath::vector2d> centers = { */
@@ -71,8 +71,8 @@ rmath::vector2d cache_acq_point_selector::operator()(
   /*                             closest.x() + cache->xsize() / 4.0 - m_arrival_tol); */
   /* auto yrange = rmath::ranged(closest.y() - cache->ysize() / 4.0 + m_arrival_tol, */
   /*                             closest.y() + cache->ysize() / 4.0 - m_arrival_tol); */
-  auto xspan = cache->xspan(cache->real_loc());
-  auto yspan = cache->yspan(cache->real_loc());
+  auto xspan = cache->xspan();
+  auto yspan = cache->yspan();
   auto xrange =
       rmath::ranged(xspan.lb() + m_arrival_tol, xspan.ub() - m_arrival_tol);
   auto yrange =
@@ -85,8 +85,8 @@ rmath::vector2d cache_acq_point_selector::operator()(
   ER_ASSERT(cache->contains_point(loc),
             "Cache%d@%s/%s does not contain %s",
             cache->id(),
-            cache->real_loc().to_str().c_str(),
-            cache->discrete_loc().to_str().c_str(),
+            cache->rloc().to_str().c_str(),
+            cache->dloc().to_str().c_str(),
             loc.to_str().c_str());
   ER_INFO("Point=%s in cache%d: robot_loc=%s,xrange=%s,yrange=%s",
           loc.to_str().c_str(),

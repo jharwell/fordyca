@@ -58,7 +58,7 @@ class cluster_distributor final : public base_distributor,
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities) override;
 
-  ds::const_block_cluster_list block_clusters(void) const override;
+  ds::block_cluster_vector block_clusters(void) const override;
 
  private:
   /* clang-format off */

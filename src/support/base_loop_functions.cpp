@@ -190,7 +190,7 @@ void base_loop_functions::arena_map_init(
    */
   if (nullptr != vconfig) {
     for (auto& block : m_arena_map->blocks()) {
-      block->display_id(vconfig->block_id);
+      block->vis_id(vconfig->block_id);
     } /* for(&block..) */
   }
 } /* arena_map_init() */

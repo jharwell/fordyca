@@ -1,7 +1,7 @@
 /**
- * @file immovable_cell_entity.hpp
+ * @file colored_entity.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,14 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPR_IMMOVABLE_CELL_ENTITY_HPP_
-#define INCLUDE_FORDYCA_REPR_IMMOVABLE_CELL_ENTITY_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_COLORED_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPR_COLORED_ENTITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
-#include "rcppsw/math/vector2.hpp"
+#include "rcppsw/utils/color.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,42 +36,31 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class immovable_cell_entity
+ * @class colored_entity
  * @ingroup fordyca repr
  *
- * @brief A class representing objects that reside within one or more squares
- * within a 2D grid whose position CANNOT change during the lifetime of the
- * object.
+ * @brief A mixin class representing cell entities that have a static color.
  */
-class immovable_cell_entity {
+class colored_entity {
  public:
   /**
-   * @brief Initialize a immovable entity with an initial location in the arena.
+   * @brief Initialize an entity with a color.
    */
-  immovable_cell_entity(const rmath::vector2d& loc, double resolution)
-      : m_real_loc(loc), m_discrete_loc(rmath::dvec2uvec(loc, resolution)) {}
+  explicit colored_entity(const rcppsw::utils::color& color) : m_color(color) {}
 
-  virtual ~immovable_cell_entity(void) = default;
+  colored_entity(const colored_entity& other) = default;
+  colored_entity& operator=(const colored_entity& other) = default;
 
-  /**
-   * @brief Get the real location (center) of the object.
-   */
-  const rmath::vector2d& real_loc(void) const { return m_real_loc; }
+  virtual ~colored_entity(void) = default;
 
-  /**
-   * @brief Get the discretized coordinates of the center of the object, which
-   * can be used to index into an arena_map.
-   *
-   */
-  const rmath::vector2u& discrete_loc(void) const { return m_discrete_loc; }
+  const rcppsw::utils::color& color(void) const { return m_color; }
 
  private:
   /* clang-format off */
-  rmath::vector2d       m_real_loc;
-  rmath::vector2u m_discrete_loc;
+  rcppsw::utils::color m_color;
   /* clang-format on */
 };
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPR_IMMOVABLE_CELL_ENTITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_COLORED_ENTITY_HPP_ */

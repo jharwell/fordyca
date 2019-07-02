@@ -57,7 +57,7 @@ class robot_los_updater_adaptor {
   void operator()(robot_los_updater<controller::depth0::crw_controller>& ) const {}
 
   template<typename ControllerType,
-           RCPPSW_SFINAE_REQUIRE(!std::is_same<ControllerType,
+           RCPPSW_SFINAE_FUNC(!std::is_same<ControllerType,
                                  controller::depth0::crw_controller>::value)>
   void operator()(robot_los_updater<ControllerType>& los_updater) const {
     los_updater(dynamic_cast<ControllerType*>(controller));

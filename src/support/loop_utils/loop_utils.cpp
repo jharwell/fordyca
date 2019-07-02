@@ -71,34 +71,39 @@ __rcsw_const bool block_drop_overlap_with_cache(
     const std::shared_ptr<repr::base_block>& block,
     const std::shared_ptr<repr::arena_cache>& cache,
     const rmath::vector2d& drop_loc) {
-  return cache->xspan(cache->real_loc()).overlaps_with(block->xspan(drop_loc)) &&
-         cache->yspan(cache->real_loc()).overlaps_with(block->yspan(drop_loc));
+  auto drop_xspan = repr::base_entity::xspan(drop_loc, block->dims().x());
+  auto drop_yspan = repr::base_entity::yspan(drop_loc, block->dims().y());
+  return cache->xspan().overlaps_with(drop_xspan) &&
+         cache->yspan().overlaps_with(drop_yspan);
 } /* block_drop_overlap_with_cache() */
 
 __rcsw_pure bool block_drop_near_arena_boundary(
     const ds::arena_map& map,
     const std::shared_ptr<repr::base_block>& block,
     const rmath::vector2d& drop_loc) {
-  return (drop_loc.x() <= block->xsize() * 2 ||
-          drop_loc.x() >= map.xrsize() - block->xsize() * 2 ||
-          drop_loc.y() <= block->ysize() * 2 ||
-          drop_loc.y() >= map.yrsize() - block->ysize() * 2);
+  return (drop_loc.x() <= block->xdim() * 2 ||
+          drop_loc.x() >= map.xrsize() - block->xdim() * 2 ||
+          drop_loc.y() <= block->ydim() * 2 ||
+          drop_loc.y() >= map.yrsize() - block->ydim() * 2);
 } /* block_drop_overlap_with_nest() */
 
 __rcsw_pure bool block_drop_overlap_with_nest(
     const std::shared_ptr<repr::base_block>& block,
     const repr::nest& nest,
     const rmath::vector2d& drop_loc) {
-  return nest.xspan(nest.real_loc()).overlaps_with(block->xspan(drop_loc)) &&
-         nest.yspan(nest.real_loc()).overlaps_with(block->yspan(drop_loc));
+  auto drop_xspan = repr::base_entity::xspan(drop_loc, block->dims().x());
+  auto drop_yspan = repr::base_entity::yspan(drop_loc, block->dims().y());
+
+  return nest.xspan().overlaps_with(drop_xspan) &&
+         nest.yspan().overlaps_with(drop_yspan);
 } /* block_drop_overlap_with_nest() */
 
 proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
                                               const ds::arena_map& map,
                                               double block_prox_dist) {
   for (const auto& b : map.blocks()) {
-    if ((b->real_loc() - c.position2D()).length() <= block_prox_dist) {
-      return {b->id(), b->real_loc(), b->real_loc() - c.position2D()};
+    if ((b->rloc() - c.position2D()).length() <= block_prox_dist) {
+      return {b->id(), b->rloc(), b->rloc() - c.position2D()};
     }
   } /* for(&b..) */
   return {-1, rmath::vector2d(), rmath::vector2d()};
@@ -108,8 +113,8 @@ proximity_status_t new_cache_cache_proximity(const controller::base_controller& 
                                              const ds::arena_map& map,
                                              double proximity_dist) {
   for (const auto& cache : map.caches()) {
-    if ((cache->real_loc() - c.position2D()).length() <= proximity_dist) {
-      return {cache->id(), cache->real_loc(), cache->real_loc() - c.position2D()};
+    if ((cache->rloc() - c.position2D()).length() <= proximity_dist) {
+      return {cache->id(), cache->rloc(), cache->rloc() - c.position2D()};
     }
   } /* for(&b..) */
   return {-1, rmath::vector2d(), rmath::vector2d()};
@@ -117,25 +122,11 @@ proximity_status_t new_cache_cache_proximity(const controller::base_controller& 
 
 placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
                                       const rmath::vector2d& ent1_dims,
-                                      const repr::multicell_entity* const entity) {
-  auto movable = dynamic_cast<const repr::movable_cell_entity*>(entity);
-  auto immovable = dynamic_cast<const repr::immovable_cell_entity*>(entity);
-
-  auto loc_xspan = repr::multicell_entity::xspan(ent1_loc, ent1_dims.x());
-  auto loc_yspan = repr::multicell_entity::yspan(ent1_loc, ent1_dims.y());
-  placement_status_t status;
-  if (nullptr != movable) {
-    auto ent_xspan = entity->xspan(movable->real_loc());
-    auto ent_yspan = entity->yspan(movable->real_loc());
-    status.x_conflict = ent_xspan.overlaps_with(loc_xspan);
-    status.y_conflict = ent_yspan.overlaps_with(loc_yspan);
-  } else {
-    auto ent_xspan = entity->xspan(immovable->real_loc());
-    auto ent_yspan = entity->yspan(immovable->real_loc());
-    status.x_conflict = ent_xspan.overlaps_with(loc_xspan);
-    status.y_conflict = ent_yspan.overlaps_with(loc_yspan);
-  }
-  return status;
+                                      const repr::base_entity* const entity) {
+  auto loc_xspan = repr::base_entity::xspan(ent1_loc, ent1_dims.x());
+  auto loc_yspan = repr::base_entity::yspan(ent1_loc, ent1_dims.y());
+  return placement_status_t{entity->xspan().overlaps_with(loc_xspan),
+                            entity->yspan().overlaps_with(loc_yspan)};
 } /* placement_conflict() */
 
 std::unique_ptr<repr::line_of_sight> compute_robot_los(

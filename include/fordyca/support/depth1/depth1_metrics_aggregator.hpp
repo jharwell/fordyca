@@ -133,48 +133,23 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
  private:
   template<typename ControllerType>
   void collect_controller_common(const ControllerType* const controller) {
-    auto manip_m =
-        dynamic_cast<const metrics::blocks::manipulation_metrics*>(
-            controller->block_manip_collator());
-    auto movement_m =
-        dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
+    collect("fsm::movement", *controller);
+    collect("blocks::manipulation", *controller->block_manip_collator());
 
-    ER_ASSERT(movement_m, "Controller does not provide FSM movement metrics");
-    ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
-
-    collect("fsm::movement", *movement_m);
-    collect("blocks::manipulation", *manip_m);
-
-    if (nullptr == controller->current_task()) {
+    auto task = dynamic_cast<const rta::polled_task*>(controller->current_task());
+    if (nullptr == task) {
       return;
     }
-    auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
-        dynamic_cast<const rta::polled_task*>(controller->current_task())
-        ->mechanism());
-    auto acq_m =
-        dynamic_cast<const metrics::fsm::goal_acq_metrics*>(
-            dynamic_cast<const rta::polled_task*>(controller->current_task())
-            ->mechanism());
-
-    auto dist_m = dynamic_cast<const rmetrics::tasks::bi_tdgraph_metrics*>(
-        controller);
-
-    ER_ASSERT(acq_m,
-              "Task does not provide FSM acquisition metrics");
-    ER_ASSERT(collision_m, "FSM does not provide collision metrics");
-    ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
-
-    collect("fsm::collision_counts", *collision_m);
+    collect("fsm::collision_counts", *task);
     collect_if("fsm::collision_locs",
-               *collision_m,
+               *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
                  auto& m = dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
                  return m.in_collision_avoidance();
                });
     collect_if(
         "blocks::acq_counts",
-        *dynamic_cast<const metrics::fsm::goal_acq_metrics*>(
-            controller->current_task()),
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
@@ -182,8 +157,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         });
     collect_if(
         "blocks::acq_locs",
-        *dynamic_cast<const metrics::fsm::goal_acq_metrics*>(
-            controller->current_task()),
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
@@ -197,7 +171,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
      */
     collect_if(
         "blocks::acq_explore_locs",
-        *acq_m,
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
@@ -206,7 +180,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         });
     collect_if(
         "blocks::acq_vector_locs",
-        *acq_m,
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
@@ -216,7 +190,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
 
     collect_if(
         "caches::acq_counts",
-        *acq_m,
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
@@ -224,7 +198,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         });
     collect_if(
         "caches::acq_locs",
-        *acq_m,
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
@@ -238,7 +212,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
      */
     collect_if(
         "caches::acq_explore_locs",
-        *acq_m,
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
@@ -247,14 +221,14 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         });
     collect_if(
         "caches::acq_vector_locs",
-        *acq_m,
+        *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(
               metrics);
           return acq_goal_type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
-    collect("tasks::distribution", *dist_m);
+    collect("tasks::distribution", *controller);
   } /* collect_controller_common() */
 };
 

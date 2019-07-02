@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
-#include "fordyca/repr/movable_cell_entity.hpp"
-#include "fordyca/repr/multicell_entity.hpp"
+#include "fordyca/repr/colored_entity.hpp"
+#include "fordyca/repr/unicell_movable_entity.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 
@@ -49,8 +49,8 @@ namespace prototype = rcppsw::patterns::prototype;
  * world) and discretized locations (where they are mapped to within the arena
  * map).
  */
-class base_block : public multicell_entity,
-                   public movable_cell_entity,
+class base_block : public unicell_movable_entity,
+                   public colored_entity,
                    public metrics::blocks::transport_metrics,
                    public prototype::clonable<base_block> {
  public:
@@ -69,7 +69,7 @@ class base_block : public multicell_entity,
    * from 0.
    */
   base_block(const rmath::vector2d& dim, const rutils::color& color)
-      : multicell_entity(dim, color, -1) {}
+      : unicell_movable_entity(dim, -1), colored_entity(color) {}
 
   /**
    * @param dim 2 element vector of the dimensions of the block.
@@ -77,7 +77,7 @@ class base_block : public multicell_entity,
    * @param id The id of the block.
    */
   base_block(const rmath::vector2d& dim, const rutils::color& color, int id)
-      : multicell_entity(dim, color, id) {}
+      : unicell_movable_entity(dim, id), colored_entity(color) {}
 
   ~base_block(void) override = default;
 
@@ -99,8 +99,8 @@ class base_block : public multicell_entity,
    * @brief Compare two \ref base_block objects for equality based on their
    * discrete location.
    */
-  bool loccmp(const base_block& other) const {
-    return this->discrete_loc() == other.discrete_loc();
+  bool dloccmp(const base_block& other) const {
+    return this->dloc() == other.dloc();
   }
 
   /* transport metrics */
@@ -157,7 +157,7 @@ class base_block : public multicell_entity,
    * This should only happen if the base_block is being carried by a robot.
    */
   bool is_out_of_sight(void) const {
-    return kOutOfSightDLoc == discrete_loc() || kOutOfSightRLoc == real_loc();
+    return kOutOfSightDLoc == dloc() || kOutOfSightRLoc == rloc();
   }
   /**
    * @brief Get the ID/index of the robot that is currently carrying this
@@ -167,22 +167,6 @@ class base_block : public multicell_entity,
    * block.
    */
   int robot_id(void) const { return m_robot_id; }
-
-  /**
-   * @brief Determine if a real-valued point lies within the extent of the
-   * entity for:
-   *
-   * 1. Visualization purposes.
-   * 2. Determining if a robot is on top of an entity.
-   *
-   * @param point The point to check.
-   *
-   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
-   */
-  bool contains_point(const rmath::vector2d& point) const {
-    return xspan(real_loc()).contains(point.x()) &&
-           yspan(real_loc()).contains(point.y());
-  }
 
  private:
   /* clang-format off */

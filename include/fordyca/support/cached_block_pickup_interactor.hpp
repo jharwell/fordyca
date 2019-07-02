@@ -34,9 +34,9 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -99,7 +99,7 @@ class cached_block_pickup_interactor
       m_penalty_handler->penalty_init(controller,
                                       tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
                                       timestep);
-  }
+    }
     return interactor_status::ekNoEvent;
   }
 
@@ -181,9 +181,10 @@ class cached_block_pickup_interactor
    * @brief Perform the actual pickup of a block from a cache, once all
    * preconditions have been satisfied.
    */
-  interactor_status perform_cached_block_pickup(T& controller,
-                                                const tv::temporal_penalty<T>& penalty,
-                                                uint timestep) {
+  interactor_status perform_cached_block_pickup(
+      T& controller,
+      const tv::temporal_penalty<T>& penalty,
+      uint timestep) {
     auto it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),

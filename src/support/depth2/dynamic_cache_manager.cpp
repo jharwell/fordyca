@@ -49,12 +49,12 @@ dynamic_cache_manager::dynamic_cache_manager(
  * Member Functions
  ******************************************************************************/
 boost::optional<ds::cache_vector> dynamic_cache_manager::create(
-    const ds::cache_vector& existing_caches,
-    const ds::const_block_cluster_list& clusters,
+    const ds::cache_vector& c_existing_caches,
+    const ds::block_cluster_vector& c_clusters,
     ds::block_vector& blocks,
     uint timestep) {
   if (auto to_use =
-          calc_blocks_for_creation(existing_caches, clusters, blocks)) {
+          calc_blocks_for_creation(c_existing_caches, c_clusters, blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
         .grid = arena_grid(),
         .cache_dim = mc_cache_config.dimension,
@@ -63,7 +63,7 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
     support::depth2::dynamic_cache_creator creator(&params);
 
     ds::cache_vector created =
-        creator.create_all(existing_caches, *to_use, timestep);
+        creator.create_all(c_existing_caches, c_clusters, *to_use, timestep);
     caches_created(created.size());
 
     /*
@@ -79,7 +79,7 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
 
 boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creation(
     const ds::cache_vector& existing_caches,
-    const ds::const_block_cluster_list& clusters,
+    const ds::block_cluster_vector& clusters,
     const ds::block_vector& blocks) {
   ds::block_vector to_use;
   auto filter = [&](const auto& b) {
@@ -104,9 +104,9 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
 
   if (to_use.size() < mc_cache_config.dynamic.min_blocks) {
     /*
-     * @todo Cannot use std::accumulate for these, because that doesn't work with
-     * C++14/gcc7 when you are accumulating into a different type (e.g. from a
-     * set of blocks into an int).
+     * @todo Cannot use std::accumulate for these, because that doesn't work
+     * with C++14/gcc7 when you are accumulating into a different type
+     * (e.g. from a set of blocks into an int).
      */
     uint count = 0;
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
@@ -126,8 +126,7 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
 
     accum = "";
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      accum += "b" + std::to_string(b->id()) + "->" +
-               b->discrete_loc().to_str() + ",";
+      accum += "b" + std::to_string(b->id()) + "->" + b->dloc().to_str() + ",";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 

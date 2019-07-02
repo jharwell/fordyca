@@ -32,12 +32,12 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace repr {
-class multicell_entity;
+class unicell_entity;
 } // namespace repr
 NS_START(ds);
 
-using entity_list_type = repr::multicell_entity*;
-using const_entity_list_type = const repr::multicell_entity*;
+using entity_list_type = repr::unicell_entity*;
+using const_entity_list_type = const repr::unicell_entity*;
 
 /*******************************************************************************
  * Type Definitions

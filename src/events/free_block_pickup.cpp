@@ -65,7 +65,7 @@ free_block_pickup::free_block_pickup(
     uint robot_index,
     uint timestep)
     : ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
-      cell_op(block->discrete_loc()),
+      cell_op(block->dloc()),
       m_timestep(timestep),
       m_robot_index(robot_index),
       m_block(block) {}
@@ -83,14 +83,13 @@ void free_block_pickup::visit(ds::cell2D& cell) {
   ER_INFO("cell2D: fb%u block%d from %s",
           m_robot_index,
           m_block->id(),
-          m_block->discrete_loc().to_str().c_str());
+          m_block->dloc().to_str().c_str());
 } /* visit() */
 
 void free_block_pickup::visit(ds::arena_map& map) {
-  ER_ASSERT(m_block->discrete_loc() ==
-                rmath::vector2u(cell_op::x(), cell_op::y()),
+  ER_ASSERT(m_block->dloc() == rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
-  __rcsw_unused rmath::vector2d old_r = m_block->real_loc();
+  __rcsw_unused rmath::vector2d old_r = m_block->rloc();
   events::cell_empty_visitor op(cell_op::coord());
   op.visit(map);
   visit(*m_block);
@@ -145,22 +144,22 @@ void free_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(m_block),
             "Block%d@%s not in DPO store",
             m_block->id(),
-            m_block->discrete_loc().to_str().c_str());
+            m_block->dloc().to_str().c_str());
   store.block_remove(m_block);
   ER_ASSERT(!store.contains(m_block),
             "Block%d@%s in DPO store after removal",
             m_block->id(),
-            m_block->discrete_loc().to_str().c_str());
+            m_block->dloc().to_str().c_str());
 } /* visit() */
 
 void free_block_pickup::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
 
-  ER_ASSERT(m_block->discrete_loc() == cell.loc(),
+  ER_ASSERT(m_block->dloc() == cell.loc(),
             "Coordinates for block%d@%s/cell@%s do not agree",
             m_block->id(),
-            m_block->discrete_loc().to_str().c_str(),
+            m_block->dloc().to_str().c_str(),
             cell.loc().to_str().c_str());
 
   ER_ASSERT(m_block->id() == cell.block()->id(),

@@ -42,7 +42,7 @@ class base_controller;
 namespace repr {
 class arena_cache;
 class nest;
-class multicell_entity;
+class base_entity;
 class line_of_sight;
 class base_block;
 }
@@ -201,7 +201,7 @@ void set_robot_tick(argos::CFootBotEntity& robot, uint timestep) {
  */
 placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
                                       const rmath::vector2d& ent1_dims,
-                                      const repr::multicell_entity* entity);
+                                      const repr::base_entity* entity);
 
 NS_END(loop_utils, support, fordyca);
 

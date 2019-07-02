@@ -43,12 +43,12 @@ using repr::base_cache;
  * Constructors/Destructor
  ******************************************************************************/
 cache_found::cache_found(std::unique_ptr<repr::base_cache> cache)
-    : cell_op(cache->discrete_loc()),
+    : cell_op(cache->dloc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
 
 cache_found::cache_found(const std::shared_ptr<repr::base_cache>& cache)
-    : cell_op(cache->discrete_loc()),
+    : cell_op(cache->dloc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
 
@@ -67,7 +67,7 @@ void cache_found::visit(ds::dpo_store& store) {
    * arena.
    */
   for (auto&& b : store.blocks().const_values_range()) {
-    if (m_cache->contains_point(b.ent()->real_loc())) {
+    if (m_cache->contains_point(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id(),
                m_cache->id());
@@ -163,7 +163,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    */
   std::list<const std::shared_ptr<repr::base_block>*> rms;
   for (auto&& b : map.blocks().const_values_range()) {
-    if (m_cache->contains_point(b.ent()->real_loc())) {
+    if (m_cache->contains_point(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id(),
                m_cache->id());
@@ -172,8 +172,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    events::cell_empty_visitor op((*b)->discrete_loc());
-    op.visit(map.access<occupancy_grid::kCell>((*b)->discrete_loc()));
+    events::cell_empty_visitor op((*b)->dloc());
+    op.visit(map.access<occupancy_grid::kCell>((*b)->dloc()));
     map.block_remove(*b);
   } /* for(&&b..) */
 

@@ -1,5 +1,5 @@
 /**
- * @file multicell_entity.hpp
+ * @file base_entity.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,17 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPR_MULTICELL_ENTITY_HPP_
-#define INCLUDE_FORDYCA_REPR_MULTICELL_ENTITY_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_BASE_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPR_BASE_ENTITY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/math/vector2.hpp"
-
 #include "fordyca/nsalias.hpp"
-#include "fordyca/repr/base_cell_entity.hpp"
 #include "rcppsw/math/range.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,26 +37,13 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class multicell_entity
+ * @class base_entity
  * @ingroup fordyca repr
  *
- * @brief Representation of an entity in the arena that can span multiple cells.
- *
- * All entities are assumed to be rectang in nature, or at least can be
- * reasonably approximated as such. All entities are assumed to maintain their
- * dimensions for their lifetime.
+ * @brief A base class from which all entities in the arena derive.
  */
-class multicell_entity : public base_cell_entity {
+class base_entity {
  public:
-  multicell_entity(const rmath::vector2d& dim, const rcppsw::utils::color& color)
-      : multicell_entity{dim, color, -1} {}
-
-  multicell_entity(const rmath::vector2d& dim,
-                   const rcppsw::utils::color& color,
-                   int id)
-      : base_cell_entity(color, id), m_dim(dim) {}
-  ~multicell_entity(void) override = default;
-
   /**
    * @brief Calculate the span in X of an entity given its location and
    * dimension in X.
@@ -79,49 +64,62 @@ class multicell_entity : public base_cell_entity {
     return rmath::ranged(loc.y() - 0.5 * ydim, loc.y() + 0.5 * ydim);
   }
 
+  base_entity(void) : base_entity{-1} {}
+  explicit base_entity(int id) : m_id(id) {}
+
+  base_entity(const base_entity& other) = default;
+  base_entity& operator=(const base_entity& other) = default;
+
+  virtual ~base_entity(void) = default;
+
   /**
-   * @brief Get the 2D space spanned by the multicell entity in absolute
-   * coordinates in the arena in Y. This is NOT the size of the entity in X.
+   * @brief Set the ID of the object.
+   */
+  void id(int id) { m_id = id; }
+
+  /**
+   * @brief Get the ID of the object.
+   */
+  int id(void) const { return m_id; }
+
+  void vis_id(bool b) { m_vis_id = b; }
+  bool vis_id(void) const { return m_vis_id; }
+
+  /**
+   * @brief Calculate the span in X of an entity given its location and
+   * dimension in X (objects track their own location and dimension).
    *
-   * @param loc The entities current location.
+   * @return The span in X of the entity.
    */
-  rmath::ranged xspan(const rmath::vector2d& loc) const {
-    return xspan(loc, m_dim.x());
-  }
+  virtual rmath::ranged xspan(void) const = 0;
 
   /**
-   * @brief Get the 2D space spanned by the multicell entity in absolute
-   * coordinates in the arena in Y. This is NOT the size of the entity in Y.
+   * @brief Calculate the span in Y of an entity given its location and
+   * dimension in Y.
    *
-   * @param loc The entities current location.
+   * @return The span in Y of the entity.
    */
-
-  rmath::ranged yspan(const rmath::vector2d& loc) const {
-    return yspan(loc, m_dim.y());
-  }
+  virtual rmath::ranged yspan(void) const = 0;
 
   /**
-   * @brief Get the size of the cell entity in the X direction. This may be
-   * greater than a single cell.
+   * @brief Get the size of the entity in the X direction.
    */
-  double xsize(void) const { return m_dim.x(); }
+  virtual double xdim(void) const = 0;
 
   /**
-   * @brief Get the size of the cell entity in the y direction. This may be
-   * greater than a single cell.
+   * @brief Get the size of the entity in the Y direction.
    */
-  double ysize(void) const { return m_dim.y(); }
+  virtual double ydim(void) const = 0;
 
-  const rmath::vector2d& dims(void) const { return m_dim; }
-  double xdim(void) const { return m_dim.x(); }
-  double ydim(void) const { return m_dim.y(); }
+  virtual bool is_movable(void) const { return false; }
 
  private:
   /* clang-format off */
-  rmath::vector2d m_dim;
+  bool m_vis_id{false};
+  int  m_id;
   /* clang-format on */
 };
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPR_MULTICELL_ENTITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_BASE_ENTITY_HPP_ */

@@ -1,5 +1,5 @@
 /**
- * @file dp_entity.hpp
+ * @file dpo_entity.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_REPR_DP_ENTITY_HPP_
-#define INCLUDE_FORDYCA_REPR_DP_ENTITY_HPP_
+#ifndef INCLUDE_FORDYCA_REPR_DPO_ENTITY_HPP_
+#define INCLUDE_FORDYCA_REPR_DPO_ENTITY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -38,7 +38,7 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dp_entity
+ * @class dpo_entity
  * @ingroup fordyca repr
  *
  * @brief A repr of a Decaying Pheromone (DP) entity in the arena,
@@ -48,11 +48,11 @@ NS_START(fordyca, repr);
  * is considered (relevance is ignored).
  */
 template <class T>
-class dp_entity {
+class dpo_entity {
  public:
-  dp_entity(void) = default;
-  dp_entity(const std::shared_ptr<T>& ent,
-            const rcppsw::swarm::pheromone_density& density)
+  dpo_entity(void) = default;
+  dpo_entity(const std::shared_ptr<T>& ent,
+             const rcppsw::swarm::pheromone_density& density)
       : m_ent(ent), m_density(density) {}
 
   /**
@@ -60,7 +60,7 @@ class dp_entity {
    * operator== on the object managed by the shared_ptr, otherwise we get only
    * pointer comparison, which is NOT what we want.
    */
-  bool operator==(const dp_entity<T>& other) const {
+  bool operator==(const dpo_entity<T>& other) const {
     return m_ent->idcmp(*other.ent());
   }
 
@@ -85,4 +85,4 @@ class dp_entity {
 
 NS_END(repr, fordyca);
 
-#endif /* INCLUDE_FORDYCA_REPR_DP_ENTITY_HPP_ */
+#endif /* INCLUDE_FORDYCA_REPR_DPO_ENTITY_HPP_ */

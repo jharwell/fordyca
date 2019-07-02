@@ -96,8 +96,8 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
                            saa_subsystem()->sensing()->tick())) {
     ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
             best->ent()->id(),
-            best->ent()->real_loc().to_str().c_str(),
-            best->ent()->discrete_loc().to_str().c_str(),
+            best->ent()->rloc().to_str().c_str(),
+            best->ent()->dloc().to_str().c_str(),
             best->density().last_result());
 
     rmath::vector2d point = cache_acq_point_selector(kFOOTBOT_CACHE_ACQ_FACTOR)(

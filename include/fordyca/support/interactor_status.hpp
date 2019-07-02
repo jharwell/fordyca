@@ -36,13 +36,13 @@ NS_START(fordyca, support);
  * Class Definitions
  ******************************************************************************/
 enum class interactor_status {
-  ekNoEvent           = 1 << 0,
-  ekNestBlockDrop     = 1 << 1,
-  ekFreeBlockPickup   = 1 << 2,
+  ekNoEvent = 1 << 0,
+  ekNestBlockDrop = 1 << 1,
+  ekFreeBlockPickup = 1 << 2,
   ekNewCacheBlockDrop = 1 << 3,
-  ekTaskAbort         = 1 << 4,
-  ekCacheDepletion    = 1 << 5,
-  ekFreeBlockDrop     = 1 << 6
+  ekTaskAbort = 1 << 4,
+  ekCacheDepletion = 1 << 5,
+  ekFreeBlockDrop = 1 << 6
 };
 NS_END(support, fordyca);
 

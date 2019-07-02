@@ -34,8 +34,8 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 constexpr char cache_sel_matrix::kNestLoc[];
 constexpr char cache_sel_matrix::kCacheProxDist[];
-constexpr char cache_sel_matrix::kBlockProxDist[];
 constexpr char cache_sel_matrix::kClusterProxDist[];
+constexpr char cache_sel_matrix::kBlockProxDist[];
 constexpr char cache_sel_matrix::kNestProxDist[];
 constexpr char cache_sel_matrix::kSiteXRange[];
 constexpr char cache_sel_matrix::kSiteYRange[];

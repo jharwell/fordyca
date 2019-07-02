@@ -59,12 +59,12 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
   for (auto& c : existing_caches.const_values_range()) {
     fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
-    if (!validator(c.ent()->real_loc(), c.ent()->id(), timestep) ||
+    if (!validator(c.ent()->rloc(), c.ent()->id(), timestep) ||
         cache_is_excluded(position, c.ent())) {
       continue;
     }
     math::existing_cache_utility u(
-        c.ent()->real_loc(),
+        c.ent()->rloc(),
         boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
     double utility =
@@ -72,8 +72,8 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for existing_cache%d@%s/%s, density=%f: %f",
              c.ent()->id(),
-             c.ent()->real_loc().to_str().c_str(),
-             c.ent()->discrete_loc().to_str().c_str(),
+             c.ent()->rloc().to_str().c_str(),
+             c.ent()->dloc().to_str().c_str(),
              c.density().last_result(),
              utility);
 
@@ -86,8 +86,8 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
   if (nullptr != best.ent()) {
     ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
             best.ent()->id(),
-            best.ent()->real_loc().to_str().c_str(),
-            best.ent()->discrete_loc().to_str().c_str(),
+            best.ent()->rloc().to_str().c_str(),
+            best.ent()->dloc().to_str().c_str(),
             best.ent()->n_blocks(),
             max_utility);
     return boost::make_optional(best);
@@ -112,8 +112,8 @@ bool existing_cache_selector::cache_is_excluded(
   if (cache->contains_point(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
              cache->id(),
-             cache->real_loc().to_str().c_str(),
-             cache->discrete_loc().to_str().c_str(),
+             cache->rloc().to_str().c_str(),
+             cache->dloc().to_str().c_str(),
              position.to_str().c_str());
     return true;
   }
@@ -132,8 +132,8 @@ bool existing_cache_selector::cache_is_excluded(
       })) {
     ER_DEBUG("Ignoring cache%d@%s/%s: On exception list",
              cache->id(),
-             cache->real_loc().to_str().c_str(),
-             cache->discrete_loc().to_str().c_str());
+             cache->rloc().to_str().c_str(),
+             cache->dloc().to_str().c_str());
     return true;
   }
 

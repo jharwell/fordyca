@@ -32,7 +32,7 @@
 #include "rcppsw/er/client.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/entity_list.hpp"
-#include "fordyca/ds/block_cluster_list.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -79,7 +79,7 @@ class base_distributor {
    * @brief Return a read-only list of \ref block_clusters for capacity checking
    * by external classes.
    */
-  virtual ds::const_block_cluster_list block_clusters(void) const = 0;
+  virtual ds::block_cluster_vector block_clusters(void) const = 0;
 
   /**
    * @brief Calls \ref distribute_block on each block.

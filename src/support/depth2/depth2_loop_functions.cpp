@@ -312,12 +312,12 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
    * If said interaction results in a block being dropped in a new cache, then
    * we need to re-run dynamic cache creation.
    */
-  auto iadaptor = robot_interactor_adaptor<robot_arena_interactor,
-                                           interactor_status>(
-                                               controller,
-                                               GetSpace().GetSimulationClock());
-  auto status = boost::apply_visitor(iadaptor,
-                                     m_interactor_map->at(controller->type_index()));
+  auto iadaptor =
+      robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
+          controller, GetSpace().GetSimulationClock());
+  auto status =
+      boost::apply_visitor(iadaptor,
+                           m_interactor_map->at(controller->type_index()));
   if (interactor_status::ekNoEvent != status) {
     if (interactor_status::ekNewCacheBlockDrop & status) {
       bool ret = cache_creation_handle(true);

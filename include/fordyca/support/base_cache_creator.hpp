@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "fordyca/ds/arena_grid.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
@@ -85,6 +86,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * @return A vector of created caches.
    */
   virtual ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+                                      const ds::block_cluster_vector& c_clusters,
                                       ds::block_vector& candidate_blocks,
                                       uint timestep) = 0;
 

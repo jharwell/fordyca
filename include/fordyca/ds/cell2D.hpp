@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
 #include "fordyca/fsm/cell2D_fsm.hpp"
@@ -37,7 +38,7 @@ NS_START(fordyca);
 namespace repr {
 class base_cache;
 class base_block;
-class base_cell_entity;
+class base_entity;
 } // namespace repr
 
 NS_START(ds);
@@ -86,15 +87,15 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
   /**
    * @brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<repr::base_cell_entity>& entity) {
+  void entity(const std::shared_ptr<repr::base_entity>& entity) {
     m_entity = entity;
   }
-  const std::shared_ptr<repr::base_cell_entity>& entity(void) const {
+  const std::shared_ptr<repr::base_entity>& entity(void) const {
     return m_entity;
   }
 
   void loc(rmath::vector2u loc) { m_loc = loc; }
-  rmath::vector2u loc(void) const { return m_loc; }
+  const rmath::vector2u& loc(void) const { return m_loc; }
 
   /**
    * @brief Get the block entity associated with this cell.
@@ -116,9 +117,9 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
 
  private:
   /* clang-format off */
-  std::string                             m_robot_id{};
-  std::shared_ptr<repr::base_cell_entity> m_entity{nullptr};
-  rmath::vector2u                         m_loc{};
+  std::string                         m_robot_id{};
+  std::shared_ptr<repr::base_entity> m_entity{nullptr};
+  rmath::vector2u                     m_loc{};
   /* clang-format on */
 };
 

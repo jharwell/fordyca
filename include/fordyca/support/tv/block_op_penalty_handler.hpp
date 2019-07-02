@@ -87,17 +87,16 @@ class block_op_penalty_handler final
   op_filter_status penalty_init(T& controller,
                                 block_op_src src,
                                 uint timestep,
-                                double cache_prox_dist = -1,
-                                double block_prox_dist = -1) {
+                                double cache_prox_dist = -1) {
     auto filter = block_op_filter<T>(
-        m_map)(controller, src, cache_prox_dist, block_prox_dist);
+        m_map)(controller, src, cache_prox_dist);
     if (filter != op_filter_status::ekSATISFIED) {
       return filter;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot already serving block penalty?");
 
-    int id = penalty_id_calc(controller, src, cache_prox_dist, block_prox_dist);
+    int id = penalty_id_calc(controller, src, cache_prox_dist);
     uint penalty = deconflict_penalty_finish(timestep);
     ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
             loop_utils::robot_id(controller),
@@ -118,8 +117,7 @@ class block_op_penalty_handler final
  private:
   int penalty_id_calc(const T& controller,
                       block_op_src src,
-                      double cache_prox_dist,
-                      double block_prox_dist) const {
+                      double cache_prox_dist) const {
     int id = -1;
     switch (src) {
       case block_op_src::ekFREE_PICKUP:
@@ -136,8 +134,6 @@ class block_op_penalty_handler final
         ER_ASSERT(nullptr != controller.block() &&
                       -1 != controller.block()->id(),
                   "Robot not carrying block?");
-        ER_ASSERT(block_prox_dist > 0.0,
-                  "Block proximity distance not specified for cache site drop");
         id = controller.block()->id();
         break;
       case block_op_src::ekNEW_CACHE_DROP:

@@ -67,7 +67,7 @@ boost::optional<ds::block_vector> static_cache_manager::calc_blocks_for_creation
       rmath::dvec2uvec(mc_cache_loc, arena_grid()->resolution());
   ds::block_vector to_use;
   for (auto& b : blocks) {
-    if (-1 == b->robot_id() && b->discrete_loc() != dcenter) {
+    if (-1 == b->robot_id() && b->dloc() != dcenter) {
       to_use.push_back(b);
     }
     if (to_use.size() >= mc_cache_config.static_.size) {
@@ -83,7 +83,7 @@ boost::optional<ds::block_vector> static_cache_manager::calc_blocks_for_creation
      */
     uint count = 0;
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      count += (b->is_out_of_sight() || b->discrete_loc() == dcenter);
+      count += (b->is_out_of_sight() || b->dloc() == dcenter);
     });
 
     std::string accum;
@@ -95,8 +95,7 @@ boost::optional<ds::block_vector> static_cache_manager::calc_blocks_for_creation
 
     accum = "";
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      accum += "b" + std::to_string(b->id()) + "->" +
-               b->discrete_loc().to_str() + ",";
+      accum += "b" + std::to_string(b->id()) + "->" + b->dloc().to_str() + ",";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 
@@ -160,7 +159,8 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
                                                 mc_cache_config.dimension);
 
   /* no existing caches, so empty vector */
-  created = creator.create_all(ds::cache_vector(), *to_use, timestep);
+  created = creator.create_all(
+      ds::cache_vector(), ds::block_cluster_vector(), *to_use, timestep);
   ER_ASSERT(1 == created.size(),
             "Wrong # caches after static create: %zu",
             created.size());
@@ -180,14 +180,13 @@ void static_cache_manager::post_creation_blocks_adjust(
     const ds::block_vector& blocks) {
   for (auto& b : blocks) {
     for (auto& c : caches) {
-      if (!c->contains_block(b) &&
-          c->xspan(c->real_loc()).overlaps_with(b->xspan(b->real_loc())) &&
-          c->yspan(c->real_loc()).overlaps_with(b->yspan(b->real_loc()))) {
-        events::cell_empty_visitor empty(b->discrete_loc());
-        empty.visit(arena_grid()->access<arena_grid::kCell>(b->discrete_loc()));
+      if (!c->contains_block(b) && c->xspan().overlaps_with(b->xspan()) &&
+          c->yspan().overlaps_with(b->yspan())) {
+        events::cell_empty_visitor empty(b->dloc());
+        empty.visit(arena_grid()->access<arena_grid::kCell>(b->dloc()));
         events::free_block_drop_visitor op(
             b,
-            rmath::dvec2uvec(c->real_loc(), arena_grid()->resolution()),
+            rmath::dvec2uvec(c->rloc(), arena_grid()->resolution()),
             arena_grid()->resolution());
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);

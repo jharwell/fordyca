@@ -45,7 +45,7 @@ void block_carry_visualizer::draw(const repr::base_block* const block,
   if (nullptr != dynamic_cast<const repr::cube_block*>(block)) {
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
-                  argos::CVector3(block->xsize(), block->xsize(), block->xsize()),
+                  argos::CVector3(block->xdim(), block->xdim(), block->xdim()),
                   argos::CColor(block->color().red(),
                                 block->color().green(),
                                 block->color().blue()));
@@ -58,7 +58,7 @@ void block_carry_visualizer::draw(const repr::base_block* const block,
      */
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
-                  argos::CVector3(block->xsize(), block->ysize(), block->ysize()),
+                  argos::CVector3(block->xdim(), block->ydim(), block->ydim()),
                   argos::CColor(block->color().red(),
                                 block->color().green(),
                                 block->color().blue()));
@@ -67,7 +67,7 @@ void block_carry_visualizer::draw(const repr::base_block* const block,
     /* Unknown block type */
     ER_FATAL_SENTINEL("Cannot visualize unknown block type: Not cube or ramp");
   }
-  if (block->display_id()) {
+  if (block->vis_id()) {
     m_qt->DrawText(argos::CVector3(0.0, 0.0, m_text_vis_offset),
                    std::string(id_len + 3, ' ') + "[b" +
                        std::to_string(block->id()) + "]",

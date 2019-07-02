@@ -76,8 +76,8 @@ class cache_sel_matrix final
  public:
   static constexpr char kNestLoc[] = "nest_loc";
   static constexpr char kCacheProxDist[] = "cache_prox_dist";
-  static constexpr char kBlockProxDist[] = "block_prox_dist";
   static constexpr char kClusterProxDist[] = "cluster_prox_dist";
+  static constexpr char kBlockProxDist[] = "block_prox_dist";
   static constexpr char kNestProxDist[] = "nest_prox_dist";
   static constexpr char kSiteXRange[] = "site_xrange";
   static constexpr char kSiteYRange[] = "site_yrange";

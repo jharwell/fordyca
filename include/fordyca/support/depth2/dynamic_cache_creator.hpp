@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +57,8 @@ class dynamic_cache_creator : public base_cache_creator,
    * @brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  ds::cache_vector create_all(const ds::cache_vector& previous_caches,
+  ds::cache_vector create_all(const ds::cache_vector& c_previous_caches,
+                              const ds::block_cluster_vector& c_clusters,
                               ds::block_vector& candidate_blocks,
                               uint timestep) override;
 
@@ -71,30 +73,53 @@ class dynamic_cache_creator : public base_cache_creator,
    *                    when the creator was called.
    * @param anchor_index Our current index within the candidate vector
    */
-  ds::block_list cache_i_blocks_calc(const ds::block_list& used_blocks,
+  ds::block_list cache_i_blocks_calc(const ds::block_list& c_used_blocks,
                                      const ds::block_vector& candidates,
                                      uint index) const;
 
   /**
-   *  @brief Create the set of blocks that our new cache needs to avoid during
-   *  placement. Blocks in this set:
+   *  @brief Blocks in this set:
    *
    * - Are not part of the set of blocks to be used for the cache we are
    *   currently attempting to create.
    * - Have not been already been made part of a cache earlier during this
    *   invocation of dynamic cache creation.
+   *
+   * Used for validation of cache creation.
    */
-  ds::block_list avoidance_blocks_calc(const ds::block_vector& candidate_blocks,
-                                       const ds::block_list& used_blocks,
-                                       const ds::block_list& cache_i_blocks) const;
+    ds::block_list free_blocks_calc(const ds::block_vector& c_candidate_blocks,
+                                    const ds::block_list& c_used_blocks) const;
+
+  /**
+   * @brief Calculate the blocks a cache will absorb as a result of its center
+   * beyond moved to deconflict with other caches/clusters/etc.
+   *
+   * @param candidate_blocks The total list of all blocks available for cache
+   *                         creation when the creator was called.
+   * @param cache_i_blocks   The blocks to be used in creating the new cache.
+   * @param used_blocks      The blocks already used to create other caches.
+   * @param center           The cache center.
+   * @param cache_dim        The cache dimension.
+   *
+   * You *need* cache_i blocks, because if you omit them then you can have
+   * blocks getting added to created caches twice, which causes all sorts of
+   * problems. See #578.
+   */
+  ds::block_list absorb_blocks_calc(
+      const ds::block_vector& c_candidate_blocks,
+      const ds::block_list& c_cache_i_blocks,
+      const ds::block_list& c_used_blocks,
+      const rmath::vector2u& c_center,
+      double cache_dim) const;
 
   /**
    * @brief Create the set of caches that our new cache needs to avoid during
    * placement from the set of caches that existed prior to this invocation of
    * the creator + the set of caches we have created thus far during invocation.
    */
-  ds::cache_vector avoidance_caches_calc(const ds::cache_vector& previous_caches,
-                                         const ds::cache_vector& created_caches) const;
+  ds::cache_vector avoidance_caches_calc(
+      const ds::cache_vector& c_previous_caches,
+      const ds::cache_vector& c_created_caches) const;
 
   /* clang-format off */
   double m_min_dist;

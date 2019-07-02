@@ -88,7 +88,7 @@ bool free_block_drop::dispatch_free_block_interactor(
         !polled->task_aborted()) {
       ER_INFO("Added block%d@%s to exception list,task='%s'",
               m_block->id(),
-              m_block->real_loc().to_str().c_str(),
+              m_block->rloc().to_str().c_str(),
               polled->name().c_str());
       bsel_matrix->sel_exception_add(m_block->id());
       ret = true;
@@ -114,8 +114,8 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
 void free_block_drop::visit(repr::base_block& block) {
   block.reset_robot_id();
 
-  block.real_loc(rmath::uvec2dvec(cell_op::coord(), m_resolution));
-  block.discrete_loc(cell_op::coord());
+  block.rloc(rmath::uvec2dvec(cell_op::coord(), m_resolution));
+  block.dloc(cell_op::coord());
 } /* visit() */
 
 void free_block_drop::visit(ds::arena_map& map) {

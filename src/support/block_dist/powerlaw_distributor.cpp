@@ -189,17 +189,16 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
   for (auto& it : m_dist_map) {
     ER_INFO("Mapped %zu clusters of capacity %u", it.second.size(), it.first);
     for (__rcsw_unused auto& dist : it.second) {
-      ER_INFO(
-          "Cluster with origin@%s: capacity=%u",
-          dist.block_clusters().front()->view().origin()->loc().to_str().c_str(),
-          dist.block_clusters().front()->capacity());
+      ER_INFO("Cluster with origin@%s: capacity=%u",
+              dist.block_clusters().front()->anchor().to_str().c_str(),
+              dist.block_clusters().front()->capacity());
     } /* for(dist..) */
   }   /* for(&l..) */
   return true;
 } /* map_clusters() */
 
-ds::const_block_cluster_list powerlaw_distributor::block_clusters(void) const {
-  ds::const_block_cluster_list ret;
+ds::block_cluster_vector powerlaw_distributor::block_clusters(void) const {
+  ds::block_cluster_vector ret;
 
   for (auto& l : m_dist_map) {
     for (auto& dist : l.second) {

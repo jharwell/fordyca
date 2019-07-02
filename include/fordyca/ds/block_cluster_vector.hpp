@@ -1,5 +1,5 @@
 /**
- * @file block_cluster_list.hpp
+ * @file block_cluster_vector.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,13 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_LIST_HPP_
-#define INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_LIST_HPP_
+#ifndef INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_VECTOR_HPP_
+#define INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_VECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
+#include <string>
+#include <vector>
 #include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
@@ -37,15 +38,13 @@ class block_cluster;
 
 NS_START(ds);
 
-using block_cluster_list_type = repr::block_cluster*;
-using const_block_cluster_list_type = const repr::block_cluster*;
+using block_cluster_vector_type = const repr::block_cluster*;
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using block_cluster_list = std::list<block_cluster_list_type>;
-using const_block_cluster_list = std::list<const_block_cluster_list_type>;
+using block_cluster_vector = std::vector<block_cluster_vector_type>;
 
 NS_END(ds, fordyca);
 
-#endif /* INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_LIST_HPP_ */
+#endif /* INCLUDE_FORDYCA_DS_BLOCK_CLUSTER_VECTOR_HPP_ */

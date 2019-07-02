@@ -31,7 +31,7 @@
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/ds/block_cluster_list.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -77,8 +77,8 @@ class dynamic_cache_manager final : public base_cache_manager,
    * created. Non-fatal failures to create dynamic caches can occur if, for
    * example, all blocks are currently being carried by robots.
    */
-  boost::optional<ds::cache_vector> create(const ds::cache_vector& existing_caches,
-                                           const ds::const_block_cluster_list& clusters,
+  boost::optional<ds::cache_vector> create(const ds::cache_vector& c_existing_caches,
+                                           const ds::block_cluster_vector& c_clusters,
                                            ds::block_vector& blocks,
                                            uint timestep);
 
@@ -93,15 +93,6 @@ class dynamic_cache_manager final : public base_cache_manager,
                     mc_cache_config.dynamic.min_dist);
   }
 
-  /**
-   * @brief Get the minimum distance that must be maintained between two blocks
-   * in order for them not to be consolidated into a cache. Equal to the minimum
-   * cache distance.
-   */
-  double block_proximity_dist(void) const {
-    return mc_cache_config.dynamic.min_dist;
-  }
-
  private:
   /*
    * @brief Calculate the blocks eligible to be considered for dynamic cache
@@ -114,7 +105,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    */
   boost::optional<ds::block_vector> calc_blocks_for_creation(
       const ds::cache_vector& existing_caches,
-      const ds::const_block_cluster_list& clusters,
+      const ds::block_cluster_vector& clusters,
       const ds::block_vector& blocks);
 
   /* clang-format off */

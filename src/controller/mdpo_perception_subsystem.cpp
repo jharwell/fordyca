@@ -121,8 +121,8 @@ void mdpo_perception_subsystem::process_los_blocks(
         auto block = m_map->access<occupancy_grid::kCell>(d).block();
         ER_DEBUG("Correct block%d %s/%s discrepency",
                  block->id(),
-                 block->real_loc().to_str().c_str(),
-                 block->discrete_loc().to_str().c_str());
+                 block->rloc().to_str().c_str(),
+                 block->dloc().to_str().c_str());
         m_map->block_remove(block);
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
@@ -137,17 +137,17 @@ void mdpo_perception_subsystem::process_los_blocks(
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id());
-    auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
+    auto& cell = m_map->access<occupancy_grid::kCell>(block->dloc());
     if (!cell.state_has_block()) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id(),
-              block->real_loc().to_str().c_str(),
-              block->discrete_loc().to_str().c_str());
+              block->rloc().to_str().c_str(),
+              block->dloc().to_str().c_str());
     } else if (cell.state_has_block()) {
       ER_DEBUG("Block%d@%s/%s already known",
                block->id(),
-               block->real_loc().to_str().c_str(),
-               block->discrete_loc().to_str().c_str());
+               block->rloc().to_str().c_str(),
+               block->dloc().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
         return b.ent()->id() == cell.block()->id();
@@ -187,8 +187,8 @@ void mdpo_perception_subsystem::process_los_caches(
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
         ER_DEBUG("Correct cache%d@%s/%s discrepency",
                  cache->id(),
-                 cache->real_loc().to_str().c_str(),
-                 cache->discrete_loc().to_str().c_str());
+                 cache->rloc().to_str().c_str(),
+                 cache->dloc().to_str().c_str());
         map()->cache_remove(cache);
       }
     } /* for(j..) */
@@ -202,23 +202,23 @@ void mdpo_perception_subsystem::process_los_caches(
      */
     ER_DEBUG("LOS: Cache%d@%s/%s: %zu blocks",
              cache->id(),
-             cache->real_loc().to_str().c_str(),
-             cache->discrete_loc().to_str().c_str(),
+             cache->rloc().to_str().c_str(),
+             cache->dloc().to_str().c_str(),
              cache->n_blocks());
-    auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
+    auto& cell = map()->access<occupancy_grid::kCell>(cache->dloc());
 
     if (!cell.state_has_cache()) {
       ER_INFO("Discovered cache%d@%s/%s: %zu blocks",
               cache->id(),
-              cache->real_loc().to_str().c_str(),
-              cache->discrete_loc().to_str().c_str(),
+              cache->rloc().to_str().c_str(),
+              cache->dloc().to_str().c_str(),
               cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
       ER_INFO("Fixed cache%d@%s/%s block count: %zu -> %zu",
               cache->id(),
-              cache->real_loc().to_str().c_str(),
-              cache->discrete_loc().to_str().c_str(),
+              cache->rloc().to_str().c_str(),
+              cache->dloc().to_str().c_str(),
               cache->n_blocks(),
               cell.cache()->n_blocks());
     }

@@ -77,8 +77,7 @@ class collector_registerer : public rer::client<collector_registerer> {
   using set_value_type = std::tuple<std::type_index, std::string, std::string>;
 
   struct set_comparator {
-    bool operator()(const set_value_type& lhs,
-                    const set_value_type& rhs) const {
+    bool operator()(const set_value_type& lhs, const set_value_type& rhs) const {
       return std::get<0>(lhs) < std::get<0>(rhs);
     }
   };
@@ -179,8 +178,8 @@ class collector_registerer : public rer::client<collector_registerer> {
 
  private:
   template <typename TCollectorWrap,
-            RCPPSW_SFINAE_REQUIRE(constructible_with_arena_dim<
-                                  typename TCollectorWrap::type>::value)>
+            RCPPSW_SFINAE_FUNC(constructible_with_arena_dim<
+                               typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath) const {
     return m_agg->collector_register<typename TCollectorWrap::type>(
@@ -188,7 +187,7 @@ class collector_registerer : public rer::client<collector_registerer> {
   }
 
   template <typename TCollectorWrap,
-            RCPPSW_SFINAE_REQUIRE(
+            RCPPSW_SFINAE_FUNC(
                 expected_constructible<typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath) const {
@@ -197,8 +196,8 @@ class collector_registerer : public rer::client<collector_registerer> {
   }
 
   template <typename TCollectorWrap,
-            RCPPSW_SFINAE_REQUIRE(constructible_without_collect_interval<
-                                  typename TCollectorWrap::type>::value)>
+            RCPPSW_SFINAE_FUNC(constructible_without_collect_interval<
+                               typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath) const {
     return m_agg->collector_register<typename TCollectorWrap::type>(scoped_name,
@@ -206,7 +205,7 @@ class collector_registerer : public rer::client<collector_registerer> {
   }
 
   template <typename TCollectorWrap,
-            RCPPSW_SFINAE_REQUIRE(
+            RCPPSW_SFINAE_FUNC(
                 constructible_with_uint<typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath) const {

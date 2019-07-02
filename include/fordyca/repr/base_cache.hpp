@@ -30,8 +30,8 @@
 
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/repr/base_block.hpp"
-#include "fordyca/repr/immovable_cell_entity.hpp"
-#include "fordyca/repr/multicell_entity.hpp"
+#include "fordyca/repr/colored_entity.hpp"
+#include "fordyca/repr/unicell_immovable_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 
 /*******************************************************************************
@@ -53,8 +53,8 @@ namespace prototype = rcppsw::patterns::prototype;
  * world) and discretized locations (where they are mapped to within the arena
  * map).
  */
-class base_cache : public multicell_entity,
-                   public immovable_cell_entity,
+class base_cache : public unicell_immovable_entity,
+                   public colored_entity,
                    public prototype::clonable<base_cache> {
  public:
   struct params {
@@ -66,7 +66,7 @@ class base_cache : public multicell_entity,
   };
   /**
    * @brief The minimum # of blocks required for a cache to exist (less than
-   * this and you just have a bunch of blocks)
+   * this and you just have a bunch of blocks).
    */
   static constexpr size_t kMinBlocks = 2;
 
@@ -102,8 +102,8 @@ class base_cache : public multicell_entity,
    * @brief Compare two \ref base_cache objects for equality based on their
    * discrete location.
    */
-  bool loccmp(const base_cache& other) const {
-    return this->discrete_loc() == other.discrete_loc();
+  bool dloccmp(const base_cache& other) const {
+    return this->dloc() == other.dloc();
   }
 
   /**
@@ -111,15 +111,12 @@ class base_cache : public multicell_entity,
    */
   __rcsw_pure bool contains_block(
       const std::shared_ptr<base_block>& c_block) const {
-    return std::find(m_blocks.begin(), m_blocks.end(), c_block) !=
-           m_blocks.end();
+    return contains_block(c_block.get());
   }
   __rcsw_pure bool contains_block(const base_block* const c_block) const {
-    return std::find_if(m_blocks.begin(),
-                        m_blocks.end(),
-                        [&](const auto&b) {
-                          return b->id() == c_block->id();
-                        }) != m_blocks.end();
+    return std::find_if(m_blocks.begin(), m_blocks.end(), [&](const auto& b) {
+             return b->id() == c_block->id();
+           }) != m_blocks.end();
   }
   virtual size_t n_blocks(void) const { return blocks().size(); }
 
@@ -136,22 +133,6 @@ class base_cache : public multicell_entity,
    */
   void block_add(const std::shared_ptr<base_block>& block) {
     m_blocks.push_back(block);
-  }
-
-  /**
-   * @brief Determine if a real-valued point lies within the extent of the
-   * entity for:
-   *
-   * 1. Visualization purposes.
-   * 2. Determining if a robot is on top of an entity.
-   *
-   * @param point The point to check.
-   *
-   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
-   */
-  bool contains_point(const rmath::vector2d& point) const {
-    return xspan(real_loc()).contains(point.x()) &&
-           yspan(real_loc()).contains(point.y());
   }
 
   /**

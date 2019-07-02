@@ -56,16 +56,16 @@ void oracle_manager::update(ds::arena_map* const map) {
                  [&](const auto& b) {
                    /* don't include blocks robot's are carrying */
                    return -1 == b->robot_id() &&
-                       /*
+                          /*
                         * Don't include blocks that are currently in a cache
                         * (harmless, but causes repeated "removed block hidden
                         * behind cache" warnings)
                         */
-                       std::none_of(map->caches().begin(),
-                                    map->caches().end(),
-                                    [&](const auto& c) {
-                                      return c->contains_block(b);
-                                    });
+                          std::none_of(map->caches().begin(),
+                                       map->caches().end(),
+                                       [&](const auto& c) {
+                                         return c->contains_block(b);
+                                       });
                  });
     m_entities->set_blocks(v);
   }

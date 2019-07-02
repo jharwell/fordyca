@@ -39,8 +39,8 @@ const rmath::vector2d base_block::kOutOfSightRLoc =
  * Member Functions
  ******************************************************************************/
 void base_block::move_out_of_sight(void) {
-  real_loc(kOutOfSightRLoc);
-  discrete_loc(kOutOfSightDLoc);
+  rloc(kOutOfSightRLoc);
+  dloc(kOutOfSightDLoc);
 } /* move_out_of_sight() */
 
 void base_block::reset_metrics(void) {

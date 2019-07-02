@@ -46,9 +46,9 @@ using collector_typelist =
     rmpl::typelist<metrics::collector_registerer::type_wrap<
                        rmetrics::tasks::bi_tab_metrics_collector>,
                    metrics::collector_registerer::type_wrap<
-                     rmetrics::tasks::execution_metrics_collector>,
+                       rmetrics::tasks::execution_metrics_collector>,
                    metrics::collector_registerer::type_wrap<
-                     rmetrics::tasks::bi_tdgraph_metrics_collector> >;
+                       rmetrics::tasks::bi_tdgraph_metrics_collector> >;
 NS_END(detail);
 
 using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;

@@ -95,7 +95,7 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
    * cache extent, and all blocks be deposited in a single cell.
    */
   for (auto& block : blocks) {
-    events::cell_empty_visitor op(block->discrete_loc());
+    events::cell_empty_visitor op(block->dloc());
     op.visit(m_grid->access<arena_grid::kCell>(op.x(), op.y()));
   } /* for(block..) */
 
@@ -112,10 +112,10 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
   ret->creation_ts(timestep);
   ER_INFO("Create cache%d@%s/%s, xspan=%s,yspan=%s with %zu blocks [%s]",
           ret->id(),
-          ret->real_loc().to_str().c_str(),
-          ret->discrete_loc().to_str().c_str(),
-          ret->xspan(ret->real_loc()).to_str().c_str(),
-          ret->yspan(ret->real_loc()).to_str().c_str(),
+          ret->rloc().to_str().c_str(),
+          ret->dloc().to_str().c_str(),
+          ret->xspan().to_str().c_str(),
+          ret->yspan().to_str().c_str(),
           ret->n_blocks(),
           rcppsw::to_string(blocks).c_str());
   return ret;
@@ -129,10 +129,10 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
    * creation process and setting it here will trigger an assert later.
    */
   for (auto& cache : caches) {
-    m_grid->access<arena_grid::kCell>(cache->discrete_loc()).entity(cache);
+    m_grid->access<arena_grid::kCell>(cache->dloc()).entity(cache);
 
-    auto xspan = cache->xspan(cache->real_loc());
-    auto yspan = cache->yspan(cache->real_loc());
+    auto xspan = cache->xspan();
+    auto yspan = cache->yspan();
     auto xmin = static_cast<uint>(std::ceil(xspan.lb() / m_grid->resolution()));
     auto xmax = static_cast<uint>(std::ceil(xspan.ub() / m_grid->resolution()));
     auto ymin = static_cast<uint>(std::ceil(yspan.lb() / m_grid->resolution()));
@@ -141,7 +141,7 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {
         rmath::vector2u c = rmath::vector2u(i, j);
-        if (c != cache->discrete_loc()) {
+        if (c != cache->dloc()) {
           ER_ASSERT(cache->contains_point(
                         rmath::uvec2dvec(c, m_grid->resolution())),
                     "Cache%d does not contain point (%u, %u) within its extent",
@@ -164,61 +164,59 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
 __rcsw_pure bool base_cache_creator::creation_sanity_checks(
     const ds::cache_vector& caches,
     const ds::block_list& free_blocks) const {
-  bool ret = true;
-
   for (auto& c1 : caches) {
-    auto c1_xspan = c1->xspan(c1->real_loc());
-    auto c1_yspan = c1->yspan(c1->real_loc());
-
+    auto c1_xspan = c1->xspan();
+    auto c1_yspan = c1->yspan();
     for (auto& c2 : caches) {
       if (c1->id() == c2->id()) {
         continue;
       }
       for (auto& b : c1->blocks()) {
-        if (c2->contains_block(b)) {
-          ER_FATAL_SENTINEL("Block%d contained in both cache%d and cache%d",
-                            b->id(),
-                            c1->id(),
-                            c2->id());
-          ret = false;
-        }
-        auto c2_xspan = c2->xspan(c2->real_loc());
-        auto c2_yspan = c2->yspan(c2->real_loc());
-        if (c1_xspan.overlaps_with(c2_xspan) &&
-            c1_yspan.overlaps_with(c2_yspan)) {
-          ER_FATAL_SENTINEL(
-              "Cache%d xspan=%s, yspan=%s overlaps cache%d "
-              "xspan=%s,yspan=%s",
-              c1->id(),
-              c1_xspan.to_str().c_str(),
-              c1_yspan.to_str().c_str(),
-              c2->id(),
-              c2_xspan.to_str().c_str(),
-              c2_yspan.to_str().c_str());
-          ret = false;
-        }
+        ER_CHECK(c1->blocks().end() == std::adjacent_find(c1->blocks().begin(),
+                                                          c1->blocks().end()),
+                 "Multiple blocks with the same ID in cache%d",
+                 c1->id());
+
+        ER_CHECK(!c2->contains_block(b),
+                 "Block%d contained in both cache%d and cache%d",
+                 b->id(),
+                 c1->id(),
+                 c2->id());
+        auto c2_xspan = c2->xspan();
+        auto c2_yspan = c2->yspan();
+        ER_CHECK(!(c1_xspan.overlaps_with(c2_xspan) &&
+                   c1_yspan.overlaps_with(c2_yspan)),
+                 "Cache%d xspan=%s, yspan=%s overlaps cache%d "
+                 "xspan=%s,yspan=%s",
+                 c1->id(),
+                 c1_xspan.to_str().c_str(),
+                 c1_yspan.to_str().c_str(),
+                 c2->id(),
+                 c2_xspan.to_str().c_str(),
+                 c2_yspan.to_str().c_str());
       } /* for(&b..) */
     }   /* for(&c2..) */
 
     for (auto& b : free_blocks) {
-      auto b_xspan = b->xspan(b->real_loc());
-      auto b_yspan = b->yspan(b->real_loc());
-      if (c1_xspan.overlaps_with(b_xspan) && c1_yspan.overlaps_with(b_yspan)) {
-        ER_FATAL_SENTINEL(
-            "Cache%d xspan=%s, yspan=%s overlaps block%d "
-            "xspan=%s,yspan=%s",
-            c1->id(),
-            c1_xspan.to_str().c_str(),
-            c1_yspan.to_str().c_str(),
-            b->id(),
-            b_xspan.to_str().c_str(),
-            b_yspan.to_str().c_str());
-        ret = false;
-      }
+      auto b_xspan = b->xspan();
+      auto b_yspan = b->yspan();
+
+      ER_CHECK(!(c1_xspan.overlaps_with(b_xspan) &&
+                 c1_yspan.overlaps_with(b_yspan)),
+               "Cache%d xspan=%s, yspan=%s overlaps block%d "
+               "xspan=%s,yspan=%s",
+               c1->id(),
+               c1_xspan.to_str().c_str(),
+               c1_yspan.to_str().c_str(),
+               b->id(),
+               b_xspan.to_str().c_str(),
+               b_yspan.to_str().c_str());
     } /* for(&b..) */
   }   /* for(&c1..) */
+  return true;
 
-  return ret;
+error:
+  return false;
 } /* creation_sanity_checks() */
 
 NS_END(support, fordyca);

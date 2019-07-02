@@ -27,8 +27,8 @@
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/base_block.hpp"
-#include "fordyca/repr/immovable_cell_entity.hpp"
-#include "fordyca/repr/multicell_entity.hpp"
+#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/repr/unicell_immovable_entity.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
 
 /*******************************************************************************
@@ -85,9 +85,13 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
      * distribution algorithm has a bug.
      */
     ER_ASSERT(!cell->state_has_block(),
-              "Destination cell already contains block");
+              "Destination cell@%s already contains block%d",
+              coords->abs.to_str().c_str(),
+              cell->block()->id());
     ER_ASSERT(!cell->state_has_cache(),
-              "Destination cell already contains cache");
+              "Destination cell@%s already contains cache%d",
+              coords->abs.to_str().c_str(),
+              cell->cache()->id());
     ER_ASSERT(!cell->state_in_cache_extent(),
               "Destination cell part of cache extent");
 
@@ -97,8 +101,8 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
       ER_DEBUG("Block%d,ptr=%p distributed@%s/%s",
                block->id(),
                block.get(),
-               block->real_loc().to_str().c_str(),
-               block->discrete_loc().to_str().c_str());
+               block->rloc().to_str().c_str(),
+               block->dloc().to_str().c_str());
       /*
        * Now that the block has been distributed, it is another entity that
        * needs to be avoided during subsequent distributions.
@@ -120,10 +124,10 @@ __rcsw_pure bool random_distributor::verify_block_dist(
     const ds::const_entity_list& entities,
     __rcsw_unused const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
-  ER_CHECK(repr::base_block::kOutOfSightDLoc != block->discrete_loc(),
+  ER_CHECK(repr::base_block::kOutOfSightDLoc != block->dloc(),
            "Block%d discrete coord still out of sight after distribution",
            block->id());
-  ER_CHECK(repr::base_block::kOutOfSightRLoc != block->real_loc(),
+  ER_CHECK(repr::base_block::kOutOfSightRLoc != block->rloc(),
            "Block%d real coord still out of sight after distribution",
            block->id());
 
@@ -131,7 +135,7 @@ __rcsw_pure bool random_distributor::verify_block_dist(
   ER_CHECK(block == cell->block().get(),
            "Block%d@%s not referenced by containing cell@%s",
            block->id(),
-           block->real_loc().to_str().c_str(),
+           block->rloc().to_str().c_str(),
            cell->loc().to_str().c_str());
 
   /* no entity should overlap with the block after distribution */
@@ -140,12 +144,12 @@ __rcsw_pure bool random_distributor::verify_block_dist(
       continue;
     }
     auto status =
-        loop_utils::placement_conflict(block->real_loc(), block->dims(), e);
+        loop_utils::placement_conflict(block->rloc(), block->dims(), e);
     ER_ASSERT(!(status.x_conflict && status.y_conflict),
               "Entity contains block%d@%s/%s after distribution",
               block->id(),
-              block->real_loc().to_str().c_str(),
-              block->real_loc().to_str().c_str());
+              block->rloc().to_str().c_str(),
+              block->rloc().to_str().c_str());
   } /* for(&e..) */
   return true;
 
