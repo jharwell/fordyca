@@ -67,14 +67,14 @@ class unicell_entity : public base_entity {
    */
   const rmath::vector2u& dloc(void) const { return m_dloc; }
 
-  rmath::ranged xspan(void) const override {
+  rmath::ranged xspan(void) const override final {
     return base_entity::xspan(rloc(), xdim());
   }
-  rmath::ranged yspan(void) const override {
+  rmath::ranged yspan(void) const override final {
     return base_entity::yspan(rloc(), ydim());
   }
-  double xdim(void) const override { return m_dim.x(); }
-  double ydim(void) const override { return m_dim.y(); }
+  double xdim(void) const override final { return m_dim.x(); }
+  double ydim(void) const override final { return m_dim.y(); }
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the

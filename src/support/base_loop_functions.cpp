@@ -76,7 +76,7 @@ void base_loop_functions::output_init(const config::output_config* const output)
     m_output_root = output->output_root + "/" + output->output_dir;
   }
 
-#ifndef RCPPSW_ER_NREPORT
+#ifndef LIBRA_ER_NREPORT
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
                       m_output_root + "/events.log");
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),

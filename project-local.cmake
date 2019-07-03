@@ -21,11 +21,12 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
 set(${target}_CHECK_LANGUAGE "CXX")
 
 if(BUILD_FOR_MSI)
-  set(LOCAL_INSTALL_PREFIX /home/gini/shared/swarm)
-elseif(BUILD_FOR_TRAVIS) # General case or BUILD_FOR_TRAVIS
+  set(LOCAL_INSTALL_PREFIX /home/gini/shared/swarm/$ENV{MSICLUSTER})
+elseif(BUILD_FOR_TRAVIS)
   set(LOCAL_INSTALL_PREFIX /usr/local)
+  set(ARGOS_INSTALL_PREFIX ${LOCAL_INSTALL_PREFIX})
 else()
-    set(LOCAL_INSTALL_PREFIX /opt/data/local)
+  set(LOCAL_INSTALL_PREFIX /opt/data/local)
 endif()
 
 if(NOT BUILD_FOR_MSI)

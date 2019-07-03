@@ -49,8 +49,8 @@ NS_START(fordyca, repr);
  * - The blocks distributed in that area.
  * - The maximum capacity of the cluster.
  */
-class block_cluster : public grid_view_entity<ds::arena_grid::const_view>,
-                      public rer::client<block_cluster> {
+class block_cluster final : public grid_view_entity<ds::arena_grid::const_view>,
+                            public rer::client<block_cluster> {
  public:
   block_cluster(const ds::arena_grid::const_view& view, uint capacity)
       : grid_view_entity<ds::arena_grid::const_view>(view),
