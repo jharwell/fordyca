@@ -75,7 +75,7 @@ bool lifecycle_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_tsavg(m_stats.cum_created);
   line += csv_entry_tsavg(m_stats.cum_depleted);
   line += csv_entry_domavg(m_stats.int_depletion_sum, m_stats.int_depleted);
-  line += csv_entry_domavg(m_stats.cum_depletion_sum, m_stats.cum_depleted);
+  line += csv_entry_domavg(m_stats.cum_depletion_sum, m_stats.cum_depleted, true);
   return true;
 } /* csv_line_build() */
 

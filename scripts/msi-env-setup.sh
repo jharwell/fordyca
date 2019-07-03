@@ -7,14 +7,13 @@ GINI_ROOT=/home/gini
 SWARM_ROOT=$GINI_ROOT/shared/swarm
 
 # Load modules
-module load cmake/3.9.3
+module load cmake/3.10.2
 module load qt/5.9.1
-module load boost/1.65.1/gnu-7.2.0
+module load boost/1.65.1/gnu-8.2.0
 module load gcc/7.2.0
 module load llvm/5.0.0
 module load python3
 module load parallel
-module unload python2/2.7.8
 
 # Set compiler vars so that cmake uses the correct version of the
 # compiler. You would think that this would not be required...

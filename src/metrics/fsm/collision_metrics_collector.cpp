@@ -95,7 +95,7 @@ bool collision_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_intavg(m_stats.int_n_exited_avoidance);
   line += csv_entry_tsavg(m_stats.cum_n_exited_avoidance);
   line += csv_entry_intavg(m_stats.int_avoidance_duration);
-  line += csv_entry_tsavg(m_stats.cum_avoidance_duration);
+  line += csv_entry_tsavg(m_stats.cum_avoidance_duration, true);
   return true;
 } /* csv_line_build() */
 

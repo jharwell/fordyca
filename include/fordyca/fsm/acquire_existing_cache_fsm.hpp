@@ -102,7 +102,7 @@ class acquire_existing_cache_fsm
    * cache are far enough inside the cache extent that all ground sensors are
    * guaranteed to read "in cache". Set to footbot radius + a little padding.
    */
-  static constexpr double kFOOTBOT_CACHE_ACQ_FACTOR = 0.3;
+  static constexpr double kFOOTBOT_CACHE_ACQ_FACTOR = 0.2;
 
   const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_matrix;

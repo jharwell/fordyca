@@ -66,7 +66,7 @@ bool movement_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_stats.cum_distance, m_stats.cum_robot_count);
 
   line += csv_entry_domavg(m_stats.int_velocity, m_stats.int_robot_count);
-  line += csv_entry_domavg(m_stats.cum_velocity, m_stats.cum_robot_count);
+  line += csv_entry_domavg(m_stats.cum_velocity, m_stats.cum_robot_count, true);
   return true;
 } /* csv_line_build() */
 

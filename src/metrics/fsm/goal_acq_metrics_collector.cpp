@@ -93,7 +93,7 @@ bool goal_acq_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_intavg(m_stats.n_int_true_exploring_for_goal);
   line += csv_entry_tsavg(m_stats.n_cum_true_exploring_for_goal);
   line += csv_entry_intavg(m_stats.n_int_false_exploring_for_goal);
-  line += csv_entry_tsavg(m_stats.n_cum_false_exploring_for_goal);
+  line += csv_entry_tsavg(m_stats.n_cum_false_exploring_for_goal, true);
 
   return true;
 } /* store_foraging_stats() */

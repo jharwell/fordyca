@@ -89,7 +89,7 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
   line +=
       std::to_string(m_int_known_percent / m_int_unknown_percent) + separator();
   line += csv_entry_tsavg(m_cum_known_percent);
-  line += csv_entry_tsavg(m_cum_unknown_percent);
+  line += csv_entry_tsavg(m_cum_unknown_percent, true);
   line +=
       std::to_string(m_cum_known_percent / m_cum_unknown_percent) + separator();
   return true;

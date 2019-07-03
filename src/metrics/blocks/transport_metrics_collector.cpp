@@ -77,60 +77,27 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_stats.cum_ramp_collected) + separator();
   line += std::to_string(m_stats.cum_cube_collected) + separator();
 
-  line +=
-      std::to_string(m_stats.int_collected / static_cast<double>(interval())) +
-      separator();
-  line += std::to_string(m_stats.cum_collected /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
+  line += csv_entry_intavg(m_stats.int_collected);
+  line += csv_entry_tsavg(m_stats.cum_collected);
 
-  line += std::to_string(m_stats.int_cube_collected /
-                         static_cast<double>(interval())) +
-          separator();
-  line += std::to_string(m_stats.cum_cube_collected /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
+  line += csv_entry_intavg(m_stats.int_cube_collected);
+  line += csv_entry_tsavg(m_stats.cum_cube_collected);
+  line += csv_entry_intavg(m_stats.int_ramp_collected);
+  line += csv_entry_tsavg(m_stats.cum_ramp_collected);
+  line += csv_entry_domavg(m_stats.int_collected,
+                           m_stats.int_transporters);
+  line += csv_entry_domavg(m_stats.cum_collected,
+                           m_stats.cum_transporters);
 
-  line += std::to_string(m_stats.int_ramp_collected /
-                         static_cast<double>(interval())) +
-          separator();
-  line += std::to_string(m_stats.cum_ramp_collected /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
+  line += csv_entry_domavg(m_stats.int_collected,
+                           m_stats.int_transport_time);
+  line += csv_entry_domavg(m_stats.cum_collected,
+                           m_stats.cum_transport_time);
 
-  line += (m_stats.int_collected > 0)
-              ? std::to_string(m_stats.int_transporters /
-                               static_cast<double>(m_stats.int_collected))
-              : "0";
-  line += separator();
-
-  line += (m_stats.cum_collected > 0)
-              ? std::to_string(m_stats.cum_transporters /
-                               static_cast<double>(m_stats.cum_collected))
-              : "0";
-  line += separator();
-
-  line += (m_stats.int_collected > 0)
-              ? std::to_string(m_stats.int_transport_time /
-                               static_cast<double>(m_stats.int_collected))
-              : "0";
-  line += separator();
-
-  line += (m_stats.cum_collected > 0)
-              ? std::to_string(m_stats.cum_transport_time /
-                               static_cast<double>(m_stats.cum_collected))
-              : "0";
-  line += separator();
-  line += (m_stats.int_collected > 0)
-              ? std::to_string(m_stats.int_initial_wait_time /
-                               static_cast<double>(m_stats.int_collected))
-              : "0";
-  line += separator();
-  line += (m_stats.cum_collected > 0)
-              ? std::to_string(m_stats.cum_initial_wait_time /
-                               static_cast<double>(m_stats.cum_collected))
-              : "0";
-  line += separator();
+  line += csv_entry_domavg(m_stats.int_collected,
+                           m_stats.int_initial_wait_time);
+  line += csv_entry_domavg(m_stats.cum_collected,
+                           m_stats.cum_initial_wait_time, true);
 
   return true;
 } /* csv_line_build() */

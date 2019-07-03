@@ -74,7 +74,7 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_stats.int_drops, m_stats.int_cache_count);
   line += csv_entry_domavg(m_stats.cum_drops, m_stats.cum_cache_count);
   line += csv_entry_intavg(m_stats.int_cache_count);
-  line += csv_entry_tsavg(m_stats.cum_cache_count);
+  line += csv_entry_tsavg(m_stats.cum_cache_count, true);
   return true;
 } /* csv_line_build() */
 

@@ -43,34 +43,6 @@ rmath::vector2d cache_acq_point_selector::operator()(
     const rmath::vector2d& robot_loc,
     const repr::base_cache* const cache,
     std::default_random_engine& rd) {
-  /*
-   * Now that we have the closest quadrant center, construct [X,Y] ranges around
-   * the center to pick a random point in. Each quadrant is cache_dim / 2.0, so
-   * quadrant center needs to be computed using cache_dim / 4.0.
-   */
-  /* auto ul_center = rmath::vector2d(cache->rloc().x() - cache->xsize() / 4.0, */
-  /*                                  cache->rloc().y() + cache->ysize() / 4.0); */
-
-  /* auto ur_center = rmath::vector2d(cache->rloc().x() + cache->xsize() / 4.0, */
-  /*                                  cache->rloc().y() + cache->ysize() / 4.0); */
-
-  /* auto lr_center = rmath::vector2d(cache->rloc().x() + cache->xsize() / 4.0, */
-  /*                                  cache->rloc().y() - cache->ysize() / 4.0); */
-  /* auto ll_center = rmath::vector2d(cache->rloc().x() - cache->xsize() / 4.0, */
-  /*                                  cache->rloc().y() - cache->ysize() / 4.0); */
-
-  /* /\* find closest center *\/ */
-  /* std::list<rmath::vector2d> centers = { */
-  /*     ul_center, ur_center, lr_center, ll_center}; */
-  /* auto closest = *std::min_element( */
-  /*     centers.begin(), centers.end(), [&](const auto& c1, const auto& c2) { */
-  /*       return (c1 - robot_loc).length() < (c2 - robot_loc).length(); */
-  /*     }); */
-
-  /* auto xrange = rmath::ranged(closest.x() - cache->xsize() / 4.0 + m_arrival_tol, */
-  /*                             closest.x() + cache->xsize() / 4.0 - m_arrival_tol); */
-  /* auto yrange = rmath::ranged(closest.y() - cache->ysize() / 4.0 + m_arrival_tol, */
-  /*                             closest.y() + cache->ysize() / 4.0 - m_arrival_tol); */
   auto xspan = cache->xspan();
   auto yspan = cache->yspan();
   auto xrange =
@@ -83,10 +55,12 @@ rmath::vector2d cache_acq_point_selector::operator()(
   rmath::vector2d loc(xrnd(rd), yrnd(rd));
 
   ER_ASSERT(cache->contains_point(loc),
-            "Cache%d@%s/%s does not contain %s",
+            "Cache%d@%s/%s with xspan=%s,yspan=%s does not contain %s",
             cache->id(),
             cache->rloc().to_str().c_str(),
             cache->dloc().to_str().c_str(),
+            cache->xspan().to_str().c_str(),
+            cache->yspan().to_str().c_str(),
             loc.to_str().c_str());
   ER_INFO("Point=%s in cache%d: robot_loc=%s,xrange=%s,yrange=%s",
           loc.to_str().c_str(),

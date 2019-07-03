@@ -107,19 +107,19 @@ __rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
   return mc_view[i][j];
 }
 
-rmath::vector2u line_of_sight::abs_ll(void) const {
+__rcsw_pure rmath::vector2u line_of_sight::abs_ll(void) const {
   return cell(0, 0).loc();
 } /* abs_ll() */
 
-rmath::vector2u line_of_sight::abs_ul(void) const {
+__rcsw_pure rmath::vector2u line_of_sight::abs_ul(void) const {
   return cell(0, ysize() - 1).loc();
 } /* abs_ul() */
 
-rmath::vector2u line_of_sight::abs_lr(void) const {
+__rcsw_pure rmath::vector2u line_of_sight::abs_lr(void) const {
   return cell(xsize() - 1, 0).loc();
 } /* abs_lr() */
 
-rmath::vector2u line_of_sight::abs_ur(void) const {
+__rcsw_pure rmath::vector2u line_of_sight::abs_ur(void) const {
   return cell(xsize() - 1, ysize() - 1).loc();
 } /* abs_ur() */
 

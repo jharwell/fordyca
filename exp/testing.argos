@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <grp_dpo_controller id="ffc"
+    <crw_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -160,7 +160,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </grp_dpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -168,7 +168,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth0_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -326,7 +326,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="256" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

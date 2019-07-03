@@ -82,7 +82,8 @@ bool manipulation_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_stats.int_cache_pickup_penalty,
                            m_stats.int_cache_pickup_events);
   line += csv_entry_domavg(m_stats.int_cache_drop_penalty,
-                           m_stats.int_cache_drop_events);
+                           m_stats.int_cache_drop_events,
+                           true);
   return true;
 } /* csv_line_build() */
 
