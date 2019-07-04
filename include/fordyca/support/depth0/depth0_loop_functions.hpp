@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "rcppsw/ds/type_map.hpp"

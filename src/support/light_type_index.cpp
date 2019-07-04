@@ -37,10 +37,4 @@ light_type_index::light_type_index(void)
     : m_index({{kNest, rutils::color::kYELLOW}, {kCache, rutils::color::kRED}}) {
 }
 
-/*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr char light_type_index::kNest[];
-constexpr char light_type_index::kCache[];
-
 NS_END(support, fordyca);

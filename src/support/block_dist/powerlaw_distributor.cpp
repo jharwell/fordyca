@@ -186,9 +186,9 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
                                               bclustp.capacity,
                                               mc_arena_resolution);
   } /* for(i..) */
-  for (auto& it : m_dist_map) {
-    ER_INFO("Mapped %zu clusters of capacity %u", it.second.size(), it.first);
-    for (__rcsw_unused auto& dist : it.second) {
+  for (auto& [clust_size, dist_list] : m_dist_map) {
+    ER_INFO("Mapped %zu clusters of capacity %u", dist_list.size(), clust_size);
+    for (__rcsw_unused auto& dist : dist_list) {
       ER_INFO("Cluster with origin@%s: capacity=%u",
               dist.block_clusters().front()->anchor().to_str().c_str(),
               dist.block_clusters().front()->capacity());

@@ -53,6 +53,8 @@
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
 #include "fordyca/support/robot_task_extractor_adaptor.hpp"
+#include "fordyca/support/swarm_iterator.hpp"
+
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 #include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
@@ -235,20 +237,16 @@ void depth1_loop_functions::private_init(void) {
       rcppsw::make_unique<detail::d1_subtask_status_map_type>();
 
   /* only needed for initialization, so not a member */
-  auto config_map = configurer_map_type();
+  auto config_map = detail::configurer_map_type();
 
   detail::functor_maps_initializer f_initializer(&config_map, this);
   boost::mpl::for_each<controller::depth1::typelist>(f_initializer);
 
   /* configure robots */
-  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity& robot =
-        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto base = dynamic_cast<controller::base_controller*>(
-        &robot.GetControllableEntity().GetController());
-    boost::apply_visitor(robot_configurer_adaptor(base),
-                         config_map.at(base->type_index()));
-  } /* for(entity_pair..) */
+  swarm_iterator::controllers(this, [&](auto* controller) {
+      boost::apply_visitor(detail::robot_configurer_adaptor(controller),
+                           config_map.at(controller->type_index()));
+    });
 } /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
@@ -257,6 +255,10 @@ void depth1_loop_functions::oracle_init(void) {
     return;
   }
   if (oraclep->tasking.enabled) {
+    /*
+     * We just need a copy of the task decomposition graph the robots are
+     * using--any robot will do.
+     */
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
     const auto& controller0 =
@@ -297,16 +299,11 @@ void depth1_loop_functions::cache_handling_init(
  ******************************************************************************/
 std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
+  swarm_iterator::controllers(this, [&](const auto* controller) {
+      v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
+                                       m_task_extractor_map->at(controller->type_index())));
+    });
 
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto base = dynamic_cast<controller::base_controller*>(
-        &robot->GetControllableEntity().GetController());
-    v.push_back(
-        boost::apply_visitor(robot_task_extractor_adaptor(base),
-                             m_task_extractor_map->at(base->type_index())));
-  } /* for(&entity..) */
   return v;
 } /* robot_tasks_extract() */
 
@@ -344,11 +341,9 @@ void depth1_loop_functions::PreStep() {
   }
 
   /* Process all robots */
-  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity& robot =
-        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    robot_timestep_process(robot);
-  } /* for(&entity_pair..) */
+  swarm_iterator::robots(this, [&](auto* robot) {
+      robot_timestep_process(*robot);
+    });
 
   /* collect metrics from non-robot sources */
   m_metrics_agg->collect_from_loop(this);
@@ -490,16 +485,13 @@ void depth1_loop_functions::static_cache_monitor(void) {
    * that the cache could be recreated (trying to emulate depth2 behavior here).
    */
   std::pair<uint, uint> counts{0, 0};
-  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto base = dynamic_cast<controller::base_controller*>(
-        &robot->GetControllableEntity().GetController());
-    auto res =
-        boost::apply_visitor(detail::d1_subtask_status_extractor_adaptor(base),
-                             m_subtask_status_map->at(base->type_index()));
-    counts.first += res.first;
-    counts.second += res.second;
-  } /* for(&entity..) */
+  swarm_iterator::controllers(this, [&](const auto* controller) {
+      auto [is_harvester, is_collector] =
+          boost::apply_visitor(detail::d1_subtask_status_extractor_adaptor(controller),
+                               m_subtask_status_map->at(controller->type_index()));
+      counts.first += is_harvester;
+      counts.second += is_collector;
+    });
 
   auto created =
       m_cache_manager->create_conditional(arena_map()->blocks(),

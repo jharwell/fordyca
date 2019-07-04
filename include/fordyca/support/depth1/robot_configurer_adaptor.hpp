@@ -34,6 +34,8 @@ NS_START(fordyca, support, depth1);
 template<class ControllerType, class AggregatorType>
 class robot_configurer;
 class depth1_metrics_aggregator;
+
+NS_START(detail);
 using configurer_map_type = rds::type_map<
    rmpl::typelist_wrap_apply<controller::depth1::typelist,
                              robot_configurer,
@@ -68,6 +70,6 @@ class robot_configurer_adaptor {
   /* clang-format on */
 };
 
-NS_END(depth1, support, fordyca);
+NS_END(detail, depth1, support, fordyca);
 
 #endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH1_ROBOT_CONFIGURER_ADAPTOR_HPP_ */

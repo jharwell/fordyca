@@ -51,6 +51,7 @@
 #include "fordyca/support/robot_los_updater_adaptor.hpp"
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
 #include "fordyca/support/robot_task_extractor_adaptor.hpp"
+#include "fordyca/support/swarm_iterator.hpp"
 
 #include "rcppsw/ds/type_map.hpp"
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
@@ -198,14 +199,10 @@ void depth2_loop_functions::private_init(void) {
   boost::mpl::for_each<controller::depth2::typelist>(f_initializer);
 
   /* configure robots */
-  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity& robot =
-        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto base = dynamic_cast<controller::base_controller*>(
-        &robot.GetControllableEntity().GetController());
-    boost::apply_visitor(detail::robot_configurer_adaptor(base),
-                         config_map.at(base->type_index()));
-  } /* for(&entity..) */
+  swarm_iterator::controllers(this, [&](auto* controller) {
+      boost::apply_visitor(detail::robot_configurer_adaptor(controller),
+                           config_map.at(controller->type_index()));
+    });
 } /* private_init() */
 
 void depth2_loop_functions::cache_handling_init(
@@ -223,16 +220,11 @@ void depth2_loop_functions::cache_handling_init(
  ******************************************************************************/
 std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
-
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto base = dynamic_cast<controller::base_controller*>(
-        &robot->GetControllableEntity().GetController());
-    v.push_back(
-        boost::apply_visitor(robot_task_extractor_adaptor(base),
-                             m_task_extractor_map->at(base->type_index())));
-  } /* for(&entity..) */
+  swarm_iterator::controllers(this, [&](auto* controller) {
+      v.push_back(
+          boost::apply_visitor(robot_task_extractor_adaptor(controller),
+                               m_task_extractor_map->at(controller->type_index())));
+    });
   return v;
 } /* robot_tasks_extract() */
 
@@ -262,11 +254,9 @@ void depth2_loop_functions::PreStep() {
   m_cache_manager->reset_metrics();
 
   /* Process all robots */
-  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity& robot =
-        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    robot_timestep_process(robot);
-  } /* for(&entity..) */
+  swarm_iterator::robots(this, [&](auto* robot) {
+      robot_timestep_process(*robot);
+    });
 
   /* handle cache removal as a result of robot interactions with arena */
   if (m_cache_manager->caches_depleted() > 0) {

@@ -35,8 +35,9 @@
 #include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/support/swarm_iterator.hpp"
+
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/swarm/convergence/config/convergence_config.hpp"
@@ -163,13 +164,14 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
     m_tv_manager = std::make_unique<tv::tv_manager>(tvp, this, arena_map());
   }
 
-  for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    m_tv_manager->register_controller(controller.entity_id());
-    controller.tv_init(m_tv_manager.get());
-  } /* for(&pair..) */
+  /*
+   * Register all controllers with temporal variance manager in order to be
+   * able to apply sensing/actuation variances if configured.
+   */
+  swarm_iterator::controllers(this, [&](auto* c) {
+      m_tv_manager->register_controller(c->entity_id());
+      c->tv_init(m_tv_manager.get());
+    });
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
@@ -212,15 +214,11 @@ void base_loop_functions::Reset(void) {
  ******************************************************************************/
 std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
-  for (auto& entity_pair : robots) {
-    auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    rmath::vector2d pos;
-    pos.set(robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-            robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-    v.push_back(pos);
-  } /* for(&entity..) */
+  swarm_iterator::robots(this, [&](auto* robot) {
+        v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+                robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
+      });
 
   /*
    * For each closest pair of robots we find, we add the corresponding distance
@@ -229,8 +227,10 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
    * algorithm).
    */
   std::vector<double> res;
+  size_t n_robots = GetSpace().GetEntitiesByType("foot-bot").size();
+
 #pragma omp parallel for num_threads(n_threads)
-  for (size_t i = 0; i < robots.size() / 2; ++i) {
+  for (size_t i = 0; i < n_robots / 2; ++i) {
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
@@ -257,28 +257,19 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
 
 std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const {
   std::vector<rmath::radians> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    v.push_back(controller.heading2D().angle());
-  } /* for(&entity..) */
+  swarm_iterator::controllers(this, [&](const auto* controller) {
+      v.push_back(controller->heading2D().angle());
+    });
   return v;
 } /* calc_robot_headings() */
 
-std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
-    uint) const {
+std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    v.push_back(controller.position2D());
-  } /* for(&entity..) */
+  swarm_iterator::controllers(this, [&](const auto* controller) {
+      v.push_back(controller->position2D());
+    });
   return v;
 } /* calc_robot_positions() */
 

@@ -36,15 +36,6 @@ NS_START(fordyca, support, block_dist);
 using ds::arena_grid;
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char dispatcher::kDistRandom[];
-constexpr char dispatcher::kDistSingleSrc[];
-constexpr char dispatcher::kDistDualSrc[];
-constexpr char dispatcher::kDistQuadSrc[];
-constexpr char dispatcher::kDistPowerlaw[];
-
-/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 dispatcher::dispatcher(ds::arena_grid* const grid,

@@ -52,6 +52,8 @@
 #include "fordyca/support/robot_los_updater_adaptor.hpp"
 #include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
+#include "fordyca/support/swarm_iterator.hpp"
+
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
@@ -162,14 +164,10 @@ void depth0_loop_functions::private_init(void) {
   boost::mpl::for_each<controller::depth0::typelist>(f_initializer);
 
   /* configure robots */
-  for (auto& entity_pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity& robot =
-        *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot.GetControllableEntity().GetController());
-    boost::apply_visitor(detail::robot_configurer_adaptor(&controller),
-                         config_map.at(controller.type_index()));
-  } /* for(entity..) */
+  swarm_iterator::controllers(this,[&](auto* controller) {
+      boost::apply_visitor(detail::robot_configurer_adaptor(controller),
+                           config_map.at(controller->type_index()));
+    });
 } /* private_init() */
 
 /*******************************************************************************
@@ -256,11 +254,9 @@ void depth0_loop_functions::PreStep(void) {
                                              : false);
 
   /* Process all robots */
-  for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    argos::CFootBotEntity& robot =
-        *argos::any_cast<argos::CFootBotEntity*>(pair.second);
-    robot_timestep_process(robot);
-  } /* for(&entity..) */
+  swarm_iterator::robots(this, [&](auto* robot) {
+      robot_timestep_process(*robot);
+    });
 
   /* collect metrics from non-robot sources */
   m_metrics_agg->collect_from_loop(this);

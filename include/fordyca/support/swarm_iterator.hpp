@@ -1,5 +1,5 @@
 /**
- * @file block_factory.cpp
+ * @file swarm_iterator.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,24 +18,45 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_SUPPORT_SWARM_ITERATOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_SWARM_ITERATOR_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/block_factory.hpp"
-#include "fordyca/fsm/expstrat/crw.hpp"
-#include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
+#include "rcppsw/common/common.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
+#include "fordyca/controller/base_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Constructors/Destructors
+ * Struct Definitions
  ******************************************************************************/
-block_factory::block_factory(void) {
-  register_type<crw>(kCRW);
-  register_type<likelihood_block_search>(kLikelihoodSearch);
-}
+struct swarm_iterator {
+  template<typename TFunction>
+  static void controllers(const base_loop_functions* const lf,
+                   const TFunction& cb) {
+    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
+      auto* robot = argos::any_cast<argos::CFootBotEntity*>(robotp);
+      auto* controller = dynamic_cast<controller::base_controller*>(
+          &robot->GetControllableEntity().GetController());
+      cb(controller);
+    } /* for(...) */
+  }
+  template<typename TFunction>
+  static void robots(const base_loop_functions* const lf,
+              const TFunction& cb) {
+    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
+      auto* robot = argos::any_cast<argos::CFootBotEntity*>(robotp);
+      cb(robot);
+    } /* for(...) */
+  }
+};
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(support, fordyca);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_SWARM_ITERATOR_HPP_ */

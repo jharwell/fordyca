@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
+
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/nsalias.hpp"
@@ -59,8 +61,8 @@ class goal_acq_metrics : public virtual rmetrics::base_metrics {
   /**
    * @brief A pair of booleans, with the first one indicating that the robot is
    * exploring for its goal, and the second one (only valid if the first is \c
-   * TRUE) indicating if it is a "true" exploring (i.e. the robot truly does not
-   * know of any instances of its target goal type), as opposed to exploring
+   * TRUE) indicating if it is a "true" exploration (i.e. the robot truly does
+   * not know of any instances of its target goal type), as opposed to exploring
    * because all of the known instances of its goal type are deemed unsuitable
    * for whatever reason.
    */

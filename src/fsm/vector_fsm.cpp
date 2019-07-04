@@ -33,14 +33,6 @@
 NS_START(fordyca, fsm);
 
 /*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr double vector_fsm::kNEW_CACHE_ARRIVAL_TOL;
-constexpr double vector_fsm::kCACHE_ARRIVAL_TOL;
-constexpr double vector_fsm::kBLOCK_ARRIVAL_TOL;
-constexpr double vector_fsm::kCACHE_SITE_ARRIVAL_TOL;
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(controller::saa_subsystem* const saa)

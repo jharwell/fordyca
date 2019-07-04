@@ -30,23 +30,6 @@
 NS_START(fordyca, controller);
 
 /*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr char cache_sel_matrix::kNestLoc[];
-constexpr char cache_sel_matrix::kCacheProxDist[];
-constexpr char cache_sel_matrix::kClusterProxDist[];
-constexpr char cache_sel_matrix::kBlockProxDist[];
-constexpr char cache_sel_matrix::kNestProxDist[];
-constexpr char cache_sel_matrix::kSiteXRange[];
-constexpr char cache_sel_matrix::kSiteYRange[];
-constexpr char cache_sel_matrix::kPickupExceptions[];
-constexpr char cache_sel_matrix::kDropExceptions[];
-constexpr char cache_sel_matrix::kPickupPolicy[];
-constexpr char cache_sel_matrix::kPickupPolicyTime[];
-constexpr char cache_sel_matrix::kPickupPolicyNull[];
-constexpr char cache_sel_matrix::kPickupPolicyCacheSize[];
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 cache_sel_matrix::cache_sel_matrix(

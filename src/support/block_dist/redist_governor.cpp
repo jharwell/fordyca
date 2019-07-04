@@ -29,16 +29,6 @@
 NS_START(fordyca, support, block_dist);
 
 /*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr char redist_governor::kTriggerNull[];
-constexpr char redist_governor::kTriggerTime[];
-constexpr char redist_governor::kTriggerBlockCount[];
-constexpr char redist_governor::kTriggerConvergence[];
-constexpr char redist_governor::kStatusSwitchPolicySingle[];
-constexpr char redist_governor::kStatusSwitchPolicyMulti[];
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 redist_governor::redist_governor(

@@ -29,10 +29,8 @@
 NS_START(fordyca, config);
 
 /*******************************************************************************
- * Global Variables
+ * Class Constants
  ******************************************************************************/
-constexpr char metrics_parser::kXMLRoot[];
-
 const std::list<std::string> metrics_parser::xml_attr = {
     "fsm_movement",
     "fsm_collision_counts",
