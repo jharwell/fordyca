@@ -50,7 +50,7 @@ dynamic_cache_creator::dynamic_cache_creator(const struct params* const p)
 ds::cache_vector dynamic_cache_creator::create_all(
     const ds::cache_vector& c_previous_caches,
     const ds::block_cluster_vector& c_clusters,
-    ds::block_vector& candidate_blocks,
+    const ds::block_vector& candidate_blocks,
     uint timestep) {
   ds::cache_vector created_caches;
 
@@ -109,7 +109,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
 
   ds::block_list free_blocks = free_blocks_calc(candidate_blocks, used_blocks);
 
-  ER_ASSERT(creation_sanity_checks(created_caches, free_blocks),
+  ER_ASSERT(creation_sanity_checks(created_caches, free_blocks, c_clusters),
             "One or more bad caches on creation");
   return created_caches;
 } /* create_all() */

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
+#include <vector>
 
 /*******************************************************************************
  * Namespaces
@@ -46,17 +47,17 @@ class static_cache_creator : public base_cache_creator,
                              public rer::client<static_cache_creator> {
  public:
   static_cache_creator(ds::arena_grid* grid,
-                       const rmath::vector2d& center,
+                       const std::vector<rmath::vector2d>& cache_locs,
                        double cache_dim);
 
-  ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
+  ds::cache_vector create_all(const ds::cache_vector& existing_caches,
                               const ds::block_cluster_vector&,
-                              ds::block_vector& blocks,
+                              const ds::block_vector& candidate_blocks,
                               uint timestep) override;
 
  private:
   /* clang-format off */
-  rmath::vector2d m_center;
+  const std::vector<rmath::vector2d> mc_centers;
   /* clang-format on */
 };
 

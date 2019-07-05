@@ -31,6 +31,7 @@
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/light_type_index.hpp"
 #include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/repr/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -110,12 +111,16 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
           mc_cache_dim, m_grid->resolution(), center, block_vec, -1},
       light_type_index()[light_type_index::kCache]);
   ret->creation_ts(timestep);
-  ER_INFO("Create cache%d@%s/%s, xspan=%s,yspan=%s with %zu blocks [%s]",
+  ER_INFO("Create cache%d@%s/%s, xspan=%s/%s,yspan=%s/%s with %zu blocks [%s]",
           ret->id(),
           ret->rloc().to_str().c_str(),
           ret->dloc().to_str().c_str(),
           ret->xspan().to_str().c_str(),
+          rmath::drange2urange(ret->xspan(),
+                               m_grid->resolution()).to_str().c_str(),
           ret->yspan().to_str().c_str(),
+          rmath::drange2urange(ret->yspan(),
+                               m_grid->resolution()).to_str().c_str(),
           ret->n_blocks(),
           rcppsw::to_string(blocks).c_str());
   return ret;
@@ -163,8 +168,19 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
 
 __rcsw_pure bool base_cache_creator::creation_sanity_checks(
     const ds::cache_vector& caches,
-    const ds::block_list& free_blocks) const {
+    const ds::block_list& free_blocks,
+    const ds::block_cluster_vector& clusters) const {
+
+  /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {
+    auto cell = m_grid->access<arena_grid::kCell>(c1->dloc());
+    ER_ASSERT(cell.fsm().state_has_cache(),
+              "Cell@%s not in HAS_CACHE state",
+              cell.loc().to_str().c_str());
+    ER_ASSERT(c1->n_blocks() == cell.block_count(),
+              "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+              c1->n_blocks(),
+              cell.block_count());
     auto c1_xspan = c1->xspan();
     auto c1_yspan = c1->yspan();
     for (auto& c2 : caches) {
@@ -197,23 +213,35 @@ __rcsw_pure bool base_cache_creator::creation_sanity_checks(
       } /* for(&b..) */
     }   /* for(&c2..) */
 
+    /* Check caches against free blocks */
     for (auto& b : free_blocks) {
-      auto b_xspan = b->xspan();
-      auto b_yspan = b->yspan();
-
-      ER_CHECK(!(c1_xspan.overlaps_with(b_xspan) &&
-                 c1_yspan.overlaps_with(b_yspan)),
+      ER_CHECK(!(c1_xspan.overlaps_with(b->xspan()) &&
+                 c1_yspan.overlaps_with(b->yspan())),
                "Cache%d xspan=%s, yspan=%s overlaps block%d "
                "xspan=%s,yspan=%s",
                c1->id(),
                c1_xspan.to_str().c_str(),
                c1_yspan.to_str().c_str(),
                b->id(),
-               b_xspan.to_str().c_str(),
-               b_yspan.to_str().c_str());
+               b->xspan().to_str().c_str(),
+               b->yspan().to_str().c_str());
     } /* for(&b..) */
   }   /* for(&c1..) */
   return true;
+
+  /* Check caches against block clusters */
+  for (auto &cache : caches) {
+    for (auto &cluster : clusters) {
+      ER_CHECK(!(cache->xspan().overlaps_with(cluster->xspan()) &&
+                 cache->yspan().overlaps_with(cluster->yspan())),
+               "Cache%d xspan=%s, yspan=%s overlaps cluster w/xspan=%s,yspan=%s",
+               cache->id(),
+               cache->xspan().to_str().c_str(),
+               cache->yspan().to_str().c_str(),
+               cluster->xspan().to_str().c_str(),
+               cluster->yspan().to_str().c_str());
+    } /* for(&cluster..) */
+  } /* for(&cache..) */
 
 error:
   return false;

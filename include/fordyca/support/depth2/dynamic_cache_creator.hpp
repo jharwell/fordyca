@@ -59,7 +59,7 @@ class dynamic_cache_creator : public base_cache_creator,
    */
   ds::cache_vector create_all(const ds::cache_vector& c_previous_caches,
                               const ds::block_cluster_vector& c_clusters,
-                              ds::block_vector& candidate_blocks,
+                              const ds::block_vector& candidate_blocks,
                               uint timestep) override;
 
  private:

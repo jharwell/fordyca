@@ -45,7 +45,7 @@ dispatcher::dispatcher(ds::arena_grid* const grid,
     : mc_resolution(arena_resolution),
       mc_padding(arena_padding),
       mc_config(*config),
-      m_dist_type(config->dist_type),
+      mc_dist_type(config->dist_type),
       m_grid(grid),
       m_dist(nullptr) {}
 dispatcher::~dispatcher(void) = default;
@@ -62,10 +62,10 @@ bool dispatcher::initialize(void) {
       kINDEX_MIN + padding,
       m_grid->xdsize() - kINDEX_MIN - padding,
       m_grid->ydsize() - kINDEX_MIN - padding);
-  if (kDistRandom == m_dist_type) {
+  if (kDistRandom == mc_dist_type) {
     m_dist = rcppsw::make_unique<random_distributor>(arena,
                                                      mc_resolution);
-  } else if (kDistSingleSrc == m_dist_type) {
+  } else if (kDistSingleSrc == mc_dist_type) {
     ds::arena_grid::view area = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.80),
         kINDEX_MIN,
@@ -75,7 +75,7 @@ bool dispatcher::initialize(void) {
         area,
         mc_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDistDualSrc == m_dist_type) {
+  } else if (kDistDualSrc == mc_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.10),
         kINDEX_MIN,
@@ -91,7 +91,7 @@ bool dispatcher::initialize(void) {
         grids,
         mc_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDistQuadSrc == m_dist_type) {
+  } else if (kDistQuadSrc == mc_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.10),
         kINDEX_MIN,
@@ -117,7 +117,7 @@ bool dispatcher::initialize(void) {
         grids,
         mc_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDistPowerlaw == m_dist_type) {
+  } else if (kDistPowerlaw == mc_dist_type) {
     auto p = rcppsw::make_unique<powerlaw_distributor>(&mc_config.powerlaw,
                                                        mc_resolution);
     if (!p->map_clusters(m_grid)) {

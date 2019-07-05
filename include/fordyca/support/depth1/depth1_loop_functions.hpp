@@ -132,9 +132,18 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   void private_init(void);
 
   /**
-   * @brief Initialize static cache handling/management.
+   * @brief Initialize static cache handling/management:
    */
-  void cache_handling_init(const config::caches::caches_config *cachep);
+  void cache_handling_init(const config::caches::caches_config *cachep,
+                           const config::arena::block_dist_config* distp);
+
+  /**
+   * @brief Map the block distribution type to the locations of one or more
+   * static caches that will be maintained by the simulation during
+   * initialization.
+   */
+  std::vector<rmath::vector2d> calc_cache_locs(
+      const config::arena::block_dist_config* distp);
 
   /**
    * @brief Initialize all oracles.
@@ -166,8 +175,8 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   std::vector<int> robot_tasks_extract(uint) const;
 
   /**
-   * @brief Monitor the status of the static cache, calculating respawn
-   * probability and potentially recreating it if it is in a depleted state.
+   * @brief Monitor the status of the static cache(s), calculating respawn
+   * probability and potentially recreating depleted caches as needed.
    *
    */
   void static_cache_monitor(void);

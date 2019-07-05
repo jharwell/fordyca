@@ -87,7 +87,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   virtual ds::cache_vector create_all(const ds::cache_vector& existing_caches,
                                       const ds::block_cluster_vector& c_clusters,
-                                      ds::block_vector& candidate_blocks,
+                                      const ds::block_vector& candidate_blocks,
                                       uint timestep) = 0;
 
   /**
@@ -98,12 +98,25 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   void update_host_cells(ds::cache_vector& caches);
 
- protected:
-  struct deconflict_res_t {
-    bool status{false};
-    rmath::vector2u loc{};
-  };
+  /**
+   * @brief Basic sanity checks on newly created caches:
+   *
+   * - No block contained in one cache is contained in another.
+   * - No two newly created caches overlap.
+   * - No block that is not currently contained in a cache overlaps any cache.
+   * - No cache overlaps a block cluster.
+   *
+   * This function is provided for derived classes to use when they implement
+   * \ref create_all().
+   *
+   * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
+   * otherwise.
+   */
+  bool creation_sanity_checks(const ds::cache_vector& caches,
+                              const ds::block_list& free_blocks,
+                              const ds::block_cluster_vector& clusters) const;
 
+ protected:
   const ds::arena_grid* grid(void) const { return m_grid; }
   ds::arena_grid* grid(void) { return m_grid; }
 
@@ -117,22 +130,6 @@ class base_cache_creator : public rer::client<base_cache_creator> {
       ds::block_list blocks,
       const rmath::vector2d& center,
       uint timestep);
-
-  /**
-   * @brief Basic sanity checks on newly created caches:
-   *
-   * - No block contained in one cache is contained in another.
-   * - No two newly created caches overlap.
-   * - No block that is not currently contained in a cache overlaps any cache.
-   *
-   * This function is provided for derived classes to use when they implement
-   * \ref create_all().
-   *
-   * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
-   * otherwise.
-   */
-  bool creation_sanity_checks(const ds::cache_vector& caches,
-                              const ds::block_list& free_blocks) const;
 
   double cache_dim(void) const { return mc_cache_dim; }
 
