@@ -77,17 +77,19 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   /**
    * @brief Create new caches.
    *
-   * @param existing_caches Vector of current caches in the arena, for use in
-   *                        avoiding overlaps during new cache creation.
-   * @param candidate_blocks The vector of free blocks that may be used in cache
-   *                         creation.
+   * @param c_existing_caches Vector of current caches in the arena, for use in
+   *                          avoiding overlaps during new cache creation.
+   * @param c_clusters Vector of block clusters in the arena, for use in
+   *                   avoiding overlaps during cache creation.
+   * @param c_alloc_blocks The vector of free blocks that may be used in
+   *                       cache creation.
    * @param timestep The current timestep.
    *
    * @return A vector of created caches.
    */
-  virtual ds::cache_vector create_all(const ds::cache_vector& existing_caches,
+  virtual ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
                                       const ds::block_cluster_vector& c_clusters,
-                                      ds::block_vector& candidate_blocks,
+                                      const ds::block_vector& c_alloc_blocks,
                                       uint timestep) = 0;
 
   /**
@@ -98,41 +100,44 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   void update_host_cells(ds::cache_vector& caches);
 
- protected:
-  struct deconflict_res_t {
-    bool status{false};
-    rmath::vector2u loc{};
-  };
-
-  const ds::arena_grid* grid(void) const { return m_grid; }
-  ds::arena_grid* grid(void) { return m_grid; }
-
-  /**
-   * @brief Create a single cache in the arena from the specified set of blocks
-   * at the specified location. Note that the blocks are passed by value because
-   * they are (possibly) modified by this function in a way that callers
-   * probably do not want.
-   */
-  std::unique_ptr<repr::arena_cache> create_single_cache(
-      ds::block_list blocks,
-      const rmath::vector2d& center,
-      uint timestep);
-
   /**
    * @brief Basic sanity checks on newly created caches:
    *
    * - No block contained in one cache is contained in another.
    * - No two newly created caches overlap.
    * - No block that is not currently contained in a cache overlaps any cache.
+   * - No cache overlaps a block cluster.
    *
-   * This function is provided for derived classes to use when they implement
-   * \ref create_all().
+   * @param caches The created caches.
+   * @param free_blocks Blocks that are not carried by a robot or part of a
+   *                    newly created cache.
+   * @param clusters Current block clusters in the arena.
    *
    * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
    * otherwise.
    */
-  bool creation_sanity_checks(const ds::cache_vector& caches,
-                              const ds::block_list& free_blocks) const;
+  bool creation_sanity_checks(const ds::cache_vector& c_caches,
+                              const ds::block_vector& c_free_blocks,
+                              const ds::block_cluster_vector& c_clusters) const;
+
+ protected:
+  const ds::arena_grid* grid(void) const { return m_grid; }
+  ds::arena_grid* grid(void) { return m_grid; }
+
+  /**
+   * @brief Create a single cache in the arena from the specified set of blocks
+   * at the specified location.
+   *
+   * @param center Location of the new cache.
+   * @param blocks Vector of blocks to use to create the cache. Passed by value
+   *               because they are (possibly) modified by this function in a
+   *               way that callers probably do not want.
+   * @param timestep The current timestep.
+   */
+  std::unique_ptr<repr::arena_cache> create_single_cache(
+      const rmath::vector2d& center,
+      ds::block_vector blocks,
+      uint timestep);
 
   double cache_dim(void) const { return mc_cache_dim; }
 

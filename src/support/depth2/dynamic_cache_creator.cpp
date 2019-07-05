@@ -50,7 +50,7 @@ dynamic_cache_creator::dynamic_cache_creator(const struct params* const p)
 ds::cache_vector dynamic_cache_creator::create_all(
     const ds::cache_vector& c_previous_caches,
     const ds::block_cluster_vector& c_clusters,
-    ds::block_vector& candidate_blocks,
+    const ds::block_vector& candidate_blocks,
     uint timestep) {
   ds::cache_vector created_caches;
 
@@ -60,10 +60,10 @@ ds::cache_vector dynamic_cache_creator::create_all(
            rcppsw::to_string(candidate_blocks).c_str(),
            candidate_blocks.size());
 
-  ds::block_list used_blocks;
+  ds::block_vector used_blocks;
   for (size_t i = 0; i < candidate_blocks.size() - 1; ++i) {
-    ds::block_list cache_i_blocks =
-        cache_i_blocks_calc(used_blocks, candidate_blocks, i);
+    ds::block_vector cache_i_blocks =
+        cache_i_blocks_alloc(used_blocks, candidate_blocks, i);
 
     /*
      * We now have all the blocks that are close enough to block i to be
@@ -95,7 +95,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * creation, which can happen otherwise.
          */
         auto cache_p = std::shared_ptr<repr::arena_cache>(create_single_cache(
-            cache_i_blocks, rmath::uvec2dvec(*center), timestep));
+            rmath::uvec2dvec(*center), cache_i_blocks, timestep));
         created_caches.push_back(cache_p);
       }
 
@@ -107,9 +107,9 @@ ds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  ds::block_list free_blocks = free_blocks_calc(candidate_blocks, used_blocks);
+  ds::block_vector free_blocks = free_blocks_calc(candidate_blocks, used_blocks);
 
-  ER_ASSERT(creation_sanity_checks(created_caches, free_blocks),
+  ER_ASSERT(creation_sanity_checks(created_caches, free_blocks, c_clusters),
             "One or more bad caches on creation");
   return created_caches;
 } /* create_all() */
@@ -122,13 +122,13 @@ ds::cache_vector dynamic_cache_creator::avoidance_caches_calc(
   return avoid;
 } /* avoidance_caches_calc() */
 
-ds::block_list dynamic_cache_creator::absorb_blocks_calc(
+ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
     const ds::block_vector& c_candidate_blocks,
-    const ds::block_list& c_cache_i_blocks,
-    const ds::block_list& c_used_blocks,
+    const ds::block_vector& c_cache_i_blocks,
+    const ds::block_vector& c_used_blocks,
     const rmath::vector2u& c_center,
     double cache_dim) const {
-  ds::block_list absorb_blocks;
+  ds::block_vector absorb_blocks;
   std::copy_if(c_candidate_blocks.begin(),
                c_candidate_blocks.end(),
                std::back_inserter(absorb_blocks),
@@ -150,10 +150,10 @@ ds::block_list dynamic_cache_creator::absorb_blocks_calc(
   return absorb_blocks;
 } /* absorb_blocks_calc() */
 
-ds::block_list dynamic_cache_creator::free_blocks_calc(
+ds::block_vector dynamic_cache_creator::free_blocks_calc(
     const ds::block_vector& c_candidate_blocks,
-    const ds::block_list& c_used_blocks) const {
-  ds::block_list free_blocks;
+    const ds::block_vector& c_used_blocks) const {
+  ds::block_vector free_blocks;
   std::copy_if(c_candidate_blocks.begin(),
                c_candidate_blocks.end(),
                std::back_inserter(free_blocks),
@@ -164,11 +164,11 @@ ds::block_list dynamic_cache_creator::free_blocks_calc(
   return free_blocks;
 } /* free_blocks_calc() */
 
-ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
-    const ds::block_list& c_used_blocks,
+ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
+    const ds::block_vector& c_used_blocks,
     const ds::block_vector& c_candidates,
     uint index) const {
-  ds::block_list src_blocks;
+  ds::block_vector src_blocks;
 
   /*
    * Block already in a new cache, so bail out.
@@ -211,6 +211,6 @@ ds::block_list dynamic_cache_creator::cache_i_blocks_calc(
     }
   } /* for(i..) */
   return src_blocks;
-} /* cache_i_blocks_calc() */
+} /* cache_i_blocks_alloc() */
 
 NS_END(depth2, support, fordyca);

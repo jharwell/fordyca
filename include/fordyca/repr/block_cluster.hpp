@@ -52,8 +52,10 @@ NS_START(fordyca, repr);
 class block_cluster final : public grid_view_entity<ds::arena_grid::const_view>,
                             public rer::client<block_cluster> {
  public:
-  block_cluster(const ds::arena_grid::const_view& view, uint capacity)
-      : grid_view_entity<ds::arena_grid::const_view>(view),
+  block_cluster(const ds::arena_grid::const_view& view,
+                double resolution,
+                uint capacity)
+      : grid_view_entity<ds::arena_grid::const_view>(view, resolution),
         ER_CLIENT_INIT("fordyca.repr.block_cluster"),
         m_capacity(capacity) {}
 

@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
-#include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/controller/base_controller.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -37,9 +37,9 @@ NS_START(fordyca, support);
  * Struct Definitions
  ******************************************************************************/
 struct swarm_iterator {
-  template<typename TFunction>
+  template <typename TFunction>
   static void controllers(const base_loop_functions* const lf,
-                   const TFunction& cb) {
+                          const TFunction& cb) {
     for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
       auto* robot = argos::any_cast<argos::CFootBotEntity*>(robotp);
       auto* controller = dynamic_cast<controller::base_controller*>(
@@ -47,9 +47,8 @@ struct swarm_iterator {
       cb(controller);
     } /* for(...) */
   }
-  template<typename TFunction>
-  static void robots(const base_loop_functions* const lf,
-              const TFunction& cb) {
+  template <typename TFunction>
+  static void robots(const base_loop_functions* const lf, const TFunction& cb) {
     for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
       auto* robot = argos::any_cast<argos::CFootBotEntity*>(robotp);
       cb(robot);

@@ -39,7 +39,7 @@ cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
                                          double arena_resolution,
                                          uint capacity)
     : ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
-      m_clust(view, capacity),
+      m_clust(view, arena_resolution, capacity),
       m_impl(view, arena_resolution) {}
 
 /*******************************************************************************

@@ -59,7 +59,7 @@ class dynamic_cache_creator : public base_cache_creator,
    */
   ds::cache_vector create_all(const ds::cache_vector& c_previous_caches,
                               const ds::block_cluster_vector& c_clusters,
-                              ds::block_vector& candidate_blocks,
+                              const ds::block_vector& candidate_blocks,
                               uint timestep) override;
 
  private:
@@ -71,11 +71,11 @@ class dynamic_cache_creator : public base_cache_creator,
    *                    other caches during this invocation of the creator.
    * @param candidates The total list of all blocks available for cache creation
    *                    when the creator was called.
-   * @param anchor_index Our current index within the candidate vector
+   * @param index Our current index within the candidate vector.
    */
-  ds::block_list cache_i_blocks_calc(const ds::block_list& c_used_blocks,
-                                     const ds::block_vector& candidates,
-                                     uint index) const;
+  ds::block_vector cache_i_blocks_alloc(const ds::block_vector& c_used_blocks,
+                                        const ds::block_vector& candidates,
+                                        uint index) const;
 
   /**
    *  @brief Blocks in this set:
@@ -87,8 +87,8 @@ class dynamic_cache_creator : public base_cache_creator,
    *
    * Used for validation of cache creation.
    */
-    ds::block_list free_blocks_calc(const ds::block_vector& c_candidate_blocks,
-                                    const ds::block_list& c_used_blocks) const;
+    ds::block_vector free_blocks_calc(const ds::block_vector& c_candidate_blocks,
+                                      const ds::block_vector& c_used_blocks) const;
 
   /**
    * @brief Calculate the blocks a cache will absorb as a result of its center
@@ -105,10 +105,10 @@ class dynamic_cache_creator : public base_cache_creator,
    * blocks getting added to created caches twice, which causes all sorts of
    * problems. See #578.
    */
-  ds::block_list absorb_blocks_calc(
+  ds::block_vector absorb_blocks_calc(
       const ds::block_vector& c_candidate_blocks,
-      const ds::block_list& c_cache_i_blocks,
-      const ds::block_list& c_used_blocks,
+      const ds::block_vector& c_cache_i_blocks,
+      const ds::block_vector& c_used_blocks,
       const rmath::vector2u& c_center,
       double cache_dim) const;
 

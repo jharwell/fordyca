@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <argos3/core/simulator/loop_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <memory>
 #include <string>
 #include <vector>

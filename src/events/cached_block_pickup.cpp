@@ -168,7 +168,9 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
-            "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+            "Cache%d/cell@%s disagree on # of blocks: cache=%zu/cell=%zu",
+            m_real_cache->id(),
+            cell.loc().to_str().c_str(),
             m_real_cache->n_blocks(),
             cell.block_count());
 

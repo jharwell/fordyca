@@ -125,8 +125,8 @@ class dispatcher {
   const double                           mc_resolution;
   const double                           mc_padding;
   const config::arena::block_dist_config mc_config;
+  std::string                            mc_dist_type;
 
-  std::string                            m_dist_type;
   ds::arena_grid*                        m_grid{nullptr};
   std::unique_ptr<base_distributor>      m_dist;
 

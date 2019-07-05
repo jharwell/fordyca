@@ -42,6 +42,8 @@
 #include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+#include "fordyca/repr/block_cluster.hpp"
+#include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth1/robot_configurer.hpp"
@@ -212,7 +214,9 @@ void depth1_loop_functions::private_init(void) {
                                                                  output_root());
 
   /* initialize cache handling and create initial cache */
-  cache_handling_init(config()->config_get<config::caches::caches_config>());
+  cache_handling_init(
+      config()->config_get<config::caches::caches_config>(),
+      &config()->config_get<config::arena::arena_map_config>()->blocks.dist);
 
   /*
    * Initialize convergence calculations to include task distribution (not
@@ -244,9 +248,9 @@ void depth1_loop_functions::private_init(void) {
 
   /* configure robots */
   swarm_iterator::controllers(this, [&](auto* controller) {
-      boost::apply_visitor(detail::robot_configurer_adaptor(controller),
-                           config_map.at(controller->type_index()));
-    });
+    boost::apply_visitor(detail::robot_configurer_adaptor(controller),
+                         config_map.at(controller->type_index()));
+  });
 } /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
@@ -273,26 +277,51 @@ void depth1_loop_functions::oracle_init(void) {
 } /* oracle_init() */
 
 void depth1_loop_functions::cache_handling_init(
-    const config::caches::caches_config* cachep) {
+    const config::caches::caches_config* cachep,
+    const config::arena::block_dist_config* distp) {
   ER_ASSERT(nullptr != cachep && cachep->static_.enable,
             "FATAL: Caches not enabled in depth1 loop functions");
   /*
-   * Regardless of how many foragers/etc there are, always create an
-   * initial cache.
+   * Regardless of how many foragers/etc there are, always create
+   * initial caches.
    */
-  rmath::vector2d cache_loc = rmath::vector2d(
-      (arena_map()->xrsize() + arena_map()->nest().rloc().x()) / 2.0,
-      arena_map()->nest().rloc().y());
-
   m_cache_manager = rcppsw::make_unique<static_cache_manager>(
-      cachep, &arena_map()->decoratee(), cache_loc);
+      cachep, &arena_map()->decoratee(), calc_cache_locs(distp));
 
-  if (auto created = m_cache_manager->create(arena_map()->blocks(),
+  auto clusters = arena_map()->block_distributor()->block_clusters();
+  if (auto created = m_cache_manager->create(arena_map()->caches(),
+                                             clusters,
+                                             arena_map()->blocks(),
                                              GetSpace().GetSimulationClock())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
 } /* cache_handling_init() */
+
+std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
+    const config::arena::block_dist_config* distp) {
+  std::vector<rmath::vector2d> cache_locs;
+
+  /*
+   * For all block distributions that are supported, and each of the static
+   * caches is halfway between the center of the nest and a block cluster.
+   */
+  if (support::block_dist::dispatcher::kDistSingleSrc == distp->dist_type ||
+      support::block_dist::dispatcher::kDistDualSrc == distp->dist_type ||
+      support::block_dist::dispatcher::kDistQuadSrc == distp->dist_type) {
+    auto clusters = arena_map()->block_distributor()->block_clusters();
+    for (auto& c : clusters) {
+      cache_locs.push_back(
+          {(c->xspan().center() + arena_map()->nest().rloc().x()) / 2.0,
+           (c->yspan().center() + arena_map()->nest().rloc().y()) / 2.0});
+    } /* for(i..) */
+  } else {
+    ER_FATAL_SENTINEL(
+        "Block distribution '%s' unsupported for static cache management",
+        distp->dist_type.c_str());
+  }
+  return cache_locs;
+} /* calc_cache_locs() */
 
 /*******************************************************************************
  * Convergence Calculations Callbacks
@@ -300,9 +329,10 @@ void depth1_loop_functions::cache_handling_init(
 std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   swarm_iterator::controllers(this, [&](const auto* controller) {
-      v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
-                                       m_task_extractor_map->at(controller->type_index())));
-    });
+    v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
+                                     m_task_extractor_map->at(
+                                         controller->type_index())));
+  });
 
   return v;
 } /* robot_tasks_extract() */
@@ -341,9 +371,8 @@ void depth1_loop_functions::PreStep() {
   }
 
   /* Process all robots */
-  swarm_iterator::robots(this, [&](auto* robot) {
-      robot_timestep_process(*robot);
-    });
+  swarm_iterator::robots(this,
+                         [&](auto* robot) { robot_timestep_process(*robot); });
 
   /* collect metrics from non-robot sources */
   m_metrics_agg->collect_from_loop(this);
@@ -449,7 +478,10 @@ void depth1_loop_functions::Reset() {
   base_loop_functions::Reset();
   m_metrics_agg->reset_all();
 
-  if (auto created = m_cache_manager->create(arena_map()->blocks(),
+  auto clusters = arena_map()->block_distributor()->block_clusters();
+  if (auto created = m_cache_manager->create(arena_map()->caches(),
+                                             clusters,
+                                             arena_map()->blocks(),
                                              GetSpace().GetSimulationClock())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
@@ -473,48 +505,46 @@ __rcsw_pure uint depth1_loop_functions::n_free_blocks(void) const {
 } /* n_free_blocks() */
 
 void depth1_loop_functions::static_cache_monitor(void) {
-  if (!arena_map()->caches().empty()) {
+  /* nothing to do--all our managed caches exist */
+  if (arena_map()->caches().size() == m_cache_manager->n_managed()) {
     return;
   }
   /*
-   * The cache is recreated with a probability that depends on the relative
-   * ratio between the # foragers and the # collectors. If there are more
-   * foragers than collectors, then the cache will be recreated very quickly. If
-   * there are more collectors than foragers, then it will probably not be
-   * recreated immediately. And if there are no foragers, there is no chance
-   * that the cache could be recreated (trying to emulate depth2 behavior here).
+   * Caches are recreated with a probability that depends on the relative ratio
+   * between the # harvesters and the # collectors. If there are more harvesters
+   * than collectors, then the cache will be recreated very quickly. If there
+   * are more collectors than harvesters, then it will probably not be recreated
+   * immediately. And if there are no harvesters, there is no chance that the
+   * cache could be recreated (trying to emulate depth2 behavior here).
    */
   std::pair<uint, uint> counts{0, 0};
   swarm_iterator::controllers(this, [&](const auto* controller) {
-      auto [is_harvester, is_collector] =
-          boost::apply_visitor(detail::d1_subtask_status_extractor_adaptor(controller),
-                               m_subtask_status_map->at(controller->type_index()));
-      counts.first += is_harvester;
-      counts.second += is_collector;
-    });
+    auto [is_harvester, is_collector] = boost::apply_visitor(
+        detail::d1_subtask_status_extractor_adaptor(controller),
+        m_subtask_status_map->at(controller->type_index()));
+    counts.first += is_harvester;
+    counts.second += is_collector;
+  });
 
+  auto clusters = arena_map()->block_distributor()->block_clusters();
   auto created =
-      m_cache_manager->create_conditional(arena_map()->blocks(),
+      m_cache_manager->create_conditional(arena_map()->caches(),
+                                          clusters,
+                                          arena_map()->blocks(),
                                           GetSpace().GetSimulationClock(),
                                           counts.first,
                                           counts.second);
   if (created) {
     arena_map()->caches_add(*created, this);
-    __rcsw_unused ds::cell2D& cell =
-        arena_map()->access<arena_grid::kCell>(arena_map()->caches()[0]->dloc());
-    ER_ASSERT(arena_map()->caches()[0]->n_blocks() == cell.block_count(),
-              "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
-              arena_map()->caches()[0]->n_blocks(),
-              cell.block_count());
     floor()->SetChanged();
-  } else {
-    ER_INFO(
-        "Could not create static cache: n_harvesters=%u,n_collectors=%u,free "
-        "blocks=%u",
-        counts.first,
-        counts.second,
-        n_free_blocks());
+    return;
   }
+  ER_INFO(
+      "Could not create static caches: n_harvesters=%u,n_collectors=%u,free "
+      "blocks=%u",
+      counts.first,
+      counts.second,
+      n_free_blocks());
 } /* static_cache_monitor() */
 
 using namespace argos; // NOLINT

@@ -51,7 +51,7 @@ dynamic_cache_manager::dynamic_cache_manager(
 boost::optional<ds::cache_vector> dynamic_cache_manager::create(
     const ds::cache_vector& c_existing_caches,
     const ds::block_cluster_vector& c_clusters,
-    ds::block_vector& blocks,
+    const ds::block_vector& blocks,
     uint timestep) {
   if (auto to_use =
           calc_blocks_for_creation(c_existing_caches, c_clusters, blocks)) {

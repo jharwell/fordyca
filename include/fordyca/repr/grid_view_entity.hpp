@@ -53,30 +53,32 @@ NS_START(fordyca, repr);
 template <class T>
 class grid_view_entity : public base_entity {
  public:
-  explicit grid_view_entity(const T& view) : grid_view_entity{view, -1} {}
-
-  grid_view_entity(const T& view, int id) : base_entity(id), m_view(view) {}
+  grid_view_entity(const T& view, double resolution)
+      : mc_resolution(resolution), m_view(view) {}
 
   ~grid_view_entity(void) override = default;
 
-  const rmath::vector2u& anchor(void) const { return m_view.origin()->loc(); }
+  const rmath::vector2u& danchor(void) const { return m_view.origin()->loc(); }
+  rmath::vector2d ranchor(void) const {
+    return rmath::uvec2dvec(m_view.origin()->loc(), mc_resolution);
+  }
 
   /**
    * @brief Get the 2D space spanned by the entity in absolute
    * coordinates in the arena in X.
    */
-  rmath::ranged xspan(void) const override {
-    return rmath::ranged(m_view.origin()->loc().x() - 0.5 * m_view.shape()[0],
-                         m_view.origin()->loc().x() + 0.5 * m_view.shape()[0]);
+  rmath::ranged xspan(void) const override final {
+    return rmath::ranged(ranchor().x(),
+                         ranchor().x() + m_view.shape()[0] * mc_resolution);
   }
 
   /**
    * @brief Get the 2D space spanned by the grid_cell entity in absolute
    * coordinates in the arena in Y.
    */
-  rmath::ranged yspan(void) const override {
-    return rmath::ranged(m_view.origin()->loc().y() - 0.5 * m_view.shape()[1],
-                         m_view.origin()->loc().y() + 0.5 * m_view.shape()[1]);
+  rmath::ranged yspan(void) const override final {
+    return rmath::ranged(ranchor().y(),
+                         ranchor().y() + m_view.shape()[1] * mc_resolution);
   }
 
   /**
@@ -89,8 +91,8 @@ class grid_view_entity : public base_entity {
     return xspan().contains(point.x()) && yspan().contains(point.y());
   }
 
-  double xdim(void) const override { return m_view.shape()[0]; }
-  double ydim(void) const override { return m_view.shape()[1]; }
+  double xdim(void) const override { return xspan().span(); }
+  double ydim(void) const override { return yspan().span(); }
 
   /**
    * @brief Get the cell associated with a particular grid location within the
@@ -106,7 +108,8 @@ class grid_view_entity : public base_entity {
 
  private:
   /* clang-format off */
-  T m_view;
+  const double mc_resolution;
+  T            m_view;
   /* clang-format on */
 };
 

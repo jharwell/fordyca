@@ -48,8 +48,8 @@
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -166,8 +166,8 @@ double tv_manager::swarm_motion_throttle(void) const {
   auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");
 
   support::swarm_iterator::controllers(mc_lf, [&](auto& controller) {
-      accum += controller->applied_motion_throttle();
-    });
+    accum += controller->applied_motion_throttle();
+  });
   return accum / robots.size();
 } /* swarm_motion_throttle() */
 
@@ -201,10 +201,10 @@ void tv_manager::update(void) {
   uint timestep = mc_lf->GetSpace().GetSimulationClock();
 
   support::swarm_iterator::controllers(mc_lf, [&](auto& controller) {
-      m_motion_throttling.at(controller->entity_id())
-          .toggle(controller->is_carrying_block());
-      m_motion_throttling.at(controller->entity_id()).update(timestep);
-    });
+    m_motion_throttling.at(controller->entity_id())
+        .toggle(controller->is_carrying_block());
+    m_motion_throttling.at(controller->entity_id()).update(timestep);
+  });
 } /* update() */
 
 NS_END(tv, support, fordyca);

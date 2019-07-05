@@ -31,12 +31,12 @@
 #include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -169,9 +169,9 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * able to apply sensing/actuation variances if configured.
    */
   swarm_iterator::controllers(this, [&](auto* c) {
-      m_tv_manager->register_controller(c->entity_id());
-      c->tv_init(m_tv_manager.get());
-    });
+    m_tv_manager->register_controller(c->entity_id());
+    c->tv_init(m_tv_manager.get());
+  });
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
@@ -216,9 +216,9 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
   std::vector<rmath::vector2d> v;
 
   swarm_iterator::robots(this, [&](auto* robot) {
-        v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-                robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
-      });
+    v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+                 robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
+  });
 
   /*
    * For each closest pair of robots we find, we add the corresponding distance
@@ -259,17 +259,18 @@ std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const
   std::vector<rmath::radians> v;
 
   swarm_iterator::controllers(this, [&](const auto* controller) {
-      v.push_back(controller->heading2D().angle());
-    });
+    v.push_back(controller->heading2D().angle());
+  });
   return v;
 } /* calc_robot_headings() */
 
-std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(uint) const {
+std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
+    uint) const {
   std::vector<rmath::vector2d> v;
 
   swarm_iterator::controllers(this, [&](const auto* controller) {
-      v.push_back(controller->position2D());
-    });
+    v.push_back(controller->position2D());
+  });
   return v;
 } /* calc_robot_positions() */
 

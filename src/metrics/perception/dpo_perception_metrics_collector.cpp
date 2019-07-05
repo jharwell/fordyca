@@ -82,7 +82,8 @@ bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_int_cache_density_sum.last_result(),
                            m_int_robot_count);
   line += csv_entry_domavg(m_cum_cache_density_sum.last_result(),
-                           m_cum_robot_count, true);
+                           m_cum_robot_count,
+                           true);
   return true;
 } /* csv_line_build() */
 

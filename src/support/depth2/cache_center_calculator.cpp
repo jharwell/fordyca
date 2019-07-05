@@ -52,7 +52,7 @@ cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
  * Member Functions
  ******************************************************************************/
 boost::optional<rmath::vector2u> cache_center_calculator::operator()(
-    const ds::block_list& c_cache_i_blocks,
+    const ds::block_vector& c_cache_i_blocks,
     const ds::cache_vector& c_existing_caches,
     const ds::block_cluster_vector& c_clusters) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),

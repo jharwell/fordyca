@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <vector>
 #include "fordyca/support/base_cache_creator.hpp"
 
 /*******************************************************************************
@@ -38,25 +39,31 @@ NS_START(fordyca, support, depth1);
  * @class static_cache_creator
  * @ingroup fordyca support depth1
  *
- * @brief Creates a static cache in the arena by taking a specified number of
- * free blocks and grouping them together into a cache at the specified
- * location.
+ * @brief Creates static cache(s) in the arena by taking \ref
+ * base_cache::kMinBlocks from the allocated blocks and grouping them together
+ * at each of the specified cache locations where a cache does not currently
+ * exist in order to create a new static cache.
  */
 class static_cache_creator : public base_cache_creator,
                              public rer::client<static_cache_creator> {
  public:
   static_cache_creator(ds::arena_grid* grid,
-                       const rmath::vector2d& center,
+                       const std::vector<rmath::vector2d>& cache_locs,
                        double cache_dim);
 
+  /**
+   * @brief Re-create all static caches. Ignores block cluster locations because
+   * the locations of the static caches do not change and are known to be
+   * conflict free.
+   */
   ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
                               const ds::block_cluster_vector&,
-                              ds::block_vector& blocks,
+                              const ds::block_vector& c_alloc_blocks,
                               uint timestep) override;
 
  private:
   /* clang-format off */
-  rmath::vector2d m_center;
+  const std::vector<rmath::vector2d> mc_centers;
   /* clang-format on */
 };
 

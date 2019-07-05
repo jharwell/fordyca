@@ -43,7 +43,8 @@ foraging_task::foraging_task(const std::string& name,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure bool foraging_task::task_in_depth0(const rta::polled_task* const task) {
+__rcsw_pure bool foraging_task::task_in_depth0(
+    const rta::polled_task* const task) {
   return task->name() == kGeneralistName;
 } /* task_in_depth0() */
 

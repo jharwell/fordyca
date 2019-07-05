@@ -54,7 +54,7 @@ NS_START(support, depth2);
  * @ingroup fordyca support depth2
  *
  * @brief Manager for creation, depletion, and metric gathering for dynamic
- * caches in the arena, whenever they are enabled.
+ * caches in the arena.
  */
 class dynamic_cache_manager final : public base_cache_manager,
                               public rer::client<dynamic_cache_manager> {
@@ -67,19 +67,17 @@ class dynamic_cache_manager final : public base_cache_manager,
    * configurations.
    *
    * @param existing_caches The list of current caches in the arena.
-   * @param blocks The total block vector for the arena.
    * @param clusters The total block clusters in the arena, for use in
-   * (possibly) disallowing cache creation within their boundaries, depending on
-   * configuration.
+   *                 disallowing cache creation within their boundaries,
+   *                 depending on  configuration.
+   * @param blocks The total block vector for the arena.
    * @param timestep The current timestep.
    *
-   * @return \c TRUE iff at least 1 dynamic cache was actually
-   * created. Non-fatal failures to create dynamic caches can occur if, for
-   * example, all blocks are currently being carried by robots.
+   * @return The created caches (if any were created).
    */
   boost::optional<ds::cache_vector> create(const ds::cache_vector& c_existing_caches,
                                            const ds::block_cluster_vector& c_clusters,
-                                           ds::block_vector& blocks,
+                                           const ds::block_vector& blocks,
                                            uint timestep);
 
   /**

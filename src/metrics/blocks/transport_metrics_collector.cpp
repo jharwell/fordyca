@@ -84,20 +84,16 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_tsavg(m_stats.cum_cube_collected);
   line += csv_entry_intavg(m_stats.int_ramp_collected);
   line += csv_entry_tsavg(m_stats.cum_ramp_collected);
-  line += csv_entry_domavg(m_stats.int_collected,
-                           m_stats.int_transporters);
-  line += csv_entry_domavg(m_stats.cum_collected,
-                           m_stats.cum_transporters);
+  line += csv_entry_domavg(m_stats.int_collected, m_stats.int_transporters);
+  line += csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transporters);
 
-  line += csv_entry_domavg(m_stats.int_collected,
-                           m_stats.int_transport_time);
-  line += csv_entry_domavg(m_stats.cum_collected,
-                           m_stats.cum_transport_time);
+  line += csv_entry_domavg(m_stats.int_collected, m_stats.int_transport_time);
+  line += csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transport_time);
 
-  line += csv_entry_domavg(m_stats.int_collected,
-                           m_stats.int_initial_wait_time);
+  line += csv_entry_domavg(m_stats.int_collected, m_stats.int_initial_wait_time);
   line += csv_entry_domavg(m_stats.cum_collected,
-                           m_stats.cum_initial_wait_time, true);
+                           m_stats.cum_initial_wait_time,
+                           true);
 
   return true;
 } /* csv_line_build() */

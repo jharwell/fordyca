@@ -65,16 +65,14 @@ void goal_acq_metrics_collector::reset(void) {
 void goal_acq_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
   auto [is_exp, true_exp] = m.is_exploring_for_goal();
-  m_stats.n_int_true_exploring_for_goal +=
-      static_cast<uint>(is_exp && true_exp);
+  m_stats.n_int_true_exploring_for_goal += static_cast<uint>(is_exp && true_exp);
   m_stats.n_int_false_exploring_for_goal +=
       static_cast<uint>(is_exp && !true_exp);
   m_stats.n_int_acquiring_goal +=
       static_cast<uint>(is_exp || m.is_vectoring_to_goal());
   m_stats.n_int_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 
-  m_stats.n_cum_true_exploring_for_goal +=
-      static_cast<uint>(is_exp && true_exp);
+  m_stats.n_cum_true_exploring_for_goal += static_cast<uint>(is_exp && true_exp);
   m_stats.n_cum_false_exploring_for_goal +=
       static_cast<uint>(is_exp && !true_exp);
   m_stats.n_cum_acquiring_goal +=
