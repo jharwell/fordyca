@@ -71,7 +71,7 @@ void cell2D_fsm::event_block_drop(void) {
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ekST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<block_data>(false));
+                 std::make_unique<block_data>(false));
 } /* event_empty() */
 
 void cell2D_fsm::event_block_pickup(void) {
@@ -84,7 +84,7 @@ void cell2D_fsm::event_block_pickup(void) {
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ekST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<block_data>(true));
+                 std::make_unique<block_data>(true));
 } /* event_block_pickup() */
 
 void cell2D_fsm::event_cache_extent(void) {

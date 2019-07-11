@@ -81,9 +81,14 @@ __rcsw_pure bool ledtaxis_cache_search::exited_collision_avoidance(void) const {
          (m_crw.task_running() && m_crw.exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
-uint ledtaxis_cache_search::collision_avoidance_duration(void) const {
-  return (m_taxis.task_running() && m_taxis.collision_avoidance_duration()) ||
-         (m_crw.task_running() && m_crw.collision_avoidance_duration());
+rtypes::timestep ledtaxis_cache_search::collision_avoidance_duration(void) const {
+  if (m_taxis.task_running()) {
+    return m_taxis.collision_avoidance_duration();
+  } else if (m_crw.task_running()) {
+    return m_crw.collision_avoidance_duration();
+  } else {
+    return rtypes::timestep(0);
+  }
 } /* collision_avoidance_duration() */
 
 __rcsw_pure rmath::vector2u ledtaxis_cache_search::avoidance_loc(void) const {

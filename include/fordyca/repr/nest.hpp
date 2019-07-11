@@ -29,6 +29,7 @@
 
 #include "fordyca/repr/colored_entity.hpp"
 #include "fordyca/repr/unicell_immovable_entity.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,7 +62,7 @@ class nest : public unicell_immovable_entity, public colored_entity {
 
   nest(const rmath::vector2d& dim,
        const rmath::vector2d& loc,
-       double resolution,
+       rtypes::discretize_ratio resolution,
        const rutils::color& light_color);
 
   /**

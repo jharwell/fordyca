@@ -41,7 +41,7 @@ NS_START(fordyca, controller);
 dpo_perception_subsystem::dpo_perception_subsystem(
     const config::perception::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.controller.dpo_perception"),
-      m_store(rcppsw::make_unique<ds::dpo_store>(&config->pheromone)) {}
+      m_store(std::make_unique<ds::dpo_store>(&config->pheromone)) {}
 
 dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
 

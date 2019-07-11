@@ -24,13 +24,18 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
+#include "fordyca/nsalias.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -92,7 +97,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
 
   cache_block_drop(const std::shared_ptr<repr::base_block>& block,
                    const std::shared_ptr<repr::arena_cache>& cache,
-                   double resolution);
+                   rtypes::discretize_ratio resolution);
   ~cache_block_drop(void) override = default;
 
   cache_block_drop(const cache_block_drop& op) = delete;
@@ -125,7 +130,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   bool dispatch_d2_cache_interactor(tasks::base_foraging_task* task,
                                     controller::cache_sel_matrix* csel_matrix);
 
-  double                             m_resolution;
+  const rtypes::discretize_ratio     mc_resolution;
   std::shared_ptr<repr::base_block>  m_block;
   std::shared_ptr<repr::arena_cache> m_cache;
   /* clang-format on */

@@ -90,15 +90,15 @@ class cached_block_pickup_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestepp.
    */
-  interactor_status operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
-        return finish_cached_block_pickup(controller, timestep);
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+        return finish_cached_block_pickup(controller, t);
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
-                                      timestep);
+                                      t);
     }
     return interactor_status::ekNoEvent;
   }
@@ -109,7 +109,8 @@ class cached_block_pickup_interactor
    * actually performs the handshaking between the cache, the arena, and the
    * robot for block pickup.
    */
-  interactor_status finish_cached_block_pickup(T& controller, uint timestep) {
+  interactor_status finish_cached_block_pickup(T& controller,
+                                               rtypes::timestep t) {
     const tv::temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
@@ -162,8 +163,8 @@ class cached_block_pickup_interactor
       fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
                                  controller.cache_sel_matrix(),
                                  true);
-      if (v(controller.position2D(), p.id(), timestep)) {
-        status = perform_cached_block_pickup(controller, p, timestep);
+      if (v(controller.position2D(), p.id(), t)) {
+        status = perform_cached_block_pickup(controller, p, t);
         m_floor->SetChanged();
       } else {
         ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
@@ -184,7 +185,7 @@ class cached_block_pickup_interactor
   interactor_status perform_cached_block_pickup(
       T& controller,
       const tv::temporal_penalty<T>& penalty,
-      uint timestep) {
+      rtypes::timestep t) {
     auto it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
@@ -193,7 +194,7 @@ class cached_block_pickup_interactor
               "Cache%d from penalty does not exist",
               penalty.id());
     events::cached_block_pickup_visitor pickup_op(
-        m_loop, *it, loop_utils::robot_id(controller), timestep);
+        m_loop, *it, loop_utils::robot_id(controller), t);
     (*it)->penalty_served(penalty.penalty());
 
     /*

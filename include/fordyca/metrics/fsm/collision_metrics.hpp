@@ -27,6 +27,7 @@
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,7 +72,7 @@ class collision_metrics : public virtual rmetrics::base_metrics {
    * @brief If \ref exited_collision_avoidance() returns \c TRUE, then this
    * should return the duration of the collision avoidance in timesteps.
    */
-  virtual uint collision_avoidance_duration(void) const = 0;
+  virtual rtypes::timestep collision_avoidance_duration(void) const = 0;
 
   /**
    * @brief When \ref in_collision_avoidance() returns \c TRUE, then this should

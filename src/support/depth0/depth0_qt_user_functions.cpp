@@ -68,7 +68,7 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   }
   if (nullptr != mdpo && mdpo->display_los()) {
     los_visualizer(this).draw(mdpo->los(),
-                              mdpo->mdpo_perception()->map()->grid_resolution());
+                              mdpo->mdpo_perception()->map()->resolution());
   }
 }
 

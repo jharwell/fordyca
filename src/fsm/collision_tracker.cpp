@@ -45,11 +45,11 @@ __rcsw_pure bool collision_tracker::exited_collision_avoidance(void) const {
   return m_exited_avoidance;
 } /* exited_collision_avoidance() */
 
-uint collision_tracker::collision_avoidance_duration(void) const {
+rtypes::timestep collision_tracker::collision_avoidance_duration(void) const {
   if (m_exited_avoidance) {
     return mc_saa->sensing()->tick() - m_avoidance_start;
   }
-  return 0;
+  return rtypes::timestep(0);
 } /* collision_avoidance_duration() */
 
 __rcsw_pure rmath::vector2u collision_tracker::avoidance_loc(void) const {

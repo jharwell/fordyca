@@ -48,7 +48,7 @@ arena_cache::arena_cache(const base_cache::params& p,
 void arena_cache::reset_metrics(void) {
   m_block_pickups = 0;
   m_block_drops = 0;
-  m_penalty_count = 0;
+  m_penalty_count = rtypes::timestep(0);
 } /* reset_metrics() */
 
 NS_END(fordyca, repr);

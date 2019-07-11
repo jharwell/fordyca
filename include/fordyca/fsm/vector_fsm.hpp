@@ -163,7 +163,7 @@ class vector_fsm final : public base_foraging_fsm,
 
   struct fsm_state {
     uint m_collision_rec_count{0};
-    uint last_collision_time{0};
+    rtypes::timestep last_collision_time{0};
   };
 
   /**

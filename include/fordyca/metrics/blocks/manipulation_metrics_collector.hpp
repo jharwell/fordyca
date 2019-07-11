@@ -60,15 +60,15 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
 
  private:
   struct stats {
-    uint int_free_pickup_events{0};
-    uint int_free_drop_events{0};
-    uint int_free_pickup_penalty{0};
-    uint int_free_drop_penalty{0};
+    uint             int_free_pickup_events{0};
+    uint             int_free_drop_events{0};
+    rtypes::timestep int_free_pickup_penalty{0};
+    rtypes::timestep int_free_drop_penalty{0};
 
-    uint int_cache_pickup_events{0};
-    uint int_cache_drop_events{0};
-    uint int_cache_pickup_penalty{0};
-    uint int_cache_drop_penalty{0};
+    uint             int_cache_pickup_events{0};
+    uint             int_cache_drop_events{0};
+    rtypes::timestep int_cache_pickup_penalty{0};
+    rtypes::timestep int_cache_drop_penalty{0};
   };
 
   std::list<std::string> csv_header_cols(void) const override;

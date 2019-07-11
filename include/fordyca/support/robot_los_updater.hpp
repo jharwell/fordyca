@@ -62,7 +62,7 @@ class robot_los_updater final
   robot_los_updater& operator=(const robot_los_updater&) = delete;
 
   void operator()(ControllerType* const c) const {
-    double mod = std::fmod(c->los_dim(), m_map->grid_resolution());
+    double mod = std::fmod(c->los_dim(), m_map->grid_resolution().v());
 
     /*
      * Some values of LOS dim and/or grid resolution might not be able to be
@@ -72,14 +72,14 @@ class robot_los_updater final
      */
     if (mod >= std::numeric_limits<double>::epsilon()) {
       ER_ASSERT(
-          std::fabs(m_map->grid_resolution() - mod) <=
+          std::fabs(m_map->grid_resolution().v() - mod) <=
               std::numeric_limits<double>::epsilon(),
           "LOS dimension (%f) not an even multiple of grid resolution (%f)",
           c->los_dim(),
-          m_map->grid_resolution());
+          m_map->grid_resolution().v());
     }
-    uint los_grid_size =
-        static_cast<uint>(std::round(c->los_dim() / m_map->grid_resolution()));
+    uint los_grid_size = static_cast<uint>(
+        std::round(c->los_dim() / m_map->grid_resolution().v()));
     loop_utils::set_robot_los(c, los_grid_size, *m_map);
   }
 

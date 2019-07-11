@@ -65,7 +65,7 @@ class localized_search : public base_expstrat,
   bool in_collision_avoidance(void) const override final;
   bool entered_collision_avoidance(void) const override final;
   bool exited_collision_avoidance(void) const override final;
-  uint collision_avoidance_duration(void) const override final;
+  rtypes::timestep collision_avoidance_duration(void) const override final;
   rmath::vector2u avoidance_loc(void) const override final;
 
   /* taskable overrides */
@@ -101,7 +101,7 @@ class localized_search : public base_expstrat,
 
   /* prototype overrides */
   std::unique_ptr<base_expstrat> clone(void) const override {
-    return rcppsw::make_unique<localized_search>(saa_subsystem());
+    return std::make_unique<localized_search>(saa_subsystem());
   }
 
  private:

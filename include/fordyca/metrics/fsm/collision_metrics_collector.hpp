@@ -61,22 +61,24 @@ class collision_metrics_collector final : public rmetrics::base_metrics_collecto
 
  private:
   struct stats {
-    uint int_n_in_avoidance;
-    uint int_n_entered_avoidance;
-    uint int_n_exited_avoidance;
-    uint int_avoidance_duration;
+    /* clang-format off */
+    uint             int_n_in_avoidance{0};
+    uint             int_n_entered_avoidance{0};
+    uint             int_n_exited_avoidance{0};
+    rtypes::timestep int_avoidance_duration{0};
 
-    uint cum_n_in_avoidance;
-    uint cum_n_entered_avoidance;
-    uint cum_n_exited_avoidance;
-    uint cum_avoidance_duration;
+    uint             cum_n_in_avoidance{0};
+    uint             cum_n_entered_avoidance{0};
+    uint             cum_n_exited_avoidance{0};
+    rtypes::timestep cum_avoidance_duration{0};
+    /* clang-format on */
   };
 
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats m_stats;
+  struct stats m_stats{};
   /* clang-format on */
 };
 

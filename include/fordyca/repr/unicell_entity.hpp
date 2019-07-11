@@ -28,6 +28,8 @@
 
 #include "fordyca/nsalias.hpp"
 #include "fordyca/repr/base_entity.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
+
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
 
@@ -96,17 +98,17 @@ class unicell_entity : public base_entity {
  protected:
   unicell_entity(const rmath::vector2d& dim,
                  const rmath::vector2d& loc,
-                 double resolution)
+                 rtypes::discretize_ratio resolution)
       : unicell_entity{dim, loc, resolution, -1} {}
 
   unicell_entity(const rmath::vector2d& dim,
                  const rmath::vector2d& loc,
-                 double resolution,
+                 rtypes::discretize_ratio resolution,
                  int id)
       : base_entity(id),
         m_dim(dim),
         m_rloc(loc),
-        m_dloc(rmath::dvec2uvec(loc, resolution)) {}
+        m_dloc(rmath::dvec2uvec(loc, resolution.v())) {}
 
   explicit unicell_entity(const rmath::vector2d& dim)
       : unicell_entity{dim, -1} {}

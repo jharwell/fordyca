@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <vector>
 #include "fordyca/support/base_cache_creator.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +50,7 @@ class static_cache_creator : public base_cache_creator,
  public:
   static_cache_creator(ds::arena_grid* grid,
                        const std::vector<rmath::vector2d>& cache_locs,
-                       double cache_dim);
+                       rtypes::spatial_dist cache_dim);
 
   /**
    * @brief Re-create all static caches. Ignores block cluster locations because
@@ -59,7 +60,7 @@ class static_cache_creator : public base_cache_creator,
   ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
                               const ds::block_cluster_vector&,
                               const ds::block_vector& c_alloc_blocks,
-                              uint timestep) override;
+                              rtypes::timestep t) override;
 
  private:
   /* clang-format off */

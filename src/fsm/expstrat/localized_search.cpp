@@ -60,9 +60,14 @@ __rcsw_pure bool localized_search::exited_collision_avoidance(void) const {
          (m_crw.task_running() && m_crw.exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
-uint localized_search::collision_avoidance_duration(void) const {
-  return (m_vfsm.task_running() && m_vfsm.collision_avoidance_duration()) ||
-         (m_crw.task_running() && m_crw.collision_avoidance_duration());
+rtypes::timestep localized_search::collision_avoidance_duration(void) const {
+  if (m_vfsm.task_running()) {
+    return m_vfsm.collision_avoidance_duration();
+  } else if (m_crw.task_running()) {
+    return m_crw.collision_avoidance_duration();
+  } else {
+    return rtypes::timestep(0);
+  }
 } /* collision_avoidance_duration() */
 
 rmath::vector2u localized_search::avoidance_loc(void) const {

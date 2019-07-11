@@ -24,12 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,7 +73,8 @@ class nest_block_drop : public rer::client<nest_block_drop> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  nest_block_drop(const std::shared_ptr<repr::base_block>& block, uint timestep);
+  nest_block_drop(const std::shared_ptr<repr::base_block>& block,
+                  rtypes::timestep t);
   ~nest_block_drop(void) override = default;
 
   nest_block_drop(const nest_block_drop& op) = delete;
@@ -114,7 +118,8 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   void dispatch_nest_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  uint                              m_timestep;
+  const rtypes::timestep            mc_timestep;
+
   std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };

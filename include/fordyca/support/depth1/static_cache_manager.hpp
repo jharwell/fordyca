@@ -79,13 +79,13 @@ class static_cache_manager final : public base_cache_manager,
   boost::optional<ds::cache_vector> create(const ds::cache_vector& existing_caches,
                                            const ds::block_cluster_vector& clusters,
                                            const ds::block_vector& blocks,
-                                           uint timestep);
+                                           rtypes::timestep t);
 
   boost::optional<ds::cache_vector> create_conditional(
       const ds::cache_vector& existing_caches,
       const ds::block_cluster_vector& clusters,
       const ds::block_vector& blocks,
-      uint timestep,
+      rtypes::timestep t,
       uint n_harvesters,
       uint n_collectors);
 

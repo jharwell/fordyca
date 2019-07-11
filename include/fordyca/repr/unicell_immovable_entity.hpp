@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/repr/unicell_entity.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,12 +47,12 @@ class unicell_immovable_entity : public unicell_entity {
  public:
   unicell_immovable_entity(const rmath::vector2d& dim,
                            const rmath::vector2d& loc,
-                           double resolution)
+                           rtypes::discretize_ratio resolution)
       : unicell_entity(dim, loc, resolution, -1) {}
 
   unicell_immovable_entity(const rmath::vector2d& dim,
                            const rmath::vector2d& loc,
-                           double resolution,
+                           rtypes::discretize_ratio resolution,
                            int id)
       : unicell_entity(dim, loc, resolution, id) {}
 

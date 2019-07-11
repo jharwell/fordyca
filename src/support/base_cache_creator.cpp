@@ -43,7 +43,7 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
-                                       double cache_dim)
+                                       rtypes::spatial_dist cache_dim)
     : ER_CLIENT_INIT("fordyca.support.base_cache_creator"),
       mc_cache_dim(cache_dim),
       m_grid(grid),
@@ -55,7 +55,7 @@ base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
 std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
     const rmath::vector2d& center,
     ds::block_vector blocks,
-    uint timestep) {
+    rtypes::timestep t) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
             center.to_str().c_str());
@@ -63,7 +63,7 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
    * The cell that will be the location of the new cache may already contain a
    * block. If so, it should be added to the list of blocks for the cache.
    */
-  rmath::vector2u d = rmath::dvec2uvec(center, grid()->resolution());
+  rmath::vector2u d = rmath::dvec2uvec(center, grid()->resolution().v());
   ds::cell2D& cell = m_grid->access<arena_grid::kCell>(d);
   if (cell.state_has_block()) {
     ER_ASSERT(nullptr != cell.block(),
@@ -106,22 +106,25 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
   } /* for(block..) */
 
   ds::block_vector block_vec(blocks.begin(), blocks.end());
-  auto ret = rcppsw::make_unique<repr::arena_cache>(
+  auto ret = std::make_unique<repr::arena_cache>(
       repr::arena_cache::params{
           mc_cache_dim, m_grid->resolution(), center, block_vec, -1},
       light_type_index()[light_type_index::kCache]);
-  ret->creation_ts(timestep);
-  ER_INFO(
-      "Create cache%d@%s/%s, xspan=%s/%s,yspan=%s/%s with %zu blocks [%s]",
-      ret->id(),
-      ret->rloc().to_str().c_str(),
-      ret->dloc().to_str().c_str(),
-      ret->xspan().to_str().c_str(),
-      rmath::drange2urange(ret->xspan(), m_grid->resolution()).to_str().c_str(),
-      ret->yspan().to_str().c_str(),
-      rmath::drange2urange(ret->yspan(), m_grid->resolution()).to_str().c_str(),
-      ret->n_blocks(),
-      rcppsw::to_string(blocks).c_str());
+  ret->creation_ts(t);
+  ER_INFO("Create cache%d@%s/%s, xspan=%s/%s,yspan=%s/%s with %zu blocks [%s]",
+          ret->id(),
+          ret->rloc().to_str().c_str(),
+          ret->dloc().to_str().c_str(),
+          ret->xspan().to_str().c_str(),
+          rmath::drange2urange(ret->xspan(), m_grid->resolution().v())
+              .to_str()
+              .c_str(),
+          ret->yspan().to_str().c_str(),
+          rmath::drange2urange(ret->yspan(), m_grid->resolution().v())
+              .to_str()
+              .c_str(),
+          ret->n_blocks(),
+          rcppsw::to_string(blocks).c_str());
   return ret;
 } /* create_single_cache() */
 
@@ -137,17 +140,21 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
 
     auto xspan = cache->xspan();
     auto yspan = cache->yspan();
-    auto xmin = static_cast<uint>(std::ceil(xspan.lb() / m_grid->resolution()));
-    auto xmax = static_cast<uint>(std::ceil(xspan.ub() / m_grid->resolution()));
-    auto ymin = static_cast<uint>(std::ceil(yspan.lb() / m_grid->resolution()));
-    auto ymax = static_cast<uint>(std::ceil(yspan.ub() / m_grid->resolution()));
+    auto xmin =
+        static_cast<uint>(std::ceil(xspan.lb() / m_grid->resolution().v()));
+    auto xmax =
+        static_cast<uint>(std::ceil(xspan.ub() / m_grid->resolution().v()));
+    auto ymin =
+        static_cast<uint>(std::ceil(yspan.lb() / m_grid->resolution().v()));
+    auto ymax =
+        static_cast<uint>(std::ceil(yspan.ub() / m_grid->resolution().v()));
 
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {
         rmath::vector2u c = rmath::vector2u(i, j);
         if (c != cache->dloc()) {
           ER_ASSERT(cache->contains_point(
-                        rmath::uvec2dvec(c, m_grid->resolution())),
+                        rmath::uvec2dvec(c, m_grid->resolution().v())),
                     "Cache%d does not contain point (%u, %u) within its extent",
                     cache->id(),
                     i,

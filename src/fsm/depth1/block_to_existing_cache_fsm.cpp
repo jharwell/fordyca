@@ -44,23 +44,23 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
           c_params->store,
           expstrat::cache_factory().create(
               c_params->exp_config.cache_strategy,
-              rcppsw::make_unique<expstrat::base_expstrat::params>(
+              std::make_unique<expstrat::base_expstrat::params>(
                   c_params->csel_matrix,
                   c_params->saa,
                   c_params->store,
                   support::light_type_index()[support::light_type_index::kCache])
                   .get()),
           false),
-      m_block_fsm(c_params->bsel_matrix,
-                  c_params->saa,
-                  c_params->store,
-                  expstrat::block_factory().create(
-                      c_params->exp_config.block_strategy,
-                      rcppsw::make_unique<expstrat::base_expstrat::params>(
-                          nullptr,
-                          c_params->saa,
-                          c_params->store)
-                          .get())) {}
+      m_block_fsm(
+          c_params->bsel_matrix,
+          c_params->saa,
+          c_params->store,
+          expstrat::block_factory().create(
+              c_params->exp_config.block_strategy,
+              std::make_unique<expstrat::base_expstrat::params>(nullptr,
+                                                                c_params->saa,
+                                                                c_params->store)
+                  .get())) {}
 
 /*******************************************************************************
  * FSM Metrics

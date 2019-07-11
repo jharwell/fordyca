@@ -24,12 +24,15 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,7 +77,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
 
   free_block_pickup(const std::shared_ptr<repr::base_block>& block,
                     uint robot_index,
-                    uint timestep);
+                    rtypes::timestep t);
   ~free_block_pickup(void) override = default;
 
   free_block_pickup(const free_block_pickup& op) = delete;
@@ -119,8 +122,9 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   void dispatch_free_block_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  uint                              m_timestep;
-  uint                              m_robot_index;
+  const rtypes::timestep            mc_timestep;
+  const uint                        mc_robot_index;
+
   std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };

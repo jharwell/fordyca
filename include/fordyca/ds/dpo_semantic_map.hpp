@@ -124,8 +124,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_DECORATE_FUNC(known_cells_inc)
   RCPPSW_DECORATE_FUNC(known_cells_dec)
   RCPPSW_DECORATE_FUNC(known_cell_count, const)
-
-  double grid_resolution(void) const { return decoratee().resolution(); }
+  RCPPSW_DECORATE_FUNC(resolution, const);
 
   bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
   bool block_remove(const std::shared_ptr<repr::base_block>& victim);

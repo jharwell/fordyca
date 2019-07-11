@@ -78,7 +78,7 @@ class dynamic_cache_manager final : public base_cache_manager,
   boost::optional<ds::cache_vector> create(const ds::cache_vector& c_existing_caches,
                                            const ds::block_cluster_vector& c_clusters,
                                            const ds::block_vector& blocks,
-                                           uint timestep);
+                                           rtypes::timestep t);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches
@@ -86,8 +86,8 @@ class dynamic_cache_manager final : public base_cache_manager,
    * dimension, minimmum distance between blocks to consider when creating
    * caches);
    */
-  double cache_proximity_dist(void) const {
-    return std::max(2 * mc_cache_config.dimension,
+  rtypes::spatial_dist cache_proximity_dist(void) const {
+    return std::max(mc_cache_config.dimension * 2,
                     mc_cache_config.dynamic.min_dist);
   }
 

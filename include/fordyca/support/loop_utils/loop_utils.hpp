@@ -31,6 +31,8 @@
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include "fordyca/repr/line_of_sight.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -118,14 +120,15 @@ bool block_drop_overlap_with_nest(
  * by the robot.
  */
 template <typename T>
-void set_robot_pos(argos::CFootBotEntity& robot, double grid_resolution) {
+void set_robot_pos(argos::CFootBotEntity& robot,
+                   rtypes::discretize_ratio resolution) {
   rmath::vector2d pos(robot.GetEmbodiedEntity()
                       .GetOriginAnchor()
                       .Position.GetX(),
                       robot.GetEmbodiedEntity()
                       .GetOriginAnchor()
                       .Position.GetY());
-  rmath::vector2u dpos = rmath::dvec2uvec(pos, grid_resolution);
+  rmath::vector2u dpos = rmath::dvec2uvec(pos, resolution.v());
 
   auto& controller =
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
@@ -143,7 +146,7 @@ void set_robot_pos(argos::CFootBotEntity& robot, double grid_resolution) {
  */
 proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
                                               const ds::arena_map& map,
-                                              double block_prox_dist);
+                                              rtypes::spatial_dist block_prox);
 
 /**
  * @brief Determine if creating a new cache centered at the robot's current
@@ -158,7 +161,7 @@ proximity_status_t cache_site_block_proximity(const controller::base_controller&
  */
 proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,
                                              const ds::arena_map& map,
-                                             double proximity_dist);
+                                             rtypes::spatial_dist new_cache_prox);
 
 
 /**
@@ -189,9 +192,9 @@ void set_robot_los(T* const controller,
 }
 
 template<typename T>
-void set_robot_tick(argos::CFootBotEntity& robot, uint timestep) {
+void set_robot_tick(argos::CFootBotEntity& robot, rtypes::timestep t) {
   auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-  controller.tick(timestep);
+  controller.tick(t);
 }
 /**
  * @brief Determine if an entity of the specified dimensions, placed at the

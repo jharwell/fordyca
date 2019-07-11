@@ -52,7 +52,7 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
     const ds::cache_vector& c_existing_caches,
     const ds::block_cluster_vector& c_clusters,
     const ds::block_vector& blocks,
-    uint timestep) {
+    rtypes::timestep t) {
   if (auto to_use =
           calc_blocks_for_creation(c_existing_caches, c_clusters, blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
@@ -63,7 +63,7 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
     support::depth2::dynamic_cache_creator creator(&params);
 
     ds::cache_vector created =
-        creator.create_all(c_existing_caches, c_clusters, *to_use, timestep);
+        creator.create_all(c_existing_caches, c_clusters, *to_use, t);
     caches_created(created.size());
 
     /*

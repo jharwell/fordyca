@@ -37,6 +37,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/block_cluster_vector.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,7 +75,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * @param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  cache_center_calculator(ds::arena_grid* grid, double cache_dim);
+  cache_center_calculator(ds::arena_grid* grid, rtypes::spatial_dist cache_dim);
 
   cache_center_calculator(const cache_center_calculator& other) = delete;
   cache_center_calculator& operator=(const cache_center_calculator& other) = delete;
@@ -141,7 +142,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
 
  private:
   /* clang-format off */
-  double                             m_cache_dim;
+  const rtypes::spatial_dist         mc_cache_dim;
   ds::arena_grid*                    m_grid;
   mutable std::default_random_engine m_rng;
   /* clang-format on */

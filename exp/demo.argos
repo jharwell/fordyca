@@ -33,11 +33,10 @@
                                              medium="leds" />
       </sensors>
       <params>
-        <output>
-          <sim output_root="output"
-               output_dir="__current_date__"
-               />
-        </output>
+        <output
+          output_root="output"
+          output_dir="__current_date__"
+          />
         <perception>
           <grid resolution="0.2"
                 size="12, 6, 2"/>
@@ -91,13 +90,12 @@
   <!-- ****************** -->
   <loop_functions library="libfordyca"
                   label="depth0_loop_functions">
-    <output>
-      <sim output_root="output"
-           output_dir="__current_date__"
-           />
+    <output output_root="output"
+            output_dir="__current_date__">
       <metrics
           output_dir="metrics"
           collect_interval="1000"
+          block_transport="block-transport.csv"
           fsm_collision_counts_fname="fsm-collision-counts.csv"
           fsm_collision_locs_fname="fsm-collision-locs.csv"
           fsm_movement_fname="fsm-movement.csv"

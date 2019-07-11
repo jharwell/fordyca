@@ -52,7 +52,7 @@ void crw_controller::Init(ticpp::Element& node) {
   ER_INFO("Initializing...");
 
   fsm::expstrat::base_expstrat::params p{nullptr, saa_subsystem(), nullptr};
-  m_fsm = rcppsw::make_unique<fsm::depth0::crw_fsm>(
+  m_fsm = std::make_unique<fsm::depth0::crw_fsm>(
       saa_subsystem(),
       fsm::expstrat::block_factory().create(fsm::expstrat::block_factory::kCRW,
                                             &p));

@@ -39,7 +39,7 @@ redist_governor::redist_governor(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void redist_governor::update(uint timestep,
+void redist_governor::update(rtypes::timestep t,
                              uint blocks_collected,
                              bool convergence_status) {
   /* # blocks is always infinite */
@@ -50,13 +50,13 @@ void redist_governor::update(uint timestep,
    * Can only be tripped once, so if already tripped avoid printing
    * diagnostic multiple times.
    */
-  if (kTriggerTime == mc_config.trigger && timestep >= mc_config.timestep &&
+  if (kTriggerTime == mc_config.trigger && t >= mc_config.timestep &&
       m_dist_status) {
     ER_INFO(
         "Redistribution disabled by trigger '%s': "
         "t=%u,n_blocks=%u,convergence=%d",
         kTriggerTime,
-        timestep,
+        t.v(),
         blocks_collected,
         convergence_status);
     m_dist_status = false;
@@ -66,7 +66,7 @@ void redist_governor::update(uint timestep,
       blocks_collected >= mc_config.block_count && m_dist_status) {
     ER_INFO("Redistribution disabled by '%s': t=%u,n_blocks=%u,convergence=%d",
             kTriggerBlockCount,
-            timestep,
+            t.v(),
             blocks_collected,
             convergence_status);
     m_dist_status = false;
@@ -89,7 +89,7 @@ void redist_governor::update(uint timestep,
         "Redistribution=%d triggered by '%s': t=%u,n_blocks=%u,convergence=%d",
         m_dist_status,
         kTriggerConvergence,
-        timestep,
+        t.v(),
         blocks_collected,
         convergence_status);
     return;

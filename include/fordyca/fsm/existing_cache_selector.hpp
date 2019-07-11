@@ -27,6 +27,7 @@
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,7 +72,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
   boost::optional<ds::dp_cache_map::value_type> operator()(
       const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position,
-      uint timestep);
+      rtypes::timestep t);
 
  private:
   /**

@@ -57,10 +57,10 @@ using ds::occupancy_grid;
 cache_block_drop::cache_block_drop(
     const std::shared_ptr<repr::base_block>& block,
     const std::shared_ptr<repr::arena_cache>& cache,
-    double resolution)
+    rtypes::discretize_ratio resolution)
     : ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
       cell_op(cache->dloc()),
-      m_resolution(resolution),
+      mc_resolution(resolution),
       m_block(block),
       m_cache(cache) {}
 
@@ -142,7 +142,7 @@ void cache_block_drop::visit(ds::dpo_semantic_map& map) {
 void cache_block_drop::visit(repr::base_block& block) {
   events::free_block_drop_visitor e(m_block, /* OK because we only have 1 block */
                                     rmath::vector2u(cell_op::x(), cell_op::y()),
-                                    m_resolution);
+                                    mc_resolution);
   e.visit(block);
 } /* visit() */
 

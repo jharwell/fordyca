@@ -26,10 +26,11 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/math/range.hpp"
-#include "rcppsw/config/base_config.hpp"
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/math/range.hpp"
+#include "rcppsw/config/base_config.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,12 +47,12 @@ NS_START(fordyca, config, cache_sel);
  * @brief XML parameters for the \ref cache_sel_matrix
  */
 struct cache_sel_matrix_config : public rconfig::base_config {
-  double cache_prox_dist{0.0};
-  double block_prox_dist{0.0};
-  double nest_prox_dist{0.0};
-  rcppsw::math::rangeu site_xrange{0, 0};
-  rcppsw::math::rangeu site_yrange{0, 0};
-  cache_pickup_policy_config pickup_policy{};
+  rtypes::spatial_dist         cache_prox_dist{0.0};
+  rtypes::spatial_dist         block_prox_dist{0.0};
+  rtypes::spatial_dist         nest_prox_dist{0.0};
+  rmath::rangeu site_xrange{0, 0};
+  rmath::rangeu site_yrange{0, 0};
+  cache_pickup_policy_config   pickup_policy{};
 };
 
 NS_END(cache_sel, config, fordyca);

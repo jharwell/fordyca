@@ -36,7 +36,7 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofname,
                                                          uint interval)
-    : base_metrics_collector(ofname, interval), m_stats() {}
+    : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
  * Member Functions
@@ -74,16 +74,17 @@ bool lifecycle_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_intavg(m_stats.int_depleted);
   line += csv_entry_tsavg(m_stats.cum_created);
   line += csv_entry_tsavg(m_stats.cum_depleted);
-  line += csv_entry_domavg(m_stats.int_depletion_sum, m_stats.int_depleted);
-  line +=
-      csv_entry_domavg(m_stats.cum_depletion_sum, m_stats.cum_depleted, true);
+  line += csv_entry_domavg(m_stats.int_depletion_sum.v(), m_stats.int_depleted);
+  line += csv_entry_domavg(m_stats.cum_depletion_sum.v(),
+                           m_stats.cum_depleted,
+                           true);
   return true;
 } /* csv_line_build() */
 
 void lifecycle_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = static_cast<const lifecycle_metrics&>(metrics);
   auto ages = m.cache_depletion_ages();
-  uint sum = std::accumulate(ages.begin(), ages.end(), 0U);
+  auto sum = std::accumulate(ages.begin(), ages.end(), rtypes::timestep(0));
 
   m_stats.int_created += m.caches_created();
   m_stats.int_depleted += m.caches_depleted();
@@ -97,7 +98,7 @@ void lifecycle_metrics_collector::collect(const rmetrics::base_metrics& metrics)
 void lifecycle_metrics_collector::reset_after_interval(void) {
   m_stats.int_created = 0;
   m_stats.int_depleted = 0;
-  m_stats.int_depletion_sum = 0;
+  m_stats.int_depletion_sum = rtypes::timestep(0);
 } /* reset_after_interval() */
 
 NS_END(caches, metrics, fordyca);

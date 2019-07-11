@@ -96,7 +96,7 @@ void mdpo_controller::shared_init(
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
   dpo_controller::perception(
-      rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 } /* shared_init() */
 
 void mdpo_controller::private_init(
@@ -106,7 +106,7 @@ void mdpo_controller::private_init(
   fsm::expstrat::base_expstrat::params p{nullptr,
                                          saa_subsystem(),
                                          perception()->dpo_store()};
-  dpo_controller::fsm(rcppsw::make_unique<fsm::depth0::dpo_fsm>(
+  dpo_controller::fsm(std::make_unique<fsm::depth0::dpo_fsm>(
       block_sel_matrix(),
       base_controller::saa_subsystem(),
       perception()->dpo_store(),

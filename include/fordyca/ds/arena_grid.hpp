@@ -28,6 +28,7 @@
 
 #include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,7 +62,7 @@ class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
    *
    * The origin of the grid is in the lower left corner at (0,0).
    */
-  arena_grid(double resolution, size_t x_max, size_t y_max)
+  arena_grid(rtypes::discretize_ratio resolution, size_t x_max, size_t y_max)
       : stacked_grid(resolution, x_max, y_max) {
     for (size_t i = 0; i < xdsize(); ++i) {
       for (size_t j = 0; j < ydsize(); ++j) {

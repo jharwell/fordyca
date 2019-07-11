@@ -50,7 +50,7 @@ cache_acq_validator::cache_acq_validator(
  ******************************************************************************/
 bool cache_acq_validator::operator()(const rmath::vector2d& loc,
                                      int id,
-                                     uint timestep) const {
+                                     rtypes::timestep t) const {
   /*
    * We can't just lookup the cache by the location key we are passed directly,
    * as it is for a point somewhere *inside* the cache, and thus probably not at
@@ -88,7 +88,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   auto& config = boost::get<config::cache_sel::cache_pickup_policy_config>(
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
-  if (cselm::kPickupPolicyTime == config.policy && timestep < config.timestep) {
+  if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
     return false;
   } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {

@@ -34,7 +34,7 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 collision_metrics_collector::collision_metrics_collector(const std::string& ofname,
                                                          uint interval)
-    : base_metrics_collector(ofname, interval), m_stats() {}
+    : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
  * Member Functions
@@ -94,8 +94,8 @@ bool collision_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_tsavg(m_stats.cum_n_entered_avoidance);
   line += csv_entry_intavg(m_stats.int_n_exited_avoidance);
   line += csv_entry_tsavg(m_stats.cum_n_exited_avoidance);
-  line += csv_entry_intavg(m_stats.int_avoidance_duration);
-  line += csv_entry_tsavg(m_stats.cum_avoidance_duration, true);
+  line += csv_entry_intavg(m_stats.int_avoidance_duration.v());
+  line += csv_entry_tsavg(m_stats.cum_avoidance_duration.v(), true);
   return true;
 } /* csv_line_build() */
 
@@ -103,7 +103,7 @@ void collision_metrics_collector::reset_after_interval(void) {
   m_stats.int_n_in_avoidance = 0;
   m_stats.int_n_entered_avoidance = 0;
   m_stats.int_n_exited_avoidance = 0;
-  m_stats.int_avoidance_duration = 0;
+  m_stats.int_avoidance_duration = rtypes::timestep(0);
 } /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);

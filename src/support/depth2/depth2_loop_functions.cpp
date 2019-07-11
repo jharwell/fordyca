@@ -165,8 +165,8 @@ void depth2_loop_functions::private_init(void) {
   config::output_config output =
       *config()->config_get<const config::output_config>();
   output.metrics.arena_grid = arenap->grid;
-  m_metrics_agg = rcppsw::make_unique<depth2_metrics_aggregator>(&output.metrics,
-                                                                 output_root());
+  m_metrics_agg = std::make_unique<depth2_metrics_aggregator>(&output.metrics,
+                                                              output_root());
 
   /* initialize cache handling */
   auto* cachep = config()->config_get<config::caches::caches_config>();
@@ -187,10 +187,10 @@ void depth2_loop_functions::private_init(void) {
    * Intitialize robot interactions with environment wth various functors/type
    * maps.
    */
-  m_interactor_map = rcppsw::make_unique<interactor_map_type>();
-  m_metric_extractor_map = rcppsw::make_unique<metric_extractor_map_type>();
-  m_los_update_map = rcppsw::make_unique<los_updater_map_type>();
-  m_task_extractor_map = rcppsw::make_unique<task_extractor_map_type>();
+  m_interactor_map = std::make_unique<interactor_map_type>();
+  m_metric_extractor_map = std::make_unique<metric_extractor_map_type>();
+  m_los_update_map = std::make_unique<los_updater_map_type>();
+  m_task_extractor_map = std::make_unique<task_extractor_map_type>();
 
   /* only needed for initialization, so not a member */
   auto config_map = detail::configurer_map_type();
@@ -238,11 +238,10 @@ void depth2_loop_functions::PreStep() {
 
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
-  arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
-                                         collector.cum_collected(),
-                                         nullptr != conv_calculator()
-                                             ? conv_calculator()->converged()
-                                             : false);
+  arena_map()->redist_governor()->update(
+      rtypes::timestep(GetSpace().GetSimulationClock()),
+      collector.cum_collected(),
+      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about caches */
   for (auto& c : arena_map()->caches()) {
@@ -265,7 +264,8 @@ void depth2_loop_functions::PreStep() {
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
-  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock()) &&
+  if (m_metrics_agg->metrics_write_all(
+          rtypes::timestep(GetSpace().GetSimulationClock())) &&
       nullptr != conv_calculator()) {
     conv_calculator()->reset_metrics();
   }
@@ -291,7 +291,7 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   loop_utils::set_robot_pos<decltype(*controller)>(
       robot, arena_map()->grid_resolution());
   loop_utils::set_robot_tick<decltype(*controller)>(
-      robot, GetSpace().GetSimulationClock());
+      robot, rtypes::timestep(GetSpace().GetSimulationClock()));
   boost::apply_visitor(robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
 
@@ -303,7 +303,7 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
    */
   auto iadaptor =
       robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
-          controller, GetSpace().GetSimulationClock());
+          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
       boost::apply_visitor(iadaptor,
                            m_interactor_map->at(controller->type_index()));
@@ -395,7 +395,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
       m_cache_manager->create(arena_map()->caches(),
                               arena_map()->block_distributor()->block_clusters(),
                               arena_map()->blocks(),
-                              GetSpace().GetSimulationClock());
+                              rtypes::timestep(GetSpace().GetSimulationClock()));
   if (created) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();

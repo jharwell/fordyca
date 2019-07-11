@@ -84,7 +84,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   bool in_collision_avoidance(void) const override final;
   bool entered_collision_avoidance(void) const override final;
   bool exited_collision_avoidance(void) const override final;
-  uint collision_avoidance_duration(void) const override final;
+  rtypes::timestep collision_avoidance_duration(void) const override final;
   rmath::vector2u avoidance_loc(void) const override final;
 
   /* goal acquisition metrics */

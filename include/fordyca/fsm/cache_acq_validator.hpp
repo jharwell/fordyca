@@ -28,6 +28,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -64,7 +65,7 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
   cache_acq_validator(const cache_acq_validator& v) = delete;
   cache_acq_validator& operator=(const cache_acq_validator& v) = delete;
 
-  bool operator()(const rmath::vector2d& loc, int id, uint timestep) const;
+  bool operator()(const rmath::vector2d& loc, int id, rtypes::timestep t) const;
 
   /* clang-format off */
   const bool                                mc_for_pickup;

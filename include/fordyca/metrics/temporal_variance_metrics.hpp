@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/metrics/base_metrics.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,13 +64,13 @@ class temporal_variance_metrics : public virtual rmetrics::base_metrics {
    * @brief Return the current value of the block manipulation penalty present
    * in the environment.
    */
-  virtual double env_block_manipulation(void) const = 0;
+  virtual rtypes::timestep env_block_manipulation(void) const = 0;
 
   /**
    * @brief Return the current value of the cache usage penalty present in the
    * environment.
    */
-  virtual double env_cache_usage(void) const = 0;
+  virtual rtypes::timestep env_cache_usage(void) const = 0;
 };
 
 NS_END(metrics, fordyca);

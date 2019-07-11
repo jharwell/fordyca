@@ -85,14 +85,14 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
    */
-  interactor_status operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     /*
      * If the controller was serving a penalty and has not finished yet, nothing
      * to do. If the controller was serving a penalty AND has satisfied it as of
      * this timestep, then actually perform the drop.
      */
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
         finish_cache_site_block_drop(controller);
         return interactor_status::ekFreeBlockDrop;
       }
@@ -109,7 +109,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
      */
     auto status = m_penalty_handler->penalty_init(controller,
                                                   tv::block_op_src::ekCACHE_SITE_DROP,
-                                                  timestep,
+                                                  t,
                                                   m_cache_manager->cache_proximity_dist());
     if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
       auto prox_status = loop_utils::new_cache_cache_proximity(controller,
@@ -131,7 +131,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
             status.entity_id,
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
-            m_cache_manager->cache_proximity_dist());
+            m_cache_manager->cache_proximity_dist().v());
     /*
      * Because caches can be dynamically created/destroyed, we cannot rely on
      * the index position of cache i to be the same as its ID, so we need to
@@ -172,7 +172,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                                      const tv::temporal_penalty<T>& penalty) {
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
                                     rmath::dvec2uvec(controller.position2D(),
-                                                     m_map->grid_resolution()),
+                                                     m_map->grid_resolution().v()),
                                     m_map->grid_resolution());
 
     drop_op.visit(*m_map);

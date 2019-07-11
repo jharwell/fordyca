@@ -69,8 +69,8 @@ void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
 } /* sel_exception_add() */
 
 void cache_sel_matrix::sel_exceptions_clear(void) {
-  boost::get<std::vector<int>>(this->operator[](kPickupExceptions)).clear();
-  boost::get<std::vector<int>>(this->operator[](kDropExceptions)).clear();
+  boost::get<std::vector<int>>(this->at(kPickupExceptions)).clear();
+  boost::get<std::vector<int>>(this->at(kDropExceptions)).clear();
 } /* sel_exceptions_clear() */
 
 NS_END(controller, fordyca);

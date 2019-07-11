@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
+
 #include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
@@ -54,7 +56,7 @@ class movement_metrics : virtual public rmetrics::base_metrics {
    * This will be called every timestep by the \ref movement_metrics_collector
    * on all robots.
    */
-  virtual double distance(void) const = 0;
+  virtual rtypes::spatial_dist distance(void) const = 0;
 
   /**
    * @brief Get the velocity that a robot has on a single timestep.

@@ -37,7 +37,7 @@ NS_START(fordyca, support, oracle);
  ******************************************************************************/
 oracle_manager::oracle_manager(
     const config::oracle::oracle_manager_config* const config)
-    : m_entities(rcppsw::make_unique<class entities_oracle>(&config->entities)),
+    : m_entities(std::make_unique<class entities_oracle>(&config->entities)),
       m_tasking(nullptr) {}
 
 /*******************************************************************************

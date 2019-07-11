@@ -126,7 +126,7 @@ void base_loop_functions::convergence_init(
   if (nullptr == config) {
     return;
   }
-  m_conv_calc = rcppsw::make_unique<rswc::convergence_calculator>(
+  m_conv_calc = std::make_unique<rswc::convergence_calculator>(
       config,
       std::bind(&base_loop_functions::calc_robot_headings,
                 this,
@@ -179,7 +179,7 @@ void base_loop_functions::arena_map_init(
   auto* aconfig = repo->config_get<config::arena::arena_map_config>();
   auto* vconfig = repo->config_get<config::visualization_config>();
 
-  m_arena_map = rcppsw::make_unique<ds::arena_map>(aconfig);
+  m_arena_map = std::make_unique<ds::arena_map>(aconfig);
   if (!m_arena_map->initialize(this)) {
     ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
@@ -201,7 +201,7 @@ void base_loop_functions::oracle_init(
     const config::oracle::oracle_manager_config* const oraclep) {
   if (nullptr != oraclep) {
     ER_INFO("Creating oracle manager");
-    m_oracle_manager = rcppsw::make_unique<oracle::oracle_manager>(oraclep);
+    m_oracle_manager = std::make_unique<oracle::oracle_manager>(oraclep);
   }
 } /* oracle_init() */
 

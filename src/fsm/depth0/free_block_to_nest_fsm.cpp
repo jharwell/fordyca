@@ -144,7 +144,8 @@ __rcsw_pure bool free_block_to_nest_fsm::exited_collision_avoidance(void) const 
          base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
-__rcsw_pure uint free_block_to_nest_fsm::collision_avoidance_duration(void) const {
+__rcsw_pure rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(
+    void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.collision_avoidance_duration();
   } else {

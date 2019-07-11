@@ -28,11 +28,14 @@
 #include <vector>
 #include <random>
 #include <boost/optional.hpp>
+#include <memory>
 
 #include "fordyca/nsalias.hpp"
-#include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
+
+#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,7 +68,7 @@ class random_distributor final : public base_distributor,
                            public rer::client<random_distributor> {
  public:
   random_distributor(const ds::arena_grid::view& grid,
-                     double resolution);
+                     rtypes::discretize_ratio resolution);
 
   random_distributor& operator=(const random_distributor& s) = delete;
 
@@ -103,11 +106,11 @@ class random_distributor final : public base_distributor,
                          const ds::cell2D* cell);
 
   /* clang-format off */
-  const double          mc_resolution;
-  const rmath::vector2u mc_origin;
-  const rmath::rangeu   mc_xspan;
-  const rmath::rangeu   mc_yspan;
-  ds::arena_grid::view  m_grid;
+  const rtypes::discretize_ratio mc_resolution;
+  const rmath::vector2u         mc_origin;
+  const rmath::rangeu           mc_xspan;
+  const rmath::rangeu           mc_yspan;
+  ds::arena_grid::view          m_grid;
   /* clang-format on */
 };
 

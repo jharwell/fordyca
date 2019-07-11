@@ -29,12 +29,12 @@
 #include "fordyca/repr/unicell_movable_entity.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, repr);
-namespace prototype = rcppsw::patterns::prototype;
 
 /*******************************************************************************
  * Class Definitions
@@ -52,7 +52,7 @@ namespace prototype = rcppsw::patterns::prototype;
 class base_block : public unicell_movable_entity,
                    public colored_entity,
                    public metrics::blocks::transport_metrics,
-                   public prototype::clonable<base_block> {
+                   public rpprototype::clonable<base_block> {
  public:
   /**
    * @brief Out of sight location base_blocks are moved to when a robot picks
@@ -106,8 +106,8 @@ class base_block : public unicell_movable_entity,
   /* transport metrics */
   void reset_metrics(void) override final;
   uint total_transporters(void) const override { return m_transporters; }
-  double total_transport_time(void) const override;
-  double initial_wait_time(void) const override;
+  rtypes::timestep total_transport_time(void) const override;
+  rtypes::timestep initial_wait_time(void) const override;
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
@@ -119,24 +119,24 @@ class base_block : public unicell_movable_entity,
   }
 
   /**
-   * @brief Set the time that the base_block is picked up for the first time after
-   * being distributed in the arena.
+   * @brief Set the time that the base_block is picked up for the first time
+   * after being distributed in the arena.
    *
    * @param time The current simulation time.
    */
-  void first_pickup_time(double time);
+  void first_pickup_time(rtypes::timestep t);
 
   /**
    * @brief Set the time that the base_block dropped in the nest.
    *
    * @param time The current simulation time.
    */
-  void nest_drop_time(double time) { m_nest_drop_time = time; }
+  void nest_drop_time(rtypes::timestep t) { m_nest_drop_time = t; }
 
   /**
    * @brief Set the time that the base_block was distributed in the arena.
    */
-  void distribution_time(double dist_time) { m_dist_time = dist_time; }
+  void distribution_time(rtypes::timestep t) { m_dist_time = t; }
 
   /**
    * @brief Reset the the base_blocks carried/not carried state when it is not
@@ -170,12 +170,12 @@ class base_block : public unicell_movable_entity,
 
  private:
   /* clang-format off */
-  int    m_robot_id{-1};
-  uint   m_transporters{0};
-  bool   m_first_pickup{false};
-  double m_first_pickup_time{0.0};
-  double m_dist_time{0.0};
-  double m_nest_drop_time{0.0};
+  int              m_robot_id{-1};
+  uint             m_transporters{0};
+  bool             m_first_pickup{false};
+  rtypes::timestep m_first_pickup_time{0};
+  rtypes::timestep m_dist_time{0};
+  rtypes::timestep m_nest_drop_time{0};
   /* clang-format on */
 };
 

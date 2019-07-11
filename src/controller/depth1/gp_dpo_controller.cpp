@@ -102,7 +102,7 @@ void gp_dpo_controller::shared_init(
 
   /* cache selection matrix */
   m_cache_sel_matrix =
-      rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
+      std::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
 } /* shared_init() */
 
 void gp_dpo_controller::private_init(

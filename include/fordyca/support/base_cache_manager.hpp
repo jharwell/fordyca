@@ -30,6 +30,7 @@
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,11 +71,11 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
   uint caches_depleted(void) const override final {
     return m_depletion_ages.size();
   }
-  std::vector<uint> cache_depletion_ages(void) const override {
+  std::vector<rtypes::timestep> cache_depletion_ages(void) const override {
     return m_depletion_ages;
   }
 
-  void cache_depleted(uint age) { m_depletion_ages.push_back(age); }
+  void cache_depleted(rtypes::timestep age) { m_depletion_ages.push_back(age); }
   void reset_metrics(void) override final {
     m_caches_created = 0;
     m_depletion_ages.clear();
@@ -87,9 +88,9 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
 
  private:
   /* clang-format off */
-  uint                   m_caches_created{0};
-  std::vector<uint>      m_depletion_ages{};
-  ds::arena_grid * const m_grid;
+  uint                          m_caches_created{0};
+  std::vector<rtypes::timestep> m_depletion_ages{};
+  ds::arena_grid * const        m_grid;
   /* clang-format on */
 };
 

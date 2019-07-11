@@ -71,7 +71,9 @@ class crw_fsm final : public base_foraging_fsm,
   RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::timestep,
+                            collision_avoidance_duration,
+                            const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */

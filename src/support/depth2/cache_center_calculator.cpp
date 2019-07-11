@@ -42,9 +42,9 @@ using ds::arena_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
-                                                 double cache_dim)
+                                                 rtypes::spatial_dist cache_dim)
     : ER_CLIENT_INIT("fordyca.support.depth2.cache_center_calculator"),
-      m_cache_dim(cache_dim),
+      mc_cache_dim(cache_dim),
       m_grid(grid),
       m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
 
@@ -152,10 +152,10 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundar
    * We need to be sure the center of the new cache is not near the arena
    * boundaries, in order to avoid all sorts of weird corner cases.
    */
-  double x_max = m_grid->xrsize() - m_cache_dim;
-  double x_min = m_cache_dim;
-  double y_max = m_grid->yrsize() - m_cache_dim;
-  double y_min = m_cache_dim;
+  double x_max = m_grid->xrsize() - mc_cache_dim.v();
+  double x_min = mc_cache_dim.v();
+  double y_max = m_grid->yrsize() - mc_cache_dim.v();
+  double y_min = mc_cache_dim.v();
 
   rmath::rangeu xbounds(static_cast<uint>(std::ceil(x_min)),
                         static_cast<uint>(std::floor(x_max)));
@@ -208,8 +208,8 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
 
   auto exc_xspan = ent->xspan();
   auto exc_yspan = ent->yspan();
-  auto newc_xspan = repr::base_entity::xspan(center_r, m_cache_dim);
-  auto newc_yspan = repr::base_entity::yspan(center_r, m_cache_dim);
+  auto newc_xspan = repr::base_entity::xspan(center_r, mc_cache_dim.v());
+  auto newc_yspan = repr::base_entity::yspan(center_r, mc_cache_dim.v());
 
   ER_TRACE("cache: xspan=%s,center=%s/%s, ent%d: xspan=%s",
            newc_xspan.to_str().c_str(),
@@ -234,15 +234,15 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
    */
   std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
   std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
-  double x_delta = std::copysign(m_grid->resolution(), xrnd(m_rng));
-  double y_delta = std::copysign(m_grid->resolution(), yrnd(m_rng));
+  double x_delta = std::copysign(m_grid->resolution().v(), xrnd(m_rng));
+  double y_delta = std::copysign(m_grid->resolution().v(), yrnd(m_rng));
 
   /*
    * Need to pass cache dimensions rather than dimensions of the entity, which
    * may be a block.
    */
   auto status = loop_utils::placement_conflict(
-      center_r, rmath::vector2d(m_cache_dim, m_cache_dim), ent);
+      center_r, rmath::vector2d(mc_cache_dim.v(), mc_cache_dim.v()), ent);
 
   if (status.x_conflict) {
     ER_TRACE("cache: xspan=%s,center=%s overlap ent%d: xspan=%s, x_delta=%f",

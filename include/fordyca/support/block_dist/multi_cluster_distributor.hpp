@@ -51,7 +51,7 @@ class multi_cluster_distributor final : public base_distributor,
                                   public rer::client<multi_cluster_distributor> {
  public:
   multi_cluster_distributor(std::vector<ds::arena_grid::view>& grids,
-                            double arena_resolution,
+                            rtypes::discretize_ratio resolution,
                             uint maxsize);
 
   multi_cluster_distributor& operator=(const multi_cluster_distributor& s) = delete;

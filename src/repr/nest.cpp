@@ -33,7 +33,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 nest::nest(const rmath::vector2d& dim,
            const rmath::vector2d& loc,
-           double resolution,
+           rtypes::discretize_ratio resolution,
            const rutils::color& light_color)
     : unicell_immovable_entity(dim, loc, resolution),
       colored_entity(rcppsw::utils::color::kGRAY70),

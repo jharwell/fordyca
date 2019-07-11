@@ -40,7 +40,7 @@ NS_START(fordyca, support, block_dist);
  * Constructors/Destructor
  ******************************************************************************/
 random_distributor::random_distributor(const ds::arena_grid::view& grid,
-                                       double resolution)
+                                       rtypes::discretize_ratio resolution)
     : ER_CLIENT_INIT("fordyca.support.block_dist.random"),
       mc_resolution(resolution),
       mc_origin(grid.origin()->loc()),
@@ -50,7 +50,7 @@ random_distributor::random_distributor(const ds::arena_grid::view& grid,
   ER_INFO("Area: xrange=%s,yrange=%s,resolution=%f",
           mc_xspan.to_str().c_str(),
           mc_yspan.to_str().c_str(),
-          mc_resolution);
+          mc_resolution.v());
 }
 
 /*******************************************************************************
@@ -183,7 +183,7 @@ boost::optional<random_distributor::coord_search_res_t> random_distributor::
     rel = {x, y};
     abs = {rel.x() + mc_origin.x(), rel.y() + mc_origin.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
-    rmath::vector2d abs_r = rmath::uvec2dvec(abs, mc_resolution);
+    rmath::vector2d abs_r = rmath::uvec2dvec(abs, mc_resolution.v());
     auto status = loop_utils::placement_conflict(abs_r, block_dim, ent);
     return status.x_conflict && status.y_conflict && count++ <= kMAX_DIST_TRIES;
   }));

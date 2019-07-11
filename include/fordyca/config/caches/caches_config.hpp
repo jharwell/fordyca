@@ -48,7 +48,7 @@ struct caches_config : public rconfig::base_config {
    * @brief How large are cache (geometrical area), when created (same for
    * static and dynamic) ?
    */
-  double               dimension{0.0};
+  rtypes::spatial_dist dimension{0.0};
   static_cache_config  static_{}; // NOLINT
   dynamic_cache_config dynamic{};
 };

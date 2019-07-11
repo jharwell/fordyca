@@ -50,7 +50,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
       m_cell_stats(fsm::cell2D_fsm::ekST_MAX_STATES),
       m_los(),
-      m_map(rcppsw::make_unique<ds::dpo_semantic_map>(config, id)) {}
+      m_map(std::make_unique<ds::dpo_semantic_map>(config, id)) {}
 
 /*******************************************************************************
  * Member Functions

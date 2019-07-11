@@ -86,11 +86,11 @@ class temporal_penalty_handler
    * @brief Given the current timestep, get the value of the penalty waveform
    * that would apply if a robot were to start serving a penalty.
    */
-  double timestep_penalty(double t) const {
+  rtypes::timestep timestep_penalty(rtypes::timestep t) const {
     if (LIKELY(nullptr != m_penalty)) {
-      return m_penalty->value(t);
+      return rtypes::timestep(static_cast<uint>(m_penalty->value(t.v())));
     }
-    return 0.0;
+    return rtypes::timestep(0);
   }
 
   /**
@@ -104,14 +104,14 @@ class temporal_penalty_handler
    * @return \c TRUE If the robot is currently waiting AND it has satisfied its
    * penalty.
    */
-  __rcsw_pure bool penalty_satisfied(const T& controller, uint timestep) const {
+  __rcsw_pure bool penalty_satisfied(const T& controller, rtypes::timestep t) const {
     auto it = std::find_if(m_penalty_list.begin(),
                            m_penalty_list.end(),
                            [&](const temporal_penalty<T>& p) {
                              return p.controller() == &controller;
                            });
     if (it != m_penalty_list.end()) {
-      return it->penalty_satisfied(timestep);
+      return it->penalty_satisfied(t);
     }
     return false;
   }
@@ -189,34 +189,35 @@ class temporal_penalty_handler
    * the list the SAME timestep they are added, so the handler incorrectly
    * thinks that there is no conflict.
    *
-   * @param timestep The current timestep.
+   * @param t The current timestep.
    */
-  uint deconflict_penalty_finish(uint timestep) const {
-    uint penalty = 0;
+  rtypes::timestep deconflict_penalty_finish(rtypes::timestep t) const {
+    rtypes::timestep penalty(0);
 
     /* can be NULL if penalty handling is disabled */
     if (nullptr != m_penalty) {
-      penalty = static_cast<uint>(m_penalty->value(timestep));
+      penalty.set(static_cast<uint>(m_penalty->value(t.v())));
     }
 
-    if (0 == penalty) {
-      ++penalty;
+    if (penalty == 0) {
+      penalty = rtypes::timestep(penalty.v() + 1);
     }
     m_orig_penalty = penalty;
     for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
-      if (it->start_time() + it->penalty() == timestep + penalty) {
-        ++penalty;
+      if (it->start_time() + it->penalty() == t + penalty) {
+        penalty.set(penalty.v() + 1);
         it = m_penalty_list.begin();
       }
     } /* for(i..) */
     return penalty;
   }
 
-  uint original_penalty(void) const { return m_orig_penalty; }
+  rtypes::timestep original_penalty(void) const { return m_orig_penalty; }
 
   /* clang-format off */
-  mutable uint                   m_orig_penalty{0};
   const std::string              mc_name;
+
+  mutable rtypes::timestep       m_orig_penalty{0};
   std::list<temporal_penalty<T>> m_penalty_list{};
   std::unique_ptr<rct::waveform> m_penalty;
   /* clang-format on */

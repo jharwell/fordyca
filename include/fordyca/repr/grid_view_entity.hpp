@@ -28,8 +28,10 @@
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/nsalias.hpp"
 #include "fordyca/repr/base_entity.hpp"
+
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,14 +55,14 @@ NS_START(fordyca, repr);
 template <class T>
 class grid_view_entity : public base_entity {
  public:
-  grid_view_entity(const T& view, double resolution)
+  grid_view_entity(const T& view, rtypes::discretize_ratio resolution)
       : mc_resolution(resolution), m_view(view) {}
 
   ~grid_view_entity(void) override = default;
 
   const rmath::vector2u& danchor(void) const { return m_view.origin()->loc(); }
   rmath::vector2d ranchor(void) const {
-    return rmath::uvec2dvec(m_view.origin()->loc(), mc_resolution);
+    return rmath::uvec2dvec(m_view.origin()->loc(), mc_resolution.v());
   }
 
   /**
@@ -69,7 +71,7 @@ class grid_view_entity : public base_entity {
    */
   rmath::ranged xspan(void) const override final {
     return rmath::ranged(ranchor().x(),
-                         ranchor().x() + m_view.shape()[0] * mc_resolution);
+                         ranchor().x() + m_view.shape()[0] * mc_resolution.v());
   }
 
   /**
@@ -78,7 +80,7 @@ class grid_view_entity : public base_entity {
    */
   rmath::ranged yspan(void) const override final {
     return rmath::ranged(ranchor().y(),
-                         ranchor().y() + m_view.shape()[1] * mc_resolution);
+                         ranchor().y() + m_view.shape()[1] * mc_resolution.v());
   }
 
   /**
@@ -108,8 +110,8 @@ class grid_view_entity : public base_entity {
 
  private:
   /* clang-format off */
-  const double mc_resolution;
-  T            m_view;
+  const rtypes::discretize_ratio mc_resolution;
+  T                              m_view;
   /* clang-format on */
 };
 

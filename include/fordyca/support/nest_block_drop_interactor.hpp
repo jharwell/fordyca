@@ -87,16 +87,16 @@ class nest_block_drop_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep The current timestep.
    */
-  interactor_status operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
-        finish_nest_block_drop(controller, timestep);
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+        finish_nest_block_drop(controller, t);
         return interactor_status::ekNestBlockDrop;
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::block_op_src::ekNEST_DROP,
-                                      timestep);
+                                      t);
     }
     return interactor_status::ekNoEvent;
   }
@@ -106,7 +106,7 @@ class nest_block_drop_interactor
    * @brief Determine if a robot is waiting to drop a block in the nest, and if
    * so send it the \ref nest_block_drop event.
    */
-  void finish_nest_block_drop(T& controller, uint timestep) {
+  void finish_nest_block_drop(T& controller, rtypes::timestep t) {
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
     ER_ASSERT(transport_goal_type::ekNEST == controller.block_transport_goal(),
               "Controller still has nest as goal");
@@ -118,7 +118,7 @@ class nest_block_drop_interactor
      */
     const tv::temporal_penalty<T>& p = *m_penalty_handler->find(controller);
 
-    perform_nest_block_drop(controller, p, timestep);
+    perform_nest_block_drop(controller, p, t);
     m_penalty_handler->remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
               "Multiple instances of same controller serving drop penalty");
@@ -130,12 +130,12 @@ class nest_block_drop_interactor
    */
   void perform_nest_block_drop(T& controller,
                                const tv::temporal_penalty<T>& penalty,
-                               uint timestep) {
+                               rtypes::timestep t) {
     /*
      * We have to do this asynchronous to the rest of metric collection, because
      * the nest block drop event resets block metrics.
      */
-    controller.block()->nest_drop_time(timestep);
+    controller.block()->nest_drop_time(t);
     m_metrics_agg->collect_from_block(controller.block().get());
 
     /*
@@ -145,7 +145,7 @@ class nest_block_drop_interactor
      */
     controller.block_manip_collator()->penalty_served(penalty.penalty());
 
-    events::nest_block_drop_visitor drop_op(controller.block(), timestep);
+    events::nest_block_drop_visitor drop_op(controller.block(), t);
 
     /* Update arena map state due to a block nest drop */
     drop_op.visit(*m_map);

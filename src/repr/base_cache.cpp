@@ -38,7 +38,7 @@ constexpr size_t base_cache::kMinBlocks;
  * Constructors/Destructor
  ******************************************************************************/
 base_cache::base_cache(const params& p)
-    : unicell_immovable_entity(rmath::vector2d(p.dimension, p.dimension),
+    : unicell_immovable_entity(rmath::vector2d(p.dimension.v(), p.dimension.v()),
                                p.center,
                                p.resolution),
       colored_entity(rutils::color::kGRAY40),
@@ -59,8 +59,8 @@ void base_cache::block_remove(const std::shared_ptr<base_block>& block) {
 } /* block_remove() */
 
 std::unique_ptr<base_cache> base_cache::clone(void) const {
-  return rcppsw::make_unique<base_cache>(
-      params{xdim(), mc_resolution, rloc(), blocks(), id()});
+  return std::make_unique<base_cache>(params{
+      rtypes::spatial_dist(xdim()), mc_resolution, rloc(), blocks(), id()});
 } /* clone() */
 
 NS_END(fordyca, repr);

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,16 +56,16 @@ class temporal_penalty {
    */
   temporal_penalty(const T* const controller,
                    int id,
-                   uint penalty,
-                   uint start_time)
+                   rtypes::timestep penalty,
+                   rtypes::timestep start_time)
       : mc_id(id),
         mc_penalty(penalty),
         mc_start_time(start_time),
         mc_controller(controller) {}
 
   const T* controller(void) const { return mc_controller; }
-  uint start_time(void) const { return mc_start_time; }
-  uint penalty(void) const { return mc_penalty; }
+  rtypes::timestep start_time(void) const { return mc_start_time; }
+  rtypes::timestep penalty(void) const { return mc_penalty; }
   int id(void) const { return mc_id; }
 
   bool operator==(const temporal_penalty& other) {
@@ -75,16 +76,16 @@ class temporal_penalty {
    * @brief If \c TRUE, then the robot has satisfied the block_manipulation
    * penalty.
    */
-  bool penalty_satisfied(uint current_time) const {
+  bool penalty_satisfied(rtypes::timestep current_time) const {
     return current_time - mc_start_time >= mc_penalty;
   }
 
  private:
   /* clang-format off */
-  int           mc_id;
-  uint          mc_penalty;
-  uint          mc_start_time;
-  const T*const mc_controller;
+  const int              mc_id;
+  const rtypes::timestep mc_penalty;
+  const rtypes::timestep mc_start_time;
+  const T*const          mc_controller;
   /* clang-format on */
 };
 

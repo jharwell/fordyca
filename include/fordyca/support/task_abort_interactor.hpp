@@ -158,7 +158,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
     }
     events::free_block_drop_visitor drop_op(
         controller.block(),
-        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution()),
+        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution());
     if (!conflict) {
       drop_op.visit(controller);

@@ -48,7 +48,8 @@ foraging_task::foraging_task(const std::string& name,
 __rcsw_pure double foraging_task::current_time(void) const {
   return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
       ->sensors()
-      ->tick();
+      ->tick()
+      .v();
 } /* current_time() */
 
 __rcsw_pure bool foraging_task::task_in_depth2(const polled_task* const task) {

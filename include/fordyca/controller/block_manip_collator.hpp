@@ -28,6 +28,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,9 +54,9 @@ class block_manip_collator : public metrics::blocks::manipulation_metrics {
   bool free_drop_event(void) const override { return m_free_drop_event; }
   bool cache_pickup_event(void) const override { return m_cache_pickup_event; }
   bool cache_drop_event(void) const override { return m_cache_drop_event; }
-  uint penalty_served(void) const override { return m_penalty; }
+  rtypes::timestep penalty_served(void) const override { return m_penalty; }
 
-  void penalty_served(uint penalty) { m_penalty = penalty; }
+  void penalty_served(rtypes::timestep penalty) { m_penalty = penalty; }
   void free_pickup_event(bool b) { m_free_pickup_event = b; }
   void free_drop_event(bool b) { m_free_drop_event = b; }
   void cache_pickup_event(bool b) { m_cache_pickup_event = b; }
@@ -70,7 +71,7 @@ class block_manip_collator : public metrics::blocks::manipulation_metrics {
 
  private:
   /* clang-format off */
-  uint m_penalty{0};
+  rtypes::timestep m_penalty{0};
   bool m_free_pickup_event{false};
   bool m_free_drop_event{false};
   bool m_cache_pickup_event{false};

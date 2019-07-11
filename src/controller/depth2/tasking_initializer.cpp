@@ -78,7 +78,7 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
                                              saa_subsystem(),
                                              perception()->dpo_store());
   auto cache_starter_fsm =
-      rcppsw::make_unique<fsm::depth2::block_to_cache_site_fsm>(
+      std::make_unique<fsm::depth2::block_to_cache_site_fsm>(
           block_sel_matrix(),
           cache_sel_matrix(),
           saa_subsystem(),
@@ -86,7 +86,7 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
           block_factory.create(exp_config->block_strategy, &expbp));
 
   auto cache_finisher_fsm =
-      rcppsw::make_unique<fsm::depth2::block_to_new_cache_fsm>(
+      std::make_unique<fsm::depth2::block_to_new_cache_fsm>(
           block_sel_matrix(),
           cache_sel_matrix(),
           saa_subsystem(),
@@ -94,26 +94,26 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
           block_factory.create(exp_config->block_strategy, &expbp));
 
   auto cache_transferer_fsm =
-      rcppsw::make_unique<fsm::depth2::cache_transferer_fsm>(
+      std::make_unique<fsm::depth2::cache_transferer_fsm>(
           cache_sel_matrix(),
           saa_subsystem(),
           perception()->dpo_store(),
           cache_factory.create(exp_config->cache_strategy, &expbp));
 
   auto cache_collector_fsm =
-      rcppsw::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
+      std::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
           cache_sel_matrix(),
           saa_subsystem(),
           perception()->dpo_store(),
           cache_factory.create(exp_config->cache_strategy, &expbp));
 
-  auto cache_starter = rcppsw::make_unique<tasks::depth2::cache_starter>(
+  auto cache_starter = std::make_unique<tasks::depth2::cache_starter>(
       task_config, std::move(cache_starter_fsm));
-  auto cache_finisher = rcppsw::make_unique<tasks::depth2::cache_finisher>(
+  auto cache_finisher = std::make_unique<tasks::depth2::cache_finisher>(
       task_config, std::move(cache_finisher_fsm));
-  auto cache_transferer = rcppsw::make_unique<tasks::depth2::cache_transferer>(
+  auto cache_transferer = std::make_unique<tasks::depth2::cache_transferer>(
       task_config, std::move(cache_transferer_fsm));
-  auto cache_collector = rcppsw::make_unique<tasks::depth2::cache_collector>(
+  auto cache_collector = std::make_unique<tasks::depth2::cache_collector>(
       task_config, std::move(cache_collector_fsm));
 
   auto collector =
@@ -211,7 +211,7 @@ void tasking_initializer::depth2_exec_est_init(
 std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
     const config::depth2::controller_repository& config_repo) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
-  auto graph = rcppsw::make_unique<rta::bi_tdgraph>(task_config);
+  auto graph = std::make_unique<rta::bi_tdgraph>(task_config);
   const auto* execp =
       std::make_unique<rta::config::task_executive_config>().get();
 
@@ -227,7 +227,7 @@ std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
   depth2_exec_est_init(config_repo, map2, graph.get());
 
   graph->active_tab_init(execp->tab_init_method);
-  return rcppsw::make_unique<rta::bi_tdgraph_executive>(execp, std::move(graph));
+  return std::make_unique<rta::bi_tdgraph_executive>(execp, std::move(graph));
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);

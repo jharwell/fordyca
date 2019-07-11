@@ -59,7 +59,7 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
                               boost::get<rmath::vector2d>(
                                   mc_matrix->find(cselm::kNestLoc)->second));
 
-    double utility = u.calc(position, c.density().last_result());
+    double utility = u.calc(position, c.density());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
              c.ent()->id(),
@@ -91,14 +91,14 @@ bool new_cache_selector::new_cache_is_excluded(
     const ds::dp_cache_map& existing_caches,
     const ds::dp_block_map& blocks,
     const repr::base_block* const new_cache) const {
-  double cache_prox =
-      boost::get<double>(mc_matrix->find(cselm::kCacheProxDist)->second);
-  double cluster_prox =
-      boost::get<double>(mc_matrix->find(cselm::kClusterProxDist)->second);
+  auto cache_prox = boost::get<rtypes::spatial_dist>(
+      mc_matrix->find(cselm::kCacheProxDist)->second);
+  auto cluster_prox = boost::get<rtypes::spatial_dist>(
+      mc_matrix->find(cselm::kClusterProxDist)->second);
 
   for (auto& ec : existing_caches.const_values_range()) {
     double dist = (ec.ent()->rloc() - new_cache->rloc()).length();
-    if (dist <= cache_prox) {
+    if (cache_prox >= dist) {
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
           new_cache->id(),
@@ -108,7 +108,7 @@ bool new_cache_selector::new_cache_is_excluded(
           ec.ent()->rloc().to_str().c_str(),
           ec.ent()->dloc().to_str().c_str(),
           dist,
-          cache_prox);
+          cache_prox.v());
       return true;
     }
   } /* for(&ec..) */
@@ -129,7 +129,7 @@ bool new_cache_selector::new_cache_is_excluded(
     }
     double dist = (b.ent()->rloc() - new_cache->rloc()).length();
 
-    if (dist <= cluster_prox) {
+    if (cluster_prox >= dist) {
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to potential block "
           "cluster@%s/%s (%f <= %f)",
@@ -139,7 +139,7 @@ bool new_cache_selector::new_cache_is_excluded(
           b.ent()->rloc().to_str().c_str(),
           b.ent()->dloc().to_str().c_str(),
           dist,
-          cluster_prox);
+          cluster_prox.v());
       return true;
     }
   } /* for(&b..) */

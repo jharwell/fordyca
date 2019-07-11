@@ -71,14 +71,16 @@ class arena_cache final : public base_cache,
 
   void has_block_pickup(void) { m_block_pickups = 1; }
   void has_block_drop(void) { m_block_drops = 1; }
-  void penalty_served(uint duration) { m_penalty_count += duration; }
+  void penalty_served(rtypes::timestep duration) {
+    m_penalty_count += duration;
+  }
   argos::CLightEntity* light(void) const { return m_light; }
 
  private:
   /* clang-format off */
   uint                 m_block_pickups{0};
   uint                 m_block_drops{0};
-  uint                 m_penalty_count{0};
+  rtypes::timestep     m_penalty_count{0};
   argos::CLightEntity* m_light;
   /* clang-format on */
 };

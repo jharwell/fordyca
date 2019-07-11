@@ -148,7 +148,7 @@ void base_controller::saa_init(const config::actuation_config* const actuation_p
       .battery = rrhal::sensors::battery_sensor(nullptr),
 #endif /* FORDYCA_WITH_ROBOT_BATTERY */
   };
-  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
+  m_saa = std::make_unique<controller::saa_subsystem>(
       actuation_p, sensing_p, &alist, &slist);
 } /* saa_init() */
 
@@ -196,7 +196,7 @@ void base_controller::output_init(const config::output_config* const config) {
 #endif
 } /* output_init() */
 
-void base_controller::tick(uint tick) {
+void base_controller::tick(rtypes::timestep tick) {
   m_saa->sensing()->tick(tick);
 } /* tick() */
 
@@ -205,7 +205,7 @@ int base_controller::entity_id(void) const {
 } /* entity_id() */
 
 void base_controller::ndc_pusht(void) {
-  ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick()) + "] [" +
+  ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick().v()) + "] [" +
               GetId() + "]");
 }
 
@@ -223,15 +223,15 @@ void base_controller::tv_init(const support::tv::tv_manager* tv_manager) {
 /*******************************************************************************
  * Movement Metrics
  ******************************************************************************/
-__rcsw_pure double base_controller::distance(void) const {
+__rcsw_pure rtypes::spatial_dist base_controller::distance(void) const {
   /*
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
    */
   if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->sensing()->heading().length();
+    return rtypes::spatial_dist(saa_subsystem()->sensing()->heading().length());
   }
-  return 0;
+  return rtypes::spatial_dist(0.0);
 } /* distance() */
 
 rmath::vector2d base_controller::velocity(void) const {

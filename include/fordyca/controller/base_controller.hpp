@@ -36,6 +36,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -91,7 +92,7 @@ class base_controller : public argos::CCI_Controller,
   virtual std::type_index type_index(void) const = 0;
 
   /* movement metrics */
-  double distance(void) const override;
+  rtypes::spatial_dist distance(void) const override;
   rmath::vector2d velocity(void) const override;
 
   /* swarm spatial 2D metrics */
@@ -182,7 +183,7 @@ class base_controller : public argos::CCI_Controller,
    * there would no doubt be considerable skew; this is a simulation hack that
    * makes things much nicer/easier to deal with.
    */
-  void tick(uint tick);
+  void tick(rtypes::timestep tick);
 
   const class block_manip_collator* block_manip_collator(void) const {
     return &m_block_manip;

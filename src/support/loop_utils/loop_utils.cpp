@@ -100,20 +100,21 @@ __rcsw_pure bool block_drop_overlap_with_nest(
 
 proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
                                               const ds::arena_map& map,
-                                              double block_prox_dist) {
+                                              rtypes::spatial_dist block_prox) {
   for (const auto& b : map.blocks()) {
-    if ((b->rloc() - c.position2D()).length() <= block_prox_dist) {
+    if (block_prox >= (b->rloc() - c.position2D()).length()) {
       return {b->id(), b->rloc(), b->rloc() - c.position2D()};
     }
   } /* for(&b..) */
   return {-1, rmath::vector2d(), rmath::vector2d()};
 } /* cache_site_block_proximity() */
 
-proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,
-                                             const ds::arena_map& map,
-                                             double proximity_dist) {
+proximity_status_t new_cache_cache_proximity(
+    const controller::base_controller& c,
+    const ds::arena_map& map,
+    rtypes::spatial_dist new_cache_prox) {
   for (const auto& cache : map.caches()) {
-    if ((cache->rloc() - c.position2D()).length() <= proximity_dist) {
+    if (new_cache_prox >= (cache->rloc() - c.position2D()).length()) {
       return {cache->id(), cache->rloc(), cache->rloc() - c.position2D()};
     }
   } /* for(&b..) */
@@ -133,8 +134,8 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
     const ds::arena_map& map,
     uint los_grid_size,
     const rmath::vector2d& pos) {
-  rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution());
-  return rcppsw::make_unique<repr::line_of_sight>(
+  rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution().v());
+  return std::make_unique<repr::line_of_sight>(
       map.subgrid(position.x(), position.y(), los_grid_size), position);
 } /* compute_robot_los */
 

@@ -100,7 +100,7 @@ class cached_block_to_nest_fsm final : public base_foraging_fsm,
   bool in_collision_avoidance(void) const override;
   bool entered_collision_avoidance(void) const override;
   bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
+  rtypes::timestep collision_avoidance_duration(void) const override;
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */

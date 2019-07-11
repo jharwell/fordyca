@@ -46,10 +46,10 @@ class dynamic_cache_creator : public base_cache_creator,
                               public rer::client<dynamic_cache_creator> {
  public:
   struct params {
-    ds::arena_grid* grid;
-    double          cache_dim;
-    double          min_dist;
-    uint            min_blocks;
+    ds::arena_grid*      grid;
+    rtypes::spatial_dist cache_dim;
+    rtypes::spatial_dist min_dist;
+    uint                 min_blocks;
   };
   explicit dynamic_cache_creator(const struct params* p);
 
@@ -60,7 +60,7 @@ class dynamic_cache_creator : public base_cache_creator,
   ds::cache_vector create_all(const ds::cache_vector& c_previous_caches,
                               const ds::block_cluster_vector& c_clusters,
                               const ds::block_vector& candidate_blocks,
-                              uint timestep) override;
+                              rtypes::timestep t) override;
 
  private:
   /**
@@ -110,7 +110,7 @@ class dynamic_cache_creator : public base_cache_creator,
       const ds::block_vector& c_cache_i_blocks,
       const ds::block_vector& c_used_blocks,
       const rmath::vector2u& c_center,
-      double cache_dim) const;
+      rtypes::spatial_dist cache_dim) const;
 
   /**
    * @brief Create the set of caches that our new cache needs to avoid during
@@ -122,8 +122,8 @@ class dynamic_cache_creator : public base_cache_creator,
       const ds::cache_vector& c_created_caches) const;
 
   /* clang-format off */
-  double m_min_dist;
-  uint   m_min_blocks;
+  const rtypes::spatial_dist mc_min_dist;
+  const uint                 mc_min_blocks;
   /* clang-format on */
 };
 

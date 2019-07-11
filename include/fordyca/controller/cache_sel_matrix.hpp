@@ -35,6 +35,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +47,7 @@ struct cache_sel_matrix_config;
 NS_START(controller);
 
 using cache_sel_variant =
-    boost::variant<double,
+    boost::variant<rtypes::spatial_dist,
                    rmath::vector2d,
                    rmath::rangeu,
                    std::vector<int>,

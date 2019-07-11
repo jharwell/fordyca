@@ -95,7 +95,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
    */
   free_block_drop(const std::shared_ptr<repr::base_block>& block,
                   const rmath::vector2u& coord,
-                  double resolution);
+                  rtypes::discretize_ratio resolution);
   ~free_block_drop(void) override = default;
 
   free_block_drop(const free_block_drop& op) = delete;
@@ -133,7 +133,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
                                       controller::block_sel_matrix* bsel_matrix);
 
   /* clang-format off */
-  double                            m_resolution;
+  const rtypes::discretize_ratio    mc_resolution;
   std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };

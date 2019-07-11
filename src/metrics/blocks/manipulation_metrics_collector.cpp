@@ -71,17 +71,17 @@ bool manipulation_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_stats.int_free_pickup_events) + separator();
   line += std::to_string(m_stats.int_free_drop_events) + separator();
 
-  line += csv_entry_domavg(m_stats.int_free_pickup_penalty,
+  line += csv_entry_domavg(m_stats.int_free_pickup_penalty.v(),
                            m_stats.int_free_pickup_events);
-  line += csv_entry_domavg(m_stats.int_free_drop_penalty,
+  line += csv_entry_domavg(m_stats.int_free_drop_penalty.v(),
                            m_stats.int_free_drop_events);
 
   line += std::to_string(m_stats.int_cache_pickup_events) + separator();
   line += std::to_string(m_stats.int_cache_drop_events) + separator();
 
-  line += csv_entry_domavg(m_stats.int_cache_pickup_penalty,
+  line += csv_entry_domavg(m_stats.int_cache_pickup_penalty.v(),
                            m_stats.int_cache_pickup_events);
-  line += csv_entry_domavg(m_stats.int_cache_drop_penalty,
+  line += csv_entry_domavg(m_stats.int_cache_drop_penalty.v(),
                            m_stats.int_cache_drop_events,
                            true);
   return true;
@@ -106,7 +106,14 @@ void manipulation_metrics_collector::collect(
 } /* collect() */
 
 void manipulation_metrics_collector::reset_after_interval(void) {
-  m_stats = {0, 0, 0, 0, 0, 0, 0, 0};
+  m_stats = {0,
+             0,
+             rtypes::timestep(0),
+             rtypes::timestep(0),
+             0,
+             0,
+             rtypes::timestep(0),
+             rtypes::timestep(0)};
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

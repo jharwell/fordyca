@@ -63,11 +63,11 @@ using ds::occupancy_grid;
 free_block_pickup::free_block_pickup(
     const std::shared_ptr<repr::base_block>& block,
     uint robot_index,
-    uint timestep)
+    rtypes::timestep t)
     : ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
       cell_op(block->dloc()),
-      m_timestep(timestep),
-      m_robot_index(robot_index),
+      mc_timestep(t),
+      mc_robot_index(robot_index),
       m_block(block) {}
 
 /*******************************************************************************
@@ -81,7 +81,7 @@ void free_block_pickup::visit(ds::cell2D& cell) {
   visit(cell.fsm());
   cell.entity(nullptr);
   ER_INFO("cell2D: fb%u block%d from %s",
-          m_robot_index,
+          mc_robot_index,
           m_block->id(),
           m_block->dloc().to_str().c_str());
 } /* visit() */
@@ -94,7 +94,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
   op.visit(map);
   visit(*m_block);
   ER_INFO("arena_map: fb%u: block%d@%s/%s",
-          m_robot_index,
+          mc_robot_index,
           m_block->id(),
           old_r.to_str().c_str(),
           cell_op::coord().to_str().c_str());
@@ -115,11 +115,11 @@ void free_block_pickup::dispatch_free_block_interactor(
  ******************************************************************************/
 void free_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
-  block.add_transporter(m_robot_index);
-  block.first_pickup_time(m_timestep);
+  block.add_transporter(mc_robot_index);
+  block.first_pickup_time(mc_timestep);
 
   block.move_out_of_sight();
-  ER_INFO("Block%d is now carried by fb%u", m_block->id(), m_robot_index);
+  ER_INFO("Block%d is now carried by fb%u", m_block->id(), mc_robot_index);
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::crw_controller& controller) {

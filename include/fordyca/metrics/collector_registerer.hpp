@@ -137,7 +137,7 @@ class collector_registerer : public rer::client<collector_registerer> {
       : ER_CLIENT_INIT("fordyca.metrics.collector_registerer"),
         mc_decomp_depth(decomposition_depth),
         mc_arena_dim(rmath::dvec2uvec(config->arena_grid.upper,
-                                      config->arena_grid.resolution)),
+                                      config->arena_grid.resolution.v())),
         mc_config(config),
         mc_create_set(create_set),
         m_agg(agg) {}

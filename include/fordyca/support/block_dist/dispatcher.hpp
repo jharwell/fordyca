@@ -29,10 +29,12 @@
 #include <memory>
 
 #include "fordyca/nsalias.hpp"
-#include "rcppsw/er/client.hpp"
 #include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/entity_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
+
+#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,8 +75,8 @@ class dispatcher {
   static constexpr char kDistPowerlaw[] = "powerlaw";
 
   dispatcher(ds::arena_grid* grid,
+             rtypes::discretize_ratio resolution,
              const config::arena::block_dist_config* config,
-             double arena_resolution,
              double arena_padding);
   ~dispatcher(void);
 
@@ -122,7 +124,7 @@ class dispatcher {
   static size_t constexpr kINDEX_MIN = 2;
 
   /* clang-format off */
-  const double                           mc_resolution;
+  const rtypes::discretize_ratio          mc_resolution;
   const double                           mc_padding;
   const config::arena::block_dist_config mc_config;
   std::string                            mc_dist_type;

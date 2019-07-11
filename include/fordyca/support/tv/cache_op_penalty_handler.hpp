@@ -82,7 +82,7 @@ class cache_op_penalty_handler final
    *            applied).
    * @param timestep The current timestep.
   */
-  op_filter_status penalty_init(T& controller, cache_op_src src, uint timestep) {
+  op_filter_status penalty_init(T& controller, cache_op_src src, rtypes::timestep t) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
@@ -95,19 +95,19 @@ class cache_op_penalty_handler final
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot already serving cache penalty?");
 
-    uint penalty = deconflict_penalty_finish(timestep);
+    auto penalty = deconflict_penalty_finish(t);
     int id = loop_utils::robot_on_cache(controller, *m_map);
     ER_ASSERT(-1 != id, "Robot not in cache?");
     ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
             loop_utils::robot_id(controller),
             id,
-            timestep,
-            original_penalty(),
-            penalty,
+            t.v(),
+            original_penalty().v(),
+            penalty.v(),
             static_cast<int>(src));
 
     penalty_list().push_back(
-        temporal_penalty<T>(&controller, id, penalty, timestep));
+        temporal_penalty<T>(&controller, id, penalty, t));
     return filter;
   }
 

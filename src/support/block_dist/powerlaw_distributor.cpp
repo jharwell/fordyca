@@ -41,9 +41,9 @@ using fordyca::ds::arena_grid;
  ******************************************************************************/
 powerlaw_distributor::powerlaw_distributor(
     const config::arena::powerlaw_dist_config* const config,
-    double arena_resolution)
+    rtypes::discretize_ratio resolution)
     : ER_CLIENT_INIT("fordyca.support.block_dist.powerlaw"),
-      mc_arena_resolution(arena_resolution),
+      mc_resolution(resolution),
       m_n_clusters(config->n_clusters),
       m_pwrdist(config->pwr_min, config->pwr_max, 2) {}
 
@@ -183,8 +183,8 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
 
   for (auto& bclustp : config) {
     m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
-                                              bclustp.capacity,
-                                              mc_arena_resolution);
+                                              mc_resolution,
+                                              bclustp.capacity);
   } /* for(i..) */
   for (auto& [clust_size, dist_list] : m_dist_map) {
     ER_INFO("Mapped %zu clusters of capacity %u", dist_list.size(), clust_size);

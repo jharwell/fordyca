@@ -56,7 +56,7 @@ class ramp_block final : public base_block {
     return repr::block_type::ekRAMP;
   }
   std::unique_ptr<base_block> clone(void) const override {
-    auto tmp = rcppsw::make_unique<ramp_block>(dims(), id());
+    auto tmp = std::make_unique<ramp_block>(dims(), id());
     tmp->dloc(this->dloc());
     tmp->rloc(this->rloc());
     tmp->reset_robot_id();

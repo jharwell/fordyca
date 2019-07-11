@@ -29,6 +29,7 @@
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,13 +61,15 @@ class movement_metrics_collector final : public rmetrics::base_metrics_collector
 
  private:
   struct stats {
-    double int_distance{0.0};
-    uint   int_robot_count{0};
-    double int_velocity{0.0};
+    /* clang-format off */
+    rtypes::spatial_dist int_distance{0.0};
+    uint                 int_robot_count{0};
+    double               int_velocity{0.0};
 
-    double cum_distance{0.0};
-    uint   cum_robot_count{0};
-    double cum_velocity{0.0};
+    rtypes::spatial_dist cum_distance{0.0};
+    uint                 cum_robot_count{0};
+    double               cum_velocity{0.0};
+    /* clang-format on */
   };
 
   std::list<std::string> csv_header_cols(void) const override;

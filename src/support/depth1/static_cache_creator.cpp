@@ -38,7 +38,7 @@ using repr::base_cache;
 static_cache_creator::static_cache_creator(
     ds::arena_grid* const grid,
     const std::vector<rmath::vector2d>& centers,
-    double cache_dim)
+    rtypes::spatial_dist cache_dim)
     : base_cache_creator(grid, cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
       mc_centers(centers) {}
@@ -50,7 +50,7 @@ ds::cache_vector static_cache_creator::create_all(
     const ds::cache_vector& c_existing_caches,
     const ds::block_cluster_vector&,
     const ds::block_vector& c_alloc_blocks,
-    uint timestep) {
+    rtypes::timestep t) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
@@ -59,7 +59,7 @@ ds::cache_vector static_cache_creator::create_all(
   auto it = c_alloc_blocks.begin();
   for (auto& center : mc_centers) {
     auto filter = [&](const auto& c) {
-      return rmath::dvec2uvec(center, grid()->resolution()) == c->dloc();
+      return rmath::dvec2uvec(center, grid()->resolution().v()) == c->dloc();
     };
     /* static cache already exists */
     if (c_existing_caches.end() != std::find_if(c_existing_caches.begin(),
@@ -83,7 +83,7 @@ ds::cache_vector static_cache_creator::create_all(
     ER_INFO("Creating static cache@%s from %zu free blocks",
             center.to_str().c_str(),
             cache_i_blocks.size());
-    created.push_back(create_single_cache(center, cache_i_blocks, timestep));
+    created.push_back(create_single_cache(center, cache_i_blocks, t));
   } /* for(&center..) */
   return created;
 } /* create_all() */

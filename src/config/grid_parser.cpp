@@ -52,7 +52,7 @@ void grid_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 __rcsw_pure bool grid_parser::validate(void) const {
-  CHECK(m_config->resolution > 0.0);
+  CHECK(m_config->resolution.v() > 0.0);
   CHECK(m_config->upper.x() > 0.0);
   CHECK(m_config->upper.y() > 0.0);
   return true;

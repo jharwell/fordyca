@@ -77,7 +77,7 @@ class crw final
 
     /* prototype overrides */
   std::unique_ptr<base_expstrat> clone(void) const override {
-    return rcppsw::make_unique<crw>(saa_subsystem());
+    return std::make_unique<crw>(saa_subsystem());
   }
  private:
   /**
@@ -86,7 +86,7 @@ class crw final
    *
    * @param timestep The current timestep.
    */
-  void ca_enter(uint timestep);
+  void ca_enter(rtypes::timestep t);
 
   /**
    * @brief Handle all logic for exiting collision avoidance; derived classes

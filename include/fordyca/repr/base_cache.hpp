@@ -33,6 +33,7 @@
 #include "fordyca/repr/colored_entity.hpp"
 #include "fordyca/repr/unicell_immovable_entity.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,11 +59,13 @@ class base_cache : public unicell_immovable_entity,
                    public prototype::clonable<base_cache> {
  public:
   struct params {
-    double dimension;
-    double resolution;
-    rmath::vector2d center;
-    const ds::block_vector& blocks;
-    int id;
+    /* clang-format off */
+    rtypes::spatial_dist     dimension; /* caches are square */
+    rtypes::discretize_ratio resolution;
+    rmath::vector2d          center;
+    const ds::block_vector&  blocks;
+    int                      id;
+    /* clang-format on */
   };
   /**
    * @brief The minimum # of blocks required for a cache to exist (less than
@@ -150,17 +153,17 @@ class base_cache : public unicell_immovable_entity,
 
   std::unique_ptr<base_cache> clone(void) const override final;
 
-  uint creation_ts(void) const { return m_creation_ts; }
-  void creation_ts(uint creation_ts) { m_creation_ts = creation_ts; }
+  rtypes::timestep creation_ts(void) const { return m_creation; }
+  void creation_ts(rtypes::timestep ts) { m_creation = ts; }
 
  private:
   /* clang-format off */
-  const double     mc_resolution;
+  const rtypes::discretize_ratio mc_resolution;
 
-  static int       m_next_id;
+  static int                     m_next_id;
 
-  uint             m_creation_ts{0};
-  ds::block_vector m_blocks;
+  rtypes::timestep               m_creation{0};
+  ds::block_vector               m_blocks;
   /* clang-format on */
 };
 

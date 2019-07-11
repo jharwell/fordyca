@@ -91,7 +91,7 @@ void gp_mdpo_controller::shared_init(
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
   gp_dpo_controller::perception(
-      rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 
   /*
    * Task executive. Even though we use the same executive as the \ref

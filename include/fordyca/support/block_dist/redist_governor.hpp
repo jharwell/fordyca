@@ -27,6 +27,7 @@
 #include "fordyca/nsalias.hpp"
 #include "fordyca/config/arena/block_redist_governor_config.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -67,11 +68,13 @@ class redist_governor : public rer::client<redist_governor> {
   /**
    * @brief Update the distribution status according to the policy parameters.
    *
-   * @param timestep
-   * @param blocks_collected
-   * @param convergence_status
+   * @param t Current timestep.
+   * @param blocks_collected # blocks collected so far.
+   * @param convergence_status Current swarm convergence status.
    */
-  void update(uint timestep, uint blocks_collected, bool convergence_status);
+  void update(rtypes::timestep t,
+              uint blocks_collected,
+              bool convergence_status);
   bool dist_status(void) const { return m_dist_status; }
 
  private:

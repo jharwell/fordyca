@@ -176,13 +176,14 @@ __rcsw_pure bool block_to_goal_fsm::exited_collision_avoidance(void) const {
           m_goal_fsm->exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
-__rcsw_pure uint block_to_goal_fsm::collision_avoidance_duration(void) const {
+__rcsw_pure rtypes::timestep block_to_goal_fsm::collision_avoidance_duration(
+    void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->collision_avoidance_duration();
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->collision_avoidance_duration();
   }
-  return 0;
+  return rtypes::timestep(0);
 } /* collision_avoidance_duration() */
 
 rmath::vector2u block_to_goal_fsm::avoidance_loc(void) const {

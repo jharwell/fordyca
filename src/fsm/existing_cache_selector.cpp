@@ -51,7 +51,7 @@ existing_cache_selector::existing_cache_selector(
 boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator()(
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position,
-    uint timestep) {
+    rtypes::timestep t) {
   ds::dp_cache_map::value_type best(nullptr, {});
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
@@ -59,7 +59,7 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
   for (auto& c : existing_caches.const_values_range()) {
     fsm::cache_acq_validator validator(mc_cache_map, mc_matrix, mc_is_pickup);
 
-    if (!validator(c.ent()->rloc(), c.ent()->id(), timestep) ||
+    if (!validator(c.ent()->rloc(), c.ent()->id(), t) ||
         cache_is_excluded(position, c.ent())) {
       continue;
     }
@@ -67,8 +67,7 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
         c.ent()->rloc(),
         boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second));
 
-    double utility =
-        u.calc(position, c.density().last_result(), c.ent()->n_blocks());
+    double utility = u.calc(position, c.density(), c.ent()->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for existing_cache%d@%s/%s, density=%f: %f",
              c.ent()->id(),

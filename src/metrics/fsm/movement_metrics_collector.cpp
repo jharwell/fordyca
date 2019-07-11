@@ -62,8 +62,8 @@ bool movement_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += csv_entry_domavg(m_stats.int_distance, m_stats.int_robot_count);
-  line += csv_entry_domavg(m_stats.cum_distance, m_stats.cum_robot_count);
+  line += csv_entry_domavg(m_stats.int_distance.v(), m_stats.int_robot_count);
+  line += csv_entry_domavg(m_stats.cum_distance.v(), m_stats.cum_robot_count);
 
   line += csv_entry_domavg(m_stats.int_velocity, m_stats.int_robot_count);
   line += csv_entry_domavg(m_stats.cum_velocity, m_stats.cum_robot_count, true);
@@ -81,7 +81,7 @@ void movement_metrics_collector::collect(const rmetrics::base_metrics& metrics) 
 } /* collect() */
 
 void movement_metrics_collector::reset_after_interval(void) {
-  m_stats.int_distance = 0.0;
+  m_stats.int_distance = rtypes::spatial_dist(0.0);
   m_stats.int_velocity = 0.0;
   m_stats.int_robot_count = 0;
 } /* reset_after_interval() */

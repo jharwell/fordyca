@@ -41,8 +41,8 @@ NS_START(fordyca, support, depth2);
 dynamic_cache_creator::dynamic_cache_creator(const struct params* const p)
     : base_cache_creator(p->grid, p->cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_creator"),
-      m_min_dist(p->min_dist),
-      m_min_blocks(p->min_blocks) {}
+      mc_min_dist(p->min_dist),
+      mc_min_blocks(p->min_blocks) {}
 
 /*******************************************************************************
  * Member Functions
@@ -51,12 +51,12 @@ ds::cache_vector dynamic_cache_creator::create_all(
     const ds::cache_vector& c_previous_caches,
     const ds::block_cluster_vector& c_clusters,
     const ds::block_vector& candidate_blocks,
-    uint timestep) {
+    rtypes::timestep t) {
   ds::cache_vector created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
-           m_min_dist,
-           m_min_blocks,
+           mc_min_dist.v(),
+           mc_min_blocks,
            rcppsw::to_string(candidate_blocks).c_str(),
            candidate_blocks.size());
 
@@ -69,7 +69,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
      * We now have all the blocks that are close enough to block i to be
      * included in a new cache, so attempt cache creation.
      */
-    if (cache_i_blocks.size() >= m_min_blocks) {
+    if (cache_i_blocks.size() >= mc_min_blocks) {
       ds::cache_vector c_avoid =
           avoidance_caches_calc(c_previous_caches, created_caches);
 
@@ -94,8 +94,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * which keeps asserts about cache extent from triggering right after
          * creation, which can happen otherwise.
          */
-        auto cache_p = std::shared_ptr<repr::arena_cache>(create_single_cache(
-            rmath::uvec2dvec(*center), cache_i_blocks, timestep));
+        auto cache_p = std::shared_ptr<repr::arena_cache>(
+            create_single_cache(rmath::uvec2dvec(*center), cache_i_blocks, t));
         created_caches.push_back(cache_p);
       }
 
@@ -127,16 +127,16 @@ ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
     const ds::block_vector& c_cache_i_blocks,
     const ds::block_vector& c_used_blocks,
     const rmath::vector2u& c_center,
-    double cache_dim) const {
+    rtypes::spatial_dist cache_dim) const {
   ds::block_vector absorb_blocks;
   std::copy_if(c_candidate_blocks.begin(),
                c_candidate_blocks.end(),
                std::back_inserter(absorb_blocks),
                [&](const auto& b) __rcsw_pure {
-                 auto xspan = rmath::ranged(c_center.x() - cache_dim / 2.0,
-                                            c_center.x() + cache_dim / 2.0);
-                 auto yspan = rmath::ranged(c_center.y() - cache_dim / 2.0,
-                                            c_center.y() + cache_dim / 2.0);
+                 auto xspan = rmath::ranged(c_center.x() - cache_dim.v() / 2.0,
+                                            c_center.x() + cache_dim.v() / 2.0);
+                 auto yspan = rmath::ranged(c_center.y() - cache_dim.v() / 2.0,
+                                            c_center.y() + cache_dim.v() / 2.0);
                  return c_used_blocks.end() == std::find(c_used_blocks.begin(),
                                                          c_used_blocks.end(),
                                                          b) &&
@@ -193,8 +193,8 @@ ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
      */
-    if ((c_candidates[index]->rloc() - c_candidates[i]->rloc()).length() <=
-        m_min_dist) {
+    if (mc_min_dist >=
+        (c_candidates[index]->rloc() - c_candidates[i]->rloc()).length()) {
       ER_ASSERT(std::find(src_blocks.begin(),
                           src_blocks.end(),
                           c_candidates[i]) == src_blocks.end(),

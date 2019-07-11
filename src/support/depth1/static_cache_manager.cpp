@@ -57,7 +57,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
     const ds::cache_vector& existing_caches,
     const ds::block_cluster_vector& clusters,
     const ds::block_vector& blocks,
-    uint timestep) {
+    rtypes::timestep t) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= repr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
@@ -74,7 +74,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
                                mc_cache_config.dimension);
 
   auto created = creator.create_all(
-      existing_caches, ds::block_cluster_vector(), *to_use, timestep);
+      existing_caches, ds::block_cluster_vector(), *to_use, t);
 
   /*
    * Fix hidden blocks and update host cells. Host cell updating must be second,
@@ -95,7 +95,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
     const ds::cache_vector& existing_caches,
     const ds::block_cluster_vector& clusters,
     const ds::block_vector& blocks,
-    uint timestep,
+    rtypes::timestep t,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
@@ -103,7 +103,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
   std::uniform_real_distribution<> dist(0.0, 1.0);
 
   if (p.calc(n_harvesters, n_collectors) >= dist(m_reng)) {
-    return create(existing_caches, clusters, blocks, timestep);
+    return create(existing_caches, clusters, blocks, t);
   } else {
     return boost::optional<ds::cache_vector>();
   }
@@ -157,7 +157,8 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
     const ds::block_vector& all_blocks,
     const rmath::vector2d& loc) const {
   ds::block_vector cache_i_blocks;
-  rmath::vector2u dcenter = rmath::dvec2uvec(loc, arena_grid()->resolution());
+  rmath::vector2u dcenter =
+      rmath::dvec2uvec(loc, arena_grid()->resolution().v());
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),
                std::back_inserter(cache_i_blocks),
@@ -243,7 +244,7 @@ void static_cache_manager::post_creation_blocks_absorb(
         empty.visit(arena_grid()->access<arena_grid::kCell>(b->dloc()));
         events::free_block_drop_visitor op(
             b,
-            rmath::dvec2uvec(c->rloc(), arena_grid()->resolution()),
+            rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
             arena_grid()->resolution());
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);

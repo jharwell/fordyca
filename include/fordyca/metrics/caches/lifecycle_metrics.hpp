@@ -27,6 +27,8 @@
 #include <vector>
 
 #include "rcppsw/metrics/base_metrics.hpp"
+#include "rcppsw/types/timestep.hpp"
+#include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +68,7 @@ class lifecycle_metrics : public rmetrics::base_metrics {
    * @brief Should return the ages of the caches that were depleted this
    * timestep (i.e. how many timesteps did they exist before being depleted?).
    */
-  virtual std::vector<uint> cache_depletion_ages(void) const = 0;
+  virtual std::vector<rtypes::timestep> cache_depletion_ages(void) const = 0;
 };
 
 NS_END(caches, metrics, fordyca);

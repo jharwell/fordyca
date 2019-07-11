@@ -29,6 +29,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -129,12 +130,12 @@ class sensing_subsystem {
   /**
    * @brief Get the current simulation time tick.
    */
-  uint tick(void) const { return m_tick; }
+  rtypes::timestep tick(void) const { return m_tick; }
 
   /**
    * @brief Set the current simulation time tick.
    */
-  void tick(uint tick) { m_tick = tick; }
+  void tick(rtypes::timestep tick) { m_tick = tick; }
 
   /**
    * @brief Get the robot's heading, which is computed from the previous 2
@@ -178,12 +179,12 @@ class sensing_subsystem {
   const double                                   mc_obstacle_delta;
   const double                                   mc_los_dim;
 
-  uint                                           m_tick{0};
-  rmath::vector2d                                m_position{};
-  rmath::vector2d                                m_prev_position{};
-  rmath::vector2u                                m_discrete_position{};
-  struct sensor_list                             m_sensors;
-  rmath::range<rmath::radians>                   m_fov;
+  rtypes::timestep             m_tick{0};
+  rmath::vector2d              m_position{};
+  rmath::vector2d              m_prev_position{};
+  rmath::vector2u              m_discrete_position{};
+  struct sensor_list           m_sensors;
+  rmath::range<rmath::radians> m_fov;
   /* clang-format off */
 };
 

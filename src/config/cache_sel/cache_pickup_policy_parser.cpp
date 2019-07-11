@@ -36,7 +36,7 @@ void cache_pickup_policy_parser::parse(const ticpp::Element& node) {
     ticpp::Element cnode = node_get(node, kXMLRoot);
     m_config = std::make_unique<config_type>();
     XML_PARSE_ATTR(cnode, m_config, policy);
-    XML_PARSE_ATTR_DFLT(cnode, m_config, timestep, 0U);
+    XML_PARSE_ATTR_DFLT(cnode, m_config, timestep, rtypes::timestep(0));
     XML_PARSE_ATTR_DFLT(cnode, m_config, cache_count, 0U);
     XML_PARSE_ATTR_DFLT(cnode, m_config, cache_size, 0U);
   }

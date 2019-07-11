@@ -66,8 +66,9 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
     rmath::vector2d nest_loc =
         boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
-    double utility = math::block_utility(b.ent()->rloc(), nest_loc)(
-        position, b.density().last_result(), priority);
+    double utility =
+        math::block_utility(b.ent()->rloc(),
+                            nest_loc)(position, b.density(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
              b.ent()->id(),

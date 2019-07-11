@@ -38,6 +38,8 @@
 #include "fordyca/ds/cache_vector.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,9 +69,8 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * @param grid Reference to arena grid.
    * @param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
-   * @param timestep The current timestep.
    */
-  base_cache_creator(ds::arena_grid* grid, double cache_dim);
+  base_cache_creator(ds::arena_grid* grid, rtypes::spatial_dist cache_dim);
 
   base_cache_creator(const base_cache_creator& other) = delete;
   base_cache_creator& operator=(const base_cache_creator& other) = delete;
@@ -90,7 +91,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   virtual ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
                                       const ds::block_cluster_vector& c_clusters,
                                       const ds::block_vector& c_alloc_blocks,
-                                      uint timestep) = 0;
+                                      rtypes::timestep t) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact
@@ -137,13 +138,13 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   std::unique_ptr<repr::arena_cache> create_single_cache(
       const rmath::vector2d& center,
       ds::block_vector blocks,
-      uint timestep);
+      rtypes::timestep t);
 
-  double cache_dim(void) const { return mc_cache_dim; }
+  rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 
  private:
   /* clang-format off */
-  double                             mc_cache_dim;
+  const rtypes::spatial_dist         mc_cache_dim;
   ds::arena_grid*                    m_grid;
   mutable std::default_random_engine m_rng;
   /* clang-format on */

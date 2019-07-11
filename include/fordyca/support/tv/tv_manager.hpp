@@ -80,8 +80,8 @@ class tv_manager final : public rer::client<tv_manager>,
 
   /* temporal variance metrics */
   double swarm_motion_throttle(void) const override;
-  double env_block_manipulation(void) const override;
-  double env_cache_usage(void) const override;
+  rtypes::timestep env_block_manipulation(void) const override;
+  rtypes::timestep env_cache_usage(void) const override;
 
   /**
    * @brief Return non-owning reference to a penalty handler for the specified

@@ -147,11 +147,11 @@ void depth0_loop_functions::private_init(void) {
   config::output_config output = *config()->config_get<config::output_config>();
   output.metrics.arena_grid = arena->grid;
 
-  m_metrics_agg = rcppsw::make_unique<depth0_metrics_aggregator>(&output.metrics,
-                                                                 output_root());
-  m_interactor_map = rcppsw::make_unique<interactor_map_type>();
-  m_metrics_map = rcppsw::make_unique<metric_extraction_map_type>();
-  m_los_update_map = rcppsw::make_unique<detail::los_updater_map_type>();
+  m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output.metrics,
+                                                              output_root());
+  m_interactor_map = std::make_unique<interactor_map_type>();
+  m_metrics_map = std::make_unique<metric_extraction_map_type>();
+  m_los_update_map = std::make_unique<detail::los_updater_map_type>();
 
   /* only needed for initialization, so not a member */
   auto config_map = detail::configurer_map_type();
@@ -188,14 +188,14 @@ void depth0_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   loop_utils::set_robot_pos<decltype(*controller)>(
       robot, arena_map()->grid_resolution());
   loop_utils::set_robot_tick<decltype(*controller)>(
-      robot, GetSpace().GetSimulationClock());
+      robot, rtypes::timestep(GetSpace().GetSimulationClock()));
   boost::apply_visitor(detail::robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
 
   /* Watch the robot interact with the environment! */
   auto iadaptor =
       robot_interactor_adaptor<depth0::robot_arena_interactor, interactor_status>(
-          controller, GetSpace().GetSimulationClock());
+          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
   auto status =
       boost::apply_visitor(iadaptor,
                            m_interactor_map->at(controller->type_index()));
@@ -247,11 +247,10 @@ void depth0_loop_functions::PreStep(void) {
 
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
-  arena_map()->redist_governor()->update(GetSpace().GetSimulationClock(),
-                                         collector.cum_collected(),
-                                         nullptr != conv_calculator()
-                                             ? conv_calculator()->converged()
-                                             : false);
+  arena_map()->redist_governor()->update(
+      rtypes::timestep(GetSpace().GetSimulationClock()),
+      collector.cum_collected(),
+      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Process all robots */
   swarm_iterator::robots(this,
@@ -261,7 +260,8 @@ void depth0_loop_functions::PreStep(void) {
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
-  if (m_metrics_agg->metrics_write_all(GetSpace().GetSimulationClock()) &&
+  if (m_metrics_agg->metrics_write_all(
+          rtypes::timestep(GetSpace().GetSimulationClock())) &&
       nullptr != conv_calculator()) {
     conv_calculator()->reset_metrics();
   }

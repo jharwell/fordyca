@@ -27,6 +27,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +42,7 @@ NS_START(fordyca, config);
  * @ingroup fordyca config perception
  */
 struct grid_config : public rconfig::base_config {
-  double resolution{0.0};
+  rtypes::discretize_ratio resolution{0.0};
   rmath::vector2d upper{};
   rmath::vector2d lower{};
 };

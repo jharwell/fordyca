@@ -56,8 +56,8 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
              config->grid.resolution,
              support::light_type_index()[support::light_type_index::kNest]),
       m_block_dispatcher(&decoratee(),
-                         &config->blocks.dist,
                          config->grid.resolution,
+                         &config->blocks.dist,
                          arena_padding()),
       m_redist_governor(&config->blocks.dist.redist_governor) {
   ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
@@ -65,7 +65,7 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
           yrsize(),
           xdsize(),
           ydsize(),
-          grid_resolution());
+          grid_resolution().v());
 }
 
 /*******************************************************************************
@@ -203,16 +203,17 @@ void arena_map::cache_extent_clear(
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  auto xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
-  auto xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
-  auto ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
-  auto ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
+  auto xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution().v()));
+  auto xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution().v()));
+  auto ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution().v()));
+  auto ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution().v()));
 
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {
       rmath::vector2u c = rmath::vector2u(i, j);
       if (c != victim->dloc()) {
-        ER_ASSERT(victim->contains_point(rmath::uvec2dvec(c, grid_resolution())),
+        ER_ASSERT(victim->contains_point(
+                      rmath::uvec2dvec(c, grid_resolution().v())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   victim->id(),
                   i,

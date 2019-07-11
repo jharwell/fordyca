@@ -76,11 +76,11 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     if (sensors()->tick() - m_state.last_collision_time <
         kFREQ_COLLISION_THRESH) {
       ER_DEBUG("Frequent collision: last=%u curr=%u",
-               m_state.last_collision_time,
-               sensors()->tick());
+               m_state.last_collision_time.v(),
+               sensors()->tick().v());
       rmath::vector2d new_dir = randomize_vector_angle(rmath::vector2d::X);
       internal_event(ekST_NEW_DIRECTION,
-                     rcppsw::make_unique<new_direction_data>(new_dir.angle()));
+                     std::make_unique<new_direction_data>(new_dir.angle()));
     } else {
       rmath::vector2d obs = sensors()->find_closest_obstacle();
       ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
@@ -153,7 +153,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
   if ((m_goal_data.loc - sensors()->position()).length() <=
       m_goal_data.tolerance) {
     internal_event(ekST_ARRIVED,
-                   rcppsw::make_unique<struct goal_data>(m_goal_data));
+                   std::make_unique<struct goal_data>(m_goal_data));
   }
 
   /*
@@ -233,8 +233,8 @@ void vector_fsm::task_start(const rta::taskable_argument* const c_arg) {
   ER_ASSERT(nullptr != a, "bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ekST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<struct goal_data>(a->vector(),
-                                                       a->tolerance()));
+                 std::make_unique<struct goal_data>(a->vector(),
+                                                    a->tolerance()));
 } /* task_start() */
 
 void vector_fsm::task_execute(void) {

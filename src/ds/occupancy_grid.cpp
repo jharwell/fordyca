@@ -47,7 +47,7 @@ occupancy_grid::occupancy_grid(
           yrsize(),
           xdsize(),
           ydsize(),
-          resolution());
+          resolution().v());
 
   for (uint i = 0; i < xdsize(); ++i) {
     for (uint j = 0; j < ydsize(); ++j) {

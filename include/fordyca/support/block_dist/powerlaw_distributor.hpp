@@ -70,7 +70,7 @@ class powerlaw_distributor final : public base_distributor,
    * @brief Initialize the distributor.
    */
   powerlaw_distributor(const config::arena::powerlaw_dist_config* config,
-                       double arena_resolution);
+                       rtypes::discretize_ratio resolution);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
@@ -131,7 +131,7 @@ class powerlaw_distributor final : public base_distributor,
                                              uint n_clusters);
 
   /* clang-format off */
-  const double                                   mc_arena_resolution{0.0};
+  const     rtypes::discretize_ratio              mc_resolution;
 
   uint                                           m_n_clusters{0};
   std::map<uint, std::list<cluster_distributor>> m_dist_map{};

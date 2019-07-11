@@ -87,12 +87,15 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_stats.int_collected, m_stats.int_transporters);
   line += csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transporters);
 
-  line += csv_entry_domavg(m_stats.int_collected, m_stats.int_transport_time);
-  line += csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transport_time);
+  line +=
+      csv_entry_domavg(m_stats.int_collected, m_stats.int_transport_time.v());
+  line +=
+      csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transport_time.v());
 
-  line += csv_entry_domavg(m_stats.int_collected, m_stats.int_initial_wait_time);
+  line += csv_entry_domavg(m_stats.int_collected,
+                           m_stats.int_initial_wait_time.v());
   line += csv_entry_domavg(m_stats.cum_collected,
-                           m_stats.cum_initial_wait_time,
+                           m_stats.cum_initial_wait_time.v(),
                            true);
 
   return true;
@@ -123,8 +126,8 @@ void transport_metrics_collector::reset_after_interval(void) {
   m_stats.int_cube_collected = 0;
   m_stats.int_ramp_collected = 0;
   m_stats.int_transporters = 0;
-  m_stats.int_transport_time = 0;
-  m_stats.int_initial_wait_time = 0;
+  m_stats.int_transport_time = rtypes::timestep(0);
+  m_stats.int_initial_wait_time = rtypes::timestep(0);
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

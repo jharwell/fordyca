@@ -122,10 +122,10 @@ void dpo_controller::shared_init(
       config_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* DPO perception subsystem */
-  m_perception = rcppsw::make_unique<dpo_perception_subsystem>(perception);
+  m_perception = std::make_unique<dpo_perception_subsystem>(perception);
 
   /* block selection matrix */
-  m_block_sel_matrix = rcppsw::make_unique<class block_sel_matrix>(block_matrix);
+  m_block_sel_matrix = std::make_unique<class block_sel_matrix>(block_matrix);
 } /* shared_init() */
 
 void dpo_controller::private_init(
@@ -135,7 +135,7 @@ void dpo_controller::private_init(
   fsm::expstrat::base_expstrat::params p{nullptr,
                                          saa_subsystem(),
                                          perception()->dpo_store()};
-  m_fsm = rcppsw::make_unique<fsm::depth0::dpo_fsm>(
+  m_fsm = std::make_unique<fsm::depth0::dpo_fsm>(
       m_block_sel_matrix.get(),
       base_controller::saa_subsystem(),
       m_perception->dpo_store(),

@@ -28,6 +28,7 @@
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/nsalias.hpp"
 #include "fordyca/repr/grid_view_entity.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +54,7 @@ class block_cluster final : public grid_view_entity<ds::arena_grid::const_view>,
                             public rer::client<block_cluster> {
  public:
   block_cluster(const ds::arena_grid::const_view& view,
-                double resolution,
+                rtypes::discretize_ratio resolution,
                 uint capacity)
       : grid_view_entity<ds::arena_grid::const_view>(view, resolution),
         ER_CLIENT_INIT("fordyca.repr.block_cluster"),

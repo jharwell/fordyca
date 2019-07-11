@@ -27,6 +27,7 @@
 #include <memory>
 
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,7 +78,7 @@ class motion_throttling_handler {
    * @brief Update the actuators in accordance with the current motion_throttling
    * configuration and timestep.
    */
-  void update(uint timestep);
+  void update(rtypes::timestep t);
 
  private:
   /* clang-format off */

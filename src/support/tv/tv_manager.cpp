@@ -86,7 +86,7 @@ class penalty_handler_initializer : public boost::static_visitor<void> {
   void operator()(const ControllerType& controller) {
     m_type_map->emplace(
         typeid(controller),
-        rcppsw::make_unique<class PenaltyHandlerType<ControllerType>>(
+        std::make_unique<class PenaltyHandlerType<ControllerType>>(
             m_arena_map, mc_config, mc_handler_name));
   }
 
@@ -171,18 +171,18 @@ double tv_manager::swarm_motion_throttle(void) const {
   return accum / robots.size();
 } /* swarm_motion_throttle() */
 
-double tv_manager::env_block_manipulation(void) const {
-  uint timestep = mc_lf->GetSpace().GetSimulationClock();
+rtypes::timestep tv_manager::env_block_manipulation(void) const {
+  rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
   return penalty_handler<controller::depth0::crw_controller>(
              block_op_src::ekNEST_DROP)
-      ->timestep_penalty(timestep);
+      ->timestep_penalty(t);
 } /* env_block_manipulation() */
 
-double tv_manager::env_cache_usage(void) const {
-  uint timestep = mc_lf->GetSpace().GetSimulationClock();
+rtypes::timestep tv_manager::env_cache_usage(void) const {
+  rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
   return penalty_handler<controller::depth1::gp_dpo_controller>(
              cache_op_src::ekEXISTING_CACHE_PICKUP)
-      ->timestep_penalty(timestep);
+      ->timestep_penalty(t);
 } /* env_cache_usage() */
 
 void tv_manager::register_controller(int robot_id) {
@@ -198,12 +198,12 @@ void tv_manager::update(void) {
   if (!mc_motion_throttle_config) {
     return;
   }
-  uint timestep = mc_lf->GetSpace().GetSimulationClock();
+  rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
 
   support::swarm_iterator::controllers(mc_lf, [&](auto& controller) {
     m_motion_throttling.at(controller->entity_id())
         .toggle(controller->is_carrying_block());
-    m_motion_throttling.at(controller->entity_id()).update(timestep);
+    m_motion_throttling.at(controller->entity_id()).update(t);
   });
 } /* update() */
 

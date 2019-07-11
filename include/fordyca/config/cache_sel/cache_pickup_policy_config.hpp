@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include <string>
 #include "rcppsw/config/base_config.hpp"
+#include "rcppsw/types/timestep.hpp"
+
 #include "fordyca/nsalias.hpp"
 
 /*******************************************************************************
@@ -37,10 +39,10 @@ NS_START(fordyca, config, cache_sel);
  * Structure Definitions
  ******************************************************************************/
 struct cache_pickup_policy_config : public rconfig::base_config {
-  std::string policy{};
-  uint        timestep{0};
-  uint        cache_count{0};
-  uint        cache_size{0};
+  std::string      policy{};
+  rtypes::timestep timestep{0};
+  uint             cache_count{0};
+  uint             cache_size{0};
 };
 
 NS_END(cache_sel, config, fordyca);

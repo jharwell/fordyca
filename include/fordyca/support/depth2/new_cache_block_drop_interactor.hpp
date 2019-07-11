@@ -85,9 +85,9 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    *
    * @return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
-  interactor_status operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
         return finish_new_cache_block_drop(controller);
       }
     } else {
@@ -101,7 +101,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
        */
       auto status = m_penalty_handler->penalty_init(controller,
                                                    tv::block_op_src::ekNEW_CACHE_DROP,
-                                                   timestep,
+                                                   t,
                                                    m_cache_manager->cache_proximity_dist());
       if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
         auto prox_status = loop_utils::new_cache_cache_proximity(controller,
@@ -124,7 +124,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
             status.entity_id,
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
-            m_cache_manager->cache_proximity_dist());
+            m_cache_manager->cache_proximity_dist().v());
     /*
      * Because caches can be dynamically created/destroyed, we cannot rely on
      * the index position of cache i to be the same as its ID, so we need to
@@ -172,7 +172,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
               controller.position2D().to_str().c_str(),
               status.entity_id,
               status.distance.length(),
-              m_cache_manager->cache_proximity_dist());
+              m_cache_manager->cache_proximity_dist().v());
 
       /*
        * We need to perform the proxmity check again after serving our block
@@ -206,7 +206,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                                     const tv::temporal_penalty<T>& penalty) {
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
                                             rmath::dvec2uvec(controller.position2D(),
-                                                             m_map->grid_resolution()),
+                                                             m_map->grid_resolution().v()),
                                             m_map->grid_resolution());
 
     drop_op.visit(controller);

@@ -143,8 +143,8 @@ __rcsw_pure bool cached_block_to_nest_fsm::exited_collision_avoidance(void) cons
          base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
-__rcsw_pure uint
-cached_block_to_nest_fsm::collision_avoidance_duration(void) const {
+__rcsw_pure rtypes::timestep cached_block_to_nest_fsm::collision_avoidance_duration(
+    void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.collision_avoidance_duration();
   } else {

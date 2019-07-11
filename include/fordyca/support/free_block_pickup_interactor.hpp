@@ -87,16 +87,16 @@ class free_block_pickup_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep The current timestep.
    */
-  interactor_status operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
-        finish_free_block_pickup(controller, timestep);
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+        finish_free_block_pickup(controller, t);
         return interactor_status::ekFreeBlockPickup;
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::block_op_src::ekFREE_PICKUP,
-                                      timestep);
+                                      t);
     }
     return interactor_status::ekNoEvent;
   }
@@ -106,7 +106,7 @@ class free_block_pickup_interactor
    * @brief Determine if a robot is waiting to pick up a free block, and if it
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
-  void finish_free_block_pickup(T& controller, uint timestep) {
+  void finish_free_block_pickup(T& controller, rtypes::timestep t) {
     ER_ASSERT(controller.goal_acquired() &&
                   acq_goal_type::ekBLOCK == controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
@@ -142,7 +142,7 @@ class free_block_pickup_interactor
       events::block_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
-      perform_free_block_pickup(controller, p, timestep);
+      perform_free_block_pickup(controller, p, t);
       m_floor->SetChanged();
     }
     m_penalty_handler->remove(p);
@@ -157,7 +157,7 @@ class free_block_pickup_interactor
    */
   void perform_free_block_pickup(T& controller,
                                  const tv::temporal_penalty<T>& penalty,
-                                 uint timestep) {
+                                 rtypes::timestep t) {
     auto it =
         std::find_if(m_map->blocks().begin(),
                      m_map->blocks().end(),
@@ -175,7 +175,7 @@ class free_block_pickup_interactor
      */
     controller.block_manip_collator()->penalty_served(penalty.penalty());
     events::free_block_pickup_visitor pickup_op(
-        *it, loop_utils::robot_id(controller), timestep);
+        *it, loop_utils::robot_id(controller), t);
 
     pickup_op.visit(controller);
     pickup_op.visit(*m_map);

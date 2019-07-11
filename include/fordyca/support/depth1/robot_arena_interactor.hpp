@@ -101,7 +101,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
    */
-  interactor_status operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_task_abort_interactor(controller,
                                 m_tv_manager->template all_penalty_handlers<T>())) {
       /*
@@ -116,16 +116,16 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
     auto status = interactor_status::ekNoEvent;
     if (controller.is_carrying_block()) {
-      status |= m_nest_drop_interactor(controller, timestep);
+      status |= m_nest_drop_interactor(controller, t);
 
       /*
        * Dropped a block in a cache does not require oracular updates, so no
        * need to track its status.
        */
-      m_existing_cache_drop_interactor(controller, timestep);
+      m_existing_cache_drop_interactor(controller, t);
     } else { /* The foot-bot has no block item */
-      status |= m_free_pickup_interactor(controller, timestep);
-      status |= m_cached_pickup_interactor(controller, timestep);
+      status |= m_free_pickup_interactor(controller, t);
+      status |= m_cached_pickup_interactor(controller, t);
     }
     return status;
   }
