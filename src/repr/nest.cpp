@@ -64,14 +64,14 @@ nest::light_list nest::init_rect(const rutils::color& color) const {
   light_list ret;
   argos::CVector3 loc1, loc2, loc3;
 
-  if (xdim() > ydim()) {
-    loc1.Set(rloc().x() - xdim() * 0.25, rloc().y(), 5.0);
+  if (xdimr() > ydimr()) {
+    loc1.Set(rloc().x() - xdimr() * 0.25, rloc().y(), 5.0);
     loc2.Set(rloc().x(), rloc().y(), 5.0);
-    loc3.Set(rloc().x() + xdim() * 0.25, rloc().y(), 5.0);
+    loc3.Set(rloc().x() + xdimr() * 0.25, rloc().y(), 5.0);
   } else {
-    loc1.Set(rloc().x(), rloc().y() - ydim() * 0.25, 5.0);
+    loc1.Set(rloc().x(), rloc().y() - ydimr() * 0.25, 5.0);
     loc2.Set(rloc().x(), rloc().y(), 5.0);
-    loc3.Set(rloc().x(), rloc().y() + ydim() * 0.25, 5.0);
+    loc3.Set(rloc().x(), rloc().y() + ydimr() * 0.25, 5.0);
   }
 
   return {new argos::CLightEntity(

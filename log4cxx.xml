@@ -38,7 +38,13 @@
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.dynamic_cache_creator" >
-    <priority value ="trace" />
+    <priority value ="debug" />
+  </category>
+  <category name="fordyca.support.depth1.static_cache_creator" >
+    <priority value ="debug" />
+  </category>
+  <category name="fordyca.support.depth1.static_cache_manager" >
+    <priority value ="debug" />
   </category>
     <category name="fordyca.tasks.depth2.cache_starter" >
     <priority value ="info" />

@@ -63,6 +63,7 @@ NS_START(fordyca, metrics, detail);
 
 using collector_typelist = rmpl::typelist<
     collector_registerer::type_wrap<fsm::movement_metrics_collector>,
+    collector_registerer::type_wrap<fsm::collision_metrics_collector>,
     collector_registerer::type_wrap<fsm::collision_locs_metrics_collector>,
     collector_registerer::type_wrap<fsm::goal_acq_metrics_collector>,
     collector_registerer::type_wrap<fsm::goal_acq_locs_metrics_collector>,

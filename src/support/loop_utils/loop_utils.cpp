@@ -81,10 +81,10 @@ __rcsw_pure bool block_drop_near_arena_boundary(
     const ds::arena_map& map,
     const std::shared_ptr<repr::base_block>& block,
     const rmath::vector2d& drop_loc) {
-  return (drop_loc.x() <= block->xdim() * 2 ||
-          drop_loc.x() >= map.xrsize() - block->xdim() * 2 ||
-          drop_loc.y() <= block->ydim() * 2 ||
-          drop_loc.y() >= map.yrsize() - block->ydim() * 2);
+  return (drop_loc.x() <= block->xdimr() * 2 ||
+          drop_loc.x() >= map.xrsize() - block->xdimr() * 2 ||
+          drop_loc.y() <= block->ydimr() * 2 ||
+          drop_loc.y() >= map.yrsize() - block->ydimr() * 2);
 } /* block_drop_overlap_with_nest() */
 
 __rcsw_pure bool block_drop_overlap_with_nest(

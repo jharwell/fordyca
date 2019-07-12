@@ -70,13 +70,13 @@ class unicell_entity : public base_entity {
   const rmath::vector2u& dloc(void) const { return m_dloc; }
 
   rmath::ranged xspan(void) const override final {
-    return base_entity::xspan(rloc(), xdim());
+    return base_entity::xspan(rloc(), xdimr());
   }
   rmath::ranged yspan(void) const override final {
-    return base_entity::yspan(rloc(), ydim());
+    return base_entity::yspan(rloc(), ydimr());
   }
-  double xdim(void) const override final { return m_dim.x(); }
-  double ydim(void) const override final { return m_dim.y(); }
+  double xdimr(void) const override final { return m_dim.x(); }
+  double ydimr(void) const override final { return m_dim.y(); }
 
   /**
    * @brief Determine if a real-valued point lies within the extent of the
@@ -113,8 +113,12 @@ class unicell_entity : public base_entity {
   explicit unicell_entity(const rmath::vector2d& dim)
       : unicell_entity{dim, -1} {}
 
-  unicell_entity(const rmath::vector2d& dim, int id)
-      : base_entity(id), m_dim(dim), m_rloc(), m_dloc() {}
+  unicell_entity(const rmath::vector2d& dim,
+                 int id)
+      : base_entity(id),
+        m_dim(dim),
+        m_rloc(),
+        m_dloc() {}
 
   template <typename T, typename = bool>
   struct entity_is_movable : std::false_type {};

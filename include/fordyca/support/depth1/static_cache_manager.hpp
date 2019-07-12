@@ -118,6 +118,9 @@ class static_cache_manager final : public base_cache_manager,
    * - Already part of an existing cache
    * - Currently carried by a robot
    * - Currently placed on the cell where cache i is to be created
+   * - Placed on the cell where any other cache besides cache i *might* be
+   *   recreated. We have to allocate blocks so that ALL static caches can be
+   *   recreated on the same timestep if needed.
    * - Already allocated for the re-creation of a different static cache
    *
    * are eligible.
@@ -129,12 +132,14 @@ class static_cache_manager final : public base_cache_manager,
    * @param all_blocks All blocks available for cache creation (already
    *                   allocated blocks are not filtered out).
    * @param loc The location the new cache is to be created at.
+   * @param n_blocks How many blocks to try to allocate for cache i.
    */
   boost::optional<ds::block_vector> cache_i_blocks_alloc(
       const ds::cache_vector& existing_caches,
       const ds::block_vector& allocated_blocks,
       const ds::block_vector& all_blocks,
-      const rmath::vector2d& loc) const;
+      const rmath::vector2d& loc,
+      size_t n_blocks) const;
 
   /**
    * @brief Absorb free blocks that are under caches into the newly created

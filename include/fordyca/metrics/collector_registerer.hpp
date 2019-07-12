@@ -150,7 +150,8 @@ class collector_registerer : public rer::client<collector_registerer> {
 
     auto range = mc_create_set.equal_range(set_value_type(id, "", ""));
 
-    ER_ASSERT(range.first != range.second,
+    ER_ASSERT(mc_create_set.end() !=
+                  mc_create_set.find(set_value_type(id, "", "")),
               "Unknown collector: type_index='%s'",
               id.name());
 

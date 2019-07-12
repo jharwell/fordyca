@@ -307,13 +307,46 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
    * caches is halfway between the center of the nest and a block cluster.
    */
   if (support::block_dist::dispatcher::kDistSingleSrc == distp->dist_type ||
-      support::block_dist::dispatcher::kDistDualSrc == distp->dist_type ||
-      support::block_dist::dispatcher::kDistQuadSrc == distp->dist_type) {
+      support::block_dist::dispatcher::kDistDualSrc == distp->dist_type) {
     auto clusters = arena_map()->block_distributor()->block_clusters();
     for (auto& c : clusters) {
       cache_locs.push_back(
           {(c->xspan().center() + arena_map()->nest().rloc().x()) / 2.0,
            (c->yspan().center() + arena_map()->nest().rloc().y()) / 2.0});
+    } /* for(i..) */
+  } else if (support::block_dist::dispatcher::kDistQuadSrc == distp->dist_type) {
+    /*
+     * Quad source is a tricky distribution to use with static caches, so we
+     * have to tweak the static cache locations in tandem with the block cluster
+     * locations to ensure that no segfaults results from cache/cache or
+     * cache/cluster overlap. See #581.
+     *
+     * Basically we want the cache centers to be halfway between the nest center
+     * and each of the block cluster centers (we assume a square arena).
+     */
+    auto clusters = arena_map()->block_distributor()->block_clusters();
+    for (auto& c : clusters) {
+      bool on_center_y =
+          std::fabs(c->xspan().center() - arena_map()->nest().rloc().x()) < 0.1;
+      bool on_center_x =
+          std::fabs(c->yspan().center() - arena_map()->nest().rloc().y()) < 0.1;
+      if (on_center_x &&
+          c->xspan().center() < arena_map()->nest().rloc().x()) { /* west */
+        cache_locs.push_back(
+            {arena_map()->xrsize() * 0.30, c->yspan().center()});
+      } else if (on_center_x && c->xspan().center() >
+                                    arena_map()->nest().rloc().x()) { /* east */
+        cache_locs.push_back(
+            {arena_map()->xrsize() * 0.675, c->yspan().center()});
+      } else if (on_center_y && c->yspan().center() <
+                                    arena_map()->nest().rloc().y()) { /* south */
+        cache_locs.push_back(
+            {c->xspan().center(), arena_map()->yrsize() * 0.30});
+      } else if (on_center_y && c->yspan().center() >
+                                    arena_map()->nest().rloc().y()) { /* north */
+        cache_locs.push_back(
+            {c->xspan().center(), arena_map()->yrsize() * 0.675});
+      }
     } /* for(i..) */
   } else {
     ER_FATAL_SENTINEL(

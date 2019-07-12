@@ -92,26 +92,32 @@ bool dispatcher::initialize(void) {
         mc_resolution,
         std::numeric_limits<uint>::max());
   } else if (kDistQuadSrc == mc_dist_type) {
+    /*
+     * Quad source is a tricky distribution to use with static caches, so we
+     * have to tweak the block cluster centers in tandem with the cache
+     * locations to ensure that no segfaults results from cache/cache or
+     * cache/cluster overlap. See #581.
+     */
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
-        static_cast<size_t>(m_grid->xdsize() * 0.10),
+        static_cast<size_t>(m_grid->xdsize() * 0.05),
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->xdsize() * 0.20),
+        static_cast<size_t>(m_grid->xdsize() * 0.15),
         m_grid->ydsize() - kINDEX_MIN - padding);
     ds::arena_grid::view area_r = m_grid->layer<arena_grid::kCell>()->subgrid(
-        static_cast<size_t>(m_grid->xdsize() * 0.80),
+        static_cast<size_t>(m_grid->xdsize() * 0.82),
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->xdsize() * 0.90),
+        static_cast<size_t>(m_grid->xdsize() * 0.92),
         m_grid->ydsize() - kINDEX_MIN - padding);
     ds::arena_grid::view area_b = m_grid->layer<arena_grid::kCell>()->subgrid(
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->ydsize() * 0.10),
+        static_cast<size_t>(m_grid->ydsize() * 0.05),
         m_grid->xdsize() - kINDEX_MIN - padding,
-        static_cast<size_t>(m_grid->ydsize() * 0.20));
+        static_cast<size_t>(m_grid->ydsize() * 0.15));
     ds::arena_grid::view area_u = m_grid->layer<arena_grid::kCell>()->subgrid(
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->ydsize() * 0.80),
+        static_cast<size_t>(m_grid->ydsize() * 0.82),
         m_grid->xdsize() - kINDEX_MIN - padding,
-        static_cast<size_t>(m_grid->ydsize() * 0.90));
+        static_cast<size_t>(m_grid->ydsize() * 0.92));
     std::vector<ds::arena_grid::view> grids{area_l, area_r, area_b, area_u};
     m_dist = std::make_unique<multi_cluster_distributor>(
         grids,

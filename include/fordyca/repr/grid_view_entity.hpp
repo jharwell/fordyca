@@ -65,6 +65,8 @@ class grid_view_entity : public base_entity {
     return rmath::uvec2dvec(m_view.origin()->loc(), mc_resolution.v());
   }
 
+  rtypes::discretize_ratio resolution(void) const { return mc_resolution; }
+
   /**
    * @brief Get the 2D space spanned by the entity in absolute
    * coordinates in the arena in X.
@@ -93,8 +95,8 @@ class grid_view_entity : public base_entity {
     return xspan().contains(point.x()) && yspan().contains(point.y());
   }
 
-  double xdim(void) const override { return xspan().span(); }
-  double ydim(void) const override { return yspan().span(); }
+  double xdimr(void) const override { return xspan().span(); }
+  double ydimr(void) const override { return yspan().span(); }
 
   /**
    * @brief Get the cell associated with a particular grid location within the
@@ -107,6 +109,14 @@ class grid_view_entity : public base_entity {
    * @return A reference to the cell.
    */
   const ds::cell2D& cell(uint i, uint j) const { return m_view[i][j]; }
+
+ protected:
+  /**
+   * @brief Return the size of the entity in discrete coordinates. Only suitable
+   * for indexing within the entity itself.
+   */
+  size_t xdimd(void) const { return m_view.shape()[0]; }
+  size_t ydimd(void) const { return m_view.shape()[1]; }
 
  private:
   /* clang-format off */

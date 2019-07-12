@@ -60,7 +60,7 @@ void base_cache::block_remove(const std::shared_ptr<base_block>& block) {
 
 std::unique_ptr<base_cache> base_cache::clone(void) const {
   return std::make_unique<base_cache>(params{
-      rtypes::spatial_dist(xdim()), mc_resolution, rloc(), blocks(), id()});
+      rtypes::spatial_dist(xdimr()), mc_resolution, rloc(), blocks(), id()});
 } /* clone() */
 
 NS_END(fordyca, repr);

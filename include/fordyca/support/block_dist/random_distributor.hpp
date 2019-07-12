@@ -107,10 +107,10 @@ class random_distributor final : public base_distributor,
 
   /* clang-format off */
   const rtypes::discretize_ratio mc_resolution;
-  const rmath::vector2u         mc_origin;
-  const rmath::rangeu           mc_xspan;
-  const rmath::rangeu           mc_yspan;
-  ds::arena_grid::view          m_grid;
+  const rmath::vector2u          mc_origin;
+  const rmath::rangeu            mc_xspan;
+  const rmath::rangeu            mc_yspan;
+  ds::arena_grid::view           m_grid;
   /* clang-format on */
 };
 

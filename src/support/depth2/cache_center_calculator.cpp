@@ -135,7 +135,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
         conflict = true;
       }
       /* check the current block cluster */
-      if (auto new_loc = deconflict_loc_entity(c_clusters[j], c_center)) {
+      if (auto new_loc = deconflict_loc_entity(c_clusters[i], c_center)) {
         new_center = new_loc.get();
         conflict = true;
       }

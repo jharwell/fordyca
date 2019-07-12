@@ -58,6 +58,17 @@ class base_cache : public unicell_immovable_entity,
                    public colored_entity,
                    public prototype::clonable<base_cache> {
  public:
+  /**
+   * @param dimension The size of the cache. Does not have to be a multiple of
+   * the arena resolution, but doing so makes it easier.
+   * @param resolution The arena resolution.
+   * @param center (X,Y) coordinates of the center of the cache.
+   * @param blocks The initial block list for the cache.
+
+   * @param id The ID to assign to the cache; -1 for a new cache, which
+   * will generate a new ID, or any positive # to use the same ID as an existing
+   * cache (used when cloning a cache into a robot's perception).
+   */
   struct params {
     /* clang-format off */
     rtypes::spatial_dist     dimension; /* caches are square */
@@ -73,17 +84,6 @@ class base_cache : public unicell_immovable_entity,
    */
   static constexpr size_t kMinBlocks = 2;
 
-  /**
-   * @param dimension The size of the cache. Does not have to be a multiple of
-   * the arena resolution, but doing so makes it easier.
-   * @param resolution The arena resolution.
-   * @param center (X,Y) coordinates of the center of the cache.
-   * @param blocks The initial block list for the cache.
-
-   * @param id The ID to assign to the cache; -1 for a new cache, which
-   * will generate a new ID, or any positive # to use the same ID as an existing
-   * cache (used when cloning a cache into a robot's perception).
-   */
   explicit base_cache(const params& p);
   ~base_cache(void) override = default;
 

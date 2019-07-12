@@ -80,8 +80,9 @@ ds::cache_vector static_cache_creator::create_all(
     std::advance(it, base_cache::kMinBlocks);
     ds::block_vector cache_i_blocks(it2, it);
 
-    ER_INFO("Creating static cache@%s from %zu free blocks",
+    ER_INFO("Creating static cache@%s: blocks=[%s] (%zu)",
             center.to_str().c_str(),
+            rcppsw::to_string(cache_i_blocks).c_str(),
             cache_i_blocks.size());
     created.push_back(create_single_cache(center, cache_i_blocks, t));
   } /* for(&center..) */

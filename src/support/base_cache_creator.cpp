@@ -87,6 +87,9 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
        * will be the first block picked up by a robot from the new cache. This
        * helps to ensure fairness/better statistics for the simulations.
        */
+      ER_DEBUG("Add block%d in from cache host cell@%s to block vector",
+               cell.block()->id(),
+               cell.loc().to_str().c_str());
       blocks.insert(blocks.begin(), cell.block());
     }
   }
@@ -179,15 +182,37 @@ __rcsw_pure bool base_cache_creator::creation_sanity_checks(
   /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {
     auto cell = m_grid->access<arena_grid::kCell>(c1->dloc());
-    ER_ASSERT(cell.fsm().state_has_cache(),
-              "Cell@%s not in HAS_CACHE state",
-              cell.loc().to_str().c_str());
-    ER_ASSERT(c1->n_blocks() == cell.block_count(),
-              "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
-              c1->n_blocks(),
-              cell.block_count());
+    ER_CHECK(cell.fsm().state_has_cache(),
+             "Cell@%s not in HAS_CACHE state",
+             cell.loc().to_str().c_str());
+    ER_CHECK(c1->n_blocks() == cell.block_count(),
+             "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+             c1->n_blocks(),
+             cell.block_count());
     auto c1_xspan = c1->xspan();
     auto c1_yspan = c1->yspan();
+
+    /* Check caches do not overlap */
+    for (auto& c2 : caches) {
+      if (c1->id() == c2->id()) {
+        continue;
+      }
+      auto c2_xspan = c2->xspan();
+      auto c2_yspan = c2->yspan();
+
+      ER_CHECK(!(c1_xspan.overlaps_with(c2_xspan) &&
+                 c1_yspan.overlaps_with(c2_yspan)),
+               "Cache%d xspan=%s, yspan=%s overlaps cache%d "
+               "xspan=%s,yspan=%s",
+               c1->id(),
+               c1_xspan.to_str().c_str(),
+               c1_yspan.to_str().c_str(),
+               c2->id(),
+               c2_xspan.to_str().c_str(),
+               c2_yspan.to_str().c_str());
+    } /* for(&c2..) */
+
+    /* check caches contain different blocks and no duplicates */
     for (auto& c2 : caches) {
       if (c1->id() == c2->id()) {
         continue;
@@ -203,18 +228,6 @@ __rcsw_pure bool base_cache_creator::creation_sanity_checks(
                  b->id(),
                  c1->id(),
                  c2->id());
-        auto c2_xspan = c2->xspan();
-        auto c2_yspan = c2->yspan();
-        ER_CHECK(!(c1_xspan.overlaps_with(c2_xspan) &&
-                   c1_yspan.overlaps_with(c2_yspan)),
-                 "Cache%d xspan=%s, yspan=%s overlaps cache%d "
-                 "xspan=%s,yspan=%s",
-                 c1->id(),
-                 c1_xspan.to_str().c_str(),
-                 c1_yspan.to_str().c_str(),
-                 c2->id(),
-                 c2_xspan.to_str().c_str(),
-                 c2_yspan.to_str().c_str());
       } /* for(&b..) */
     }   /* for(&c2..) */
 

@@ -138,8 +138,11 @@ boost::optional<ds::block_vector> static_cache_manager::blocks_alloc(
     const ds::block_vector& blocks) const {
   ds::block_vector alloc_i;
   for (auto& loc : mc_cache_locs) {
-    if (auto cache_i =
-            cache_i_blocks_alloc(existing_caches, alloc_i, blocks, loc)) {
+    if (auto cache_i = cache_i_blocks_alloc(
+            existing_caches, alloc_i, blocks, loc, repr::base_cache::kMinBlocks)) {
+      ER_DEBUG("Alloc_blocks=[%s] for cache@%s",
+               rcppsw::to_string(*cache_i).c_str(),
+               loc.to_str().c_str());
       alloc_i.insert(alloc_i.end(), cache_i->begin(), cache_i->end());
     }
   } /* for(&loc..) */
@@ -155,30 +158,40 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
     const ds::cache_vector& existing_caches,
     const ds::block_vector& allocated_blocks,
     const ds::block_vector& all_blocks,
-    const rmath::vector2d& loc) const {
+    const rmath::vector2d& loc,
+    size_t n_blocks) const {
   ds::block_vector cache_i_blocks;
   rmath::vector2u dcenter =
       rmath::dvec2uvec(loc, arena_grid()->resolution().v());
-  std::copy_if(all_blocks.begin(),
-               all_blocks.end(),
-               std::back_inserter(cache_i_blocks),
-               [&](const auto& b) {
-                 /* not carried by robot */
-                 return -1 == b->robot_id() &&
-                        /* not on the cell where the cache is to be created */
-                        b->dloc() != dcenter &&
-                        /* not already allocated for a different cache */
-                        allocated_blocks.end() ==
-                            std::find(allocated_blocks.begin(),
-                                      allocated_blocks.end(),
-                                      b) &&
-                        /* not already in an existing cache */
-                        std::all_of(existing_caches.begin(),
-                                    existing_caches.end(),
-                                    [&](const auto& c) {
-                                      return !c->contains_block(b);
-                                    });
-               });
+  std::copy_if(
+      all_blocks.begin(),
+      all_blocks.end(),
+      std::back_inserter(cache_i_blocks),
+      [&](const auto& b) {
+        /* don't have enough blocks yet */
+        return (cache_i_blocks.size() < n_blocks) &&
+               /* not carried by robot */
+               -1 == b->robot_id() &&
+               /* not already allocated for a different cache */
+               allocated_blocks.end() == std::find(allocated_blocks.begin(),
+                                                   allocated_blocks.end(),
+                                                   b) &&
+               /* not already in an existing cache */
+               std::all_of(existing_caches.begin(),
+                           existing_caches.end(),
+                           [&](const auto& c) {
+                             return !c->contains_block(b);
+                           }) &&
+               /* not already on a cell where cache will be re-created, or
+                  * on the cell where ANOTHER cache *might* be recreated */
+               std::all_of(mc_cache_locs.begin(),
+                           mc_cache_locs.end(),
+                           [&](const auto& l) {
+                             return b->dloc() !=
+                                    rmath::dvec2uvec(
+                                        l, arena_grid()->resolution().v());
+                           });
+      });
 
   if (cache_i_blocks.size() < repr::base_cache::kMinBlocks) {
     /*
@@ -200,7 +213,7 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
                     accum += "b" + std::to_string(b->id()) + "->fb" +
                              std::to_string(b->robot_id()) + ",";
                   });
-    ER_DEBUG("Block carry statuses: [%s]", accum.c_str());
+    ER_TRACE("Cache i alloc_blocks carry statuses: [%s]", accum.c_str());
 
     accum = "";
     std::for_each(
@@ -208,7 +221,7 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
           accum +=
               "b" + std::to_string(b->id()) + "->" + b->dloc().to_str() + ",";
         });
-    ER_DEBUG("Block locations: [%s]", accum.c_str());
+    ER_TRACE("Cache i alloc_blocks locs: [%s]", accum.c_str());
 
     ER_ASSERT(cache_i_blocks.size() - count < repr::base_cache::kMinBlocks,
               "For new cache @%s/%s: %zu blocks SHOULD be "

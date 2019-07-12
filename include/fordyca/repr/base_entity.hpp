@@ -102,14 +102,14 @@ class base_entity {
   virtual rmath::ranged yspan(void) const = 0;
 
   /**
-   * @brief Get the size of the entity in the X direction.
+   * @brief Get the size of the entity in the X direction in real coordinates.
    */
-  virtual double xdim(void) const = 0;
+  virtual double xdimr(void) const = 0;
 
   /**
-   * @brief Get the size of the entity in the Y direction.
+   * @brief Get the size of the entity in the Y direction in real coordinates.
    */
-  virtual double ydim(void) const = 0;
+  virtual double ydimr(void) const = 0;
 
   virtual bool is_movable(void) const { return false; }
 

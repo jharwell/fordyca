@@ -94,6 +94,7 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
                        [&](const auto& clust) {
                          /* constructed, so must assign before search */
                          auto cblocks = clust->blocks();
+                         ER_INFO("cluster blocks: [%s]", rcppsw::to_string(cblocks).c_str());
                          return cblocks.end() ==
                                 std::find(cblocks.begin(), cblocks.end(), b);
                        }) &&

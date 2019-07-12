@@ -45,7 +45,7 @@ void block_carry_visualizer::draw(const repr::base_block* const block,
   if (nullptr != dynamic_cast<const repr::cube_block*>(block)) {
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
-                  argos::CVector3(block->xdim(), block->xdim(), block->xdim()),
+                  argos::CVector3(block->xdimr(), block->xdimr(), block->xdimr()),
                   argos::CColor(block->color().red(),
                                 block->color().green(),
                                 block->color().blue()));
@@ -58,7 +58,7 @@ void block_carry_visualizer::draw(const repr::base_block* const block,
      */
     m_qt->DrawBox(argos::CVector3(0.0, 0.0, m_block_vis_offset),
                   argos::CQuaternion(),
-                  argos::CVector3(block->xdim(), block->ydim(), block->ydim()),
+                  argos::CVector3(block->xdimr(), block->ydimr(), block->ydimr()),
                   argos::CColor(block->color().red(),
                                 block->color().green(),
                                 block->color().blue()));

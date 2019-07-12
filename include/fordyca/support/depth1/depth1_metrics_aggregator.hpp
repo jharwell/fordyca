@@ -140,7 +140,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     if (nullptr == task) {
       return;
     }
-    collect("fsm::collision_counts", *task);
+    collect("fsm::collision_counts", *task->mechanism());
     collect_if("fsm::collision_locs",
                *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
