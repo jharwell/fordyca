@@ -402,6 +402,14 @@ void depth1_loop_functions::PreStep() {
     floor()->SetChanged();
   }
 
+  /*
+   * After (possibly) re-creating static caches, update the oracle, so each
+   * robot gets the most up to date information about caches.
+   */
+  if (nullptr != oracle_manager()) {
+    oracle_manager()->update(arena_map());
+  }
+
   /* Process all robots */
   swarm_iterator::robots(this,
                          [&](auto* robot) { robot_timestep_process(*robot); });
@@ -529,7 +537,7 @@ void depth1_loop_functions::Destroy(void) {
   }
 } /* Destroy() */
 
-__rcsw_pure uint depth1_loop_functions::n_free_blocks(void) const {
+uint depth1_loop_functions::n_free_blocks(void) const {
   auto accum = [&](uint sum, const auto& b) {
     return sum + (-1 == b->robot_id());
   };
