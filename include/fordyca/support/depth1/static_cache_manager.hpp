@@ -158,18 +158,6 @@ class static_cache_manager final : public base_cache_manager,
   void post_creation_blocks_absorb(const ds::cache_vector& caches,
                                    const ds::block_vector& blocks);
 
-  /**
-   * @brief Calculate the blocks that are:
-   *
-   * - Not carried by a robot
-   * - Not inside a cache
-   *
-   * @param created_caches Newly created caches.
-   * @param all_blocks All blocks that were used during dynamic cache creation.
-   */
-  ds::block_vector calc_free_blocks(const ds::cache_vector& created_caches,
-                                  const ds::block_vector& all_blocks) const;
-
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;
   const std::vector<rmath::vector2d>  mc_cache_locs;

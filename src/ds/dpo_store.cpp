@@ -140,7 +140,7 @@ dpo_store::update_res_t dpo_store::block_update(
        */
       rmath::vector2u old_loc = it1->ent()->dloc();
       m_blocks.obj_add({block_in.ent()->id(), block_in});
-      __rcsw_unused int id = block_in.ent()->id();
+      RCSW_UNUSED int id = block_in.ent()->id();
       ER_TRACE("Add block%d@%s (n_blocks=%zu)",
                id,
                block_in.ent()->dloc().to_str().c_str(),
@@ -199,7 +199,7 @@ void dpo_store::clear_all(void) {
   m_caches.clear();
 } /* clear_all() */
 
-__rcsw_pure bool dpo_store::contains(
+bool dpo_store::contains(
     const std::shared_ptr<repr::base_block>& block) const {
   return m_blocks.contains(block->id());
 } /* contains() */
@@ -208,7 +208,7 @@ bool dpo_store::contains(const std::shared_ptr<repr::base_cache>& cache) const {
   return m_caches.contains(cache->dloc());
 } /* contains() */
 
-__rcsw_pure const dp_block_map::value_type* dpo_store::find(
+const dp_block_map::value_type* dpo_store::find(
     const std::shared_ptr<repr::base_block>& block) const {
   return m_blocks.find(block->id());
 } /* find() */

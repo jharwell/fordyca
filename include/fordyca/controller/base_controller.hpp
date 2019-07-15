@@ -79,26 +79,26 @@ class base_controller : public argos::CCI_Controller,
                         public metrics::spatial::swarm_dist2D_metrics,
                         public rer::client<base_controller> {
  public:
-  base_controller(void);
-  ~base_controller(void) override;
+  base_controller(void) RCSW_COLD;
+  ~base_controller(void) override RCSW_COLD;
 
   base_controller(const base_controller& other) = delete;
   base_controller& operator=(const base_controller& other) = delete;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
-  void Reset(void) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
+  void Reset(void) override RCSW_COLD;
 
   virtual std::type_index type_index(void) const = 0;
 
   /* movement metrics */
-  rtypes::spatial_dist distance(void) const override;
+  rtypes::spatial_dist distance(void) const override RCSW_PURE;
   rmath::vector2d velocity(void) const override;
 
   /* swarm spatial 2D metrics */
-  const rmath::vector2d& position2D(void) const override final;
-  const rmath::vector2u& discrete_position2D(void) const override final;
-  rmath::vector2d heading2D(void) const override final;
+  const rmath::vector2d& position2D(void) const override final RCSW_PURE;
+  const rmath::vector2u& discrete_position2D(void) const override final RCSW_PURE;
+  rmath::vector2d heading2D(void) const override final RCSW_PURE;
 
   /**
    * @brief By default controllers have no perception subsystem, and are
@@ -162,7 +162,7 @@ class base_controller : public argos::CCI_Controller,
     m_block = block;
   }
 
-  void tv_init(const support::tv::tv_manager* tv_manager);
+  void tv_init(const support::tv::tv_manager* tv_manager) RCSW_COLD;
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.

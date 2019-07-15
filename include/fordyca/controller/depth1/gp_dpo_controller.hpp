@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
@@ -70,11 +71,11 @@ class gp_dpo_controller : public depth0::dpo_controller,
  public:
   using dpo_controller::perception;
 
-  gp_dpo_controller(void);
-  ~gp_dpo_controller(void) override;
+  gp_dpo_controller(void) RCSW_COLD;
+  ~gp_dpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void ControlStep(void) override;
 
   /* task distribution metrics */
@@ -92,8 +93,8 @@ class gp_dpo_controller : public depth0::dpo_controller,
   /**
    * @brief Get the current task the controller is executing.
    */
-  tasks::base_foraging_task* current_task(void);
-  const tasks::base_foraging_task* current_task(void) const;
+  tasks::base_foraging_task* current_task(void) RCSW_PURE;
+  const tasks::base_foraging_task* current_task(void) const RCSW_PURE;
 
   int task_id(const std::string& task_name) const;
 
@@ -109,7 +110,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  const rta::bi_tab* active_tab(void) const;
+  const rta::bi_tab* active_tab(void) const RCSW_PURE;
 
   /*
    * Public to setup metric collection from tasks.
@@ -148,10 +149,10 @@ class gp_dpo_controller : public depth0::dpo_controller,
    * - Task executive (\ref rta::bi_tdgraph_executive)
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    *
-   * @param config_repo Handle to parameter repository for this controller (after
-   *                   parsing and validation).
+   * @param config_repo Handle to parameter repository for this controller
+   *                   (after parsing and validation).
    */
-  void shared_init(const config::depth1::controller_repository& config_repo);
+  void shared_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
   /*
    * The \ref gp_dpo_controller owns the executive, but derived classes can
@@ -168,7 +169,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void task_abort_cb(const rta::polled_task*);
 
  private:
-  void private_init(const config::depth1::controller_repository& config_repo);
+  void private_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
   /* clang-format off */
   bool                                      m_display_task{false};

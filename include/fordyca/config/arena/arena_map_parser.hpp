@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
+
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/arena/blocks_parser.hpp"
 #include "fordyca/config/grid_parser.hpp"
@@ -58,7 +60,7 @@ class arena_map_parser final : public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "arena_map";
 
   void parse(const ticpp::Element& node) override;
-  bool validate(void) const override;
+  bool validate(void) const override RCSW_PURE;
 
   std::string xml_root(void) const override { return kXMLRoot; }
 

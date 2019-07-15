@@ -33,15 +33,15 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool collision_tracker::in_collision_avoidance(void) const {
+ bool collision_tracker::in_collision_avoidance(void) const {
   return m_in_avoidance;
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool collision_tracker::entered_collision_avoidance(void) const {
+ bool collision_tracker::entered_collision_avoidance(void) const {
   return m_entered_avoidance;
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool collision_tracker::exited_collision_avoidance(void) const {
+ bool collision_tracker::exited_collision_avoidance(void) const {
   return m_exited_avoidance;
 } /* exited_collision_avoidance() */
 
@@ -52,7 +52,7 @@ rtypes::timestep collision_tracker::collision_avoidance_duration(void) const {
   return rtypes::timestep(0);
 } /* collision_avoidance_duration() */
 
-__rcsw_pure rmath::vector2u collision_tracker::avoidance_loc(void) const {
+ rmath::vector2u collision_tracker::avoidance_loc(void) const {
   return mc_saa->sensing()->discrete_position();
 } /* avoidance_loc() */
 

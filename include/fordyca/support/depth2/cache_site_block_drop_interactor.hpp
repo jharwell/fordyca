@@ -112,7 +112,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                                                   t,
                                                   m_cache_manager->cache_proximity_dist());
     if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
-      auto prox_status = loop_utils::new_cache_cache_proximity(controller,
+      auto prox_status = utils::new_cache_cache_proximity(controller,
                                                                *m_map,
                                                                m_cache_manager->cache_proximity_dist());
       ER_ASSERT(-1 != prox_status.entity_id,
@@ -124,7 +124,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
 
  private:
   void cache_proximity_notify(T& controller,
-                              const loop_utils::proximity_status_t& status) {
+                              const utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position2D().to_str().c_str(),

@@ -28,7 +28,7 @@
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -107,7 +107,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  ds::block_vector free_blocks = free_blocks_calc(candidate_blocks, used_blocks);
+  ds::block_vector free_blocks = utils::free_blocks_calc(created_caches,
+                                                         candidate_blocks);
 
   ER_ASSERT(creation_sanity_checks(created_caches, free_blocks, c_clusters),
             "One or more bad caches on creation");
@@ -132,7 +133,7 @@ ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
   std::copy_if(c_candidate_blocks.begin(),
                c_candidate_blocks.end(),
                std::back_inserter(absorb_blocks),
-               [&](const auto& b) __rcsw_pure {
+               [&](const auto& b) RCSW_PURE {
                  auto xspan = rmath::ranged(c_center.x() - cache_dim.v() / 2.0,
                                             c_center.x() + cache_dim.v() / 2.0);
                  auto yspan = rmath::ranged(c_center.y() - cache_dim.v() / 2.0,
@@ -149,20 +150,6 @@ ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
                });
   return absorb_blocks;
 } /* absorb_blocks_calc() */
-
-ds::block_vector dynamic_cache_creator::free_blocks_calc(
-    const ds::block_vector& c_candidate_blocks,
-    const ds::block_vector& c_used_blocks) const {
-  ds::block_vector free_blocks;
-  std::copy_if(c_candidate_blocks.begin(),
-               c_candidate_blocks.end(),
-               std::back_inserter(free_blocks),
-               [&](const auto& b) __rcsw_pure {
-                 return c_used_blocks.end() ==
-                        std::find(c_used_blocks.begin(), c_used_blocks.end(), b);
-               });
-  return free_blocks;
-} /* free_blocks_calc() */
 
 ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
     const ds::block_vector& c_used_blocks,

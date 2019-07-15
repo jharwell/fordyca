@@ -156,7 +156,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
   bool verify_site(const rmath::vector2d& site,
                    const ds::dp_cache_map& known_caches,
-                   const ds::dp_block_map& known_blocks) const;
+                   const ds::dp_block_map& known_blocks) const RCSW_CONST;
 
   std::string nlopt_ret_str(nlopt::result res) const;
 
@@ -170,18 +170,18 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
 double __cache_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data);
+                               void *data) RCSW_PURE;
 
 double __block_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data);
+                               void *data) RCSW_PURE;
 double __nest_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data);
+                               void *data) RCSW_PURE;
 
 double __site_utility_func(const std::vector<double>& x,
                            std::vector<double>& ,
-                           void *data);
+                           void *data) RCSW_PURE;
 
 NS_END(depth2, controller, fordyca);
 

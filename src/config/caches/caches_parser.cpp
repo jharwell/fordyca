@@ -54,7 +54,7 @@ void caches_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(cnode, m_config, dimension);
 } /* parse() */
 
-__rcsw_pure bool caches_parser::validate(void) const {
+bool caches_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }

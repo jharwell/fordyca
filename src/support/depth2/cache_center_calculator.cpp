@@ -30,7 +30,7 @@
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/block_cluster.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -241,7 +241,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
    * Need to pass cache dimensions rather than dimensions of the entity, which
    * may be a block.
    */
-  auto status = loop_utils::placement_conflict(
+  auto status = utils::placement_conflict(
       center_r, rmath::vector2d(mc_cache_dim.v(), mc_cache_dim.v()), ent);
 
   if (status.x_conflict) {

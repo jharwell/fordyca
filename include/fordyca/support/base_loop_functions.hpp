@@ -89,15 +89,15 @@ class oracle_manager;
 class base_loop_functions : public argos::CLoopFunctions,
                             public rer::client<base_loop_functions> {
  public:
-  base_loop_functions(void);
-  ~base_loop_functions(void) override;
+  base_loop_functions(void) RCSW_COLD;
+  ~base_loop_functions(void) override RCSW_COLD;
 
   base_loop_functions(const base_loop_functions& s) = delete;
   base_loop_functions& operator=(const base_loop_functions& s) = delete;
 
   /* CLoopFunctions overrides */
-  void Init(ticpp::Element&) override;
-  void Reset(void) override;
+  void Init(ticpp::Element&) override RCSW_COLD;
+  void Reset(void) override RCSW_COLD;
   void PreStep(void) override;
 
   void ndc_push(void) {
@@ -130,41 +130,41 @@ class base_loop_functions : public argos::CLoopFunctions,
     return m_oracle_manager.get();
   }
 
+ private:
   /**
    * @brief Initialize convergence calculations.
    *
    * @param config Parsed convergence parameters.
    */
-  void convergence_init(const rsc::config::convergence_config* config);
+  void convergence_init(const rsc::config::convergence_config* config) RCSW_COLD;
 
- private:
   /**
    * @brief Initialize logging for all support/loop function code.
    *
    * @param output Parsed output parameters.
    */
-  void output_init(const config::output_config* output);
+  void output_init(const config::output_config* output) RCSW_COLD;
 
   /**
    * @brief Initialize the arena contents.
    *
    * @param repo Repository of parsed parameters.
    */
-  void arena_map_init(const config::loop_function_repository* repo);
+  void arena_map_init(const config::loop_function_repository* repo) RCSW_COLD;
 
   /**
    * @brief Initialize temporal variance handling.
    *
    * @param tvp Parsed TV parameters.
    */
-  void tv_init(const config::tv::tv_manager_config* tvp);
+  void tv_init(const config::tv::tv_manager_config* tvp) RCSW_COLD;
 
   /**
    * @brief Initialize oracular information injection.
    *
    * @param oraclep Parsed \ref oracle_manager parameters.
    */
-  void oracle_init(const config::oracle::oracle_manager_config* oraclep);
+  void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
 
   std::vector<double> calc_robot_nn(uint n_threads) const;
   std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;

@@ -46,7 +46,7 @@ void arena_map_parser::parse(const ticpp::Element& node) {
   m_config->nest = *m_nest.config_get<nest_parser::config_type>();
 } /* parse() */
 
-__rcsw_pure bool arena_map_parser::validate(void) const {
+bool arena_map_parser::validate(void) const {
   return m_grid.validate() && m_blocks.validate() && m_nest.validate();
 } /* validate() */
 

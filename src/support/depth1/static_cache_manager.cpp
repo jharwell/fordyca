@@ -30,6 +30,7 @@
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -83,7 +84,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
   post_creation_blocks_absorb(created, blocks);
   creator.update_host_cells(created);
 
-  auto free_blocks = calc_free_blocks(created, blocks);
+  auto free_blocks = utils::free_blocks_calc(created, blocks);
   ER_ASSERT(creator.creation_sanity_checks(created, free_blocks, clusters),
             "One or more bad caches on creation");
 
@@ -108,30 +109,6 @@ boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
     return boost::optional<ds::cache_vector>();
   }
 } /* create_conditional() */
-
-ds::block_vector static_cache_manager::calc_free_blocks(
-    const ds::cache_vector& created_caches,
-    const ds::block_vector& all_blocks) const {
-  ds::block_vector free_blocks;
-  std::copy_if(all_blocks.begin(),
-               all_blocks.end(),
-               std::back_inserter(free_blocks),
-               [&](const auto& b) __rcsw_pure {
-                 /* block not carried by robot */
-                 return -1 == b->robot_id() &&
-                        /*
-                      * Block not inside cache (to catch blocks that were on the
-                      * host cell for the cache, and we incorporated into it
-                      * during creation).
-                      */
-                        std::all_of(created_caches.begin(),
-                                    created_caches.end(),
-                                    [&](const auto& c) {
-                                      return !c->contains_block(b);
-                                    });
-               });
-  return free_blocks;
-} /* calc_free_blocks() */
 
 boost::optional<ds::block_vector> static_cache_manager::blocks_alloc(
     const ds::cache_vector& existing_caches,

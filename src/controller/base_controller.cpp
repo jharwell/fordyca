@@ -205,8 +205,11 @@ int base_controller::entity_id(void) const {
 } /* entity_id() */
 
 void base_controller::ndc_pusht(void) {
-  ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick().v()) + "] [" +
-              GetId() + "]");
+  ER_NDC_PUSH(std::string("[t=") +
+              std::to_string(m_saa->sensing()->tick().v()) +
+              std::string("] [") +
+              GetId() +
+              std::string("]"));
 }
 
 double base_controller::applied_motion_throttle(void) const {
@@ -223,7 +226,7 @@ void base_controller::tv_init(const support::tv::tv_manager* tv_manager) {
 /*******************************************************************************
  * Movement Metrics
  ******************************************************************************/
-__rcsw_pure rtypes::spatial_dist base_controller::distance(void) const {
+rtypes::spatial_dist base_controller::distance(void) const {
   /*
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
@@ -248,15 +251,15 @@ rmath::vector2d base_controller::velocity(void) const {
 /*******************************************************************************
  * Swarm Spatial Metrics
  ******************************************************************************/
-__rcsw_pure const rmath::vector2d& base_controller::position2D(void) const {
+const rmath::vector2d& base_controller::position2D(void) const {
   return m_saa->sensing()->position();
 }
-__rcsw_pure const rmath::vector2u& base_controller::discrete_position2D(
+const rmath::vector2u& base_controller::discrete_position2D(
     void) const {
   return m_saa->sensing()->discrete_position();
 }
 
-__rcsw_pure rmath::vector2d base_controller::heading2D(void) const {
+rmath::vector2d base_controller::heading2D(void) const {
   return m_saa->sensing()->heading();
 }
 

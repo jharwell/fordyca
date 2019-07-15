@@ -78,19 +78,6 @@ class dynamic_cache_creator : public base_cache_creator,
                                         uint index) const;
 
   /**
-   *  @brief Blocks in this set:
-   *
-   * - Are not part of the set of blocks to be used for the cache we are
-   *   currently attempting to create.
-   * - Have not been already been made part of a cache earlier during this
-   *   invocation of dynamic cache creation.
-   *
-   * Used for validation of cache creation.
-   */
-    ds::block_vector free_blocks_calc(const ds::block_vector& c_candidate_blocks,
-                                      const ds::block_vector& c_used_blocks) const;
-
-  /**
    * @brief Calculate the blocks a cache will absorb as a result of its center
    * beyond moved to deconflict with other caches/clusters/etc.
    *

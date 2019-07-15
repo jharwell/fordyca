@@ -119,7 +119,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   bool creation_sanity_checks(const ds::cache_vector& c_caches,
                               const ds::block_vector& c_free_blocks,
-                              const ds::block_cluster_vector& c_clusters) const;
+                              const ds::block_cluster_vector& c_clusters) const RCSW_PURE;
 
  protected:
   const ds::arena_grid* grid(void) const { return m_grid; }

@@ -120,16 +120,15 @@ void gp_dpo_controller::task_abort_cb(const rta::polled_task*) {
   m_task_aborted = true;
 } /* task_abort_cb() */
 
-__rcsw_pure const rta::bi_tab* gp_dpo_controller::active_tab(void) const {
+const rta::bi_tab* gp_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
-__rcsw_pure tasks::base_foraging_task* gp_dpo_controller::current_task(void) {
+tasks::base_foraging_task* gp_dpo_controller::current_task(void) {
   return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* gp_dpo_controller::current_task(
-    void) const {
+const tasks::base_foraging_task* gp_dpo_controller::current_task(void) const {
   return dynamic_cast<const tasks::base_foraging_task*>(
       m_executive->current_task());
 } /* current_task() */
@@ -184,7 +183,7 @@ int gp_dpo_controller::task_id(const std::string& task_name) const {
   return executive()->graph()->vertex_id(v);
 } /* task_id() */
 
-__rcsw_pure int gp_dpo_controller::current_task_tab(void) const {
+int gp_dpo_controller::current_task_tab(void) const {
   return dynamic_cast<const rta::bi_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */

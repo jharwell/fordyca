@@ -59,7 +59,7 @@ void collector::task_start(const rta::taskable_argument* const) {
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-__rcsw_pure double collector::abort_prob_calc(void) {
+double collector::abort_prob_calc(void) {
   /*
    * Collectors always have a small chance of aborting their task when not at a
    * task interface. Not strictly necessary at least for now, but it IS
@@ -166,7 +166,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(collector,
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__rcsw_pure bool collector::task_at_interface(void) const {
+ bool collector::task_at_interface(void) const {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
   return !(transport_goal_type::ekNEST == fsm->block_transport_goal());
 } /* task_at_interface() */

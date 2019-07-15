@@ -118,7 +118,7 @@ class powerlaw_distributor final : public base_distributor,
    *
    * @return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
    */
-  bool check_cluster_placements(const cluster_paramvec& pvec);
+  bool check_cluster_placements(const cluster_paramvec& pvec) RCSW_PURE;
 
   /**
    * @brief Perform a "guess and check" cluster placement until you get a

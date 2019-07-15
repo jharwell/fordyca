@@ -64,7 +64,7 @@ class metrics_parser final : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "metrics";
 
-  bool validate(void) const override __rcsw_pure;
+  bool validate(void) const override RCSW_ATTR(pure, cold);
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }

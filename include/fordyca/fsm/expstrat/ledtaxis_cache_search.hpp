@@ -80,11 +80,11 @@ class ledtaxis_cache_search : public base_expstrat,
   void task_execute(void) override final;
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override final;
-  bool entered_collision_avoidance(void) const override final;
-  bool exited_collision_avoidance(void) const override final;
+  bool in_collision_avoidance(void) const override final RCSW_PURE;
+  bool entered_collision_avoidance(void) const override final RCSW_PURE;
+  bool exited_collision_avoidance(void) const override final RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override final;
-  rmath::vector2u avoidance_loc(void) const override final;
+  rmath::vector2u avoidance_loc(void) const override final RCSW_PURE;
 
   /* prototype overrides */
   std::unique_ptr<base_expstrat> clone(void) const override {

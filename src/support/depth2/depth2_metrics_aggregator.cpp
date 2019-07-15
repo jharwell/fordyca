@@ -100,7 +100,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void depth2_metrics_aggregator::task_alloc_cb(
-    __rcsw_unused const rta::polled_task* const task,
+    RCSW_UNUSED const rta::polled_task* const task,
     const rta::bi_tab* const tab) {
   if (task0::kGeneralistName == tab->root()->name()) {
     collect("tasks::tab::generalist", *tab);

@@ -42,7 +42,7 @@ void sensing_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(snode, m_config, los_dim);
 } /* parse() */
 
-__rcsw_pure bool sensing_parser::validate(void) const {
+bool sensing_parser::validate(void) const {
   CHECK(m_config->los_dim > 0.0);
   CHECK(m_proximity_parser.validate());
   return true;

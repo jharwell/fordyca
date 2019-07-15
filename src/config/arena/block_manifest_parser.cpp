@@ -41,7 +41,7 @@ void block_manifest_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(bnode, m_config, unit_dim);
 } /* parse() */
 
-__rcsw_pure bool block_manifest_parser::validate(void) const {
+bool block_manifest_parser::validate(void) const {
   CHECK(m_config->unit_dim > 0);
   CHECK(m_config->n_cube > 0 || m_config->n_ramp > 0);
   return true;

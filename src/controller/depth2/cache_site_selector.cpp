@@ -82,7 +82,7 @@ boost::optional<rmath::vector2d> cache_site_selector::operator()(
   return boost::make_optional(site);
 } /* operator()() */
 
-__rcsw_const bool cache_site_selector::verify_site(
+ bool cache_site_selector::verify_site(
     const rmath::vector2d& site,
     const ds::dp_cache_map& known_caches,
     const ds::dp_block_map& known_blocks) const {
@@ -241,7 +241,7 @@ std::string cache_site_selector::nlopt_ret_str(nlopt::result res) const {
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-__rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
+double __cache_constraint_func(const std::vector<double>& x,
                                            std::vector<double>&,
                                            void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
@@ -253,7 +253,7 @@ __rcsw_pure double __cache_constraint_func(const std::vector<double>& x,
   return val;
 } /* __cache_constraint_func() */
 
-__rcsw_pure double __nest_constraint_func(const std::vector<double>& x,
+double __nest_constraint_func(const std::vector<double>& x,
                                           std::vector<double>&,
                                           void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
@@ -265,7 +265,7 @@ __rcsw_pure double __nest_constraint_func(const std::vector<double>& x,
   return val;
 } /* __nest_constraint_func() */
 
-__rcsw_pure double __block_constraint_func(const std::vector<double>& x,
+double __block_constraint_func(const std::vector<double>& x,
                                            std::vector<double>&,
                                            void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
@@ -277,7 +277,7 @@ __rcsw_pure double __block_constraint_func(const std::vector<double>& x,
   return val;
 } /* __block_constraint_func() */
 
-__rcsw_pure double __site_utility_func(const std::vector<double>& x,
+double __site_utility_func(const std::vector<double>& x,
                                        std::vector<double>&,
                                        void* data) {
   /*

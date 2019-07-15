@@ -96,10 +96,10 @@ class cache_op_penalty_handler final
               "Robot already serving cache penalty?");
 
     auto penalty = deconflict_penalty_finish(t);
-    int id = loop_utils::robot_on_cache(controller, *m_map);
+    int id = utils::robot_on_cache(controller, *m_map);
     ER_ASSERT(-1 != id, "Robot not in cache?");
     ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            loop_utils::robot_id(controller),
+            utils::robot_id(controller),
             id,
             t.v(),
             original_penalty().v(),

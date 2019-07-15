@@ -97,7 +97,7 @@ void arena_map::caches_add(const cache_vector& caches,
   ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
 } /* caches_add() */
 
-__rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
+int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   /*
    * Caches hide blocks, add even though a robot may technically be standing on
    * a block, if it is also standing in a cache, that takes priority.
@@ -114,7 +114,7 @@ __rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   return -1;
 } /* robot_on_block() */
 
-__rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
+int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
   for (auto& c : m_caches) {
     if (c->contains_point(pos)) {
       return c->id();
@@ -187,7 +187,7 @@ void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
 
   /* Remove cache */
   size_t before = caches().size();
-  __rcsw_unused int id = victim->id();
+  RCSW_UNUSED int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
   ER_ASSERT(caches().size() == before - 1, "Cache%d not removed", id);
 } /* cache_remove() */

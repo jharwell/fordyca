@@ -127,7 +127,7 @@ class existing_cache_block_drop_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    int cache_id = loop_utils::robot_on_cache(controller, *m_map);
+    int cache_id = utils::robot_on_cache(controller, *m_map);
 
     if (p.id() != cache_id) {
       ER_WARN("%s cannot drop in cache%d: No such cache",

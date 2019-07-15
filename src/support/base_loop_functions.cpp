@@ -64,33 +64,6 @@ base_loop_functions::~base_loop_functions(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_loop_functions::output_init(const config::output_config* const output) {
-  if ("__current_date__" == output->output_dir) {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    m_output_root = output->output_root + "/" +
-                    std::to_string(now.date().year()) + "-" +
-                    std::to_string(now.date().month()) + "-" +
-                    std::to_string(now.date().day()) + ":" +
-                    std::to_string(now.time_of_day().hours()) + "-" +
-                    std::to_string(now.time_of_day().minutes());
-  } else {
-    m_output_root = output->output_root + "/" + output->output_dir;
-  }
-
-#ifndef LIBRA_ER_NREPORT
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
-                      m_output_root + "/events.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
-                      m_output_root + "/support.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
-                      m_output_root + "/sim.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
-                      m_output_root + "/sim.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
-                      m_output_root + "/metrics.log");
-#endif
-} /* output_init() */
-
 void base_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
   /* parse simulation input file */
@@ -120,6 +93,33 @@ void base_loop_functions::Init(ticpp::Element& node) {
   std::srand(std::time(nullptr));
   ndc_pop();
 } /* Init() */
+
+void base_loop_functions::output_init(const config::output_config* const output) {
+  if ("__current_date__" == output->output_dir) {
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    m_output_root = output->output_root + "/" +
+                    std::to_string(now.date().year()) + "-" +
+                    std::to_string(now.date().month()) + "-" +
+                    std::to_string(now.date().day()) + ":" +
+                    std::to_string(now.time_of_day().hours()) + "-" +
+                    std::to_string(now.time_of_day().minutes());
+  } else {
+    m_output_root = output->output_root + "/" + output->output_dir;
+  }
+
+#ifndef LIBRA_ER_NREPORT
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
+                      m_output_root + "/events.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
+                      m_output_root + "/support.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
+                      m_output_root + "/sim.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
+                      m_output_root + "/sim.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
+                      m_output_root + "/metrics.log");
+#endif
+} /* output_init() */
 
 void base_loop_functions::convergence_init(
     const rswc::config::convergence_config* const config) {

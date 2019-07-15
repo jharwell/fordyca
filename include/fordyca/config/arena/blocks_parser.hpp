@@ -59,7 +59,7 @@ class blocks_parser : public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "blocks";
 
   void parse(const ticpp::Element& node) override;
-  bool validate(void) const override;
+  bool validate(void) const override RCSW_PURE;
 
   std::string xml_root(void) const override { return kXMLRoot; }
 

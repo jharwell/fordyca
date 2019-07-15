@@ -62,7 +62,7 @@ class block_acq_validator : public rer::client<block_acq_validator> {
   block_acq_validator(const block_acq_validator& v) = delete;
   block_acq_validator& operator=(const block_acq_validator& v) = delete;
 
-  bool operator()(const rmath::vector2d& loc, uint id) const;
+  bool operator()(const rmath::vector2d& loc, uint id) const RCSW_PURE;
 
  private:
   /* clang-format off */

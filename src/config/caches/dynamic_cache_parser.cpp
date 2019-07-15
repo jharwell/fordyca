@@ -48,7 +48,7 @@ void dynamic_cache_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_const bool dynamic_cache_parser::validate(void) const {
+ bool dynamic_cache_parser::validate(void) const {
   if (!is_parsed() || (is_parsed() && !m_config->enable)) {
     return true;
   }

@@ -29,7 +29,7 @@
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
 #include "fordyca/repr/unicell_immovable_entity.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -119,10 +119,10 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
   }
 } /* distribute_block() */
 
-__rcsw_pure bool random_distributor::verify_block_dist(
+bool random_distributor::verify_block_dist(
     const repr::base_block* const block,
     const ds::const_entity_list& entities,
-    __rcsw_unused const ds::cell2D* const cell) {
+    RCSW_UNUSED const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
   ER_CHECK(repr::base_block::kOutOfSightDLoc != block->dloc(),
            "Block%d discrete coord still out of sight after distribution",
@@ -144,7 +144,7 @@ __rcsw_pure bool random_distributor::verify_block_dist(
       continue;
     }
     auto status =
-        loop_utils::placement_conflict(block->rloc(), block->dims(), e);
+        utils::placement_conflict(block->rloc(), block->dims(), e);
     ER_ASSERT(!(status.x_conflict && status.y_conflict),
               "Entity contains block%d@%s/%s after distribution",
               block->id(),
@@ -184,7 +184,7 @@ boost::optional<random_distributor::coord_search_res_t> random_distributor::
     abs = {rel.x() + mc_origin.x(), rel.y() + mc_origin.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
     rmath::vector2d abs_r = rmath::uvec2dvec(abs, mc_resolution.v());
-    auto status = loop_utils::placement_conflict(abs_r, block_dim, ent);
+    auto status = utils::placement_conflict(abs_r, block_dim, ent);
     return status.x_conflict && status.y_conflict && count++ <= kMAX_DIST_TRIES;
   }));
   if (count <= kMAX_DIST_TRIES) {

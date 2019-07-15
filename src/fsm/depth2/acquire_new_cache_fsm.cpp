@@ -69,7 +69,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-__rcsw_pure bool acquire_new_cache_fsm::candidates_exist(void) const {
+ bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
@@ -115,7 +115,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_const acq_goal_type
+ acq_goal_type
 acquire_new_cache_fsm::acquisition_goal_internal(void) const {
   return acq_goal_type::ekNEW_CACHE;
 } /* acquisition_goal() */

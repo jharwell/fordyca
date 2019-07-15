@@ -38,7 +38,7 @@ void proximity_sensor_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(pnode, m_config, delta);
 } /* parse() */
 
-__rcsw_pure bool proximity_sensor_parser::validate(void) const {
+bool proximity_sensor_parser::validate(void) const {
   CHECK(m_config->delta > 0.0);
   return true;
 

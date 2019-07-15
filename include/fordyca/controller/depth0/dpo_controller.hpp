@@ -56,13 +56,13 @@ NS_START(depth0);
 class dpo_controller : public crw_controller,
                        public rer::client<dpo_controller> {
  public:
-  dpo_controller(void);
-  ~dpo_controller(void) override;
+  dpo_controller(void) RCSW_COLD;
+  ~dpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void ControlStep(void) override;
-  void Reset(void) override;
+  void Reset(void) override RCSW_COLD;
 
   std::type_index type_index(void) const override {
     return {typeid(*this)};
@@ -89,7 +89,7 @@ class dpo_controller : public crw_controller,
   /**
    * @brief Get the current LOS for the robot.
    */
-  const repr::line_of_sight* los(void) const;
+  const repr::line_of_sight* los(void) const RCSW_PURE;
 
   /**
    * @brief Set whether or not a robot is supposed to display it's LOS as a
@@ -110,8 +110,8 @@ class dpo_controller : public crw_controller,
     return m_perception.get();
   }
 
-  dpo_perception_subsystem* dpo_perception(void);
-  const dpo_perception_subsystem* dpo_perception(void) const;
+  dpo_perception_subsystem* dpo_perception(void) RCSW_PURE;
+  const dpo_perception_subsystem* dpo_perception(void) const RCSW_PURE;
 
   fsm::depth0::dpo_fsm* fsm(void) { return m_fsm.get(); }
   const fsm::depth0::dpo_fsm* fsm(void) const { return m_fsm.get(); }
@@ -153,7 +153,7 @@ class dpo_controller : public crw_controller,
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const config::depth0::dpo_controller_repository& config_repo);
+  void shared_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 
  private:
   /**
@@ -166,7 +166,7 @@ class dpo_controller : public crw_controller,
    *
    * This is called after \ref shared_init() during \ref Init().xo
    */
-  void private_init(const config::depth0::dpo_controller_repository& config_repo);
+  void private_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 
   /* clang-format off */
   bool                                       m_display_los{false};

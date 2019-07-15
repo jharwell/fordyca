@@ -103,7 +103,7 @@ class random_distributor final : public base_distributor,
       const rmath::vector2d& block_dim);
   bool verify_block_dist(const repr::base_block* block,
                          const ds::const_entity_list& entities,
-                         const ds::cell2D* cell);
+                         const ds::cell2D* cell) RCSW_PURE;
 
   /* clang-format off */
   const rtypes::discretize_ratio mc_resolution;

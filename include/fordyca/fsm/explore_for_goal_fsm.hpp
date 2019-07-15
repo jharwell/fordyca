@@ -88,7 +88,7 @@ class explore_for_goal_fsm final : public base_foraging_fsm,
   bool task_finished(void) const override {
     return ekST_FINISHED == current_state();
   }
-  bool task_running(void) const override;
+  bool task_running(void) const override RCSW_PURE;
   void task_reset(void) override {
     init();
     if (nullptr != m_explore_behavior) {

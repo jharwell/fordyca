@@ -97,24 +97,23 @@ class cached_block_to_nest_fsm final : public base_foraging_fsm,
   void task_start(const rta::taskable_argument*) override {}
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  rtypes::timestep collision_avoidance_duration(void) const override;
+  bool in_collision_avoidance(void) const override RCSW_PURE;
+  bool entered_collision_avoidance(void) const override RCSW_PURE;
+  bool exited_collision_avoidance(void) const override RCSW_PURE;
+  rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */
-  bool goal_acquired(void) const override;
+  bool goal_acquired(void) const override RCSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
-
-  acq_goal_type acquisition_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
+  transport_goal_type block_transport_goal(void) const override RCSW_PURE;;
 
   /**
    * @brief Reset the FSM

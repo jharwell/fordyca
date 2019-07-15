@@ -103,8 +103,8 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<repr::base_block> block(void) const;
-  std::shared_ptr<repr::base_block> block(void);
+  std::shared_ptr<repr::base_block> block(void) const RCSW_PURE;
+  std::shared_ptr<repr::base_block> block(void) RCSW_PURE;
 
   /**
    * @brief Get the cache entity associated with this cell.
@@ -112,8 +112,8 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
    * Will be NULL unless it contains a cache, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<repr::base_cache> cache(void) const;
-  std::shared_ptr<repr::base_cache> cache(void);
+  std::shared_ptr<repr::base_cache> cache(void) const RCSW_PURE;
+  std::shared_ptr<repr::base_cache> cache(void) RCSW_PURE;
 
  private:
   /* clang-format off */

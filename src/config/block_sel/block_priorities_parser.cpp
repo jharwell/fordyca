@@ -42,7 +42,7 @@ void block_priorities_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_pure bool block_priorities_parser::validate(void) const {
+bool block_priorities_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }

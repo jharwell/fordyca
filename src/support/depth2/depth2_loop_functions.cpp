@@ -78,12 +78,12 @@ NS_START(detail);
  * initialization and simulation.
  */
 struct functor_maps_initializer : public boost::static_visitor<void> {
-  functor_maps_initializer(configurer_map_type* const cmap,
+  RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
                            depth2_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
-  void operator()(const T& controller) const {
+  RCSW_COLD void operator()(const T& controller) const {
     typename robot_arena_interactor<T>::params p{lf->arena_map(),
                                                  lf->m_metrics_agg.get(),
                                                  lf->floor(),
@@ -270,7 +270,6 @@ void depth2_loop_functions::PreStep() {
     conv_calculator()->reset_metrics();
   }
   m_metrics_agg->timestep_inc_all();
-  m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 
   ndc_pop();
@@ -288,9 +287,9 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   controller->block_manip_collator()->reset();
 
   /* Set robot position, time, and send it its new LOS */
-  loop_utils::set_robot_pos<decltype(*controller)>(
+  utils::set_robot_pos<decltype(*controller)>(
       robot, arena_map()->grid_resolution());
-  loop_utils::set_robot_tick<decltype(*controller)>(
+  utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
   boost::apply_visitor(robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));

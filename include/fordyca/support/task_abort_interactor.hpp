@@ -133,7 +133,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
      */
     bool conflict = false;
     for (auto& cache : m_map->caches()) {
-      if (loop_utils::block_drop_overlap_with_cache(
+      if (utils::block_drop_overlap_with_cache(
               controller.block(), cache, controller.position2D())) {
         conflict = true;
       }
@@ -150,9 +150,9 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
      * avoidance kicking in. This can result in an endless loop if said block
      * is the only one a robot knows about (see #242).
      */
-    if (loop_utils::block_drop_overlap_with_nest(
+    if (utils::block_drop_overlap_with_nest(
             controller.block(), m_map->nest(), controller.position2D()) ||
-        loop_utils::block_drop_near_arena_boundary(
+        utils::block_drop_near_arena_boundary(
             *m_map, controller.block(), controller.position2D())) {
       conflict = true;
     }

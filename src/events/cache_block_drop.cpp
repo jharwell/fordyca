@@ -123,7 +123,7 @@ void cache_block_drop::visit(ds::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(),
             "Undefined robot index for block%d",
             m_block->id());
-  __rcsw_unused int index = m_block->robot_id();
+  RCSW_UNUSED int index = m_block->robot_id();
   visit(*m_block);
   visit(*m_cache);
   visit(map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()));

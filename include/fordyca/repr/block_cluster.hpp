@@ -62,7 +62,7 @@ class block_cluster final : public grid_view_entity<ds::arena_grid::const_view>,
 
   uint capacity(void) const { return m_capacity; }
   size_t block_count(void) const { return blocks().size(); }
-  ds::const_block_list blocks(void) const;
+  ds::const_block_list blocks(void) const RCSW_PURE;
 
  private:
   /* clang-format off */

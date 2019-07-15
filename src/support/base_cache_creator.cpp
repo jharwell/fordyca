@@ -31,7 +31,7 @@
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/block_cluster.hpp"
 #include "fordyca/support/light_type_index.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -175,7 +175,7 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
   }     /* for(cache..) */
 } /* update_host_cells() */
 
-__rcsw_pure bool base_cache_creator::creation_sanity_checks(
+ bool base_cache_creator::creation_sanity_checks(
     const ds::cache_vector& caches,
     const ds::block_vector& free_blocks,
     const ds::block_cluster_vector& clusters) const {

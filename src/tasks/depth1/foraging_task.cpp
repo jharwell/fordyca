@@ -45,14 +45,14 @@ foraging_task::foraging_task(const std::string& name,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure double foraging_task::current_time(void) const {
+double foraging_task::current_time(void) const {
   return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
       ->sensors()
       ->tick()
       .v();
 } /* current_time() */
 
-__rcsw_pure bool foraging_task::task_in_depth1(const polled_task* const task) {
+bool foraging_task::task_in_depth1(const polled_task* const task) {
   return task->name() == kCollectorName || task->name() == kHarvesterName;
 } /* task_in_depth1() */
 

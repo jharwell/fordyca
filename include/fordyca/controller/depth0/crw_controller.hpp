@@ -56,13 +56,13 @@ class crw_controller : public base_controller,
                        public fsm::block_transporter,
                        public rer::client<crw_controller> {
  public:
-  crw_controller(void);
-  ~crw_controller(void) override;
+  crw_controller(void) RCSW_COLD;
+  ~crw_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void ControlStep(void) override;
-  void Reset(void) override;
+  void Reset(void) override RCSW_COLD;
 
   std::type_index type_index(void) const override {
     return {typeid(*this)};

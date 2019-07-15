@@ -59,7 +59,7 @@ class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  bool validate(void) const override;
+  bool validate(void) const override RCSW_PURE;
 
  private:
   const rconfig::base_config* config_get_impl(void) const override {

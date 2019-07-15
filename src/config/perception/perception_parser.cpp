@@ -48,7 +48,7 @@ void perception_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_pure bool perception_parser::validate(void) const {
+bool perception_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }

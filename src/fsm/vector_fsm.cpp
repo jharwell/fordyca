@@ -48,7 +48,7 @@ vector_fsm::vector_fsm(controller::saa_subsystem* const saa)
 /*******************************************************************************
  * States
  ******************************************************************************/
-__rcsw_const FSM_STATE_DEFINE_ND(vector_fsm, start) {
+RCSW_CONST FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::ekHANDLED;
 }
 
@@ -175,9 +175,9 @@ FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
   return controller::foraging_signal::ekHANDLED;
 }
 
-__rcsw_const FSM_STATE_DEFINE(vector_fsm,
+RCSW_CONST FSM_STATE_DEFINE(vector_fsm,
                               arrived,
-                              __rcsw_unused struct goal_data* data) {
+                              RCSW_UNUSED struct goal_data* data) {
   if (ekST_ARRIVED != last_state()) {
     ER_DEBUG("Executing ekST_ARRIVED: target=%s, tol=%f",
              data->loc.to_str().c_str(),
@@ -201,15 +201,15 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool vector_fsm::in_collision_avoidance(void) const {
+ bool vector_fsm::in_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE == current_state();
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool vector_fsm::entered_collision_avoidance(void) const {
+ bool vector_fsm::entered_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE != last_state() && in_collision_avoidance();
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool vector_fsm::exited_collision_avoidance(void) const {
+ bool vector_fsm::exited_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE == last_state() && !in_collision_avoidance();
 } /* exited_collision_avoidance() */
 
@@ -247,7 +247,7 @@ void vector_fsm::init(void) {
   rpfsm::simple_fsm::init();
 } /* init() */
 
-__rcsw_pure rmath::vector2d vector_fsm::calc_vector_to_goal(
+ rmath::vector2d vector_fsm::calc_vector_to_goal(
     const rmath::vector2d& goal) {
   return goal - sensors()->position();
 } /* calc_vector_to_goal() */

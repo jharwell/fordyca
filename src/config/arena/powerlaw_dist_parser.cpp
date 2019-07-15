@@ -43,7 +43,7 @@ void powerlaw_dist_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_pure bool powerlaw_dist_parser::validate(void) const {
+bool powerlaw_dist_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }

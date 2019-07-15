@@ -106,8 +106,8 @@ class base_block : public unicell_movable_entity,
   /* transport metrics */
   void reset_metrics(void) override final;
   uint total_transporters(void) const override { return m_transporters; }
-  rtypes::timestep total_transport_time(void) const override;
-  rtypes::timestep initial_wait_time(void) const override;
+  rtypes::timestep total_transport_time(void) const override RCSW_PURE;
+  rtypes::timestep initial_wait_time(void) const override RCSW_PURE;
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back

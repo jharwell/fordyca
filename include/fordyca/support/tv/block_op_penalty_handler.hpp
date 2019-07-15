@@ -29,7 +29,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/support/tv/block_op_filter.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 #include "fordyca/support/tv/temporal_penalty_handler.hpp"
 
 /*******************************************************************************
@@ -99,7 +99,7 @@ class block_op_penalty_handler final
     int id = penalty_id_calc(controller, src, cache_prox);
     rtypes::timestep penalty = deconflict_penalty_finish(t);
     ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            loop_utils::robot_id(controller),
+            utils::robot_id(controller),
             id,
             t.v(),
             original_penalty().v(),
@@ -121,7 +121,7 @@ class block_op_penalty_handler final
     int id = -1;
     switch (src) {
       case block_op_src::ekFREE_PICKUP:
-        id = loop_utils::robot_on_block(controller, *m_map);
+        id = utils::robot_on_block(controller, *m_map);
         ER_ASSERT(-1 != id, "Robot not on block?");
         break;
       case block_op_src::ekNEST_DROP:

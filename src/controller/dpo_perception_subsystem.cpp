@@ -232,11 +232,11 @@ void dpo_perception_subsystem::los_tracking_sync(
 /*******************************************************************************
  * DPO Perception Metrics
  ******************************************************************************/
-__rcsw_pure uint dpo_perception_subsystem::n_known_blocks(void) const {
+uint dpo_perception_subsystem::n_known_blocks(void) const {
   return m_store->blocks().size();
 } /* n_known_blocks() */
 
-__rcsw_pure uint dpo_perception_subsystem::n_known_caches(void) const {
+uint dpo_perception_subsystem::n_known_caches(void) const {
   return m_store->caches().size();
 } /* n_known_caches() */
 

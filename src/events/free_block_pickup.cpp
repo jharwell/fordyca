@@ -89,7 +89,7 @@ void free_block_pickup::visit(ds::cell2D& cell) {
 void free_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_block->dloc() == rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
-  __rcsw_unused rmath::vector2d old_r = m_block->rloc();
+  RCSW_UNUSED rmath::vector2d old_r = m_block->rloc();
   events::cell_empty_visitor op(cell_op::coord());
   op.visit(map);
   visit(*m_block);
@@ -102,7 +102,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
 
 void free_block_pickup::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
-  __rcsw_unused auto* polled = dynamic_cast<rta::polled_task*>(task);
+  RCSW_UNUSED auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non free block interactor task %s causing free block pickup",

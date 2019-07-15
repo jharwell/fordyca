@@ -93,7 +93,7 @@ endif()
 
 
 # Force failures at build time rather than runtime
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 
 if (BUILD_FOR_MSI)
   # For nlopt

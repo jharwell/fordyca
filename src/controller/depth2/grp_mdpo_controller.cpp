@@ -75,11 +75,11 @@ void grp_mdpo_controller::shared_init(
       std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 } /* shared_init() */
 
-__rcsw_pure mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void) {
+mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* mdpo_perception() */
 
-__rcsw_pure const mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(
+const mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(
     void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());

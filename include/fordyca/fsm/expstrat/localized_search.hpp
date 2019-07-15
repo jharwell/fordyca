@@ -62,9 +62,9 @@ class localized_search : public base_expstrat,
   localized_search& operator=(const localized_search&) = delete;
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override final;
-  bool entered_collision_avoidance(void) const override final;
-  bool exited_collision_avoidance(void) const override final;
+  bool in_collision_avoidance(void) const override final RCSW_PURE;
+  bool entered_collision_avoidance(void) const override final RCSW_PURE;
+  bool exited_collision_avoidance(void) const override final RCSW_PURE;
   rtypes::timestep collision_avoidance_duration(void) const override final;
   rmath::vector2u avoidance_loc(void) const override final;
 

@@ -47,7 +47,7 @@ class cube_block final : public base_block {
   explicit cube_block(const rmath::vector2d& dim)
       : base_block(dim, rutils::color::kBLACK, -1) {}
 
-  cube_block(const rmath::vector2d& dim, int id)
+  cube_block(const rmath::vector2d& dim, int id) noexcept
       : base_block(dim, rutils::color::kBLACK, id) {}
 
   repr::block_type type(void) const override {

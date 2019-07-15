@@ -113,11 +113,11 @@ class dpo_store final : public rer::client<dpo_store> {
 
   void clear_all(void);
 
-  bool contains(const std::shared_ptr<repr::base_block>& block) const;
+  bool contains(const std::shared_ptr<repr::base_block>& block) const RCSW_PURE;
   bool contains(const std::shared_ptr<repr::base_cache>& cache) const;
 
   const dp_block_map::value_type* find(
-      const std::shared_ptr<repr::base_block>& block) const;
+      const std::shared_ptr<repr::base_block>& block) const RCSW_PURE;
 
   const dp_cache_map::value_type* find(
       const std::shared_ptr<repr::base_cache>& cache) const;

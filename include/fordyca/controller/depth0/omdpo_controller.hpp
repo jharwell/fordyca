@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 
 /*******************************************************************************
@@ -48,8 +49,8 @@ NS_START(depth0);
 class omdpo_controller : public mdpo_controller,
                          public rer::client<omdpo_controller> {
  public:
-  omdpo_controller(void);
-  ~omdpo_controller(void) override;
+  omdpo_controller(void) RCSW_COLD;
+  ~omdpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
   void ControlStep(void) override;
@@ -58,7 +59,7 @@ class omdpo_controller : public mdpo_controller,
     return {typeid(*this)};
   }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor);
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
 
  private:
   /* clang-format off */

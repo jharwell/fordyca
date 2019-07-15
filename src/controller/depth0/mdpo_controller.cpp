@@ -113,12 +113,11 @@ void mdpo_controller::private_init(
       f.create(exp_config->block_strategy, &p)));
 } /* private_init() */
 
-__rcsw_pure mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {
+mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-__rcsw_pure const mdpo_perception_subsystem* mdpo_controller::mdpo_perception(
-    void) const {
+const mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* perception() */

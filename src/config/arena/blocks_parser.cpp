@@ -40,7 +40,7 @@ void blocks_parser::parse(const ticpp::Element& node) {
   m_config->dist = *m_dist.config_get<block_dist_parser::config_type>();
 } /* parse() */
 
-__rcsw_pure bool blocks_parser::validate(void) const {
+bool blocks_parser::validate(void) const {
   return m_dist.validate();
 } /* validate() */
 

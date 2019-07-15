@@ -70,7 +70,7 @@ void nest_block_drop::visit(ds::arena_map& map) {
 
 void nest_block_drop::dispatch_nest_interactor(
     tasks::base_foraging_task* const task) {
-  __rcsw_unused auto* polled = dynamic_cast<rta::polled_task*>(task);
+  RCSW_UNUSED auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto interactor = dynamic_cast<events::nest_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non nest-interactor task %s causing nest block drop",

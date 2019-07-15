@@ -53,6 +53,7 @@
 #include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
@@ -76,12 +77,12 @@ NS_START(detail);
  * initialization and simulation.
  */
 struct functor_maps_initializer {
-  functor_maps_initializer(configurer_map_type* const cmap,
+  RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
                            depth0_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
-  void operator()(const T& controller) const {
+  RCSW_COLD void operator()(const T& controller) const {
     lf->m_interactor_map->emplace(
         typeid(controller),
         robot_arena_interactor<T>(lf->arena_map(),
@@ -185,9 +186,9 @@ void depth0_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   controller->block_manip_collator()->reset();
 
   /* Set robot position, time, and send it its new LOS */
-  loop_utils::set_robot_pos<decltype(*controller)>(
+  utils::set_robot_pos<decltype(*controller)>(
       robot, arena_map()->grid_resolution());
-  loop_utils::set_robot_tick<decltype(*controller)>(
+  utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
   boost::apply_visitor(detail::robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
@@ -216,7 +217,7 @@ void depth0_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   }
 } /* robot_timestep_process() */
 
-__rcsw_pure argos::CColor depth0_loop_functions::GetFloorColor(
+argos::CColor depth0_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
   rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
   if (arena_map()->nest().contains_point(tmp)) {
@@ -267,7 +268,6 @@ void depth0_loop_functions::PreStep(void) {
   }
   /* write out all metrics */
   m_metrics_agg->timestep_inc_all();
-  m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 
   ndc_pop();

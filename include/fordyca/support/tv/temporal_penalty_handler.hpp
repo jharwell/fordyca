@@ -28,7 +28,7 @@
 #include <string>
 #include <memory>
 
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 #include "fordyca/support/tv/temporal_penalty.hpp"
 #include "rcppsw/control/periodic_waveform.hpp"
 #include "rcppsw/control/waveform_generator.hpp"
@@ -104,7 +104,7 @@ class temporal_penalty_handler
    * @return \c TRUE If the robot is currently waiting AND it has satisfied its
    * penalty.
    */
-  __rcsw_pure bool penalty_satisfied(const T& controller, rtypes::timestep t) const {
+  RCSW_PURE bool penalty_satisfied(const T& controller, rtypes::timestep t) const {
     auto it = std::find_if(m_penalty_list.begin(),
                            m_penalty_list.end(),
                            [&](const temporal_penalty<T>& p) {
@@ -143,7 +143,7 @@ class temporal_penalty_handler
     if (it != m_penalty_list.end()) {
       m_penalty_list.remove(*it);
     }
-    ER_INFO("fb%d", loop_utils::robot_id(controller));
+    ER_INFO("fb%d", utils::robot_id(controller));
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot still serving penalty after abort?!");
   }
@@ -159,7 +159,7 @@ class temporal_penalty_handler
    * @brief If \c TRUE, then the specified robot is currently serving a cache
    * penalty.
    */
-  __rcsw_pure bool is_serving_penalty(const T& controller) const {
+  RCSW_PURE bool is_serving_penalty(const T& controller) const {
     auto it = std::find_if(m_penalty_list.begin(),
                            m_penalty_list.end(),
                            [&](const temporal_penalty<T>& p) {

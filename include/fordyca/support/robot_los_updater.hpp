@@ -28,7 +28,7 @@
 #include <limits>
 
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -80,7 +80,7 @@ class robot_los_updater final
     }
     uint los_grid_size = static_cast<uint>(
         std::round(c->los_dim() / m_map->grid_resolution().v()));
-    loop_utils::set_robot_los(c, los_grid_size, *m_map);
+    utils::set_robot_los(c, los_grid_size, *m_map);
   }
 
  private:

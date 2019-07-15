@@ -104,7 +104,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                                                    t,
                                                    m_cache_manager->cache_proximity_dist());
       if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
-        auto prox_status = loop_utils::new_cache_cache_proximity(controller,
+        auto prox_status = utils::new_cache_cache_proximity(controller,
                                                                  *m_map,
                                                                  m_cache_manager->cache_proximity_dist());
         ER_ASSERT(-1 != prox_status.entity_id,
@@ -117,7 +117,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
 
  private:
   void cache_proximity_notify(T& controller,
-                              const loop_utils::proximity_status_t& status) {
+                              const utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position2D().to_str().c_str(),
@@ -155,7 +155,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     ER_ASSERT(controller.current_task()->goal_acquired() &&
               tv::acq_goal_type::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for new cache block drop");
-    auto status = loop_utils::new_cache_cache_proximity(controller,
+    auto status = utils::new_cache_cache_proximity(controller,
                                                        *m_map,
                                                        m_cache_manager->cache_proximity_dist());
 

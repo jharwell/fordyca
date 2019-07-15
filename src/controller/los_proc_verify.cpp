@@ -38,14 +38,13 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
   /*
-   * Verify that for each cell that contained a block in the LOS, that the
-   * block is also contained in the store after processing. If we are using
-   * oracular controllers, then it is possible to be told about the
-   * existence of a block that is hidden by a cache, which will be removed
-   * during normal LOS processing from our DPO store, but will trigger an
-   * unconditional assert() here. The fix is to only assert() if there is
-   * not a cache that contains the block's location, and it is therefore not
-   * occluded.
+   * Verify that for each cell that contained a block in the LOS, that the block
+   * is also contained in the store after processing. If we are using oracular
+   * controllers, then it is possible to be told about the existence of a block
+   * that is hidden by a cache, which will be removed during normal LOS
+   * processing from our DPO store, but will trigger an unconditional assert()
+   * here. The fix is to only assert() if there is not a cache that contains the
+   * block's location, and it is therefore not occluded.
    */
   for (auto& cache : c_dpo->caches().const_values_range()) {
     for (auto& block : mc_los->blocks()) {

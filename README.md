@@ -44,14 +44,40 @@ anywhere), with the following arguments:
 
 For example:
 
-        ./bootstrap.sh $HOME/research YES /usr/local 2
+        ./bootstrap.sh $HOME/research YES /usr/local 2 > output.txt 2>&1
 
 To build the code under `~/research` on a 2 core machine and install ARGoS
-system-wide.
+system-wide. The `> output.txt 2>&1` part is important to capture the output of
+running the script so that if there are errors it is easier to track them down
+(the script generates a LOT of output, which usually overflows terminal
+ringbuffers).
 
 The script assumes you have sudo privileges on the machine you want to install
 the project on. If you do not, you will have to build a *lot* more stuff from
 source manually.
+
+# Viewing The Documentation
+
+After the bootstrap.sh script finishes successfully, you can (*AND SHOULD*) view
+the doxygen documentation in your browser by navigating to the generated
+`index.html` file. Simply open your browser, and then put the path to the
+fordyca repo followed by `/build/docs/html/index.html`. For example, if you
+built fordyca under `$HOME/research`, then you would do
+`$HOME/research/build/docs/html/index.html` in the address bar of your browser.
+
+Alternatively, if you would like a .pdf of the documentation, you can navigate to
+the `latex` directory for doxygen and then build said pdf. Again assuming you
+built fordyca in `$HOME/research`, do the following:
+
+    cd $HOME/research/fordyca/build/docs/latex
+    make
+
+A `refman.pdf` will (eventually) be built in that directory once the command
+finishes. Note that if you want to do build the .pdf you will also need the
+following programs:
+
+- `pdflatex` (`texlive-latex-base` on ubuntu)
+- Texlive fonts (`texlive-fonts-extra` `texlive-fonts-recommended` `texlive-generic-recommended` `texlive-fonts-science` on ubuntu)
 
 # Available Controllers
 

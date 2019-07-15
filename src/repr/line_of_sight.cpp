@@ -84,7 +84,7 @@ ds::cache_list line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-__rcsw_pure bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
+ bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   for (size_t i = 0; i < xsize(); ++i) {
     for (size_t j = 0; j < ysize(); ++j) {
       if (cell(i, j).loc() == loc) {
@@ -95,7 +95,7 @@ __rcsw_pure bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   return false;
 } /* contains_loc() */
 
-__rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
+ const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
   ER_ASSERT(i < mc_view.shape()[0],
             "Out of bounds X access: %u >= %lu",
             i,
@@ -107,19 +107,19 @@ __rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
   return mc_view[i][j];
 }
 
-__rcsw_pure rmath::vector2u line_of_sight::abs_ll(void) const {
+ rmath::vector2u line_of_sight::abs_ll(void) const {
   return cell(0, 0).loc();
 } /* abs_ll() */
 
-__rcsw_pure rmath::vector2u line_of_sight::abs_ul(void) const {
+ rmath::vector2u line_of_sight::abs_ul(void) const {
   return cell(0, ysize() - 1).loc();
 } /* abs_ul() */
 
-__rcsw_pure rmath::vector2u line_of_sight::abs_lr(void) const {
+ rmath::vector2u line_of_sight::abs_lr(void) const {
   return cell(xsize() - 1, 0).loc();
 } /* abs_lr() */
 
-__rcsw_pure rmath::vector2u line_of_sight::abs_ur(void) const {
+ rmath::vector2u line_of_sight::abs_ur(void) const {
   return cell(xsize() - 1, ysize() - 1).loc();
 } /* abs_ur() */
 

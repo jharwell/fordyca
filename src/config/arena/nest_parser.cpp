@@ -48,7 +48,7 @@ void nest_parser::parse(const ticpp::Element& node) {
   m_config->dims.y(std::atof(res[1].c_str()));
 } /* parse() */
 
-__rcsw_pure bool nest_parser::validate(void) const {
+bool nest_parser::validate(void) const {
   CHECK(m_config->center.is_pd());
   CHECK(m_config->dims.is_pd());
   return true;

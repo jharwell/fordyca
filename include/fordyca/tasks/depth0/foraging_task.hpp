@@ -72,7 +72,7 @@ class foraging_task
 
   ~foraging_task(void) override = default;
 
-  static bool task_in_depth0(const rta::polled_task* task);
+  static bool task_in_depth0(const rta::polled_task* task) RCSW_PURE;
 };
 
 NS_END(depth0, tasks, fordyca);

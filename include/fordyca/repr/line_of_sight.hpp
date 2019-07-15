@@ -84,10 +84,10 @@ class line_of_sight final : public rer::client<line_of_sight> {
    */
   size_t xsize(void) const { return mc_view.shape()[0]; }
 
-  rmath::vector2u abs_ll(void) const;
-  rmath::vector2u abs_lr(void) const;
-  rmath::vector2u abs_ul(void) const;
-  rmath::vector2u abs_ur(void) const;
+  rmath::vector2u abs_ll(void) const RCSW_PURE;
+  rmath::vector2u abs_lr(void) const RCSW_PURE;
+  rmath::vector2u abs_ul(void) const RCSW_PURE;
+  rmath::vector2u abs_ur(void) const RCSW_PURE;
 
   /**
    * @brief Get the size of the Y dimension for a LOS.
@@ -99,7 +99,7 @@ class line_of_sight final : public rer::client<line_of_sight> {
   /**
    * @brief Determine if the *ABSOLUTE* arena location is contained in the LOS.
    */
-  bool contains_loc(const rmath::vector2u& loc) const;
+  bool contains_loc(const rmath::vector2u& loc) const RCSW_PURE;
 
   /**
    * @brief Get the # elements in a LOS.
@@ -118,7 +118,7 @@ class line_of_sight final : public rer::client<line_of_sight> {
    *
    * @return A reference to the cell.
    */
-  const ds::cell2D& cell(uint i, uint j) const;
+  const ds::cell2D& cell(uint i, uint j) const RCSW_PURE;
 
   /**
    * @brief Get the coordinates for the center of the LOS.

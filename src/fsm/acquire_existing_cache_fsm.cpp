@@ -124,7 +124,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
   return boost::optional<acquire_goal_fsm::candidate_type>();
 } /* existing_cache_select() */
 
-__rcsw_pure bool acquire_existing_cache_fsm::candidates_exist(void) const {
+ bool acquire_existing_cache_fsm::candidates_exist(void) const {
   return !mc_store->caches().empty();
 } /* candidates() */
 
@@ -140,7 +140,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   }
 } /* cache_acquired_cb() */
 
-__rcsw_const acq_goal_type
+ acq_goal_type
 acquire_existing_cache_fsm::acq_goal_internal(void) const {
   return acq_goal_type::ekEXISTING_CACHE;
 } /* acq_goal() */

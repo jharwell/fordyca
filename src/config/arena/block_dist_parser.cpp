@@ -55,7 +55,7 @@ void block_dist_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-__rcsw_pure bool block_dist_parser::validate(void) const {
+bool block_dist_parser::validate(void) const {
   CHECK(true == m_powerlaw.validate());
   CHECK(true == m_manifest.validate());
   CHECK(true == m_redist_governor.validate());

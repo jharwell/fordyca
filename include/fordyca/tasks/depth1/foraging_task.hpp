@@ -61,10 +61,10 @@ class foraging_task : public base_foraging_task,
                 std::unique_ptr<rta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
-  static bool task_in_depth1(const polled_task* task);
+  static bool task_in_depth1(const polled_task* task) RCSW_PURE;
 
     /* task overrides */
-  double current_time(void) const override;
+  double current_time(void) const override RCSW_PURE;
 };
 
 NS_END(depth1, tasks, fordyca);

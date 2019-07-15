@@ -118,32 +118,32 @@ HFSM_STATE_DEFINE(cached_block_to_nest_fsm,
   return controller::foraging_signal::ekHANDLED;
 }
 
-__rcsw_const HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
+RCSW_CONST HFSM_STATE_DEFINE_ND(cached_block_to_nest_fsm, finished) {
   return controller::foraging_signal::ekHANDLED;
 }
 
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool cached_block_to_nest_fsm::in_collision_avoidance(void) const {
+ bool cached_block_to_nest_fsm::in_collision_avoidance(void) const {
   return (m_cache_fsm.task_running() && m_cache_fsm.in_collision_avoidance()) ||
          base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool cached_block_to_nest_fsm::entered_collision_avoidance(
+ bool cached_block_to_nest_fsm::entered_collision_avoidance(
     void) const {
   return (m_cache_fsm.task_running() &&
           m_cache_fsm.entered_collision_avoidance()) ||
          base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool cached_block_to_nest_fsm::exited_collision_avoidance(void) const {
+ bool cached_block_to_nest_fsm::exited_collision_avoidance(void) const {
   return (m_cache_fsm.task_running() &&
           m_cache_fsm.exited_collision_avoidance()) ||
          base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
-__rcsw_pure rtypes::timestep cached_block_to_nest_fsm::collision_avoidance_duration(
+ rtypes::timestep cached_block_to_nest_fsm::collision_avoidance_duration(
     void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.collision_avoidance_duration();
@@ -152,7 +152,7 @@ __rcsw_pure rtypes::timestep cached_block_to_nest_fsm::collision_avoidance_durat
   }
 } /* collision_avoidance_duration() */
 
-__rcsw_pure rmath::vector2u cached_block_to_nest_fsm::avoidance_loc(void) const {
+ rmath::vector2u cached_block_to_nest_fsm::avoidance_loc(void) const {
   if (m_cache_fsm.task_running()) {
     return m_cache_fsm.avoidance_loc();
   } else {
@@ -187,7 +187,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
                          m_cache_fsm,
                          const);
 
-__rcsw_pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
+ bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (acq_goal_type::ekEXISTING_CACHE == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
@@ -196,7 +196,7 @@ __rcsw_pure bool cached_block_to_nest_fsm::goal_acquired(void) const {
   return false;
 }
 
-__rcsw_pure acq_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
+ acq_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
     return acq_goal_type::ekEXISTING_CACHE;
@@ -210,7 +210,7 @@ __rcsw_pure acq_goal_type cached_block_to_nest_fsm::acquisition_goal(void) const
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-__rcsw_pure transport_goal_type
+ transport_goal_type
 cached_block_to_nest_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_DROP == current_state()) {

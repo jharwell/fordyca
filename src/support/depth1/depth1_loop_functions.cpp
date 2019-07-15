@@ -76,7 +76,6 @@ template <class ControllerType>
 struct d1_subtask_status_extractor
     : boost::static_visitor<std::pair<bool, bool>> {
   using controller_type = ControllerType;
-  d1_subtask_status_extractor(void) = default;
 
   std::pair<bool, bool> operator()(const ControllerType* const c) const {
     auto task = dynamic_cast<const rta::polled_task*>(c->current_task());
@@ -119,12 +118,12 @@ struct d1_subtask_status_extractor_adaptor
  * initialization and simulation.
  */
 struct functor_maps_initializer : public boost::static_visitor<void> {
-  functor_maps_initializer(configurer_map_type* const cmap,
+  RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
                            depth1_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
-  void operator()(const T& controller) const {
+  RCSW_COLD void operator()(const T& controller) const {
     typename robot_arena_interactor<T>::params p{lf->arena_map(),
                                                  lf->m_metrics_agg.get(),
                                                  lf->floor(),
@@ -425,7 +424,6 @@ void depth1_loop_functions::PreStep() {
   }
 
   m_metrics_agg->timestep_inc_all();
-  m_metrics_agg->timestep_reset_all();
   m_metrics_agg->interval_reset_all();
 
   ndc_pop();
@@ -443,9 +441,9 @@ void depth1_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   controller->block_manip_collator()->reset();
 
   /* Set robot position, time, and send it its new LOS */
-  loop_utils::set_robot_pos<decltype(*controller)>(
+  utils::set_robot_pos<decltype(*controller)>(
       robot, arena_map()->grid_resolution());
-  loop_utils::set_robot_tick<decltype(*controller)>(
+  utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
   boost::apply_visitor(robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
@@ -537,15 +535,6 @@ void depth1_loop_functions::Destroy(void) {
   }
 } /* Destroy() */
 
-uint depth1_loop_functions::n_free_blocks(void) const {
-  auto accum = [&](uint sum, const auto& b) {
-    return sum + (-1 == b->robot_id());
-  };
-
-  return std::accumulate(
-      arena_map()->blocks().begin(), arena_map()->blocks().end(), 0, accum);
-} /* n_free_blocks() */
-
 void depth1_loop_functions::static_cache_monitor(void) {
   /* nothing to do--all our managed caches exist */
   if (arena_map()->caches().size() == m_cache_manager->n_managed()) {
@@ -583,10 +572,11 @@ void depth1_loop_functions::static_cache_monitor(void) {
   }
   ER_INFO(
       "Could not create static caches: n_harvesters=%u,n_collectors=%u,free "
-      "blocks=%u",
+      "blocks=%zu",
       counts.first,
       counts.second,
-      n_free_blocks());
+      utils::free_blocks_calc(arena_map()->caches(),
+                              arena_map()->blocks()).size());
 } /* static_cache_monitor() */
 
 using namespace argos; // NOLINT

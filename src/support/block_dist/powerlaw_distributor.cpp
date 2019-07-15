@@ -100,7 +100,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
      * we have to cast.
      */
     auto view = grid->layer<arena_grid::kCell>()->subgrid(x, y, x_max, y_max);
-    __rcsw_unused rmath::vector2u loc = (*view.origin()).loc();
+    RCSW_UNUSED rmath::vector2u loc = (*view.origin()).loc();
     ER_TRACE("Guess cluster%zu placement x=[%lu-%lu], y=[%lu-%lu], size=%u",
              i,
              loc.x() + view.index_bases()[0],
@@ -113,7 +113,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
   return config;
 } /* guess_cluster_placements() */
 
-__rcsw_pure bool powerlaw_distributor::check_cluster_placements(
+ bool powerlaw_distributor::check_cluster_placements(
     const cluster_paramvec& pvec) {
   for (const cluster_config& p : pvec) {
     bool overlap = std::any_of(pvec.begin(), pvec.end(), [&](const auto& other) {
@@ -188,7 +188,7 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
   } /* for(i..) */
   for (auto& [clust_size, dist_list] : m_dist_map) {
     ER_INFO("Mapped %zu clusters of capacity %u", dist_list.size(), clust_size);
-    for (__rcsw_unused auto& dist : dist_list) {
+    for (RCSW_UNUSED auto& dist : dist_list) {
       ER_INFO("Cluster with origin@%s/%s: capacity=%u",
               dist.block_clusters().front()->ranchor().to_str().c_str(),
               dist.block_clusters().front()->danchor().to_str().c_str(),

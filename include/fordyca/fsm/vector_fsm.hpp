@@ -107,9 +107,9 @@ class vector_fsm final : public base_foraging_fsm,
   void init(void) override;
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
+  bool in_collision_avoidance(void) const override RCSW_PURE;
+  bool entered_collision_avoidance(void) const override RCSW_PURE;
+  bool exited_collision_avoidance(void) const override RCSW_PURE;
   rmath::vector2u avoidance_loc(void) const override;
 
  protected:
@@ -188,7 +188,7 @@ class vector_fsm final : public base_foraging_fsm,
    * @return The vector, specified with the tail at the robot and the head
    * pointing towards the goal.
    */
-  rmath::vector2d calc_vector_to_goal(const rmath::vector2d& goal);
+  rmath::vector2d calc_vector_to_goal(const rmath::vector2d& goal) RCSW_PURE;
 
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, rpfsm::event_data);

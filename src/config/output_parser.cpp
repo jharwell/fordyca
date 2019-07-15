@@ -48,7 +48,7 @@ void output_parser::parse(const ticpp::Element& node) {
   XML_PARSE_ATTR(onode, m_config, output_dir);
 } /* parse() */
 
-__rcsw_pure bool output_parser::validate(void) const {
+bool output_parser::validate(void) const {
   return m_metrics_parser.validate();
 } /* validate() */
 

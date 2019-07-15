@@ -72,8 +72,8 @@ class mdpo_perception_subsystem final
     return m_cell_stats[state];
   }
   void reset_metrics(void) override;
-  double known_percentage(void) const override __rcsw_pure;
-  double unknown_percentage(void) const override __rcsw_pure;
+  double known_percentage(void) const override RCSW_PURE;
+  double unknown_percentage(void) const override RCSW_PURE;
 
   /**
    * @brief Update the robot's perception of the environment, passing it its
@@ -88,8 +88,8 @@ class mdpo_perception_subsystem final
 
   const ds::dpo_semantic_map* map(void) const { return m_map.get(); }
   ds::dpo_semantic_map* map(void) { return m_map.get(); }
-  const ds::dpo_store* dpo_store(void) const override __rcsw_pure;
-  ds::dpo_store* dpo_store(void) override __rcsw_pure;
+  const ds::dpo_store* dpo_store(void) const override RCSW_PURE;
+  ds::dpo_store* dpo_store(void) override RCSW_PURE;
 
  private:
   /*

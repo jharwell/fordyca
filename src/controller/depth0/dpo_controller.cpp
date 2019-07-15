@@ -65,7 +65,7 @@ void dpo_controller::perception(
   m_perception = std::move(perception);
 }
 
-__rcsw_pure const repr::line_of_sight* dpo_controller::los(void) const {
+const repr::line_of_sight* dpo_controller::los(void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get())->los();
 }
 void dpo_controller::los(std::unique_ptr<repr::line_of_sight> new_los) {
@@ -142,11 +142,11 @@ void dpo_controller::private_init(
       f.create(exp_config->block_strategy, &p));
 } /* private_init() */
 
-__rcsw_pure dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
+dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
   return static_cast<dpo_perception_subsystem*>(m_perception.get());
 } /* dpo_perception() */
 
-__rcsw_pure const dpo_perception_subsystem* dpo_controller::dpo_perception(
+const dpo_perception_subsystem* dpo_controller::dpo_perception(
     void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get());
 } /* dpo_perception() */

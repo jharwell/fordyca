@@ -29,7 +29,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
@@ -99,7 +99,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    *
    */
   op_filter_status free_pickup_filter(const T& controller) const {
-    int block_id = loop_utils::robot_on_block(controller, *m_map);
+    int block_id = utils::robot_on_block(controller, *m_map);
     if (!(controller.goal_acquired() &&
           acq_goal_type::ekBLOCK == controller.acquisition_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
@@ -134,7 +134,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
 
-    int cache_id = loop_utils::new_cache_cache_proximity(controller,
+    int cache_id = utils::new_cache_cache_proximity(controller,
                                                          *m_map,
                                                          cache_prox)
                    .entity_id;
@@ -156,7 +156,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
           transport_goal_type::ekNEW_CACHE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
-    int cache_id = loop_utils::new_cache_cache_proximity(controller,
+    int cache_id = utils::new_cache_cache_proximity(controller,
                                                          *m_map,
                                                          cache_prox)
                        .entity_id;

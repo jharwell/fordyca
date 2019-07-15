@@ -75,17 +75,18 @@ rmath::vector2d saa_subsystem::linear_velocity(void) const {
           m_sensing->heading().angle()};
 } /* linear_velocity() */
 
-__rcsw_pure double saa_subsystem::angular_velocity(void) const {
+double saa_subsystem::angular_velocity(void) const {
   return (m_actuation->differential_drive().right_linspeed() -
           m_actuation->differential_drive().left_linspeed()) /
          m_actuation->differential_drive().axle_length();
 } /* angular_velocity() */
 
-__rcsw_pure double saa_subsystem::max_speed(void) const {
+double saa_subsystem::max_speed(void) const {
   return m_actuation->differential_drive().max_speed();
 } /* max_speed() */
 
-__rcsw_pure rmath::vector2d saa_subsystem::position(void) const {
+rmath::vector2d saa_subsystem::position(void) const {
   return m_sensing->position();
 } /* position() */
+
 NS_END(controller, fordyca);

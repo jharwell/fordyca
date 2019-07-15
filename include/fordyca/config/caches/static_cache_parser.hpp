@@ -56,7 +56,7 @@ class static_cache_parser final: public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "static";
 
   void parse(const ticpp::Element& node) override;
-  bool validate(void) const override;
+  bool validate(void) const override RCSW_CONST;
 
   std::string xml_root(void) const override { return kXMLRoot; }
 

@@ -258,7 +258,7 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
             pcache->ent()->n_blocks());
 
   } else {
-    __rcsw_unused int id = pcache->ent()->id();
+    RCSW_UNUSED int id = pcache->ent()->id();
     pcache->ent_obj()->block_remove(m_pickup_block);
     store.cache_remove(pcache->ent_obj());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
@@ -301,7 +301,7 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
             cell.cache()->n_blocks());
 
   } else {
-    __rcsw_unused int id = cell.cache()->id();
+    RCSW_UNUSED int id = cell.cache()->id();
     cell.cache()->block_remove(m_pickup_block);
 
     map.cache_remove(cell.cache());

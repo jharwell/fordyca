@@ -75,11 +75,11 @@ class dpo_map {
    * @brief Returns a pointer to the object that matches the specified key, or
    * nullptr if the key is not found in themap.
    */
-  __rcsw_pure const value_type* find(const key_type& key) const {
+  const value_type* find(const key_type& key) const RCSW_PURE {
     auto it = m_obj.find(key);
     return (it == m_obj.end()) ? nullptr : &(it->second);
   }
-  __rcsw_pure value_type* find(const key_type& key) {
+  value_type* find(const key_type& key) RCSW_PURE {
     auto it = m_obj.find(key);
     return (it == m_obj.end()) ? nullptr : &(it->second);
   }
@@ -88,7 +88,7 @@ class dpo_map {
    * @brief Returns \c TRUE iff the key is contained in the map, and \c FALSE
    * otherwise.
    */
-  __rcsw_pure bool contains(const key_type& key) const {
+  RCSW_PURE bool contains(const key_type& key) const {
     return nullptr != find(key);
   }
 

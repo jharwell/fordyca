@@ -140,7 +140,7 @@ class cached_block_pickup_interactor
      * initialized with (not just checking if it is not -1).
      */
     auto status = interactor_status::ekNoEvent;
-    if (p.id() != loop_utils::robot_on_cache(controller, *m_map)) {
+    if (p.id() != utils::robot_on_cache(controller, *m_map)) {
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
@@ -194,7 +194,7 @@ class cached_block_pickup_interactor
               "Cache%d from penalty does not exist",
               penalty.id());
     events::cached_block_pickup_visitor pickup_op(
-        m_loop, *it, loop_utils::robot_id(controller), t);
+        m_loop, *it, utils::robot_id(controller), t);
     (*it)->penalty_served(penalty.penalty());
 
     /*

@@ -1,6 +1,6 @@
 /**
  * @file loop_utils.hpp
- * @ingroup fordyca support loop_utils
+ * @ingroup fordyca support utils
  *
  * Helpers for loop functions that CAN be free functions, as they do not require
  * access to anything in \ref argos::CLoopFunctions.
@@ -22,17 +22,19 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_LOOP_UTILS_LOOP_UTILS_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_LOOP_UTILS_LOOP_UTILS_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_UTILS_LOOP_UTILS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_UTILS_LOOP_UTILS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "fordyca/repr/line_of_sight.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
+#include "fordyca/nsalias.hpp"
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,17 +51,11 @@ class line_of_sight;
 class base_block;
 }
 namespace ds { class arena_map; }
-NS_START(support, loop_utils);
+NS_START(support, utils);
 
 /*******************************************************************************
  * Types
  ******************************************************************************/
-struct proximity_status_t {
-  int entity_id{-1};
-  rmath::vector2d entity_loc{};
-  rmath::vector2d distance{};
-};
-
 struct placement_status_t {
   bool x_conflict{false};
   bool y_conflict{false};
@@ -68,49 +64,6 @@ struct placement_status_t {
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-/**
- * @brief Check if a robot is on top of a block. If, so return the block index.
- *
- * @param robot The robot to check.
- * @param map \ref arena_map reference.
- *
- * @return The block index, or -1 if the robot is not on top of a block.
- */
-int robot_on_block(const argos::CFootBotEntity& robot, const ds::arena_map& map);
-int robot_on_block(const controller::base_controller& controller,
-                   const ds::arena_map& map);
-
-/**
- * @brief Check if a robot is on top of a cache. If, so return the cache index.
- *
- * @param robot The robot to check.
- * @param map \ref arena_map reference.
- *
- * @return The cache index, or -1 if the robot is not on top of a cache.
- */
-int robot_on_cache(const argos::CFootBotEntity& robot, const ds::arena_map& map);
-int robot_on_cache(const controller::base_controller& controller,
-                   const ds::arena_map& map);
-/**
- * @brief Get the ID of the robot as an integer.
- */
-int robot_id(const argos::CFootBotEntity& robot);
-int robot_id(const controller::base_controller& controller);
-
-bool block_drop_overlap_with_cache(
-    const std::shared_ptr<repr::base_block>& block,
-    const std::shared_ptr<repr::arena_cache>& cache,
-    const rmath::vector2d& drop_loc);
-
-bool block_drop_near_arena_boundary(
-    const ds::arena_map& map,
-    const std::shared_ptr<repr::base_block>& block,
-    const rmath::vector2d& drop_loc);
-bool block_drop_overlap_with_nest(
-    const std::shared_ptr<repr::base_block>& block,
-    const repr::nest& nest,
-    const rmath::vector2d& drop_loc);
-
 /**
  * @brief Set the position of the robot in the arena.
  *
@@ -135,34 +88,6 @@ void set_robot_pos(argos::CFootBotEntity& robot,
   controller.position(pos);
   controller.discrete_position(dpos);
 }
-
-/**
- * @brief Determine if creating dropping a block at the robot's current
- * position will cause a cache to be created because it is too close to other
- * blocks in the arena (blocks that are unknown to the robot).
- *
- * @return (block id of cache that is too close (-1 if none), distance to said
- *         block).
- */
-proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
-                                              const ds::arena_map& map,
-                                              rtypes::spatial_dist block_prox);
-
-/**
- * @brief Determine if creating a new cache centered at the robot's current
- * position will overlap with any other caches in the arena/be too close to
- * them. This is an approximate check, because the weighted centroid of
- * constituent blocks is used rather than the robot's current location when
- * creating a new cache, but this should serve as a good check against invalid
- * cache creation.
- *
- * @return (cache id of cache that is too close (-1 if none), distance to said
- *         cache).
- */
-proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,
-                                             const ds::arena_map& map,
-                                             rtypes::spatial_dist new_cache_prox);
-
 
 /**
  * @brief Compute the line of sight for a given robot.
@@ -196,6 +121,7 @@ void set_robot_tick(argos::CFootBotEntity& robot, rtypes::timestep t) {
   auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   controller.tick(t);
 }
+
 /**
  * @brief Determine if an entity of the specified dimensions, placed at the
  * specified location (or that currently exists at the specified location), will
@@ -206,6 +132,18 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
                                       const rmath::vector2d& ent1_dims,
                                       const repr::base_entity* entity);
 
-NS_END(loop_utils, support, fordyca);
+/**
+ * @brief Calculate the blocks that are:
+ *
+ * - Not carried by a robot
+ * - Not inside a cache
+ *
+ * @param all_caches All existing caches in the arena.
+ * @param all_blocks All blocks in the arena.
+ */
+ds::block_vector free_blocks_calc(const ds::cache_vector& all_caches,
+                                  const ds::block_vector& all_blocks);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_LOOP_UTILS_LOOP_UTILS_HPP_ */
+NS_END(utils, support, fordyca);
+
+#endif /* INCLUDE_FORDYCA_SUPPORT_UTILS_LOOP_UTILS_HPP_ */

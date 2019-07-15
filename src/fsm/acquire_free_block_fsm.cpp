@@ -105,11 +105,11 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
   }
 } /* block_select() */
 
-__rcsw_pure bool acquire_free_block_fsm::candidates_exist(void) const {
+ bool acquire_free_block_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exist() */
 
-__rcsw_const acq_goal_type acquire_free_block_fsm::acq_goal_internal(void) const {
+acq_goal_type acquire_free_block_fsm::acq_goal_internal(void) const {
   return acq_goal_type::ekBLOCK;
 } /* acq_goal() */
 

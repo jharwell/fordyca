@@ -56,14 +56,13 @@ NS_START(controller, depth2);
 class ogrp_mdpo_controller : public depth1::gp_omdpo_controller,
                              public rer::client<ogrp_mdpo_controller> {
  public:
-  ogrp_mdpo_controller(void)
+  RCSW_COLD ogrp_mdpo_controller(void)
       : ER_CLIENT_INIT("fordyca.controller.depth2.ogrp_mdpo") {}
-  ~ogrp_mdpo_controller(void) override = default;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
 
-  void shared_init(const config::depth2::controller_repository& config_repo);
+  void shared_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 };
 
 NS_END(depth2, controller, fordyca);

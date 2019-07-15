@@ -66,17 +66,17 @@ void ledtaxis_cache_search::task_execute(void) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool ledtaxis_cache_search::in_collision_avoidance(void) const {
+ bool ledtaxis_cache_search::in_collision_avoidance(void) const {
   return (m_taxis.task_running() && m_taxis.in_collision_avoidance()) ||
          (m_crw.task_running() && m_crw.in_collision_avoidance());
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool ledtaxis_cache_search::entered_collision_avoidance(void) const {
+ bool ledtaxis_cache_search::entered_collision_avoidance(void) const {
   return (m_taxis.task_running() && m_taxis.entered_collision_avoidance()) ||
          (m_crw.task_running() && m_crw.entered_collision_avoidance());
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool ledtaxis_cache_search::exited_collision_avoidance(void) const {
+ bool ledtaxis_cache_search::exited_collision_avoidance(void) const {
   return (m_taxis.task_running() && m_taxis.exited_collision_avoidance()) ||
          (m_crw.task_running() && m_crw.exited_collision_avoidance());
 } /* exited_collision_avoidance() */
@@ -91,7 +91,7 @@ rtypes::timestep ledtaxis_cache_search::collision_avoidance_duration(void) const
   }
 } /* collision_avoidance_duration() */
 
-__rcsw_pure rmath::vector2u ledtaxis_cache_search::avoidance_loc(void) const {
+ rmath::vector2u ledtaxis_cache_search::avoidance_loc(void) const {
   ER_ASSERT(m_taxis.task_running() || m_crw.task_running(),
             "In collision avoidance without running task?");
   if (m_taxis.task_running()) {

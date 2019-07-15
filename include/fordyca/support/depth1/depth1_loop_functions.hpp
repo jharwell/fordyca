@@ -71,13 +71,13 @@ using d1_subtask_status_map_type =
 class depth1_loop_functions : public depth0::depth0_loop_functions,
                               public rer::client<depth1_loop_functions> {
  public:
-  depth1_loop_functions(void);
-  ~depth1_loop_functions(void) override;
+  depth1_loop_functions(void) RCSW_COLD;
+  ~depth1_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void PreStep() override;
-  void Reset(void) override;
-  void Destroy(void) override;
+  void Reset(void) override RCSW_COLD;
+  void Destroy(void) override RCSW_COLD;
 
  protected:
   /**
@@ -88,7 +88,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * - Enable task distribution entropy calculations
    * - Tasking oracle
    */
-  void shared_init(ticpp::Element& node);
+  void shared_init(ticpp::Element& node) RCSW_COLD;
 
  private:
   using interactor_map_type = rds::type_map<
@@ -129,13 +129,13 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * - Static cache handling/management.
    * - Tasking oracle.
    */
-  void private_init(void);
+  void private_init(void) RCSW_COLD;
 
   /**
    * @brief Initialize static cache handling/management:
    */
   void cache_handling_init(const config::caches::caches_config *cachep,
-                           const config::arena::block_dist_config* distp);
+                           const config::arena::block_dist_config* distp) RCSW_COLD;
 
   /**
    * @brief Map the block distribution type to the locations of one or more
@@ -143,12 +143,12 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * initialization.
    */
   std::vector<rmath::vector2d> calc_cache_locs(
-      const config::arena::block_dist_config* distp);
+      const config::arena::block_dist_config* distp) RCSW_COLD;
 
   /**
    * @brief Initialize all oracles.
    */
-  void oracle_init(void);
+  void oracle_init(void) RCSW_COLD;
 
   /**
    * @brief Process a single robot on a timestep:
@@ -160,11 +160,6 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   void robot_timestep_process(argos::CFootBotEntity& robot);
 
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-
-  /**
-   * @brief Count the # of free blocks in the arena.
-   */
-  uint n_free_blocks(void) const;
 
   /**
    * @brief Extract the numerical ID of the task each robot is currently

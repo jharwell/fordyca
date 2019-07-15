@@ -47,7 +47,7 @@ block_acq_validator::block_acq_validator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure bool block_acq_validator::operator()(const rmath::vector2d& loc,
+ bool block_acq_validator::operator()(const rmath::vector2d& loc,
                                                  uint id) const {
   auto block = mc_map->find(id);
 

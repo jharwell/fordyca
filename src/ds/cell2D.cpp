@@ -38,19 +38,19 @@ cell2D::cell2D(void) { decoratee().init(); }
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure std::shared_ptr<repr::base_block> cell2D::block(void) const {
+std::shared_ptr<repr::base_block> cell2D::block(void) const {
   return std::dynamic_pointer_cast<repr::base_block>(m_entity);
 } /* block() */
 
-__rcsw_pure std::shared_ptr<repr::base_block> cell2D::block(void) {
+std::shared_ptr<repr::base_block> cell2D::block(void) {
   return std::dynamic_pointer_cast<repr::base_block>(m_entity);
 } /* block() */
 
-__rcsw_pure std::shared_ptr<repr::base_cache> cell2D::cache(void) {
+std::shared_ptr<repr::base_cache> cell2D::cache(void) {
   return std::dynamic_pointer_cast<repr::base_cache>(m_entity);
 } /* cache() */
 
-__rcsw_pure std::shared_ptr<repr::base_cache> cell2D::cache(void) const {
+std::shared_ptr<repr::base_cache> cell2D::cache(void) const {
   return std::dynamic_pointer_cast<repr::base_cache>(m_entity);
 } /* cache() */
 

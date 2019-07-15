@@ -43,7 +43,7 @@ void actuation_parser::parse(const ticpp::Element& node) {
       rrsteer2D::config::xml::force_calculator_parser::config_type>();
 } /* parse() */
 
-__rcsw_pure bool actuation_parser::validate(void) const {
+bool actuation_parser::validate(void) const {
   return m_differential_drive.validate() && m_steering.validate();
 } /* validate() */
 
