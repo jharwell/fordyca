@@ -163,7 +163,6 @@ class vector_fsm final : public base_foraging_fsm,
 
   struct fsm_state {
     uint m_collision_rec_count{0};
-    rtypes::timestep last_collision_time{0};
   };
 
   /**
@@ -205,6 +204,8 @@ class vector_fsm final : public base_foraging_fsm,
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_avoidance);
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_recovery);
 
+  FSM_EXIT_DECLARE(vector_fsm, exit_collision_avoidance);
+
   /**
    * @brief Defines the state map for the FSM.
    *
@@ -219,8 +220,10 @@ class vector_fsm final : public base_foraging_fsm,
     FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP){
         FSM_STATE_MAP_ENTRY_EX_ALL(&start, nullptr, nullptr, nullptr),
         FSM_STATE_MAP_ENTRY_EX_ALL(&vector, nullptr, &entry_vector, nullptr),
-        FSM_STATE_MAP_ENTRY_EX_ALL(
-            &collision_avoidance, nullptr, &entry_collision_avoidance, nullptr),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
+                                   nullptr,
+                                   &entry_collision_avoidance,
+                                   &exit_collision_avoidance),
         FSM_STATE_MAP_ENTRY_EX_ALL(
             &collision_recovery, nullptr, &entry_collision_recovery, nullptr),
         FSM_STATE_MAP_ENTRY_EX_ALL(

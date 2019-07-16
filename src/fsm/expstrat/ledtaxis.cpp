@@ -36,18 +36,18 @@ NS_START(fordyca, fsm, expstrat);
  * General Member Functions
  ******************************************************************************/
 void ledtaxis::task_execute(void) {
-  rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
-  saa_subsystem()->steer2D_force_calc().avoidance(obs);
   saa_subsystem()->steer2D_force_calc().wander();
-  if (saa_subsystem()->sensing()->threatening_obstacle_exists()) {
+
+  if (auto obs = saa_subsystem()->sensing()->avg_obstacle_within_prox()) {
     m_tracker.ca_enter();
 
-    ER_DEBUG("Found threatening obstacle: (%f, %f)@%f [%f]",
-             obs.x(),
-             obs.y(),
-             obs.angle().value(),
-             obs.length());
+    ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
+             obs->to_str().c_str(),
+             obs->angle().value(),
+             obs->length());
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
+    saa_subsystem()->steer2D_force_calc().avoidance(*obs);
+
   } else {
     m_tracker.ca_exit();
 
@@ -57,7 +57,7 @@ void ledtaxis::task_execute(void) {
         saa_subsystem()->sensing()->blobs().readings(),
         support::light_type_index()[support::light_type_index::kCache]);
   }
-  saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
+  saa_subsystem()->steer2D_force_apply();
 } /* task_execute() */
 
 bool ledtaxis::task_finished(void) const {

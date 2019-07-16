@@ -22,6 +22,9 @@
   <category name="rcppsw.ta.executive" >
     <priority value ="info" />
   </category>
+  <category name="rcppsw.robotics.steer2D.force_calculator" >
+    <priority value ="trace" />
+  </category>
   <category name="rcppsw.algorithm.clustering" >
     <priority value ="off" />
   </category>
@@ -31,8 +34,14 @@
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
-    <category name="fordyca.fsm.cache_acquisition_validator" >
+  <category name="fordyca.fsm.cache_acquisition_validator" >
     <priority value ="all" />
+  </category>
+  <category name="fordyca.fsm.acquire_goal_fsm" >
+    <priority value ="trace" />
+  </category>
+  <category name="fordyca.fsm.expstrat.crw" >
+    <priority value ="trace" />
   </category>
   <category name="fordyca.support.block_dist" >
     <priority value ="info" />
@@ -55,9 +64,15 @@
   <category name="fordyca.support.base_cache_creator" >
     <priority value ="trace" />
   </category>
+  <category name="fordyca.fsm.depth0.free_block_to_nest" >
+    <priority value ="trace" />
+  </category>
 
   <category name="fordyca.controller.dpo_perception" >
     <priority value ="info" />
+  </category>
+  <category name="fordyca.controller.saa_subsystem" >
+    <priority value ="trace" />
   </category>
   <category name="fordyca.controller.oracular_info_receptor" >
     <priority value ="info" />

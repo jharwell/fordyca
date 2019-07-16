@@ -65,6 +65,9 @@ bool base_controller::block_detected(void) const {
 void base_controller::position(const rmath::vector2d& loc) {
   m_saa->sensing()->position(loc);
 }
+void base_controller::heading(const rmath::radians& h) {
+  m_saa->sensing()->heading(h);
+}
 void base_controller::discrete_position(const rmath::vector2u& loc) {
   m_saa->sensing()->discrete_position(loc);
 }
@@ -232,7 +235,7 @@ rtypes::spatial_dist base_controller::distance(void) const {
    * because of the prev/current location not being set up properly yet.
    */
   if (saa_subsystem()->sensing()->tick() > 1) {
-    return rtypes::spatial_dist(saa_subsystem()->sensing()->heading().length());
+    return rtypes::spatial_dist(saa_subsystem()->sensing()->tick_travel().length());
   }
   return rtypes::spatial_dist(0.0);
 } /* distance() */
@@ -260,7 +263,7 @@ const rmath::vector2u& base_controller::discrete_position2D(
 }
 
 rmath::vector2d base_controller::heading2D(void) const {
-  return m_saa->sensing()->heading();
+  return {1.0, m_saa->sensing()->heading()};
 }
 
 NS_END(controller, fordyca);

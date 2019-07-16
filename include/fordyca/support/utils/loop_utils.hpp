@@ -65,12 +65,12 @@ struct placement_status_t {
  * Functions
  ******************************************************************************/
 /**
- * @brief Set the position of the robot in the arena.
+ * @brief Set the position and orientation of the robot in the arena.
  *
  * This is a hack that makes getting my research up and running easier.
  *
- * @todo This should eventually be replaced by a calculation of robot's position
- * by the robot.
+ * @todo This should eventually be replaced by a calculation of robot's
+ * position/orientation by the robot.
  */
 template <typename T>
 void set_robot_pos(argos::CFootBotEntity& robot,
@@ -82,11 +82,17 @@ void set_robot_pos(argos::CFootBotEntity& robot,
                       .GetOriginAnchor()
                       .Position.GetY());
   rmath::vector2u dpos = rmath::dvec2uvec(pos, resolution.v());
+  argos::CRadians x_ang, y_ang, z_ang;
+  robot.GetEmbodiedEntity().GetOriginAnchor().Orientation.ToEulerAngles(z_ang,
+                                                                        y_ang,
+                                                                        x_ang);
 
+  rmath::radians heading(rmath::radians(z_ang.GetValue()));
   auto& controller =
       dynamic_cast<T&>(robot.GetControllableEntity().GetController());
   controller.position(pos);
   controller.discrete_position(dpos);
+  controller.heading(heading);
 }
 
 /**

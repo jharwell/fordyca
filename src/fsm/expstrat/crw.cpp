@@ -35,18 +35,16 @@ NS_START(fordyca, fsm, expstrat);
  * General Member Functions
  ******************************************************************************/
 void crw::task_execute(void) {
-  rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
-  saa_subsystem()->steer2D_force_calc().avoidance(obs);
   saa_subsystem()->steer2D_force_calc().wander();
 
-  if (saa_subsystem()->sensing()->threatening_obstacle_exists()) {
+  if (auto obs = saa_subsystem()->sensing()->avg_obstacle_within_prox()) {
     m_tracker.ca_enter();
+    saa_subsystem()->steer2D_force_calc().avoidance(*obs);
 
-    ER_DEBUG("Found threatening obstacle: (%f, %f)@%f [%f]",
-             obs.x(),
-             obs.y(),
-             obs.angle().value(),
-             obs.length());
+    ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
+             obs->to_str().c_str(),
+             obs->angle().value(),
+             obs->length());
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
   } else {
     m_tracker.ca_exit();
@@ -61,8 +59,8 @@ void crw::task_execute(void) {
       saa_subsystem()->steer2D_force_calc().value(
           saa_subsystem()->steer2D_force_calc().value() * 0.7);
     }
-    saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
   }
+  saa_subsystem()->steer2D_force_apply();
 } /* task_execute() */
 
 NS_END(expstrat, fsm, fordyca);

@@ -47,13 +47,12 @@ block_acq_validator::block_acq_validator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
- bool block_acq_validator::operator()(const rmath::vector2d& loc,
-                                                 uint id) const {
+bool block_acq_validator::operator()(const rmath::vector2d& loc, uint id) const {
   auto block = mc_map->find(id);
 
   /* Sanity checks for acqusition */
   if (nullptr == block) {
-    ER_WARN("Acquisition of free block%d@%s invalid: no such block",
+    ER_WARN("Acquisition of free block%d@%s invalid: block unknown",
             id,
             loc.to_str().c_str());
     return false;

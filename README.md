@@ -77,7 +77,7 @@ finishes. Note that if you want to do build the .pdf you will also need the
 following programs:
 
 - `pdflatex` (`texlive-latex-base` on ubuntu)
-- Texlive fonts (`texlive-fonts-extra` `texlive-fonts-recommended` `texlive-generic-recommended` `texlive-fonts-science` on ubuntu)
+- Texlive fonts (`texlive-fonts-extra` on ubuntu)
 
 # Available Controllers
 

@@ -203,6 +203,7 @@ class base_controller : public argos::CCI_Controller,
    */
   void position(const rmath::vector2d& loc);
   void discrete_position(const rmath::vector2u& loc);
+  void heading(const rmath::radians& h);
 
   /**
    * @brief Convenience function to add footbot ID to salient messages during
