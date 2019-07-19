@@ -26,7 +26,7 @@ This is the main entry point for getting started on the project.
    Robotics," arXiv:1906.01108 [cs.RO], June 2019.
    [Link](https://arxiv.org/abs/1906.01108)
 
-# Setup
+# Setup (Debug build)
 
 Download `scripts/bootstrap.sh` BEFORE cloning this repo. The script can be
 downloaded by navigating to the file on github, clicking the `raw` button, and
@@ -56,6 +56,35 @@ The script assumes you have sudo privileges on the machine you want to install
 the project on. If you do not, you will have to build a *lot* more stuff from
 source manually.
 
+*IMPORTANT* If you want to build an _optimized_ version of fordyca (necessary
+for large swarms), you will need to either manually modify the `bootstrap.sh`
+script that you copied, or re-run `cmake` and `make` as shown below.
+
+# Setup (Optimized Build)
+
+To build forydca with optimizations (necessary for using sierra or running large
+scale simulations, will need a different cmake command than the one
+`bootstrap.sh` uses for you. Something like the following, run from the `build`
+directory prior to building will do the trick:
+
+    cmake -DCMAKE_C_COMPILER=gcc-8\
+    -DCMAKE_CXX_COMPILER=g++-8\
+    -DWITH_FOOTBOT_BATTERY=NO\
+    -DWITH_FOOTBOT_RAB=NO\
+    -DWITH_FOOTBOT_LEDS=NO\
+    -DCMAKE_BUILD_TYPE=OPT\
+    -DLIBRA_ER_NREPORT=YES\
+    ..
+
+To get an idea of what some of the non-project specific options mean, head over
+to the [libra](https://github.com/swarm-robotics/libra/tree/devel/README.md)
+repo and look at the README.
+
+`WITH_FOOTBOT_BATTERY`, `WITH_FOOTBOT_RAB`, `WITH_FOOTBOT_LEDS` are things that
+are only needed if you are running experiments which utilize those
+sensors/actuators, otherwise they slow things down a *LOT* with large swarms
+(which is why you are compiling with optimizations on in the first place).
+
 # Viewing The Documentation
 
 After the bootstrap.sh script finishes successfully, you can (*AND SHOULD*) view
@@ -80,7 +109,6 @@ following programs:
 - Texlive fonts (`texlive-fonts-extra` on ubuntu)
 
 # Available Controllers
-
 | Controller | Status | Loop functions | Notes                                                                                                                                 |
 |------------|--------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
 | crw        | Stable | depth0         | CRW = Correlated Random Walk.                                                                                                         |
@@ -137,9 +165,12 @@ After successful compilation, follow these steps to run a foraging scenario:
 # Running on MSI
 
 Head over to
-[sierra](https://github.com/swarm-robotics/sierra/tree/devel/docs/README.md),
-and follow the MSI setup instructions over there. Don't try to run on MSI
-without it. Just don't.
+[sierra](https://github.com/swarm-robotics/sierra/tree/devel/README.md), and
+follow the MSI setup instructions over there. Don't try to run on MSI without
+it. Just don't.
+
+*IMPORTANT* Do not try to run sierra with a debug build of fordyca. It probably
+won't work and will be obnoxiously/irritatingly slow if it does.
 
 # Troubleshooting
 

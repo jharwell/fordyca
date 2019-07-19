@@ -108,9 +108,9 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
        * This needs to be here, rather than in each robot's control step
        * function, in order to avoid triggering erroneous handling of an aborted
        * task in the loop functions when the executive has not aborted the newly
-       * allocated task *after* the previous task was aborted. See #532.
+       * allocated task *after* the previous task was aborted. See #532,#587.
        */
-      controller.task_aborted(false);
+      controller.task_status_update(tasks::task_status::ekRunning);
       return interactor_status::ekTaskAbort;
     }
 

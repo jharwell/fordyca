@@ -113,8 +113,7 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
   return config;
 } /* guess_cluster_placements() */
 
- bool powerlaw_distributor::check_cluster_placements(
-    const cluster_paramvec& pvec) {
+bool powerlaw_distributor::check_cluster_placements(const cluster_paramvec& pvec) {
   for (const cluster_config& p : pvec) {
     bool overlap = std::any_of(pvec.begin(), pvec.end(), [&](const auto& other) {
       /*

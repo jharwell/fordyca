@@ -112,8 +112,7 @@ class base_cache : public unicell_immovable_entity,
   /**
    * @brief \c TRUE iff the cache contains the specified block.
    */
-  RCSW_PURE bool contains_block(
-      const std::shared_ptr<base_block>& c_block) const {
+  RCSW_PURE bool contains_block(const std::shared_ptr<base_block>& c_block) const {
     return contains_block(c_block.get());
   }
   RCSW_PURE bool contains_block(const base_block* const c_block) const {

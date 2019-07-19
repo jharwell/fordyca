@@ -157,27 +157,26 @@ RCSW_CONST HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
- bool block_to_goal_fsm::in_collision_avoidance(void) const {
+bool block_to_goal_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm->task_running() && m_block_fsm->in_collision_avoidance()) ||
          (m_goal_fsm->task_running() && m_goal_fsm->in_collision_avoidance());
 } /* in_collision_avoidance() */
 
- bool block_to_goal_fsm::entered_collision_avoidance(void) const {
+bool block_to_goal_fsm::entered_collision_avoidance(void) const {
   return (m_block_fsm->task_running() &&
           m_block_fsm->entered_collision_avoidance()) ||
          (m_goal_fsm->task_running() &&
           m_goal_fsm->entered_collision_avoidance());
 } /* entered_collision_avoidance() */
 
- bool block_to_goal_fsm::exited_collision_avoidance(void) const {
+bool block_to_goal_fsm::exited_collision_avoidance(void) const {
   return (m_block_fsm->task_running() &&
           m_block_fsm->exited_collision_avoidance()) ||
          (m_goal_fsm->task_running() &&
           m_goal_fsm->exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
- rtypes::timestep block_to_goal_fsm::collision_avoidance_duration(
-    void) const {
+rtypes::timestep block_to_goal_fsm::collision_avoidance_duration(void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->collision_avoidance_duration();
   } else if (m_goal_fsm->task_running()) {
@@ -199,7 +198,7 @@ rmath::vector2u block_to_goal_fsm::avoidance_loc(void) const {
 /*******************************************************************************
  * Acquisition Metrics
  ******************************************************************************/
- block_to_goal_fsm::exp_status block_to_goal_fsm::is_exploring_for_goal(
+block_to_goal_fsm::exp_status block_to_goal_fsm::is_exploring_for_goal(
     void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->is_exploring_for_goal();
@@ -209,12 +208,12 @@ rmath::vector2u block_to_goal_fsm::avoidance_loc(void) const {
   return std::make_pair(false, false);
 } /* is_exploring_for_goal() */
 
- bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
+bool block_to_goal_fsm::is_vectoring_to_goal(void) const {
   return (m_block_fsm->is_vectoring_to_goal() && m_block_fsm->task_running()) ||
          (m_goal_fsm->is_vectoring_to_goal() && m_goal_fsm->task_running());
 } /* is_vectoring_to_block */
 
- bool block_to_goal_fsm::goal_acquired(void) const {
+bool block_to_goal_fsm::goal_acquired(void) const {
   return (ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) ||
          (ekST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */

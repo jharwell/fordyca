@@ -23,7 +23,7 @@
     <priority value ="info" />
   </category>
   <category name="rcppsw.robotics.steer2D.force_calculator" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="rcppsw.algorithm.clustering" >
     <priority value ="off" />
@@ -41,7 +41,7 @@
     <priority value ="trace" />
   </category>
   <category name="fordyca.fsm.expstrat.crw" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.support.block_dist" >
     <priority value ="info" />
@@ -72,7 +72,7 @@
     <priority value ="info" />
   </category>
   <category name="fordyca.controller.saa_subsystem" >
-    <priority value ="trace" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.controller.oracular_info_receptor" >
     <priority value ="info" />

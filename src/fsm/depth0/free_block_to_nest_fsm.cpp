@@ -127,25 +127,24 @@ RCSW_CONST FSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
- bool free_block_to_nest_fsm::in_collision_avoidance(void) const {
+bool free_block_to_nest_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
          base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
- bool free_block_to_nest_fsm::entered_collision_avoidance(void) const {
+bool free_block_to_nest_fsm::entered_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.entered_collision_avoidance()) ||
          base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
- bool free_block_to_nest_fsm::exited_collision_avoidance(void) const {
+bool free_block_to_nest_fsm::exited_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.exited_collision_avoidance()) ||
          base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
- rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(
-    void) const {
+rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.collision_avoidance_duration();
   } else {
@@ -153,7 +152,7 @@ RCSW_CONST FSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
   }
 } /* collision_avoidance_duration() */
 
- rmath::vector2u free_block_to_nest_fsm::avoidance_loc(void) const {
+rmath::vector2u free_block_to_nest_fsm::avoidance_loc(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.avoidance_loc();
   } else {
@@ -187,7 +186,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
                          m_block_fsm,
                          const);
 
- acq_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
+acq_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
     return acq_goal_type::ekBLOCK;
@@ -195,7 +194,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
   return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
- bool free_block_to_nest_fsm::goal_acquired(void) const {
+bool free_block_to_nest_fsm::goal_acquired(void) const {
   if (acq_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
@@ -217,8 +216,7 @@ void free_block_to_nest_fsm::task_execute(void) {
                rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
-transport_goal_type
-free_block_to_nest_fsm::block_transport_goal(void) const {
+transport_goal_type free_block_to_nest_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_DROP == current_state()) {
     return transport_goal_type::ekNEST;

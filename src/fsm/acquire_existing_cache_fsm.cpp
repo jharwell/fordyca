@@ -98,7 +98,7 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
             best->ent()->id(),
             best->ent()->rloc().to_str().c_str(),
             best->ent()->dloc().to_str().c_str(),
-            best->density().last_result());
+            best->density().v());
 
     rmath::vector2d point = cache_acq_point_selector(kFOOTBOT_CACHE_ACQ_FACTOR)(
         saa_subsystem()->sensing()->position(), best->ent(), m_rd);
@@ -124,7 +124,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
   return boost::optional<acquire_goal_fsm::candidate_type>();
 } /* existing_cache_select() */
 
- bool acquire_existing_cache_fsm::candidates_exist(void) const {
+bool acquire_existing_cache_fsm::candidates_exist(void) const {
   return !mc_store->caches().empty();
 } /* candidates() */
 
@@ -140,8 +140,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   }
 } /* cache_acquired_cb() */
 
- acq_goal_type
-acquire_existing_cache_fsm::acq_goal_internal(void) const {
+acq_goal_type acquire_existing_cache_fsm::acq_goal_internal(void) const {
   return acq_goal_type::ekEXISTING_CACHE;
 } /* acq_goal() */
 

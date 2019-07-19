@@ -143,8 +143,7 @@ bool random_distributor::verify_block_dist(
     if (e == block) {
       continue;
     }
-    auto status =
-        utils::placement_conflict(block->rloc(), block->dims(), e);
+    auto status = utils::placement_conflict(block->rloc(), block->dims(), e);
     ER_ASSERT(!(status.x_conflict && status.y_conflict),
               "Entity contains block%d@%s/%s after distribution",
               block->id(),

@@ -44,11 +44,11 @@ generalist::generalist(const rta::config::task_alloc_config* const config,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
- double generalist::abort_prob_calc(void) {
+double generalist::abort_prob_calc(void) {
   return executable_task::abort_prob();
 } /* abort_prob_calc() */
 
- double generalist::current_time(void) const {
+double generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::free_block_to_nest_fsm*>(
              polled_task::mechanism())
       ->sensors()

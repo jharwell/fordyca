@@ -74,7 +74,7 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
              b.ent()->id(),
              b.ent()->rloc().to_str().c_str(),
              b.ent()->dloc().to_str().c_str(),
-             b.density().last_result(),
+             b.density().v(),
              utility);
     if (utility > max_utility) {
       best = b;

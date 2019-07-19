@@ -107,8 +107,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  ds::block_vector free_blocks = utils::free_blocks_calc(created_caches,
-                                                         candidate_blocks);
+  ds::block_vector free_blocks =
+      utils::free_blocks_calc(created_caches, candidate_blocks);
 
   ER_ASSERT(creation_sanity_checks(created_caches, free_blocks, c_clusters),
             "One or more bad caches on creation");

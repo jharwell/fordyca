@@ -159,7 +159,6 @@ RCPPSW_WRAP_OVERRIDE_DEF(harvester,
                              polled_task::mechanism()),
                          const);
 
-
 RCPPSW_WRAP_OVERRIDE_DEF(harvester,
                          current_vector_loc,
                          *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(

@@ -51,8 +51,7 @@ void actuation_subsystem::reset(void) {
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void actuation_subsystem::leds_set_color(
-    RCSW_UNUSED const rutils::color& color) {
+void actuation_subsystem::leds_set_color(RCSW_UNUSED const rutils::color& color) {
 #ifdef FORDYCA_WITH_ROBOT_LEDS
   m_actuators.leds.set_color(-1, color);
 #endif

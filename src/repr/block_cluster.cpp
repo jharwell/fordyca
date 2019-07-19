@@ -31,7 +31,7 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
- ds::const_block_list block_cluster::blocks(void) const {
+ds::const_block_list block_cluster::blocks(void) const {
   ds::const_block_list ret;
   for (uint i = 0; i < xdimd(); ++i) {
     for (uint j = 0; j < ydimd(); ++j) {

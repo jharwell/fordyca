@@ -67,13 +67,12 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
- bool acquire_cache_site_fsm::site_acquired_cb(
-    bool explore_result) const {
+bool acquire_cache_site_fsm::site_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "Found cache site by exploring?");
   return true;
 } /* site_acquired_cb() */
 
- bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
+bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   ER_FATAL_SENTINEL("Cache site acquired through exploration");
   return false;
 } /* site_exploration_term_cb() */
@@ -93,8 +92,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::site_s
   }
 } /* site_select() */
 
- acq_goal_type
-acquire_cache_site_fsm::acquisition_goal_internal(void) const {
+acq_goal_type acquire_cache_site_fsm::acquisition_goal_internal(void) const {
   return acq_goal_type::ekCACHE_SITE;
 } /* acquisition_goal_internal() */
 

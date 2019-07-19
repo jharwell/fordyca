@@ -79,7 +79,7 @@ NS_START(detail);
  */
 struct functor_maps_initializer : public boost::static_visitor<void> {
   RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
-                           depth2_loop_functions* const lf_in)
+                                     depth2_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
@@ -287,8 +287,8 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   controller->block_manip_collator()->reset();
 
   /* Set robot position, time, and send it its new LOS */
-  utils::set_robot_pos<decltype(*controller)>(
-      robot, arena_map()->grid_resolution());
+  utils::set_robot_pos<decltype(*controller)>(robot,
+                                              arena_map()->grid_resolution());
   utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
   boost::apply_visitor(robot_los_updater_adaptor(controller),

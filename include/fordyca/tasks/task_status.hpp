@@ -1,7 +1,7 @@
 /**
- * @file cache_respawn_probability.cpp
+ * @file task_status.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,30 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_TASKS_TASK_STATUS_HPP_
+#define INCLUDE_FORDYCA_TASKS_TASK_STATUS_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/math/cache_respawn_probability.hpp"
-#include <cmath>
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, math);
+NS_START(fordyca, tasks);
 
 /*******************************************************************************
- * Constructors/Destructor
+ * Class Definitions
  ******************************************************************************/
-cache_respawn_probability::cache_respawn_probability(double scale_factor)
-    : mc_scale_factor(scale_factor) {}
+enum class task_status {
+  ekNull,
+  ekRunning,
+  ekAbortPending,
+  ekAbortProcessed
+};
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-double cache_respawn_probability::calc(uint n_harvesters, uint n_collectors) {
-  double tmp;
-  if (0 == n_collectors) {
-    tmp = mc_scale_factor * n_harvesters;
-  } else {
-    tmp = mc_scale_factor * n_harvesters / n_collectors;
-  }
-  return eval(1 - std::exp(-tmp));
-} /* calc() */
 
-NS_END(expressions, fordyca);
+NS_END(tasks, fordyca);
+
+#endif /* INCLUDE_FORDYCA_TASKS_TASK_STATUS_HPP_ */

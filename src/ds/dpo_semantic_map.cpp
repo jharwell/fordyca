@@ -77,13 +77,13 @@ void dpo_semantic_map::decay_all(void) {
     rswarm::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
-    ER_ASSERT(std::fabs((map_density - b.density()).last_result()) <=
+    ER_ASSERT(std::fabs((map_density - b.density()).v()) <=
                   std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP block%d density disagree: %f vs %f",
               loc.to_str().c_str(),
               b.ent()->id(),
-              map_density.last_result(),
-              b.density().last_result());
+              map_density.v(),
+              b.density().v());
   } /* for(&b..) */
 
   for (auto&& c : m_store.caches().const_values_range()) {
@@ -91,13 +91,13 @@ void dpo_semantic_map::decay_all(void) {
     rswarm::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
-    ER_ASSERT(std::fabs((map_density - c.density()).last_result()) <=
+    ER_ASSERT(std::fabs((map_density - c.density()).v()) <=
                   std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP cache%d density disagree: %f vs %f",
               loc.to_str().c_str(),
               c.ent()->id(),
-              map_density.last_result(),
-              c.density().last_result());
+              map_density.v(),
+              c.density().v());
   } /* for(&c..) */
 } /* decay_all() */
 

@@ -82,10 +82,9 @@ boost::optional<rmath::vector2d> cache_site_selector::operator()(
   return boost::make_optional(site);
 } /* operator()() */
 
- bool cache_site_selector::verify_site(
-    const rmath::vector2d& site,
-    const ds::dp_cache_map& known_caches,
-    const ds::dp_block_map& known_blocks) const {
+bool cache_site_selector::verify_site(const rmath::vector2d& site,
+                                      const ds::dp_cache_map& known_caches,
+                                      const ds::dp_block_map& known_blocks) const {
   for (auto& c : known_caches.const_values_range()) {
     ER_ASSERT(rtypes::spatial_dist((c.ent()->rloc() - site).length()) >=
                   std::get<0>(m_constraints)[0].cache_prox,
@@ -242,8 +241,8 @@ std::string cache_site_selector::nlopt_ret_str(nlopt::result res) const {
  * Non-Member Functions
  ******************************************************************************/
 double __cache_constraint_func(const std::vector<double>& x,
-                                           std::vector<double>&,
-                                           void* data) {
+                               std::vector<double>&,
+                               void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
@@ -254,8 +253,8 @@ double __cache_constraint_func(const std::vector<double>& x,
 } /* __cache_constraint_func() */
 
 double __nest_constraint_func(const std::vector<double>& x,
-                                          std::vector<double>&,
-                                          void* data) {
+                              std::vector<double>&,
+                              void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
@@ -266,8 +265,8 @@ double __nest_constraint_func(const std::vector<double>& x,
 } /* __nest_constraint_func() */
 
 double __block_constraint_func(const std::vector<double>& x,
-                                           std::vector<double>&,
-                                           void* data) {
+                               std::vector<double>&,
+                               void* data) {
   if (std::isnan(x[0]) || std::isnan(x[1])) {
     return std::numeric_limits<double>::max();
   }
@@ -278,8 +277,8 @@ double __block_constraint_func(const std::vector<double>& x,
 } /* __block_constraint_func() */
 
 double __site_utility_func(const std::vector<double>& x,
-                                       std::vector<double>&,
-                                       void* data) {
+                           std::vector<double>&,
+                           void* data) {
   /*
    * @todo If for some reason we get a NaN point, return the worst possible
    * utility. Again this should probably not be necessary, but I don't know

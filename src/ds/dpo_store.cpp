@@ -157,7 +157,7 @@ dpo_store::update_res_t dpo_store::block_update(
       ER_TRACE("Update density of known block%d@%s to %f",
                block_in.ent()->id(),
                block_in.ent()->dloc().to_str().c_str(),
-               block_in.density().last_result());
+               block_in.density().v());
     }
   } else { /* block is not known */
     ER_TRACE("Unknown incoming block%d", block_in.ent()->id());
@@ -199,8 +199,7 @@ void dpo_store::clear_all(void) {
   m_caches.clear();
 } /* clear_all() */
 
-bool dpo_store::contains(
-    const std::shared_ptr<repr::base_block>& block) const {
+bool dpo_store::contains(const std::shared_ptr<repr::base_block>& block) const {
   return m_blocks.contains(block->id());
 } /* contains() */
 

@@ -108,7 +108,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(explore_for_goal_fsm,
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
- bool explore_for_goal_fsm::task_running(void) const {
+bool explore_for_goal_fsm::task_running(void) const {
   return ekST_START != current_state() && ekST_FINISHED != current_state() &&
          nullptr != m_explore_behavior;
 }

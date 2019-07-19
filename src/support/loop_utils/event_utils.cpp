@@ -55,28 +55,26 @@ bool block_drop_overlap_with_cache(
   auto drop_xspan = repr::base_entity::xspan(drop_loc, block->dims().x());
   auto drop_yspan = repr::base_entity::yspan(drop_loc, block->dims().y());
   return cache->xspan().overlaps_with(drop_xspan) &&
-      cache->yspan().overlaps_with(drop_yspan);
+         cache->yspan().overlaps_with(drop_yspan);
 } /* block_drop_overlap_with_cache() */
 
-bool block_drop_near_arena_boundary(
-    const ds::arena_map& map,
-    const std::shared_ptr<repr::base_block>& block,
-    const rmath::vector2d& drop_loc) {
+bool block_drop_near_arena_boundary(const ds::arena_map& map,
+                                    const std::shared_ptr<repr::base_block>& block,
+                                    const rmath::vector2d& drop_loc) {
   return (drop_loc.x() <= block->xdimr() * 2 ||
           drop_loc.x() >= map.xrsize() - block->xdimr() * 2 ||
           drop_loc.y() <= block->ydimr() * 2 ||
           drop_loc.y() >= map.yrsize() - block->ydimr() * 2);
 } /* block_drop_overlap_with_nest() */
 
-bool block_drop_overlap_with_nest(
-    const std::shared_ptr<repr::base_block>& block,
-    const repr::nest& nest,
-    const rmath::vector2d& drop_loc) {
+bool block_drop_overlap_with_nest(const std::shared_ptr<repr::base_block>& block,
+                                  const repr::nest& nest,
+                                  const rmath::vector2d& drop_loc) {
   auto drop_xspan = repr::base_entity::xspan(drop_loc, block->dims().x());
   auto drop_yspan = repr::base_entity::yspan(drop_loc, block->dims().y());
 
   return nest.xspan().overlaps_with(drop_xspan) &&
-      nest.yspan().overlaps_with(drop_yspan);
+         nest.yspan().overlaps_with(drop_yspan);
 } /* block_drop_overlap_with_nest() */
 
 proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
@@ -101,6 +99,5 @@ proximity_status_t new_cache_cache_proximity(
   } /* for(&b..) */
   return {-1, rmath::vector2d(), rmath::vector2d()};
 } /* new_cache_cache_proximity() */
-
 
 NS_END(utils, support, fordyca);

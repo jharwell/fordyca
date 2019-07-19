@@ -146,8 +146,7 @@ dpo_perception_subsystem* dpo_controller::dpo_perception(void) {
   return static_cast<dpo_perception_subsystem*>(m_perception.get());
 } /* dpo_perception() */
 
-const dpo_perception_subsystem* dpo_controller::dpo_perception(
-    void) const {
+const dpo_perception_subsystem* dpo_controller::dpo_perception(void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get());
 } /* dpo_perception() */
 

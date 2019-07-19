@@ -74,7 +74,6 @@ void gp_mdpo_controller::ControlStep(void) {
             block()->robot_id());
 
   perception()->update(nullptr);
-  task_aborted(false);
   executive()->run();
   ndc_pop();
 } /* ControlStep() */
@@ -111,8 +110,7 @@ mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-const mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(
-    void) const {
+const mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* perception() */

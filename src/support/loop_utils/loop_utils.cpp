@@ -40,7 +40,7 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
   auto loc_xspan = repr::base_entity::xspan(ent1_loc, ent1_dims.x());
   auto loc_yspan = repr::base_entity::yspan(ent1_loc, ent1_dims.y());
   return placement_status_t{entity->xspan().overlaps_with(loc_xspan),
-        entity->yspan().overlaps_with(loc_yspan)};
+                            entity->yspan().overlaps_with(loc_yspan)};
 } /* placement_conflict() */
 
 std::unique_ptr<repr::line_of_sight> compute_robot_los(
@@ -52,9 +52,8 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
       map.subgrid(position.x(), position.y(), los_grid_size), position);
 } /* compute_robot_los */
 
-ds::block_vector free_blocks_calc(
-    const ds::cache_vector& all_caches,
-    const ds::block_vector& all_blocks) {
+ds::block_vector free_blocks_calc(const ds::cache_vector& all_caches,
+                                  const ds::block_vector& all_blocks) {
   ds::block_vector free_blocks;
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),

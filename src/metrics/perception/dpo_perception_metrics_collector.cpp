@@ -75,15 +75,10 @@ bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_int_known_caches, m_int_robot_count);
   line += csv_entry_domavg(m_cum_known_caches, m_cum_robot_count);
 
-  line += csv_entry_domavg(m_int_block_density_sum.last_result(),
-                           m_int_robot_count);
-  line += csv_entry_domavg(m_cum_block_density_sum.last_result(),
-                           m_cum_robot_count);
-  line += csv_entry_domavg(m_int_cache_density_sum.last_result(),
-                           m_int_robot_count);
-  line += csv_entry_domavg(m_cum_cache_density_sum.last_result(),
-                           m_cum_robot_count,
-                           true);
+  line += csv_entry_domavg(m_int_block_density_sum.v(), m_int_robot_count);
+  line += csv_entry_domavg(m_cum_block_density_sum.v(), m_cum_robot_count);
+  line += csv_entry_domavg(m_int_cache_density_sum.v(), m_int_robot_count);
+  line += csv_entry_domavg(m_cum_cache_density_sum.v(), m_cum_robot_count, true);
   return true;
 } /* csv_line_build() */
 

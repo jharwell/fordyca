@@ -84,7 +84,7 @@ rmath::vector2d saa_subsystem::linear_velocity(void) const {
     return {0.1, m_sensing->heading()};
   } else {
     return {m_actuation->differential_drive().current_speed(),
-          m_sensing->heading()};
+            m_sensing->heading()};
   }
 } /* linear_velocity() */
 

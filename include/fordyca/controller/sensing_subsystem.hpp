@@ -141,7 +141,9 @@ class sensing_subsystem {
    * @brief Get how far the robot has traveled in the last timestep, as well as
    * the direction/magnitude.
    */
-  rmath::vector2d tick_travel(void) const { return m_position - m_prev_position; }
+  rmath::vector2d tick_travel(void) const {
+    return m_position - m_prev_position;
+  }
 
   /**
    * @brief Get the angle of the current robot's heading. A shortcut to help

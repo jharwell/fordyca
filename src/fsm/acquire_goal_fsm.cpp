@@ -51,11 +51,11 @@ acquire_goal_fsm::acquire_goal_fsm(
       m_vector_fsm(saa),
       m_explore_fsm(saa, std::move(behavior), m_hooks.explore_term_cb),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-      HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
-                                  nullptr,
-                                  nullptr,
-                                  &exit_fsm_acquire_goal),
-      HFSM_STATE_MAP_ENTRY_EX(&finished)} {
+                   HFSM_STATE_MAP_ENTRY_EX_ALL(&fsm_acquire_goal,
+                                               nullptr,
+                                               nullptr,
+                                               &exit_fsm_acquire_goal),
+                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {
   m_explore_fsm.change_parent(explore_for_goal_fsm::ekST_EXPLORE,
                               &fsm_acquire_goal);
 }
@@ -96,25 +96,24 @@ RCSW_CONST HFSM_STATE_DEFINE_ND(acquire_goal_fsm, finished) {
 bool acquire_goal_fsm::in_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.in_collision_avoidance()) ||
-      (m_vector_fsm.task_running() && m_vector_fsm.in_collision_avoidance());
+         (m_vector_fsm.task_running() && m_vector_fsm.in_collision_avoidance());
 } /* in_collision_avoidance() */
 
 bool acquire_goal_fsm::entered_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.entered_collision_avoidance()) ||
-      (m_vector_fsm.task_running() &&
-       m_vector_fsm.entered_collision_avoidance());
+         (m_vector_fsm.task_running() &&
+          m_vector_fsm.entered_collision_avoidance());
 } /* entered_collision_avoidance() */
 
 bool acquire_goal_fsm::exited_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.exited_collision_avoidance()) ||
-      (m_vector_fsm.task_running() &&
-       m_vector_fsm.exited_collision_avoidance());
+         (m_vector_fsm.task_running() &&
+          m_vector_fsm.exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
-rtypes::timestep acquire_goal_fsm::collision_avoidance_duration(
-    void) const {
+rtypes::timestep acquire_goal_fsm::collision_avoidance_duration(void) const {
   if (m_explore_fsm.task_running()) {
     return m_explore_fsm.collision_avoidance_duration();
   } else if (m_vector_fsm.task_running()) {
@@ -127,10 +126,9 @@ bool acquire_goal_fsm::goal_acquired(void) const {
   return current_state() == ekST_FINISHED;
 } /* cache_acquired() */
 
-acquire_goal_fsm::exp_status acquire_goal_fsm::is_exploring_for_goal(
-    void) const {
+acquire_goal_fsm::exp_status acquire_goal_fsm::is_exploring_for_goal(void) const {
   return std::make_pair(current_state() == ekST_ACQUIRE_GOAL &&
-                        m_explore_fsm.task_running(),
+                            m_explore_fsm.task_running(),
                         !m_hooks.candidates_exist());
 } /* is_exploring_for_goal() */
 

@@ -138,7 +138,7 @@
         <sensing
             los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
-                            delta="0.0001" />
+                            delta="0.1" />
           </sensing>
         <actuation>
           <steering2D>

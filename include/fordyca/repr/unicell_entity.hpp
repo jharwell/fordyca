@@ -113,12 +113,8 @@ class unicell_entity : public base_entity {
   explicit unicell_entity(const rmath::vector2d& dim)
       : unicell_entity{dim, -1} {}
 
-  unicell_entity(const rmath::vector2d& dim,
-                 int id)
-      : base_entity(id),
-        m_dim(dim),
-        m_rloc(),
-        m_dloc() {}
+  unicell_entity(const rmath::vector2d& dim, int id)
+      : base_entity(id), m_dim(dim), m_rloc(), m_dloc() {}
 
   template <typename T, typename = bool>
   struct entity_is_movable : std::false_type {};

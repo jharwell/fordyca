@@ -108,6 +108,18 @@ void grp_dpo_controller::private_init(
 
 void grp_dpo_controller::task_alloc_cb(const rta::polled_task* const task,
                                        const rta::bi_tab* const) {
+  /**
+   * @brief Callback for task alloc. Needed to reset the task state of the
+   * controller (not the task, which is handled by the executive) in the case
+   * that the previous task was aborted. Not reseting this results in erroneous
+   * handling of the newly allocated task as if it was aborted by the loop
+   * functions, resulting in inconsistent state with the robot's executive. See
+   * #532,#587.
+   */
+  if (tasks::task_status::ekAbortPending != task_status()) {
+    task_status_update(tasks::task_status::ekRunning);
+  }
+
   if (!m_bsel_exception_added) {
     block_sel_matrix()->sel_exceptions_clear();
   }

@@ -79,8 +79,7 @@ mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* mdpo_perception() */
 
-const mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(
-    void) const {
+const mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* mdpo_perception() */

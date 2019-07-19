@@ -208,11 +208,8 @@ int base_controller::entity_id(void) const {
 } /* entity_id() */
 
 void base_controller::ndc_pusht(void) {
-  ER_NDC_PUSH(std::string("[t=") +
-              std::to_string(m_saa->sensing()->tick().v()) +
-              std::string("] [") +
-              GetId() +
-              std::string("]"));
+  ER_NDC_PUSH(std::string("[t=") + std::to_string(m_saa->sensing()->tick().v()) +
+              std::string("] [") + GetId() + std::string("]"));
 }
 
 double base_controller::applied_motion_throttle(void) const {
@@ -235,7 +232,8 @@ rtypes::spatial_dist base_controller::distance(void) const {
    * because of the prev/current location not being set up properly yet.
    */
   if (saa_subsystem()->sensing()->tick() > 1) {
-    return rtypes::spatial_dist(saa_subsystem()->sensing()->tick_travel().length());
+    return rtypes::spatial_dist(
+        saa_subsystem()->sensing()->tick_travel().length());
   }
   return rtypes::spatial_dist(0.0);
 } /* distance() */
@@ -257,8 +255,7 @@ rmath::vector2d base_controller::velocity(void) const {
 const rmath::vector2d& base_controller::position2D(void) const {
   return m_saa->sensing()->position();
 }
-const rmath::vector2u& base_controller::discrete_position2D(
-    void) const {
+const rmath::vector2u& base_controller::discrete_position2D(void) const {
   return m_saa->sensing()->discrete_position();
 }
 

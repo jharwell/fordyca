@@ -42,6 +42,7 @@
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
 #include "fordyca/support/depth0/robot_configurer.hpp"
@@ -53,7 +54,6 @@
 #include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
-#include "fordyca/repr/line_of_sight.hpp"
 
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
@@ -78,7 +78,7 @@ NS_START(detail);
  */
 struct functor_maps_initializer {
   RCSW_COLD functor_maps_initializer(configurer_map_type* const cmap,
-                           depth0_loop_functions* const lf_in)
+                                     depth0_loop_functions* const lf_in)
 
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
@@ -186,8 +186,8 @@ void depth0_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
   controller->block_manip_collator()->reset();
 
   /* Set robot position, time, and send it its new LOS */
-  utils::set_robot_pos<decltype(*controller)>(
-      robot, arena_map()->grid_resolution());
+  utils::set_robot_pos<decltype(*controller)>(robot,
+                                              arena_map()->grid_resolution());
   utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
   boost::apply_visitor(detail::robot_los_updater_adaptor(controller),

@@ -42,8 +42,8 @@ existing_cache_utility::existing_cache_utility(const rmath::vector2d& cache_loc,
 double existing_cache_utility::calc(const rmath::vector2d& rloc,
                                     const rswarm::pheromone_density& density,
                                     size_t n_blocks) {
-  return set_result(
-      (std::exp(density.last_result()) * n_blocks) /
+  return eval(
+      (std::exp(density.v()) * n_blocks) /
       ((mc_cache_loc - rloc).length() * (mc_cache_loc - mc_nest_loc).length()));
 } /* calc() */
 

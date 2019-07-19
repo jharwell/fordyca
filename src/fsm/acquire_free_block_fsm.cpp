@@ -105,7 +105,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
   }
 } /* block_select() */
 
- bool acquire_free_block_fsm::candidates_exist(void) const {
+bool acquire_free_block_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exist() */
 

@@ -73,7 +73,7 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
              c.ent()->id(),
              c.ent()->rloc().to_str().c_str(),
              c.ent()->dloc().to_str().c_str(),
-             c.density().last_result(),
+             c.density().v(),
              utility);
 
     if (utility > max_utility) {

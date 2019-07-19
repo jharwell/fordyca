@@ -98,12 +98,12 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
   cell2D& cell = access<kCell>(i, j);
 
   if (!m_pheromone_repeat_deposit) {
-    ER_ASSERT(density.last_result() <= 1.0,
+    ER_ASSERT(density.v() <= 1.0,
               "Repeat pheromone deposit detected for cell@(%u, %u) (%f > "
               "1.0, state=%d)",
               i,
               j,
-              density.last_result(),
+              density.v(),
               cell.fsm().current_state());
   }
 
@@ -113,8 +113,8 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
    * also check if the cell state is known, but that is slower than checking if
    * the density has already been reset.
    */
-  if (density.last_result() < kEPSILON &&
-      density.last_result() > std::numeric_limits<double>::min()) {
+  if (density.v() < kEPSILON &&
+      density.v() > std::numeric_limits<double>::min()) {
     ER_TRACE("Relevance of cell(%u, %u) is within %f of 0 for %s",
              i,
              j,

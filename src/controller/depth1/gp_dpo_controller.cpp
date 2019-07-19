@@ -114,10 +114,18 @@ void gp_dpo_controller::private_init(
                                     perception())(config_repo);
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
+  executive()->task_alloc_notify(
+      std::bind(&gp_dpo_controller::task_alloc_cb, this, std::placeholders::_1));
 } /* private_init() */
 
 void gp_dpo_controller::task_abort_cb(const rta::polled_task*) {
-  m_task_aborted = true;
+  m_task_status = tasks::task_status::ekAbortPending;
+} /* task_abort_cb() */
+
+void gp_dpo_controller::task_alloc_cb(const rta::polled_task*) {
+  if (tasks::task_status::ekAbortPending != m_task_status) {
+    m_task_status = tasks::task_status::ekRunning;
+  }
 } /* task_abort_cb() */
 
 const rta::bi_tab* gp_dpo_controller::active_tab(void) const {

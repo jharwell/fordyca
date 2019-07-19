@@ -30,6 +30,8 @@
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
+#include "fordyca/tasks/task_status.hpp"
+
 #include "rcppsw/ta/logical_task.hpp"
 
 /*******************************************************************************
@@ -127,7 +129,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
    * been aborted, using the current task's abort status will always return
    * false, and lead to inconsistent simulation state.
    */
-  bool task_aborted(void) const { return m_task_aborted; }
+  tasks::task_status task_status(void) const { return m_task_status; }
 
   const class cache_sel_matrix* cache_sel_matrix(void) const {
     return m_cache_sel_matrix.get();
@@ -136,7 +138,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
     return m_cache_sel_matrix.get();
   }
 
-  void task_aborted(bool task_aborted) { m_task_aborted = task_aborted; }
+  void task_status_update(tasks::task_status s) { m_task_status = s; }
 
  protected:
   /**
@@ -168,13 +170,22 @@ class gp_dpo_controller : public depth0::dpo_controller,
    */
   void task_abort_cb(const rta::polled_task*);
 
+  /**
+   * @brief Callback for task alloc. Needed to reset the task state of the
+   * controller (not the task, which is handled by the executive) in the case
+   * that the previous task was aborted. Not reseting this results in erroneous
+   * handling of the newly allocated task as if it was aborted by the loop
+   * functions, resulting in inconsistent state with the robot's executive.
+   */
+  void task_alloc_cb(const rta::polled_task*);
+
  private:
   void private_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
   /* clang-format off */
-  bool                                      m_display_task{false};
-  bool                                      m_task_aborted{false};
-  std::unique_ptr<class cache_sel_matrix>   m_cache_sel_matrix;
+  bool                                       m_display_task{false};
+  tasks::task_status                         m_task_status{tasks::task_status::ekNull};
+  std::unique_ptr<class cache_sel_matrix>    m_cache_sel_matrix;
   std::unique_ptr<rta::bi_tdgraph_executive> m_executive;
   /* clang-format on */
 };

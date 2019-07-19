@@ -52,7 +52,7 @@ void cache_finisher::task_start(const rta::taskable_argument* const) {
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
- double cache_finisher::abort_prob_calc(void) {
+double cache_finisher::abort_prob_calc(void) {
   if (-1 == active_interface()) {
     return rta::abort_probability::kMIN_ABORT_PROB;
   } else {
@@ -60,8 +60,7 @@ void cache_finisher::task_start(const rta::taskable_argument* const) {
   }
 } /* abort_prob_calc() */
 
- double cache_finisher::interface_time_calc(uint interface,
-                                                       double start_time) {
+double cache_finisher::interface_time_calc(uint interface, double start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */

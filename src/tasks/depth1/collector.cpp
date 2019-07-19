@@ -166,7 +166,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(collector,
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
- bool collector::task_at_interface(void) const {
+bool collector::task_at_interface(void) const {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
   return !(transport_goal_type::ekNEST == fsm->block_transport_goal());
 } /* task_at_interface() */

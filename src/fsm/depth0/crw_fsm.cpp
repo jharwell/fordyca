@@ -124,11 +124,11 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rpfsm::event_data* data) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
- crw_fsm::exp_status crw_fsm::is_exploring_for_goal(void) const {
+crw_fsm::exp_status crw_fsm::is_exploring_for_goal(void) const {
   return std::make_pair(current_state() == ekST_ACQUIRE_BLOCK, true);
 } /* is_exploring_for_goal() */
 
- bool crw_fsm::goal_acquired(void) const {
+bool crw_fsm::goal_acquired(void) const {
   if (acq_goal_type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_PICKUP;
   } else if (transport_goal_type::ekNEST == block_transport_goal()) {
@@ -153,25 +153,25 @@ rmath::vector2u crw_fsm::current_vector_loc(void) const {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
- bool crw_fsm::in_collision_avoidance(void) const {
+bool crw_fsm::in_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.in_collision_avoidance()) ||
          base_foraging_fsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
- bool crw_fsm::entered_collision_avoidance(void) const {
+bool crw_fsm::entered_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.entered_collision_avoidance()) ||
          base_foraging_fsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
- bool crw_fsm::exited_collision_avoidance(void) const {
+bool crw_fsm::exited_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.exited_collision_avoidance()) ||
          base_foraging_fsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
- rtypes::timestep crw_fsm::collision_avoidance_duration(void) const {
+rtypes::timestep crw_fsm::collision_avoidance_duration(void) const {
   if (m_explore_fsm.task_running()) {
     return m_explore_fsm.collision_avoidance_duration();
   } else {
@@ -201,7 +201,7 @@ bool crw_fsm::block_detected(void) const {
   return saa_subsystem()->sensing()->block_detected();
 } /* block_detected() */
 
- transport_goal_type crw_fsm::block_transport_goal(void) const {
+transport_goal_type crw_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::ekNEST;
@@ -209,7 +209,7 @@ bool crw_fsm::block_detected(void) const {
   return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
- acq_goal_type crw_fsm::acquisition_goal(void) const {
+acq_goal_type crw_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return acq_goal_type::ekBLOCK;

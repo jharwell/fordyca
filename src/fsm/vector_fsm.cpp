@@ -150,7 +150,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
    * Not doing this results in robots getting stuck when they all are trying to
    * pick up the same block in close quarters.
    */
-  if (auto obs = sensors()->avg_obstacle_within_prox() &&
+  if (sensors()->avg_obstacle_within_prox() &&
       !saa_subsystem()->steer2D_force_calc().within_slowing_radius()) {
     internal_event(ekST_COLLISION_AVOIDANCE);
   } else {
@@ -162,8 +162,8 @@ FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
 }
 
 RCSW_CONST FSM_STATE_DEFINE(vector_fsm,
-                              arrived,
-                              RCSW_UNUSED struct goal_data* data) {
+                            arrived,
+                            RCSW_UNUSED struct goal_data* data) {
   if (ekST_ARRIVED != last_state()) {
     ER_DEBUG("Executing ekST_ARRIVED: target=%s, tol=%f",
              data->loc.to_str().c_str(),
@@ -195,15 +195,15 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
- bool vector_fsm::in_collision_avoidance(void) const {
+bool vector_fsm::in_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE == current_state();
 } /* in_collision_avoidance() */
 
- bool vector_fsm::entered_collision_avoidance(void) const {
+bool vector_fsm::entered_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE != last_state() && in_collision_avoidance();
 } /* entered_collision_avoidance() */
 
- bool vector_fsm::exited_collision_avoidance(void) const {
+bool vector_fsm::exited_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE == last_state() && !in_collision_avoidance();
 } /* exited_collision_avoidance() */
 
@@ -241,8 +241,7 @@ void vector_fsm::init(void) {
   rpfsm::simple_fsm::init();
 } /* init() */
 
- rmath::vector2d vector_fsm::calc_vector_to_goal(
-    const rmath::vector2d& goal) {
+rmath::vector2d vector_fsm::calc_vector_to_goal(const rmath::vector2d& goal) {
   return goal - sensors()->position();
 } /* calc_vector_to_goal() */
 

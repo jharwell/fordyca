@@ -58,11 +58,11 @@ void base_block::first_pickup_time(rtypes::timestep time) {
   }
 } /* first_pickup_time() */
 
- rtypes::timestep base_block::total_transport_time(void) const {
+rtypes::timestep base_block::total_transport_time(void) const {
   return m_nest_drop_time - m_first_pickup_time;
 } /* total_transport_time() */
 
- rtypes::timestep base_block::initial_wait_time(void) const {
+rtypes::timestep base_block::initial_wait_time(void) const {
   return m_first_pickup_time - m_dist_time;
 } /* initial_wait_time() */
 

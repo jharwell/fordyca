@@ -69,7 +69,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
- bool acquire_new_cache_fsm::candidates_exist(void) const {
+bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
@@ -84,7 +84,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_s
             best->ent()->id(),
             best->ent()->rloc().to_str().c_str(),
             best->ent()->dloc().to_str().c_str(),
-            best->density().last_result());
+            best->density().v());
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(best->ent()->rloc(),
                                          vector_fsm::kNEW_CACHE_ARRIVAL_TOL,
@@ -115,8 +115,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
- acq_goal_type
-acquire_new_cache_fsm::acquisition_goal_internal(void) const {
+acq_goal_type acquire_new_cache_fsm::acquisition_goal_internal(void) const {
   return acq_goal_type::ekNEW_CACHE;
 } /* acquisition_goal() */
 
