@@ -140,21 +140,40 @@ For loop functions configuration, see
 
 After successful compilation, follow these steps to run a foraging scenario:
 
-1. Set the `ARGOS_PLUGIN_PATH` variable to contain the path to the
-   `libfordyca.so` file. On bash, that is:
+1. Set the `ARGOS_PLUGIN_PATH` variable to contain (1) the path to the directory
+   containing the `libfordyca.so` file, (2) the path to the ARGoS libraries. On
+   bash, that is:
 
-        export ARGOS_PLUGIN_PATH=/path/to/where/argos/lib/dir:/path/to/fordyca/build/lib
+        export ARGOS_PLUGIN_PATH=/usr/local/lib/argos3/lib:$HOME/git/fordyca/build/lib
 
-   Where you replace both `/path/to` entries to actual paths.  Note that you
-   need BOTH of these terms in the path, because this defines the ENTIRE search
-   space for argos to look for libraries (including its own core libraries).
+   Assuming you have installed ARGoS to `/usr/local` and have cloned/built
+   fordyca under `$HOME/git`. If your paths are different, modify the above paths
+   accordingly. Note that you need BOTH of these terms in the path, because this
+   defines the ENTIRE search space for argos to look for libraries (including
+   its own core libraries).
 
-2. Unless you compile out event reporting, you will need to set the path to the
-   log4cxx configuration file. On bash that is:
+2. If you have installed ARGoS to a non-system path (i.e. something other than
+   `/usr/local` or `/usr`), you will also need to update *system* dynamic
+   library search paths so the OS can find the libraries that the ARGoS
+   executable requires. If you installed it to a system path, then you can skip
+   this step. On bash:
 
-        export LOG4CXX_CONFIGURATION=/path/to/fordyca/log4cxx.xml
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/local/lib/argos3
 
-3. cd to the ROOT of the fordyca repo, and run the demo experiment:
+   Assuming you have installed ARGoS to `/opt/local`. If you installed it
+   somewhere else, then update the path above accordingly.
+
+3. Unless you compile out event reporting (built fordyca with optimizations
+   *AND* with `LIBRA_ER_NREPORT=YES` passed to cmake), you will need to set the
+   path to the log4cxx configuration file, which tells fordyca which classes
+   should have logging turned on, and how verbose to be. On bash that is:
+
+        export LOG4CXX_CONFIGURATION=$HOME/git/fordyca/log4cxx.xml
+
+   Assuming you have cloned and built fordyca in `$HOME/git`. If you cloned and
+   built it somewhere else, then update the above path accordingly.
+
+4. cd to the ROOT of the fordyca repo, and run the demo experiment:
 
         argos3 -c exp/demo.argos
 

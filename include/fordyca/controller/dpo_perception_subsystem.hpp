@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
@@ -101,7 +102,7 @@ class dpo_perception_subsystem final
   void los_tracking_sync(const repr::line_of_sight* c_los,
                          const ds::cache_list& los_caches);
   void los_tracking_sync(const repr::line_of_sight* c_los,
-                         const ds::block_list& blocks);
+                         const ds::block_list& los_blocks);
 
  private:
   /* clang-format off */

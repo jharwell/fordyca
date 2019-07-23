@@ -69,7 +69,7 @@
   </category>
 
   <category name="fordyca.controller.dpo_perception" >
-    <priority value ="info" />
+    <priority value ="trace" />
   </category>
   <category name="fordyca.controller.saa_subsystem" >
     <priority value ="info" />
