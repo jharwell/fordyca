@@ -112,7 +112,9 @@ class free_block_pickup_interactor
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving pickup penalty");
-
+    ER_ASSERT(!controller.is_carrying_block(),
+              "Controller is already carrying block%d",
+              controller.block()->id());
     /*
      * More than 1 robot can pick up a block in a timestep, so we have to
      * search for this robot's controller

@@ -75,8 +75,8 @@ class motion_throttling_handler {
   void toggle(bool en) { m_en = en; }
 
   /**
-   * @brief Update the actuators in accordance with the current motion_throttling
-   * configuration and timestep.
+   * @brief Update the actuators in accordance with the current
+   * motion_throttling configuration and timestep.
    */
   void update(rtypes::timestep t);
 

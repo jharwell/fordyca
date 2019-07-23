@@ -229,13 +229,25 @@ std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
 } /* robot_tasks_extract() */
 
 /*******************************************************************************
- * General Member Functions
+ * ARGoS Hooks
  ******************************************************************************/
 void depth2_loop_functions::PreStep() {
   ndc_push();
-
   base_loop_functions::PreStep();
 
+  /* Process all robots */
+  swarm_iterator::robots(this, [&](auto* robot) { robot_pre_step(*robot); });
+
+  ndc_pop();
+} /* PreStep() */
+
+void depth2_loop_functions::PostStep(void) {
+  ndc_push();
+
+  /* Process all robots */
+  swarm_iterator::robots(this, [&](auto* robot) { robot_post_step(*robot); });
+
+  /* Update block distribution status */
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
   arena_map()->redist_governor()->update(
@@ -252,15 +264,7 @@ void depth2_loop_functions::PreStep() {
   m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
   m_cache_manager->reset_metrics();
 
-  /* Process all robots */
-  swarm_iterator::robots(this,
-                         [&](auto* robot) { robot_timestep_process(*robot); });
-
-  /* handle cache removal as a result of robot interactions with arena */
-  if (m_cache_manager->caches_depleted() > 0) {
-    floor()->SetChanged();
-  }
-  /* collect metrics from non-robot sources */
+  /* collect metrics from loop functions */
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
@@ -273,9 +277,62 @@ void depth2_loop_functions::PreStep() {
   m_metrics_agg->interval_reset_all();
 
   ndc_pop();
-} /* PreStep() */
+} /* PostStep() */
 
-void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot) {
+void depth2_loop_functions::Reset(void) {
+  ndc_push();
+  base_loop_functions::Reset();
+  m_metrics_agg->reset_all();
+  cache_creation_handle(false);
+  ndc_pop();
+}
+
+void depth2_loop_functions::Destroy(void) {
+  if (nullptr != m_metrics_agg) {
+    m_metrics_agg->finalize_all();
+  }
+} /* Destroy() */
+
+argos::CColor depth2_loop_functions::GetFloorColor(
+    const argos::CVector2& plane_pos) {
+  rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
+  if (arena_map()->nest().contains_point(tmp)) {
+    return argos::CColor(arena_map()->nest().color().red(),
+                         arena_map()->nest().color().green(),
+                         arena_map()->nest().color().blue());
+  }
+  /*
+   * Blocks are inside caches, so display the cache the point is inside FIRST,
+   * so that you don't have blocks rendering inside of caches.
+   */
+  for (auto& cache : arena_map()->caches()) {
+    if (cache->contains_point(tmp)) {
+      return argos::CColor(cache->color().red(),
+                           cache->color().green(),
+                           cache->color().blue());
+    }
+  } /* for(&cache..) */
+
+  for (auto& block : arena_map()->blocks()) {
+    /*
+     * Even though each block type has a unique color, the only distinction
+     * that robots can make to determine if they are on a block or not is
+     * between shades of black/white. So, all blocks must appear as black, even
+     * when they are not actually (when blocks are picked up their correct color
+     * is shown through visualization).
+     */
+    if (block->contains_point(tmp)) {
+      return argos::CColor::BLACK;
+    }
+  } /* for(&block..) */
+
+  return argos::CColor::WHITE;
+} /* GetFloorColor() */
+
+/*******************************************************************************
+ * General Member Functions
+ ******************************************************************************/
+void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
   auto controller = dynamic_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -328,57 +385,58 @@ void depth2_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot)
       oracle_manager()->update(arena_map());
     }
   }
-} /* robot_timestep_process() */
+} /* robot_pre_step() */
 
-argos::CColor depth2_loop_functions::GetFloorColor(
-    const argos::CVector2& plane_pos) {
-  rmath::vector2d tmp(plane_pos.GetX(), plane_pos.GetY());
-  if (arena_map()->nest().contains_point(tmp)) {
-    return argos::CColor(arena_map()->nest().color().red(),
-                         arena_map()->nest().color().green(),
-                         arena_map()->nest().color().blue());
-  }
+void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
+  auto controller = dynamic_cast<controller::base_controller*>(
+      &robot.GetControllableEntity().GetController());
+
   /*
-   * Blocks are inside caches, so display the cache the point is inside FIRST,
-   * so that you don't have blocks rendering inside of caches.
+   * Watch the robot interact with its environment after physics have been
+   * updated and its controller has run.
+   *
+   * If said interaction results in a block being dropped in a new cache, then
+   * we need to re-run dynamic cache creation.
    */
-  for (auto& cache : arena_map()->caches()) {
-    if (cache->contains_point(tmp)) {
-      return argos::CColor(cache->color().red(),
-                           cache->color().green(),
-                           cache->color().blue());
+  auto iadaptor =
+      robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
+          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+  auto status =
+      boost::apply_visitor(iadaptor,
+                           m_interactor_map->at(controller->type_index()));
+  if (interactor_status::ekNoEvent != status) {
+    if (interactor_status::ekNewCacheBlockDrop & status) {
+      bool ret = cache_creation_handle(true);
+      if (!ret) {
+        ER_WARN("Unable to create cache after block drop in new cache");
+      }
     }
-  } /* for(&cache..) */
 
-  for (auto& block : arena_map()->blocks()) {
     /*
-     * Even though each block type has a unique color, the only distinction
-     * that robots can make to determine if they are on a block or not is
-     * between shades of black/white. So, all blocks must appear as black, even
-     * when they are not actually (when blocks are picked up their correct color
-     * is shown through visualization).
+     * The oracle does not have up-to-date information about all caches in the
+     * arena now that one has been created, so we need to update the oracle in
+     * the middle of processing robots. This is not an issue in depth1, because
+     * caches are always created AFTER processing all robots for a timestep.
+     *
+     * It also does not necessarily have up-to-date information about all blocks
+     * in the arena, as a robot could have dropped a block when it aborted its
+     * current task.
      */
-    if (block->contains_point(tmp)) {
-      return argos::CColor::BLACK;
+    if (nullptr != oracle_manager()) {
+      oracle_manager()->update(arena_map());
     }
-  } /* for(&block..) */
-
-  return argos::CColor::WHITE;
-} /* GetFloorColor() */
-
-void depth2_loop_functions::Reset(void) {
-  ndc_push();
-  base_loop_functions::Reset();
-  m_metrics_agg->reset_all();
-  cache_creation_handle(false);
-  ndc_pop();
-}
-
-void depth2_loop_functions::Destroy(void) {
-  if (nullptr != m_metrics_agg) {
-    m_metrics_agg->finalize_all();
   }
-} /* Destroy() */
+
+  /*
+   * Collect metrics from robot, now that it has finished interacting with the
+   * environment and no more changes to its state will occur this timestep.
+   */
+  auto madaptor =
+      robot_metric_extractor_adaptor<depth2_metrics_aggregator>(controller);
+  boost::apply_visitor(madaptor,
+                       m_metric_extractor_map->at(controller->type_index()));
+  controller->block_manip_collator()->reset();
+} /* robot_post_step() */
 
 bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
   auto* cachep = config()->config_get<config::caches::caches_config>();

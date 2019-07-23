@@ -120,7 +120,9 @@ class cached_block_pickup_interactor
     ER_ASSERT(tv::acq_goal_type::ekEXISTING_CACHE ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
-
+    ER_ASSERT(!controller.is_carrying_block(),
+              "Controller is already carrying block%d",
+              controller.block()->id());
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
      * same/successive/close together timesteps, then the first robot to serve

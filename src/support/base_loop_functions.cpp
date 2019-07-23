@@ -138,16 +138,28 @@ void base_loop_functions::convergence_init(
 } /* convergence_init() */
 
 void base_loop_functions::PreStep(void) {
+  /*
+   * Needs to be before robot controllers are run, so they run with the correct
+   * throttling/are subjected to the correct penalties, etc.
+   */
   if (nullptr != m_tv_manager) {
     m_tv_manager->update();
   }
-  if (nullptr != m_conv_calc) {
-    m_conv_calc->update();
-  }
+
   if (nullptr != m_oracle_manager) {
     m_oracle_manager->update(arena_map());
   }
 } /* PreStep() */
+
+void base_loop_functions::PostStep(void) {
+  /*
+   * Needs to be after robot controllers are run, because compute convergence
+   * before that gives you the convergence status for the LAST timestep.
+   */
+  if (nullptr != m_conv_calc) {
+    m_conv_calc->update();
+  }
+} /* PostStep() */
 
 void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
   /*

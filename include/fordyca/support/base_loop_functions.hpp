@@ -99,6 +99,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   void Init(ticpp::Element&) override RCSW_COLD;
   void Reset(void) override RCSW_COLD;
   void PreStep(void) override;
+  void PostStep(void) override;
 
   void ndc_push(void) {
     ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");

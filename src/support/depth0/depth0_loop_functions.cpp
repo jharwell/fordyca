@@ -172,50 +172,60 @@ void depth0_loop_functions::private_init(void) {
 } /* private_init() */
 
 /*******************************************************************************
- * General Member Functions
+ * ARGoS Hooks
  ******************************************************************************/
-void depth0_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::base_controller*>(
-      &robot.GetControllableEntity().GetController());
+void depth0_loop_functions::PreStep(void) {
+  ndc_push();
+  base_loop_functions::PreStep();
 
-  /* collect metrics from robot before its state changes */
-  auto madaptor =
-      robot_metric_extractor_adaptor<depth0_metrics_aggregator>(controller);
-  boost::apply_visitor(madaptor, m_metrics_map->at(controller->type_index()));
+  /* Process all robots */
+  swarm_iterator::robots(this, [&](auto* robot) { robot_pre_step(*robot); });
 
-  controller->block_manip_collator()->reset();
+  ndc_pop();
+} /* PreStep() */
 
-  /* Set robot position, time, and send it its new LOS */
-  utils::set_robot_pos<decltype(*controller)>(robot,
-                                              arena_map()->grid_resolution());
-  utils::set_robot_tick<decltype(*controller)>(
-      robot, rtypes::timestep(GetSpace().GetSimulationClock()));
-  boost::apply_visitor(detail::robot_los_updater_adaptor(controller),
-                       m_los_update_map->at(controller->type_index()));
+void depth0_loop_functions::PostStep(void) {
+  ndc_push();
+  base_loop_functions::PostStep();
 
-  /* Watch the robot interact with the environment! */
-  auto iadaptor =
-      robot_interactor_adaptor<depth0::robot_arena_interactor, interactor_status>(
-          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
-  auto status =
-      boost::apply_visitor(iadaptor,
-                           m_interactor_map->at(controller->type_index()));
+  /* Process all robots */
+  swarm_iterator::robots(this, [&](auto* robot) { robot_post_step(*robot); });
 
-  /*
-   * The oracle does not necessarily have up-to-date information about all
-   * blocks in the arena, as a robot could have dropped a block in the nest or
-   * picked one up, so its version of the set of free blocks in the arena is out
-   * of date. Robots processed *after* the robot that caused the event need
-   * the correct free block set to be available from the oracle upon request, to
-   * avoid asserts during on debug builds. On optimized builds the asserts are
-   * ignored/compiled out, which is not a problem, because they LOS processing
-   * errors that can result are transient and are corrected the next
-   * timestep. See #577.
-   */
-  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map());
+  /* Update block distribution status */
+  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+      *(*m_metrics_agg)["blocks::transport"]);
+  arena_map()->redist_governor()->update(
+      rtypes::timestep(GetSpace().GetSimulationClock()),
+      collector.cum_collected(),
+      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+
+  /* collect metrics from loop functions */
+  m_metrics_agg->collect_from_loop(this);
+
+  /* Not a clean way to do this in the convergence metrics collector... */
+  if (m_metrics_agg->metrics_write_all(
+          rtypes::timestep(GetSpace().GetSimulationClock())) &&
+      nullptr != conv_calculator()) {
+    conv_calculator()->reset_metrics();
   }
-} /* robot_timestep_process() */
+  m_metrics_agg->timestep_inc_all();
+  m_metrics_agg->interval_reset_all();
+
+  ndc_pop();
+} /* PostStep() */
+
+void depth0_loop_functions::Destroy(void) {
+  if (nullptr != m_metrics_agg) {
+    m_metrics_agg->finalize_all();
+  }
+} /* Destroy() */
+
+void depth0_loop_functions::Reset(void) {
+  ndc_push();
+  base_loop_functions::Reset();
+  m_metrics_agg->reset_all();
+  ndc_pop();
+} /* Reset() */
 
 argos::CColor depth0_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
@@ -242,49 +252,62 @@ argos::CColor depth0_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void depth0_loop_functions::PreStep(void) {
-  ndc_push();
-  base_loop_functions::PreStep();
+/*******************************************************************************
+ * General Member Functions
+ ******************************************************************************/
+void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
+  auto controller = static_cast<controller::base_controller*>(
+      &robot.GetControllableEntity().GetController());
 
-  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
-      *(*m_metrics_agg)["blocks::transport"]);
-  arena_map()->redist_governor()->update(
-      rtypes::timestep(GetSpace().GetSimulationClock()),
-      collector.cum_collected(),
-      nullptr != conv_calculator() ? conv_calculator()->converged() : false);
+  /* Set robot position, time, and send it its new LOS */
+  utils::set_robot_pos<decltype(*controller)>(robot,
+                                              arena_map()->grid_resolution());
+  utils::set_robot_tick<decltype(*controller)>(
+      robot, rtypes::timestep(GetSpace().GetSimulationClock()));
+  boost::apply_visitor(detail::robot_los_updater_adaptor(controller),
+                       m_los_update_map->at(controller->type_index()));
+} /* robot_pre_step() */
 
-  /* Process all robots */
-  swarm_iterator::robots(this,
-                         [&](auto* robot) { robot_timestep_process(*robot); });
+void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
+  auto controller = static_cast<controller::base_controller*>(
+      &robot.GetControllableEntity().GetController());
 
-  /* collect metrics from non-robot sources */
-  m_metrics_agg->collect_from_loop(this);
+  /*
+   * Watch the robot interact with its environment after physics have been
+   * updated and its controller has run.
+   */
+  auto iadaptor =
+      robot_interactor_adaptor<depth0::robot_arena_interactor, interactor_status>(
+          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+  auto status =
+      boost::apply_visitor(iadaptor,
+                           m_interactor_map->at(controller->type_index()));
 
-  /* Not a clean way to do this in the convergence metrics collector... */
-  if (m_metrics_agg->metrics_write_all(
-          rtypes::timestep(GetSpace().GetSimulationClock())) &&
-      nullptr != conv_calculator()) {
-    conv_calculator()->reset_metrics();
+  /*
+   * The oracle does not necessarily have up-to-date information about all
+   * blocks in the arena, as a robot could have dropped a block in the nest or
+   * picked one up, so its version of the set of free blocks in the arena is out
+   * of date. Robots processed *after* the robot that caused the event need
+   * the correct free block set to be available from the oracle upon request, to
+   * avoid asserts during on debug builds. On optimized builds the asserts are
+   * ignored/compiled out, which is not a problem, because the LOS processing
+   * errors that can result are transient and are corrected the next
+   * timestep. See #577.
+   */
+  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
+    oracle_manager()->update(arena_map());
   }
-  /* write out all metrics */
-  m_metrics_agg->timestep_inc_all();
-  m_metrics_agg->interval_reset_all();
 
-  ndc_pop();
-} /* PreStep() */
+  /*
+   * Collect metrics from robot, now that it has finished interacting with the
+   * environment and no more changes to its state will occur this timestep.
+   */
+  auto madaptor =
+      robot_metric_extractor_adaptor<depth0_metrics_aggregator>(controller);
+  boost::apply_visitor(madaptor, m_metrics_map->at(controller->type_index()));
 
-void depth0_loop_functions::Destroy(void) {
-  if (nullptr != m_metrics_agg) {
-    m_metrics_agg->finalize_all();
-  }
-} /* Destroy() */
-
-void depth0_loop_functions::Reset(void) {
-  ndc_push();
-  base_loop_functions::Reset();
-  m_metrics_agg->reset_all();
-  ndc_pop();
-} /* Reset() */
+  controller->block_manip_collator()->reset();
+} /* robot_post_step() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

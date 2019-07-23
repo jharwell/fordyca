@@ -65,6 +65,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
 
   void Init(ticpp::Element& node) override RCSW_COLD;
   void PreStep() override;
+  void PostStep() override;
   void Reset(void) override RCSW_COLD;
   void Destroy(void) override RCSW_COLD;
 
@@ -135,14 +136,22 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
    */
   std::vector<int> robot_tasks_extract(uint) const;
 
-  /**
-   * @brief Process a single robot on a timestep:
+    /**
+   * @brief Process a single robot on a timestep, before running its controller:
    *
-   * - Collect metrics from it.
    * - Set its new position, time, LOS from ARGoS.
    * - Have it interact with the environment.
    */
-  void robot_timestep_process(argos::CFootBotEntity& robot);
+  void robot_pre_step(argos::CFootBotEntity& robot);
+
+  /**
+   * @brief Process a single robot on a timestep, after running its controller:
+   *
+   * - Have it interact with the environment.
+   * - Collect metrics from it.
+   */
+  void robot_post_step(argos::CFootBotEntity& robot);
+
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   /* clang-format off */

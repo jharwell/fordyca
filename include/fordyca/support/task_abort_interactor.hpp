@@ -89,10 +89,6 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
     }
     auto polled =
         dynamic_cast<const rta::polled_task*>(controller.current_task());
-    ER_ASSERT(polled->task_aborted(),
-              "%s in 'task aborted' state, but current task '%s' not aborted",
-              controller.GetId().c_str(),
-              polled->name().c_str());
     /*
      * If a robot aborted its task and was carrying a block, it needs to (1)
      * drop it so that the block is not left dangling and unusable for the rest

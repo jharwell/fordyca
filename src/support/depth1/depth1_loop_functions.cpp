@@ -370,12 +370,35 @@ std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
 } /* robot_tasks_extract() */
 
 /*******************************************************************************
- * General Member Functions
+ * ARGoS Hooks
  ******************************************************************************/
 void depth1_loop_functions::PreStep() {
   ndc_push();
   base_loop_functions::PreStep();
 
+  /* Process all robots */
+  swarm_iterator::robots(this, [&](auto* robot) { robot_pre_step(*robot); });
+
+  ndc_pop();
+} /* PreStep() */
+
+void depth1_loop_functions::PostStep(void) {
+  ndc_push();
+  base_loop_functions::PostStep();
+
+  /* Process all robots */
+  swarm_iterator::robots(this, [&](auto* robot) { robot_post_step(*robot); });
+
+  /*
+   * Manage the static cache and handle cache removal as a result of robot
+   * interactions with arena.
+   */
+  static_cache_monitor();
+  if (m_cache_manager->caches_depleted() > 0) {
+    floor()->SetChanged();
+  }
+
+  /* Update block distribution status */
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
   arena_map()->redist_governor()->update(
@@ -388,32 +411,11 @@ void depth1_loop_functions::PreStep() {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
+
   m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
   m_cache_manager->reset_metrics();
 
-  /*
-   * Manage the static cache. Must be before per-robot processing, so each robot
-   * gets their internal object store updated with (potentially) new cache
-   * information (oracular robots and non).
-   */
-  static_cache_monitor();
-  if (m_cache_manager->caches_depleted() > 0) {
-    floor()->SetChanged();
-  }
-
-  /*
-   * After (possibly) re-creating static caches, update the oracle, so each
-   * robot gets the most up to date information about caches.
-   */
-  if (nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map());
-  }
-
-  /* Process all robots */
-  swarm_iterator::robots(this,
-                         [&](auto* robot) { robot_timestep_process(*robot); });
-
-  /* collect metrics from non-robot sources */
+  /* Collect metrics from loop functions */
   m_metrics_agg->collect_from_loop(this);
 
   /* Not a clean way to do this in the convergence metrics collector... */
@@ -422,59 +424,34 @@ void depth1_loop_functions::PreStep() {
       nullptr != conv_calculator()) {
     conv_calculator()->reset_metrics();
   }
-
   m_metrics_agg->timestep_inc_all();
   m_metrics_agg->interval_reset_all();
 
   ndc_pop();
-} /* PreStep() */
+} /* PostStep() */
 
-void depth1_loop_functions::robot_timestep_process(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::base_controller*>(
-      &robot.GetControllableEntity().GetController());
+void depth1_loop_functions::Reset() {
+  ndc_push();
+  base_loop_functions::Reset();
+  m_metrics_agg->reset_all();
 
-  /* get stats from this robot before its state changes */
-  auto madaptor =
-      robot_metric_extractor_adaptor<depth1_metrics_aggregator>(controller);
-  boost::apply_visitor(madaptor,
-                       m_metric_extractor_map->at(controller->type_index()));
-  controller->block_manip_collator()->reset();
-
-  /* Set robot position, time, and send it its new LOS */
-  utils::set_robot_pos<decltype(*controller)>(robot,
-                                              arena_map()->grid_resolution());
-  utils::set_robot_tick<decltype(*controller)>(
-      robot, rtypes::timestep(GetSpace().GetSimulationClock()));
-  boost::apply_visitor(robot_los_updater_adaptor(controller),
-                       m_los_update_map->at(controller->type_index()));
-
-  /* Watch the robot interact with its environment! */
-  auto iadaptor =
-      robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
-          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
-  auto status =
-      boost::apply_visitor(iadaptor,
-                           m_interactor_map->at(controller->type_index()));
-  /*
-   * The oracle does not necessarily have up-to-date information about all
-   * blocks in the arena, as a robot could have dropped a block in the nest or
-   * picked one up, so its version of the set of free blocks in the arena is out
-   * of date. Robots processed *after* the robot that caused the event need
-   * the correct free block set to be available from the oracle upon request, to
-   * avoid asserts during on debug builds. On optimized builds the asserts are
-   * ignored/compiled out, which is not a problem, because they LOS processing
-   * errors that can result are transient and are corrected the next
-   * timestep.
-   *
-   * This is not a problem for caches, because caches are created (if needed)
-   * after *all* robots have been processed for the given timestep.
-   *
-   * See #577.
-   */
-  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map());
+  auto clusters = arena_map()->block_distributor()->block_clusters();
+  if (auto created = m_cache_manager->create(
+          arena_map()->caches(),
+          clusters,
+          arena_map()->blocks(),
+          rtypes::timestep(GetSpace().GetSimulationClock()))) {
+    arena_map()->caches_add(*created, this);
+    floor()->SetChanged();
   }
-} /* robot_timestep_process() */
+  ndc_pop();
+} /* Reset() */
+
+void depth1_loop_functions::Destroy(void) {
+  if (nullptr != m_metrics_agg) {
+    m_metrics_agg->finalize_all();
+  }
+} /* Destroy() */
 
 argos::CColor depth1_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {
@@ -512,28 +489,66 @@ argos::CColor depth1_loop_functions::GetFloorColor(
   return argos::CColor::WHITE;
 } /* GetFloorColor() */
 
-void depth1_loop_functions::Reset() {
-  ndc_push();
-  base_loop_functions::Reset();
-  m_metrics_agg->reset_all();
+/*******************************************************************************
+ * General Member Functions
+ ******************************************************************************/
+void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
+  auto controller = dynamic_cast<controller::base_controller*>(
+      &robot.GetControllableEntity().GetController());
 
-  auto clusters = arena_map()->block_distributor()->block_clusters();
-  if (auto created = m_cache_manager->create(
-          arena_map()->caches(),
-          clusters,
-          arena_map()->blocks(),
-          rtypes::timestep(GetSpace().GetSimulationClock()))) {
-    arena_map()->caches_add(*created, this);
-    floor()->SetChanged();
-  }
-  ndc_pop();
-} /* Reset() */
+  /* Set robot position, time, and send it its new LOS */
+  utils::set_robot_pos<decltype(*controller)>(robot,
+                                              arena_map()->grid_resolution());
+  utils::set_robot_tick<decltype(*controller)>(
+      robot, rtypes::timestep(GetSpace().GetSimulationClock()));
+  boost::apply_visitor(robot_los_updater_adaptor(controller),
+                       m_los_update_map->at(controller->type_index()));
+} /* robot_pre_step() */
 
-void depth1_loop_functions::Destroy(void) {
-  if (nullptr != m_metrics_agg) {
-    m_metrics_agg->finalize_all();
+void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
+  auto controller = dynamic_cast<controller::base_controller*>(
+      &robot.GetControllableEntity().GetController());
+
+  /*
+   * Watch the robot interact with its environment after physics have been
+   * updated and its controller has run.
+   */
+  auto iadaptor =
+      robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
+          controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+  auto status =
+      boost::apply_visitor(iadaptor,
+                           m_interactor_map->at(controller->type_index()));
+  /*
+   * The oracle does not necessarily have up-to-date information about all
+   * blocks in the arena, as a robot could have dropped a block in the nest or
+   * picked one up, so its version of the set of free blocks in the arena is out
+   * of date. Robots processed *after* the robot that caused the event need
+   * the correct free block set to be available from the oracle upon request, to
+   * avoid asserts during on debug builds. On optimized builds the asserts are
+   * ignored/compiled out, which is not a problem, because they LOS processing
+   * errors that can result are transient and are corrected the next
+   * timestep.
+   *
+   * This is not a problem for caches, because caches are created (if needed)
+   * after *all* robots have been processed for the given timestep.
+   *
+   * See #577.
+   */
+  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
+    oracle_manager()->update(arena_map());
   }
-} /* Destroy() */
+
+  /*
+   * Collect metrics from robot, now that it has finished interacting with the
+   * environment and no more changes to its state will occur this timestep.
+   */
+  auto madaptor =
+      robot_metric_extractor_adaptor<depth1_metrics_aggregator>(controller);
+  boost::apply_visitor(madaptor,
+                       m_metric_extractor_map->at(controller->type_index()));
+  controller->block_manip_collator()->reset();
+} /* robot_post_step() */
 
 void depth1_loop_functions::static_cache_monitor(void) {
   /* nothing to do--all our managed caches exist */

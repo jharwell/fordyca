@@ -34,13 +34,7 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-enum class task_status {
-  ekNull,
-  ekRunning,
-  ekAbortPending,
-  ekAbortProcessed
-};
-
+enum class task_status { ekNull, ekRunning, ekAbortPending, ekAbortProcessed };
 
 NS_END(tasks, fordyca);
 
