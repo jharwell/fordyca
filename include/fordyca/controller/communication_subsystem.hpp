@@ -23,7 +23,7 @@ NS_START(controller);
  *
  * @brief 
  */
-class communication_subsystem {
+class communication_subsystem : public rer::client<communication_subsystem> {
  public:
   const std::string kRANDOM = "random";
   const std::string kUTILITY = "utility";
@@ -76,6 +76,12 @@ class communication_subsystem {
   void set_communication_parameters(
       const struct config::communication_config* params) {
     m_communication_params = *params;
+
+    if (m_communication_params.on) {
+      ER_ASSERT(m_communication_params.mode.compare(kRANDOM) == 0 ||
+                m_communication_params.mode.compare(kUTILITY) == 0,
+                "Communication mode not correctly set");
+    }
   }
 
  private:

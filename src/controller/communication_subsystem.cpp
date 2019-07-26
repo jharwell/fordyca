@@ -31,14 +31,6 @@
 #include "fordyca/repr/ramp_block.hpp"
 #include "rcppsw/robotics/hal/wifi_packet.hpp"
 
-/*
-VERIFY IT WORKS:
-changed "nest_loc" to kNestLoc
-*/
-
-// NATETODO: do I need these
-
-// #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -52,20 +44,13 @@ communication_subsystem::communication_subsystem(
     controller::base_perception_subsystem* perception,
     controller::saa_subsystem* saa,
     class block_sel_matrix* block_sel_matrix)
-    : m_perception(perception),
+    : ER_CLIENT_INIT("fordyca.controller.communication_subsystem"),
+      m_perception(perception),
       m_saa(saa),
       m_block_sel_matrix(block_sel_matrix) {}
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-
-//  This is how we got the params in Init from MDPO.
-// void mdpo_controller::Init(ticpp::Element &node)
-// {
-//   auto *comm_params = param_repo.config_get<config::communication_config>();
-//   m_communication_params = *comm_params;
-// }
-
 void communication_subsystem::communication_check(void) {
   // If communication is off, do nothing and return;
   if (!m_communication_params.on) {
@@ -119,10 +104,6 @@ void communication_subsystem::fill_packet(void) {
     rcppsw::math::vector2u cell = get_most_valuable_cell();
     x_coord = cell.x();
     y_coord = cell.y();
-  } else {
-    // Fail safe coords
-    x_coord = 2;
-    y_coord = 2;
   }
 
   ds::cell2D cell =
