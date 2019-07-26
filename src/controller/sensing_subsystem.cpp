@@ -82,7 +82,8 @@ bool sensing_subsystem::cache_detected(void) const {
   return m_sensors.ground.detect(0.4, 0.1, 3);
 } /* block_detected() */
 
-std::vector<rrhal::sensors::rab_wifi_sensor::rab_wifi_packet> sensing_subsystem::recieve_message() {
+std::vector<rrhal::sensors::rab_wifi_sensor::rab_wifi_packet> sensing_subsystem::
+    recieve_message() {
   return m_sensors.rabs.readings();
 }
 

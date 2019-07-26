@@ -186,11 +186,10 @@ void dpo_perception_subsystem::los_tracking_sync(
       continue;
     }
     auto exists_in_los =
-        los_caches.end() != std::find_if(los_caches.begin(),
-                                         los_caches.end(),
-                                         [&](const auto& c) {
-                                           return c->dloccmp(*it->ent_obj());
-                                         });
+        los_caches.end() !=
+        std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
+          return c->dloccmp(*it->ent_obj());
+        });
 
     if (!exists_in_los) {
       ER_INFO("Remove tracked cache%d@%s: not in LOS caches",
@@ -239,11 +238,10 @@ void dpo_perception_subsystem::los_tracking_sync(
       continue;
     }
     auto exists_in_los =
-        los_blocks.end() != std::find_if(los_blocks.begin(),
-                                         los_blocks.end(),
-                                         [&](const auto& b) {
-                                           return b->idcmp(*(it->ent_obj()));
-                                         });
+        los_blocks.end() !=
+        std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
+          return b->idcmp(*(it->ent_obj()));
+        });
     ER_TRACE("Block%d location in LOS", it->ent()->id());
     if (!exists_in_los) {
       ER_INFO("Remove tracked block%d@%s/%s: not in LOS blocks",

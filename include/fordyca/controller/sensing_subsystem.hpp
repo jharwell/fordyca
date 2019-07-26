@@ -36,8 +36,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace config
-{
+namespace config {
 struct sensing_config;
 }
 
@@ -54,47 +53,40 @@ NS_START(controller);
  * foraging controllers.  Contains common sensor functionality for all
  * controllers.
  */
-class sensing_subsystem
-{
-public:
+class sensing_subsystem {
+ public:
   /**
    * @brief Initialize the base sensing subsystem.
    *
    * @param config Subsystem parameters.
    * @param list List of handles to sensing devices.
    */
-  sensing_subsystem(const config::sensing_config *config,
-                    const sensor_list *list);
+  sensing_subsystem(const config::sensing_config* config,
+                    const sensor_list* list);
 
   double los_dim(void) const { return mc_los_dim; }
 
   /**
    * @brief Get the list of sensors that the subsystem is managing.
    */
-  const struct sensor_list &sensor_list(void) const { return m_sensors; }
+  const struct sensor_list& sensor_list(void) const { return m_sensors; }
 
-  const rrhal::sensors::proximity_sensor &proximity(void) const
-  {
+  const rrhal::sensors::proximity_sensor& proximity(void) const {
     return m_sensors.proximity;
   }
-  const rrhal::sensors::colored_blob_camera_sensor &blobs(void) const
-  {
+  const rrhal::sensors::colored_blob_camera_sensor& blobs(void) const {
     return m_sensors.blobs;
   }
-  const rrhal::sensors::light_sensor &light(void) const
-  {
+  const rrhal::sensors::light_sensor& light(void) const {
     return m_sensors.light;
   }
-  const rrhal::sensors::ground_sensor &ground(void) const
-  {
+  const rrhal::sensors::ground_sensor& ground(void) const {
     return m_sensors.ground;
   }
-  const rrhal::sensors::rab_wifi_sensor &rabs(void) const
-  {
+  const rrhal::sensors::rab_wifi_sensor& rabs(void) const {
     return m_sensors.rabs;
   }
-  const rrhal::sensors::battery_sensor &battery(void) const
-  {
+  const rrhal::sensors::battery_sensor& battery(void) const {
     return m_sensors.battery;
   }
 
@@ -121,23 +113,20 @@ public:
    * of self-localizing. That's not the point of this project, and this was much
    * faster/easier.
    */
-  const rmath::vector2d &position(void) const { return m_position; }
-  const rmath::vector2u &discrete_position(void) const
-  {
+  const rmath::vector2d& position(void) const { return m_position; }
+  const rmath::vector2u& discrete_position(void) const {
     return m_discrete_position;
   }
 
   /**
    * @brief Set the robot's current location.
    */
-  void position(const rmath::vector2d &position)
-  {
+  void position(const rmath::vector2d& position) {
     m_prev_position = m_position;
     m_position = position;
   }
 
-  void discrete_position(const rmath::vector2u &position)
-  {
+  void discrete_position(const rmath::vector2u& position) {
     m_discrete_position = position;
   }
 
@@ -172,7 +161,7 @@ public:
 
   std::vector<rrhal::sensors::rab_wifi_sensor::rab_wifi_packet> recieve_message();
 
-private:
+ private:
   /* clang-format off */
   const double                 mc_obstacle_delta;
   const double                 mc_los_dim;

@@ -27,7 +27,6 @@
 #include <argos3/plugins/simulator/entities/light_entity.h>
 #include <algorithm>
 #include <vector>
-#include <argos3/plugins/simulator/entities/light_entity.h>
 
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/utilization_metrics.hpp"
@@ -72,7 +71,7 @@ class arena_cache final : public base_cache,
 
   void has_block_pickup(void) { m_block_pickups = 1; }
   void has_block_drop(void) { m_block_drops = 1; }
-  
+
   void penalty_served(rtypes::timestep duration) {
     m_penalty_count += duration;
   }

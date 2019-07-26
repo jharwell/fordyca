@@ -24,17 +24,17 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/repr/ramp_block.hpp"
-#include "fordyca/repr/cube_block.hpp"
-#include "fordyca/events/block_found.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/saa_subsystem.hpp"
+#include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/events/block_found.hpp"
+#include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/cube_block.hpp"
+#include "fordyca/repr/ramp_block.hpp"
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -52,8 +52,7 @@ mdpo_controller::~mdpo_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void mdpo_controller::ControlStep(void)
-{
+void mdpo_controller::ControlStep(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -67,8 +66,7 @@ void mdpo_controller::ControlStep(void)
   ndc_pop();
 } /* ControlStep() */
 
-void mdpo_controller::Init(ticpp::Element &node)
-{
+void mdpo_controller::Init(ticpp::Element& node) {
   /*
    * Note that we do not call \ref crw_controller::Init()--there
    * is nothing in there that we need.
@@ -90,7 +88,7 @@ void mdpo_controller::Init(ticpp::Element &node)
   shared_init(config_repo);
   private_init(config_repo);
 
-  auto *comm_params = config_repo.config_get<config::communication_config>();
+  auto* comm_params = config_repo.config_get<config::communication_config>();
   // m_comm = controller::communication_subsystem(comm_params, );
   m_comm.set_communication_parameters(comm_params);
 

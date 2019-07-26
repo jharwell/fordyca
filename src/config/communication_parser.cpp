@@ -34,19 +34,16 @@ NS_START(fordyca, config);
 void communication_parser::parse(const ticpp::Element& node) {
   ticpp::Element anode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
-  
+
   XML_PARSE_ATTR(anode, m_config, on);
   XML_PARSE_ATTR(anode, m_config, mode);
   XML_PARSE_ATTR(anode, m_config, prob_send);
   XML_PARSE_ATTR(anode, m_config, prob_receive);
 } /* parse() */
 
-bool communication_parser::validate(void) const
-{
-  return m_config->prob_send >= 0.0 &&
-         m_config->prob_send <= 1.0 &&
-         m_config->prob_receive >= 0.0 &&
-         m_config->prob_receive <= 1.0;
+bool communication_parser::validate(void) const {
+  return m_config->prob_send >= 0.0 && m_config->prob_send <= 1.0 &&
+         m_config->prob_receive >= 0.0 && m_config->prob_receive <= 1.0;
 } /* validate() */
 
 NS_END(config, fordyca);

@@ -87,10 +87,7 @@ class actuation_subsystem {
     m_actuators.wifi.broadcast_start(packet);
   }
 
-  void stop_sending_message(void) {
-    m_actuators.wifi.broadcast_stop();
-  }
-
+  void stop_sending_message(void) { m_actuators.wifi.broadcast_stop(); }
 
  private:
   /* clang-format off */

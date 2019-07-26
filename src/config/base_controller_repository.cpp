@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/config/base_controller_repository.hpp"
 #include "fordyca/config/actuation_parser.hpp"
+#include "fordyca/config/communication_parser.hpp"
 #include "fordyca/config/exploration_parser.hpp"
 #include "fordyca/config/output_parser.hpp"
 #include "fordyca/config/sensing_parser.hpp"
-#include "fordyca/config/communication_parser.hpp"
 
 /*******************************************************************************
  * Namespaces

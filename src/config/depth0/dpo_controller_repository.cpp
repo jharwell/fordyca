@@ -33,8 +33,7 @@ NS_START(fordyca, config, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dpo_controller_repository::dpo_controller_repository(void)
-{
+dpo_controller_repository::dpo_controller_repository(void) {
   parser_register<block_sel::block_sel_matrix_parser,
                   block_sel::block_sel_matrix_config>(
       block_sel::block_sel_matrix_parser::kXMLRoot);
