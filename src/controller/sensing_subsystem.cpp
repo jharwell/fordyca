@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/config/sensing_config.hpp"
+#include "rcppsw/robotics/hal/wifi_packet.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -88,18 +89,8 @@ bool sensing_subsystem::cache_detected(void) const {
   return m_sensors.ground.detect(0.4, 0.1, 3);
 } /* block_detected() */
 
-std::vector<std::vector<uint8_t>> sensing_subsystem::recieve_message() {
-  std::vector<std::vector<uint8_t>> return_data;
-  auto readings = m_sensors.rabs.readings();
-  for (auto reading : readings) {
-    std::vector<uint8_t> data = reading.data;
-    // Check if data isn't empty and if there is a value in the state position
-    if (!data.empty() && static_cast<int>(data[2]) >= 1 &&
-      static_cast<int>(data[0]) > 0 && static_cast<int>(data[1]) > 0) {
-      return_data.push_back(data);
-    }
-  }
-  return return_data;
+std::vector<rrhal::sensors::rab_wifi_sensor::rab_wifi_packet> sensing_subsystem::recieve_message() {
+  return m_sensors.rabs.readings();
 }
 
 NS_END(controller, fordyca);

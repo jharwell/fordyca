@@ -162,9 +162,8 @@
           <differential_drive soft_turn_max="15"
                               max_speed="10.0" />
         </actuation>
-        <communication on="true"
+        <communication on="false"
                        mode="utility"
-                       max_message_length="10"
                        prob_send="0.3"
                        prob_receive="0.9" />
       </params>

@@ -42,7 +42,6 @@ NS_START(fordyca, config);
 struct communication_config : public rcppsw::config::base_config {
   double prob_send{0.0};
   double prob_receive{0.0};
-  int max_message_length{0};
   std::string mode{"random"};
   bool on{false};
 };

@@ -32,6 +32,8 @@ The following root XML tags are defined:
 
 - `actuation` - Parameters for robot actuators.
 
+- `communication` - Parameters for inter-robot communication.
+
 ### `output`
 
 #### `sim`
@@ -325,6 +327,16 @@ task allocation, with a `method` tag that can be one of [`harwell2019`].
                     place).
 
 - `max_speed` - The maximimum speed of the robot.
+
+### `communication`
+
+- `on` - true/false that enables/disables the use of communication
+
+- `mode` - utility/random that determines how cells will be selected for communicationS
+
+- `prob_send` - The probability of sending a message. Specified as a decimal.
+
+- `prob_receive` - The probability of receiving a message. Specified as a decimal.
 
 ## Loop Functions
 

@@ -29,6 +29,7 @@
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/config/communication_config.hpp"
 #include "rcppsw/robotics/hal/wifi_packet.hpp"
+#include "fordyca/controller/communication_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -103,45 +104,11 @@ private:
    */
   void private_init(void);
 
-  /**
-   * @brief Checks for available messages from nearby robots, and
-   * probabilistically integrates their contents. Also probabilistically
-   * sends messages to nearby robots.
-   *
-   * Called from \ref ControlStep().
-   */
-  void communication_check(void);
-
-  /**
-   * @brief Calls get_most_valuable_cell, and fills a rab_wifi_packet with
-   * information representing the current state of that cell.
-   *
-   * Called iteratively from \ref communication_check().
-   */
-  void fill_packet(void);
-
-  /**
-   * @brief Integrate a received communication packet's contents with the
-   * robot's internal environmental mapping.
-   *
-   * Called from \ref communication_check().
-   */
-  void integrate_recieved_packet(rcppsw::robotics::hal::wifi_packet packet);
-
-  /**
-   * @brief Returns a vector containing the (X,Y) coordinates of the cell deamed
-   * most valuable according to block count, distance from the nest, and current
-   * pheromon levels.
-   *
-   * Called from \ref fill_packet().
-   */
-  rcppsw::math::vector2u get_most_valuable_cell(void);
+  void private_init(const config::depth0::mdpo_controller_repository &param_repo);
 
   /* clang-format off */
-  struct config::communication_config        m_communication_params;
+  class controller::communication_subsystem m_comm;
   /* clang-format on */
-
-  void private_init(const config::depth0::mdpo_controller_repository &param_repo);
 };
 
 NS_END(depth0, controller, fordyca);

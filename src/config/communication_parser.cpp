@@ -44,16 +44,13 @@ void communication_parser::parse(const ticpp::Element &node)
       std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
   XML_PARSE_ATTR(anode, m_params, on);
   XML_PARSE_ATTR(anode, m_params, mode);
-  XML_PARSE_ATTR(anode, m_params, max_message_length);
   XML_PARSE_ATTR(anode, m_params, prob_send);
   XML_PARSE_ATTR(anode, m_params, prob_receive);
 } /* parse() */
 
 __rcsw_pure bool communication_parser::validate(void) const
 {
-  return m_params->max_message_length >= 0 &&
-         m_params->max_message_length <= 20 &&
-         m_params->prob_send >= 0.0 &&
+  return m_params->prob_send >= 0.0 &&
          m_params->prob_send <= 1.0 &&
          m_params->prob_receive >= 0.0 &&
          m_params->prob_receive <= 1.0;

@@ -187,7 +187,7 @@ public:
    */
   rmath::vector2d find_closest_obstacle(void) const;
 
-  std::vector<std::vector<uint8_t>> recieve_message();
+  std::vector<rrhal::sensors::rab_wifi_sensor::rab_wifi_packet> recieve_message();
 
 private:
   /* clang-format off */
