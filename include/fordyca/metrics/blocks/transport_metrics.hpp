@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "fordyca/repr/block_type.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -61,13 +62,13 @@ class transport_metrics : public rmetrics::base_metrics {
    * @brief Return the total amount of time that it took from the first pickup
    * to when the block was deposited in the nest.
    */
-  virtual double total_transport_time(void) const = 0;
+  virtual rtypes::timestep total_transport_time(void) const = 0;
 
   /**
    * @brief Return the amount of time that the block sits in the arena after
    * being distributed but before it is picked up for the first time.
    */
-  virtual double initial_wait_time(void) const = 0;
+  virtual rtypes::timestep initial_wait_time(void) const = 0;
 
   /**
    * @brief When a block is collected, return the type of the block

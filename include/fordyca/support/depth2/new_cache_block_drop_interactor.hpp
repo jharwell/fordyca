@@ -32,6 +32,7 @@
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -84,9 +85,9 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    *
    * @return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
-  bool operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
         return finish_new_cache_block_drop(controller);
       }
     } else {
@@ -100,11 +101,10 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
        */
       auto status = m_penalty_handler->penalty_init(controller,
                                                    tv::block_op_src::ekNEW_CACHE_DROP,
-                                                   timestep,
-                                                   m_cache_manager->cache_proximity_dist(),
-                                                   m_cache_manager->block_proximity_dist());
+                                                   t,
+                                                   m_cache_manager->cache_proximity_dist());
       if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
-        auto prox_status = loop_utils::new_cache_cache_proximity(controller,
+        auto prox_status = utils::new_cache_cache_proximity(controller,
                                                                  *m_map,
                                                                  m_cache_manager->cache_proximity_dist());
         ER_ASSERT(-1 != prox_status.entity_id,
@@ -112,19 +112,19 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
         cache_proximity_notify(controller, prox_status);
       }
     }
-    return false;
+    return interactor_status::ekNoEvent;
   }
 
  private:
   void cache_proximity_notify(T& controller,
-                              const loop_utils::proximity_status_t& status) {
+                              const utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in new cache: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position2D().to_str().c_str(),
             status.entity_id,
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
-            m_cache_manager->cache_proximity_dist());
+            m_cache_manager->cache_proximity_dist().v());
     /*
      * Because caches can be dynamically created/destroyed, we cannot rely on
      * the index position of cache i to be the same as its ID, so we need to
@@ -146,7 +146,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    * @brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache site and is looking to drop an object on it.
    */
-  bool finish_new_cache_block_drop(T& controller) {
+  interactor_status finish_new_cache_block_drop(T& controller) {
     const tv::temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
@@ -155,7 +155,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     ER_ASSERT(controller.current_task()->goal_acquired() &&
               tv::acq_goal_type::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for new cache block drop");
-    auto status = loop_utils::new_cache_cache_proximity(controller,
+    auto status = utils::new_cache_cache_proximity(controller,
                                                        *m_map,
                                                        m_cache_manager->cache_proximity_dist());
 
@@ -172,7 +172,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
               controller.position2D().to_str().c_str(),
               status.entity_id,
               status.distance.length(),
-              m_cache_manager->cache_proximity_dist());
+              m_cache_manager->cache_proximity_dist().v());
 
       /*
        * We need to perform the proxmity check again after serving our block
@@ -188,13 +188,13 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                 status.entity_id);
       events::cache_proximity_visitor prox_op(*it);
       prox_op.visit(controller);
-      return false;
+      return interactor_status::ekNoEvent;
     } else {
       perform_new_cache_block_drop(controller, p);
       m_penalty_handler->remove(p);
       ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
-      return true;
+      return interactor_status::ekNewCacheBlockDrop;
     }
   }
 
@@ -206,7 +206,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                                     const tv::temporal_penalty<T>& penalty) {
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
                                             rmath::dvec2uvec(controller.position2D(),
-                                                             m_map->grid_resolution()),
+                                                             m_map->grid_resolution().v()),
                                             m_map->grid_resolution());
 
     drop_op.visit(controller);

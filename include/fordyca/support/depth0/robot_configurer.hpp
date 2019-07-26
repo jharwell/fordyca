@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
 #include <boost/variant/static_visitor.hpp>
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
@@ -72,7 +71,7 @@ class robot_configurer : public boost::static_visitor<void> {
       c->display_id(mc_config->robot_id);
     }
     if (nullptr != m_oracle) {
-      auto receptor = rcppsw::make_unique<controller::oracular_info_receptor>(
+      auto receptor = std::make_unique<controller::oracular_info_receptor>(
           nullptr, m_oracle);
       c->oracle_init(std::move(receptor));
     }

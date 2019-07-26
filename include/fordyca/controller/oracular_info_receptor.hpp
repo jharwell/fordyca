@@ -80,8 +80,8 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
    */
   void dpo_store_update(ds::dpo_store* store);
 
-  bool entities_blocks_enabled(void) const;
-  bool entities_caches_enabled(void) const;
+  bool entities_blocks_enabled(void) const RCSW_PURE;
+  bool entities_caches_enabled(void) const RCSW_PURE;
 
  private:
   /**

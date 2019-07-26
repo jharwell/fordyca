@@ -21,8 +21,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+#include <argos3/plugins/simulator/media/led_medium.h>
 
 #include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -32,7 +34,6 @@
 #include "fordyca/repr/ramp_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
@@ -54,14 +55,17 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
              config->nest.center,
              config->grid.resolution,
              support::light_type_index()[support::light_type_index::kNest]),
-      m_block_dispatcher(&decoratee(), &config->blocks.dist, arena_padding()),
+      m_block_dispatcher(&decoratee(),
+                         config->grid.resolution,
+                         &config->blocks.dist,
+                         arena_padding()),
       m_redist_governor(&config->blocks.dist.redist_governor) {
   ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),
           yrsize(),
           xdsize(),
           ydsize(),
-          grid_resolution());
+          grid_resolution().v());
 }
 
 /*******************************************************************************
@@ -76,18 +80,24 @@ bool arena_map::initialize(support::base_loop_functions* loop) {
 } /* initialize() */
 
 void arena_map::caches_add(const cache_vector& caches,
-                support::base_loop_functions* loop) {
+                           support::base_loop_functions* loop) {
+  auto& medium = loop->GetSimulator().GetMedium<argos::CLEDMedium>(
+      config::saa_xml_names().leds_saa);
 
-  /* Add all lights of caches to the arena */
-  for (auto &c : caches) {
-    loop->AddEntity(*c->light());
+  /*
+   * Add all lights of caches to the arena. Cache lights are added directly to
+   * the LED medium, which is different than what is rendered to the screen, so
+   * they actually are invisible.
+   */
+  for (auto& c : caches) {
+    medium.AddEntity(*c->light());
   } /* for(&c..) */
 
   m_caches.insert(m_caches.end(), caches.begin(), caches.end());
   ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
 } /* caches_add() */
 
-__rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
+int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   /*
    * Caches hide blocks, add even though a robot may technically be standing on
    * a block, if it is also standing in a cache, that takes priority.
@@ -104,7 +114,7 @@ __rcsw_pure int arena_map::robot_on_block(const rmath::vector2d& pos) const {
   return -1;
 } /* robot_on_block() */
 
-__rcsw_pure int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
+int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
   for (auto& c : m_caches) {
     if (c->contains_point(pos)) {
       return c->id();
@@ -153,8 +163,8 @@ void arena_map::distribute_all_blocks(void) {
 
   /*
    * Once all blocks have been distributed, and (possibly) all caches have been
-   * created via block consolidation, then all cells that do not have blocks or
-   * caches are empty.
+   * created via block consolidation, all cells that do not have blocks or
+   * caches should be empty.
    */
   for (size_t i = 0; i < xdsize(); ++i) {
     for (size_t j = 0; j < ydsize(); ++j) {
@@ -171,19 +181,21 @@ void arena_map::distribute_all_blocks(void) {
 void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
                              support::base_loop_functions* loop) {
   /* Remove light for cache from ARGoS */
-  loop->RemoveEntity(*victim->light());
+  auto& medium = loop->GetSimulator().GetMedium<argos::CLEDMedium>(
+      config::saa_xml_names().leds_saa);
+  medium.RemoveEntity(*victim->light());
 
   /* Remove cache */
   size_t before = caches().size();
-  __rcsw_unused int id = victim->id();
+  RCSW_UNUSED int id = victim->id();
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
   ER_ASSERT(caches().size() == before - 1, "Cache%d not removed", id);
 } /* cache_remove() */
 
 void arena_map::cache_extent_clear(
     const std::shared_ptr<repr::arena_cache>& victim) {
-  auto xspan = victim->xspan(victim->real_loc());
-  auto yspan = victim->yspan(victim->real_loc());
+  auto xspan = victim->xspan();
+  auto yspan = victim->yspan();
 
   /*
    * To reset all cells covered by the cache's extent, we simply send them a
@@ -191,16 +203,17 @@ void arena_map::cache_extent_clear(
    * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
-  auto xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution()));
-  auto xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution()));
-  auto ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution()));
-  auto ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution()));
+  auto xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution().v()));
+  auto xmax = static_cast<uint>(std::ceil(xspan.ub() / grid_resolution().v()));
+  auto ymin = static_cast<uint>(std::ceil(yspan.lb() / grid_resolution().v()));
+  auto ymax = static_cast<uint>(std::ceil(yspan.ub() / grid_resolution().v()));
 
   for (uint i = xmin; i < xmax; ++i) {
     for (uint j = ymin; j < ymax; ++j) {
       rmath::vector2u c = rmath::vector2u(i, j);
-      if (c != victim->discrete_loc()) {
-        ER_ASSERT(victim->contains_point(rmath::uvec2dvec(c, grid_resolution())),
+      if (c != victim->dloc()) {
+        ER_ASSERT(victim->contains_point(
+                      rmath::uvec2dvec(c, grid_resolution().v())),
                   "Cache%d does not contain point (%u, %u) within its extent",
                   victim->id(),
                   i,

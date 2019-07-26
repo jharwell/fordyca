@@ -29,6 +29,8 @@
 #include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,20 +56,11 @@ NS_START(support);
  * @brief Manager for creation, depletion, and metric gathering for base
  * caches in the arena, whenever they are enabled.
  */
-class base_cache_manager : public metrics::caches::lifecycle_metrics {
+class base_cache_manager : public metrics::caches::lifecycle_metrics,
+                           public rer::client<base_cache_manager> {
  public:
-  struct creation_res_t {
-    bool status{false};
-    ds::cache_vector caches{};
-  };
-
-  struct block_calc_res_t {
-    bool status{false};
-    ds::block_vector blocks{};
-  };
-
   explicit base_cache_manager(ds::arena_grid* const arena_grid)
-      : m_grid(arena_grid) {}
+      : ER_CLIENT_INIT("fordyca.support.cache_manager"), m_grid(arena_grid) {}
   ~base_cache_manager(void) override = default;
 
   base_cache_manager(const base_cache_manager& other) = delete;
@@ -78,11 +71,11 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics {
   uint caches_depleted(void) const override final {
     return m_depletion_ages.size();
   }
-  std::vector<uint> cache_depletion_ages(void) const override {
+  std::vector<rtypes::timestep> cache_depletion_ages(void) const override {
     return m_depletion_ages;
   }
 
-  void cache_depleted(uint age) { m_depletion_ages.push_back(age); }
+  void cache_depleted(rtypes::timestep age) { m_depletion_ages.push_back(age); }
   void reset_metrics(void) override final {
     m_caches_created = 0;
     m_depletion_ages.clear();
@@ -95,9 +88,9 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics {
 
  private:
   /* clang-format off */
-  uint                   m_caches_created{0};
-  std::vector<uint>      m_depletion_ages{};
-  ds::arena_grid * const m_grid;
+  uint                          m_caches_created{0};
+  std::vector<rtypes::timestep> m_depletion_ages{};
+  ds::arena_grid * const        m_grid;
   /* clang-format on */
 };
 

@@ -48,16 +48,15 @@ NS_START(depth2);
 class grp_mdpo_controller : public depth2::grp_dpo_controller,
                             public rer::client<grp_mdpo_controller> {
  public:
-  grp_mdpo_controller(void);
-  ~grp_mdpo_controller(void) override = default;
+  grp_mdpo_controller(void) RCSW_COLD;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
 
-  void shared_init(const config::depth2::controller_repository& param_repo);
+  void shared_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 
-  mdpo_perception_subsystem* mdpo_perception(void);
-  const mdpo_perception_subsystem* mdpo_perception(void) const;
+  mdpo_perception_subsystem* mdpo_perception(void) RCSW_PURE;
+  const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;
 };
 
 NS_END(depth2, controller, fordyca);

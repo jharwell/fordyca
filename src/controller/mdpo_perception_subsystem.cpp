@@ -50,7 +50,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
       m_cell_stats(fsm::cell2D_fsm::ekST_MAX_STATES),
       m_los(),
-      m_map(rcppsw::make_unique<ds::dpo_semantic_map>(config, id)) {}
+      m_map(std::make_unique<ds::dpo_semantic_map>(config, id)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -121,8 +121,8 @@ void mdpo_perception_subsystem::process_los_blocks(
         auto block = m_map->access<occupancy_grid::kCell>(d).block();
         ER_DEBUG("Correct block%d %s/%s discrepency",
                  block->id(),
-                 block->real_loc().to_str().c_str(),
-                 block->discrete_loc().to_str().c_str());
+                 block->rloc().to_str().c_str(),
+                 block->dloc().to_str().c_str());
         m_map->block_remove(block);
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
@@ -137,17 +137,17 @@ void mdpo_perception_subsystem::process_los_blocks(
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
               block->id());
-    auto& cell = m_map->access<occupancy_grid::kCell>(block->discrete_loc());
+    auto& cell = m_map->access<occupancy_grid::kCell>(block->dloc());
     if (!cell.state_has_block()) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id(),
-              block->real_loc().to_str().c_str(),
-              block->discrete_loc().to_str().c_str());
+              block->rloc().to_str().c_str(),
+              block->dloc().to_str().c_str());
     } else if (cell.state_has_block()) {
       ER_DEBUG("Block%d@%s/%s already known",
                block->id(),
-               block->real_loc().to_str().c_str(),
-               block->discrete_loc().to_str().c_str());
+               block->rloc().to_str().c_str(),
+               block->dloc().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
         return b.ent()->id() == cell.block()->id();
@@ -187,8 +187,8 @@ void mdpo_perception_subsystem::process_los_caches(
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
         ER_DEBUG("Correct cache%d@%s/%s discrepency",
                  cache->id(),
-                 cache->real_loc().to_str().c_str(),
-                 cache->discrete_loc().to_str().c_str());
+                 cache->rloc().to_str().c_str(),
+                 cache->dloc().to_str().c_str());
         map()->cache_remove(cache);
       }
     } /* for(j..) */
@@ -202,23 +202,23 @@ void mdpo_perception_subsystem::process_los_caches(
      */
     ER_DEBUG("LOS: Cache%d@%s/%s: %zu blocks",
              cache->id(),
-             cache->real_loc().to_str().c_str(),
-             cache->discrete_loc().to_str().c_str(),
+             cache->rloc().to_str().c_str(),
+             cache->dloc().to_str().c_str(),
              cache->n_blocks());
-    auto& cell = map()->access<occupancy_grid::kCell>(cache->discrete_loc());
+    auto& cell = map()->access<occupancy_grid::kCell>(cache->dloc());
 
     if (!cell.state_has_cache()) {
       ER_INFO("Discovered cache%d@%s/%s: %zu blocks",
               cache->id(),
-              cache->real_loc().to_str().c_str(),
-              cache->discrete_loc().to_str().c_str(),
+              cache->rloc().to_str().c_str(),
+              cache->dloc().to_str().c_str(),
               cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
       ER_INFO("Fixed cache%d@%s/%s block count: %zu -> %zu",
               cache->id(),
-              cache->real_loc().to_str().c_str(),
-              cache->discrete_loc().to_str().c_str(),
+              cache->rloc().to_str().c_str(),
+              cache->dloc().to_str().c_str(),
               cache->n_blocks(),
               cell.cache()->n_blocks());
     }
@@ -261,23 +261,23 @@ void mdpo_perception_subsystem::update_cell_stats(
   }   /* for(i..) */
 } /* update_cell_stats() */
 
-__rcsw_pure ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
+ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) {
   return m_map->store();
 } /* dpo_store() */
 
-__rcsw_pure const ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) const {
+const ds::dpo_store* mdpo_perception_subsystem::dpo_store(void) const {
   return m_map->store();
 } /* dpo_store() */
 
 /*******************************************************************************
  * MDPO Perception Metrics
  ******************************************************************************/
-__rcsw_pure double mdpo_perception_subsystem::known_percentage(void) const {
+double mdpo_perception_subsystem::known_percentage(void) const {
   return m_map->known_cell_count() /
          static_cast<double>(m_map->xdsize() * m_map->ydsize());
 } /* known_percentage() */
 
-__rcsw_pure double mdpo_perception_subsystem::unknown_percentage(void) const {
+double mdpo_perception_subsystem::unknown_percentage(void) const {
   return 1.0 - known_percentage();
 } /* unknown_percentage() */
 

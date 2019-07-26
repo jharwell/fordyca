@@ -29,31 +29,22 @@
 NS_START(fordyca, config);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char actuation_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void actuation_parser::parse(const ticpp::Element& node) {
   ticpp::Element anode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
+
   m_differential_drive.parse(anode);
   m_steering.parse(anode);
-
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-  m_config->differential_drive = *m_differential_drive.config_get();
-  m_config->steering = *m_steering.config_get();
+  m_config->differential_drive = *m_differential_drive.config_get<
+      rrkin2D::config::xml::differential_drive_parser::config_type>();
+  m_config->steering = *m_steering.config_get<
+      rrsteer2D::config::xml::force_calculator_parser::config_type>();
 } /* parse() */
 
-__rcsw_pure bool actuation_parser::validate(void) const {
-  CHECK(m_differential_drive.validate());
-  CHECK(m_steering.validate());
-  return true;
-
-error:
-  return false;
+bool actuation_parser::validate(void) const {
+  return m_differential_drive.validate() && m_steering.validate();
 } /* validate() */
 
 NS_END(config, fordyca);

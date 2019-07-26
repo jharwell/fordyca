@@ -84,9 +84,9 @@ class cache_finisher final : public foraging_task,
   bool task_completed(void) const override { return task_finished(); }
 
   void task_start(const rta::taskable_argument*) override;
-  double abort_prob_calc(void) override;
+  double abort_prob_calc(void) override RCSW_PURE;
   double interface_time_calc(uint interface,
-                             double start_time) override;
+                             double start_time) override RCSW_PURE;
   void active_interface_update(int) override;
 };
 

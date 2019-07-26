@@ -34,7 +34,7 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
 using transport_goal_type = fsm::block_transporter::goal_type;
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -52,7 +52,7 @@ void cache_finisher::task_start(const rta::taskable_argument* const) {
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-__rcsw_pure double cache_finisher::abort_prob_calc(void) {
+double cache_finisher::abort_prob_calc(void) {
   if (-1 == active_interface()) {
     return rta::abort_probability::kMIN_ABORT_PROB;
   } else {
@@ -60,8 +60,7 @@ __rcsw_pure double cache_finisher::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-__rcsw_pure double cache_finisher::interface_time_calc(uint interface,
-                                                       double start_time) {
+double cache_finisher::interface_time_calc(uint interface, double start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
@@ -81,8 +80,8 @@ void cache_finisher::active_interface_update(int) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);
+      ER_TRACE("Interface start at timestep %f", current_time());
     }
-    ER_TRACE("Interface start at timestep %f", current_time());
   }
 } /* active_interface_update() */
 

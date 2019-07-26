@@ -54,17 +54,10 @@ bool sensing_subsystem::in_nest(void) const {
   return m_sensors.ground.detect(0.7, 0.1, 3);
 } /* in_nest() */
 
-rmath::vector2d sensing_subsystem::find_closest_obstacle(void) const {
-  return m_sensors.proximity.closest_prox_obj(position(),
-                                              mc_obstacle_delta,
-                                              m_fov);
-} /* find_closest_obstacle() */
-
-bool sensing_subsystem::threatening_obstacle_exists(void) const {
-  return m_sensors.proximity.prox_obj_exists(position(),
-                                             mc_obstacle_delta,
-                                             m_fov);
-} /* threatening_obstacle_exists() */
+boost::optional<rmath::vector2d> sensing_subsystem::avg_obstacle_within_prox(
+    void) const {
+  return m_sensors.proximity.avg_prox_obj(mc_obstacle_delta, m_fov);
+} /* avg_obstacle_within_prox() */
 
 bool sensing_subsystem::block_detected(void) const {
   /*

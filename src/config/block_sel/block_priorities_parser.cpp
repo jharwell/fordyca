@@ -30,23 +30,23 @@
 NS_START(fordyca, config, block_sel);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char block_priorities_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void block_priorities_parser::parse(const ticpp::Element& node) {
-  ticpp::Element bnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  if (nullptr != node.FirstChild(kXMLRoot, false)) {
+    ticpp::Element bnode = node_get(node, kXMLRoot);
+    m_config = std::make_unique<config_type>();
 
-  XML_PARSE_ATTR(bnode, m_config, cube);
-  XML_PARSE_ATTR(bnode, m_config, ramp);
+    XML_PARSE_ATTR_DFLT(bnode, m_config, cube, 1.0);
+    XML_PARSE_ATTR_DFLT(bnode, m_config, ramp, 1.0);
+  }
 } /* parse() */
 
-__rcsw_pure bool block_priorities_parser::validate(void) const {
+bool block_priorities_parser::validate(void) const {
+  if (!is_parsed()) {
+    return true;
+  }
+
   CHECK(m_config->cube >= 1.0);
   CHECK(m_config->ramp >= 1.0);
   return true;

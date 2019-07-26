@@ -43,13 +43,13 @@ motion_throttling_handler::~motion_throttling_handler(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void motion_throttling_handler::update(uint timestep) {
+void motion_throttling_handler::update(rtypes::timestep t) {
   if (m_en) {
-    m_active = m_waveform->value(timestep);
+    m_active = m_waveform->value(t.v());
   } else {
     m_active = 0;
   }
-  m_applied = m_waveform->value(timestep);
+  m_applied = m_waveform->value(t.v());
 } /* update() */
 
 NS_END(tv, support, fordyca);

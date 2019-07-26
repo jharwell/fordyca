@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/light_type_index.hpp"
-#include "fordyca/repr/nest.hpp"
-#include "fordyca/repr/arena_cache.hpp"
 
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/repr/nest.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -35,16 +35,7 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 light_type_index::light_type_index(void)
-    : m_index({
-        {kNest, rutils::color::kYELLOW},
-        {kCache, rutils::color::kRED}
-  }) {}
-
-/*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr char light_type_index::kNest[];
-constexpr char light_type_index::kCache[];
-
+    : m_index({{kNest, rutils::color::kYELLOW}, {kCache, rutils::color::kRED}}) {
+}
 
 NS_END(support, fordyca);

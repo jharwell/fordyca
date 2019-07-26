@@ -63,28 +63,28 @@ void cell2D_fsm::event_empty(void) {
 
 void cell2D_fsm::event_block_drop(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
-      ekST_HAS_BLOCK,              /* unknown */
-      ekST_HAS_BLOCK,              /* empty */
-      ekST_HAS_CACHE,              /* has block */
-      ekST_HAS_CACHE,              /* has cache */
+      ekST_HAS_BLOCK,               /* unknown */
+      ekST_HAS_BLOCK,               /* empty */
+      ekST_HAS_CACHE,               /* has block */
+      ekST_HAS_CACHE,               /* has cache */
       rpfsm::event_signal::ekFATAL, /* cache extent */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ekST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<block_data>(false));
+                 std::make_unique<block_data>(false));
 } /* event_empty() */
 
 void cell2D_fsm::event_block_pickup(void) {
   FSM_DEFINE_TRANSITION_MAP(kTRANSITIONS){
       rpfsm::event_signal::ekFATAL, /* unknown */
       rpfsm::event_signal::ekFATAL, /* empty */
-      ekST_EMPTY,                  /* has block */
-      ekST_HAS_CACHE,              /* has cache */
+      ekST_EMPTY,                   /* has block */
+      ekST_HAS_CACHE,               /* has cache */
       rpfsm::event_signal::ekFATAL, /* cache extent */
   };
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ekST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<block_data>(true));
+                 std::make_unique<block_data>(true));
 } /* event_block_pickup() */
 
 void cell2D_fsm::event_cache_extent(void) {
@@ -95,7 +95,7 @@ void cell2D_fsm::event_cache_extent(void) {
          * This is technically bad, but the arena map fixes it right after
          * creating a new cache, so we can let it slide here.
          */
-      ekST_CACHE_EXTENT,           /* has block */
+      ekST_CACHE_EXTENT,            /* has block */
       rpfsm::event_signal::ekFATAL, /* has cache */
       rpfsm::event_signal::ekFATAL, /* cache extent */
   };

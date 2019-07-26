@@ -79,19 +79,18 @@ void mdpo_controller::Init(ticpp::Element &node)
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */
-  config::depth0::mdpo_controller_repository param_repo;
-  param_repo.parse_all(node);
+  config::depth0::mdpo_controller_repository config_repo;
+  config_repo.parse_all(node);
 
-  if (!param_repo.validate_all())
-  {
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
-  shared_init(param_repo);
-  private_init(param_repo);
+  shared_init(config_repo);
+  private_init(config_repo);
 
-  auto *comm_params = param_repo.config_get<config::communication_config>();
+  auto *comm_params = config_repo.config_get<config::communication_config>();
   // m_comm = controller::communication_subsystem(comm_params, );
   m_comm.set_communication_parameters(comm_params);
 
@@ -100,45 +99,40 @@ void mdpo_controller::Init(ticpp::Element &node)
 } /* Init() */
 
 void mdpo_controller::shared_init(
-    const config::depth0::mdpo_controller_repository &param_repo)
-{
+    const config::depth0::mdpo_controller_repository& config_repo) {
   /* block selection matrix and DPO subsystem */
-  dpo_controller::shared_init(param_repo);
+  dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
   config::perception::perception_config p =
-      *param_repo.config_get<config::perception::perception_config>();
+      *config_repo.config_get<config::perception::perception_config>();
   p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
   dpo_controller::perception(
-      rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 } /* shared_init() */
 
 void mdpo_controller::private_init(
-    const config::depth0::mdpo_controller_repository &param_repo)
-{
-  auto *exp_config = param_repo.config_get<config::exploration_config>();
+    const config::depth0::mdpo_controller_repository& config_repo) {
+  auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
-  fsm::expstrat::base_expstrat::params p(nullptr,
+  fsm::expstrat::base_expstrat::params p{nullptr,
                                          saa_subsystem(),
-                                         perception()->dpo_store());
-  dpo_controller::fsm(rcppsw::make_unique<fsm::depth0::dpo_fsm>(
+                                         perception()->dpo_store()};
+  dpo_controller::fsm(std::make_unique<fsm::depth0::dpo_fsm>(
       block_sel_matrix(),
       base_controller::saa_subsystem(),
       perception()->dpo_store(),
       f.create(exp_config->block_strategy, &p)));
 } /* private_init() */
 
-__rcsw_pure mdpo_perception_subsystem *mdpo_controller::mdpo_perception(void)
-{
-  return static_cast<mdpo_perception_subsystem *>(dpo_controller::perception());
+mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {
+  return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-__rcsw_pure const mdpo_perception_subsystem *mdpo_controller::mdpo_perception(
-    void) const
-{
-  return static_cast<const mdpo_perception_subsystem *>(
+const mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) const {
+  return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* perception() */
 

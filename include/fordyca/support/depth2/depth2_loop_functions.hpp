@@ -25,6 +25,8 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include <memory>
+
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
 #include "fordyca/support/robot_los_updater.hpp"
 #include "fordyca/support/robot_metric_extractor.hpp"
@@ -58,12 +60,14 @@ struct functor_maps_initializer;
 class depth2_loop_functions : public depth1::depth1_loop_functions,
                               public rer::client<depth2_loop_functions> {
  public:
-  depth2_loop_functions(void);
-  ~depth2_loop_functions(void) override;
+  depth2_loop_functions(void) RCSW_COLD;
+  ~depth2_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void PreStep() override;
-  void Reset(void) override;
+  void PostStep() override;
+  void Reset(void) override RCSW_COLD;
+  void Destroy(void) override RCSW_COLD;
 
   /**
    * @brief Initialize depth2 support to be shared with derived classes
@@ -71,7 +75,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
    * - All depth1 shared initialization
    * - Depth2 metric collection
    */
-  void shared_init(ticpp::Element& node);
+  void shared_init(ticpp::Element& node) RCSW_COLD;
 
  private:
   using interactor_map_type = rds::type_map<
@@ -104,14 +108,14 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
    */
   friend detail::functor_maps_initializer;
 
-  void private_init(void);
+  void private_init(void) RCSW_COLD;
 
-  void cache_handling_init(const config::caches::caches_config* cachep);
+  void cache_handling_init(const config::caches::caches_config* cachep) RCSW_COLD;
 
   /**
    * @brief Handle creation of dynamic caches during initialization, reset, or
    * when triggered by events during simulation.
-   *
+   *3a
    * @param on_drop \c TRUE if caches are to be (potentially) created as a
    * result of a robot block drop. If \c FALSE, then consider dynamic cache
    * creation in other situations.
@@ -132,14 +136,22 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
    */
   std::vector<int> robot_tasks_extract(uint) const;
 
-  /**
-   * @brief Process a single robot on a timestep:
+    /**
+   * @brief Process a single robot on a timestep, before running its controller:
    *
-   * - Collect metrics from it.
    * - Set its new position, time, LOS from ARGoS.
    * - Have it interact with the environment.
    */
-  void robot_timestep_process(argos::CFootBotEntity& robot);
+  void robot_pre_step(argos::CFootBotEntity& robot);
+
+  /**
+   * @brief Process a single robot on a timestep, after running its controller:
+   *
+   * - Have it interact with the environment.
+   * - Collect metrics from it.
+   */
+  void robot_post_step(argos::CFootBotEntity& robot);
+
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   /* clang-format off */

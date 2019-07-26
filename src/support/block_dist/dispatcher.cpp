@@ -36,23 +36,16 @@ NS_START(fordyca, support, block_dist);
 using ds::arena_grid;
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char dispatcher::kDistRandom[];
-constexpr char dispatcher::kDistSingleSrc[];
-constexpr char dispatcher::kDistDualSrc[];
-constexpr char dispatcher::kDistQuadSrc[];
-constexpr char dispatcher::kDistPowerlaw[];
-
-/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 dispatcher::dispatcher(ds::arena_grid* const grid,
+                       rtypes::discretize_ratio resolution,
                        const config::arena::block_dist_config* const config,
                        double arena_padding)
-    : mc_padding(arena_padding),
+    : mc_resolution(resolution),
+      mc_padding(arena_padding),
       mc_config(*config),
-      m_dist_type(config->dist_type),
+      mc_dist_type(config->dist_type),
       m_grid(grid),
       m_dist(nullptr) {}
 dispatcher::~dispatcher(void) = default;
@@ -61,7 +54,7 @@ dispatcher::~dispatcher(void) = default;
  * Member Functions
  ******************************************************************************/
 bool dispatcher::initialize(void) {
-  uint padding = static_cast<uint>(mc_padding / m_grid->resolution());
+  uint padding = static_cast<uint>(mc_padding / m_grid->resolution().v());
 
   /* clang-format off */
   ds::arena_grid::view arena = m_grid->layer<arena_grid::kCell>()->subgrid(
@@ -69,20 +62,20 @@ bool dispatcher::initialize(void) {
       kINDEX_MIN + padding,
       m_grid->xdsize() - kINDEX_MIN - padding,
       m_grid->ydsize() - kINDEX_MIN - padding);
-  if (kDistRandom == m_dist_type) {
-    m_dist = rcppsw::make_unique<random_distributor>(arena,
-                                                     mc_config.arena_resolution);
-  } else if (kDistSingleSrc == m_dist_type) {
+  if (kDistRandom == mc_dist_type) {
+    m_dist = std::make_unique<random_distributor>(arena,
+                                                     mc_resolution);
+  } else if (kDistSingleSrc == mc_dist_type) {
     ds::arena_grid::view area = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.80),
         kINDEX_MIN,
         static_cast<size_t>(m_grid->xdsize() * 0.90),
         m_grid->ydsize() - kINDEX_MIN - padding);
-    m_dist = rcppsw::make_unique<cluster_distributor>(
+    m_dist = std::make_unique<cluster_distributor>(
         area,
-        mc_config.arena_resolution,
+        mc_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDistDualSrc == m_dist_type) {
+  } else if (kDistDualSrc == mc_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.10),
         kINDEX_MIN,
@@ -94,38 +87,45 @@ bool dispatcher::initialize(void) {
         static_cast<size_t>(m_grid->xdsize() * 0.90),
         m_grid->ydsize() - kINDEX_MIN - padding);
     std::vector<ds::arena_grid::view> grids{area_l, area_r};
-    m_dist = rcppsw::make_unique<multi_cluster_distributor>(
+    m_dist = std::make_unique<multi_cluster_distributor>(
         grids,
-        mc_config.arena_resolution,
+        mc_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDistQuadSrc == m_dist_type) {
+  } else if (kDistQuadSrc == mc_dist_type) {
+    /*
+     * Quad source is a tricky distribution to use with static caches, so we
+     * have to tweak the block cluster centers in tandem with the cache
+     * locations to ensure that no segfaults results from cache/cache or
+     * cache/cluster overlap. See #581.
+     */
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
-        static_cast<size_t>(m_grid->xdsize() * 0.10),
+        static_cast<size_t>(m_grid->xdsize() * 0.05),
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->xdsize() * 0.20),
+        static_cast<size_t>(m_grid->xdsize() * 0.15),
         m_grid->ydsize() - kINDEX_MIN - padding);
     ds::arena_grid::view area_r = m_grid->layer<arena_grid::kCell>()->subgrid(
-        static_cast<size_t>(m_grid->xdsize() * 0.80),
+        static_cast<size_t>(m_grid->xdsize() * 0.82),
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->xdsize() * 0.90),
+        static_cast<size_t>(m_grid->xdsize() * 0.92),
         m_grid->ydsize() - kINDEX_MIN - padding);
     ds::arena_grid::view area_b = m_grid->layer<arena_grid::kCell>()->subgrid(
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->ydsize() * 0.10),
+        static_cast<size_t>(m_grid->ydsize() * 0.05),
         m_grid->xdsize() - kINDEX_MIN - padding,
-        static_cast<size_t>(m_grid->ydsize() * 0.20));
+        static_cast<size_t>(m_grid->ydsize() * 0.15));
     ds::arena_grid::view area_u = m_grid->layer<arena_grid::kCell>()->subgrid(
         kINDEX_MIN,
-        static_cast<size_t>(m_grid->ydsize() * 0.80),
+        static_cast<size_t>(m_grid->ydsize() * 0.82),
         m_grid->xdsize() - kINDEX_MIN - padding,
-        static_cast<size_t>(m_grid->ydsize() * 0.90));
+        static_cast<size_t>(m_grid->ydsize() * 0.92));
     std::vector<ds::arena_grid::view> grids{area_l, area_r, area_b, area_u};
-    m_dist = rcppsw::make_unique<multi_cluster_distributor>(
+    m_dist = std::make_unique<multi_cluster_distributor>(
         grids,
-        mc_config.arena_resolution,
+        mc_resolution,
         std::numeric_limits<uint>::max());
-  } else if (kDistPowerlaw == m_dist_type) {
-    auto p = rcppsw::make_unique<powerlaw_distributor>(&mc_config);
+  } else if (kDistPowerlaw == mc_dist_type) {
+    auto p = std::make_unique<powerlaw_distributor>(&mc_config.powerlaw,
+                                                       mc_resolution);
     if (!p->map_clusters(m_grid)) {
       return false;
     }

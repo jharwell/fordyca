@@ -46,13 +46,12 @@ saa_subsystem::saa_subsystem(const config::actuation_config* const aconfig,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void saa_subsystem::steer2D_force_apply(const std::pair<bool, bool>& force) {
-  ER_DEBUG("position=(%f, %f)",
-           m_sensing->position().x(),
-           m_sensing->position().y())
-  ER_DEBUG("linear_vel=(%f,%f)@%f [%f] angular_vel=%f",
-           linear_velocity().x(),
-           linear_velocity().y(),
+void saa_subsystem::steer2D_force_apply(void) {
+  ER_DEBUG("position=%s heading=%s",
+           m_sensing->position().to_str().c_str(),
+           m_sensing->heading().to_str().c_str())
+  ER_DEBUG("linear_vel=%s@%f [%f] angular_vel=%f",
+           linear_velocity().to_str().c_str(),
            linear_velocity().angle().value(),
            linear_velocity().length(),
            angular_velocity());
@@ -65,27 +64,42 @@ void saa_subsystem::steer2D_force_apply(const std::pair<bool, bool>& force) {
   double speed = m_steer2D_calc.value().length() *
                  (1.0 - m_actuation->differential_drive().active_throttle());
   m_actuation->differential_drive().fsm_drive(speed,
-                                              m_steer2D_calc.value().angle(),
-                                              force);
+                                              m_steer2D_calc.value().angle());
   m_steer2D_calc.reset();
 } /* steer2D_force_apply() */
 
 rmath::vector2d saa_subsystem::linear_velocity(void) const {
-  return {m_actuation->differential_drive().current_speed(),
-          m_sensing->heading().angle()};
+  auto speed = m_actuation->differential_drive().current_speed();
+  /*
+   * If speed comes back as 0.0, then we are executing a hard turn, probably as
+   * we vector somewhere. In order to have the arrival force work properly, we
+   * need to have a velocity with a non-zero length and the correct heading
+   * angle at all times. So we report that we have velocity even though we do
+   * not, for the purposes of making those calculations work.
+   *
+   * There probably is a better way to do this, but I don't know what it is. See
+   * #585.
+   */
+  if (speed <= std::numeric_limits<double>::epsilon()) {
+    return {0.1, m_sensing->heading()};
+  } else {
+    return {m_actuation->differential_drive().current_speed(),
+            m_sensing->heading()};
+  }
 } /* linear_velocity() */
 
-__rcsw_pure double saa_subsystem::angular_velocity(void) const {
+double saa_subsystem::angular_velocity(void) const {
   return (m_actuation->differential_drive().right_linspeed() -
           m_actuation->differential_drive().left_linspeed()) /
          m_actuation->differential_drive().axle_length();
 } /* angular_velocity() */
 
-__rcsw_pure double saa_subsystem::max_speed(void) const {
+double saa_subsystem::max_speed(void) const {
   return m_actuation->differential_drive().max_speed();
 } /* max_speed() */
 
-__rcsw_pure rmath::vector2d saa_subsystem::position(void) const {
+rmath::vector2d saa_subsystem::position(void) const {
   return m_sensing->position();
 } /* position() */
+
 NS_END(controller, fordyca);

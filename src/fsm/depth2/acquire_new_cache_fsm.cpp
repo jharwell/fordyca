@@ -42,7 +42,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
     controller::saa_subsystem* saa,
     ds::dpo_store* const store,
     std::unique_ptr<expstrat::base_expstrat> exp_behavior)
-    : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
+    : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
       acquire_goal_fsm(
           saa,
           std::move(exp_behavior),
@@ -69,7 +69,7 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-__rcsw_pure bool acquire_new_cache_fsm::candidates_exist(void) const {
+bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
@@ -80,14 +80,14 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_s
   /* A "new" cache is the same as a single block  */
   if (auto best = selector(
           mc_store->blocks(), mc_store->caches(), sensors()->position())) {
-    ER_INFO("Select new cache%d@%s/%s, utility=%f for acquisition",
+    ER_INFO("Select new cache%d@%s/%s,density=%f for acquisition",
             best->ent()->id(),
-            best->ent()->real_loc().to_str().c_str(),
-            best->ent()->discrete_loc().to_str().c_str(),
-            best->density().last_result());
+            best->ent()->rloc().to_str().c_str(),
+            best->ent()->dloc().to_str().c_str(),
+            best->density().v());
     return boost::make_optional(
-        acquire_goal_fsm::candidate_type(best->ent()->real_loc(),
-                                         vector_fsm::kCACHE_ARRIVAL_TOL,
+        acquire_goal_fsm::candidate_type(best->ent()->rloc(),
+                                         vector_fsm::kNEW_CACHE_ARRIVAL_TOL,
                                          best->ent()->id()));
   } else {
     /*
@@ -102,8 +102,8 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
   rmath::vector2d position = saa_subsystem()->sensing()->position();
   for (auto& b : mc_store->blocks().const_values_range()) {
-    if ((b.ent()->real_loc() - position).length() <=
-        vector_fsm::kCACHE_ARRIVAL_TOL) {
+    if ((b.ent()->rloc() - position).length() <=
+        vector_fsm::kNEW_CACHE_ARRIVAL_TOL) {
       return true;
     }
   } /* for(&b..) */
@@ -115,8 +115,7 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_const acq_goal_type
-acquire_new_cache_fsm::acquisition_goal_internal(void) const {
+acq_goal_type acquire_new_cache_fsm::acquisition_goal_internal(void) const {
   return acq_goal_type::ekNEW_CACHE;
 } /* acquisition_goal() */
 

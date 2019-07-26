@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
 using transport_goal_type = fsm::block_transporter::goal_type;
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -56,7 +56,7 @@ void cache_transferer::task_start(const rta::taskable_argument* const) {
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-__rcsw_pure double cache_transferer::abort_prob_calc(void) {
+double cache_transferer::abort_prob_calc(void) {
   if (-1 == active_interface()) {
     return rta::abort_probability::kMIN_ABORT_PROB;
   } else {
@@ -64,9 +64,8 @@ __rcsw_pure double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-__rcsw_pure double cache_transferer::interface_time_calc(__rcsw_unused uint
-                                                             interface,
-                                                         double start_time) {
+double cache_transferer::interface_time_calc(RCSW_UNUSED uint interface,
+                                             double start_time) {
   return current_time() - start_time;
 } /* interface_time_calc() */
 

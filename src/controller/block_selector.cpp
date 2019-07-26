@@ -66,14 +66,15 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
     rmath::vector2d nest_loc =
         boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
-    double utility = math::block_utility(b.ent()->real_loc(), nest_loc)(
-        position, b.density().last_result(), priority);
+    double utility =
+        math::block_utility(b.ent()->rloc(),
+                            nest_loc)(position, b.density(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
              b.ent()->id(),
-             b.ent()->real_loc().to_str().c_str(),
-             b.ent()->discrete_loc().to_str().c_str(),
-             b.density().last_result(),
+             b.ent()->rloc().to_str().c_str(),
+             b.ent()->dloc().to_str().c_str(),
+             b.density().v(),
              utility);
     if (utility > max_utility) {
       best = b;
@@ -84,8 +85,8 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
   if (nullptr != best.ent()) {
     ER_INFO("Best utility: block%d@%s/%s: %f",
             best.ent()->id(),
-            best.ent()->real_loc().to_str().c_str(),
-            best.ent()->discrete_loc().to_str().c_str(),
+            best.ent()->rloc().to_str().c_str(),
+            best.ent()->dloc().to_str().c_str(),
             max_utility);
     return boost::make_optional(best);
   } else {
@@ -96,14 +97,13 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
 
 bool block_selector::block_is_excluded(const rmath::vector2d& position,
                                        const repr::base_block* const block) const {
-  double block_dim = std::min(block->xspan(block->real_loc()).span(),
-                              block->yspan(block->real_loc()).span());
-  if ((position - block->real_loc()).length() <= block_dim) {
+  double block_dim = std::min(block->xspan().span(), block->yspan().span());
+  if ((position - block->rloc()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
              block->id(),
-             block->real_loc().to_str().c_str(),
-             block->discrete_loc().to_str().c_str(),
-             (position - block->real_loc()).length(),
+             block->rloc().to_str().c_str(),
+             block->dloc().to_str().c_str(),
+             (position - block->rloc()).length(),
              block_dim);
     return true;
   }
@@ -114,8 +114,8 @@ bool block_selector::block_is_excluded(const rmath::vector2d& position,
       })) {
     ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
              block->id(),
-             block->real_loc().to_str().c_str(),
-             block->discrete_loc().to_str().c_str());
+             block->rloc().to_str().c_str(),
+             block->dloc().to_str().c_str());
     return true;
   }
   return false;

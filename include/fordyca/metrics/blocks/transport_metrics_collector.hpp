@@ -87,20 +87,20 @@ class transport_metrics_collector final : public rmetrics::base_metrics_collecto
      * transported from original distribution locations to the nest within an
      * interval.
      */
-    double int_transport_time{0.0};
+    rtypes::timestep int_transport_time{0};
 
     /**
      * @brief Total amount of time between original arena distribution and first
      * pickup for all collected blocks in interval.
      */
-    double int_initial_wait_time{0.0};
+    rtypes::timestep int_initial_wait_time{0};
 
     uint cum_collected{0};
     uint cum_cube_collected{0};
     uint cum_ramp_collected{0};
     double cum_transporters{0.0};
-    double cum_transport_time{0.0};
-    double cum_initial_wait_time{0.0};
+    rtypes::timestep cum_transport_time{0};
+    rtypes::timestep cum_initial_wait_time{0};
   };
 
   std::list<std::string> csv_header_cols(void) const override;

@@ -44,7 +44,7 @@ NS_START(fordyca, config);
  */
 class base_controller_repository : public rconfig::xml::xml_config_repository {
  public:
-  base_controller_repository();
+  base_controller_repository(void) RCSW_COLD;
 };
 
 NS_END(config, fordyca);

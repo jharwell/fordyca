@@ -27,11 +27,14 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
@@ -58,7 +61,7 @@ class cached_block_pickup_interactor
                                  argos::CFloorEntity* const floor_in,
                                  tv::tv_manager* tv_manager,
                                  support::base_cache_manager* cache_manager,
-                                 support::base_loop_functions * loop)
+                                 support::base_loop_functions* loop)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
@@ -87,16 +90,17 @@ class cached_block_pickup_interactor
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestepp.
    */
-  void operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
-        finish_cached_block_pickup(controller, timestep);
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+        return finish_cached_block_pickup(controller, t);
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
-                                      timestep);
+                                      t);
     }
+    return interactor_status::ekNoEvent;
   }
 
  private:
@@ -105,7 +109,8 @@ class cached_block_pickup_interactor
    * actually performs the handshaking between the cache, the arena, and the
    * robot for block pickup.
    */
-  void finish_cached_block_pickup(T& controller, uint timestep) {
+  interactor_status finish_cached_block_pickup(T& controller,
+                                               rtypes::timestep t) {
     const tv::temporal_penalty<T>& p = m_penalty_handler->next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
@@ -115,7 +120,9 @@ class cached_block_pickup_interactor
     ER_ASSERT(tv::acq_goal_type::ekEXISTING_CACHE ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
-
+    ER_ASSERT(!controller.is_carrying_block(),
+              "Controller is already carrying block%d",
+              controller.block()->id());
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
      * same/successive/close together timesteps, then the first robot to serve
@@ -134,28 +141,53 @@ class cached_block_pickup_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    if (p.id() != loop_utils::robot_on_cache(controller, *m_map)) {
+    auto status = interactor_status::ekNoEvent;
+    if (p.id() != utils::robot_on_cache(controller, *m_map)) {
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
               p.id());
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
-      perform_cached_block_pickup(controller, p, timestep);
-      m_floor->SetChanged();
+      /*
+       * If the cache still exists after a robot serves its penalty we still
+       * need to double check that it does not violate the robot's cache pickup
+       * policy, because it is possible that two robots entering a cache on the
+       * same/successive/close together timesteps to both be able to start
+       * serving their respective penalties (and not violate their respective
+       * pickup policies), but that the one who picks up a block first would
+       * cause f* the second one to violate THEIR pickup policy if they picked
+       * up a block (i.e. the cache now has too few blocks for pickup).
+       *
+       * In this case, you don't need to do anything, as the change in the
+       * cache's status will be picked up by the robot's LOS next timestep.
+       */
+      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
+                                 controller.cache_sel_matrix(),
+                                 true);
+      if (v(controller.position2D(), p.id(), t)) {
+        status = perform_cached_block_pickup(controller, p, t);
+        m_floor->SetChanged();
+      } else {
+        ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
+                controller.GetId().c_str(),
+                p.id());
+      }
     }
     m_penalty_handler->remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
               "Multiple instances of same controller serving cache penalty");
+    return status;
   }
 
   /**
    * @brief Perform the actual pickup of a block from a cache, once all
    * preconditions have been satisfied.
    */
-  void perform_cached_block_pickup(T& controller,
-                                   const tv::temporal_penalty<T>& penalty,
-                                   uint timestep) {
+  interactor_status perform_cached_block_pickup(
+      T& controller,
+      const tv::temporal_penalty<T>& penalty,
+      rtypes::timestep t) {
     auto it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
@@ -163,10 +195,8 @@ class cached_block_pickup_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cached_block_pickup_visitor pickup_op(m_loop,
-                                                  *it,
-                                                  loop_utils::robot_id(controller),
-                                                  timestep);
+    events::cached_block_pickup_visitor pickup_op(
+        m_loop, *it, utils::robot_id(controller), t);
     (*it)->penalty_served(penalty.penalty());
 
     /*
@@ -176,9 +206,16 @@ class cached_block_pickup_interactor
      * Map (actually remove the cache/ensure proper block decrement)
      * Controller
      */
+    uint n_caches1 = m_map->caches().size();
     pickup_op.visit(*m_cache_manager);
     pickup_op.visit(*m_map);
     pickup_op.visit(controller);
+    uint n_caches2 = m_map->caches().size();
+
+    if (n_caches2 < n_caches1) {
+      return interactor_status::ekCacheDepletion;
+    }
+    return interactor_status::ekNoEvent;
   }
 
  private:

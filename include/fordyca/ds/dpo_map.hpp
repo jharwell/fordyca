@@ -28,7 +28,7 @@
 #include <map>
 #include <utility>
 
-#include "fordyca/repr/dp_entity.hpp"
+#include "fordyca/repr/dpo_entity.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -50,7 +50,7 @@ NS_START(fordyca, ds);
 template <typename key_type, typename obj_type>
 class dpo_map {
  public:
-  using value_type = typename repr::dp_entity<obj_type>;
+  using value_type = typename repr::dpo_entity<obj_type>;
   using map_type = std::map<key_type, value_type>;
 
   template <typename T, typename Adaptor>
@@ -75,11 +75,11 @@ class dpo_map {
    * @brief Returns a pointer to the object that matches the specified key, or
    * nullptr if the key is not found in themap.
    */
-  __rcsw_pure const value_type* find(const key_type& key) const {
+  const value_type* find(const key_type& key) const RCSW_PURE {
     auto it = m_obj.find(key);
     return (it == m_obj.end()) ? nullptr : &(it->second);
   }
-  __rcsw_pure value_type* find(const key_type& key) {
+  value_type* find(const key_type& key) RCSW_PURE {
     auto it = m_obj.find(key);
     return (it == m_obj.end()) ? nullptr : &(it->second);
   }
@@ -88,7 +88,7 @@ class dpo_map {
    * @brief Returns \c TRUE iff the key is contained in the map, and \c FALSE
    * otherwise.
    */
-  __rcsw_pure bool contains(const key_type& key) const {
+  RCSW_PURE bool contains(const key_type& key) const {
     return nullptr != find(key);
   }
 

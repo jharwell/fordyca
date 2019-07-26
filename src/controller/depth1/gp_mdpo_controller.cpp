@@ -53,15 +53,15 @@ void gp_mdpo_controller::Init(ticpp::Element& node) {
 
   ndc_push();
   ER_INFO("Initializing...");
-  config::depth1::controller_repository param_repo;
+  config::depth1::controller_repository config_repo;
 
-  param_repo.parse_all(node);
-  if (!param_repo.validate_all()) {
+  config_repo.parse_all(node);
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
-  shared_init(param_repo);
+  shared_init(config_repo);
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
@@ -74,24 +74,23 @@ void gp_mdpo_controller::ControlStep(void) {
             block()->robot_id());
 
   perception()->update(nullptr);
-  task_aborted(false);
   executive()->run();
   ndc_pop();
 } /* ControlStep() */
 
 void gp_mdpo_controller::shared_init(
-    const config::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& config_repo) {
   /* block/cache selection matrices, executive  */
-  gp_dpo_controller::shared_init(param_repo);
+  gp_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
   config::perception::perception_config p =
-      *param_repo.config_get<config::perception::perception_config>();
+      *config_repo.config_get<config::perception::perception_config>();
   p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
   gp_dpo_controller::perception(
-      rcppsw::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+      std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 
   /*
    * Task executive. Even though we use the same executive as the \ref
@@ -101,18 +100,17 @@ void gp_mdpo_controller::shared_init(
   executive(tasking_initializer(block_sel_matrix(),
                                 cache_sel_matrix(),
                                 saa_subsystem(),
-                                perception())(param_repo));
+                                perception())(config_repo));
   executive()->task_abort_notify(std::bind(
       &gp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 
 } /* shared_init() */
 
-__rcsw_pure mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) {
+mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-__rcsw_pure const mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(
-    void) const {
+const mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* perception() */

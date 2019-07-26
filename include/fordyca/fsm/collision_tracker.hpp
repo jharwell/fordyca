@@ -47,11 +47,11 @@ class collision_tracker : public metrics::fsm::collision_metrics {
   collision_tracker& operator=(const collision_tracker&) = delete;
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override final;
-  bool entered_collision_avoidance(void) const override final;
-  bool exited_collision_avoidance(void) const override final;
-  uint collision_avoidance_duration(void) const override final;
-  rmath::vector2u avoidance_loc(void) const override final;
+  bool in_collision_avoidance(void) const override final RCSW_PURE;
+  bool entered_collision_avoidance(void) const override final RCSW_PURE;
+  bool exited_collision_avoidance(void) const override final RCSW_PURE;
+  rtypes::timestep collision_avoidance_duration(void) const override final;
+  rmath::vector2u avoidance_loc(void) const override final RCSW_PURE;
 
   /**
    * @brief Handle all logic for entering collision avoidance; classes should
@@ -72,7 +72,7 @@ class collision_tracker : public metrics::fsm::collision_metrics {
   bool                                   m_entered_avoidance{false};
   bool                                   m_exited_avoidance{false};
   bool                                   m_in_avoidance{false};
-  uint                                   m_avoidance_start{0};
+  rtypes::timestep                       m_avoidance_start{0};
   const controller::saa_subsystem* const mc_saa;
   /* clang-format on */
 };

@@ -38,16 +38,13 @@ NS_START(fordyca, config, depth1);
 controller_repository::controller_repository(void) {
   parser_register<cache_sel::cache_sel_matrix_parser,
                   cache_sel::cache_sel_matrix_config>(
-      cache_sel::cache_sel_matrix_parser::kXMLRoot,
-      cache_sel::cache_sel_matrix_parser::kHeader1);
+      cache_sel::cache_sel_matrix_parser::kXMLRoot);
   parser_register<rta::config::xml::task_alloc_parser,
                   rta::config::task_alloc_config>(
-      rta::config::xml::task_alloc_parser::kXMLRoot,
-      rconfig::xml::xml_config_parser::kHeader1);
+      rta::config::xml::task_alloc_parser::kXMLRoot);
   parser_register<rta::config::xml::task_executive_parser,
                   rta::config::task_executive_config>(
-      rta::config::xml::task_executive_parser::kXMLRoot,
-      rconfig::xml::xml_config_parser::kHeader1);
+      rta::config::xml::task_executive_parser::kXMLRoot);
 
   parser_find<rta::config::xml::task_alloc_parser>(
       rta::config::xml::task_alloc_parser::kXMLRoot)

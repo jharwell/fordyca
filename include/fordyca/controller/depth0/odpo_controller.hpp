@@ -47,8 +47,8 @@ NS_START(depth0);
 class odpo_controller : public dpo_controller,
                         public rer::client<odpo_controller> {
  public:
-  odpo_controller(void);
-  ~odpo_controller(void) override;
+  odpo_controller(void) RCSW_COLD;
+  ~odpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
   void ControlStep(void) override;
@@ -57,7 +57,7 @@ class odpo_controller : public dpo_controller,
     return {typeid(*this)};
   }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor);
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
 
  private:
   /* clang-format off */

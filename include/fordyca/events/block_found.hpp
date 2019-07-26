@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
@@ -107,7 +109,7 @@ class block_found : public rer::client<block_found>, public cell_op {
  */
 using block_found_visitor_impl =
     rpvisitor::precise_visitor<detail::block_found,
-                              detail::block_found::visit_typelist>;
+                               detail::block_found::visit_typelist>;
 
 NS_END(detail);
 

@@ -41,7 +41,7 @@ NS_START(fordyca, controller);
 dpo_perception_subsystem::dpo_perception_subsystem(
     const config::perception::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.controller.dpo_perception"),
-      m_store(rcppsw::make_unique<ds::dpo_store>(&config->pheromone)) {}
+      m_store(std::make_unique<ds::dpo_store>(&config->pheromone)) {}
 
 dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
 
@@ -87,10 +87,10 @@ void dpo_perception_subsystem::process_los(
 void dpo_perception_subsystem::process_los_caches(
     const repr::line_of_sight* const c_los) {
   ds::cache_list los_caches = c_los->caches();
+  ER_DEBUG("Caches in DPO store: [%s]",
+           rcppsw::to_string(m_store->caches()).c_str());
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
-    ER_DEBUG("Caches in DPO store: [%s]",
-             rcppsw::to_string(m_store->caches()).c_str());
   }
 
   /* Fix our tracking of caches that no longer exist in our perception */
@@ -100,12 +100,12 @@ void dpo_perception_subsystem::process_los_caches(
     if (!m_store->contains(cache)) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id(),
-              cache->real_loc().to_str().c_str(),
-              cache->discrete_loc().to_str().c_str());
+              cache->rloc().to_str().c_str(),
+              cache->dloc().to_str().c_str());
     } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
       ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
               cache->id(),
-              cache->discrete_loc().to_str().c_str(),
+              cache->dloc().to_str().c_str(),
               m_store->find(cache)->ent()->n_blocks(),
               cache->n_blocks());
     }
@@ -134,10 +134,10 @@ void dpo_perception_subsystem::process_los_blocks(
    * explicitly assign it.
    */
   ds::block_list los_blocks = c_los->blocks();
+  ER_DEBUG("Blocks in DPO store: [%s]",
+           rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(los_blocks).c_str());
-    ER_DEBUG("Blocks in DPO store: [%s]",
-             rcppsw::to_string(m_store->blocks()).c_str());
   }
 
   /*
@@ -148,19 +148,21 @@ void dpo_perception_subsystem::process_los_blocks(
 
   for (auto&& block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(),
-              "Block%d out of sight in LOS?",
-              block->id());
+              "Block%d@%s/%s out of sight in LOS?",
+              block->id(),
+              block->rloc().to_str().c_str(),
+              block->dloc().to_str().c_str());
 
     if (!m_store->contains(block)) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id(),
-              block->real_loc().to_str().c_str(),
-              block->discrete_loc().to_str().c_str());
+              block->rloc().to_str().c_str(),
+              block->dloc().to_str().c_str());
     } else {
       ER_DEBUG("Block%d@%s/%s already known",
                block->id(),
-               block->real_loc().to_str().c_str(),
-               block->discrete_loc().to_str().c_str());
+               block->rloc().to_str().c_str(),
+               block->dloc().to_str().c_str());
     }
     events::block_found_visitor op(block->clone());
     op.visit(*m_store);
@@ -175,29 +177,45 @@ void dpo_perception_subsystem::los_tracking_sync(
    * the corresponding cache should also be in our LOS. If it is not, then our
    * tracked version is out of date and needs to be removed.
    */
-  for (auto& cache : m_store->caches().const_values_range()) {
-    if (c_los->contains_loc(cache.ent()->discrete_loc())) {
-      auto it =
-          std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
-            return c->loccmp(*cache.ent_obj());
-          });
+  auto range = m_store->caches().const_values_range();
+  auto it = range.begin();
 
-      if (los_caches.end() == it) {
-        ER_INFO("Remove tracked cache%d@%s: not in LOS caches",
-                cache.ent()->id(),
-                cache.ent()->discrete_loc().to_str().c_str());
-        m_store->cache_remove(cache.ent_obj());
-        ER_ASSERT(nullptr == m_store->find(cache.ent_obj()),
-                  "Cache%d still exists in store after removal",
-                  cache.ent()->id());
-      }
+  while (it != range.end()) {
+    if (!c_los->contains_loc(it->ent()->dloc())) {
+      ++it;
+      continue;
     }
-  } /* for(&&block..) */
+    auto exists_in_los =
+        los_caches.end() != std::find_if(los_caches.begin(),
+                                         los_caches.end(),
+                                         [&](const auto& c) {
+                                           return c->dloccmp(*it->ent_obj());
+                                         });
+
+    if (!exists_in_los) {
+      ER_INFO("Remove tracked cache%d@%s: not in LOS caches",
+              it->ent()->id(),
+              it->ent()->dloc().to_str().c_str());
+      /*
+       * Copy iterator object + iterator increment MUST be before removal to
+       * avoid iterator invalidation and undefined behavior (I've seen both a
+       * segfault and infinite loop). See #589.
+       */
+      auto tmp = *it;
+      ++it;
+      m_store->cache_remove(tmp.ent_obj());
+      ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
+                "Cache%d still exists in store after removal",
+                tmp.ent()->id());
+    } else {
+      ++it;
+    }
+  } /* while(it..) */
 } /* los_tracking_sync() */
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::line_of_sight* const c_los,
-    const ds::block_list& blocks) {
+    const ds::block_list& los_blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
    * the corresponding block should also be in our LOS. If it is not, then our
@@ -207,34 +225,56 @@ void dpo_perception_subsystem::los_tracking_sync(
    * has moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  for (auto& block : m_store->blocks().const_values_range()) {
-    if (c_los->contains_loc(block.ent()->discrete_loc())) {
-      auto it = std::find_if(blocks.begin(), blocks.end(), [&](const auto& b) {
-        return b->idcmp(*block.ent_obj());
-      });
-      if (blocks.end() == it) {
-        /*
-         * Needed for assert() to prevent last reference to shared_ptr being
-         * removed and object destruction.
-         */
-        auto tmp = block;
-        m_store->block_remove(tmp.ent_obj());
-        ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
-                  "Block%d still exists in store after removal",
-                  tmp.ent()->id());
-      }
+  auto range = m_store->blocks().const_values_range();
+  auto it = range.begin();
+
+  while (it != range.end()) {
+    ER_TRACE("Examining block%d@%s/%s",
+             it->ent()->id(),
+             it->ent()->rloc().to_str().c_str(),
+             it->ent()->dloc().to_str().c_str());
+
+    if (!c_los->contains_loc(it->ent()->dloc())) {
+      ++it;
+      continue;
     }
-  } /* for(&&block..) */
+    auto exists_in_los =
+        los_blocks.end() != std::find_if(los_blocks.begin(),
+                                         los_blocks.end(),
+                                         [&](const auto& b) {
+                                           return b->idcmp(*(it->ent_obj()));
+                                         });
+    ER_TRACE("Block%d location in LOS", it->ent()->id());
+    if (!exists_in_los) {
+      ER_INFO("Remove tracked block%d@%s/%s: not in LOS blocks",
+              it->ent()->id(),
+              it->ent()->rloc().to_str().c_str(),
+              it->ent()->dloc().to_str().c_str());
+      /*
+       * Copy iterator object + iterator increment MUST be before removal to
+       * avoid iterator invalidation and undefined behavior (I've seen both a
+       * segfault and infinite loop). See #589.
+       */
+      auto tmp = *it;
+      ++it;
+      m_store->block_remove(tmp.ent_obj());
+      ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
+                "Block%d still exists in store after removal",
+                tmp.ent()->id());
+    } else {
+      ++it;
+    }
+  } /* while(it..) */
 } /* los_tracking_sync() */
 
 /*******************************************************************************
  * DPO Perception Metrics
  ******************************************************************************/
-__rcsw_pure uint dpo_perception_subsystem::n_known_blocks(void) const {
+uint dpo_perception_subsystem::n_known_blocks(void) const {
   return m_store->blocks().size();
 } /* n_known_blocks() */
 
-__rcsw_pure uint dpo_perception_subsystem::n_known_caches(void) const {
+uint dpo_perception_subsystem::n_known_caches(void) const {
   return m_store->caches().size();
 } /* n_known_caches() */
 

@@ -57,7 +57,7 @@ void harvester::task_start(const rta::taskable_argument* const) {
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
-__rcsw_pure double harvester::abort_prob_calc(void) {
+double harvester::abort_prob_calc(void) {
   /*
    * Harvesters always have a small chance of aborting their task when not at a
    * task interface. Having the harvester task un-abortable until AFTER it
@@ -71,8 +71,7 @@ __rcsw_pure double harvester::abort_prob_calc(void) {
   }
 } /* calc_abort_prob() */
 
-__rcsw_pure double harvester::interface_time_calc(uint interface,
-                                                  double start_time) {
+double harvester::interface_time_calc(uint interface, double start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return current_time() - start_time;
 } /* interface_time_calc() */
@@ -169,7 +168,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(harvester,
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/
-__rcsw_pure bool harvester::task_at_interface(void) const {
+bool harvester::task_at_interface(void) const {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
   return transport_goal_type::ekEXISTING_CACHE == fsm->block_transport_goal();

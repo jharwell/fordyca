@@ -54,9 +54,9 @@ NS_START(fordyca, events, detail);
  * Constructors/Destructor
  ******************************************************************************/
 nest_block_drop::nest_block_drop(const std::shared_ptr<repr::base_block>& block,
-                                 uint timestep)
+                                 rtypes::timestep t)
     : ER_CLIENT_INIT("fordyca.events.nest_block_drop"),
-      m_timestep(timestep),
+      mc_timestep(t),
       m_block(block) {}
 
 /*******************************************************************************
@@ -70,7 +70,7 @@ void nest_block_drop::visit(ds::arena_map& map) {
 
 void nest_block_drop::dispatch_nest_interactor(
     tasks::base_foraging_task* const task) {
-  __rcsw_unused auto* polled = dynamic_cast<rta::polled_task*>(task);
+  RCSW_UNUSED auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto interactor = dynamic_cast<events::nest_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non nest-interactor task %s causing nest block drop",
@@ -83,7 +83,7 @@ void nest_block_drop::dispatch_nest_interactor(
  ******************************************************************************/
 void nest_block_drop::visit(repr::base_block& block) {
   block.reset_metrics();
-  block.distribution_time(m_timestep);
+  block.distribution_time(mc_timestep);
 } /* visit() */
 
 void nest_block_drop::visit(controller::depth0::crw_controller& controller) {

@@ -82,7 +82,7 @@ class cell2D_fsm final : public rpfsm::simple_fsm,
   size_t block_count(void) const { return m_block_count; }
 
  private:
-  struct block_data : public rpfsm::event_data {
+  struct block_data final : public rpfsm::event_data {
     explicit block_data(bool pickup_in) : pickup(pickup_in) {}
     bool pickup;
   };

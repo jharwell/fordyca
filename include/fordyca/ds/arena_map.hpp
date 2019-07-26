@@ -187,7 +187,7 @@ class arena_map final : public rer::client<arena_map>,
    * @return The ID of the block that the robot is on, or -1 if the robot is not
    * actually on a block.
    */
-  int robot_on_block(const rmath::vector2d& pos) const;
+  int robot_on_block(const rmath::vector2d& pos) const RCSW_PURE;
 
   /**
    * @brief Determine if a robot is currently on top of a cache (i.e. if the
@@ -204,7 +204,7 @@ class arena_map final : public rer::client<arena_map>,
    * @return The ID of the cache that the robot is on, or -1 if the robot is not
    * actually on a cache.
    */
-  int robot_on_cache(const rmath::vector2d& pos) const;
+  int robot_on_cache(const rmath::vector2d& pos) const RCSW_PURE;
 
   /**
    * @brief Get the subgrid for use in calculating a robot's LOS.
@@ -222,11 +222,17 @@ class arena_map final : public rer::client<arena_map>,
   const_grid_view subgrid(size_t x, size_t y, size_t radius) const {
     return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
   }
-  double grid_resolution(void) const { return decoratee().resolution(); }
+
+  rtypes::discretize_ratio grid_resolution(void) const {
+    return decoratee().resolution();
+  }
+
   const repr::nest& nest(void) const { return m_nest; }
+
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
   }
+
   support::block_dist::redist_governor* redist_governor(void) {
     return &m_redist_governor;
   }

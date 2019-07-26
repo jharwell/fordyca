@@ -68,7 +68,7 @@ class likelihood_block_search : public localized_search {
 
   /* prototype overrides */
   std::unique_ptr<base_expstrat> clone(void) const override {
-    return rcppsw::make_unique<likelihood_block_search>(saa_subsystem(),
+    return std::make_unique<likelihood_block_search>(saa_subsystem(),
                                                        mc_store);
   }
 

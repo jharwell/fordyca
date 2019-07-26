@@ -24,7 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,16 +75,16 @@ class motion_throttling_handler {
   void toggle(bool en) { m_en = en; }
 
   /**
-   * @brief Update the actuators in accordance with the current motion_throttling
-   * configuration and timestep.
+   * @brief Update the actuators in accordance with the current
+   * motion_throttling configuration and timestep.
    */
-  void update(uint timestep);
+  void update(rtypes::timestep t);
 
  private:
   /* clang-format off */
-  bool   m_en{false};
-  double m_active{0.0};
-  double m_applied{0.0};
+  bool                           m_en{false};
+  double                         m_active{0.0};
+  double                         m_applied{0.0};
   std::unique_ptr<rct::waveform> m_waveform;
   /* clang-format off */
 };

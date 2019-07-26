@@ -36,11 +36,11 @@ NS_START(fordyca, support, block_dist);
  * Constructors/Destructor
  ******************************************************************************/
 cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
-                                         double arena_resolution,
+                                         rtypes::discretize_ratio resolution,
                                          uint capacity)
     : ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
-      m_clust(view, capacity),
-      m_impl(view, arena_resolution) {}
+      m_clust(view, resolution, capacity),
+      m_impl(view, resolution) {}
 
 /*******************************************************************************
  * Member Functions
@@ -69,8 +69,8 @@ bool cluster_distributor::distribute_blocks(ds::block_vector& blocks,
   return m_impl.distribute_blocks(blocks, entities);
 } /* distribute_blocks() */
 
-ds::const_block_cluster_list cluster_distributor::block_clusters(void) const {
-  return ds::const_block_cluster_list{&m_clust};
+ds::block_cluster_vector cluster_distributor::block_clusters(void) const {
+  return ds::block_cluster_vector{&m_clust};
 } /* block_clusters() */
 
 NS_END(block_dist, support, fordyca);

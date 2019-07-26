@@ -7,7 +7,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="5000"
+    <experiment length="1000"
                 ticks_per_second="5"
                 random_seed="123" />
   </framework>
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="ffc"
+    <gp_dpo_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -24,7 +24,7 @@
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="false" />
+        <footbot_proximity implementation="default" show_rays="true" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
@@ -33,11 +33,10 @@
         <battery implementation="default" />
       </sensors>
       <params>
-        <output>
-          <sim output_root="output"
-               output_dir="__current_date__"
-               />
-        </output>
+        <output
+          output_root="output"
+          output_dir="__current_date__"
+          />
         <perception>
           <grid resolution="0.2"
                 size="12, 6, 2"/>
@@ -54,7 +53,7 @@
             <src_sigmoid_sel
                 input_src="exec">
               <sigmoid_sel
-                  method="">
+                  method="harwell2018">
                 <sigmoid reactivity="8"
                          offset="3"
                          gamma="1.0"/>
@@ -62,7 +61,7 @@
               </src_sigmoid_sel>
           </task_abort>
           <task_partition
-              always_partition="false"
+              always_partition="true"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -113,34 +112,33 @@
         </task_alloc>
         <block_sel_matrix
               nest="6, 3">
-              <block_priorities
-                  cube="1.0"
-                  ramp="1.0"
-                  />
-              <pickup_policy
-                  policy="cluster_proximity"
-                  prox_dist="3.0"
-                  />
+        <!--       <block_priorities -->
+        <!--           cube="1.0" -->
+        <!--           ramp="1.0" -->
+        <!--           /> -->
+        <!--       <pickup_policy -->
+        <!--           policy="cluster_proximity" -->
+        <!--           prox_dist="3.0" -->
+        <!--           /> -->
         </block_sel_matrix>
         <cache_sel_matrix
             cache_prox_dist="1.6"
             nest_prox_dist="3.0"
             block_prox_dist="1.0"
-            cluster_prox_dist="1.0"
             site_xrange="2:10"
             site_yrange="2.5:3">
           <pickup_policy
-              policy="cache_size"
+              policy="Null"
               timestep="20000"
               cache_size="3"/>
         </cache_sel_matrix>
         <exploration
             block_strategy="CRW"
-            cache_strategy="utility_search"/>
+            cache_strategy="ledtaxis_search"/>
         <sensing
             los_dim="0.4">
           <proximity_sensor angle_range="-1.1:1.1"
-                            delta="0.0001" />
+                            delta="0.1" />
           </sensing>
         <actuation>
           <steering2D>
@@ -149,7 +147,6 @@
             <arrival_force slowing_radius="0.2"
                            slowing_speed_min="1.0"
                            max="8"/>
-            <polar_force max="8"/>
             <wander_force circle_distance="4.0"
                           circle_radius="100.0"
                           max_angle_delta="5"
@@ -167,7 +164,7 @@
                        prob_send="0.3"
                        prob_receive="0.9" />
       </params>
-    </crw_controller>
+    </gp_dpo_controller>
 
   </controllers>
 
@@ -175,122 +172,114 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth0_loop_functions">
-    <battery
-        power_station_amount="0"
-        power_station_size="1"
-        power_station_distrubtion="normal"/>
-    <output>
-      <sim output_root="output"
-           output_dir="__current_date__"
-           />
+                  label="depth1_loop_functions">
+    <output
+        output_root="output"
+        output_dir="__current_date__">
       <metrics
           output_dir="metrics"
-          fsm_collision_counts_fname="fsm-collision-counts.csv"
-          fsm_collision_locs_fname="fsm-collision-locs.csv"
-          fsm_movement_fname="fsm-movement.csv"
-          block_acq_counts_fname="block-acq-counts.csv"
-          block_acq_locs_fname="block-acq-locs.csv"
-          block_acq_explore_locs_fname="block-acq-explore-locs.csv"
-          block_acq_vector_locs_fname="block-acq-vector-locs.csv"
-          block_transport_fname="block-transport.csv"
-          block_manipulation_fname="block-manipulation.csv"
-          cache_acq_counts_fname="cache-acq-counts.csv"
-          cache_acq_locs_fname="cache-acq-locs.csv"
-          cache_acq_explore_locs_fname="cache-acq-explore-locs.csv"
-          cache_acq_vector_locs_fname="cache-acq-vector-locs.csv"
-          cache_utilization_fname="cache-utilization.csv"
-          cache_lifecycle_fname="cache-lifecycle.csv"
-          cache_locations_fname="cache-locations.csv"
-          task_execution_generalist_fname="task-execution-generalist.csv"
-          task_execution_collector_fname="task-execution-collector.csv"
-          task_execution_harvester_fname="task-execution-harvester.csv"
-          task_execution_cache_starter_fname="task-execution-cache_starter.csv"
-          task_execution_cache_finisher_fname="task-execution-cache_finisher.csv"
-          task_execution_cache_transferer_fname="task-execution-cache_transferer.csv"
-          task_execution_cache_collector_fname="task-execution-cache_collector.csv"
-          task_tab_generalist_fname="task-tab-generalist.csv"
-          task_tab_collector_fname="task-tab-collector.csv"
-          task_tab_harvester_fname="task-tab-harvester.csv"
-          task_distribution_fname="task-distribution.csv"
-          perception_dpo_fname="perception-dpo.csv"
-          perception_mdpo_fname="perception-mdpo.csv"
-          swarm_dist_pos2D_fname="swarm-dist-pos2D.csv"
-          swarm_convergence_fname="swarm-convergence.csv"
-          temporal_variance_fname="temporal-variance.csv"
-          collect_interval="1000">
-          </metrics>
-    </output>
-    <convergence
-        n_threads="0"
-        epsilon="0.1"
-        epsilon_delta="1000">
-      <positional_entropy
-          enable="false"
-          horizon="0:13.41"
-          horizon_delta="1.34"/>
-      <task_dist_entropy enable="false"/>
-      <interactivity enable="false"/>
-      <angular_order enable="false"/>
-    </convergence>
 
-    <oracle_manager>
-      <tasking_oracle
-          task_exec_est="false"
-          task_interface_est="false"
-          />
-      <entities_oracle
-          blocks_enabled="true"
-          caches_enabled="true"/>
-      </oracle_manager>
-    <temporal_variance>
-      <blocks>
-        <manipulation_penalty>
-          <waveform
-              type="Null"
-              frequency="0.01"
-              amplitude="50"
-              offset="50"
-              phase="0"/>
-        </manipulation_penalty>
-        <carry_throttle>
-          <waveform
-              type="Sine"
-              frequency="0.004"
-              amplitude="0.4"
-              offset="0.4"
-              phase="0"/>
-        </carry_throttle>
-      </blocks>
-      <caches>
-        <usage_penalty>
-          <waveform
-              type="Null"
-              frequency="100"
-              amplitude="500"
-              offset="10"
-              phase="0"/>
-        </usage_penalty>
-      </caches>
-    </temporal_variance>
+          block_acq_counts="block-acq-counts.csv"
+          block_acq_locs="block-acq-locs.csv"
+          block_acq_explore_locs="block-acq-explore-locs.csv"
+          block_acq_vector_locs="block-acq-vector-locs.csv"
+          block_transport="block-transport.csv"
+          block_manipulation="block-manipulation.csv"
+          cache_acq_counts="cache-acq-counts.csv"
+          cache_acq_locs="cache-acq-locs.csv"
+          cache_acq_explore_locs="cache-acq-explore-locs.csv"
+          cache_acq_vector_locs="cache-acq-vector-locs.csv"
+          cache_utilization="cache-utilization.csv"
+          cache_lifecycle="cache-lifecycle.csv"
+          cache_locations="cache-locations.csv"
+          task_execution_generalist="task-execution-generalist.csv"
+          task_execution_collector="task-execution-collector.csv"
+          task_execution_harvester="task-execution-harvester.csv"
+          task_execution_cache_starter="task-execution-cache_starter.csv"
+          task_execution_cache_finisher="task-execution-cache_finisher.csv"
+          task_execution_cache_transferer="task-execution-cache_transferer.csv"
+          task_execution_cache_collector="task-execution-cache_collector.csv"
+          task_tab_generalist="task-tab-generalist.csv"
+          task_tab_collector="task-tab-collector.csv"
+          task_tab_harvester="task-tab-harvester.csv"
+          task_distribution="task-distribution.csv"
+          perception_dpo="perception-dpo.csv"
+          perception_mdpo="perception-mdpo.csv"
+          swarm_dist_pos2D="swarm-dist-pos2D.csv"
+          swarm_convergence="swarm-convergence.csv"
+          temporal_variance="temporal-variance.csv"
+          collect_interval="1000">
+      </metrics>
+    </output>
+    <!-- <convergence -->
+    <!--     n_threads="0" -->
+    <!--     epsilon="0.1" -->
+    <!--     epsilon_delta="1000"> -->
+    <!--   <positional_entropy -->
+    <!--       enable="false" -->
+    <!--       horizon="0:13.41" -->
+    <!--       horizon_delta="1.34"/> -->
+    <!--   <task_dist_entropy enable="false"/> -->
+    <!--   <interactivity enable="false"/> -->
+    <!--   <!-\- <angular_order enable="false"/> -\-> -->
+    <!-- </convergence> -->
+
+    <!-- <oracle_manager> -->
+    <!--   <tasking_oracle -->
+    <!--       task_exec_est="false" -->
+    <!--       task_interface_est="false" -->
+    <!--       /> -->
+    <!--   <entities_oracle -->
+    <!--       blocks="true" -->
+    <!--       caches="true"/> -->
+    <!--   </oracle_manager> -->
+    <!-- <temporal_variance> -->
+      <!-- <blocks> -->
+      <!--   <manipulation_penalty> -->
+      <!--     <waveform -->
+      <!--         type="Null" -->
+      <!--         frequency="0.01" -->
+      <!--         amplitude="50" -->
+      <!--         offset="50" -->
+      <!--         phase="0"/> -->
+      <!--   </manipulation_penalty> -->
+      <!--   <carry_throttle> -->
+      <!--     <waveform -->
+      <!--         type="Sine" -->
+      <!--         frequency="0.004" -->
+      <!--         amplitude="0.4" -->
+      <!--         offset="0.4" -->
+      <!--         phase="0"/> -->
+      <!--   </carry_throttle> -->
+      <!-- </blocks> -->
+      <!-- <caches> -->
+      <!--   <usage_penalty> -->
+      <!--     <waveform -->
+      <!--         type="Null" -->
+      <!--         frequency="100" -->
+      <!--         amplitude="500" -->
+      <!--         offset="10" -->
+      <!--         phase="0"/> -->
+      <!--   </usage_penalty> -->
+      <!-- </caches> -->
+    <!-- </temporal_variance> -->
 
     <arena_map>
       <grid resolution="0.2"
             size="12, 6, 2"/>
       <blocks>
         <distribution
-            arena_resolution="0.2"
             dist_type="single_source">
-          <redist_governor
-              trigger="Null"
-              recurrence_policy="multi"
-              timestep="500"
-              block_count="2"/>
-          <powerlaw
-              pwr_min="0"
-              pwr_max="3"
-              n_clusters="15"
-              />
+          <!-- <redist_governor -->
+          <!--     trigger="Null" -->
+          <!--     recurrence_policy="multi" -->
+          <!--     timestep="500" -->
+          <!--     block_count="2"/> -->
+          <!-- <powerlaw -->
+          <!--     pwr_min="0" -->
+          <!--     pwr_max="3" -->
+          <!--     n_clusters="15" -->
+          <!--     /> -->
           <manifest
               n_cube="50"
               n_ramp="0"
@@ -310,11 +299,12 @@
                robot_drop_only="false"/>
     </caches>
 
-    <visualization robot_id="true"
-                   robot_los="false"
-                   robot_task="false"
-                   block_id="false"
-                   />
+    
+  <!--   <visualization robot_id="true" -->
+  <!--                  robot_los="true" -->
+  <!--                  robot_task="true" -->
+  <!--                  block_id="false" -->
+  <!--                  /> -->
   </loop_functions>
 
   <!-- *********************** -->
@@ -392,28 +382,31 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
-    <qt-opengl autoplay="true">
-       <frame_grabbing directory="frames"
-                       base_name="frame_"
-                       format="png"
-                       quality="100" />
-      <camera>
-        <placement idx="0"
-                   position="6,3,6"
-                   look_at="6,3,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-        <placement idx="1"
-                   position="6,0,5"
-                   look_at="6,3,0"
-                   lens_focal_length="20"
-                   up="0,1,0"
-                   />
-      </camera>
-      <user_functions label="depth0_qt_user_functions" />
-    </qt-opengl>
-  </visualization>
+  <!-- <visualization> -->
+  <!--   <qt-opengl autoplay="true"> -->
+  <!--      <frame_grabbing directory="frames" -->
+  <!--                      base_name="frame_" -->
+  <!--                      format="png" -->
+  <!--                      quality="100" -->
+  <!--                      headless_grabbing="true" -->
+  <!--                      headless_frame_size="1600x1200" -->
+  <!--                      /> -->
+  <!--     <camera> -->
+  <!--       <placement idx="0" -->
+  <!--                  position="6,3,6" -->
+  <!--                  look_at="6,3,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--       <placement idx="1" -->
+  <!--                  position="6,0,5" -->
+  <!--                  look_at="6,3,0" -->
+  <!--                  lens_focal_length="20" -->
+  <!--                  up="0,1,0" -->
+  <!--                  /> -->
+  <!--     </camera> -->
+  <!--     <user_functions label="depth0_qt_user_functions" /> -->
+  <!--   </qt-opengl> -->
+  <!-- </visualization> -->
 
 </argos-configuration>

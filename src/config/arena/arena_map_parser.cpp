@@ -30,32 +30,23 @@
 NS_START(fordyca, config, arena);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char arena_map_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void arena_map_parser::parse(const ticpp::Element& node) {
   ticpp::Element anode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
+
   m_grid.parse(anode);
-  m_config->grid = *m_grid.config_get();
+  m_config->grid = *m_grid.config_get<grid_parser::config_type>();
 
   m_blocks.parse(anode);
-  m_config->blocks = *m_blocks.config_get();
+  m_config->blocks = *m_blocks.config_get<blocks_parser::config_type>();
 
   m_nest.parse(anode);
-  m_config->nest = *m_nest.config_get();
+  m_config->nest = *m_nest.config_get<nest_parser::config_type>();
 } /* parse() */
 
-void arena_map_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_grid << m_blocks << m_nest << build_footer();
-} /* show() */
-
-__rcsw_pure bool arena_map_parser::validate(void) const {
+bool arena_map_parser::validate(void) const {
   return m_grid.validate() && m_blocks.validate() && m_nest.validate();
 } /* validate() */
 

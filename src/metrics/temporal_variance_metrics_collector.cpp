@@ -55,8 +55,8 @@ std::list<std::string> temporal_variance_metrics_collector::csv_header_cols(
 
 bool temporal_variance_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_swarm_motion_throttle) + separator();
-  line += std::to_string(m_env_block_manip) + separator();
-  line += std::to_string(m_env_cache_usage) + separator();
+  line += std::to_string(m_env_block_manip.v()) + separator();
+  line += std::to_string(m_env_cache_usage.v()) + separator();
   return true;
 } /* csv_line_build() */
 

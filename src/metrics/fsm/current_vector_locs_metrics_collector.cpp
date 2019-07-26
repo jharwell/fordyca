@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/fsm/current_vector_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,12 +32,16 @@ NS_START(fordyca, metrics, fsm);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-uint current_vector_locs_metrics_collector::collect_cell(
-    const rmetrics::base_metrics& metrics,
-    const rmath::vector2u& coord) const {
-  auto& m = dynamic_cast<const fsm::goal_acquisition_metrics&>(metrics);
+void current_vector_locs_metrics_collector::collect(
+    const rmetrics::base_metrics& metrics) {
+  auto& m = dynamic_cast<const goal_acq_metrics&>(metrics);
+  inc_total_count();
 
-  return static_cast<uint>(m.current_vector_loc() == coord);
-} /* collect_cell() */
+  for (size_t i = 0; i < xsize(); ++i) {
+    for (size_t j = 0; j < ysize(); ++j) {
+      inc_cell_count(i, j, m.current_vector_loc() == rmath::vector2u(i, j));
+    } /* for(j..) */
+  }   /* for(i..) */
+} /* collect() */
 
 NS_END(fsm, metrics, fordyca);

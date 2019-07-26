@@ -25,12 +25,11 @@
  * Includes
  ******************************************************************************/
 #include <memory>
-#include <utility>
 
 #include "fordyca/controller/actuator_list.hpp"
 #include "fordyca/controller/sensor_list.hpp"
-#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,9 +66,9 @@ class saa_subsystem final : public rcppsw::robotics::steer2D::boid,
 
   /* BOID interface */
   rmath::vector2d linear_velocity(void) const override;
-  double angular_velocity(void) const override;
-  double max_speed(void) const override;
-  rmath::vector2d position(void) const override;
+  double angular_velocity(void) const override RCSW_PURE;
+  double max_speed(void) const override RCSW_PURE;
+  rmath::vector2d position(void) const override RCSW_PURE;
 
   void sensing(const std::shared_ptr<sensing_subsystem>& sensing) {
     m_sensing = sensing;
@@ -79,7 +78,7 @@ class saa_subsystem final : public rcppsw::robotics::steer2D::boid,
    * @brief Apply the summed steering forces; change wheel speeds. Resets the
    * summed forces.
    */
-  void steer2D_force_apply(const std::pair<bool, bool>& force);
+  void steer2D_force_apply(void);
 
   rrsteer2D::force_calculator& steer2D_force_calc(void) {
     return m_steer2D_calc;

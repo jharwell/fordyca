@@ -17,15 +17,20 @@
 
 mkdir -p $1 && cd $1
 
-fordyca_pkgs=(qtbase5-dev libceres-dev npm libfreeimageplus-dev freeglut3-dev libeigen3-dev)
-rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache pip3)
-libra_pkgs=(npm graphviz doxygen cppcheck cmake make gcc-7 libclang-6.0-dev
-           clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)
+fordyca_pkgs=(qtbase5-dev libnlopt-dev libnlopt-cxx-dev libfreeimageplus-dev
+              freeglut3-dev libeigen3-dev)
+rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache python3-pip)
+libra_pkgs=(make cmake git npm graphviz doxygen cppcheck cmake make gcc-8 g++-8
+            libclang-6.0-dev clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)
 
 python_pkgs=(cpplint)
 
-# Install packages
-sudo apt-get install "${libra_pkgs[@]}" "${rcppsw_pkgs[@]}" "${fordyca_pkgs[@]}"
+# Install packages (must be loop to ignore ones that don't exist)
+for pkg in "${libra_pkgs[@]}" "${rcppsw_pkgs[@]}" "${fordyca_pkgs[@]}"
+do
+    sudo apt-get -my install $pkg
+done
+
 sudo -H pip3 install  "${python_pkgs[@]}"
 
 # Install ARGoS
@@ -44,7 +49,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
 	  ../src
 make -j $4
 make doc
-if [ "$YES" = "$2" ]; then
+if [ "YES" = "$2" ]; then
     sudo make install;
 else
     make install;
@@ -71,6 +76,12 @@ ln -s $1/rcppsw ext/rcppsw
 
 # Build fordyca and documentation
 mkdir -p build && cd build
-cmake ..
+cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 ..
 make -j $4
 make documentation
+
+# If installed ARGoS as root, all project repos are also owned by root, so we
+# need to fix that.
+if [ "$YES" = "$2" ]; then
+    sudo chown $SUDO_USER:$SUDO_USER -R $1
+fi;

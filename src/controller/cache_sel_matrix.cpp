@@ -23,29 +23,11 @@
  ******************************************************************************/
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
-#include "fordyca/config/cache_sel/pickup_policy_config.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-
-/*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr char cache_sel_matrix::kNestLoc[];
-constexpr char cache_sel_matrix::kCacheProxDist[];
-constexpr char cache_sel_matrix::kBlockProxDist[];
-constexpr char cache_sel_matrix::kClusterProxDist[];
-constexpr char cache_sel_matrix::kNestProxDist[];
-constexpr char cache_sel_matrix::kSiteXRange[];
-constexpr char cache_sel_matrix::kSiteYRange[];
-constexpr char cache_sel_matrix::kPickupExceptions[];
-constexpr char cache_sel_matrix::kDropExceptions[];
-constexpr char cache_sel_matrix::kPickupPolicy[];
-constexpr char cache_sel_matrix::kPickupPolicyTime[];
-constexpr char cache_sel_matrix::kPickupPolicyNull[];
-constexpr char cache_sel_matrix::kPickupPolicyCacheSize[];
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -87,8 +69,8 @@ void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
 } /* sel_exception_add() */
 
 void cache_sel_matrix::sel_exceptions_clear(void) {
-  boost::get<std::vector<int>>(this->operator[](kPickupExceptions)).clear();
-  boost::get<std::vector<int>>(this->operator[](kDropExceptions)).clear();
+  boost::get<std::vector<int>>(this->at(kPickupExceptions)).clear();
+  boost::get<std::vector<int>>(this->at(kDropExceptions)).clear();
 } /* sel_exceptions_clear() */
 
 NS_END(controller, fordyca);

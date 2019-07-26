@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/nsalias.hpp"
 #include "fordyca/config/caches/caches_config.hpp"
@@ -48,10 +49,7 @@ NS_START(fordyca, config, caches);
  */
 class caches_parser final: public rconfig::xml::xml_config_parser {
  public:
-  explicit caches_parser(uint level)
-      : xml_config_parser(level),
-        m_static(level + 1),
-        m_dynamic(level + 1) {}
+  using config_type = caches_config;
 
   /**
    * @brief The root tag that all static cache parameters should lie under in
@@ -60,25 +58,19 @@ class caches_parser final: public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "caches";
 
   void parse(const ticpp::Element& node) override;
-  bool validate(void) const override;
+  bool validate(void) const override RCSW_PURE;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  bool parsed(void) const override { return m_parsed; }
-
-  std::shared_ptr<caches_config> config_get(void) const {
-    return m_config;
-  }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  bool                           m_parsed{false};
-  std::shared_ptr<caches_config> m_config{nullptr};
-  static_cache_parser            m_static;
-  dynamic_cache_parser           m_dynamic;
+  std::unique_ptr<config_type> m_config{nullptr};
+  static_cache_parser          m_static{};
+  dynamic_cache_parser         m_dynamic{};
   /* clang-format on */
 };
 

@@ -30,30 +30,19 @@
 NS_START(fordyca, config, arena);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char block_redist_governor_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void block_redist_governor_parser::parse(const ticpp::Element& node) {
-  /*
-   * Needs to be populated always so we get the null trigger when the governor
-   * is disabled.
-   */
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-
-  if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    ticpp::Element lnode = node_get(node, kXMLRoot);
-    XML_PARSE_ATTR_DFLT(lnode, m_config, timestep, 0U);
-    XML_PARSE_ATTR_DFLT(lnode, m_config, block_count, 0U);
-    XML_PARSE_ATTR(lnode, m_config, trigger);
-    XML_PARSE_ATTR(lnode, m_config, recurrence_policy);
-  } else {
-    m_config->trigger = "Null";
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
   }
+  m_config = std::make_unique<config_type>();
+  ticpp::Element lnode = node_get(node, kXMLRoot);
+
+  XML_PARSE_ATTR(lnode, m_config, trigger);
+  XML_PARSE_ATTR(lnode, m_config, recurrence_policy);
+  XML_PARSE_ATTR_DFLT(lnode, m_config, timestep, rtypes::timestep(0));
+  XML_PARSE_ATTR_DFLT(lnode, m_config, block_count, 0U);
 } /* parse() */
 
 NS_END(arena, config, fordyca);

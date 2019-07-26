@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 
@@ -54,21 +55,22 @@ class tasking_initializer : public depth1::tasking_initializer,
   tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
-                      base_perception_subsystem* perception);
-  ~tasking_initializer(void) override;
+                      base_perception_subsystem* perception) RCSW_COLD;
+  ~tasking_initializer(void) override RCSW_COLD;
 
   std::unique_ptr<rta::bi_tdgraph_executive>
-  operator()(const config::depth2::controller_repository& param_repo);
+  operator()(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 
   using depth1::tasking_initializer::tasking_map;
 
  protected:
   tasking_map depth2_tasks_create(
-      const config::depth2::controller_repository& param_repo,
-      rta::bi_tdgraph* graph);
-  void depth2_exec_est_init(const config::depth2::controller_repository& param_repo,
+      const config::depth2::controller_repository& config_repo,
+      rta::bi_tdgraph* graph) RCSW_COLD;
+
+  void depth2_exec_est_init(const config::depth2::controller_repository& config_repo,
                             const tasking_map& map,
-                            rta::bi_tdgraph* graph);
+                            rta::bi_tdgraph* graph) RCSW_COLD;
 };
 
 NS_END(depth2, controller, fordyca);

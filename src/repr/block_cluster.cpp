@@ -31,11 +31,11 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure ds::const_block_list block_cluster::blocks(void) const {
+ds::const_block_list block_cluster::blocks(void) const {
   ds::const_block_list ret;
-  for (size_t i = 0; i < m_view.shape()[0]; ++i) {
-    for (size_t j = 0; j < m_view.shape()[1]; ++j) {
-      const ds::cell2D& cell = m_view[i][j];
+  for (uint i = 0; i < xdimd(); ++i) {
+    for (uint j = 0; j < ydimd(); ++j) {
+      const auto& cell = block_cluster::cell(i, j);
       ER_ASSERT(!cell.state_has_cache(),
                 "Cell@%s in HAS_CACHE state",
                 cell.loc().to_str().c_str());

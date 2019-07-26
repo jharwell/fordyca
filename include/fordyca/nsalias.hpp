@@ -45,6 +45,8 @@ namespace decorator {
 } /* namespace decorator */
 } /* namespace patterns */
 namespace swarm {
+namespace convergence {
+} /* namespace convergence */
 } /* namespace swarm */
 namespace math {
 } /* namespace math */
@@ -72,6 +74,8 @@ namespace steer2D {
 namespace hal {
 } /* namespace hal */
 } /* namespace robotics */
+namespace types {
+} /* namespace types */
 } /* namespace rcppsw */
 
 NS_START(fordyca);
@@ -103,6 +107,8 @@ namespace rrobotics = rcppsw::robotics;
 namespace rrhal = rrobotics::hal;
 namespace rrkin2D = rrobotics::kin2D;
 namespace rrsteer2D = rrobotics::steer2D;
+namespace rsc = rswarm::convergence;
+namespace rtypes = rcppsw::types;
 
 NS_END(fordyca);
 

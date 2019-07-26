@@ -29,12 +29,13 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/config/cache_sel/pickup_policy_config.hpp"
+#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_exception.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,12 +45,13 @@ namespace config { namespace cache_sel {
 struct cache_sel_matrix_config;
 }} // namespace config::cache_sel
 NS_START(controller);
+
 using cache_sel_variant =
-    boost::variant<double,
+    boost::variant<rtypes::spatial_dist,
                    rmath::vector2d,
                    rmath::rangeu,
                    std::vector<int>,
-                   config::cache_sel::pickup_policy_config>;
+                   config::cache_sel::cache_pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions
@@ -75,8 +77,8 @@ class cache_sel_matrix final
  public:
   static constexpr char kNestLoc[] = "nest_loc";
   static constexpr char kCacheProxDist[] = "cache_prox_dist";
-  static constexpr char kBlockProxDist[] = "block_prox_dist";
   static constexpr char kClusterProxDist[] = "cluster_prox_dist";
+  static constexpr char kBlockProxDist[] = "block_prox_dist";
   static constexpr char kNestProxDist[] = "nest_prox_dist";
   static constexpr char kSiteXRange[] = "site_xrange";
   static constexpr char kSiteYRange[] = "site_yrange";
@@ -88,7 +90,7 @@ class cache_sel_matrix final
    * able to pickup from *ANY* cache.
    */
   static constexpr char kPickupPolicy[] = "pickup_policy";
-  static constexpr char kPickupPolicyNull[] = "Null";
+  static constexpr char kPickupPolicyNull[] = "";
   static constexpr char kPickupPolicyTime[] = "time";
   static constexpr char kPickupPolicyCacheSize[] = "cache_size";
 

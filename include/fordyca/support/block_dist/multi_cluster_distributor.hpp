@@ -51,14 +51,14 @@ class multi_cluster_distributor final : public base_distributor,
                                   public rer::client<multi_cluster_distributor> {
  public:
   multi_cluster_distributor(std::vector<ds::arena_grid::view>& grids,
-                            double arena_resolution,
+                            rtypes::discretize_ratio resolution,
                             uint maxsize);
 
   multi_cluster_distributor& operator=(const multi_cluster_distributor& s) = delete;
 
   bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
-  ds::const_block_cluster_list block_clusters(void) const override;
+  ds::block_cluster_vector block_clusters(void) const override;
 
  private:
   /* clang-format off */

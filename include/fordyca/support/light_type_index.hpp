@@ -27,8 +27,8 @@
 #include <map>
 #include <string>
 
-#include "rcppsw/utils/color.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/utils/color.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -69,7 +69,6 @@ class light_type_index {
   std::map<std::string, rutils::color> m_index;
   /* clang-format on */
 };
-
 
 NS_END(fordyca, support);
 

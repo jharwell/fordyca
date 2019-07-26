@@ -46,11 +46,6 @@ struct block_dist_config : public rconfig::base_config {
   block_manifest manifest{};
 
   /**
-   * @brief Resolution of the arena the blocks are being distributed into.
-   */
-  double arena_resolution{0.0};
-
-  /**
    * @brief Type of block distribution being performed.
    */
   std::string dist_type{};

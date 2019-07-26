@@ -24,8 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
 #include <string>
+#include <typeindex>
 
+#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
@@ -34,10 +37,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-
-namespace config {
-struct metrics_config;
-}
 
 namespace support {
 class base_loop_functions;
@@ -83,12 +82,9 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
    */
   void collect_from_controller(const controller::base_controller* controller);
 
- protected:
   const std::string& metrics_path(void) const { return m_metrics_path; }
 
  private:
-  static constexpr uint kPOS_ENTROPY_ITER = 10;
-
   /* clang-format off */
   std::string m_metrics_path;
   /* clang-format on */

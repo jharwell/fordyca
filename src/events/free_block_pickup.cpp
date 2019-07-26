@@ -63,11 +63,11 @@ using ds::occupancy_grid;
 free_block_pickup::free_block_pickup(
     const std::shared_ptr<repr::base_block>& block,
     uint robot_index,
-    uint timestep)
+    rtypes::timestep t)
     : ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
-      cell_op(block->discrete_loc()),
-      m_timestep(timestep),
-      m_robot_index(robot_index),
+      cell_op(block->dloc()),
+      mc_timestep(t),
+      mc_robot_index(robot_index),
       m_block(block) {}
 
 /*******************************************************************************
@@ -81,21 +81,20 @@ void free_block_pickup::visit(ds::cell2D& cell) {
   visit(cell.fsm());
   cell.entity(nullptr);
   ER_INFO("cell2D: fb%u block%d from %s",
-          m_robot_index,
+          mc_robot_index,
           m_block->id(),
-          m_block->discrete_loc().to_str().c_str());
+          m_block->dloc().to_str().c_str());
 } /* visit() */
 
 void free_block_pickup::visit(ds::arena_map& map) {
-  ER_ASSERT(m_block->discrete_loc() ==
-                rmath::vector2u(cell_op::x(), cell_op::y()),
+  ER_ASSERT(m_block->dloc() == rmath::vector2u(cell_op::x(), cell_op::y()),
             "Coordinates for block/cell do not agree");
-  __rcsw_unused rmath::vector2d old_r = m_block->real_loc();
+  RCSW_UNUSED rmath::vector2d old_r = m_block->rloc();
   events::cell_empty_visitor op(cell_op::coord());
   op.visit(map);
   visit(*m_block);
   ER_INFO("arena_map: fb%u: block%d@%s/%s",
-          m_robot_index,
+          mc_robot_index,
           m_block->id(),
           old_r.to_str().c_str(),
           cell_op::coord().to_str().c_str());
@@ -103,7 +102,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
 
 void free_block_pickup::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
-  __rcsw_unused auto* polled = dynamic_cast<rta::polled_task*>(task);
+  RCSW_UNUSED auto* polled = dynamic_cast<rta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non free block interactor task %s causing free block pickup",
@@ -116,11 +115,11 @@ void free_block_pickup::dispatch_free_block_interactor(
  ******************************************************************************/
 void free_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
-  block.add_transporter(m_robot_index);
-  block.first_pickup_time(m_timestep);
+  block.add_transporter(mc_robot_index);
+  block.first_pickup_time(mc_timestep);
 
   block.move_out_of_sight();
-  ER_INFO("Block%d is now carried by fb%u", m_block->id(), m_robot_index);
+  ER_INFO("Block%d is now carried by fb%u", m_block->id(), mc_robot_index);
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
@@ -145,22 +144,22 @@ void free_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(m_block),
             "Block%d@%s not in DPO store",
             m_block->id(),
-            m_block->discrete_loc().to_str().c_str());
+            m_block->dloc().to_str().c_str());
   store.block_remove(m_block);
   ER_ASSERT(!store.contains(m_block),
             "Block%d@%s in DPO store after removal",
             m_block->id(),
-            m_block->discrete_loc().to_str().c_str());
+            m_block->dloc().to_str().c_str());
 } /* visit() */
 
 void free_block_pickup::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
 
-  ER_ASSERT(m_block->discrete_loc() == cell.loc(),
+  ER_ASSERT(m_block->dloc() == cell.loc(),
             "Coordinates for block%d@%s/cell@%s do not agree",
             m_block->id(),
-            m_block->discrete_loc().to_str().c_str(),
+            m_block->dloc().to_str().c_str(),
             cell.loc().to_str().c_str());
 
   ER_ASSERT(m_block->id() == cell.block()->id(),

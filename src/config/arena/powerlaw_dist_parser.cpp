@@ -30,38 +30,23 @@
 NS_START(fordyca, config, arena);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char powerlaw_dist_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void powerlaw_dist_parser::parse(const ticpp::Element& node) {
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
     ticpp::Element bnode = node_get(node, kXMLRoot);
-    m_config =
-        std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+    m_config = std::make_unique<config_type>();
+
     XML_PARSE_ATTR(bnode, m_config, pwr_min);
     XML_PARSE_ATTR(bnode, m_config, pwr_max);
     XML_PARSE_ATTR(bnode, m_config, n_clusters);
-    m_parsed = true;
   }
 } /* parse() */
 
-void powerlaw_dist_parser::show(std::ostream& stream) const {
-  stream << build_header();
-  if (!m_parsed) {
-    stream << "<<  Not Parsed >>" << std::endl << build_footer();
-    return;
+bool powerlaw_dist_parser::validate(void) const {
+  if (!is_parsed()) {
+    return true;
   }
-  stream << XML_ATTR_STR(m_config, pwr_min) << std::endl
-         << XML_ATTR_STR(m_config, pwr_max) << std::endl
-         << XML_ATTR_STR(m_config, n_clusters) << std::endl
-         << build_footer();
-} /* show() */
-
-__rcsw_pure bool powerlaw_dist_parser::validate(void) const {
   CHECK(m_config->pwr_min > 2);
   CHECK(m_config->pwr_max >= m_config->pwr_min);
   CHECK(m_config->n_clusters > 0);

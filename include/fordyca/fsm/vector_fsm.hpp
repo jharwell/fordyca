@@ -66,7 +66,15 @@ class vector_fsm final : public base_foraging_fsm,
    * @brief The tolerance within which a robot's location has to be in order to
    * be considered having arrived at the specified cache's location.
    */
-  constexpr static double kCACHE_ARRIVAL_TOL = 0.3;
+  constexpr static double kCACHE_ARRIVAL_TOL = 0.02;
+
+  /**
+   * @brief The tolerance within which a robot's location has to be in order to
+   * be considered having arrived at the specified new cache's location. More
+   * relaxed than the tolerance for cache arrivals, as we are creating a cache,
+   * and things can be much more approximate.
+   */
+  constexpr static double kNEW_CACHE_ARRIVAL_TOL = 0.4;
 
   /**
    * @brief The tolerance within which a robot's location has to be in order to
@@ -99,9 +107,9 @@ class vector_fsm final : public base_foraging_fsm,
   void init(void) override;
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
+  bool in_collision_avoidance(void) const override RCSW_PURE;
+  bool entered_collision_avoidance(void) const override RCSW_PURE;
+  bool exited_collision_avoidance(void) const override RCSW_PURE;
   rmath::vector2u avoidance_loc(void) const override;
 
  protected:
@@ -155,7 +163,6 @@ class vector_fsm final : public base_foraging_fsm,
 
   struct fsm_state {
     uint m_collision_rec_count{0};
-    uint last_collision_time{0};
   };
 
   /**
@@ -180,7 +187,7 @@ class vector_fsm final : public base_foraging_fsm,
    * @return The vector, specified with the tail at the robot and the head
    * pointing towards the goal.
    */
-  rmath::vector2d calc_vector_to_goal(const rmath::vector2d& goal);
+  rmath::vector2d calc_vector_to_goal(const rmath::vector2d& goal) RCSW_PURE;
 
   /* inherited states */
   HFSM_STATE_INHERIT(base_foraging_fsm, new_direction, rpfsm::event_data);
@@ -197,6 +204,8 @@ class vector_fsm final : public base_foraging_fsm,
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_avoidance);
   FSM_ENTRY_DECLARE_ND(vector_fsm, entry_collision_recovery);
 
+  FSM_EXIT_DECLARE(vector_fsm, exit_collision_avoidance);
+
   /**
    * @brief Defines the state map for the FSM.
    *
@@ -211,8 +220,10 @@ class vector_fsm final : public base_foraging_fsm,
     FSM_DEFINE_STATE_MAP(state_map_ex, kSTATE_MAP){
         FSM_STATE_MAP_ENTRY_EX_ALL(&start, nullptr, nullptr, nullptr),
         FSM_STATE_MAP_ENTRY_EX_ALL(&vector, nullptr, &entry_vector, nullptr),
-        FSM_STATE_MAP_ENTRY_EX_ALL(
-            &collision_avoidance, nullptr, &entry_collision_avoidance, nullptr),
+        FSM_STATE_MAP_ENTRY_EX_ALL(&collision_avoidance,
+                                   nullptr,
+                                   &entry_collision_avoidance,
+                                   &exit_collision_avoidance),
         FSM_STATE_MAP_ENTRY_EX_ALL(
             &collision_recovery, nullptr, &entry_collision_recovery, nullptr),
         FSM_STATE_MAP_ENTRY_EX_ALL(

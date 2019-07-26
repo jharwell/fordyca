@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <map>
 #include <string>
+#include <memory>
 
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
@@ -70,29 +71,29 @@ class tasking_initializer : public rer::client<tasking_initializer> {
   tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
                       controller::saa_subsystem* saa,
-                      base_perception_subsystem* perception);
+                      base_perception_subsystem* perception) RCSW_COLD;
 
-  ~tasking_initializer(void) override;
+  ~tasking_initializer(void) override RCSW_COLD;
   tasking_initializer& operator=(const tasking_initializer& other) = delete;
   tasking_initializer(const tasking_initializer& other) = delete;
 
   std::unique_ptr<rta::bi_tdgraph_executive>
-  operator()(const config::depth1::controller_repository& param_repo);
+  operator()(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
  protected:
   using tasking_map = std::map<std::string, rta::polled_task*>;
 
-  const base_perception_subsystem* perception(void) const { return m_perception; }
-  base_perception_subsystem* perception(void) { return m_perception; }
+  RCSW_COLD const base_perception_subsystem* perception(void) const { return m_perception; }
+  RCSW_COLD base_perception_subsystem* perception(void) { return m_perception; }
 
-  controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
-  const class block_sel_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
+  RCSW_COLD controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
+  RCSW_COLD const class block_sel_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
 
-  tasking_map depth1_tasks_create(
-      const config::depth1::controller_repository& param_repo,
+  RCSW_COLD tasking_map depth1_tasks_create(
+      const config::depth1::controller_repository& config_repo,
       rta::bi_tdgraph* graph);
-  void depth1_exec_est_init(
-      const config::depth1::controller_repository& param_repo,
+  RCSW_COLD void depth1_exec_est_init(
+      const config::depth1::controller_repository& config_repo,
       const tasking_map& map,
       rta::bi_tdgraph* graph);
   const class cache_sel_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }

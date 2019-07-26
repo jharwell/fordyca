@@ -29,26 +29,16 @@
 NS_START(fordyca, config);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char proximity_sensor_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void proximity_sensor_parser::parse(const ticpp::Element& node) {
   ticpp::Element pnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
+
   XML_PARSE_ATTR(pnode, m_config, delta);
 } /* parse() */
 
-void proximity_sensor_parser::show(std::ostream& stream) const {
-  stream << build_header() << XML_ATTR_STR(m_config, delta) << std::endl
-         << build_footer();
-} /* show() */
-
-__rcsw_pure bool proximity_sensor_parser::validate(void) const {
+bool proximity_sensor_parser::validate(void) const {
   CHECK(m_config->delta > 0.0);
   return true;
 

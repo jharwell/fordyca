@@ -36,6 +36,8 @@
 #include "fordyca/ds/cache_vector.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +46,7 @@ NS_START(fordyca);
 namespace repr {
 class arena_cache;
 class base_block;
-class multicell_entity;
+class base_entity;
 } // namespace repr
 NS_START(support, depth2);
 
@@ -60,13 +62,11 @@ NS_START(support, depth2);
  * Given:
  * - The blocks that should be included the cache (initial guess for center is
  *   the average x/y coordinates of elements in this list).
- * - The block that should not be included in the cache and need to be avoided
- *   during placement.
  * - Existing caches that need to be avoided during placement.
  */
 class cache_center_calculator : public rer::client<cache_center_calculator> {
  public:
-  static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 10;
+  static constexpr uint kOVERLAP_SEARCH_MAX_TRIES = 100;
 
   /**
    * @brief Initialize a new cache calculator.
@@ -75,7 +75,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * @param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  cache_center_calculator(ds::arena_grid* grid, double cache_dim);
+  cache_center_calculator(ds::arena_grid* grid, rtypes::spatial_dist cache_dim);
 
   cache_center_calculator(const cache_center_calculator& other) = delete;
   cache_center_calculator& operator=(const cache_center_calculator& other) = delete;
@@ -87,22 +87,17 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * Ideally that will be just the average of the x and y coordinates of all the
    * constituent blocks. However, it is possible that placing a cache at that
    * location will cause it to overlap with other caches, and so corrections may
-   * be necessary. We also need to deconflict the new cache location from
-   * existing blocks in the arena, as it is possible that blocks that are too
-   * far away to be considered part of our new cache will overlap it if it moves
-   * around to deconflict with existing caches.
+   * be necessary.
    *
-   * @param candidate_blocks The list of blocks to create a new cache from.
+   * @param cache_i_blocks The list of blocks to create a new cache from.
    * @param existing_caches Vector of existing caches in the arena.
-   * @param nc_blocks List of free (non-candidate) blocks in the arena that are
-   *                  NOT going to be part of the new cache.
    *
    * @return Coordinates of the new cache, if any were found.
    */
   boost::optional<rmath::vector2u> operator()(
-      const ds::block_list& cache_i_blocks,
-      const ds::block_list& nc_blocks,
-      const ds::cache_vector& existing_caches) const;
+      const ds::block_vector& c_cache_i_blocks,
+      const ds::cache_vector& c_existing_caches,
+      const ds::block_cluster_vector& c_clusters) const;
 
  private:
   /**
@@ -112,9 +107,9 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * @return An updated cache center, if one is needed.
    */
   boost::optional<rmath::vector2u> deconflict_loc(
-      const ds::block_list& nc_blocks,
-      const ds::cache_vector& existing_caches,
-      const rmath::vector2u& center) const;
+      const ds::cache_vector& c_existing_caches,
+      const ds::block_cluster_vector& c_clusters,
+      const rmath::vector2u& c_center) const;
 
   /**
    * @brief Given the size of the cache-to-be and its tentative location in the
@@ -142,13 +137,12 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               discretized).
    */
   boost::optional<rmath::vector2u> deconflict_loc_entity(
-      const repr::multicell_entity* ent,
-      const rmath::vector2d& ent_loc,
+      const repr::base_entity* ent,
       const rmath::vector2u& center) const;
 
  private:
   /* clang-format off */
-  double                             m_cache_dim;
+  const rtypes::spatial_dist         mc_cache_dim;
   ds::arena_grid*                    m_grid;
   mutable std::default_random_engine m_rng;
   /* clang-format on */

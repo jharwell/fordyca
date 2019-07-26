@@ -27,9 +27,9 @@
 #include <string>
 
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
@@ -37,7 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
@@ -69,9 +69,8 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    * and the reason why. (\c FALSE, -1) otherwise.
    */
   op_filter_status operator()(T& controller,
-                          block_op_src src,
-                          double cache_prox_dist,
-                          double block_prox_dist) {
+                              block_op_src src,
+                              rtypes::spatial_dist cache_prox) {
     /*
      * If the robot has not acquired a block, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a block but is still
@@ -84,10 +83,9 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
         return nest_drop_filter(controller);
       case block_op_src::ekCACHE_SITE_DROP:
         return cache_site_drop_filter(controller,
-                                      block_prox_dist,
-                                      cache_prox_dist);
+                                      cache_prox);
       case block_op_src::ekNEW_CACHE_DROP:
-        return new_cache_drop_filter(controller, cache_prox_dist);
+        return new_cache_drop_filter(controller, cache_prox);
       default:
         ER_FATAL_SENTINEL("Unhandled penalty type %d", static_cast<int>(src));
     } /* switch() */
@@ -101,7 +99,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    *
    */
   op_filter_status free_pickup_filter(const T& controller) const {
-    int block_id = loop_utils::robot_on_block(controller, *m_map);
+    int block_id = utils::robot_on_block(controller, *m_map);
     if (!(controller.goal_acquired() &&
           acq_goal_type::ekBLOCK == controller.acquisition_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
@@ -129,23 +127,16 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    * block/cache is too close.
    */
   op_filter_status cache_site_drop_filter(const T& controller,
-                                      double block_prox_dist,
-                                      double cache_prox_dist) const {
+                                          rtypes::spatial_dist cache_prox) const {
     if (!(controller.goal_acquired() &&
           acq_goal_type::ekCACHE_SITE == controller.acquisition_goal() &&
           transport_goal_type::ekCACHE_SITE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
-    int block_id = loop_utils::cache_site_block_proximity(controller,
-                                                          *m_map,
-                                                          block_prox_dist)
-                       .entity_id;
-    if (-1 != block_id) {
-      return op_filter_status::ekBLOCK_PROXIMITY;
-    }
-    int cache_id = loop_utils::new_cache_cache_proximity(controller,
+
+    int cache_id = utils::new_cache_cache_proximity(controller,
                                                          *m_map,
-                                                         cache_prox_dist)
+                                                         cache_prox)
                    .entity_id;
     if (-1 != cache_id) {
       return op_filter_status::ekCACHE_PROXIMITY;
@@ -159,15 +150,15 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    * is too close to another cache to do a free block drop at the chosen site.
    */
   op_filter_status new_cache_drop_filter(const T& controller,
-                                     double cache_prox_dist) const {
+                                         rtypes::spatial_dist cache_prox) const {
     if (!(controller.goal_acquired() &&
           acq_goal_type::ekNEW_CACHE == controller.acquisition_goal() &&
           transport_goal_type::ekNEW_CACHE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
-    int cache_id = loop_utils::new_cache_cache_proximity(controller,
+    int cache_id = utils::new_cache_cache_proximity(controller,
                                                          *m_map,
-                                                         cache_prox_dist)
+                                                         cache_prox)
                        .entity_id;
     if (-1 != cache_id) {
       return op_filter_status::ekCACHE_PROXIMITY;

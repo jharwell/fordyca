@@ -29,7 +29,9 @@
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/tasks/task_status.hpp"
 #include "rcppsw/ta/logical_task.hpp"
+#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -81,10 +83,12 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
    * @return \c TRUE if the robot aborted is current task, \c FALSE otherwise.
    */
   bool operator()(T& controller, const penalty_handler_list& penalty_handlers) {
-    if (nullptr == controller.current_task() || !controller.task_aborted()) {
+    if (nullptr == controller.current_task() ||
+        tasks::task_status::ekAbortPending != controller.task_status()) {
       return false;
     }
-
+    auto polled =
+        dynamic_cast<const rta::polled_task*>(controller.current_task());
     /*
      * If a robot aborted its task and was carrying a block, it needs to (1)
      * drop it so that the block is not left dangling and unusable for the rest
@@ -93,17 +97,13 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
     if (controller.is_carrying_block()) {
       ER_INFO("%s aborted task '%s' while carrying block%d",
               controller.GetId().c_str(),
-              dynamic_cast<rta::logical_task*>(controller.current_task())
-                  ->name()
-                  .c_str(),
+              polled->name().c_str(),
               controller.block()->id());
       task_abort_with_block(controller);
     } else {
       ER_INFO("%s aborted task '%s' (no block)",
               controller.GetId().c_str(),
-              dynamic_cast<rta::logical_task*>(controller.current_task())
-                  ->name()
-                  .c_str());
+              polled->name().c_str());
     }
     bool aborted = false;
     for (auto& h : penalty_handlers) {
@@ -114,9 +114,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
         aborted = true;
         ER_INFO("%s aborted task '%s' while serving '%s' penalty",
                 controller.GetId().c_str(),
-                dynamic_cast<rta::logical_task*>(controller.current_task())
-                    ->name()
-                    .c_str(),
+                polled->name().c_str(),
                 h->name().c_str());
       }
     } /* for(&h..) */
@@ -133,7 +131,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
      */
     bool conflict = false;
     for (auto& cache : m_map->caches()) {
-      if (loop_utils::block_drop_overlap_with_cache(
+      if (utils::block_drop_overlap_with_cache(
               controller.block(), cache, controller.position2D())) {
         conflict = true;
       }
@@ -150,15 +148,15 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
      * avoidance kicking in. This can result in an endless loop if said block
      * is the only one a robot knows about (see #242).
      */
-    if (loop_utils::block_drop_overlap_with_nest(
+    if (utils::block_drop_overlap_with_nest(
             controller.block(), m_map->nest(), controller.position2D()) ||
-        loop_utils::block_drop_near_arena_boundary(
+        utils::block_drop_near_arena_boundary(
             *m_map, controller.block(), controller.position2D())) {
       conflict = true;
     }
     events::free_block_drop_visitor drop_op(
         controller.block(),
-        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution()),
+        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution());
     if (!conflict) {
       drop_op.visit(controller);

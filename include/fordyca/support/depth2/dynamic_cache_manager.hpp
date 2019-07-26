@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
-#include <utility>
 #include <algorithm>
 #include <boost/optional.hpp>
 
@@ -33,7 +31,7 @@
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/ds/block_cluster_list.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -56,7 +54,7 @@ NS_START(support, depth2);
  * @ingroup fordyca support depth2
  *
  * @brief Manager for creation, depletion, and metric gathering for dynamic
- * caches in the arena, whenever they are enabled.
+ * caches in the arena.
  */
 class dynamic_cache_manager final : public base_cache_manager,
                               public rer::client<dynamic_cache_manager> {
@@ -69,20 +67,18 @@ class dynamic_cache_manager final : public base_cache_manager,
    * configurations.
    *
    * @param existing_caches The list of current caches in the arena.
-   * @param blocks The total block vector for the arena.
    * @param clusters The total block clusters in the arena, for use in
-   * (possibly) disallowing cache creation within their boundaries, depending on
-   * configuration.
+   *                 disallowing cache creation within their boundaries,
+   *                 depending on  configuration.
+   * @param blocks The total block vector for the arena.
    * @param timestep The current timestep.
    *
-   * @return \c TRUE iff at least 1 dynamic cache was actually
-   * created. Non-fatal failures to create dynamic caches can occur if, for
-   * example, all blocks are currently being carried by robots.
+   * @return The created caches (if any were created).
    */
-  boost::optional<ds::cache_vector> create(const ds::cache_vector& existing_caches,
-                                           const ds::const_block_cluster_list& clusters,
-                                           ds::block_vector& blocks,
-                                           uint timestep);
+  boost::optional<ds::cache_vector> create(const ds::cache_vector& c_existing_caches,
+                                           const ds::block_cluster_vector& c_clusters,
+                                           const ds::block_vector& blocks,
+                                           rtypes::timestep t);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches
@@ -90,18 +86,9 @@ class dynamic_cache_manager final : public base_cache_manager,
    * dimension, minimmum distance between blocks to consider when creating
    * caches);
    */
-  double cache_proximity_dist(void) const {
-    return std::max(2 * mc_cache_config.dimension,
+  rtypes::spatial_dist cache_proximity_dist(void) const {
+    return std::max(mc_cache_config.dimension * 2,
                     mc_cache_config.dynamic.min_dist);
-  }
-
-  /**
-   * @brief Get the minimum distance that must be maintained between two blocks
-   * in order for them not to be consolidated into a cache. Equal to the minimum
-   * cache distance.
-   */
-  double block_proximity_dist(void) const {
-    return mc_cache_config.dynamic.min_dist;
   }
 
  private:
@@ -116,7 +103,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    */
   boost::optional<ds::block_vector> calc_blocks_for_creation(
       const ds::cache_vector& existing_caches,
-      const ds::const_block_cluster_list& clusters,
+      const ds::block_cluster_vector& clusters,
       const ds::block_vector& blocks);
 
   /* clang-format off */

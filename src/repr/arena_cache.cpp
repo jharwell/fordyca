@@ -34,14 +34,13 @@ NS_START(fordyca, repr);
 arena_cache::arena_cache(const base_cache::params& p,
                          const rutils::color& light_color)
     : base_cache(p),
-      m_light(new argos::CLightEntity("cache_light" + std::to_string(id()),
-                                      argos::CVector3(real_loc().x(),
-                                                      real_loc().y(),
-                                                      0.0),
-                                      argos::CColor(light_color.red(),
-                                                    light_color.green(),
-                                                    light_color.blue()),
-                                      1.0)) {}
+      m_light(
+          new argos::CLightEntity("cache_light" + std::to_string(id()),
+                                  argos::CVector3(rloc().x(), rloc().y(), 0.0),
+                                  argos::CColor(light_color.red(),
+                                                light_color.green(),
+                                                light_color.blue()),
+                                  1.0)) {}
 
 /*******************************************************************************
  * Member Functions
@@ -49,7 +48,7 @@ arena_cache::arena_cache(const base_cache::params& p,
 void arena_cache::reset_metrics(void) {
   m_block_pickups = 0;
   m_block_drops = 0;
-  m_penalty_count = 0;
+  m_penalty_count = rtypes::timestep(0);
 } /* reset_metrics() */
 
 NS_END(fordyca, repr);

@@ -43,7 +43,7 @@ NS_START(fordyca, metrics, fsm);
  *
  * @brief Collector for robot exploration trajectories, which is collected as a
  * 2D array, and needs its own collector separate from the \ref
- * goal_acquisition_metrics_collector (1 .csv per collector).
+ * goal_acq_metrics_collector (1 .csv per collector).
  */
 class current_vector_locs_metrics_collector final : public spatial::grid2D_avg_metrics_collector {
  public:
@@ -57,8 +57,7 @@ class current_vector_locs_metrics_collector final : public spatial::grid2D_avg_m
                                     const rmath::vector2u& dims) :
       grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  uint collect_cell(const rmetrics::base_metrics& metrics,
-                    const rmath::vector2u& coord) const override;
+    void collect(const rmetrics::base_metrics& metrics) override;
 };
 
 NS_END(fsm, metrics, fordyca);

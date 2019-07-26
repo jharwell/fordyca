@@ -60,10 +60,10 @@ class throttling_differential_drive : public rrkin2D::differential_drive {
       const throttling_differential_drive& other) = delete;
 
   double active_throttle(void) const {
-    return mc_throttling->active_throttle();
+    return (nullptr != mc_throttling) ? mc_throttling->active_throttle() : 0.0;
   }
   double applied_throttle(void) const {
-    return mc_throttling->applied_throttle();
+    return (nullptr != mc_throttling) ? mc_throttling->applied_throttle() : 0.0;
   }
 
   void throttling(const support::tv::motion_throttling_handler* throttling) {

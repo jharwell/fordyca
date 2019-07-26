@@ -30,17 +30,15 @@
 NS_START(fordyca, config, caches);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char dynamic_cache_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void dynamic_cache_parser::parse(const ticpp::Element& node) {
+  /* dynamic caches not used */
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
   ticpp::Element cnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
 
   XML_PARSE_ATTR(cnode, m_config, enable);
   if (m_config->enable) {
@@ -50,18 +48,13 @@ void dynamic_cache_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-void dynamic_cache_parser::show(std::ostream& stream) const {
-  stream << build_header() << std::endl
-         << XML_ATTR_STR(m_config, enable) << std::endl
-         << XML_ATTR_STR(m_config, min_dist) << std::endl
-         << XML_ATTR_STR(m_config, min_blocks) << std::endl
-         << XML_ATTR_STR(m_config, robot_drop_only) << std::endl
-         << build_footer();
-} /* show() */
-
-__rcsw_const bool dynamic_cache_parser::validate(void) const {
+bool dynamic_cache_parser::validate(void) const {
+  if (!is_parsed() || (is_parsed() && !m_config->enable)) {
+    return true;
+  }
   CHECK(m_config->min_dist > 0);
   CHECK(m_config->min_blocks > 0);
+  return true;
 
 error:
   return false;

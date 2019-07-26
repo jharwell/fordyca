@@ -29,6 +29,7 @@
 #include <map>
 #include <utility>
 #include <list>
+#include <memory>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
@@ -44,7 +45,7 @@ namespace repr {
 class block;
 } // namespace repr
 
-namespace config { namespace arena { struct block_dist_config; }}
+namespace config { namespace arena { struct powerlaw_dist_config; }}
 
 NS_START(support, block_dist);
 
@@ -68,7 +69,8 @@ class powerlaw_distributor final : public base_distributor,
   /**
    * @brief Initialize the distributor.
    */
-  explicit powerlaw_distributor(const config::arena::block_dist_config* config);
+  powerlaw_distributor(const config::arena::powerlaw_dist_config* config,
+                       rtypes::discretize_ratio resolution);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
@@ -76,7 +78,7 @@ class powerlaw_distributor final : public base_distributor,
   bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
 
-  ds::const_block_cluster_list block_clusters(void) const override;
+  ds::block_cluster_vector block_clusters(void) const override;
 
   /**
    * @brief Computer cluster locations such that no two clusters overlap, and
@@ -116,7 +118,7 @@ class powerlaw_distributor final : public base_distributor,
    *
    * @return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
    */
-  bool check_cluster_placements(const cluster_paramvec& pvec);
+  bool check_cluster_placements(const cluster_paramvec& pvec) RCSW_PURE;
 
   /**
    * @brief Perform a "guess and check" cluster placement until you get a
@@ -129,7 +131,8 @@ class powerlaw_distributor final : public base_distributor,
                                              uint n_clusters);
 
   /* clang-format off */
-  double                                         m_arena_resolution{0.0};
+  const     rtypes::discretize_ratio              mc_resolution;
+
   uint                                           m_n_clusters{0};
   std::map<uint, std::list<cluster_distributor>> m_dist_map{};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;

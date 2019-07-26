@@ -39,11 +39,11 @@ block_utility::block_utility(const rmath::vector2d& block_loc,
  * Member Functions
  ******************************************************************************/
 double block_utility::calc(const rmath::vector2d& rloc,
-                           double density,
+                           const rswarm::pheromone_density& density,
                            double priority) {
-  return set_result(
+  return eval(
       ((mc_block_loc - mc_nest_loc).length() / (mc_block_loc - rloc).length()) *
-      std::exp(density * priority));
+      std::exp(density.v() * priority));
 } /* calc() */
 
 NS_END(expressions, fordyca);

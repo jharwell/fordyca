@@ -43,6 +43,7 @@ class cache_factory :
   static constexpr char kCRW[] = "CRW";
   static constexpr char kLikelihoodSearch[] = "likelihood_search";
   static constexpr char kUtilitySearch[] = "utility_search";
+  static constexpr char kLEDTaxisSearch[] = "ledtaxis_search";
 
   cache_factory(void);
 };

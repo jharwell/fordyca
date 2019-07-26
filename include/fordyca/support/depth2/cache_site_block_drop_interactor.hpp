@@ -34,6 +34,7 @@
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/ds/arena_map.hpp"
+#include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -84,17 +85,18 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    * @param controller The controller to handle interactions for.
    * @param timestep   The current timestep.
    */
-  void operator()(T& controller, uint timestep) {
+  interactor_status operator()(T& controller, rtypes::timestep t) {
     /*
      * If the controller was serving a penalty and has not finished yet, nothing
      * to do. If the controller was serving a penalty AND has satisfied it as of
      * this timestep, then actually perform the drop.
      */
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
         finish_cache_site_block_drop(controller);
+        return interactor_status::ekFreeBlockDrop;
       }
-      return;
+      return interactor_status::ekNoEvent;
     }
 
     /*
@@ -107,49 +109,29 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
      */
     auto status = m_penalty_handler->penalty_init(controller,
                                                   tv::block_op_src::ekCACHE_SITE_DROP,
-                                                  timestep,
-                                                  m_cache_manager->cache_proximity_dist(),
-                                                  m_cache_manager->block_proximity_dist());
-    if (tv::op_filter_status::ekBLOCK_PROXIMITY == status) {
-      auto prox_status = loop_utils::cache_site_block_proximity(controller,
-                                                                *m_map,
-                                                                m_cache_manager->block_proximity_dist());
-      ER_ASSERT(-1 != prox_status.entity_id,
-                "No block too close with BlockProximity return status");
-      block_proximity_notify(controller, prox_status);
-    } else if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
-      auto prox_status = loop_utils::new_cache_cache_proximity(controller,
+                                                  t,
+                                                  m_cache_manager->cache_proximity_dist());
+    if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
+      auto prox_status = utils::new_cache_cache_proximity(controller,
                                                                *m_map,
                                                                m_cache_manager->cache_proximity_dist());
       ER_ASSERT(-1 != prox_status.entity_id,
                 "No cache too close with CacheProximity return status");
       cache_proximity_notify(controller, prox_status);
     }
+    return interactor_status::ekNoEvent;
   }
 
  private:
-  void block_proximity_notify(T& controller,
-                              const loop_utils::proximity_status_t& status) {
-    ER_WARN("%s@%s cannot drop block in cache site: Block%d@%s too close (%f <= %f)",
-            controller.GetId().c_str(),
-            controller.position2D().to_str().c_str(),
-            status.entity_id,
-            status.entity_loc.to_str().c_str(),
-            status.distance.length(),
-            m_cache_manager->block_proximity_dist());
-    events::block_proximity_visitor prox_op(m_map->blocks()[status.entity_id]);
-    prox_op.visit(controller);
-  }
-
   void cache_proximity_notify(T& controller,
-                              const loop_utils::proximity_status_t& status) {
+                              const utils::proximity_status_t& status) {
     ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position2D().to_str().c_str(),
             status.entity_id,
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
-            m_cache_manager->cache_proximity_dist());
+            m_cache_manager->cache_proximity_dist().v());
     /*
      * Because caches can be dynamically created/destroyed, we cannot rely on
      * the index position of cache i to be the same as its ID, so we need to
@@ -176,24 +158,10 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     ER_ASSERT(controller.current_task()->goal_acquired() &&
               tv::acq_goal_type::ekCACHE_SITE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache site block drop");
-    auto status = loop_utils::cache_site_block_proximity(controller,
-                                                             *m_map,
-                                                             m_cache_manager->block_proximity_dist());
-
-    /*
-     * We checked this before starting to serve a penalty, but it is still
-     * possible that another robot dropped a block nearby that we are unaware
-     * of, so we need to check again to make sure we can still drop the block on
-     * the cache site.
-     */
-    if (-1 != status.entity_id) {
-      block_proximity_notify(controller, status);
-    } else {
-      perform_cache_site_block_drop(controller, p);
-      m_penalty_handler->remove(p);
-      ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
+    perform_cache_site_block_drop(controller, p);
+    m_penalty_handler->remove(p);
+    ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
-    }
   }
 
   /**
@@ -204,7 +172,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                                      const tv::temporal_penalty<T>& penalty) {
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
                                     rmath::dvec2uvec(controller.position2D(),
-                                                     m_map->grid_resolution()),
+                                                     m_map->grid_resolution().v()),
                                     m_map->grid_resolution());
 
     drop_op.visit(*m_map);

@@ -68,9 +68,9 @@ class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acq_goal_type acquisition_goal_internal(void) const;
+  acq_goal_type acquisition_goal_internal(void) const RCSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> cache_select(void) const;
-  bool candidates_exist(void) const;
+  bool candidates_exist(void) const RCSW_PURE;
   bool cache_acquired_cb(bool explore_result) const;
 
   /* clang-format off */

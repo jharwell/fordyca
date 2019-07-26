@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
 #include "fordyca/config/metrics_parser.hpp"
@@ -50,8 +51,7 @@ NS_START(fordyca, config);
  */
 class output_parser final : public rconfig::xml::xml_config_parser {
  public:
-  explicit output_parser(uint level)
-      : xml_config_parser(level), m_metrics_parser(level + 1) {}
+  using config_type = output_config;
 
   /**
    * @brief The root tag that all output loop functions parameters should lie
@@ -59,22 +59,19 @@ class output_parser final : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "output";
 
-  void show(std::ostream& stream) const override;
-  bool validate(void) const override;
-  void parse(const ticpp::Element& node) override;
+  bool validate(void) const override RCSW_ATTR(pure, cold);
+  void parse(const ticpp::Element& node) override RCSW_COLD;
 
-  std::string xml_root(void) const override { return kXMLRoot; }
-
-  std::shared_ptr<output_config> config_get(void) const { return m_config; }
+  RCSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(void) const override {
-    return m_config;
+  RCSW_COLD const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  std::shared_ptr<output_config> m_config{nullptr};
-  metrics_parser m_metrics_parser;
+  std::unique_ptr<output_config> m_config{nullptr};
+  metrics_parser                 m_metrics_parser{};
   /* clang-format on */
 };
 

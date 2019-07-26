@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/ta/taskable.hpp"
 
@@ -35,7 +35,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 class acquire_goal_fsm;
@@ -58,7 +58,7 @@ class acquire_free_block_fsm;
 class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
                           public base_foraging_fsm,
                           public rta::taskable,
-                          public metrics::fsm::goal_acquisition_metrics,
+                          public metrics::fsm::goal_acq_metrics,
                           public fsm::block_transporter {
  public:
   block_to_goal_fsm(acquire_goal_fsm* goal_fsm,
@@ -81,17 +81,18 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   void task_reset(void) override { init(); }
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override final;
-  bool entered_collision_avoidance(void) const override final;
-  bool exited_collision_avoidance(void) const override final;
-  uint collision_avoidance_duration(void) const override final;
-  rmath::vector2u avoidance_loc(void) const override final;
+  bool in_collision_avoidance(void) const override final RCSW_PURE;
+  bool entered_collision_avoidance(void) const override final RCSW_PURE;
+  bool exited_collision_avoidance(void) const override final RCSW_PURE;
+  rtypes::timestep collision_avoidance_duration(
+      void) const override final RCSW_PURE;
+  rmath::vector2u avoidance_loc(void) const override final RCSW_PURE;
 
   /* goal acquisition metrics */
   rmath::vector2u acquisition_loc(void) const override final;
-  bool is_vectoring_to_goal(void) const override final;
-  exp_status is_exploring_for_goal(void) const override final;
-  bool goal_acquired(void) const override;
+  bool is_vectoring_to_goal(void) const override final RCSW_PURE;
+  exp_status is_exploring_for_goal(void) const override final RCSW_PURE;
+  bool goal_acquired(void) const override RCSW_PURE;
   acq_goal_type acquisition_goal(void) const override;
   rmath::vector2u current_explore_loc(void) const override final;
   rmath::vector2u current_vector_loc(void) const override final;

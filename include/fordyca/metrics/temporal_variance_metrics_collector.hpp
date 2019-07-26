@@ -62,8 +62,8 @@ class temporal_variance_metrics_collector final
 
   /* clang-format off */
   double m_swarm_motion_throttle{0.0};
-  double m_env_block_manip{0.0};
-  double m_env_cache_usage{0.0};
+  rtypes::timestep m_env_block_manip{0};
+  rtypes::timestep m_env_cache_usage{0};
   /* clang-format on */
 };
 

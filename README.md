@@ -26,10 +26,13 @@ This is the main entry point for getting started on the project.
    Robotics," arXiv:1906.01108 [cs.RO], June 2019.
    [Link](https://arxiv.org/abs/1906.01108)
 
-# Setup
+# Setup (Debug build)
 
-Download `scripts/bootstrap.sh` BEFORE cloning this repo, and run it, with the
-following arguments:
+Download `scripts/bootstrap.sh` BEFORE cloning this repo. The script can be
+downloaded by navigating to the file on github, clicking the `raw` button, and
+then right clicking and doing `Save As`. After downloading, mark the script as
+executable (`chmod +x bootstrap.sh`) and then run it (it can be run from
+anywhere), with the following arguments:
 
 - 1st arg: Is the root directory for the project (all repos will be cloned/built
   in here, and it *must* be an absolute path).
@@ -41,29 +44,77 @@ following arguments:
 
 For example:
 
-        ./bootstrap.sh $HOME/research YES /usr/local 2
+        ./bootstrap.sh $HOME/research YES /usr/local 2 > output.txt 2>&1
 
 To build the code under `~/research` on a 2 core machine and install ARGoS
-system-wide.
+system-wide. The `> output.txt 2>&1` part is important to capture the output of
+running the script so that if there are errors it is easier to track them down
+(the script generates a LOT of output, which usually overflows terminal
+ringbuffers).
 
 The script assumes you have sudo privileges on the machine you want to install
 the project on. If you do not, you will have to build a *lot* more stuff from
 source manually.
 
-# Configuring Simulations
+*IMPORTANT* If you want to build an _optimized_ version of fordyca (necessary
+for large swarms), you will need to either manually modify the `bootstrap.sh`
+script that you copied, or re-run `cmake` and `make` as shown below.
 
-For parameter configuration see
-[parameters](https://github.com/swarm-robotics/fordyca/tree/devel/docs/parameters.md).
+# Setup (Optimized Build)
 
-## Controller Configuration
+To build forydca with optimizations (necessary for using sierra or running large
+scale simulations, will need a different cmake command than the one
+`bootstrap.sh` uses for you. Something like the following, run from the `build`
+directory prior to building will do the trick:
 
+    cmake -DCMAKE_C_COMPILER=gcc-8\
+    -DCMAKE_CXX_COMPILER=g++-8\
+    -DWITH_FOOTBOT_BATTERY=NO\
+    -DWITH_FOOTBOT_RAB=NO\
+    -DWITH_FOOTBOT_LEDS=NO\
+    -DCMAKE_BUILD_TYPE=OPT\
+    -DLIBRA_ER_NREPORT=YES\
+    ..
 
+To get an idea of what some of the non-project specific options mean, head over
+to the [libra](https://github.com/swarm-robotics/libra/tree/devel/README.md)
+repo and look at the README.
+
+`WITH_FOOTBOT_BATTERY`, `WITH_FOOTBOT_RAB`, `WITH_FOOTBOT_LEDS` are things that
+are only needed if you are running experiments which utilize those
+sensors/actuators, otherwise they slow things down a *LOT* with large swarms
+(which is why you are compiling with optimizations on in the first place).
+
+# Viewing The Documentation
+
+After the bootstrap.sh script finishes successfully, you can (*AND SHOULD*) view
+the doxygen documentation in your browser by navigating to the generated
+`index.html` file. Simply open your browser, and then put the path to the
+fordyca repo followed by `/build/docs/html/index.html`. For example, if you
+built fordyca under `$HOME/research`, then you would do
+`$HOME/research/build/docs/html/index.html` in the address bar of your browser.
+
+Alternatively, if you would like a .pdf of the documentation, you can navigate to
+the `latex` directory for doxygen and then build said pdf. Again assuming you
+built fordyca in `$HOME/research`, do the following:
+
+    cd $HOME/research/fordyca/build/docs/latex
+    make
+
+A `refman.pdf` will (eventually) be built in that directory once the command
+finishes. Note that if you want to do build the .pdf you will also need the
+following programs:
+
+- `pdflatex` (`texlive-latex-base` on ubuntu)
+- Texlive fonts (`texlive-fonts-extra` on ubuntu)
+
+# Available Controllers
 | Controller | Status | Loop functions | Notes                                                                                                                                 |
 |------------|--------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
 | crw        | Stable | depth0         | CRW = Correlated Random Walk.                                                                                                         |
 | dpo        | Stable | depth0         | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                            |
 | mdpo       | Stable | depth0         | MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena tracking relevance of individual cells within it.           |
-| odpo       | Stable | depth0         | ODPO = Oracular DPO. Has perfect information about blocks in the arena.                                                               |
+| odpo       | Stable | depth0         | ODPO = Oracular DPO. Has perfect information about blocks in thye arena.                                                              |
 | omdpo      | Stable | depth0         | OMDPO = Oracular MDPO. Has perfect information about blocks in the arena.                                                             |
 | gp\_dpo    | Stable | depth1         | Greedy task partitioning + DPO. Requires static caches to also be enabled.                                                            |
 | gp\_odpo   | Stable | depth1         | Greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.             |
@@ -74,25 +125,55 @@ For parameter configuration see
 | grp\_odpo  | Stable | depth2         | Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled.  |
 | grp\_omdpo | Stable | depth2         | Recursive greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled. |
 
+# Configuring Simulations
+
+This project extends the base `.argos` file (XML file really) with a set of new
+parameters for controllers and loop functions.
+
+For controller configuration, see
+[controller](https://github.com/swarm-robotics/fordyca/tree/devel/docs/controller-xml-configuration.md).
+
+For loop functions configuration, see
+[loop functions](https://github.com/swarm-robotics/fordyca/tree/devel/docs/loop-functions-xml-configuration.md).
+
 # Running On Your Laptop
 
 After successful compilation, follow these steps to run a foraging scenario:
 
-1. Set the `ARGOS_PLUGIN_PATH` variable to contain the path to the
-   `libfordyca.so` file. On bash, that is:
+1. Set the `ARGOS_PLUGIN_PATH` variable to contain (1) the path to the directory
+   containing the `libfordyca.so` file, (2) the path to the ARGoS libraries. On
+   bash, that is:
 
-        export ARGOS_PLUGIN_PATH=/path/to/where/argos/lib/dir:/path/to/fordyca/build/lib
+        export ARGOS_PLUGIN_PATH=/usr/local/lib/argos3/lib:$HOME/git/fordyca/build/lib
 
-   Note that you need BOTH of these terms in the path, because this defines the
-   ENTIRE search space for argos to look for libraries (including its own core
-   libraries).
+   Assuming you have installed ARGoS to `/usr/local` and have cloned/built
+   fordyca under `$HOME/git`. If your paths are different, modify the above paths
+   accordingly. Note that you need BOTH of these terms in the path, because this
+   defines the ENTIRE search space for argos to look for libraries (including
+   its own core libraries).
 
-2. Unless you compile out event reporting, you will need to set the path to the
-   log4cxx configuration file. On bash that is:
+2. If you have installed ARGoS to a non-system path (i.e. something other than
+   `/usr/local` or `/usr`), you will also need to update *system* dynamic
+   library search paths so the OS can find the libraries that the ARGoS
+   executable requires. If you installed it to a system path, then you can skip
+   this step. On bash:
 
-        export LOG4CXX_CONFIGURATION=/path/to/fordyca/log4cxx.xml
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/local/lib/argos3
 
-3. cd to the ROOT of the fordyca repo, and run the demo experiment:
+   Assuming you have installed ARGoS to `/opt/local`. If you installed it
+   somewhere else, then update the path above accordingly.
+
+3. Unless you compile out event reporting (built fordyca with optimizations
+   *AND* with `LIBRA_ER_NREPORT=YES` passed to cmake), you will need to set the
+   path to the log4cxx configuration file, which tells fordyca which classes
+   should have logging turned on, and how verbose to be. On bash that is:
+
+        export LOG4CXX_CONFIGURATION=$HOME/git/fordyca/log4cxx.xml
+
+   Assuming you have cloned and built fordyca in `$HOME/git`. If you cloned and
+   built it somewhere else, then update the above path accordingly.
+
+4. cd to the ROOT of the fordyca repo, and run the demo experiment:
 
         argos3 -c exp/demo.argos
 
@@ -103,9 +184,12 @@ After successful compilation, follow these steps to run a foraging scenario:
 # Running on MSI
 
 Head over to
-[sierra](https://github.com/swarm-robotics/sierra/tree/devel/docs/README.md),
-and follow the MSI setup instructions over there. Don't try to run on MSI
-without it. Just don't.
+[sierra](https://github.com/swarm-robotics/sierra/tree/devel/README.md), and
+follow the MSI setup instructions over there. Don't try to run on MSI without
+it. Just don't.
+
+*IMPORTANT* Do not try to run sierra with a debug build of fordyca. It probably
+won't work and will be obnoxiously/irritatingly slow if it does.
 
 # Troubleshooting
 

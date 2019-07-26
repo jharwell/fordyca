@@ -34,6 +34,7 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth2);
+using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -66,25 +67,12 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_const bool acquire_cache_site_fsm::site_acquired_cb(
-    bool explore_result) const {
+bool acquire_cache_site_fsm::site_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "Found cache site by exploring?");
-  rmath::vector2d position = saa_subsystem()->sensing()->position();
-  for (auto& b : mc_store->blocks().const_values_range()) {
-    if ((position - b.ent()->real_loc()).length() <=
-        boost::get<double>(mc_matrix->find("block_prox_dist")->second)) {
-      ER_WARN("Cannot acquire cache site@%s: Block%d@%s too close",
-              position.to_str().c_str(),
-              b.ent()->id(),
-              b.ent()->real_loc().to_str().c_str());
-      return false;
-    }
-  } /* for(&b..) */
-
   return true;
 } /* site_acquired_cb() */
 
-__rcsw_const bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
+bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   ER_FATAL_SENTINEL("Cache site acquired through exploration");
   return false;
 } /* site_exploration_term_cb() */
@@ -104,8 +92,7 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::site_s
   }
 } /* site_select() */
 
-__rcsw_const acq_goal_type
-acquire_cache_site_fsm::acquisition_goal_internal(void) const {
+acq_goal_type acquire_cache_site_fsm::acquisition_goal_internal(void) const {
   return acq_goal_type::ekCACHE_SITE;
 } /* acquisition_goal_internal() */
 

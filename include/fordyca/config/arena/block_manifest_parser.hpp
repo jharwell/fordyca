@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/config/arena/block_manifest.hpp"
 
@@ -47,8 +48,7 @@ NS_START(fordyca, config, arena);
  */
 class block_manifest_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit block_manifest_parser(uint level) : xml_config_parser(level) {}
-
+  using config_type = block_manifest;
   /**
    * @brief The root tag that all block manifest parameters should lie under
    * in the XML tree.
@@ -56,22 +56,16 @@ class block_manifest_parser : public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "manifest";
 
   void parse(const ticpp::Element& node) override;
-  void show(std::ostream& stream) const override;
-  bool validate(void) const override;
+  bool validate(void) const override RCSW_PURE;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<block_manifest> config_get(void) const {
-    return m_config;
-  }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
-
   /* clang-format off */
-  std::shared_ptr<block_manifest> m_config{nullptr};
+  std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 

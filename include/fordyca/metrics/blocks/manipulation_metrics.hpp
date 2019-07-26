@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
 #include "fordyca/nsalias.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +65,7 @@ class manipulation_metrics : public virtual rmetrics::base_metrics {
    * block. Only valid for the specific manipulation type, as determined by
    * calling the other members of the class.
    */
-  virtual uint penalty_served(void) const = 0;
+  virtual rtypes::timestep penalty_served(void) const = 0;
 
   /**
    * @brief If \c TRUE, then a cached block was picked up this timestep.

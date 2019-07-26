@@ -47,17 +47,16 @@ class cube_block final : public base_block {
   explicit cube_block(const rmath::vector2d& dim)
       : base_block(dim, rutils::color::kBLACK, -1) {}
 
-  cube_block(const rmath::vector2d& dim, int id)
+  cube_block(const rmath::vector2d& dim, int id) noexcept
       : base_block(dim, rutils::color::kBLACK, id) {}
 
   repr::block_type type(void) const override {
     return repr::block_type::ekCUBE;
   }
   std::unique_ptr<base_block> clone(void) const override {
-    std::unique_ptr<base_block> tmp =
-        rcppsw::make_unique<cube_block>(dims(), id());
-    tmp->discrete_loc(this->discrete_loc());
-    tmp->real_loc(this->real_loc());
+    std::unique_ptr<base_block> tmp = std::make_unique<cube_block>(dims(), id());
+    tmp->dloc(this->dloc());
+    tmp->rloc(this->rloc());
     tmp->reset_robot_id();
     return tmp;
   } /* clone() */

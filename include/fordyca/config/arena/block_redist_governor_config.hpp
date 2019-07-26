@@ -25,8 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/config/base_config.hpp"
 #include "fordyca/nsalias.hpp"
+
+#include "rcppsw/config/base_config.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,10 +43,10 @@ NS_START(fordyca, config, arena);
  * @ingroup fordyca config arena
  */
 struct block_redist_governor_config : public rconfig::base_config {
-  uint        timestep{0};
-  uint        block_count{0};
-  std::string trigger{};
-  std::string recurrence_policy{};
+  rtypes::timestep timestep{0};
+  uint             block_count{0};
+  std::string      trigger{};
+  std::string      recurrence_policy{};
 };
 
 NS_END(arena, config, fordyca);

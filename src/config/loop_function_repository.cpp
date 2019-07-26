@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/config/arena/arena_map_parser.hpp"
-#include "fordyca/config/battery_parser.hpp"
 #include "fordyca/config/caches/caches_parser.hpp"
 #include "fordyca/config/oracle/oracle_manager_parser.hpp"
 #include "fordyca/config/output_parser.hpp"
@@ -42,28 +41,21 @@ namespace rswc = rswarm::convergence;
  * Constructors/Destructor
  ******************************************************************************/
 loop_function_repository::loop_function_repository(void) noexcept {
-  parser_register<output_parser, output_config>(
-      output_parser::kXMLRoot, rconfig::xml::xml_config_parser::kHeader1);
+  parser_register<output_parser, output_config>(output_parser::kXMLRoot);
   parser_register<arena::arena_map_parser, arena::arena_map_config>(
-      arena::arena_map_parser::kXMLRoot,
-      rconfig::xml::xml_config_parser::kHeader1);
+      arena::arena_map_parser::kXMLRoot);
   parser_register<tv::tv_manager_parser, tv::tv_manager_config>(
-      tv::tv_manager_parser::kXMLRoot,
-      rconfig::xml::xml_config_parser::kHeader1);
+      tv::tv_manager_parser::kXMLRoot);
   parser_register<visualization_parser, visualization_config>(
-      visualization_parser::kXMLRoot, rconfig::xml::xml_config_parser::kHeader1);
-  parser_register<battery_parser, battery_config>(
-      battery_parser::kXMLRoot, rconfig::xml::xml_config_parser::kHeader1);
+      visualization_parser::kXMLRoot);
+
   parser_register<oracle::oracle_manager_parser, oracle::oracle_manager_config>(
-      oracle::oracle_manager_parser::kXMLRoot,
-      rconfig::xml::xml_config_parser::kHeader1);
+      oracle::oracle_manager_parser::kXMLRoot);
   parser_register<caches::caches_parser, caches::caches_config>(
-      caches::caches_parser::kXMLRoot,
-      rconfig::xml::xml_config_parser::kHeader1);
+      caches::caches_parser::kXMLRoot);
   parser_register<rswc::config::xml::convergence_parser,
                   rswc::config::convergence_config>(
-      rswc::config::xml::convergence_parser::kXMLRoot,
-      rconfig::xml::xml_config_parser::kHeader1);
+      rswc::config::xml::convergence_parser::kXMLRoot);
 }
 
 NS_END(config, fordyca);

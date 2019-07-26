@@ -67,9 +67,9 @@ double cache_site_utility::calc(const rmath::vector2d& site_loc) {
   ER_TRACE("Utility: %f",
            (1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
   if (deviation_from_ideal <= std::numeric_limits<double>::epsilon()) {
-    return set_result(std::numeric_limits<double>::min());
+    return eval(std::numeric_limits<double>::min());
   }
-  return set_result((1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
+  return eval((1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
 } /* calc() */
 
 NS_END(expressions, fordyca);

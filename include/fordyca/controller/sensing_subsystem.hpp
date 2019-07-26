@@ -29,6 +29,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -143,18 +144,20 @@ public:
   /**
    * @brief Get the current simulation time tick.
    */
-  uint tick(void) const { return m_tick; }
+  rtypes::timestep tick(void) const { return m_tick; }
 
   /**
    * @brief Set the current simulation time tick.
    */
-  void tick(uint tick) { m_tick = tick; }
+  void tick(rtypes::timestep tick) { m_tick = tick; }
 
   /**
-   * @brief Get the robot's heading, which is computed from the previous 2
-   * calculated (ahem set) robot positions.
+   * @brief Get how far the robot has traveled in the last timestep, as well as
+   * the direction/magnitude.
    */
-  rmath::vector2d heading(void) const { return m_position - m_prev_position; }
+  rmath::vector2d tick_travel(void) const {
+    return m_position - m_prev_position;
+  }
 
   /**
    * @brief Get the angle of the current robot's heading. A shortcut to help
@@ -162,44 +165,25 @@ public:
    *
    * @return The heading angle.
    */
-  rmath::radians heading_angle(void) const { return heading().angle(); }
+  const rmath::radians& heading(void) const { return m_heading; }
+  void heading(const rmath::radians& r) { m_heading = r; }
 
-  /**
-   * @brief Figure out if a threatening obstacle exists near to the robot's
-   * current location.
-   *
-   * A threatening obstacle is defined as one that is closer than the defined
-   * obstacle delta to the robot. Note that the obstacle delta is NOT a measure
-   * of distance, but a measure [0, 1] indicating how close an obstacle is which
-   * increases exponentially as the obstacle nears.
-   *
-   * @return \c TRUE if a threatening obstacle is found, \c FALSE otherwise.
-   */
-  bool threatening_obstacle_exists(void) const;
-
-  /**
-   * @brief Return the closest obstacle (i.e. the most threatening).
-   *
-   * Should be used in conjunction with \ref threatening_obstacle_exists().
-   * Threatening obstacles are those within the specified distance to the robot,
-   * and those that fall within a specific angle range (i.e. obstacles behind
-   * the robot are ignored).
-   */
-  rmath::vector2d find_closest_obstacle(void) const;
+  boost::optional<rmath::vector2d> avg_obstacle_within_prox(void) const;
 
   std::vector<rrhal::sensors::rab_wifi_sensor::rab_wifi_packet> recieve_message();
 
 private:
   /* clang-format off */
-  const double                                   mc_obstacle_delta;
-  const double                                   mc_los_dim;
+  const double                 mc_obstacle_delta;
+  const double                 mc_los_dim;
 
-  uint                                           m_tick{0};
-  rmath::vector2d                                m_position{};
-  rmath::vector2d                                m_prev_position{};
-  rmath::vector2u                                m_discrete_position{};
-  struct sensor_list                             m_sensors;
-  rmath::range<rmath::radians>                   m_fov;
+  rtypes::timestep             m_tick{0};
+  rmath::vector2d              m_position{};
+  rmath::vector2d              m_prev_position{};
+  rmath::radians               m_heading{};
+  rmath::vector2u              m_discrete_position{};
+  struct sensor_list           m_sensors;
+  rmath::range<rmath::radians> m_fov;
   /* clang-format off */
 };
 

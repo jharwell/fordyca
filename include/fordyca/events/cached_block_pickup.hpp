@@ -31,7 +31,9 @@
 #include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
+
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -95,7 +97,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   cached_block_pickup(support::base_loop_functions* loop,
                       const std::shared_ptr<repr::arena_cache>& cache,
                       uint robot_index,
-                      uint timestep);
+                      rtypes::timestep t);
   ~cached_block_pickup(void) override = default;
 
   cached_block_pickup(const cached_block_pickup& op) = delete;
@@ -133,7 +135,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
 
   /* clang-format off */
   const uint                         mc_robot_index;
-  const uint                         mc_timestep;
+  const rtypes::timestep             mc_timestep;
 
   support::base_loop_functions       *m_loop;
   std::shared_ptr<repr::arena_cache> m_real_cache;
@@ -159,7 +161,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
  */
 using cached_block_pickup_visitor_impl =
     rpvisitor::precise_visitor<detail::cached_block_pickup,
-                              detail::cached_block_pickup::visit_typelist>;
+                               detail::cached_block_pickup::visit_typelist>;
 
 NS_END(detail);
 

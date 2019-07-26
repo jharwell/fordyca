@@ -37,11 +37,11 @@ NS_START(fordyca, support, block_dist);
  ******************************************************************************/
 multi_cluster_distributor::multi_cluster_distributor(
     std::vector<ds::arena_grid::view>& grids,
-    double arena_resolution,
+    rtypes::discretize_ratio resolution,
     uint maxsize)
     : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster") {
   for (auto& g : grids) {
-    m_dists.emplace_back(g, arena_resolution, maxsize);
+    m_dists.emplace_back(g, resolution, maxsize);
   } /* for(i..) */
 }
 
@@ -76,9 +76,9 @@ bool multi_cluster_distributor::distribute_block(
   return false;
 } /* distribute_block() */
 
-ds::const_block_cluster_list multi_cluster_distributor::block_clusters(
-    void) const {
-  ds::const_block_cluster_list ret;
+ds::block_cluster_vector multi_cluster_distributor::block_clusters(void) const {
+  ds::block_cluster_vector ret;
+
   for (auto& dist : m_dists) {
     auto bclusts = dist.block_clusters();
     ret.insert(ret.end(), bclusts.begin(), bclusts.end());

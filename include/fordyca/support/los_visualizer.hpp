@@ -26,6 +26,7 @@
 #include <string>
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +67,7 @@ class los_visualizer : public rer::client<los_visualizer> {
    * @param los The LOS to visualize.
    * @param grid_resolution The grid resolution for the arena.
    */
-  void draw(const repr::line_of_sight* los, double grid_resolution);
+  void draw(const repr::line_of_sight* los, rtypes::discretize_ratio resolution);
 
   /* clang-format off */
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};

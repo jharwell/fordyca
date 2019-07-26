@@ -66,11 +66,11 @@ cached_block_pickup::cached_block_pickup(
     support::base_loop_functions* loop,
     const std::shared_ptr<repr::arena_cache>& cache,
     uint robot_index,
-    uint timestep)
+    rtypes::timestep t)
     : ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
-      cell_op(cache->discrete_loc()),
+      cell_op(cache->dloc()),
       mc_robot_index(robot_index),
-      mc_timestep(timestep),
+      mc_timestep(t),
       m_loop(loop),
       m_real_cache(cache) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
@@ -112,7 +112,7 @@ bool cached_block_pickup::dispatch_d2_cache_interactor(
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
     ER_INFO("Added cache%d@%s to drop exception list,task='%s'",
             m_real_cache->id(),
-            m_real_cache->real_loc().to_str().c_str(),
+            m_real_cache->rloc().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
         {m_real_cache->id(), controller::cache_sel_exception::kDrop});
@@ -159,7 +159,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
   int cache_id = m_real_cache->id();
   ER_ASSERT(-1 != cache_id, "Cache ID undefined on block pickup");
 
-  rmath::vector2u cache_coord = m_real_cache->discrete_loc();
+  rmath::vector2u cache_coord = m_real_cache->dloc();
   ER_ASSERT(cache_coord == cell_op::coord(),
             "Coordinates for cache%d%s/cell@%s do not agree",
             cache_id,
@@ -168,7 +168,9 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
-            "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
+            "Cache%d/cell@%s disagree on # of blocks: cache=%zu/cell=%zu",
+            m_real_cache->id(),
+            cell.loc().to_str().c_str(),
             m_real_cache->n_blocks(),
             cell.block_count());
 
@@ -223,7 +225,7 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(m_real_cache),
             "Cache%d@%s not in DPO store",
             m_real_cache->id(),
-            m_real_cache->discrete_loc().to_str().c_str());
+            m_real_cache->dloc().to_str().c_str());
 
   auto pcache = store.find(m_real_cache);
 
@@ -239,8 +241,8 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
   if (!pcache->ent()->contains_block(m_pickup_block)) {
     ER_INFO("DPO cache%d@%s/%s does not contain pickup block%d",
             pcache->ent()->id(),
-            pcache->ent()->real_loc().to_str().c_str(),
-            pcache->ent()->discrete_loc().to_str().c_str(),
+            pcache->ent()->rloc().to_str().c_str(),
+            pcache->ent()->dloc().to_str().c_str(),
             m_pickup_block->id());
     return;
   }
@@ -256,7 +258,7 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
             pcache->ent()->n_blocks());
 
   } else {
-    __rcsw_unused int id = pcache->ent()->id();
+    RCSW_UNUSED int id = pcache->ent()->id();
     pcache->ent_obj()->block_remove(m_pickup_block);
     store.cache_remove(pcache->ent_obj());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
@@ -279,8 +281,8 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
   ER_ASSERT(cell.cache()->contains_block(m_pickup_block),
             "Perceived cache%d@%s/%s does not contain pickup block%d",
             cell.cache()->id(),
-            cell.cache()->real_loc().to_str().c_str(),
-            cell.cache()->discrete_loc().to_str().c_str(),
+            cell.cache()->rloc().to_str().c_str(),
+            cell.cache()->dloc().to_str().c_str(),
             m_pickup_block->id());
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
@@ -299,7 +301,7 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
             cell.cache()->n_blocks());
 
   } else {
-    __rcsw_unused int id = cell.cache()->id();
+    RCSW_UNUSED int id = cell.cache()->id();
     cell.cache()->block_remove(m_pickup_block);
 
     map.cache_remove(cell.cache());

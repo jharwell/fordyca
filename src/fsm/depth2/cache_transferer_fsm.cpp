@@ -43,15 +43,14 @@ cache_transferer_fsm::cache_transferer_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-__rcsw_pure acq_goal_type cache_transferer_fsm::acquisition_goal(void) const {
+acq_goal_type cache_transferer_fsm::acquisition_goal(void) const {
   if (ekST_START != current_state() && ekST_FINISHED != current_state()) {
     return acq_goal_type::ekEXISTING_CACHE;
   }
   return acq_goal_type::ekNONE;
 } /* acquisition_goal() */
 
-__rcsw_pure transport_goal_type
-cache_transferer_fsm::block_transport_goal(void) const {
+transport_goal_type cache_transferer_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_GOAL == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
     return transport_goal_type::ekEXISTING_CACHE;
@@ -59,12 +58,12 @@ cache_transferer_fsm::block_transport_goal(void) const {
   return transport_goal_type::ekNONE;
 } /* block_transport_goal() */
 
-__rcsw_pure bool cache_transferer_fsm::is_acquiring_dest_cache(void) const {
+bool cache_transferer_fsm::is_acquiring_dest_cache(void) const {
   return transport_goal_type::ekEXISTING_CACHE == block_transport_goal() &&
          m_dest_cache_fsm.task_running();
 } /* is_acquiring_dest_cache() */
 
-__rcsw_pure bool cache_transferer_fsm::is_acquiring_src_cache(void) const {
+bool cache_transferer_fsm::is_acquiring_src_cache(void) const {
   return transport_goal_type::ekEXISTING_CACHE == block_transport_goal() &&
          m_src_cache_fsm.task_running();
 } /* is_acquiring_src_cache() */

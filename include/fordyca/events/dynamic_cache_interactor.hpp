@@ -48,7 +48,7 @@ class cache_proximity;
  */
 class dynamic_cache_interactor
     : public rpvisitor::polymorphic_accept_set<detail::block_proximity,
-                                              detail::cache_proximity> {};
+                                               detail::cache_proximity> {};
 
 NS_END(events, fordyca);
 

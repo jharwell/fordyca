@@ -31,12 +31,6 @@
 NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr char block_factory::kCRW[];
-constexpr char block_factory::kLikelihoodSearch[];
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 block_factory::block_factory(void) {

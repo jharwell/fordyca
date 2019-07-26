@@ -63,13 +63,13 @@ class lifecycle_metrics_collector final : public rmetrics::base_metrics_collecto
    * @brief All stats are cumulative within an interval.
    */
   struct stats {
-    uint int_created;
-    uint int_depleted;
-    uint int_depletion_sum;
+    uint int_created{0};
+    uint int_depleted{0};
+    rtypes::timestep int_depletion_sum{0};
 
-    uint cum_created;
-    uint cum_depleted;
-    uint cum_depletion_sum;
+    uint cum_created{0};
+    uint cum_depleted{0};
+    rtypes::timestep cum_depletion_sum{0};
   };
 
 
@@ -77,7 +77,7 @@ class lifecycle_metrics_collector final : public rmetrics::base_metrics_collecto
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats   m_stats;
+  struct stats   m_stats{};
   /* clang-format on */
 };
 

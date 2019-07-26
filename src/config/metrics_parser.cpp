@@ -29,66 +29,73 @@
 NS_START(fordyca, config);
 
 /*******************************************************************************
- * Global Variables
+ * Class Constants
  ******************************************************************************/
-constexpr char metrics_parser::kXMLRoot[];
+const std::list<std::string> metrics_parser::xml_attr = {
+    "fsm_movement",
+    "fsm_collision_counts",
+    "fsm_collision_locs",
+
+    "block_acq_counts",
+    "block_acq_locs",
+    "block_acq_explore_locs",
+    "block_acq_vector_locs",
+    "block_transport",
+    "block_manipulation",
+
+    "cache_acq_counts",
+    "cache_acq_locs",
+    "cache_acq_explore_locs",
+    "cache_acq_vector_locs",
+    "cache_utilization",
+    "cache_lifecycle",
+    "cache_locations",
+
+    "task_execution_generalist",
+    "task_execution_collector",
+    "task_execution_harvester",
+    "task_execution_cache_starter",
+    "task_execution_cache_finisher",
+    "task_execution_cache_transferer",
+    "task_execution_cache_collector",
+
+    "task_tab_generalist",
+    "task_tab_harvester",
+    "task_tab_collector",
+
+    "task_distribution",
+
+    "swarm_dist_pos2D",
+    "swarm_convergence",
+    "temporal_variance",
+    "perception_mdpo",
+    "perception_dpo",
+};
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void metrics_parser::parse(const ticpp::Element& node) {
-  ticpp::Element mnode = node_get(node, kXMLRoot);
-
   /* loop functions metrics not part of controller XML tree  */
   if (nullptr != node.FirstChild(kXMLRoot, false)) {
-    XML_PARSE_ATTR(mnode, m_config, fsm_collision_counts_fname);
-    XML_PARSE_ATTR(mnode, m_config, fsm_collision_locs_fname);
-    XML_PARSE_ATTR(mnode, m_config, fsm_movement_fname);
-
-    XML_PARSE_ATTR(mnode, m_config, block_transport_fname);
-    XML_PARSE_ATTR(mnode, m_config, block_acq_locs_fname);
-    XML_PARSE_ATTR(mnode, m_config, block_acq_explore_locs_fname);
-    XML_PARSE_ATTR(mnode, m_config, block_acq_vector_locs_fname);
-    XML_PARSE_ATTR(mnode, m_config, block_acq_counts_fname);
-    XML_PARSE_ATTR(mnode, m_config, block_manipulation_fname);
-
-    XML_PARSE_ATTR(mnode, m_config, cache_acq_locs_fname);
-    XML_PARSE_ATTR(mnode, m_config, cache_acq_explore_locs_fname);
-    XML_PARSE_ATTR(mnode, m_config, cache_acq_vector_locs_fname);
-    XML_PARSE_ATTR(mnode, m_config, cache_acq_counts_fname);
-    XML_PARSE_ATTR(mnode, m_config, cache_utilization_fname);
-    XML_PARSE_ATTR(mnode, m_config, cache_lifecycle_fname);
-    XML_PARSE_ATTR(mnode, m_config, cache_locations_fname);
-
-    XML_PARSE_ATTR(mnode, m_config, task_execution_generalist_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_execution_collector_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_execution_harvester_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_execution_cache_starter_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_execution_cache_finisher_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_execution_cache_transferer_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_execution_cache_collector_fname);
-
-    XML_PARSE_ATTR(mnode, m_config, task_tab_generalist_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_tab_collector_fname);
-    XML_PARSE_ATTR(mnode, m_config, task_tab_harvester_fname);
-
-    XML_PARSE_ATTR(mnode, m_config, task_distribution_fname);
+    ticpp::Element mnode = node_get(node, kXMLRoot);
+    m_config = std::make_unique<config_type>();
 
     XML_PARSE_ATTR(mnode, m_config, output_dir);
-
-    XML_PARSE_ATTR(mnode, m_config, perception_mdpo_fname);
-    XML_PARSE_ATTR(mnode, m_config, perception_dpo_fname);
-
-    XML_PARSE_ATTR(mnode, m_config, swarm_dist_pos2D_fname);
-    XML_PARSE_ATTR(mnode, m_config, swarm_convergence_fname);
-    XML_PARSE_ATTR(mnode, m_config, temporal_variance_fname);
     XML_PARSE_ATTR(mnode, m_config, collect_interval);
-    m_parsed = true;
+
+    for (auto& m : xml_attr) {
+      if (mnode.HasAttribute(m)) {
+        std::string tmp;
+        node_attr_get(mnode, m, tmp);
+        m_config->enabled[m] = tmp;
+      }
+    } /* for(&m..) */
   }
 } /* parse() */
 
-__rcsw_pure bool metrics_parser::validate(void) const {
-  if (m_parsed) {
+bool metrics_parser::validate(void) const {
+  if (is_parsed()) {
     CHECK(m_config->collect_interval > 0);
   }
   return true;

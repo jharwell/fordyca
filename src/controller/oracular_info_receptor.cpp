@@ -125,13 +125,13 @@ void oracular_info_receptor::exec_est_update(rta::polled_task* const task) {
             "Bad oracle query 'exec_est.%s': no such task",
             task->name().c_str());
   auto oracle_exec_est = boost::get<rta::time_estimate>(exec_result.get());
-  __rcsw_unused double exec_old = task->task_exec_estimate().last_result();
-  task->exec_estimate_update(oracle_exec_est.last_result());
+  RCSW_UNUSED double exec_old = task->task_exec_estimate().v();
+  task->exec_estimate_update(oracle_exec_est.v());
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on abort: %f -> %f",
           task->name().c_str(),
-          oracle_exec_est.last_result(),
+          oracle_exec_est.v(),
           exec_old,
-          task->task_exec_estimate().last_result());
+          task->task_exec_estimate().v());
 } /* exec_est_update() */
 
 void oracular_info_receptor::int_est_update(rta::polled_task* const task) {
@@ -140,20 +140,20 @@ void oracular_info_receptor::int_est_update(rta::polled_task* const task) {
             "Bad oracle query 'int_est.%s': no such task",
             task->name().c_str());
   auto oracle_int_est = boost::get<rta::time_estimate>(int_result.get());
-  __rcsw_unused double int_old = task->task_interface_estimate(0).last_result();
-  task->interface_estimate_update(0, oracle_int_est.last_result());
+  RCSW_UNUSED double int_old = task->task_interface_estimate(0).v();
+  task->interface_estimate_update(0, oracle_int_est.v());
   ER_INFO("Update 'int_est.%s' with oracular estimate %f on abort: %f -> %f",
           task->name().c_str(),
-          oracle_int_est.last_result(),
+          oracle_int_est.v(),
           int_old,
-          task->task_interface_estimate(0).last_result());
+          task->task_interface_estimate(0).v());
 } /* int_est_update() */
 
-__rcsw_pure bool oracular_info_receptor::entities_blocks_enabled(void) const {
+bool oracular_info_receptor::entities_blocks_enabled(void) const {
   return m_entities_oracle->blocks_enabled();
 } /* entities_blocks_enabled() */
 
-__rcsw_pure bool oracular_info_receptor::entities_caches_enabled(void) const {
+bool oracular_info_receptor::entities_caches_enabled(void) const {
   return m_entities_oracle->caches_enabled();
 } /* entities_blocks_enabled() */
 

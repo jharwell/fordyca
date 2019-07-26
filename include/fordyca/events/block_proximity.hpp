@@ -96,7 +96,7 @@ class block_proximity : public rer::client<block_proximity> {
  */
 using block_proximity_visitor_impl =
     rpvisitor::precise_visitor<detail::block_proximity,
-                              detail::block_proximity::visit_typelist>;
+                               detail::block_proximity::visit_typelist>;
 
 NS_END(detail);
 

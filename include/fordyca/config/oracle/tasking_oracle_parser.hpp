@@ -18,13 +18,14 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_TASKING_ORACLE_PARSER_HPP_
-#define INCLUDE_FORDYCA_CONFIG_TASKING_ORACLE_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_ORACLE_TASKING_ORACLE_PARSER_HPP_
+#define INCLUDE_FORDYCA_CONFIG_ORACLE_TASKING_ORACLE_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/config/oracle/tasking_oracle_config.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
@@ -46,7 +47,7 @@ NS_START(fordyca, config, oracle);
  */
 class tasking_oracle_parser : public rconfig::xml::xml_config_parser {
  public:
-  explicit tasking_oracle_parser(uint level) : xml_config_parser(level) {}
+  using config_type = tasking_oracle_config;
 
   /**
    * @brief The root tag that all cache parameters should lie under in the
@@ -55,23 +56,17 @@ class tasking_oracle_parser : public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "tasking_oracle";
 
   void parse(const ticpp::Element& node) override;
-
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<tasking_oracle_config> config_get(void) const {
-    return m_config;
-  }
-
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  std::shared_ptr<tasking_oracle_config> m_config{nullptr};
+  std::unique_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 
 NS_END(oracle, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_TASKING_ORACLE_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_ORACLE_TASKING_ORACLE_PARSER_HPP_ */

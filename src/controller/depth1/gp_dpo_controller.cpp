@@ -75,61 +75,68 @@ void gp_dpo_controller::Init(ticpp::Element& node) {
 
   ndc_push();
   ER_INFO("Initializing...");
-  config::depth1::controller_repository param_repo;
+  config::depth1::controller_repository config_repo;
 
-  param_repo.parse_all(node);
-  if (!param_repo.validate_all()) {
+  config_repo.parse_all(node);
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
-  shared_init(param_repo);
-  private_init(param_repo);
+  shared_init(config_repo);
+  private_init(config_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void gp_dpo_controller::shared_init(
-    const config::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& config_repo) {
   /* DPO perception subsystem, block selection matrix */
-  dpo_controller::shared_init(param_repo);
+  dpo_controller::shared_init(config_repo);
 
   auto* cache_mat =
-      param_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
+      config_repo.config_get<config::cache_sel::cache_sel_matrix_config>();
   auto* block_mat =
-      param_repo.config_get<config::block_sel::block_sel_matrix_config>();
+      config_repo.config_get<config::block_sel::block_sel_matrix_config>();
 
   /* cache selection matrix */
   m_cache_sel_matrix =
-      rcppsw::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
+      std::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
 } /* shared_init() */
 
 void gp_dpo_controller::private_init(
-    const config::depth1::controller_repository& param_repo) {
+    const config::depth1::controller_repository& config_repo) {
   /* task executive */
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
                                     saa_subsystem(),
-                                    perception())(param_repo);
+                                    perception())(config_repo);
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
+  executive()->task_alloc_notify(
+      std::bind(&gp_dpo_controller::task_alloc_cb, this, std::placeholders::_1));
 } /* private_init() */
 
 void gp_dpo_controller::task_abort_cb(const rta::polled_task*) {
-  m_task_aborted = true;
+  m_task_status = tasks::task_status::ekAbortPending;
 } /* task_abort_cb() */
 
-__rcsw_pure const rta::bi_tab* gp_dpo_controller::active_tab(void) const {
+void gp_dpo_controller::task_alloc_cb(const rta::polled_task*) {
+  if (tasks::task_status::ekAbortPending != m_task_status) {
+    m_task_status = tasks::task_status::ekRunning;
+  }
+} /* task_abort_cb() */
+
+const rta::bi_tab* gp_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
-__rcsw_pure tasks::base_foraging_task* gp_dpo_controller::current_task(void) {
+tasks::base_foraging_task* gp_dpo_controller::current_task(void) {
   return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
 } /* current_task() */
 
-__rcsw_pure const tasks::base_foraging_task* gp_dpo_controller::current_task(
-    void) const {
+const tasks::base_foraging_task* gp_dpo_controller::current_task(void) const {
   return dynamic_cast<const tasks::base_foraging_task*>(
       m_executive->current_task());
 } /* current_task() */
@@ -161,7 +168,7 @@ RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
                           goal_acquired,
                           current_task(),
                           false,
-                         const);
+                          const);
 
 /*******************************************************************************
  * Task Distribution Metrics
@@ -184,7 +191,7 @@ int gp_dpo_controller::task_id(const std::string& task_name) const {
   return executive()->graph()->vertex_id(v);
 } /* task_id() */
 
-__rcsw_pure int gp_dpo_controller::current_task_tab(void) const {
+int gp_dpo_controller::current_task_tab(void) const {
   return dynamic_cast<const rta::bi_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */

@@ -25,16 +25,18 @@
  * Includes
  ******************************************************************************/
 #include <argos3/core/control_interface/ci_controller.h>
+#include <memory>
 #include <string>
 #include <typeindex>
 
 #include "fordyca/controller/block_manip_collator.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,30 +75,30 @@ class saa_subsystem;
  */
 class base_controller : public argos::CCI_Controller,
                         public metrics::fsm::movement_metrics,
-                        public metrics::fsm::goal_acquisition_metrics,
+                        public metrics::fsm::goal_acq_metrics,
                         public metrics::spatial::swarm_dist2D_metrics,
                         public rer::client<base_controller> {
  public:
-  base_controller(void);
-  ~base_controller(void) override;
+  base_controller(void) RCSW_COLD;
+  ~base_controller(void) override RCSW_COLD;
 
   base_controller(const base_controller& other) = delete;
   base_controller& operator=(const base_controller& other) = delete;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
-  void Reset(void) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
+  void Reset(void) override RCSW_COLD;
 
   virtual std::type_index type_index(void) const = 0;
 
   /* movement metrics */
-  double distance(void) const override;
+  rtypes::spatial_dist distance(void) const override RCSW_PURE;
   rmath::vector2d velocity(void) const override;
 
   /* swarm spatial 2D metrics */
-  const rmath::vector2d& position2D(void) const override;
-  const rmath::vector2u& discrete_position2D(void) const override;
-  rmath::vector2d heading2D(void) const override;
+  const rmath::vector2d& position2D(void) const override final RCSW_PURE;
+  const rmath::vector2u& discrete_position2D(void) const override final RCSW_PURE;
+  rmath::vector2d heading2D(void) const override final RCSW_PURE;
 
   /**
    * @brief By default controllers have no perception subsystem, and are
@@ -160,7 +162,7 @@ class base_controller : public argos::CCI_Controller,
     m_block = block;
   }
 
-  void tv_init(const support::tv::tv_manager* tv_manager);
+  void tv_init(const support::tv::tv_manager* tv_manager) RCSW_COLD;
 
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
@@ -181,7 +183,7 @@ class base_controller : public argos::CCI_Controller,
    * there would no doubt be considerable skew; this is a simulation hack that
    * makes things much nicer/easier to deal with.
    */
-  void tick(uint tick);
+  void tick(rtypes::timestep tick);
 
   const class block_manip_collator* block_manip_collator(void) const {
     return &m_block_manip;
@@ -201,6 +203,7 @@ class base_controller : public argos::CCI_Controller,
    */
   void position(const rmath::vector2d& loc);
   void discrete_position(const rmath::vector2u& loc);
+  void heading(const rmath::radians& h);
 
   /**
    * @brief Convenience function to add footbot ID to salient messages during
@@ -231,7 +234,6 @@ class base_controller : public argos::CCI_Controller,
                 const config::sensing_config* sensing_p);
 
   /* clang-format off */
-  const support::tv::tv_manager*             m_tv_manager{nullptr};
   bool                                       m_display_id{false};
   std::shared_ptr<repr::base_block>          m_block{nullptr};
   std::unique_ptr<controller::saa_subsystem> m_saa;

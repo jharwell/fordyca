@@ -27,9 +27,9 @@
 #include <string>
 
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/support/tv/block_op_filter.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 #include "fordyca/support/tv/temporal_penalty_handler.hpp"
 
 /*******************************************************************************
@@ -37,7 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca, support, tv);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
@@ -86,29 +86,28 @@ class block_op_penalty_handler final
    */
   op_filter_status penalty_init(T& controller,
                                 block_op_src src,
-                                uint timestep,
-                                double cache_prox_dist = -1,
-                                double block_prox_dist = -1) {
+                                rtypes::timestep t,
+                                rtypes::spatial_dist cache_prox = rtypes::spatial_dist(-1)) {
     auto filter = block_op_filter<T>(
-        m_map)(controller, src, cache_prox_dist, block_prox_dist);
+        m_map)(controller, src, cache_prox);
     if (filter != op_filter_status::ekSATISFIED) {
       return filter;
     }
     ER_ASSERT(!is_serving_penalty(controller),
               "Robot already serving block penalty?");
 
-    int id = penalty_id_calc(controller, src, cache_prox_dist, block_prox_dist);
-    uint penalty = deconflict_penalty_finish(timestep);
+    int id = penalty_id_calc(controller, src, cache_prox);
+    rtypes::timestep penalty = deconflict_penalty_finish(t);
     ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            loop_utils::robot_id(controller),
+            utils::robot_id(controller),
             id,
-            timestep,
-            original_penalty(),
-            penalty,
+            t.v(),
+            original_penalty().v(),
+            penalty.v(),
             static_cast<int>(src));
 
     penalty_list().push_back(
-        temporal_penalty<T>(&controller, id, penalty, timestep));
+        temporal_penalty<T>(&controller, id, penalty, t));
     return filter;
   }
 
@@ -118,12 +117,11 @@ class block_op_penalty_handler final
  private:
   int penalty_id_calc(const T& controller,
                       block_op_src src,
-                      double cache_prox_dist,
-                      double block_prox_dist) const {
+                      rtypes::spatial_dist cache_prox) const {
     int id = -1;
     switch (src) {
       case block_op_src::ekFREE_PICKUP:
-        id = loop_utils::robot_on_block(controller, *m_map);
+        id = utils::robot_on_block(controller, *m_map);
         ER_ASSERT(-1 != id, "Robot not on block?");
         break;
       case block_op_src::ekNEST_DROP:
@@ -136,15 +134,13 @@ class block_op_penalty_handler final
         ER_ASSERT(nullptr != controller.block() &&
                       -1 != controller.block()->id(),
                   "Robot not carrying block?");
-        ER_ASSERT(block_prox_dist > 0.0,
-                  "Block proximity distance not specified for cache site drop");
         id = controller.block()->id();
         break;
       case block_op_src::ekNEW_CACHE_DROP:
         ER_ASSERT(nullptr != controller.block() &&
                       -1 != controller.block()->id(),
                   "Robot not carrying block?");
-        ER_ASSERT(cache_prox_dist > 0.0,
+        ER_ASSERT(cache_prox > 0.0,
                   "Cache proximity distance not specified for new cache drop");
         id = controller.block()->id();
         break;

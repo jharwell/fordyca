@@ -183,7 +183,7 @@ void communication_subsystem::fill_packet(void)
   packet.data.push_back(static_cast<uint8_t>(type));
 
   rcppsw::swarm::pheromone_density &density = mdpo_perception()->map()->access<ds::occupancy_grid::kPheromone>(x_coord, y_coord);
-  packet.data.push_back(static_cast<uint8_t>(density.last_result() * 10));
+  packet.data.push_back(static_cast<uint8_t>(density.v() * 10));
 
   saa_subsystem()->actuation()->start_sending_message(packet);
 }
@@ -199,7 +199,7 @@ void communication_subsystem::integrate_recieved_packet(std::vector<uint8_t> pac
   rcppsw::math::vector2u disc_loc = rcppsw::math::vector2u(x_coord, y_coord);
 
   auto rcoord_vector = uvec2dvec(disc_loc,
-                                 mdpo_perception()->map()->grid_resolution());
+                                 mdpo_perception()->map()->resolution().v());
 
   // type of block (if it's not a bl->acceock it will be -1)
   int type = static_cast<int>(packet_data[4]);
@@ -212,7 +212,7 @@ void communication_subsystem::integrate_recieved_packet(std::vector<uint8_t> pac
 
     // If the recieved pheromone density is less than the known, don't
     // integrate the recieved information.
-    if (pheromone_density <= 0.1 || density.last_result() >= pheromone_density)
+    if (pheromone_density <= 0.1 || density.v() >= pheromone_density)
     {
       return;
     }
@@ -227,8 +227,8 @@ void communication_subsystem::integrate_recieved_packet(std::vector<uint8_t> pac
         size = 2;
       }
       std::shared_ptr<repr::cube_block> block_ptr(new repr::cube_block(rcppsw::math::vector2d(size, 1), ent_id));
-      block_ptr->real_loc(rcoord_vector);
-      block_ptr->discrete_loc(disc_loc);
+      block_ptr->rloc(rcoord_vector);
+      block_ptr->dloc(disc_loc);
 
       events::block_found_visitor found_block(block_ptr);
       found_block.visit(*(mdpo_perception()->dpo_store()));
@@ -279,7 +279,7 @@ rcppsw::math::vector2u communication_subsystem::get_most_valuable_cell(void)
                                     ((j - nest_y_coord) ^ 2)) ^
                                    (1 / 2))) *
                              current_cell.block_count() *
-                             density.last_result());
+                             density.v());
 
         // Update variables
         if (current_cell_value > communicated_cell_value)

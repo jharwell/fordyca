@@ -34,6 +34,8 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
+
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 
@@ -60,17 +62,17 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   struct cache_constraint_data {
     const repr::base_cache* mc_cache{nullptr};
     cache_site_selector*    selector{nullptr};
-    double                  cache_prox_dist{0.0};
+    rtypes::spatial_dist     cache_prox{0.0};
   };
   struct block_constraint_data {
     const repr::base_block* mc_block{nullptr};
     cache_site_selector*    selector{nullptr};
-    double                  block_prox_dist{0.0};
+    rtypes::spatial_dist    block_prox{0.0};
   };
   struct nest_constraint_data {
     rmath::vector2d      nest_loc{};
     cache_site_selector* selector{nullptr};
-    double               nest_prox_dist{0.0};
+    rtypes::spatial_dist nest_prox{0.0};
   };
   struct site_utility_data {
     rmath::vector2d position{};
@@ -154,7 +156,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
   bool verify_site(const rmath::vector2d& site,
                    const ds::dp_cache_map& known_caches,
-                   const ds::dp_block_map& known_blocks) const;
+                   const ds::dp_block_map& known_blocks) const RCSW_CONST;
 
   std::string nlopt_ret_str(nlopt::result res) const;
 
@@ -168,18 +170,18 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
 double __cache_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data);
+                               void *data) RCSW_PURE;
 
 double __block_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data);
+                               void *data) RCSW_PURE;
 double __nest_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
-                               void *data);
+                               void *data) RCSW_PURE;
 
 double __site_utility_func(const std::vector<double>& x,
                            std::vector<double>& ,
-                           void *data);
+                           void *data) RCSW_PURE;
 
 NS_END(depth2, controller, fordyca);
 

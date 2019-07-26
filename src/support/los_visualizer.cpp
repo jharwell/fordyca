@@ -39,20 +39,20 @@ NS_START(fordyca, support);
  * Member Functions
  ******************************************************************************/
 void los_visualizer::draw(const repr::line_of_sight* const los,
-                          double grid_resolution) {
+                          rtypes::discretize_ratio grid_resolution) {
   /* has not been populated yet on first timestep */
   if (nullptr == los) {
     return;
   }
   std::vector<argos::CVector2> points;
-  points.emplace_back(-grid_resolution * los->xsize() / 2,
-                      -grid_resolution * los->ysize() / 2);
-  points.emplace_back(-grid_resolution * los->xsize() / 2,
-                      grid_resolution * los->ysize() / 2);
-  points.emplace_back(grid_resolution * los->xsize() / 2,
-                      grid_resolution * los->ysize() / 2);
-  points.emplace_back(grid_resolution * los->xsize() / 2,
-                      -grid_resolution * los->ysize() / 2);
+  points.emplace_back(-grid_resolution.v() * los->xsize() / 2,
+                      -grid_resolution.v() * los->ysize() / 2);
+  points.emplace_back(-grid_resolution.v() * los->xsize() / 2,
+                      grid_resolution.v() * los->ysize() / 2);
+  points.emplace_back(grid_resolution.v() * los->xsize() / 2,
+                      grid_resolution.v() * los->ysize() / 2);
+  points.emplace_back(grid_resolution.v() * los->xsize() / 2,
+                      -grid_resolution.v() * los->ysize() / 2);
 
   /* draw LOS slightly above the ground so that it renders better */
   m_qt->DrawPolygon(argos::CVector3(0, 0, 0.05),

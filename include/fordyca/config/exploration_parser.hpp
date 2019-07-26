@@ -48,7 +48,7 @@ NS_START(fordyca, config);
  */
 class exploration_parser final : public rconfig::xml::xml_config_parser {
  public:
-  explicit exploration_parser(uint level) : xml_config_parser(level) {}
+  using config_type = exploration_config;
 
   /**
    * @brief The root tag that all XML configuration for exploration should lie
@@ -57,19 +57,15 @@ class exploration_parser final : public rconfig::xml::xml_config_parser {
   static constexpr char kXMLRoot[] = "exploration";
 
   void parse(const ticpp::Element& node) override;
-
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<exploration_config> config_get(void) const {
-    return m_config;
-  }
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  std::shared_ptr<exploration_config> m_config{nullptr};
+  std::shared_ptr<config_type> m_config{nullptr};
   /* clang-format on */
 };
 

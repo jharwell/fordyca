@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <memory>
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
@@ -40,7 +40,7 @@ namespace ds { class dpo_store; }
 
 NS_START(fsm, depth0);
 
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -60,7 +60,7 @@ using transport_goal_type = block_transporter::goal_type;
  */
 class dpo_fsm final : public base_foraging_fsm,
                      rer::client<dpo_fsm>,
-                     public metrics::fsm::goal_acquisition_metrics,
+                     public metrics::fsm::goal_acq_metrics,
                      public block_transporter {
  public:
   dpo_fsm(const controller::block_sel_matrix* sel_matrix,
@@ -73,7 +73,7 @@ class dpo_fsm final : public base_foraging_fsm,
   RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::timestep, collision_avoidance_duration, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */

@@ -77,60 +77,26 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   line += std::to_string(m_stats.cum_ramp_collected) + separator();
   line += std::to_string(m_stats.cum_cube_collected) + separator();
 
+  line += csv_entry_intavg(m_stats.int_collected);
+  line += csv_entry_tsavg(m_stats.cum_collected);
+
+  line += csv_entry_intavg(m_stats.int_cube_collected);
+  line += csv_entry_tsavg(m_stats.cum_cube_collected);
+  line += csv_entry_intavg(m_stats.int_ramp_collected);
+  line += csv_entry_tsavg(m_stats.cum_ramp_collected);
+  line += csv_entry_domavg(m_stats.int_collected, m_stats.int_transporters);
+  line += csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transporters);
+
   line +=
-      std::to_string(m_stats.int_collected / static_cast<double>(interval())) +
-      separator();
-  line += std::to_string(m_stats.cum_collected /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
+      csv_entry_domavg(m_stats.int_collected, m_stats.int_transport_time.v());
+  line +=
+      csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transport_time.v());
 
-  line += std::to_string(m_stats.int_cube_collected /
-                         static_cast<double>(interval())) +
-          separator();
-  line += std::to_string(m_stats.cum_cube_collected /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
-
-  line += std::to_string(m_stats.int_ramp_collected /
-                         static_cast<double>(interval())) +
-          separator();
-  line += std::to_string(m_stats.cum_ramp_collected /
-                         static_cast<double>(timestep() + 1)) +
-          separator();
-
-  line += (m_stats.int_collected > 0)
-              ? std::to_string(m_stats.int_transporters /
-                               static_cast<double>(m_stats.int_collected))
-              : "0";
-  line += separator();
-
-  line += (m_stats.cum_collected > 0)
-              ? std::to_string(m_stats.cum_transporters /
-                               static_cast<double>(m_stats.cum_collected))
-              : "0";
-  line += separator();
-
-  line += (m_stats.int_collected > 0)
-              ? std::to_string(m_stats.int_transport_time /
-                               static_cast<double>(m_stats.int_collected))
-              : "0";
-  line += separator();
-
-  line += (m_stats.cum_collected > 0)
-              ? std::to_string(m_stats.cum_transport_time /
-                               static_cast<double>(m_stats.cum_collected))
-              : "0";
-  line += separator();
-  line += (m_stats.int_collected > 0)
-              ? std::to_string(m_stats.int_initial_wait_time /
-                               static_cast<double>(m_stats.int_collected))
-              : "0";
-  line += separator();
-  line += (m_stats.cum_collected > 0)
-              ? std::to_string(m_stats.cum_initial_wait_time /
-                               static_cast<double>(m_stats.cum_collected))
-              : "0";
-  line += separator();
+  line += csv_entry_domavg(m_stats.int_collected,
+                           m_stats.int_initial_wait_time.v());
+  line += csv_entry_domavg(m_stats.cum_collected,
+                           m_stats.cum_initial_wait_time.v(),
+                           true);
 
   return true;
 } /* csv_line_build() */
@@ -160,8 +126,8 @@ void transport_metrics_collector::reset_after_interval(void) {
   m_stats.int_cube_collected = 0;
   m_stats.int_ramp_collected = 0;
   m_stats.int_transporters = 0;
-  m_stats.int_transport_time = 0;
-  m_stats.int_initial_wait_time = 0;
+  m_stats.int_transport_time = rtypes::timestep(0);
+  m_stats.int_initial_wait_time = rtypes::timestep(0);
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

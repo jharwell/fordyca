@@ -29,11 +29,6 @@
 NS_START(fordyca, config, tv);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char tv_manager_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void tv_manager_parser::parse(const ticpp::Element& node) {
@@ -43,8 +38,7 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
   }
 
   ticpp::Element tvnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
 
   /* block temporal variance configured */
   if (nullptr != tvnode.FirstChild("blocks", false)) {
@@ -52,11 +46,15 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
 
     if (nullptr != bnode.FirstChild("manipulation_penalty", false)) {
       m_block_manip.parse(node_get(bnode, "manipulation_penalty"));
-      m_config->block_manipulation_penalty = *m_block_manip.config_get();
+      m_config->block_manipulation_penalty =
+          *m_block_manip
+               .config_get<rct::config::xml::waveform_parser::config_type>();
     }
     if (nullptr != bnode.FirstChild("carry_throttle", false)) {
       m_block_carry.parse(node_get(bnode, "carry_throttle"));
-      m_config->block_carry_throttle = *m_block_carry.config_get();
+      m_config->block_carry_throttle =
+          *m_block_carry
+               .config_get<rct::config::xml::waveform_parser::config_type>();
     }
   }
 
@@ -65,12 +63,14 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
     ticpp::Element cnode = node_get(tvnode, "caches");
     if (nullptr != cnode.FirstChild("usage_penalty", false)) {
       m_cache_usage.parse(node_get(cnode, "usage_penalty"));
-      m_config->cache_usage_penalty = *m_cache_usage.config_get();
+      m_config->cache_usage_penalty =
+          *m_cache_usage
+               .config_get<rct::config::xml::waveform_parser::config_type>();
     }
   }
 } /* parse() */
 
-__rcsw_const bool tv_manager_parser::validate(void) const {
+bool tv_manager_parser::validate(void) const {
   return m_block_manip.validate() && m_block_carry.validate() &&
          m_cache_usage.validate();
 } /* validate() */

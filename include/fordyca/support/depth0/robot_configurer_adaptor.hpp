@@ -56,7 +56,7 @@ class robot_configurer_adaptor {
   void operator()(robot_configurer<controller::depth0::crw_controller>& ) const {}
 
   template<typename T,
-           RCPPSW_SFINAE_REQUIRE(!std::is_same<T,
+           RCPPSW_SFINAE_FUNC(!std::is_same<T,
                                  controller::depth0::crw_controller>::value)>
   void operator()(robot_configurer<T>& configurer) const {
     auto cast = dynamic_cast<typename support::depth0::robot_configurer<T>::controller_type*>(controller);

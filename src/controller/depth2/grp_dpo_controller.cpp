@@ -69,22 +69,22 @@ void grp_dpo_controller::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing");
 
-  config::depth2::controller_repository param_repo;
-  param_repo.parse_all(node);
-  if (!param_repo.validate_all()) {
+  config::depth2::controller_repository config_repo;
+  config_repo.parse_all(node);
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
-  shared_init(param_repo);
-  private_init(param_repo);
+  shared_init(config_repo);
+  private_init(config_repo);
 
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
 void grp_dpo_controller::private_init(
-    const config::depth2::controller_repository& param_repo) {
+    const config::depth2::controller_repository& config_repo) {
   /*
    * Rebind executive to use depth2 task decomposition graph instead of depth1
    * version.
@@ -92,7 +92,7 @@ void grp_dpo_controller::private_init(
   executive(tasking_initializer(block_sel_matrix(),
                                 cache_sel_matrix(),
                                 saa_subsystem(),
-                                perception())(param_repo));
+                                perception())(config_repo));
 
   /*
    * Set task alloction callback, rebind task abort callback (original was lost
@@ -108,6 +108,18 @@ void grp_dpo_controller::private_init(
 
 void grp_dpo_controller::task_alloc_cb(const rta::polled_task* const task,
                                        const rta::bi_tab* const) {
+  /**
+   * @brief Callback for task alloc. Needed to reset the task state of the
+   * controller (not the task, which is handled by the executive) in the case
+   * that the previous task was aborted. Not reseting this results in erroneous
+   * handling of the newly allocated task as if it was aborted by the loop
+   * functions, resulting in inconsistent state with the robot's executive. See
+   * #532,#587.
+   */
+  if (tasks::task_status::ekAbortPending != task_status()) {
+    task_status_update(tasks::task_status::ekRunning);
+  }
+
   if (!m_bsel_exception_added) {
     block_sel_matrix()->sel_exceptions_clear();
   }

@@ -49,16 +49,16 @@ class ramp_block final : public base_block {
   explicit ramp_block(const rmath::vector2d& dim)
       : base_block(dim, rutils::color::kBLUE, -1) {}
 
-  ramp_block(const rmath::vector2d& dim, int id)
+  ramp_block(const rmath::vector2d& dim, int id) noexcept
       : base_block(dim, rutils::color::kBLUE, id) {}
 
   repr::block_type type(void) const override {
     return repr::block_type::ekRAMP;
   }
   std::unique_ptr<base_block> clone(void) const override {
-    auto tmp = rcppsw::make_unique<ramp_block>(dims(), id());
-    tmp->discrete_loc(this->discrete_loc());
-    tmp->real_loc(this->real_loc());
+    auto tmp = std::make_unique<ramp_block>(dims(), id());
+    tmp->dloc(this->dloc());
+    tmp->rloc(this->rloc());
     tmp->reset_robot_id();
     return tmp;
   } /* clone() */

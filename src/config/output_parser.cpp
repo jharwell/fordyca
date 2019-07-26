@@ -30,39 +30,25 @@
 NS_START(fordyca, config);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char output_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void output_parser::parse(const ticpp::Element& node) {
   ticpp::Element onode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
+
   std::vector<std::string> res, res2;
 
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
-
-  /* only present for loop functions */
-  if (nullptr != onode.FirstChild(metrics_parser::kXMLRoot, false)) {
-    m_metrics_parser.parse(onode);
-    m_config->metrics = *m_metrics_parser.config_get();
+  m_metrics_parser.parse(onode);
+  if (m_metrics_parser.is_parsed()) {
+    m_config->metrics =
+        *m_metrics_parser.config_get<metrics_parser::config_type>();
   }
 
-  ticpp::Element snode = node_get(onode, "sim");
-  XML_PARSE_ATTR(snode, m_config, output_root);
-  XML_PARSE_ATTR(snode, m_config, output_dir);
+  XML_PARSE_ATTR(onode, m_config, output_root);
+  XML_PARSE_ATTR(onode, m_config, output_dir);
 } /* parse() */
 
-void output_parser::show(std::ostream& stream) const {
-  stream << build_header() << m_metrics_parser
-         << XML_ATTR_STR(m_config, output_root) << std::endl
-         << XML_ATTR_STR(m_config, output_dir) << std::endl
-         << build_footer();
-} /* show() */
-
-__rcsw_pure bool output_parser::validate(void) const {
+bool output_parser::validate(void) const {
   return m_metrics_parser.validate();
 } /* validate() */
 

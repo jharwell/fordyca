@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <utility>
-
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
@@ -123,7 +121,7 @@ class robot_configurer {
                     std::placeholders::_1));
     }
     if (nullptr != m_tasking_oracle || nullptr != m_ent_oracle) {
-      auto receptor = rcppsw::make_unique<controller::oracular_info_receptor>(
+      auto receptor = std::make_unique<controller::oracular_info_receptor>(
           m_tasking_oracle, m_ent_oracle);
       c->oracle_init(std::move(receptor));
     }

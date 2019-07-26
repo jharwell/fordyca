@@ -72,7 +72,7 @@ class utility_cache_search : public localized_search {
 
   /* prototype overrides */
   std::unique_ptr<base_expstrat> clone(void) const override {
-    return rcppsw::make_unique<utility_cache_search>(mc_matrix,
+    return std::make_unique<utility_cache_search>(mc_matrix,
                                                      mc_store,
                                                      saa_subsystem());
   }

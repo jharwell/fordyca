@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,10 +46,10 @@ class dynamic_cache_creator : public base_cache_creator,
                               public rer::client<dynamic_cache_creator> {
  public:
   struct params {
-    ds::arena_grid* grid;
-    double          cache_dim;
-    double          min_dist;
-    uint            min_blocks;
+    ds::arena_grid*      grid;
+    rtypes::spatial_dist cache_dim;
+    rtypes::spatial_dist min_dist;
+    uint                 min_blocks;
   };
   explicit dynamic_cache_creator(const struct params* p);
 
@@ -56,9 +57,10 @@ class dynamic_cache_creator : public base_cache_creator,
    * @brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  ds::cache_vector create_all(const ds::cache_vector& previous_caches,
-                              ds::block_vector& candidate_blocks,
-                              uint timestep) override;
+  ds::cache_vector create_all(const ds::cache_vector& c_previous_caches,
+                              const ds::block_cluster_vector& c_clusters,
+                              const ds::block_vector& candidate_blocks,
+                              rtypes::timestep t) override;
 
  private:
   /**
@@ -69,36 +71,46 @@ class dynamic_cache_creator : public base_cache_creator,
    *                    other caches during this invocation of the creator.
    * @param candidates The total list of all blocks available for cache creation
    *                    when the creator was called.
-   * @param anchor_index Our current index within the candidate vector
+   * @param index Our current index within the candidate vector.
    */
-  ds::block_list cache_i_blocks_calc(const ds::block_list& used_blocks,
-                                     const ds::block_vector& candidates,
-                                     uint index) const;
+  ds::block_vector cache_i_blocks_alloc(const ds::block_vector& c_used_blocks,
+                                        const ds::block_vector& candidates,
+                                        uint index) const;
 
   /**
-   *  @brief Create the set of blocks that our new cache needs to avoid during
-   *  placement. Blocks in this set:
+   * @brief Calculate the blocks a cache will absorb as a result of its center
+   * beyond moved to deconflict with other caches/clusters/etc.
    *
-   * - Are not part of the set of blocks to be used for the cache we are
-   *   currently attempting to create.
-   * - Have not been already been made part of a cache earlier during this
-   *   invocation of dynamic cache creation.
+   * @param candidate_blocks The total list of all blocks available for cache
+   *                         creation when the creator was called.
+   * @param cache_i_blocks   The blocks to be used in creating the new cache.
+   * @param used_blocks      The blocks already used to create other caches.
+   * @param center           The cache center.
+   * @param cache_dim        The cache dimension.
+   *
+   * You *need* cache_i blocks, because if you omit them then you can have
+   * blocks getting added to created caches twice, which causes all sorts of
+   * problems. See #578.
    */
-  ds::block_list avoidance_blocks_calc(const ds::block_vector& candidate_blocks,
-                                       const ds::block_list& used_blocks,
-                                       const ds::block_list& cache_i_blocks) const;
+  ds::block_vector absorb_blocks_calc(
+      const ds::block_vector& c_candidate_blocks,
+      const ds::block_vector& c_cache_i_blocks,
+      const ds::block_vector& c_used_blocks,
+      const rmath::vector2u& c_center,
+      rtypes::spatial_dist cache_dim) const;
 
   /**
    * @brief Create the set of caches that our new cache needs to avoid during
    * placement from the set of caches that existed prior to this invocation of
    * the creator + the set of caches we have created thus far during invocation.
    */
-  ds::cache_vector avoidance_caches_calc(const ds::cache_vector& previous_caches,
-                                         const ds::cache_vector& created_caches) const;
+  ds::cache_vector avoidance_caches_calc(
+      const ds::cache_vector& c_previous_caches,
+      const ds::cache_vector& c_created_caches) const;
 
   /* clang-format off */
-  double m_min_dist;
-  uint   m_min_blocks;
+  const rtypes::spatial_dist mc_min_dist;
+  const uint                 mc_min_blocks;
   /* clang-format on */
 };
 

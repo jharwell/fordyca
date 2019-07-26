@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/support/block_dist/random_distributor.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/repr/block_cluster.hpp"
@@ -47,7 +49,7 @@ class cluster_distributor final : public base_distributor,
                             public rer::client<cluster_distributor> {
  public:
   cluster_distributor(const ds::arena_grid::view& view,
-                      double arena_resolution,
+                      rtypes::discretize_ratio resolution,
                       uint capacity);
   ~cluster_distributor(void) override = default;
 
@@ -58,7 +60,7 @@ class cluster_distributor final : public base_distributor,
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities) override;
 
-  ds::const_block_cluster_list block_clusters(void) const override;
+  ds::block_cluster_vector block_clusters(void) const override;
 
  private:
   /* clang-format off */

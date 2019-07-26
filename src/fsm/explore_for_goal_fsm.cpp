@@ -55,7 +55,7 @@ HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, start) {
   return controller::foraging_signal::ekHANDLED;
 }
 
-__rcsw_const HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
+RCSW_CONST HFSM_STATE_DEFINE_ND(explore_for_goal_fsm, finished) {
   return controller::foraging_signal::ekHANDLED;
 }
 
@@ -108,7 +108,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(explore_for_goal_fsm,
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-__rcsw_pure bool explore_for_goal_fsm::task_running(void) const {
+bool explore_for_goal_fsm::task_running(void) const {
   return ekST_START != current_state() && ekST_FINISHED != current_state() &&
          nullptr != m_explore_behavior;
 }

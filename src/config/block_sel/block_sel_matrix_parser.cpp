@@ -30,17 +30,15 @@
 NS_START(fordyca, config, block_sel);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char block_sel_matrix_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void block_sel_matrix_parser::parse(const ticpp::Element& node) {
+  /* block selection matrix not used */
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
   ticpp::Element cnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
 
   rcppsw::utils::line_parser parser(' ');
   std::string val;
@@ -49,9 +47,23 @@ void block_sel_matrix_parser::parse(const ticpp::Element& node) {
   m_config->nest.set(std::atof(res[0].c_str()), std::atof(res[1].c_str()));
 
   m_priorities.parse(cnode);
+  if (m_priorities.is_parsed()) {
+    m_config->priorities =
+        *m_priorities.config_get<block_priorities_parser::config_type>();
+  }
+
   m_pickup_policy.parse(cnode);
-  m_config->priorities = *m_priorities.config_get();
-  m_config->pickup_policy = *m_pickup_policy.config_get();
+  if (m_pickup_policy.is_parsed()) {
+    m_config->pickup_policy =
+        *m_pickup_policy.config_get<block_pickup_policy_parser::config_type>();
+  }
 } /* parse() */
+
+bool block_sel_matrix_parser::validate(void) const {
+  if (!is_parsed()) {
+    return true;
+  }
+  return m_priorities.validate() && m_pickup_policy.validate();
+} /* validate() */
 
 NS_END(block_sel, config, fordyca);

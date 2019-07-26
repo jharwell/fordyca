@@ -32,14 +32,6 @@
 NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
- * Constant Definitions
- ******************************************************************************/
-constexpr char foraging_task::kCacheStarterName[];
-constexpr char foraging_task::kCacheFinisherName[];
-constexpr char foraging_task::kCacheTransfererName[];
-constexpr char foraging_task::kCacheCollectorName[];
-
-/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
@@ -53,10 +45,11 @@ foraging_task::foraging_task(const std::string& name,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure double foraging_task::current_time(void) const {
+double foraging_task::current_time(void) const {
   return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
       ->sensors()
-      ->tick();
+      ->tick()
+      .v();
 } /* current_time() */
 
 bool foraging_task::task_in_depth2(const polled_task* const task) {

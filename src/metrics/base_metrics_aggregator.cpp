@@ -22,41 +22,60 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
+#include <boost/mpl/for_each.hpp>
 #include <experimental/filesystem>
 
 #include "fordyca/config/metrics_config.hpp"
+#include "fordyca/config/metrics_parser.hpp"
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/repr/base_block.hpp"
-
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/acquisition_locs_metrics_collector.hpp"
+#include "fordyca/metrics/collector_registerer.hpp"
+#include "fordyca/metrics/fsm/collision_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/current_explore_locs_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/current_vector_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_locs_metrics_collector.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics_collector.hpp"
 #include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/fsm/movement_metrics_collector.hpp"
 #include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
 #include "fordyca/metrics/spatial/swarm_pos2D_metrics_collector.hpp"
 #include "fordyca/metrics/temporal_variance_metrics.hpp"
 #include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/metrics/fsm/collision_locs_metrics_collector.hpp"
 
 #include "rcppsw/metrics/swarm/convergence_metrics.hpp"
 #include "rcppsw/metrics/swarm/convergence_metrics_collector.hpp"
+#include "rcppsw/mpl/typelist.hpp"
 #include "rcppsw/swarm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 namespace fs = std::experimental::filesystem;
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, detail);
+
+using collector_typelist = rmpl::typelist<
+    collector_registerer::type_wrap<fsm::movement_metrics_collector>,
+    collector_registerer::type_wrap<fsm::collision_metrics_collector>,
+    collector_registerer::type_wrap<fsm::collision_locs_metrics_collector>,
+    collector_registerer::type_wrap<fsm::goal_acq_metrics_collector>,
+    collector_registerer::type_wrap<fsm::goal_acq_locs_metrics_collector>,
+    collector_registerer::type_wrap<fsm::current_explore_locs_metrics_collector>,
+    collector_registerer::type_wrap<fsm::current_vector_locs_metrics_collector>,
+    collector_registerer::type_wrap<blocks::transport_metrics_collector>,
+    collector_registerer::type_wrap<blocks::manipulation_metrics_collector>,
+    collector_registerer::type_wrap<spatial::swarm_pos2D_metrics_collector>,
+    collector_registerer::type_wrap<rmetrics::swarm::convergence_metrics_collector>,
+    collector_registerer::type_wrap<temporal_variance_metrics_collector> >;
+
+NS_END(detail);
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -71,71 +90,44 @@ base_metrics_aggregator::base_metrics_aggregator(
   } else {
     ER_WARN("Output metrics path '%s' already exists", m_metrics_path.c_str());
   }
-  register_collector<metrics::fsm::movement_metrics_collector>(
-      "fsm::movement",
-      metrics_path() + "/" + mconfig->fsm_movement_fname,
-      mconfig->collect_interval);
+  collector_registerer::creatable_set creatable_set = {
+      {typeid(fsm::movement_metrics_collector), "fsm_movement", "fsm::movement"},
+      {typeid(fsm::collision_locs_metrics_collector),
+       "fsm_collision_locs",
+       "fsm::collision_locs"},
+      {typeid(fsm::collision_metrics_collector),
+       "fsm_collision_counts",
+       "fsm::collision_counts"},
+      {typeid(fsm::goal_acq_metrics_collector),
+       "block_acq_counts",
+       "blocks::acq_counts"},
+      {typeid(fsm::goal_acq_locs_metrics_collector),
+       "block_acq_locs",
+       "blocks::acq_locs"},
+      {typeid(fsm::current_explore_locs_metrics_collector),
+       "block_acq_explore_locs",
+       "blocks::acq_explore_locs"},
+      {typeid(fsm::current_vector_locs_metrics_collector),
+       "block_acq_vector_locs",
+       "blocks::acq_vector_locs"},
+      {typeid(blocks::transport_metrics_collector),
+       "block_transport",
+       "blocks::transport"},
+      {typeid(blocks::manipulation_metrics_collector),
+       "block_manipulation",
+       "blocks::manipulation"},
+      {typeid(spatial::swarm_pos2D_metrics_collector),
+       "swarm_dist_pos2D",
+       "swarm::spatial_dist::pos2D"},
+      {typeid(rmetrics::swarm::convergence_metrics_collector),
+       "swarm_convergence",
+       "swarm::convergence"},
+      {typeid(temporal_variance_metrics_collector),
+       "loop_temporal_variance",
+       "loop::temporal_variance"}};
 
-  register_collector<metrics::fsm::collision_metrics_collector>(
-      "fsm::collision_counts",
-      metrics_path() + "/" + mconfig->fsm_collision_counts_fname,
-      mconfig->collect_interval);
-
-  register_collector<metrics::fsm::collision_locs_metrics_collector>(
-      "fsm::collision_locs",
-      metrics_path() + "/" + mconfig->fsm_collision_locs_fname,
-      mconfig->collect_interval,
-      rmath::dvec2uvec(mconfig->arena_grid.upper,
-                       mconfig->arena_grid.resolution));
-
-  register_collector<metrics::fsm::goal_acquisition_metrics_collector>(
-      "blocks::acq_counts",
-      metrics_path() + "/" + mconfig->block_acq_counts_fname,
-      mconfig->collect_interval);
-  register_collector<metrics::fsm::acquisition_locs_metrics_collector>(
-      "blocks::acq_locs",
-      metrics_path() + "/" + mconfig->block_acq_locs_fname,
-      mconfig->collect_interval,
-      rmath::dvec2uvec(mconfig->arena_grid.upper,
-                       mconfig->arena_grid.resolution));
-  register_collector<metrics::fsm::current_explore_locs_metrics_collector>(
-      "blocks::acq_explore_locs",
-      metrics_path() + "/" + mconfig->block_acq_explore_locs_fname,
-      mconfig->collect_interval,
-      rmath::dvec2uvec(mconfig->arena_grid.upper,
-                       mconfig->arena_grid.resolution));
-  register_collector<metrics::fsm::current_vector_locs_metrics_collector>(
-      "blocks::acq_vector_locs",
-      metrics_path() + "/" + mconfig->block_acq_vector_locs_fname,
-      mconfig->collect_interval,
-      rmath::dvec2uvec(mconfig->arena_grid.upper,
-                       mconfig->arena_grid.resolution));
-
-  register_collector<metrics::blocks::transport_metrics_collector>(
-      "blocks::transport",
-      metrics_path() + "/" + mconfig->block_transport_fname,
-      mconfig->collect_interval);
-
-  register_collector<metrics::blocks::manipulation_metrics_collector>(
-      "blocks::manipulation",
-      metrics_path() + "/" + mconfig->block_manipulation_fname,
-      mconfig->collect_interval);
-
-  register_collector<metrics::spatial::swarm_pos2D_metrics_collector>(
-      "swarm::spatial_dist::pos2D",
-      metrics_path() + "/" + mconfig->swarm_dist_pos2D_fname,
-      mconfig->collect_interval,
-      rmath::dvec2uvec(mconfig->arena_grid.upper,
-                       mconfig->arena_grid.resolution));
-
-  register_collector<rmetrics::swarm::convergence_metrics_collector>(
-      "swarm::convergence",
-      metrics_path() + "/" + mconfig->swarm_convergence_fname,
-      mconfig->collect_interval);
-
-  register_collector<metrics::temporal_variance_metrics_collector>(
-      "loop::temporal_variance",
-      metrics_path() + "/" + mconfig->temporal_variance_fname);
+  collector_registerer registerer(mconfig, creatable_set, this);
+  boost::mpl::for_each<detail::collector_typelist>(registerer);
   reset_all();
 }
 
@@ -144,7 +136,9 @@ base_metrics_aggregator::base_metrics_aggregator(
  ******************************************************************************/
 void base_metrics_aggregator::collect_from_loop(
     const support::base_loop_functions* const loop) {
-  collect("swarm::convergence", *loop->conv_calculator());
+  if (nullptr != loop->conv_calculator()) {
+    collect("swarm::convergence", *loop->conv_calculator());
+  }
   collect("loop::temporal_variance", *loop->tv_manager());
 } /* collect_from_loop() */
 

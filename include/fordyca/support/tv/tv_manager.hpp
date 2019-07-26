@@ -24,13 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <tuple>
 #include <typeindex>
 #include <list>
 #include <map>
+#include <memory>
 #include <boost/variant.hpp>
-#include "fordyca/controller/controller_fwd.hpp"
+#include <boost/optional.hpp>
 
+#include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/metrics/temporal_variance_metrics.hpp"
 #include "fordyca/support/tv/block_op_penalty_handler.hpp"
 #include "fordyca/support/tv/cache_op_penalty_handler.hpp"
@@ -79,8 +80,8 @@ class tv_manager final : public rer::client<tv_manager>,
 
   /* temporal variance metrics */
   double swarm_motion_throttle(void) const override;
-  double env_block_manipulation(void) const override;
-  double env_cache_usage(void) const override;
+  rtypes::timestep env_block_manipulation(void) const override;
+  rtypes::timestep env_cache_usage(void) const override;
 
   /**
    * @brief Return non-owning reference to a penalty handler for the specified
@@ -160,6 +161,9 @@ class tv_manager final : public rer::client<tv_manager>,
           };
   }
 
+  bool movement_throttling_enabled(void) const {
+    return (mc_motion_throttle_config) ? true : false;
+  }
   const motion_throttling_handler* movement_throttling_handler(int robot_id) const {
     return &m_motion_throttling.at(robot_id);
   }
@@ -207,7 +211,7 @@ class tv_manager final : public rer::client<tv_manager>,
 
   /* clang-format off */
   const support::base_loop_functions* const      mc_lf;
-  const rct::config::waveform_config             mc_motion_throttle_config;
+  boost::optional<rct::config::waveform_config>  mc_motion_throttle_config{};
 
   rds::type_map<block_handler_typelist>          m_fb_pickup{};
   rds::type_map<block_handler_typelist>          m_nest_drop{};

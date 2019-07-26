@@ -84,20 +84,29 @@ class acquire_existing_cache_fsm
   void by_exploration_ok(bool b) { m_by_exploration_ok = b; }
 
  private:
-  using acquisition_loc_type = std::pair<int, rmath::vector2d>;
+  using acq_loc_type = std::pair<int, rmath::vector2d>;
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acq_goal_type acquisition_goal_internal(void) const;
+  acq_goal_type acq_goal_internal(void) const RCSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
-  bool candidates_exist(void) const;
-  boost::optional<acquisition_loc_type> calc_acquisition_location(void);
-  bool cache_acquisition_valid(const rmath::vector2d& loc, uint id) const;
+  bool candidates_exist(void) const RCSW_PURE;
+  boost::optional<acq_loc_type> calc_acq_location(void);
+  bool cache_acq_valid(const rmath::vector2d& loc, uint id);
 
   bool cache_acquired_cb(bool explore_result) const;
-  bool cache_exploration_term_cb(void) const;
 
   /* clang-format off */
+  /**
+   * @brief Needed to ensure the points that robots choose when acquiring the
+   * cache are far enough inside the cache extent that all ground sensors are
+   * guaranteed to read "in cache". Set to footbot radius + a little padding.
+   */
+  static constexpr double kFOOTBOT_CACHE_ACQ_FACTOR = 0.2;
+
+  const bool                                mc_for_pickup;
+  const controller::cache_sel_matrix* const mc_matrix;
+  const ds::dpo_store*                const mc_store;
   /**
    * @brief Is it OK to acquire a cache via exploration? Usually you do not want
    * this because:
@@ -108,9 +117,6 @@ class acquire_existing_cache_fsm
    *   yet.
    */
   bool                                      m_by_exploration_ok{false};
-  const bool                                mc_for_pickup;
-  const controller::cache_sel_matrix* const mc_matrix;
-  const ds::dpo_store*      const           mc_store;
   std::default_random_engine                m_rd;
   /* clang-format on */
 };

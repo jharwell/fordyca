@@ -48,6 +48,7 @@
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
+#include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
@@ -85,7 +86,7 @@ class penalty_handler_initializer : public boost::static_visitor<void> {
   void operator()(const ControllerType& controller) {
     m_type_map->emplace(
         typeid(controller),
-        rcppsw::make_unique<class PenaltyHandlerType<ControllerType>>(
+        std::make_unique<class PenaltyHandlerType<ControllerType>>(
             m_arena_map, mc_config, mc_handler_name));
   }
 
@@ -104,9 +105,11 @@ class penalty_handler_initializer : public boost::static_visitor<void> {
 tv_manager::tv_manager(const config::tv::tv_manager_config* config,
                        const support::base_loop_functions* const lf,
                        ds::arena_map* const map)
-    : ER_CLIENT_INIT("fordyca.support.tv.tv_manager"),
-      mc_lf(lf),
-      mc_motion_throttle_config(config->block_carry_throttle) {
+    : ER_CLIENT_INIT("fordyca.support.tv.tv_manager"), mc_lf(lf) {
+  if (!config->block_carry_throttle.type.empty()) {
+    mc_motion_throttle_config =
+        boost::make_optional(config->block_carry_throttle);
+  }
   /* All controllers can drop blocks in the nest */
   boost::mpl::for_each<controller::typelist>(
       penalty_handler_initializer<block_handler_typelist,
@@ -162,47 +165,46 @@ double tv_manager::swarm_motion_throttle(void) const {
   double accum = 0.0;
   auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");
 
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    accum += controller.applied_motion_throttle();
-  } /* for(&entity..) */
+  support::swarm_iterator::controllers(mc_lf, [&](auto& controller) {
+    accum += controller->applied_motion_throttle();
+  });
   return accum / robots.size();
 } /* swarm_motion_throttle() */
 
-double tv_manager::env_block_manipulation(void) const {
-  uint timestep = mc_lf->GetSpace().GetSimulationClock();
+rtypes::timestep tv_manager::env_block_manipulation(void) const {
+  rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
   return penalty_handler<controller::depth0::crw_controller>(
              block_op_src::ekNEST_DROP)
-      ->timestep_penalty(timestep);
+      ->timestep_penalty(t);
 } /* env_block_manipulation() */
 
-double tv_manager::env_cache_usage(void) const {
-  uint timestep = mc_lf->GetSpace().GetSimulationClock();
+rtypes::timestep tv_manager::env_cache_usage(void) const {
+  rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
   return penalty_handler<controller::depth1::gp_dpo_controller>(
              cache_op_src::ekEXISTING_CACHE_PICKUP)
-      ->timestep_penalty(timestep);
+      ->timestep_penalty(t);
 } /* env_cache_usage() */
 
 void tv_manager::register_controller(int robot_id) {
-  m_motion_throttling.emplace(std::piecewise_construct,
-                              std::forward_as_tuple(robot_id),
-                              std::forward_as_tuple(&mc_motion_throttle_config));
+  if (mc_motion_throttle_config) {
+    m_motion_throttling.emplace(std::piecewise_construct,
+                                std::forward_as_tuple(robot_id),
+                                std::forward_as_tuple(
+                                    &mc_motion_throttle_config.get()));
+  }
 } /* register_controller() */
 
 void tv_manager::update(void) {
-  auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");
-  uint timestep = mc_lf->GetSpace().GetSimulationClock();
+  if (!mc_motion_throttle_config) {
+    return;
+  }
+  rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
 
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    m_motion_throttling.at(controller.entity_id())
-        .toggle(controller.is_carrying_block());
-    m_motion_throttling.at(controller.entity_id()).update(timestep);
-  } /* for(&entity..) */
+  support::swarm_iterator::controllers(mc_lf, [&](auto& controller) {
+    m_motion_throttling.at(controller->entity_id())
+        .toggle(controller->is_carrying_block());
+    m_motion_throttling.at(controller->entity_id()).update(t);
+  });
 } /* update() */
 
 NS_END(tv, support, fordyca);

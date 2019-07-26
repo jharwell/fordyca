@@ -31,12 +31,13 @@
 #include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
+#include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
-#include "fordyca/ds/arena_map.hpp"
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/swarm/convergence/config/convergence_config.hpp"
@@ -63,37 +64,15 @@ base_loop_functions::~base_loop_functions(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_loop_functions::output_init(const config::output_config* const output) {
-  if ("__current_date__" == output->output_dir) {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    m_output_root = output->output_root + "/" +
-                    std::to_string(now.date().year()) + "-" +
-                    std::to_string(now.date().month()) + "-" +
-                    std::to_string(now.date().day()) + ":" +
-                    std::to_string(now.time_of_day().hours()) + "-" +
-                    std::to_string(now.time_of_day().minutes());
-  } else {
-    m_output_root = output->output_root + "/" + output->output_dir;
-  }
-
-#ifndef RCPPSW_ER_NREPORT
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
-                      m_output_root + "/events.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
-                      m_output_root + "/support.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
-                      m_output_root + "/sim.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
-                      m_output_root + "/sim.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
-                      m_output_root + "/metrics.log");
-#endif
-} /* output_init() */
-
 void base_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
   /* parse simulation input file */
   m_config.parse_all(node);
+
+  if (!m_config.validate_all()) {
+    ER_FATAL_SENTINEL("Not all parameters were validated");
+    std::exit(EXIT_FAILURE);
+  }
 
   /* initialize output and metrics collection */
   output_init(m_config.config_get<config::output_config>());
@@ -115,9 +94,39 @@ void base_loop_functions::Init(ticpp::Element& node) {
   ndc_pop();
 } /* Init() */
 
+void base_loop_functions::output_init(const config::output_config* const output) {
+  if ("__current_date__" == output->output_dir) {
+    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+    m_output_root = output->output_root + "/" +
+                    std::to_string(now.date().year()) + "-" +
+                    std::to_string(now.date().month()) + "-" +
+                    std::to_string(now.date().day()) + ":" +
+                    std::to_string(now.time_of_day().hours()) + "-" +
+                    std::to_string(now.time_of_day().minutes());
+  } else {
+    m_output_root = output->output_root + "/" + output->output_dir;
+  }
+
+#ifndef LIBRA_ER_NREPORT
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
+                      m_output_root + "/events.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
+                      m_output_root + "/support.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
+                      m_output_root + "/sim.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
+                      m_output_root + "/sim.log");
+  client::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
+                      m_output_root + "/metrics.log");
+#endif
+} /* output_init() */
+
 void base_loop_functions::convergence_init(
     const rswc::config::convergence_config* const config) {
-  m_conv_calc = rcppsw::make_unique<rswc::convergence_calculator>(
+  if (nullptr == config) {
+    return;
+  }
+  m_conv_calc = std::make_unique<rswc::convergence_calculator>(
       config,
       std::bind(&base_loop_functions::calc_robot_headings,
                 this,
@@ -129,20 +138,52 @@ void base_loop_functions::convergence_init(
 } /* convergence_init() */
 
 void base_loop_functions::PreStep(void) {
-  m_tv_manager->update();
-  m_conv_calc->update();
+  /*
+   * Needs to be before robot controllers are run, so they run with the correct
+   * throttling/are subjected to the correct penalties, etc.
+   */
+  if (nullptr != m_tv_manager) {
+    m_tv_manager->update();
+  }
+
+  if (nullptr != m_oracle_manager) {
+    m_oracle_manager->update(arena_map());
+  }
 } /* PreStep() */
 
-void base_loop_functions::tv_init(const config::tv::tv_manager_config* const tvp) {
-  m_tv_manager = rcppsw::make_unique<tv::tv_manager>(tvp, this, arena_map());
+void base_loop_functions::PostStep(void) {
+  /*
+   * Needs to be after robot controllers are run, because compute convergence
+   * before that gives you the convergence status for the LAST timestep.
+   */
+  if (nullptr != m_conv_calc) {
+    m_conv_calc->update();
+  }
+} /* PostStep() */
 
-  for (auto& pair : GetSpace().GetEntitiesByType("foot-bot")) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    m_tv_manager->register_controller(controller.entity_id());
-    controller.tv_init(m_tv_manager.get());
-  } /* for(&pair..) */
+void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
+  /*
+   * Even if temporal variance is not requested in teh input file, we still
+   * need to create the manager in order to deconflict pickups/drops/etc
+   */
+  if (nullptr == tvp) {
+    m_tv_manager = std::make_unique<tv::tv_manager>(
+        std::make_unique<config::tv::tv_manager_config>().get(),
+        this,
+        arena_map());
+  } else {
+    ER_INFO("Creating temporal variance manager");
+    m_tv_manager = std::make_unique<tv::tv_manager>(tvp, this, arena_map());
+  }
+
+  /*
+   * Register all controllers with temporal variance manager in order to be
+   * able to apply sensing/actuation variances if configured.
+   */
+  swarm_iterator::controllers(this, [&](auto* c) {
+    m_tv_manager->register_controller(c->entity_id());
+    c->tv_init(m_tv_manager.get());
+  });
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
@@ -150,7 +191,7 @@ void base_loop_functions::arena_map_init(
   auto* aconfig = repo->config_get<config::arena::arena_map_config>();
   auto* vconfig = repo->config_get<config::visualization_config>();
 
-  m_arena_map = rcppsw::make_unique<ds::arena_map>(aconfig);
+  m_arena_map = std::make_unique<ds::arena_map>(aconfig);
   if (!m_arena_map->initialize(this)) {
     ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
@@ -163,15 +204,17 @@ void base_loop_functions::arena_map_init(
    */
   if (nullptr != vconfig) {
     for (auto& block : m_arena_map->blocks()) {
-      block->display_id(vconfig->block_id);
+      block->vis_id(vconfig->block_id);
     } /* for(&block..) */
   }
 } /* arena_map_init() */
 
 void base_loop_functions::oracle_init(
     const config::oracle::oracle_manager_config* const oraclep) {
-  ER_INFO("Creating oracle manager");
-  m_oracle_manager = rcppsw::make_unique<oracle::oracle_manager>(oraclep);
+  if (nullptr != oraclep) {
+    ER_INFO("Creating oracle manager");
+    m_oracle_manager = std::make_unique<oracle::oracle_manager>(oraclep);
+  }
 } /* oracle_init() */
 
 void base_loop_functions::Reset(void) {
@@ -183,15 +226,11 @@ void base_loop_functions::Reset(void) {
  ******************************************************************************/
 std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
-  for (auto& entity_pair : robots) {
-    auto& robot = *argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    rmath::vector2d pos;
-    pos.set(robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-            robot.GetEmbodiedEntity().GetOriginAnchor().Position.GetY());
-    v.push_back(pos);
-  } /* for(&entity..) */
+  swarm_iterator::robots(this, [&](auto* robot) {
+    v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
+                 robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
+  });
 
   /*
    * For each closest pair of robots we find, we add the corresponding distance
@@ -200,8 +239,10 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
    * algorithm).
    */
   std::vector<double> res;
+  size_t n_robots = GetSpace().GetEntitiesByType("foot-bot").size();
+
 #pragma omp parallel for num_threads(n_threads)
-  for (size_t i = 0; i < robots.size() / 2; ++i) {
+  for (size_t i = 0; i < n_robots / 2; ++i) {
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
@@ -228,28 +269,20 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
 
 std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const {
   std::vector<rmath::radians> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    v.push_back(controller.heading2D().angle());
-  } /* for(&entity..) */
+  swarm_iterator::controllers(this, [&](const auto* controller) {
+    v.push_back(controller->heading2D().angle());
+  });
   return v;
 } /* calc_robot_headings() */
 
 std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
     uint) const {
   std::vector<rmath::vector2d> v;
-  auto& robots = GetSpace().GetEntitiesByType("foot-bot");
 
-  for (auto& entity_pair : robots) {
-    auto* robot = argos::any_cast<argos::CFootBotEntity*>(entity_pair.second);
-    auto& controller = dynamic_cast<controller::base_controller&>(
-        robot->GetControllableEntity().GetController());
-    v.push_back(controller.position2D());
-  } /* for(&entity..) */
+  swarm_iterator::controllers(this, [&](const auto* controller) {
+    v.push_back(controller->position2D());
+  });
   return v;
 } /* calc_robot_positions() */
 

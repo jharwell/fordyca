@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/block_sel/block_priority_config.hpp"
-#include "fordyca/config/block_sel/pickup_policy_config.hpp"
+#include "fordyca/config/block_sel/block_pickup_policy_config.hpp"
 
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/config/base_config.hpp"
@@ -48,7 +48,7 @@ NS_START(fordyca, config, block_sel);
 struct block_sel_matrix_config : public rconfig::base_config {
   rmath::vector2d nest{};
   block_priority_config priorities {};
-  pickup_policy_config pickup_policy{};
+  block_pickup_policy_config pickup_policy{};
 };
 
 NS_END(block_sel, config, fordyca);

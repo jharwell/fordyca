@@ -27,6 +27,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/math/expression.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/swarm/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,16 +57,20 @@ class existing_cache_utility : public rcppsw::math::expression<double> {
   existing_cache_utility(const rmath::vector2d& cache_loc,
                          const rmath::vector2d& nest_loc);
 
-  double calc(const rmath::vector2d& rloc, double density, size_t n_blocks = 1);
+  double calc(const rmath::vector2d& rloc,
+              const rswarm::pheromone_density& density,
+              size_t n_blocks = 1);
   double operator()(const rmath::vector2d& rloc,
-                    double density,
+                    const rswarm::pheromone_density& density,
                     size_t n_blocks) {
     return calc(rloc, density, n_blocks);
   }
 
  private:
+  /* clang-format off */
   const rmath::vector2d mc_cache_loc;
   const rmath::vector2d mc_nest_loc;
+  /* clang-format on */
 };
 
 NS_END(math, fordyca);

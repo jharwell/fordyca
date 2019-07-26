@@ -28,7 +28,7 @@
 
 #include "fordyca/fsm/base_foraging_fsm.hpp"
 #include "fordyca/fsm/explore_for_goal_fsm.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
+#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/metrics/fsm/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 
@@ -41,7 +41,7 @@ namespace state_machine = rcppsw::patterns::state_machine;
 namespace controller { class sensing_subsystem; class actuation_subsystem;}
 
 NS_START(fsm, depth0);
-using acq_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
+using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using transport_goal_type = block_transporter::goal_type;
 
 /*******************************************************************************
@@ -58,7 +58,7 @@ using transport_goal_type = block_transporter::goal_type;
  */
 class crw_fsm final : public base_foraging_fsm,
                 public rer::client<crw_fsm>,
-                public metrics::fsm::goal_acquisition_metrics,
+                public metrics::fsm::goal_acq_metrics,
                 public block_transporter {
  public:
   explicit crw_fsm(controller::saa_subsystem* saa,
@@ -68,24 +68,24 @@ class crw_fsm final : public base_foraging_fsm,
   crw_fsm& operator=(const crw_fsm& fsm) = delete;
 
   /* collision metrics */
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, entered_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(bool, exited_collision_avoidance, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(uint, collision_avoidance_duration, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
+  bool in_collision_avoidance(void) const override RCSW_PURE;
+  bool entered_collision_avoidance(void) const override RCSW_PURE;
+  bool exited_collision_avoidance(void) const override RCSW_PURE;
+  rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
+  rmath::vector2u avoidance_loc(void) const override;
 
   /* goal acquisition metrics */
-  acq_goal_type acquisition_goal(void) const override;
-  exp_status is_exploring_for_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override RCSW_PURE;
+  exp_status is_exploring_for_goal(void) const override RCSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
-  bool goal_acquired(void) const override;
+  bool goal_acquired(void) const override RCSW_PURE;
   rmath::vector2u acquisition_loc(void) const override;
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
+  transport_goal_type block_transport_goal(void) const override RCSW_PURE;
 
   /**
    * @brief (Re)-initialize the FSM.

@@ -24,8 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 
 /*******************************************************************************
@@ -55,11 +53,10 @@ NS_START(controller, depth2);
 class grp_dpo_controller : public depth1::gp_dpo_controller,
                            public rer::client<grp_dpo_controller> {
  public:
-  grp_dpo_controller(void);
-  ~grp_dpo_controller(void) override = default;
+  grp_dpo_controller(void) RCSW_COLD;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void ControlStep(void) override;
 
   void bsel_exception_added(bool b) { m_bsel_exception_added = b; }
@@ -68,7 +65,7 @@ class grp_dpo_controller : public depth1::gp_dpo_controller,
  private:
   void task_alloc_cb(const rta::polled_task* task,
                      const rta::bi_tab*);
-  void private_init(const config::depth2::controller_repository& param_repo);
+  void private_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 
 
   /* clang-format off */

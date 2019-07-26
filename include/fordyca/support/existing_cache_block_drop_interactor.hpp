@@ -78,17 +78,17 @@ class existing_cache_block_drop_interactor
    * @brief The actual handling function for interactions.
    *
    * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
+   * @param t   The current timestep.
    */
-  void operator()(T& controller, uint timestep) {
+  void operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
+      if (m_penalty_handler->penalty_satisfied(controller, t)) {
         finish_cache_block_drop(controller);
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::cache_op_src::ekEXISTING_CACHE_DROP,
-                                      timestep);
+                                      t);
     }
   }
 
@@ -127,7 +127,7 @@ class existing_cache_block_drop_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    int cache_id = loop_utils::robot_on_cache(controller, *m_map);
+    int cache_id = utils::robot_on_cache(controller, *m_map);
 
     if (p.id() != cache_id) {
       ER_WARN("%s cannot drop in cache%d: No such cache",

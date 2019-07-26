@@ -85,7 +85,7 @@ class cell_unknown : public cell_op, public rer::client<cell_unknown> {
  */
 using cell_unknown_visitor_impl =
     rpvisitor::precise_visitor<detail::cell_unknown,
-                              detail::cell_unknown::visit_typelist>;
+                               detail::cell_unknown::visit_typelist>;
 
 NS_END(detail);
 

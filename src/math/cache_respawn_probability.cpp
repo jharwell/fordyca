@@ -45,7 +45,7 @@ double cache_respawn_probability::calc(uint n_harvesters, uint n_collectors) {
   } else {
     tmp = mc_scale_factor * n_harvesters / n_collectors;
   }
-  return set_result(1 - std::exp(-tmp));
+  return eval(1 - std::exp(-tmp));
 } /* calc() */
 
 NS_END(expressions, fordyca);

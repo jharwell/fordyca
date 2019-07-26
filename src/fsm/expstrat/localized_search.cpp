@@ -45,24 +45,29 @@ void localized_search::task_execute(void) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool localized_search::in_collision_avoidance(void) const {
+bool localized_search::in_collision_avoidance(void) const {
   return (m_vfsm.task_running() && m_vfsm.in_collision_avoidance()) ||
          (m_crw.task_running() && m_crw.in_collision_avoidance());
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool localized_search::entered_collision_avoidance(void) const {
+bool localized_search::entered_collision_avoidance(void) const {
   return (m_vfsm.task_running() && m_vfsm.entered_collision_avoidance()) ||
          (m_crw.task_running() && m_crw.entered_collision_avoidance());
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool localized_search::exited_collision_avoidance(void) const {
+bool localized_search::exited_collision_avoidance(void) const {
   return (m_vfsm.task_running() && m_vfsm.exited_collision_avoidance()) ||
          (m_crw.task_running() && m_crw.exited_collision_avoidance());
 } /* exited_collision_avoidance() */
 
-uint localized_search::collision_avoidance_duration(void) const {
-  return (m_vfsm.task_running() && m_vfsm.collision_avoidance_duration()) ||
-         (m_crw.task_running() && m_crw.collision_avoidance_duration());
+rtypes::timestep localized_search::collision_avoidance_duration(void) const {
+  if (m_vfsm.task_running()) {
+    return m_vfsm.collision_avoidance_duration();
+  } else if (m_crw.task_running()) {
+    return m_crw.collision_avoidance_duration();
+  } else {
+    return rtypes::timestep(0);
+  }
 } /* collision_avoidance_duration() */
 
 rmath::vector2u localized_search::avoidance_loc(void) const {

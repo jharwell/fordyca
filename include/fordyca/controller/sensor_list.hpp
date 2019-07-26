@@ -26,11 +26,11 @@
  ******************************************************************************/
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/robotics/hal/sensors/battery_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/colored_blob_camera_sensor.hpp"
+#include "rcppsw/robotics/hal/sensors/ground_sensor.hpp"
+#include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/proximity_sensor.hpp"
 #include "rcppsw/robotics/hal/sensors/rab_wifi_sensor.hpp"
-#include "rcppsw/robotics/hal/sensors/light_sensor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <argos3/plugins/simulator/entities/light_entity.h>
 #include <algorithm>
 #include <vector>
 #include <argos3/plugins/simulator/entities/light_entity.h>
@@ -45,7 +46,7 @@ NS_START(fordyca, repr);
  * @ingroup fordyca repr
  *
  * @brief A repr of an ACTUAL cache within the arena. This differs from \ref
- * dp_entity caches because they:
+ * dpo_entity caches because they:
  *
  * - Handle cache penalties
  * - Can collect metrics about their usage
@@ -67,18 +68,21 @@ class arena_cache final : public base_cache,
   uint total_block_pickups(void) const override { return m_block_pickups; }
   uint total_block_drops(void) const override { return m_block_drops; }
   void reset_metrics(void) override;
-  rmath::vector2u location(void) const override { return discrete_loc(); }
+  rmath::vector2u location(void) const override { return dloc(); }
 
   void has_block_pickup(void) { m_block_pickups = 1; }
   void has_block_drop(void) { m_block_drops = 1; }
-  void penalty_served(uint duration) { m_penalty_count += duration; }
+  
+  void penalty_served(rtypes::timestep duration) {
+    m_penalty_count += duration;
+  }
   argos::CLightEntity* light(void) const { return m_light; }
 
  private:
   /* clang-format off */
   uint                 m_block_pickups{0};
   uint                 m_block_drops{0};
-  uint                 m_penalty_count{0};
+  rtypes::timestep     m_penalty_count{0};
   argos::CLightEntity* m_light;
   /* clang-format on */
 };

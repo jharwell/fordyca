@@ -51,15 +51,15 @@ NS_START(depth2);
 class grp_odpo_controller : public depth2::grp_dpo_controller,
                             public rer::client<grp_odpo_controller> {
  public:
-  grp_odpo_controller(void);
-  ~grp_odpo_controller(void) override;
+  grp_odpo_controller(void) RCSW_COLD;
+  ~grp_odpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
   void ControlStep(void) override;
 
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 
-  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor);
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
 
  private:
   /* clang-format off */

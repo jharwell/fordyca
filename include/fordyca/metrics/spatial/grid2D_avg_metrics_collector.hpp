@@ -45,6 +45,10 @@ NS_START(fordyca, metrics, spatial);
  *
  * @brief Base class for collectors using a 2D grid to fill with counts of
  * SOMETHING, to be averaged over the entire simulation.
+ *
+ * This class forces derived classes to implement the \ref collect() function,
+ * because implementing it here will cause excessive use of dynamic_cast, which
+ * will slow things down a LOT at runtime.
  */
 class grid2D_avg_metrics_collector : public rmetrics::base_metrics_collector {
  public:
@@ -57,14 +61,15 @@ class grid2D_avg_metrics_collector : public rmetrics::base_metrics_collector {
                                uint interval,
                                const rmath::vector2u& dims);
 
-  /**
-   * @brief Collect a count of SOMETHING from an (i,j) cell.
-   */
-  virtual uint collect_cell(const rmetrics::base_metrics& metrics,
-                            const rmath::vector2u& coord) const = 0;
-
   void reset(void) override;
-  void collect(const rmetrics::base_metrics& metrics) override;
+
+ protected:
+  void inc_cell_count(size_t i, size_t j, uint amount) {
+    m_stats.access(i, j) += amount;
+  }
+  void inc_total_count(void) { ++m_total_count; }
+  size_t xsize(void) const { return m_stats.xsize(); }
+  size_t ysize(void) const { return m_stats.ysize(); }
 
  private:
   std::list<std::string> csv_header_cols(void) const override;
@@ -72,7 +77,7 @@ class grid2D_avg_metrics_collector : public rmetrics::base_metrics_collector {
 
   /* clang-format off */
   rcppsw::ds::grid2D<uint> m_stats;
-  uint                     m_count{0};
+  uint                     m_total_count{0};
   /* clang-format on */
 };
 

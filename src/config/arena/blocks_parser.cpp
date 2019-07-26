@@ -30,28 +30,18 @@
 NS_START(fordyca, config, arena);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char blocks_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void blocks_parser::parse(const ticpp::Element& node) {
   ticpp::Element bnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
 
   m_dist.parse(bnode);
-  m_config->dist = *m_dist.config_get();
+  m_config->dist = *m_dist.config_get<block_dist_parser::config_type>();
 } /* parse() */
 
-__rcsw_pure bool blocks_parser::validate(void) const {
-  CHECK(true == m_dist.validate());
-  return true;
-
-error:
-  return false;
+bool blocks_parser::validate(void) const {
+  return m_dist.validate();
 } /* validate() */
 
 NS_END(arena, config, fordyca);

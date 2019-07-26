@@ -42,9 +42,9 @@ NS_START(fordyca, config);
  * @class communication_parser
  * @ingroup config
  */
-class communication_parser : public rconfig::xml::xml_config_parser {
+class communication_parser final : public rconfig::xml::xml_config_parser {
  public:
-  explicit communication_parser(uint level) : xml_config_parser(level) {}
+  using config_type = communication_config;
 
   /**
    * @brief The root tag that all actuation parameters should lie under in the
@@ -52,21 +52,18 @@ class communication_parser : public rconfig::xml::xml_config_parser {
    */
   static constexpr char kXMLRoot[] = "communication";
 
-  bool validate(void) const override;
-  void parse(const ticpp::Element &node) override;
+  bool validate(void) const override RCSW_PURE;
+  void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<communication_config> config_get(void) const {
-    return m_params;
-  }
 
-private:
-  std::shared_ptr<rcppsw::config::base_config> config_get_impl(void) const override {
-    return m_params;
+ private:
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   // clang-format off
-  std::shared_ptr<communication_config>           m_params{nullptr};
+  std::unique_ptr<config_type> m_config{nullptr};
   // clang-format on
 };
 

@@ -39,30 +39,30 @@ const rmath::vector2d base_block::kOutOfSightRLoc =
  * Member Functions
  ******************************************************************************/
 void base_block::move_out_of_sight(void) {
-  real_loc(kOutOfSightRLoc);
-  discrete_loc(kOutOfSightDLoc);
+  rloc(kOutOfSightRLoc);
+  dloc(kOutOfSightDLoc);
 } /* move_out_of_sight() */
 
 void base_block::reset_metrics(void) {
   m_transporters = 0;
-  m_first_pickup_time = 0.0;
+  m_first_pickup_time = rtypes::timestep(0);
   m_first_pickup = false;
-  m_dist_time = 0.0;
-  m_nest_drop_time = 0.0;
+  m_dist_time = rtypes::timestep(0);
+  m_nest_drop_time = rtypes::timestep(0);
 } /* reset_metrics(); */
 
-void base_block::first_pickup_time(double time) {
+void base_block::first_pickup_time(rtypes::timestep time) {
   if (!m_first_pickup) {
     m_first_pickup_time = time;
     m_first_pickup = true;
   }
 } /* first_pickup_time() */
 
-__rcsw_pure double base_block::total_transport_time(void) const {
+rtypes::timestep base_block::total_transport_time(void) const {
   return m_nest_drop_time - m_first_pickup_time;
 } /* total_transport_time() */
 
-__rcsw_pure double base_block::initial_wait_time(void) const {
+rtypes::timestep base_block::initial_wait_time(void) const {
   return m_first_pickup_time - m_dist_time;
 } /* initial_wait_time() */
 

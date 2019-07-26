@@ -30,12 +30,12 @@
 #include "fordyca/config/actuation_config.hpp"
 #include "fordyca/config/base_controller_repository.hpp"
 #include "fordyca/config/output_config.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/config/sensing_config.hpp"
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -65,12 +65,15 @@ bool base_controller::block_detected(void) const {
 void base_controller::position(const rmath::vector2d& loc) {
   m_saa->sensing()->position(loc);
 }
+void base_controller::heading(const rmath::radians& h) {
+  m_saa->sensing()->heading(h);
+}
 void base_controller::discrete_position(const rmath::vector2u& loc) {
   m_saa->sensing()->discrete_position(loc);
 }
 
 void base_controller::Init(ticpp::Element& node) {
-#ifndef RCPPSW_ER_NREPORT
+#ifndef LIBRA_ER_NREPORT
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
   } else {
@@ -79,22 +82,22 @@ void base_controller::Init(ticpp::Element& node) {
   }
 #endif
 
-  config::base_controller_repository param_repo;
-  param_repo.parse_all(node);
+  config::base_controller_repository config_repo;
+  config_repo.parse_all(node);
 
   ndc_push();
-  if (!param_repo.validate_all()) {
+  if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
   /* initialize output */
-  auto* config = param_repo.config_get<config::output_config>();
+  auto* config = config_repo.config_get<config::output_config>();
   output_init(config);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  saa_init(param_repo.config_get<config::actuation_config>(),
-           param_repo.config_get<config::sensing_config>());
+  saa_init(config_repo.config_get<config::actuation_config>(),
+           config_repo.config_get<config::sensing_config>());
   ndc_pop();
 } /* Init() */
 
@@ -148,7 +151,7 @@ void base_controller::saa_init(const config::actuation_config* const actuation_p
       .battery = rrhal::sensors::battery_sensor(nullptr),
 #endif /* FORDYCA_WITH_ROBOT_BATTERY */
   };
-  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
+  m_saa = std::make_unique<controller::saa_subsystem>(
       actuation_p, sensing_p, &alist, &slist);
 } /* saa_init() */
 
@@ -169,7 +172,7 @@ void base_controller::output_init(const config::output_config* const config) {
     fs::create_directories(output_root);
   }
 
-#ifndef RCPPSW_ER_NREPORT
+#ifndef LIBRA_ER_NREPORT
   /*
    * Each file appender is attached to a root category in the FORDYCA
    * namespace. If you give different file appenders the same file, then the
@@ -196,7 +199,7 @@ void base_controller::output_init(const config::output_config* const config) {
 #endif
 } /* output_init() */
 
-void base_controller::tick(uint tick) {
+void base_controller::tick(rtypes::timestep tick) {
   m_saa->sensing()->tick(tick);
 } /* tick() */
 
@@ -205,8 +208,8 @@ int base_controller::entity_id(void) const {
 } /* entity_id() */
 
 void base_controller::ndc_pusht(void) {
-  ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick()) + "] [" +
-              GetId() + "]");
+  ER_NDC_PUSH(std::string("[t=") + std::to_string(m_saa->sensing()->tick().v()) +
+              std::string("] [") + GetId() + std::string("]"));
 }
 
 double base_controller::applied_motion_throttle(void) const {
@@ -214,23 +217,25 @@ double base_controller::applied_motion_throttle(void) const {
 } /* applied_motion_throttle() */
 
 void base_controller::tv_init(const support::tv::tv_manager* tv_manager) {
-  m_tv_manager = tv_manager;
-  saa_subsystem()->actuation()->differential_drive().throttling(
-      tv_manager->movement_throttling_handler(entity_id()));
+  if (tv_manager->movement_throttling_enabled()) {
+    saa_subsystem()->actuation()->differential_drive().throttling(
+        tv_manager->movement_throttling_handler(entity_id()));
+  }
 } /* tv_init() */
 
 /*******************************************************************************
  * Movement Metrics
  ******************************************************************************/
-__rcsw_pure double base_controller::distance(void) const {
+rtypes::spatial_dist base_controller::distance(void) const {
   /*
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
    */
   if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->sensing()->heading().length();
+    return rtypes::spatial_dist(
+        saa_subsystem()->sensing()->tick_travel().length());
   }
-  return 0;
+  return rtypes::spatial_dist(0.0);
 } /* distance() */
 
 rmath::vector2d base_controller::velocity(void) const {
@@ -247,15 +252,15 @@ rmath::vector2d base_controller::velocity(void) const {
 /*******************************************************************************
  * Swarm Spatial Metrics
  ******************************************************************************/
-__rcsw_pure const rmath::vector2d& base_controller::position2D(void) const {
+const rmath::vector2d& base_controller::position2D(void) const {
   return m_saa->sensing()->position();
 }
-__rcsw_pure const rmath::vector2u& base_controller::discrete_position2D(void) const {
+const rmath::vector2u& base_controller::discrete_position2D(void) const {
   return m_saa->sensing()->discrete_position();
 }
 
-__rcsw_pure rmath::vector2d base_controller::heading2D(void) const {
-  return m_saa->sensing()->heading();
+rmath::vector2d base_controller::heading2D(void) const {
+  return {1.0, m_saa->sensing()->heading()};
 }
 
 NS_END(controller, fordyca);

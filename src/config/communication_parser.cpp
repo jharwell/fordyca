@@ -29,31 +29,24 @@
 NS_START(fordyca, config);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char communication_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void communication_parser::parse(const ticpp::Element &node)
-{
-  ticpp::Element anode = node_get(const_cast<ticpp::Element &>(node), kXMLRoot);
-
-  m_params =
-      std::make_shared<std::remove_reference<decltype(*m_params)>::type>();
-  XML_PARSE_ATTR(anode, m_params, on);
-  XML_PARSE_ATTR(anode, m_params, mode);
-  XML_PARSE_ATTR(anode, m_params, prob_send);
-  XML_PARSE_ATTR(anode, m_params, prob_receive);
+void communication_parser::parse(const ticpp::Element& node) {
+  ticpp::Element anode = node_get(node, kXMLRoot);
+  m_config = std::make_unique<config_type>();
+  
+  XML_PARSE_ATTR(anode, m_config, on);
+  XML_PARSE_ATTR(anode, m_config, mode);
+  XML_PARSE_ATTR(anode, m_config, prob_send);
+  XML_PARSE_ATTR(anode, m_config, prob_receive);
 } /* parse() */
 
-__rcsw_pure bool communication_parser::validate(void) const
+bool communication_parser::validate(void) const
 {
-  return m_params->prob_send >= 0.0 &&
-         m_params->prob_send <= 1.0 &&
-         m_params->prob_receive >= 0.0 &&
-         m_params->prob_receive <= 1.0;
+  return m_config->prob_send >= 0.0 &&
+         m_config->prob_send <= 1.0 &&
+         m_config->prob_receive >= 0.0 &&
+         m_config->prob_receive <= 1.0;
 } /* validate() */
 
 NS_END(config, fordyca);

@@ -67,14 +67,13 @@ NS_START(depth0);
  * collection functions can be reused.
  */
 class mdpo_controller : public dpo_controller,
-                        public rer::client<mdpo_controller>
-{
-public:
-  mdpo_controller(void);
-  ~mdpo_controller(void) override;
+                        public rer::client<mdpo_controller> {
+ public:
+  mdpo_controller(void) RCSW_COLD;
+  ~mdpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element &node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void ControlStep(void) override;
 
   std::type_index type_index(void) const override
@@ -82,8 +81,8 @@ public:
     return {typeid(*this)};
   }
 
-  mdpo_perception_subsystem *mdpo_perception(void);
-  const mdpo_perception_subsystem *mdpo_perception(void) const;
+  mdpo_perception_subsystem* mdpo_perception(void) RCSW_PURE;
+  const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;
 
   /**
    * @brief Initialization that derived classes may also need to perform, if the
@@ -92,7 +91,7 @@ public:
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    * - Block selection matrix (\ref block_sel_matrix)
    */
-  void shared_init(const config::depth0::mdpo_controller_repository &param_repo);
+  void shared_init(const config::depth0::mdpo_controller_repository& config_repo) RCSW_COLD;
 
 private:
   /**
@@ -102,9 +101,7 @@ private:
    *
    * Called after \ref shared_init() in \ref Init().
    */
-  void private_init(void);
-
-  void private_init(const config::depth0::mdpo_controller_repository &param_repo);
+  void private_init(const config::depth0::mdpo_controller_repository& config_repo) RCSW_COLD;
 
   /* clang-format off */
   class controller::communication_subsystem m_comm;

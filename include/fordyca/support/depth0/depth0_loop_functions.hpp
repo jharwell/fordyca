@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "rcppsw/ds/type_map.hpp"
@@ -64,13 +66,14 @@ class robot_arena_interactor;
 class depth0_loop_functions : public base_loop_functions,
                               public rer::client<depth0_loop_functions> {
  public:
-  depth0_loop_functions(void);
-  ~depth0_loop_functions(void) override;
+  depth0_loop_functions(void) RCSW_COLD;
+  ~depth0_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void PreStep(void) override;
-  void Reset(void) override;
-  void Destroy(void) override;
+  void PostStep(void) override;
+  void Reset(void) override RCSW_COLD;
+  void Destroy(void) override RCSW_COLD;
 
  protected:
   /**
@@ -78,7 +81,7 @@ class depth0_loop_functions : public base_loop_functions,
    *
    * - Depth0 metric collection
    */
-  void shared_init(ticpp::Element& node);
+  void shared_init(ticpp::Element& node) RCSW_COLD;
 
  private:
   using interactor_map_type = rds::type_map<
@@ -118,18 +121,25 @@ class depth0_loop_functions : public base_loop_functions,
    * - Various maps mapping controller types to metric collection, controller
    *   initialization, and arena interaction maps (reflection basically).
    */
-  void private_init(void);
+  void private_init(void) RCSW_COLD;
 
   /**
-   * @brief Process a single robot on a timestep:
+   * @brief Process a single robot on a timestep, before running its controller:
    *
-   * - Collect metrics from it.
    * - Set its new position, time, LOS from ARGoS.
    * - Have it interact with the environment.
    */
-  void robot_timestep_process(argos::CFootBotEntity& robot);
+  void robot_pre_step(argos::CFootBotEntity& robot);
 
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+  /**
+   * @brief Process a single robot on a timestep, after running its controller:
+   *
+   * - Have it interact with the environment.
+   * - Collect metrics from it.
+   */
+  void robot_post_step(argos::CFootBotEntity& robot);
+
+  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override RCSW_PURE;
 
   /* clang-format off */
   std::unique_ptr<depth0_metrics_aggregator>  m_metrics_agg;

@@ -25,16 +25,16 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
-#include "fordyca/repr/movable_cell_entity.hpp"
-#include "fordyca/repr/multicell_entity.hpp"
+#include "fordyca/repr/colored_entity.hpp"
+#include "fordyca/repr/unicell_movable_entity.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, repr);
-namespace prototype = rcppsw::patterns::prototype;
 
 /*******************************************************************************
  * Class Definitions
@@ -49,10 +49,10 @@ namespace prototype = rcppsw::patterns::prototype;
  * world) and discretized locations (where they are mapped to within the arena
  * map).
  */
-class base_block : public multicell_entity,
-                   public movable_cell_entity,
+class base_block : public unicell_movable_entity,
+                   public colored_entity,
                    public metrics::blocks::transport_metrics,
-                   public prototype::clonable<base_block> {
+                   public rpprototype::clonable<base_block> {
  public:
   /**
    * @brief Out of sight location base_blocks are moved to when a robot picks
@@ -69,7 +69,7 @@ class base_block : public multicell_entity,
    * from 0.
    */
   base_block(const rmath::vector2d& dim, const rutils::color& color)
-      : multicell_entity(dim, color, -1) {}
+      : unicell_movable_entity(dim, -1), colored_entity(color) {}
 
   /**
    * @param dim 2 element vector of the dimensions of the block.
@@ -77,7 +77,7 @@ class base_block : public multicell_entity,
    * @param id The id of the block.
    */
   base_block(const rmath::vector2d& dim, const rutils::color& color, int id)
-      : multicell_entity(dim, color, id) {}
+      : unicell_movable_entity(dim, id), colored_entity(color) {}
 
   ~base_block(void) override = default;
 
@@ -99,15 +99,15 @@ class base_block : public multicell_entity,
    * @brief Compare two \ref base_block objects for equality based on their
    * discrete location.
    */
-  bool loccmp(const base_block& other) const {
-    return this->discrete_loc() == other.discrete_loc();
+  bool dloccmp(const base_block& other) const {
+    return this->dloc() == other.dloc();
   }
 
   /* transport metrics */
   void reset_metrics(void) override final;
   uint total_transporters(void) const override { return m_transporters; }
-  double total_transport_time(void) const override;
-  double initial_wait_time(void) const override;
+  rtypes::timestep total_transport_time(void) const override RCSW_PURE;
+  rtypes::timestep initial_wait_time(void) const override RCSW_PURE;
 
   /**
    * @brief Increment the # of carries this block has undergone on its way back
@@ -119,24 +119,24 @@ class base_block : public multicell_entity,
   }
 
   /**
-   * @brief Set the time that the base_block is picked up for the first time after
-   * being distributed in the arena.
+   * @brief Set the time that the base_block is picked up for the first time
+   * after being distributed in the arena.
    *
    * @param time The current simulation time.
    */
-  void first_pickup_time(double time);
+  void first_pickup_time(rtypes::timestep t);
 
   /**
    * @brief Set the time that the base_block dropped in the nest.
    *
    * @param time The current simulation time.
    */
-  void nest_drop_time(double time) { m_nest_drop_time = time; }
+  void nest_drop_time(rtypes::timestep t) { m_nest_drop_time = t; }
 
   /**
    * @brief Set the time that the base_block was distributed in the arena.
    */
-  void distribution_time(double dist_time) { m_dist_time = dist_time; }
+  void distribution_time(rtypes::timestep t) { m_dist_time = t; }
 
   /**
    * @brief Reset the the base_blocks carried/not carried state when it is not
@@ -157,7 +157,7 @@ class base_block : public multicell_entity,
    * This should only happen if the base_block is being carried by a robot.
    */
   bool is_out_of_sight(void) const {
-    return kOutOfSightDLoc == discrete_loc() || kOutOfSightRLoc == real_loc();
+    return kOutOfSightDLoc == dloc() || kOutOfSightRLoc == rloc();
   }
   /**
    * @brief Get the ID/index of the robot that is currently carrying this
@@ -168,30 +168,14 @@ class base_block : public multicell_entity,
    */
   int robot_id(void) const { return m_robot_id; }
 
-  /**
-   * @brief Determine if a real-valued point lies within the extent of the
-   * entity for:
-   *
-   * 1. Visualization purposes.
-   * 2. Determining if a robot is on top of an entity.
-   *
-   * @param point The point to check.
-   *
-   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
-   */
-  bool contains_point(const rmath::vector2d& point) const {
-    return xspan(real_loc()).contains(point.x()) &&
-           yspan(real_loc()).contains(point.y());
-  }
-
  private:
   /* clang-format off */
-  int    m_robot_id{-1};
-  uint   m_transporters{0};
-  bool   m_first_pickup{false};
-  double m_first_pickup_time{0.0};
-  double m_dist_time{0.0};
-  double m_nest_drop_time{0.0};
+  int              m_robot_id{-1};
+  uint             m_transporters{0};
+  bool             m_first_pickup{false};
+  rtypes::timestep m_first_pickup_time{0};
+  rtypes::timestep m_dist_time{0};
+  rtypes::timestep m_nest_drop_time{0};
   /* clang-format on */
 };
 

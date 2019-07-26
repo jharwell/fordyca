@@ -28,7 +28,7 @@
 #include <memory>
 
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
-#include "fordyca/config/cache_sel/pickup_policy_parser.hpp"
+#include "fordyca/config/cache_sel/cache_pickup_policy_parser.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
 /*******************************************************************************
@@ -48,9 +48,7 @@ NS_START(fordyca, config, cache_sel);
  */
 class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
  public:
-  explicit cache_sel_matrix_parser(uint level)
-      : xml_config_parser(level),
-        m_pickup_policy(level + 1) {}
+  using config_type = cache_sel_matrix_config;
 
   /**
    * @brief The root tag that all cache sel matrix parameters should lie
@@ -61,20 +59,16 @@ class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
   void parse(const ticpp::Element& node) override;
 
   std::string xml_root(void) const override { return kXMLRoot; }
-  std::shared_ptr<cache_sel_matrix_config> config_get(void) const {
-    return m_config;
-  }
-  bool validate(void) const override;
+  bool validate(void) const override RCSW_PURE;
 
  private:
-  std::shared_ptr<rconfig::base_config> config_get_impl(
-      void) const override {
-    return m_config;
+  const rconfig::base_config* config_get_impl(void) const override {
+    return m_config.get();
   }
 
   /* clang-format off */
-  std::shared_ptr<cache_sel_matrix_config> m_config{nullptr};
-  pickup_policy_parser                     m_pickup_policy;
+  std::unique_ptr<config_type> m_config{nullptr};
+  cache_pickup_policy_parser   m_pickup_policy{};
   /* clang-format on */
 };
 

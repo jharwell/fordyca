@@ -27,9 +27,9 @@
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/base_block.hpp"
-#include "fordyca/repr/immovable_cell_entity.hpp"
-#include "fordyca/repr/multicell_entity.hpp"
-#include "fordyca/support/loop_utils/loop_utils.hpp"
+#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/repr/unicell_immovable_entity.hpp"
+#include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,7 @@ NS_START(fordyca, support, block_dist);
  * Constructors/Destructor
  ******************************************************************************/
 random_distributor::random_distributor(const ds::arena_grid::view& grid,
-                                       double resolution)
+                                       rtypes::discretize_ratio resolution)
     : ER_CLIENT_INIT("fordyca.support.block_dist.random"),
       mc_resolution(resolution),
       mc_origin(grid.origin()->loc()),
@@ -50,7 +50,7 @@ random_distributor::random_distributor(const ds::arena_grid::view& grid,
   ER_INFO("Area: xrange=%s,yrange=%s,resolution=%f",
           mc_xspan.to_str().c_str(),
           mc_yspan.to_str().c_str(),
-          mc_resolution);
+          mc_resolution.v());
 }
 
 /*******************************************************************************
@@ -85,9 +85,13 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
      * distribution algorithm has a bug.
      */
     ER_ASSERT(!cell->state_has_block(),
-              "Destination cell already contains block");
+              "Destination cell@%s already contains block%d",
+              coords->abs.to_str().c_str(),
+              cell->block()->id());
     ER_ASSERT(!cell->state_has_cache(),
-              "Destination cell already contains cache");
+              "Destination cell@%s already contains cache%d",
+              coords->abs.to_str().c_str(),
+              cell->cache()->id());
     ER_ASSERT(!cell->state_in_cache_extent(),
               "Destination cell part of cache extent");
 
@@ -97,8 +101,8 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
       ER_DEBUG("Block%d,ptr=%p distributed@%s/%s",
                block->id(),
                block.get(),
-               block->real_loc().to_str().c_str(),
-               block->discrete_loc().to_str().c_str());
+               block->rloc().to_str().c_str(),
+               block->dloc().to_str().c_str());
       /*
        * Now that the block has been distributed, it is another entity that
        * needs to be avoided during subsequent distributions.
@@ -115,15 +119,15 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
   }
 } /* distribute_block() */
 
-__rcsw_pure bool random_distributor::verify_block_dist(
+bool random_distributor::verify_block_dist(
     const repr::base_block* const block,
     const ds::const_entity_list& entities,
-    __rcsw_unused const ds::cell2D* const cell) {
+    RCSW_UNUSED const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
-  ER_CHECK(repr::base_block::kOutOfSightDLoc != block->discrete_loc(),
+  ER_CHECK(repr::base_block::kOutOfSightDLoc != block->dloc(),
            "Block%d discrete coord still out of sight after distribution",
            block->id());
-  ER_CHECK(repr::base_block::kOutOfSightRLoc != block->real_loc(),
+  ER_CHECK(repr::base_block::kOutOfSightRLoc != block->rloc(),
            "Block%d real coord still out of sight after distribution",
            block->id());
 
@@ -131,7 +135,7 @@ __rcsw_pure bool random_distributor::verify_block_dist(
   ER_CHECK(block == cell->block().get(),
            "Block%d@%s not referenced by containing cell@%s",
            block->id(),
-           block->real_loc().to_str().c_str(),
+           block->rloc().to_str().c_str(),
            cell->loc().to_str().c_str());
 
   /* no entity should overlap with the block after distribution */
@@ -139,13 +143,12 @@ __rcsw_pure bool random_distributor::verify_block_dist(
     if (e == block) {
       continue;
     }
-    auto status =
-        loop_utils::placement_conflict(block->real_loc(), block->dims(), e);
+    auto status = utils::placement_conflict(block->rloc(), block->dims(), e);
     ER_ASSERT(!(status.x_conflict && status.y_conflict),
               "Entity contains block%d@%s/%s after distribution",
               block->id(),
-              block->real_loc().to_str().c_str(),
-              block->real_loc().to_str().c_str());
+              block->rloc().to_str().c_str(),
+              block->rloc().to_str().c_str());
   } /* for(&e..) */
   return true;
 
@@ -179,8 +182,8 @@ boost::optional<random_distributor::coord_search_res_t> random_distributor::
     rel = {x, y};
     abs = {rel.x() + mc_origin.x(), rel.y() + mc_origin.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {
-    rmath::vector2d abs_r = rmath::uvec2dvec(abs, mc_resolution);
-    auto status = loop_utils::placement_conflict(abs_r, block_dim, ent);
+    rmath::vector2d abs_r = rmath::uvec2dvec(abs, mc_resolution.v());
+    auto status = utils::placement_conflict(abs_r, block_dim, ent);
     return status.x_conflict && status.y_conflict && count++ <= kMAX_DIST_TRIES;
   }));
   if (count <= kMAX_DIST_TRIES) {

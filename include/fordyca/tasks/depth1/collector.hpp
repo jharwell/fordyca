@@ -86,11 +86,11 @@ class collector : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
 
   /* task metrics */
-  bool task_at_interface(void) const override;
+  bool task_at_interface(void) const override RCSW_PURE;
   bool task_completed(void) const override { return task_finished(); }
 
   void task_start(const rta::taskable_argument*) override;
-  double abort_prob_calc(void) override;
+  double abort_prob_calc(void) override RCSW_PURE;
   double interface_time_calc(uint interface,
                              double start_time) override;
   void active_interface_update(int) override;

@@ -65,7 +65,7 @@ ds::cache_list line_of_sight::caches(void) const {
         ER_ASSERT(cache->n_blocks() >= base_cache::kMinBlocks,
                   "Cache%d@%s has too few blocks (%zu < %zu)",
                   cache->id(),
-                  cache->discrete_loc().to_str().c_str(),
+                  cache->dloc().to_str().c_str(),
                   cache->n_blocks(),
                   base_cache::kMinBlocks);
         /*
@@ -84,7 +84,7 @@ ds::cache_list line_of_sight::caches(void) const {
   return caches;
 } /* caches() */
 
-__rcsw_pure bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
+bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   for (size_t i = 0; i < xsize(); ++i) {
     for (size_t j = 0; j < ysize(); ++j) {
       if (cell(i, j).loc() == loc) {
@@ -95,7 +95,7 @@ __rcsw_pure bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   return false;
 } /* contains_loc() */
 
-__rcsw_pure const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
+const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
   ER_ASSERT(i < mc_view.shape()[0],
             "Out of bounds X access: %u >= %lu",
             i,

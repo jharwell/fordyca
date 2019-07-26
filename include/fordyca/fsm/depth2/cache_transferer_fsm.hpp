@@ -63,13 +63,13 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
   cache_transferer_fsm& operator=(const cache_transferer_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acq_goal_type acquisition_goal(void) const override;
+  acq_goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
+  transport_goal_type block_transport_goal(void) const override RCSW_PURE;
 
-  bool is_acquiring_dest_cache(void) const;
-  bool is_acquiring_src_cache(void) const;
+  bool is_acquiring_dest_cache(void) const RCSW_PURE;
+  bool is_acquiring_src_cache(void) const RCSW_PURE;
 
  private:
   /* clang-format off */

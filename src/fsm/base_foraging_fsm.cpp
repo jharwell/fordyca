@@ -68,21 +68,21 @@ HFSM_STATE_DEFINE(base_foraging_fsm, leaving_nest, rpfsm::event_data* data) {
    * nest. Instead, wander about within the nest until you find the edge (either
    * on your own or being pushed out via collision avoidance).
    */
-  if (m_saa->sensing()->threatening_obstacle_exists()) {
+  if (auto obs = m_saa->sensing()->avg_obstacle_within_prox()) {
     m_tracker.ca_enter();
-    rmath::vector2d obs = saa_subsystem()->sensing()->find_closest_obstacle();
-    saa_subsystem()->steer2D_force_calc().avoidance(obs);
+    saa_subsystem()->steer2D_force_calc().avoidance(*obs);
   } else {
     m_tracker.ca_exit();
   }
   saa_subsystem()->steer2D_force_calc().wander();
-  m_saa->steer2D_force_apply(std::make_pair(false, false));
+  m_saa->steer2D_force_apply();
 
   if (!m_saa->sensing()->in_nest()) {
     return controller::foraging_signal::ekLEFT_NEST;
   }
   return rpfsm::event_signal::ekHANDLED;
-}
+} /* leaving_nest() */
+
 HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data) {
   ER_ASSERT(rpfsm::event_type::ekNORMAL == data->type(),
             "ekST_TRANSPORT_TO_NEST cannot handle child events");
@@ -101,7 +101,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data)
   if (m_saa->sensing()->in_nest()) {
     if (m_nest_count++ < kNEST_COUNT_MAX_STEPS) {
       m_saa->steer2D_force_calc().wander();
-      m_saa->steer2D_force_apply(std::make_pair(false, false));
+      m_saa->steer2D_force_apply();
       return controller::foraging_signal::ekHANDLED;
     } else {
       m_nest_count = 0;
@@ -109,30 +109,27 @@ HFSM_STATE_DEFINE(base_foraging_fsm, transport_to_nest, rpfsm::event_data* data)
     }
   }
 
+  /*
+   * Add a bit of wander force when returning to the nest so that we do not
+   * beeline for its center directly to decrease congestion.
+   */
+  m_saa->steer2D_force_calc().wander();
+  m_saa->steer2D_force_calc().value(m_saa->steer2D_force_calc().value() * 0.5);
   m_saa->steer2D_force_calc().phototaxis(m_saa->sensing()->light().readings());
 
-  rmath::vector2d obs = m_saa->sensing()->find_closest_obstacle();
-  if (m_saa->sensing()->threatening_obstacle_exists()) {
+  if (auto obs = m_saa->sensing()->avg_obstacle_within_prox()) {
     m_tracker.ca_enter();
-    m_saa->steer2D_force_calc().avoidance(obs);
+    m_saa->steer2D_force_calc().avoidance(*obs);
   } else {
-    /*
-     * If we are currently spinning in place (hard turn), we have 0 linear
-     * velocity, and that does not play well with the arrival force
-     * calculations. To fix this, and a bit of wander force.
-     */
-    if (m_saa->linear_velocity().length() <= 0.1) {
-      m_saa->steer2D_force_calc().wander();
-    }
     m_tracker.ca_exit();
   }
 
-  m_saa->steer2D_force_apply(std::make_pair(true, false));
+  m_saa->steer2D_force_apply();
   return rpfsm::event_signal::ekHANDLED;
-}
+} /* transport_to_nest() */
 
 HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rpfsm::event_data* data) {
-  rmath::radians current_dir = m_saa->sensing()->heading_angle();
+  rmath::radians current_dir = m_saa->sensing()->heading();
 
   /*
    * The new direction is only passed the first time this state is entered, so
@@ -154,8 +151,7 @@ HFSM_STATE_DEFINE(base_foraging_fsm, new_direction, rpfsm::event_data* data) {
    */
   actuators()->differential_drive().fsm_drive(
       base_foraging_fsm::actuators()->differential_drive().max_speed() * 0.1,
-      (current_dir - m_new_dir),
-      std::make_pair(false, true));
+      (current_dir - m_new_dir));
 
   /*
    * We limit the maximum # of steps that we spin, and have an arrival tolerance

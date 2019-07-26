@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "fordyca/config/actuation_config.hpp"
 #include "fordyca/controller/actuator_list.hpp"
-#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 #include "fordyca/controller/throttling_differential_drive.hpp"
+#include "rcppsw/robotics/steer2D/force_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces

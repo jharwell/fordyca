@@ -32,11 +32,16 @@ NS_START(fordyca, metrics, spatial);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-uint swarm_pos2D_metrics_collector::collect_cell(
-    const rmetrics::base_metrics& metrics,
-    const rmath::vector2u& coord) const {
+void swarm_pos2D_metrics_collector::collect(
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const swarm_dist2D_metrics&>(metrics);
-  return static_cast<uint>(m.discrete_position2D() == coord);
-} /* collect_cell() */
+  inc_total_count();
+
+  for (size_t i = 0; i < xsize(); ++i) {
+    for (size_t j = 0; j < ysize(); ++j) {
+      inc_cell_count(i, j, m.discrete_position2D() == rmath::vector2u(i, j));
+    } /* for(j..) */
+  }   /* for(i..) */
+} /* collect() */
 
 NS_END(spatial, metrics, fordyca);

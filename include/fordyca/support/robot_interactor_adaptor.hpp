@@ -26,6 +26,7 @@
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/ds/type_map.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -47,19 +48,19 @@ template <template <typename ControllerType> class InteractorType,
 class robot_interactor_adaptor {
  public:
   robot_interactor_adaptor(controller::base_controller* const controller,
-                           uint timestep)
-      : m_timestep(timestep), m_controller(controller) {}
+                           rtypes::timestep t)
+      : mc_timestep(t), m_controller(controller) {}
 
   template <typename T>
   RetType operator()(InteractorType<T>& interactor) const {
     auto controller =
         dynamic_cast<typename InteractorType<T>::controller_type*>(m_controller);
-    return interactor(*controller, m_timestep);
+    return interactor(*controller, mc_timestep);
   }
 
  private:
   /* clang-format off */
-  uint                               m_timestep;
+  const rtypes::timestep             mc_timestep;
   controller::base_controller* const m_controller;
   /* clang-format on */
 };

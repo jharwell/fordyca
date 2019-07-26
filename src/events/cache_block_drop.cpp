@@ -57,10 +57,10 @@ using ds::occupancy_grid;
 cache_block_drop::cache_block_drop(
     const std::shared_ptr<repr::base_block>& block,
     const std::shared_ptr<repr::arena_cache>& cache,
-    double resolution)
+    rtypes::discretize_ratio resolution)
     : ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
-      cell_op(cache->discrete_loc()),
-      m_resolution(resolution),
+      cell_op(cache->dloc()),
+      mc_resolution(resolution),
       m_block(block),
       m_cache(cache) {}
 
@@ -90,7 +90,7 @@ bool cache_block_drop::dispatch_d2_cache_interactor(
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
     ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
             m_block->id(),
-            m_block->real_loc().to_str().c_str(),
+            m_block->rloc().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
         {m_cache->id(), controller::cache_sel_exception::kPickup});
@@ -123,7 +123,7 @@ void cache_block_drop::visit(ds::arena_map& map) {
   ER_ASSERT(-1 != m_block->robot_id(),
             "Undefined robot index for block%d",
             m_block->id());
-  __rcsw_unused int index = m_block->robot_id();
+  RCSW_UNUSED int index = m_block->robot_id();
   visit(*m_block);
   visit(*m_cache);
   visit(map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()));
@@ -142,7 +142,7 @@ void cache_block_drop::visit(ds::dpo_semantic_map& map) {
 void cache_block_drop::visit(repr::base_block& block) {
   events::free_block_drop_visitor e(m_block, /* OK because we only have 1 block */
                                     rmath::vector2u(cell_op::x(), cell_op::y()),
-                                    m_resolution);
+                                    mc_resolution);
   e.visit(block);
 } /* visit() */
 

@@ -30,17 +30,15 @@
 NS_START(fordyca, config, caches);
 
 /*******************************************************************************
- * Global Variables
- ******************************************************************************/
-constexpr char static_cache_parser::kXMLRoot[];
-
-/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void static_cache_parser::parse(const ticpp::Element& node) {
+  /* static caches not used */
+  if (nullptr == node.FirstChild(kXMLRoot, false)) {
+    return;
+  }
   ticpp::Element cnode = node_get(node, kXMLRoot);
-  m_config =
-      std::make_shared<std::remove_reference<decltype(*m_config)>::type>();
+  m_config = std::make_unique<config_type>();
 
   XML_PARSE_ATTR(cnode, m_config, enable);
   if (m_config->enable) {
@@ -49,17 +47,14 @@ void static_cache_parser::parse(const ticpp::Element& node) {
   }
 } /* parse() */
 
-void static_cache_parser::show(std::ostream& stream) const {
-  stream << build_header() << std::endl
-         << XML_ATTR_STR(m_config, enable) << std::endl
-         << XML_ATTR_STR(m_config, size) << std::endl
-         << XML_ATTR_STR(m_config, respawn_scale_factor) << std::endl
-         << build_footer();
-} /* show() */
+bool static_cache_parser::validate(void) const {
+  if (!is_parsed() || (is_parsed() && !m_config->enable)) {
+    return true;
+  }
 
-__rcsw_const bool static_cache_parser::validate(void) const {
   CHECK(m_config->size > 0);
   CHECK(m_config->respawn_scale_factor > 0);
+  return true;
 
 error:
   return false;

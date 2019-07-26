@@ -33,13 +33,6 @@
 NS_START(fordyca, fsm);
 
 /*******************************************************************************
- * Class Constants
- ******************************************************************************/
-constexpr double vector_fsm::kCACHE_ARRIVAL_TOL;
-constexpr double vector_fsm::kBLOCK_ARRIVAL_TOL;
-constexpr double vector_fsm::kCACHE_SITE_ARRIVAL_TOL;
-
-/*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 vector_fsm::vector_fsm(controller::saa_subsystem* const saa)
@@ -55,7 +48,7 @@ vector_fsm::vector_fsm(controller::saa_subsystem* const saa)
 /*******************************************************************************
  * States
  ******************************************************************************/
-__rcsw_const FSM_STATE_DEFINE_ND(vector_fsm, start) {
+RCSW_CONST FSM_STATE_DEFINE_ND(vector_fsm, start) {
   return controller::foraging_signal::ekHANDLED;
 }
 
@@ -73,47 +66,32 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_avoidance) {
     actuators()->differential_drive().set_wheel_speeds(
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
-    ca_tracker()->ca_enter();
     internal_event(ekST_COLLISION_RECOVERY);
     return controller::foraging_signal::ekHANDLED;
   }
 
-  if (sensors()->threatening_obstacle_exists()) {
-    ca_tracker()->ca_exit();
-    if (sensors()->tick() - m_state.last_collision_time <
-        kFREQ_COLLISION_THRESH) {
-      ER_DEBUG("Frequent collision: last=%u curr=%u",
-               m_state.last_collision_time,
-               sensors()->tick());
-      rmath::vector2d new_dir = randomize_vector_angle(rmath::vector2d::X);
-      internal_event(ekST_NEW_DIRECTION,
-                     rcppsw::make_unique<new_direction_data>(new_dir.angle()));
-    } else {
-      rmath::vector2d obs = sensors()->find_closest_obstacle();
-      ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
-               obs.to_str().c_str(),
-               obs.angle().value(),
-               obs.length());
-      saa_subsystem()->steer2D_force_calc().avoidance(obs);
-      /*
-       * If we are currently spinning in place (hard turn), we have 0 linear
-       * velocity, and that does not play well with the arrival force
-       * calculations. To fix this, add a bit of wander force.
-       */
-      if (saa_subsystem()->linear_velocity().length() <= 0.1) {
-        saa_subsystem()->steer2D_force_calc().wander();
-      }
-      saa_subsystem()->steer2D_force_apply(std::make_pair(false, false));
+  if (auto obs = sensors()->avg_obstacle_within_prox()) {
+    ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
+             obs->to_str().c_str(),
+             obs->angle().value(),
+             obs->length());
+    saa_subsystem()->steer2D_force_calc().avoidance(*obs);
+    /*
+     * If we are currently spinning in place (hard turn), we have 0 linear
+     * velocity, and that does not play well with the arrival force
+     * calculations. To fix this, add a bit of wander force.
+     */
+    if (saa_subsystem()->linear_velocity().length() <= 0.1) {
+      saa_subsystem()->steer2D_force_calc().wander();
     }
+    saa_subsystem()->steer2D_force_apply();
   } else {
-    m_state.last_collision_time = sensors()->tick();
     /*
      * Go in whatever direction you are currently facing for collision recovery.
      */
     actuators()->differential_drive().set_wheel_speeds(
         actuators()->differential_drive().max_speed() * 0.7,
         actuators()->differential_drive().max_speed() * 0.7);
-    ca_tracker()->ca_exit();
     internal_event(ekST_COLLISION_RECOVERY);
   }
   return controller::foraging_signal::ekHANDLED;
@@ -135,7 +113,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
    * (or maybe that is how it is supposed to work; idk). This causes an
    * exception and ARGoS crashes. See #519.
    */
-  if (sensors()->threatening_obstacle_exists()) {
+  if (auto obs = sensors()->avg_obstacle_within_prox()) {
     m_state.m_collision_rec_count = 0;
     internal_event(ekST_COLLISION_AVOIDANCE);
   } else if (++m_state.m_collision_rec_count >= kCOLLISION_RECOVERY_TIME) {
@@ -144,6 +122,7 @@ FSM_STATE_DEFINE_ND(vector_fsm, collision_recovery) {
   }
   return controller::foraging_signal::ekHANDLED;
 }
+
 FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
   if (ekST_VECTOR != last_state()) {
     ER_DEBUG("Executing ekST_VECTOR");
@@ -160,7 +139,7 @@ FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
   if ((m_goal_data.loc - sensors()->position()).length() <=
       m_goal_data.tolerance) {
     internal_event(ekST_ARRIVED,
-                   rcppsw::make_unique<struct goal_data>(m_goal_data));
+                   std::make_unique<struct goal_data>(m_goal_data));
   }
 
   /*
@@ -171,20 +150,20 @@ FSM_STATE_DEFINE(vector_fsm, vector, rpfsm::event_data* data) {
    * Not doing this results in robots getting stuck when they all are trying to
    * pick up the same block in close quarters.
    */
-  if (sensors()->threatening_obstacle_exists() &&
+  if (sensors()->avg_obstacle_within_prox() &&
       !saa_subsystem()->steer2D_force_calc().within_slowing_radius()) {
     internal_event(ekST_COLLISION_AVOIDANCE);
   } else {
     saa_subsystem()->steer2D_force_calc().seek_to(m_goal_data.loc);
     saa_subsystem()->actuation()->leds_set_color(rutils::color::kBLUE);
-    saa_subsystem()->steer2D_force_apply(std::make_pair(true, false));
+    saa_subsystem()->steer2D_force_apply();
   }
   return controller::foraging_signal::ekHANDLED;
 }
 
-__rcsw_const FSM_STATE_DEFINE(vector_fsm,
-                              arrived,
-                              __rcsw_unused struct goal_data* data) {
+RCSW_CONST FSM_STATE_DEFINE(vector_fsm,
+                            arrived,
+                            RCSW_UNUSED struct goal_data* data) {
   if (ekST_ARRIVED != last_state()) {
     ER_DEBUG("Executing ekST_ARRIVED: target=%s, tol=%f",
              data->loc.to_str().c_str(),
@@ -197,10 +176,18 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_vector) {
   ER_DEBUG("Entering ekST_VECTOR");
   actuators()->leds_set_color(rutils::color::kBLUE);
 }
+
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_avoidance) {
   ER_DEBUG("Entering ekST_COLLISION_AVOIDANCE");
+  ca_tracker()->ca_enter();
   actuators()->leds_set_color(rutils::color::kRED);
 }
+
+FSM_EXIT_DEFINE(vector_fsm, exit_collision_avoidance) {
+  ER_DEBUG("Exiting ekST_COLLISION_AVOIDANCE");
+  ca_tracker()->ca_exit();
+}
+
 FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
   ER_DEBUG("Entering ekST_COLLISION_RECOVERY");
   actuators()->leds_set_color(rutils::color::kYELLOW);
@@ -208,15 +195,15 @@ FSM_ENTRY_DEFINE_ND(vector_fsm, entry_collision_recovery) {
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/
-__rcsw_pure bool vector_fsm::in_collision_avoidance(void) const {
+bool vector_fsm::in_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE == current_state();
 } /* in_collision_avoidance() */
 
-__rcsw_pure bool vector_fsm::entered_collision_avoidance(void) const {
+bool vector_fsm::entered_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE != last_state() && in_collision_avoidance();
 } /* entered_collision_avoidance() */
 
-__rcsw_pure bool vector_fsm::exited_collision_avoidance(void) const {
+bool vector_fsm::exited_collision_avoidance(void) const {
   return ekST_COLLISION_AVOIDANCE == last_state() && !in_collision_avoidance();
 } /* exited_collision_avoidance() */
 
@@ -240,8 +227,8 @@ void vector_fsm::task_start(const rta::taskable_argument* const c_arg) {
   ER_ASSERT(nullptr != a, "bad argument passed");
   FSM_VERIFY_TRANSITION_MAP(kTRANSITIONS, ekST_MAX_STATES);
   external_event(kTRANSITIONS[current_state()],
-                 rcppsw::make_unique<struct goal_data>(a->vector(),
-                                                       a->tolerance()));
+                 std::make_unique<struct goal_data>(a->vector(),
+                                                    a->tolerance()));
 } /* task_start() */
 
 void vector_fsm::task_execute(void) {
@@ -254,8 +241,7 @@ void vector_fsm::init(void) {
   rpfsm::simple_fsm::init();
 } /* init() */
 
-__rcsw_pure rmath::vector2d vector_fsm::calc_vector_to_goal(
-    const rmath::vector2d& goal) {
+rmath::vector2d vector_fsm::calc_vector_to_goal(const rmath::vector2d& goal) {
   return goal - sensors()->position();
 } /* calc_vector_to_goal() */
 
