@@ -35,8 +35,8 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 ds::block_list line_of_sight::blocks(void) const {
   ds::block_list blocks{};
-  for (uint i = 0; i < mc_view.shape()[0]; ++i) {
-    for (uint j = 0; j < mc_view.shape()[1]; ++j) {
+  for (uint i = 0; i < xsize(); ++i) {
+    for (uint j = 0; j < ysize(); ++j) {
       const ds::cell2D& cell = mc_view[i][j];
       if (cell.state_has_block()) {
         ER_ASSERT(nullptr != cell.block(),
@@ -53,8 +53,8 @@ ds::block_list line_of_sight::blocks(void) const {
 ds::cache_list line_of_sight::caches(void) const {
   ds::cache_list caches = m_caches;
 
-  for (uint i = 0; i < mc_view.shape()[0]; ++i) {
-    for (uint j = 0; j < mc_view.shape()[1]; ++j) {
+  for (uint i = 0; i < xsize(); ++i) {
+    for (uint j = 0; j < ysize(); ++j) {
       const ds::cell2D& cell = mc_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = cell.cache();

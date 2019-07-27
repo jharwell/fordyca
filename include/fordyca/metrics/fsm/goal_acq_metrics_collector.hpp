@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <list>
+#include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/nsalias.hpp"
@@ -59,23 +60,23 @@ class goal_acq_metrics_collector final : public rmetrics::base_metrics_collector
   void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
+  /**
+   * @brief Container for holding collected statistics. Must be atomic so counts
+   * are valid in parallel metric collection contexts.
+   */
   struct stats {
-    uint n_int_true_exploring_for_goal;
-    uint n_int_false_exploring_for_goal;
-    uint n_int_vectoring_to_goal;
-    uint n_int_acquiring_goal;
-
-    uint n_cum_true_exploring_for_goal;
-    uint n_cum_false_exploring_for_goal;
-    uint n_cum_vectoring_to_goal;
-    uint n_cum_acquiring_goal;
+    std::atomic_uint n_true_exploring_for_goal{0};
+    std::atomic_uint n_false_exploring_for_goal{0};
+    std::atomic_uint n_vectoring_to_goal{0};
+    std::atomic_uint n_acquiring_goal{0};
   };
 
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats m_stats;
+  struct stats m_interval{};
+  struct stats m_cum{};
   /* clang-format on */
 };
 

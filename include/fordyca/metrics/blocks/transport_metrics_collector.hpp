@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <list>
+#include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/nsalias.hpp"
@@ -58,56 +59,56 @@ class transport_metrics_collector final : public rmetrics::base_metrics_collecto
   void collect(const rmetrics::base_metrics& metrics) override;
   void reset_after_interval(void) override;
 
-  uint cum_collected(void) const { return m_stats.cum_collected; }
+  uint cum_collected(void) const { return m_cum.collected; }
 
-  private:
+ private:
+  /**
+   * @brief Container for holding collected statistics. Must be atomic so counts
+   * are valid in parallel metric collection contexts. Ideally the times
+   * would be atomic \ref rtypes::timestep, but that type does not meet the
+   * std::atomic requirements.
+   */
   struct stats {
     /**
      * @brief  Total # blocks collected in interval.
      */
-    uint int_collected{0};
+    std::atomic_uint collected{0};
 
     /**
      * @brief  Total # cube blocks collected in interval.
      */
-    uint int_cube_collected{0};
+    std::atomic_uint cube_collected{0};
 
     /**
      * @brief  Total # ramp blocks collected in interval.
      */
-    uint int_ramp_collected{0};
+    std::atomic_uint ramp_collected{0};
 
     /**
      * @brief Total # transporters for collected blocks in interval.
      */
-    uint int_transporters{0};
+    std::atomic_uint transporters{0};
 
     /**
      * @brief Total amount of time taken for all collected blocks to be
      * transported from original distribution locations to the nest within an
      * interval.
      */
-    rtypes::timestep int_transport_time{0};
+    std::atomic_uint transport_time{0};
 
     /**
      * @brief Total amount of time between original arena distribution and first
      * pickup for all collected blocks in interval.
      */
-    rtypes::timestep int_initial_wait_time{0};
-
-    uint cum_collected{0};
-    uint cum_cube_collected{0};
-    uint cum_ramp_collected{0};
-    double cum_transporters{0.0};
-    rtypes::timestep cum_transport_time{0};
-    rtypes::timestep cum_initial_wait_time{0};
+    std::atomic_uint initial_wait_time{0};
   };
 
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats m_stats{};
+  struct stats m_interval{};
+  struct stats m_cum{};
   /* clang-format on */
 };
 

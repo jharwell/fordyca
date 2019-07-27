@@ -68,7 +68,7 @@ class foraging_task
   static bool task_in_depth2(const polled_task* task) RCSW_PURE;
 
   /* task overrides */
-  double current_time(void) const override RCSW_PURE;
+  rtypes::timestep current_time(void) const override RCSW_PURE;
 };
 
 NS_END(depth2, tasks, fordyca);

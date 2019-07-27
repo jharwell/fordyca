@@ -184,7 +184,7 @@ class collector_registerer : public rer::client<collector_registerer> {
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath) const {
     return m_agg->collector_register<typename TCollectorWrap::type>(
-        scoped_name, fpath, mc_config->collect_interval, mc_arena_dim);
+        scoped_name, fpath, mc_config->output_interval, mc_arena_dim);
   }
 
   template <typename TCollectorWrap,
@@ -193,7 +193,7 @@ class collector_registerer : public rer::client<collector_registerer> {
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath) const {
     return m_agg->collector_register<typename TCollectorWrap::type>(
-        scoped_name, fpath, mc_config->collect_interval);
+        scoped_name, fpath, mc_config->output_interval);
   }
 
   template <typename TCollectorWrap,
@@ -211,7 +211,7 @@ class collector_registerer : public rer::client<collector_registerer> {
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath) const {
     return m_agg->collector_register<typename TCollectorWrap::type>(
-        scoped_name, fpath, mc_config->collect_interval, mc_decomp_depth);
+        scoped_name, fpath, mc_config->output_interval, mc_decomp_depth);
   }
 
   /**

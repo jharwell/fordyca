@@ -64,9 +64,9 @@ double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-double cache_transferer::interface_time_calc(RCSW_UNUSED uint interface,
-                                             double start_time) {
-  return current_time() - start_time;
+rtypes::timestep cache_transferer::interface_time_calc(uint,
+                                                     const rtypes::timestep& start_time) {
+  return rtypes::timestep(current_time() - start_time);
 } /* interface_time_calc() */
 
 void cache_transferer::active_interface_update(int) {
@@ -76,26 +76,26 @@ void cache_transferer::active_interface_update(int) {
     if (fsm->goal_acquired() && interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
-      ER_TRACE("Interface0 finished at timestep %f", current_time());
+      ER_TRACE("Interface0 finished at timestep %u", current_time().v());
     }
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);
-      ER_TRACE("Interface0 start at timestep %f", current_time());
+      ER_TRACE("Interface0 start at timestep %u", current_time().v());
     }
-    ER_TRACE("Interface0 time: %f", interface_time(0));
+    ER_TRACE("Interface0 time: %u", interface_time(0).v());
   } else if (fsm->is_acquiring_dest_cache()) {
     if (fsm->goal_acquired() && interface_in_prog(1)) {
       interface_exit(1);
       interface_time_mark_finish(1);
-      ER_TRACE("Interface1 finished at timestep %f", current_time());
+      ER_TRACE("Interface1 finished at timestep %u", current_time().v());
     }
     if (!interface_in_prog(1)) {
       interface_enter(1);
       interface_time_mark_start(1);
-      ER_TRACE("Interface1 start at timestep %f", current_time());
+      ER_TRACE("Interface1 start at timestep %u", current_time().v());
     }
-    ER_TRACE("Interface1 time: %f", interface_time(0));
+    ER_TRACE("Interface1 time: %u", interface_time(1).v());
   }
 } /* active_interface_update() */
 

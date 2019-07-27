@@ -165,10 +165,12 @@ void depth0_loop_functions::private_init(void) {
   boost::mpl::for_each<controller::depth0::typelist>(f_initializer);
 
   /* configure robots */
-  swarm_iterator::controllers(this, [&](auto* controller) {
-    boost::apply_visitor(detail::robot_configurer_adaptor(controller),
-                         config_map.at(controller->type_index()));
-  });
+  swarm_iterator::controllers<swarm_iterator::dynamic_order>(
+      this,
+      [&](auto* controller) {
+        boost::apply_visitor(detail::robot_configurer_adaptor(controller),
+                             config_map.at(controller->type_index()));
+      });
 } /* private_init() */
 
 /*******************************************************************************
@@ -179,7 +181,9 @@ void depth0_loop_functions::PreStep(void) {
   base_loop_functions::PreStep();
 
   /* Process all robots */
-  swarm_iterator::robots(this, [&](auto* robot) { robot_pre_step(*robot); });
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(
+      this,
+      [&](auto* robot) { robot_pre_step(*robot); });
 
   ndc_pop();
 } /* PreStep() */
@@ -188,8 +192,13 @@ void depth0_loop_functions::PostStep(void) {
   ndc_push();
   base_loop_functions::PostStep();
 
-  /* Process all robots */
-  swarm_iterator::robots(this, [&](auto* robot) { robot_post_step(*robot); });
+  /* Process all robots: interact with environment then collect metrics */
+  swarm_iterator::robots<swarm_iterator::static_order>(
+      this,
+      [&](auto* robot) { robot_post_step1(*robot); });
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(
+      this,
+      [&](auto* robot) { robot_post_step2(*robot); });
 
   /* Update block distribution status */
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
@@ -268,7 +277,7 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
+void depth0_loop_functions::robot_post_step1(argos::CFootBotEntity& robot) {
   auto controller = static_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -297,6 +306,11 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
     oracle_manager()->update(arena_map());
   }
+} /* robot_post_step1() */
+
+void depth0_loop_functions::robot_post_step2(argos::CFootBotEntity& robot) {
+  auto controller = static_cast<controller::base_controller*>(
+      &robot.GetControllableEntity().GetController());
 
   /*
    * Collect metrics from robot, now that it has finished interacting with the
@@ -307,7 +321,7 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   boost::apply_visitor(madaptor, m_metrics_map->at(controller->type_index()));
 
   controller->block_manip_collator()->reset();
-} /* robot_post_step() */
+} /* robot_post_step2() */
 
 using namespace argos; // NOLINT
 #pragma clang diagnostic push

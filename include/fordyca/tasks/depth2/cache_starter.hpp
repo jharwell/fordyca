@@ -85,8 +85,8 @@ class cache_starter final : public foraging_task,
 
   void task_start(const rta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
-  double interface_time_calc(uint interface,
-                             double start_time) override RCSW_PURE;
+  rtypes::timestep interface_time_calc(uint interface,
+                                       const rtypes::timestep& start_time) override RCSW_PURE;
   void active_interface_update(int) override;
 };
 

@@ -25,11 +25,12 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
 #include <list>
+#include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/nsalias.hpp"
+#include "fordyca/fsm/cell2D_states.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,16 +64,16 @@ class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_co
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
-  /* clang-format off */
-  std::vector<uint> m_int_states;
-  double            m_int_known_percent{0.0};
-  double            m_int_unknown_percent{0.0};
-  uint              m_int_robots{0};
+  struct stats {
+    std::atomic_uint    states[::fordyca::fsm::cell2D_states::ekST_MAX_STATES];
+    std::atomic<double> known_percent{0.0};
+    std::atomic<double> unknown_percent{0.0};
+    std::atomic_uint    robots{0};
+  };
 
-  std::vector<uint> m_cum_states;
-  double            m_cum_known_percent{0.0};
-  double            m_cum_unknown_percent{0.0};
-  uint              m_cum_robots{0};
+  /* clang-format off */
+  struct stats m_interval{};
+  struct stats m_cum{};
   /* clang-format on */
 };
 

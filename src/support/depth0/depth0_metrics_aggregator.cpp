@@ -113,10 +113,8 @@ void depth0_metrics_aggregator::collect_from_controller(
 
   collect_if("fsm::collision_locs",
              *controller->fsm(),
-             [&](const rmetrics::base_metrics& metrics) {
-               auto& m =
-                   dynamic_cast<const metrics::fsm::collision_metrics&>(metrics);
-               return m.in_collision_avoidance();
+             [&](const rmetrics::base_metrics&) {
+               return controller->fsm()->ca_tracker()->in_collision_avoidance();
              });
 
   collect_if("blocks::acq_locs",

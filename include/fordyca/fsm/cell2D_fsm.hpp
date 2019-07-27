@@ -29,6 +29,7 @@
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcsw/common/common.h"
+#include "fordyca/fsm/cell2D_states.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,28 +50,28 @@ NS_START(fordyca, fsm);
 class cell2D_fsm final : public rpfsm::simple_fsm,
                          public rer::client<cell2D_fsm> {
  public:
-  enum state {
-    ekST_UNKNOWN,
-    ekST_EMPTY,
-    ekST_HAS_BLOCK,
-    ekST_HAS_CACHE,
-    ekST_CACHE_EXTENT,
-    ekST_MAX_STATES
-  };
-
+  using states = cell2D_states;
   cell2D_fsm(void);
   ~cell2D_fsm(void) override = default;
   cell2D_fsm(const cell2D_fsm& other) = default;
 
   void init(void) override;
 
-  bool state_is_known(void) const { return current_state() != ekST_UNKNOWN; }
-  bool state_has_block(void) const { return current_state() == ekST_HAS_BLOCK; }
-  bool state_has_cache(void) const { return current_state() == ekST_HAS_CACHE; }
-  bool state_in_cache_extent(void) const {
-    return current_state() == ekST_CACHE_EXTENT;
+  bool state_is_known(void) const {
+    return current_state() != std::underlying_type<states>::type(states::ekST_UNKNOWN);
   }
-  bool state_is_empty(void) const { return current_state() == ekST_EMPTY; }
+  bool state_has_block(void) const {
+    return current_state() == std::underlying_type<states>::type(states::ekST_HAS_BLOCK);
+  }
+  bool state_has_cache(void) const {
+    return current_state() == std::underlying_type<states>::type(states::ekST_HAS_CACHE);
+  }
+  bool state_in_cache_extent(void) const {
+    return current_state() == std::underlying_type<states>::type(states::ekST_CACHE_EXTENT);
+  }
+  bool state_is_empty(void) const {
+    return current_state() == std::underlying_type<states>::type(states::ekST_EMPTY);
+  }
 
   /* events */
   void event_unknown(void);
@@ -101,7 +102,9 @@ class cell2D_fsm final : public rpfsm::simple_fsm,
         FSM_STATE_MAP_ENTRY(&state_cache),
         FSM_STATE_MAP_ENTRY(&state_cache_extent),
     };
-    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ekST_MAX_STATES);
+    FSM_VERIFY_STATE_MAP(state_map,
+                         kSTATE_MAP,
+                         std::underlying_type<states>::type(states::ekST_MAX_STATES));
     return &kSTATE_MAP[index];
   }
 

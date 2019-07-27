@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <list>
+#include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/nsalias.hpp"
@@ -60,23 +61,24 @@ class movement_metrics_collector final : public rmetrics::base_metrics_collector
   void reset_after_interval(void) override;
 
  private:
+  /**
+   * @brief Container for holding collected statistics. Must be atomic so counts
+   * are valid in parallel metric collection contexts. Ideally the distances
+   * would be atomic \ref rtypes::spatial_dist, but that type does not meet the
+   * std::atomic requirements.
+   */
   struct stats {
-    /* clang-format off */
-    rtypes::spatial_dist int_distance{0.0};
-    uint                 int_robot_count{0};
-    double               int_velocity{0.0};
-
-    rtypes::spatial_dist cum_distance{0.0};
-    uint                 cum_robot_count{0};
-    double               cum_velocity{0.0};
-    /* clang-format on */
+    std::atomic<double> distance{0.0};
+    std::atomic_uint    robot_count{0};
+    std::atomic<double> velocity{0.0};
   };
 
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats m_stats{};
+  struct stats m_interval{};
+  struct stats m_cum{};
   /* clang-format on */
 };
 

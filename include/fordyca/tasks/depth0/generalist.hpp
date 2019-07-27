@@ -78,8 +78,10 @@ class generalist final : public foraging_task {
 
   void task_start(const rta::taskable_argument* const) override {}
 
-  double current_time(void) const override RCSW_PURE;
-  double interface_time_calc(uint, double) override { return 0.0; }
+  rtypes::timestep current_time(void) const override RCSW_PURE;
+  rtypes::timestep interface_time_calc(uint, const rtypes::timestep&) override {
+    return rtypes::timestep(0);
+  }
   void active_interface_update(int) override {}
   double abort_prob_calc(void) override RCSW_PURE;
 };

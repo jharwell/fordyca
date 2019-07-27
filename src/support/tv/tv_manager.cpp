@@ -165,7 +165,9 @@ double tv_manager::swarm_motion_throttle(void) const {
   double accum = 0.0;
   auto& robots = mc_lf->GetSpace().GetEntitiesByType("foot-bot");
 
-  support::swarm_iterator::controllers(mc_lf, [&](auto& controller) {
+  support::swarm_iterator::controllers<swarm_iterator::static_order>(
+      mc_lf,
+      [&](auto& controller) {
     accum += controller->applied_motion_throttle();
   });
   return accum / robots.size();
@@ -200,7 +202,9 @@ void tv_manager::update(void) {
   }
   rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
 
-  support::swarm_iterator::controllers(mc_lf, [&](auto& controller) {
+  support::swarm_iterator::controllers<swarm_iterator::static_order>(
+      mc_lf,
+      [&](auto& controller) {
     m_motion_throttling.at(controller->entity_id())
         .toggle(controller->is_carrying_block());
     m_motion_throttling.at(controller->entity_id()).update(t);

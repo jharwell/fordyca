@@ -68,21 +68,21 @@ bool manipulation_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.int_free_pickup_events) + separator();
-  line += std::to_string(m_stats.int_free_drop_events) + separator();
+  line += std::to_string(m_interval.free_pickup_events) + separator();
+  line += std::to_string(m_interval.free_drop_events) + separator();
 
-  line += csv_entry_domavg(m_stats.int_free_pickup_penalty.v(),
-                           m_stats.int_free_pickup_events);
-  line += csv_entry_domavg(m_stats.int_free_drop_penalty.v(),
-                           m_stats.int_free_drop_events);
+  line += csv_entry_domavg(m_interval.free_pickup_penalty,
+                           m_interval.free_pickup_events);
+  line += csv_entry_domavg(m_interval.free_drop_penalty,
+                           m_interval.free_drop_events);
 
-  line += std::to_string(m_stats.int_cache_pickup_events) + separator();
-  line += std::to_string(m_stats.int_cache_drop_events) + separator();
+  line += std::to_string(m_interval.cache_pickup_events) + separator();
+  line += std::to_string(m_interval.cache_drop_events) + separator();
 
-  line += csv_entry_domavg(m_stats.int_cache_pickup_penalty.v(),
-                           m_stats.int_cache_pickup_events);
-  line += csv_entry_domavg(m_stats.int_cache_drop_penalty.v(),
-                           m_stats.int_cache_drop_events,
+  line += csv_entry_domavg(m_interval.cache_pickup_penalty,
+                           m_interval.cache_pickup_events);
+  line += csv_entry_domavg(m_interval.cache_drop_penalty,
+                           m_interval.cache_drop_events,
                            true);
   return true;
 } /* csv_line_build() */
@@ -91,29 +91,30 @@ void manipulation_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const manipulation_metrics&>(metrics);
   if (m.free_pickup_event()) {
-    ++m_stats.int_free_pickup_events;
-    m_stats.int_free_pickup_penalty += m.penalty_served();
+    ++m_interval.free_pickup_events;
+    m_interval.free_pickup_penalty += m.penalty_served().v();
   } else if (m.free_drop_event()) {
-    ++m_stats.int_free_drop_events;
-    m_stats.int_free_drop_penalty += m.penalty_served();
+    ++m_interval.free_drop_events;
+    m_interval.free_drop_penalty += m.penalty_served().v();
   } else if (m.cache_pickup_event()) {
-    ++m_stats.int_cache_pickup_events;
-    m_stats.int_cache_pickup_penalty += m.penalty_served();
+    ++m_interval.cache_pickup_events;
+    m_interval.cache_pickup_penalty += m.penalty_served().v();
   } else if (m.cache_drop_event()) {
-    ++m_stats.int_cache_drop_events;
-    m_stats.int_cache_drop_penalty += m.penalty_served();
+    ++m_interval.cache_drop_events;
+    m_interval.cache_drop_penalty += m.penalty_served().v();
   }
 } /* collect() */
 
 void manipulation_metrics_collector::reset_after_interval(void) {
-  m_stats = {0,
-             0,
-             rtypes::timestep(0),
-             rtypes::timestep(0),
-             0,
-             0,
-             rtypes::timestep(0),
-             rtypes::timestep(0)};
+  m_interval.free_pickup_events = 0;
+  m_interval.free_drop_events = 0;
+  m_interval.free_pickup_penalty = 0;
+  m_interval.free_drop_penalty = 0;
+
+  m_interval.cache_pickup_events = 0;
+  m_interval.cache_drop_events = 0;
+  m_interval.cache_pickup_penalty = 0;
+  m_interval.cache_drop_penalty = 0;
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

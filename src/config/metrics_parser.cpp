@@ -82,7 +82,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
     m_config = std::make_unique<config_type>();
 
     XML_PARSE_ATTR(mnode, m_config, output_dir);
-    XML_PARSE_ATTR(mnode, m_config, collect_interval);
+    XML_PARSE_ATTR(mnode, m_config, output_interval);
 
     for (auto& m : xml_attr) {
       if (mnode.HasAttribute(m)) {
@@ -96,7 +96,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
 bool metrics_parser::validate(void) const {
   if (is_parsed()) {
-    CHECK(m_config->collect_interval > 0);
+    CHECK(m_config->output_interval > 0);
   }
   return true;
 

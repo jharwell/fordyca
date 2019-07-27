@@ -73,29 +73,29 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += std::to_string(m_stats.cum_collected) + separator();
-  line += std::to_string(m_stats.cum_ramp_collected) + separator();
-  line += std::to_string(m_stats.cum_cube_collected) + separator();
+  line += std::to_string(m_cum.collected) + separator();
+  line += std::to_string(m_cum.ramp_collected) + separator();
+  line += std::to_string(m_cum.cube_collected) + separator();
 
-  line += csv_entry_intavg(m_stats.int_collected);
-  line += csv_entry_tsavg(m_stats.cum_collected);
+  line += csv_entry_intavg(m_interval.collected);
+  line += csv_entry_tsavg(m_cum.collected);
 
-  line += csv_entry_intavg(m_stats.int_cube_collected);
-  line += csv_entry_tsavg(m_stats.cum_cube_collected);
-  line += csv_entry_intavg(m_stats.int_ramp_collected);
-  line += csv_entry_tsavg(m_stats.cum_ramp_collected);
-  line += csv_entry_domavg(m_stats.int_collected, m_stats.int_transporters);
-  line += csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transporters);
+  line += csv_entry_intavg(m_interval.cube_collected);
+  line += csv_entry_tsavg(m_cum.cube_collected);
+  line += csv_entry_intavg(m_interval.ramp_collected);
+  line += csv_entry_tsavg(m_cum.ramp_collected);
+  line += csv_entry_domavg(m_interval.collected, m_interval.transporters);
+  line += csv_entry_domavg(m_cum.collected, m_cum.transporters);
 
   line +=
-      csv_entry_domavg(m_stats.int_collected, m_stats.int_transport_time.v());
+      csv_entry_domavg(m_interval.collected, m_interval.transport_time);
   line +=
-      csv_entry_domavg(m_stats.cum_collected, m_stats.cum_transport_time.v());
+      csv_entry_domavg(m_cum.collected, m_cum.transport_time);
 
-  line += csv_entry_domavg(m_stats.int_collected,
-                           m_stats.int_initial_wait_time.v());
-  line += csv_entry_domavg(m_stats.cum_collected,
-                           m_stats.cum_initial_wait_time.v(),
+  line += csv_entry_domavg(m_interval.collected,
+                           m_interval.initial_wait_time);
+  line += csv_entry_domavg(m_cum.collected,
+                           m_cum.initial_wait_time,
                            true);
 
   return true;
@@ -103,31 +103,31 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
 
 void transport_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const transport_metrics&>(metrics);
-  ++m_stats.int_collected;
-  m_stats.int_cube_collected += (repr::block_type::ekCUBE == m.type());
-  m_stats.int_ramp_collected += (repr::block_type::ekRAMP == m.type());
+  ++m_interval.collected;
+  m_interval.cube_collected += (repr::block_type::ekCUBE == m.type());
+  m_interval.ramp_collected += (repr::block_type::ekRAMP == m.type());
 
-  ++m_stats.cum_collected;
-  m_stats.cum_cube_collected += (repr::block_type::ekCUBE == m.type());
-  m_stats.cum_ramp_collected += (repr::block_type::ekRAMP == m.type());
+  ++m_cum.collected;
+  m_cum.cube_collected += (repr::block_type::ekCUBE == m.type());
+  m_cum.ramp_collected += (repr::block_type::ekRAMP == m.type());
 
-  m_stats.int_transporters += m.total_transporters();
-  m_stats.cum_transporters += m.total_transporters();
+  m_interval.transporters += m.total_transporters();
+  m_cum.transporters += m.total_transporters();
 
-  m_stats.int_transport_time += m.total_transport_time();
-  m_stats.cum_transport_time += m.total_transport_time();
+  m_interval.transport_time += m.total_transport_time().v();
+  m_cum.transport_time += m.total_transport_time().v();
 
-  m_stats.int_initial_wait_time += m.initial_wait_time();
-  m_stats.cum_initial_wait_time += m.initial_wait_time();
+  m_interval.initial_wait_time += m.initial_wait_time().v();
+  m_cum.initial_wait_time += m.initial_wait_time().v();
 } /* collect() */
 
 void transport_metrics_collector::reset_after_interval(void) {
-  m_stats.int_collected = 0;
-  m_stats.int_cube_collected = 0;
-  m_stats.int_ramp_collected = 0;
-  m_stats.int_transporters = 0;
-  m_stats.int_transport_time = rtypes::timestep(0);
-  m_stats.int_initial_wait_time = rtypes::timestep(0);
+  m_interval.collected = 0;
+  m_interval.cube_collected = 0;
+  m_interval.ramp_collected = 0;
+  m_interval.transporters = 0;
+  m_interval.transport_time = 0;
+  m_interval.initial_wait_time = 0;
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

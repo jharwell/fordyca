@@ -62,9 +62,10 @@ double cache_starter::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-double cache_starter::interface_time_calc(uint interface, double start_time) {
+rtypes::timestep cache_starter::interface_time_calc(uint interface,
+                                                     const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
-  return current_time() - start_time;
+  return rtypes::timestep(current_time() - start_time);
 } /* interface_time_calc() */
 
 void cache_starter::active_interface_update(int) {

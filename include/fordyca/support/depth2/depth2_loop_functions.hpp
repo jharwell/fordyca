@@ -145,12 +145,26 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void robot_pre_step(argos::CFootBotEntity& robot);
 
   /**
-   * @brief Process a single robot on a timestep, after running its controller:
+   * @brief Process a single robot on a timestep, after running its controller,
+   * step1: have it interact with the environment.
    *
-   * - Have it interact with the environment.
-   * - Collect metrics from it.
+   * This is done serially for all robots.
+   *
+   * @todo This is separate from step 2 until robot-arena interactions can be
+   * made thread safe and then they can be recombined.
    */
-  void robot_post_step(argos::CFootBotEntity& robot);
+  void robot_post_step1(argos::CFootBotEntity& robot);
+
+  /**
+   * @brief Process a single robot on a timestep, after running its controller,
+   * step 2: collect metrics from it.
+   *
+   * This is done in parallel for all robots.
+   *
+   * @todo This is separate from step 1 until robot-arena interactions can be
+   * made thread safe and then they can be recombined.
+   */
+  void robot_post_step2(argos::CFootBotEntity& robot);
 
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 

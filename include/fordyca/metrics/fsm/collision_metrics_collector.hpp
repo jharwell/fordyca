@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <list>
+#include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/nsalias.hpp"
@@ -60,25 +61,25 @@ class collision_metrics_collector final : public rmetrics::base_metrics_collecto
   void reset_after_interval(void) override;
 
  private:
+  /**
+   * @brief Container for holding collected statistics. Must be atomic so counts
+   * are valid in parallel metric collection contexts. Ideally the durations
+   * would be atomic \ref rtypes::timestep, but that type does not meet the
+   * std::atomic requirements.
+   */
   struct stats {
-    /* clang-format off */
-    uint             int_n_in_avoidance{0};
-    uint             int_n_entered_avoidance{0};
-    uint             int_n_exited_avoidance{0};
-    rtypes::timestep int_avoidance_duration{0};
-
-    uint             cum_n_in_avoidance{0};
-    uint             cum_n_entered_avoidance{0};
-    uint             cum_n_exited_avoidance{0};
-    rtypes::timestep cum_avoidance_duration{0};
-    /* clang-format on */
+    std::atomic_uint n_in_avoidance{0};
+    std::atomic_uint n_entered_avoidance{0};
+    std::atomic_uint n_exited_avoidance{0};
+    std::atomic_uint avoidance_duration{0};
   };
 
   std::list<std::string> csv_header_cols(void) const override;
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats m_stats{};
+  struct stats m_interval{};
+  struct stats m_cum{};
   /* clang-format on */
 };
 

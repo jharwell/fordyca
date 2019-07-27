@@ -87,7 +87,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
         tasks::task_status::ekAbortPending != controller.task_status()) {
       return false;
     }
-    auto polled =
+    RCSW_UNUSED auto polled =
         dynamic_cast<const rta::polled_task*>(controller.current_task());
     /*
      * If a robot aborted its task and was carrying a block, it needs to (1)

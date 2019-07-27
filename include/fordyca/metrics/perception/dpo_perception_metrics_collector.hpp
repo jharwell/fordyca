@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <list>
+#include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "rcppsw/swarm/pheromone_density.hpp"
@@ -65,17 +66,23 @@ class dpo_perception_metrics_collector final
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  uint                      m_int_robot_count{0};
-  uint                      m_int_known_blocks{0};
-  uint                      m_int_known_caches{0};
-  rswarm::pheromone_density m_int_block_density_sum{};
-  rswarm::pheromone_density m_int_cache_density_sum{};
 
-  uint                      m_cum_robot_count{0};
-  uint                      m_cum_known_blocks{0};
-  uint                      m_cum_known_caches{0};
-  rswarm::pheromone_density m_cum_block_density_sum{};
-  rswarm::pheromone_density m_cum_cache_density_sum{};
+  /**
+   * @brief Container for holding collected statistics. Must be atomic so counts
+   * are valid in parallel metric collection contexts. Ideally the densities
+   * would be atomic \ref rswarm::pheromone_density, but that type does not meet
+   * the std::atomic requirements.
+   */
+  struct stats {
+    std::atomic_uint    robot_count{0};
+    std::atomic_uint    known_blocks{0};
+    std::atomic_uint    known_caches{0};
+    std::atomic<double> block_density_sum{};
+    std::atomic<double> cache_density_sum{};
+  };
+
+  struct stats m_interval{};
+  struct stats m_cum{};
   /* clang-format on */
 };
 

@@ -70,40 +70,53 @@ bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += csv_entry_domavg(m_int_known_blocks, m_int_robot_count);
-  line += csv_entry_domavg(m_cum_known_blocks, m_cum_robot_count);
-  line += csv_entry_domavg(m_int_known_caches, m_int_robot_count);
-  line += csv_entry_domavg(m_cum_known_caches, m_cum_robot_count);
+  line += csv_entry_domavg(m_interval.known_blocks, m_interval.robot_count);
+  line += csv_entry_domavg(m_cum.known_blocks, m_cum.robot_count);
+  line += csv_entry_domavg(m_interval.known_caches, m_interval.robot_count);
+  line += csv_entry_domavg(m_cum.known_caches, m_cum.robot_count);
 
-  line += csv_entry_domavg(m_int_block_density_sum.v(), m_int_robot_count);
-  line += csv_entry_domavg(m_cum_block_density_sum.v(), m_cum_robot_count);
-  line += csv_entry_domavg(m_int_cache_density_sum.v(), m_int_robot_count);
-  line += csv_entry_domavg(m_cum_cache_density_sum.v(), m_cum_robot_count, true);
+  line += csv_entry_domavg(m_interval.block_density_sum, m_interval.robot_count);
+  line += csv_entry_domavg(m_cum.block_density_sum, m_cum.robot_count);
+  line += csv_entry_domavg(m_interval.cache_density_sum, m_interval.robot_count);
+  line += csv_entry_domavg(m_cum.cache_density_sum,
+                           m_cum.robot_count,
+                           true);
   return true;
 } /* csv_line_build() */
 
 void dpo_perception_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const dpo_perception_metrics&>(metrics);
-  ++m_int_robot_count;
-  ++m_cum_robot_count;
-  m_int_known_blocks += m.n_known_blocks();
-  m_int_known_caches += m.n_known_caches();
-  m_int_block_density_sum += m.avg_block_density();
-  m_int_cache_density_sum += m.avg_cache_density();
+  ++m_interval.robot_count;
+  ++m_cum.robot_count;
 
-  m_cum_known_blocks += m.n_known_blocks();
-  m_cum_known_caches += m.n_known_caches();
-  m_cum_block_density_sum += m.avg_block_density();
-  m_cum_cache_density_sum += m.avg_cache_density();
+  m_interval.known_blocks += m.n_known_blocks();
+  m_interval.known_caches += m.n_known_caches();
+
+  m_cum.known_blocks += m.n_known_blocks();
+  m_cum.known_caches += m.n_known_caches();
+
+  auto int_bsum = m_interval.block_density_sum.load();
+  auto int_csum = m_interval.cache_density_sum.load();
+  m_interval.block_density_sum.compare_exchange_strong(int_bsum,
+                                                        int_bsum + m.avg_block_density().v());
+  m_interval.cache_density_sum.compare_exchange_strong(int_csum,
+                                                        int_csum + m.avg_cache_density().v());
+
+  auto cum_bsum = m_cum.block_density_sum.load();
+  auto cum_csum = m_cum.cache_density_sum.load();
+  m_cum.block_density_sum.compare_exchange_strong(cum_bsum,
+                                                        cum_bsum + m.avg_block_density().v());
+  m_cum.cache_density_sum.compare_exchange_strong(cum_csum,
+                                                        cum_csum + m.avg_cache_density().v());
 } /* collect() */
 
 void dpo_perception_metrics_collector::reset_after_interval(void) {
-  m_int_robot_count = 0;
-  m_int_known_blocks = 0;
-  m_int_known_caches = 0;
-  m_int_block_density_sum.reset();
-  m_int_cache_density_sum.reset();
+  m_interval.robot_count = 0;
+  m_interval.known_blocks = 0;
+  m_interval.known_caches = 0;
+  m_interval.block_density_sum = 0.0;
+  m_interval.cache_density_sum = 0.0;
 } /* reset_after_interval() */
 
 NS_END(perception, metrics, fordyca);

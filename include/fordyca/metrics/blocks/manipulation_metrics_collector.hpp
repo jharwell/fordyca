@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <string>
 #include <list>
+#include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/nsalias.hpp"
@@ -59,16 +60,22 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
   void reset_after_interval(void) override;
 
  private:
+  /**
+   * @brief Container for holding collected statistics. Must be atomic so counts
+   * are valid in parallel metric collection contexts. Ideally the penalties
+   * would be atomic \ref rtypes::timestep, but that type does not meet the
+   * std::atomic requirements.
+   */
   struct stats {
-    uint             int_free_pickup_events{0};
-    uint             int_free_drop_events{0};
-    rtypes::timestep int_free_pickup_penalty{0};
-    rtypes::timestep int_free_drop_penalty{0};
+    std::atomic_uint free_pickup_events{0};
+    std::atomic_uint free_drop_events{0};
+    std::atomic_uint free_pickup_penalty{0};
+    std::atomic_uint free_drop_penalty{0};
 
-    uint             int_cache_pickup_events{0};
-    uint             int_cache_drop_events{0};
-    rtypes::timestep int_cache_pickup_penalty{0};
-    rtypes::timestep int_cache_drop_penalty{0};
+    std::atomic_uint cache_pickup_events{0};
+    std::atomic_uint cache_drop_events{0};
+    std::atomic_uint cache_pickup_penalty{0};
+    std::atomic_uint cache_drop_penalty{0};
   };
 
   std::list<std::string> csv_header_cols(void) const override;
@@ -76,7 +83,7 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
   bool csv_line_build(std::string& line) override;
 
   /* clang-format off */
-  struct stats m_stats{};
+  struct stats m_interval{};
   /* clang-format on */
 };
 

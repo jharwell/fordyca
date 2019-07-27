@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <gp_dpo_controller id="ffc"
+    <crw_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -160,7 +160,7 @@
                               max_speed="10.0" />
         </actuation>
       </params>
-    </gp_dpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -168,7 +168,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth0_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -204,7 +204,7 @@
           swarm_dist_pos2D="swarm-dist-pos2D.csv"
           swarm_convergence="swarm-convergence.csv"
           temporal_variance="temporal-variance.csv"
-          collect_interval="1000">
+          output_interval="1000">
       </metrics>
     </output>
     <!-- <convergence -->

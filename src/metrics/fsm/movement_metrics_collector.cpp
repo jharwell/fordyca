@@ -62,28 +62,38 @@ bool movement_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += csv_entry_domavg(m_stats.int_distance.v(), m_stats.int_robot_count);
-  line += csv_entry_domavg(m_stats.cum_distance.v(), m_stats.cum_robot_count);
+  line += csv_entry_domavg(m_interval.distance.load(), m_interval.robot_count);
+  line += csv_entry_domavg(m_cum.distance.load(), m_cum.robot_count);
 
-  line += csv_entry_domavg(m_stats.int_velocity, m_stats.int_robot_count);
-  line += csv_entry_domavg(m_stats.cum_velocity, m_stats.cum_robot_count, true);
+  line += csv_entry_domavg(m_interval.velocity.load(), m_interval.robot_count);
+  line += csv_entry_domavg(m_cum.velocity.load(),
+                           m_cum.robot_count,
+                           true);
   return true;
 } /* csv_line_build() */
 
 void movement_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::movement_metrics&>(metrics);
-  ++m_stats.int_robot_count;
-  ++m_stats.cum_robot_count;
-  m_stats.cum_distance += m.distance();
-  m_stats.int_distance += m.distance();
-  m_stats.cum_velocity += m.velocity().length();
-  m_stats.int_velocity += m.velocity().length();
+  ++m_interval.robot_count;
+  ++m_cum.robot_count;
+  auto cum_dist = m_cum.distance.load();
+  auto int_dist = m_interval.distance.load();
+  auto cum_vel = m_cum.velocity.load();
+  auto int_vel = m_interval.velocity.load();
+  m_cum.distance.compare_exchange_strong(cum_dist,
+                                               cum_dist + m.distance().v());
+  m_interval.distance.compare_exchange_strong(int_dist,
+                                               int_dist + m.distance().v());
+  m_cum.velocity.compare_exchange_strong(cum_vel,
+                                               cum_vel + m.velocity().length());
+  m_interval.velocity.compare_exchange_strong(int_vel,
+                                               int_vel + m.velocity().length());
 } /* collect() */
 
 void movement_metrics_collector::reset_after_interval(void) {
-  m_stats.int_distance = rtypes::spatial_dist(0.0);
-  m_stats.int_velocity = 0.0;
-  m_stats.int_robot_count = 0;
+  m_interval.distance = 0.0;
+  m_interval.velocity = 0.0;
+  m_interval.robot_count = 0;
 } /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);

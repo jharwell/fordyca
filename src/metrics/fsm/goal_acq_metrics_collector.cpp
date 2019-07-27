@@ -34,7 +34,7 @@ NS_START(fordyca, metrics, fsm);
  ******************************************************************************/
 goal_acq_metrics_collector::goal_acq_metrics_collector(const std::string& ofname,
                                                        uint interval)
-    : base_metrics_collector(ofname, interval), m_stats() {}
+    : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
  * Member Functions
@@ -64,43 +64,48 @@ void goal_acq_metrics_collector::reset(void) {
 
 void goal_acq_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
-  auto [is_exp, true_exp] = m.is_exploring_for_goal();
-  m_stats.n_int_true_exploring_for_goal += static_cast<uint>(is_exp && true_exp);
-  m_stats.n_int_false_exploring_for_goal +=
-      static_cast<uint>(is_exp && !true_exp);
-  m_stats.n_int_acquiring_goal +=
-      static_cast<uint>(is_exp || m.is_vectoring_to_goal());
-  m_stats.n_int_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
+  auto[is_exp, true_exp] = m.is_exploring_for_goal();
 
-  m_stats.n_cum_true_exploring_for_goal += static_cast<uint>(is_exp && true_exp);
-  m_stats.n_cum_false_exploring_for_goal +=
+  m_interval.n_true_exploring_for_goal +=
+      static_cast<uint>(is_exp && true_exp);
+  m_interval.n_false_exploring_for_goal +=
       static_cast<uint>(is_exp && !true_exp);
-  m_stats.n_cum_acquiring_goal +=
+  m_interval.n_acquiring_goal +=
       static_cast<uint>(is_exp || m.is_vectoring_to_goal());
-  m_stats.n_cum_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
+  m_interval.n_vectoring_to_goal +=
+      static_cast<uint>(m.is_vectoring_to_goal());
+
+  m_cum.n_true_exploring_for_goal +=
+      static_cast<uint>(is_exp && true_exp);
+  m_cum.n_false_exploring_for_goal +=
+      static_cast<uint>(is_exp && !true_exp);
+  m_cum.n_acquiring_goal +=
+      static_cast<uint>(is_exp || m.is_vectoring_to_goal());
+  m_cum.n_vectoring_to_goal +=
+      static_cast<uint>(m.is_vectoring_to_goal());
 } /* collect() */
 
 bool goal_acq_metrics_collector::csv_line_build(std::string& line) {
   if (!((timestep() + 1) % interval() == 0)) {
     return false;
   }
-  line += csv_entry_intavg(m_stats.n_int_acquiring_goal);
-  line += csv_entry_tsavg(m_stats.n_cum_acquiring_goal);
-  line += csv_entry_intavg(m_stats.n_int_vectoring_to_goal);
-  line += csv_entry_tsavg(m_stats.n_cum_vectoring_to_goal);
-  line += csv_entry_intavg(m_stats.n_int_true_exploring_for_goal);
-  line += csv_entry_tsavg(m_stats.n_cum_true_exploring_for_goal);
-  line += csv_entry_intavg(m_stats.n_int_false_exploring_for_goal);
-  line += csv_entry_tsavg(m_stats.n_cum_false_exploring_for_goal, true);
+  line += csv_entry_intavg(m_interval.n_acquiring_goal.load());
+  line += csv_entry_tsavg(m_cum.n_acquiring_goal.load());
+  line += csv_entry_intavg(m_interval.n_vectoring_to_goal.load());
+  line += csv_entry_tsavg(m_cum.n_vectoring_to_goal.load());
+  line += csv_entry_intavg(m_interval.n_true_exploring_for_goal.load());
+  line += csv_entry_tsavg(m_cum.n_true_exploring_for_goal.load());
+  line += csv_entry_intavg(m_interval.n_false_exploring_for_goal.load());
+  line += csv_entry_tsavg(m_cum.n_false_exploring_for_goal.load(), true);
 
   return true;
 } /* store_foraging_stats() */
 
 void goal_acq_metrics_collector::reset_after_interval(void) {
-  m_stats.n_int_true_exploring_for_goal = 0;
-  m_stats.n_int_false_exploring_for_goal = 0;
-  m_stats.n_int_acquiring_goal = 0;
-  m_stats.n_int_vectoring_to_goal = 0;
+  m_interval.n_true_exploring_for_goal = 0;
+  m_interval.n_false_exploring_for_goal = 0;
+  m_interval.n_acquiring_goal = 0;
+  m_interval.n_vectoring_to_goal = 0;
 } /* reset_after_interval() */
 
 NS_END(fsm, metrics, fordyca);

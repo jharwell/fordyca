@@ -1,7 +1,7 @@
 /**
- * @file metrics_config.hpp
+ * @file cell2D_states.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,43 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_METRICS_CONFIG_HPP_
-#define INCLUDE_FORDYCA_CONFIG_METRICS_CONFIG_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_CELL2D_STATES_HPP_
+#define INCLUDE_FORDYCA_FSM_CELL2D_STATES_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <map>
-#include <string>
-
-#include "fordyca/config/grid_config.hpp"
-#include "rcppsw/config/base_config.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
- * Structure Definitions
+ * Class Definitions
  ******************************************************************************/
-/**
- * @struct metrics_config
- * @ingroup fordyca config
- *
- * Each member represents the filename to which a specific type of metrics
- * should be logged. Empty filename=no metrics of that type will be collected.
- */
-struct metrics_config : public rconfig::base_config {
-  using enabled_map_type = std::map<std::string, std::string>;
-
-  std::string output_dir{};
-  grid_config arena_grid{};
-  uint output_interval{0};
-
-  enabled_map_type enabled{};
+enum cell2D_states {
+  ekST_UNKNOWN,
+  ekST_EMPTY,
+  ekST_HAS_BLOCK,
+  ekST_HAS_CACHE,
+  ekST_CACHE_EXTENT,
+  ekST_MAX_STATES
 };
 
-NS_END(config, fordyca);
+NS_END(fordyca, fsm);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_METRICS_CONFIG_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_CELL2D_STATES_HPP_ */

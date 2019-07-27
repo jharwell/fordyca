@@ -180,10 +180,13 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * Register all controllers with temporal variance manager in order to be
    * able to apply sensing/actuation variances if configured.
    */
-  swarm_iterator::controllers(this, [&](auto* c) {
-    m_tv_manager->register_controller(c->entity_id());
-    c->tv_init(m_tv_manager.get());
-  });
+  swarm_iterator::controllers<swarm_iterator::static_order>(
+      this,
+      [&](auto* c) {
+        m_tv_manager->register_controller(c->entity_id());
+        c->tv_init(m_tv_manager.get());
+      }
+  );
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
@@ -224,10 +227,10 @@ void base_loop_functions::Reset(void) {
 /*******************************************************************************
  * Metrics
  ******************************************************************************/
-std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
+std::vector<double> base_loop_functions::calc_robot_nn(RCSW_UNUSED uint n_threads) const {
   std::vector<rmath::vector2d> v;
 
-  swarm_iterator::robots(this, [&](auto* robot) {
+  swarm_iterator::robots<swarm_iterator::static_order>(this, [&](auto* robot) {
     v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
                  robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
   });
@@ -270,9 +273,11 @@ std::vector<double> base_loop_functions::calc_robot_nn(uint) const {
 std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const {
   std::vector<rmath::radians> v;
 
-  swarm_iterator::controllers(this, [&](const auto* controller) {
-    v.push_back(controller->heading2D().angle());
-  });
+  swarm_iterator::controllers<swarm_iterator::static_order>(
+      this,
+      [&](const auto* controller) {
+        v.push_back(controller->heading2D().angle());
+      });
   return v;
 } /* calc_robot_headings() */
 
@@ -280,9 +285,11 @@ std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
     uint) const {
   std::vector<rmath::vector2d> v;
 
-  swarm_iterator::controllers(this, [&](const auto* controller) {
-    v.push_back(controller->position2D());
-  });
+  swarm_iterator::controllers<swarm_iterator::static_order>(
+      this,
+      [&](const auto* controller) {
+        v.push_back(controller->position2D());
+      });
   return v;
 } /* calc_robot_positions() */
 
