@@ -62,16 +62,24 @@ class ledtaxis_cache_search : public base_expstrat,
   ledtaxis_cache_search& operator=(const ledtaxis_cache_search&) = delete;
 
   /* taskable overrides */
-  void task_start(const rta::taskable_argument*) override {
-      m_taxis.task_start(nullptr);
-  }
-  void task_reset(void) override final {
-    m_taxis.task_reset();
-    m_crw.task_reset();
-  }
+
+  /**
+   * @brief Start LED taxis cache search. Crucially, this enables the camera
+   * sensor for use during exploration. See #593.
+   */
+  void task_start(const rta::taskable_argument*) override;
+
+  /**
+   * @brief Reset LED taxis cache search after a cache is successfully
+   * discovered. Crucially, this disable the camera sensor for increased
+   * computational efficiency. See #593.
+   */
+  void task_reset(void) override final;
+
   bool task_running(void) const override final {
     return m_taxis.task_running() || m_crw.task_running();
   }
+
   /**
    * @brief Since we are exploring for something we don't know about, we will
    * never finish (stopping exploration is handled at a higher level).

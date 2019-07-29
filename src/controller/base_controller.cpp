@@ -127,6 +127,7 @@ void base_controller::saa_init(const config::actuation_config* const actuation_p
       .wifi = rrhal::actuators::wifi_actuator(nullptr)
 #endif /* FORDYCA_WITH_ROBOT_RAB */
   };
+
   sensor_list slist = {
 #ifdef FORDYCA_WITH_ROBOT_RAB
       .rabs = rrhal::sensors::rab_wifi_sensor(

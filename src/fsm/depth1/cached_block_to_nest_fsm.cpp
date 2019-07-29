@@ -62,7 +62,7 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                nullptr,
                                                &entry_transport_to_nest,
-                                               nullptr),
+                                               &exit_transport_to_nest),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
                                                nullptr,
                                                &entry_leaving_nest,

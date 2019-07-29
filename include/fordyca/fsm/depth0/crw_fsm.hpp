@@ -57,9 +57,9 @@ using transport_goal_type = block_transporter::goal_type;
  * block back to the nest, and drops it.
  */
 class crw_fsm final : public base_foraging_fsm,
-                public rer::client<crw_fsm>,
-                public metrics::fsm::goal_acq_metrics,
-                public block_transporter {
+                      public rer::client<crw_fsm>,
+                      public metrics::fsm::goal_acq_metrics,
+                      public block_transporter {
  public:
   explicit crw_fsm(controller::saa_subsystem* saa,
                    std::unique_ptr<expstrat::base_expstrat> exp_behavior);
@@ -119,6 +119,8 @@ class crw_fsm final : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
+
+  HFSM_EXIT_INHERIT(base_foraging_fsm, exit_transport_to_nest);
 
   /* crw fsm states */
   HFSM_STATE_DECLARE(crw_fsm, start, state_machine::event_data);

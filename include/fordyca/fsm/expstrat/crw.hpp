@@ -79,6 +79,7 @@ class crw final
   std::unique_ptr<base_expstrat> clone(void) const override {
     return std::make_unique<crw>(saa_subsystem());
   }
+
  private:
   /**
    * @brief Handle all logic for entering collision avoidance; derived classes

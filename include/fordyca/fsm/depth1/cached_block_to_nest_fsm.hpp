@@ -177,6 +177,8 @@ class cached_block_to_nest_fsm final : public base_foraging_fsm,
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
 
+  HFSM_EXIT_INHERIT(base_foraging_fsm, exit_transport_to_nest);
+
   /* foraging states */
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);

@@ -91,6 +91,7 @@ class base_foraging_fsm : public rpfsm::hfsm,
   const std::shared_ptr<const controller::actuation_subsystem> actuators(
       void) const;
   const std::shared_ptr<controller::actuation_subsystem> actuators(void);
+  const collision_tracker* ca_tracker(void) const { return &m_tracker; }
 
  protected:
   /**
@@ -105,7 +106,6 @@ class base_foraging_fsm : public rpfsm::hfsm,
   const controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
   controller::saa_subsystem* saa_subsystem(void) { return m_saa; }
   collision_tracker* ca_tracker(void) { return &m_tracker; }
-  const collision_tracker* ca_tracker(void) const { return &m_tracker; }
 
   /**
    * @brief Robots entering this state will return to the nest.
@@ -141,8 +141,13 @@ class base_foraging_fsm : public rpfsm::hfsm,
   HFSM_STATE_DECLARE(base_foraging_fsm, new_direction, rpfsm::event_data);
 
   /**
-   * @brief A simple entry state for returning to nest, used to set LED colors
-   * for visualization purposes.
+   * @brief Entry state for returning to nest.
+   *
+   * Used to:
+   *
+   * - Set LED colors for visualization purposes.
+   * - Enable light sensor (disabled otherwise for computational
+   * - efficiency). See #593.
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_transport_to_nest);
 
@@ -163,6 +168,18 @@ class base_foraging_fsm : public rpfsm::hfsm,
    * change LED color for visualization purposes.
    */
   HFSM_ENTRY_DECLARE_ND(base_foraging_fsm, entry_wait_for_signal);
+
+  /**
+   * @brief Exit state for returning to nest (i.e. when the robot arrives in the
+   * nest).
+   *
+   * Used to:
+   *
+   * - Set LED colors for visualization purposes.
+   * - Disable light sensor (disabled unless a robot is activiely returning to
+   * - the nest for computational        efficiency). See #593.
+   */
+  HFSM_EXIT_DECLARE(base_foraging_fsm, exit_transport_to_nest);
 
  private:
   /**

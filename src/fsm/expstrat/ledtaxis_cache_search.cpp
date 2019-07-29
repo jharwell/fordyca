@@ -63,6 +63,17 @@ void ledtaxis_cache_search::task_execute(void) {
   m_crw.task_execute();
 } /* task_execute() */
 
+void ledtaxis_cache_search::task_start(const rta::taskable_argument*) {
+  saa_subsystem()->sensing()->blobs().enable();
+  m_taxis.task_start(nullptr);
+} /* task_start() */
+
+void ledtaxis_cache_search::task_reset(void) {
+  saa_subsystem()->sensing()->blobs().disable();
+  m_taxis.task_reset();
+  m_crw.task_reset();
+} /* task_reset() */
+
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/

@@ -81,8 +81,6 @@ class acquire_existing_cache_fsm
   acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm&) =
       delete;
 
-  void by_exploration_ok(bool b) { m_by_exploration_ok = b; }
-
  private:
   using acq_loc_type = std::pair<int, rmath::vector2d>;
   /*
@@ -107,16 +105,6 @@ class acquire_existing_cache_fsm
   const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*                const mc_store;
-  /**
-   * @brief Is it OK to acquire a cache via exploration? Usually you do not want
-   * this because:
-   *
-   * - The cache we just acquired might have been one that was excluded from the
-   *   list of eligible caches for acquisition.
-   * - We might not have meant the criteria for block pickup from this cache
-   *   yet.
-   */
-  bool                                      m_by_exploration_ok{false};
   std::default_random_engine                m_rd;
   /* clang-format on */
 };

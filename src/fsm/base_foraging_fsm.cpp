@@ -169,7 +169,11 @@ HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_leaving_nest) {
   m_saa->actuation()->leds_set_color(rutils::color::kWHITE);
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_transport_to_nest) {
+  m_saa->sensing()->light().enable();
   m_saa->actuation()->leds_set_color(rutils::color::kGREEN);
+}
+HFSM_EXIT_DEFINE(base_foraging_fsm, exit_transport_to_nest) {
+  m_saa->sensing()->light().disable();
 }
 HFSM_ENTRY_DEFINE_ND(base_foraging_fsm, entry_new_direction) {
   actuators()->leds_set_color(rutils::color::kCYAN);

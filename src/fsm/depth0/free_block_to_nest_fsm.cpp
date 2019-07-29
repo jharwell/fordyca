@@ -61,7 +61,7 @@ free_block_to_nest_fsm::free_block_to_nest_fsm(
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
                                                nullptr,
                                                &entry_transport_to_nest,
-                                               nullptr),
+                                               &exit_transport_to_nest),
                    HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
 
 HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {

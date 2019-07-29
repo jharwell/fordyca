@@ -124,6 +124,7 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
                      rpfsm::event_data);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
+  HFSM_EXIT_INHERIT(base_foraging_fsm, exit_transport_to_nest);
   HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
   HFSM_STATE_DECLARE(free_block_to_nest_fsm, start, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, acquire_block);

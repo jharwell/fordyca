@@ -130,7 +130,8 @@ bool acquire_existing_cache_fsm::candidates_exist(void) const {
 
 bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   if (explore_result) {
-    return m_by_exploration_ok;
+    ER_FATAL_SENTINEL("Robot acquired cache via exploration");
+    return false;
   } else {
     if (saa_subsystem()->sensing()->cache_detected()) {
       return true;
