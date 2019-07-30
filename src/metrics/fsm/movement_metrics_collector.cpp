@@ -66,9 +66,7 @@ bool movement_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_cum.distance.load(), m_cum.robot_count);
 
   line += csv_entry_domavg(m_interval.velocity.load(), m_interval.robot_count);
-  line += csv_entry_domavg(m_cum.velocity.load(),
-                           m_cum.robot_count,
-                           true);
+  line += csv_entry_domavg(m_cum.velocity.load(), m_cum.robot_count, true);
   return true;
 } /* csv_line_build() */
 
@@ -80,14 +78,13 @@ void movement_metrics_collector::collect(const rmetrics::base_metrics& metrics) 
   auto int_dist = m_interval.distance.load();
   auto cum_vel = m_cum.velocity.load();
   auto int_vel = m_interval.velocity.load();
-  m_cum.distance.compare_exchange_strong(cum_dist,
-                                               cum_dist + m.distance().v());
+  m_cum.distance.compare_exchange_strong(cum_dist, cum_dist + m.distance().v());
   m_interval.distance.compare_exchange_strong(int_dist,
-                                               int_dist + m.distance().v());
+                                              int_dist + m.distance().v());
   m_cum.velocity.compare_exchange_strong(cum_vel,
-                                               cum_vel + m.velocity().length());
+                                         cum_vel + m.velocity().length());
   m_interval.velocity.compare_exchange_strong(int_vel,
-                                               int_vel + m.velocity().length());
+                                              int_vel + m.velocity().length());
 } /* collect() */
 
 void movement_metrics_collector::reset_after_interval(void) {

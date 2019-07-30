@@ -89,7 +89,7 @@ class free_block_pickup_interactor
    */
   interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+      if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_free_block_pickup(controller, t);
         return interactor_status::ekFreeBlockPickup;
       }
@@ -117,9 +117,19 @@ class free_block_pickup_interactor
               controller.block()->id());
     /*
      * More than 1 robot can pick up a block in a timestep, so we have to
-     * search for this robot's controller
+     * search for this robot's controller.
      */
-    const tv::temporal_penalty<T>& p = *m_penalty_handler->find(controller);
+    const auto& p = *m_penalty_handler->penalty_find(controller);
+
+    /*
+     * We cannot just lock around the critical arena map updates
+     * here in order to make this section thread safe because if two threads
+     * updating two robots both having finished serving their penalty this
+     * timestep manage to pass the check to actually perform the block pickup
+     * before one of them actually finishes picking up a block, then the second
+     * one will not get the necessary \ref block_vanished event. See #594.
+     */
+    m_map->block_mtx().lock();
 
     /*
      * If two robots both are serving penalties on the same ramp block (possible
@@ -140,14 +150,16 @@ class free_block_pickup_interactor
     if (p.id() != utils::robot_on_block(controller, *m_map)) {
       ER_WARN("%s cannot pickup block%d: No such block",
               controller.GetId().c_str(),
-              m_penalty_handler->find(controller)->id());
+              m_penalty_handler->penalty_find(controller)->id());
       events::block_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
       perform_free_block_pickup(controller, p, t);
       m_floor->SetChanged();
     }
-    m_penalty_handler->remove(p);
+    m_map->block_mtx().unlock();
+
+    m_penalty_handler->penalty_remove(p);
     ER_ASSERT(
         !m_penalty_handler->is_serving_penalty(controller),
         "Multiple instances of same controller serving block pickup penalty");
@@ -160,6 +172,7 @@ class free_block_pickup_interactor
   void perform_free_block_pickup(T& controller,
                                  const tv::temporal_penalty<T>& penalty,
                                  rtypes::timestep t) {
+    /* Holding block mutex not necessary here, but does not hurt */
     auto it =
         std::find_if(m_map->blocks().begin(),
                      m_map->blocks().end(),
@@ -176,9 +189,7 @@ class free_block_pickup_interactor
      * classes--no clean way to mix the two.
      */
     controller.block_manip_collator()->penalty_served(penalty.penalty());
-    events::free_block_pickup_visitor pickup_op(*it,
-                                                utils::robot_id(controller),
-                                                t);
+    events::free_block_pickup_visitor pickup_op(*it, controller.entity_id(), t);
 
     pickup_op.visit(controller);
     pickup_op.visit(*m_map);

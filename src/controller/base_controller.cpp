@@ -35,6 +35,7 @@
 #include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/controller/sensing_subsystem.hpp"
+#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
@@ -47,7 +48,9 @@ namespace fs = std::experimental::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 base_controller::base_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.base"), m_saa(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.base"),
+      m_block(nullptr),
+      m_saa(nullptr) {}
 
 base_controller::~base_controller(void) = default;
 
@@ -224,6 +227,13 @@ void base_controller::tv_init(const support::tv::tv_manager* tv_manager) {
   }
 } /* tv_init() */
 
+void base_controller::block(std::unique_ptr<repr::base_block> block) {
+  m_block = std::move(block);
+}
+
+std::unique_ptr<repr::base_block> base_controller::block_release(void) {
+  return std::move(m_block);
+}
 /*******************************************************************************
  * Movement Metrics
  ******************************************************************************/

@@ -71,6 +71,7 @@
       DEPTH2_NON_ORACULAR_CONTROLLER_TYPES
 #define CONTROLLER_TYPES \
   ORACULAR_CONTROLLER_TYPES, NON_ORACULAR_CONTROLLER_TYPES
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/

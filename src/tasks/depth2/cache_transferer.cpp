@@ -64,8 +64,9 @@ double cache_transferer::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-rtypes::timestep cache_transferer::interface_time_calc(uint,
-                                                     const rtypes::timestep& start_time) {
+rtypes::timestep cache_transferer::interface_time_calc(
+    uint,
+    const rtypes::timestep& start_time) {
   return rtypes::timestep(current_time() - start_time);
 } /* interface_time_calc() */
 

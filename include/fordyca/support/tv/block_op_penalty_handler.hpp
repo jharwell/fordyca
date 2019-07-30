@@ -57,15 +57,16 @@ class block_op_penalty_handler final
       public rer::client<block_op_penalty_handler<T>> {
  public:
   using temporal_penalty_handler<T>::is_serving_penalty;
-  using temporal_penalty_handler<T>::deconflict_penalty_finish;
-  using temporal_penalty_handler<T>::original_penalty;
+  using temporal_penalty_handler<T>::penalty_finish_uniqueify;
+  using temporal_penalty_handler<T>::penalty_calc;
+  using temporal_penalty_handler<T>::penalty_add;
 
   block_op_penalty_handler(ds::arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler<T>(config, name),
         ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
-        m_map(map) {}
+        mc_map(map) {}
 
   ~block_op_penalty_handler(void) override = default;
   block_op_penalty_handler& operator=(const block_op_penalty_handler& other) =
@@ -86,33 +87,31 @@ class block_op_penalty_handler final
    */
   op_filter_status penalty_init(T& controller,
                                 block_op_src src,
-                                rtypes::timestep t,
+                                const rtypes::timestep& t,
                                 rtypes::spatial_dist cache_prox = rtypes::spatial_dist(-1)) {
     auto filter = block_op_filter<T>(
-        m_map)(controller, src, cache_prox);
+        mc_map)(controller, src, cache_prox);
     if (filter != op_filter_status::ekSATISFIED) {
       return filter;
     }
     ER_ASSERT(!is_serving_penalty(controller),
-              "Robot already serving block penalty?");
+              "%s already serving block penalty?",
+              controller.GetId().c_str());
 
     int id = penalty_id_calc(controller, src, cache_prox);
-    rtypes::timestep penalty = deconflict_penalty_finish(t);
-    ER_INFO("fb%d: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            utils::robot_id(controller),
+    rtypes::timestep orig_duration = penalty_calc(t);
+    rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
+    ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
+            controller.GetId().c_str(),
             id,
             t.v(),
-            original_penalty().v(),
-            penalty.v(),
+            orig_duration.v(),
+            duration.v(),
             static_cast<int>(src));
 
-    penalty_list().push_back(
-        temporal_penalty<T>(&controller, id, penalty, t));
+    penalty_add(temporal_penalty<T>(&controller, id, duration, t));
     return filter;
   }
-
- protected:
-  using temporal_penalty_handler<T>::penalty_list;
 
  private:
   int penalty_id_calc(const T& controller,
@@ -121,7 +120,7 @@ class block_op_penalty_handler final
     int id = -1;
     switch (src) {
       case block_op_src::ekFREE_PICKUP:
-        id = utils::robot_on_block(controller, *m_map);
+        id = utils::robot_on_block(controller, *mc_map);
         ER_ASSERT(-1 != id, "Robot not on block?");
         break;
       case block_op_src::ekNEST_DROP:
@@ -151,7 +150,7 @@ class block_op_penalty_handler final
   } /* penalty_id_calc() */
 
   /* clang-format off */
-  ds::arena_map* const m_map;
+  const ds::arena_map* const mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

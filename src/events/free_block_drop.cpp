@@ -59,10 +59,12 @@ using ds::occupancy_grid;
  ******************************************************************************/
 free_block_drop::free_block_drop(const std::shared_ptr<repr::base_block>& block,
                                  const rmath::vector2u& coord,
-                                 rtypes::discretize_ratio resolution)
+                                 rtypes::discretize_ratio resolution,
+                                 bool cache_lock)
     : ER_CLIENT_INIT("fordyca.events.free_block_drop"),
       cell_op(coord),
       mc_resolution(resolution),
+      mc_cache_lock(cache_lock),
       m_block(block) {}
 
 /*******************************************************************************
@@ -136,10 +138,16 @@ void free_block_drop::visit(ds::arena_map& map) {
    * CHANGE AGAIN UNLESS REALLY REALLY SURE WHAT I AM DOING.
    */
   if (cell.state_has_cache()) {
+    if (mc_cache_lock) {
+      map.cache_mtx().lock();
+    }
     cache_block_drop op(m_block,
                         std::static_pointer_cast<repr::arena_cache>(cell.cache()),
                         mc_resolution);
     op.visit(map);
+    if (mc_cache_lock) {
+      map.cache_mtx().lock();
+    }
   } else if (cell.state_has_block()) {
     map.distribute_single_block(m_block);
   } else {

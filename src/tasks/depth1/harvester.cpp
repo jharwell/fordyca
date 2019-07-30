@@ -71,8 +71,9 @@ double harvester::abort_prob_calc(void) {
   }
 } /* calc_abort_prob() */
 
-rtypes::timestep harvester::interface_time_calc(uint interface,
-                                                const rtypes::timestep& start_time) {
+rtypes::timestep harvester::interface_time_calc(
+    uint interface,
+    const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return rtypes::timestep(current_time() - start_time);
 } /* interface_time_calc() */
@@ -88,7 +89,7 @@ void harvester::active_interface_update(int) {
       interface_time_mark_finish(0);
       ER_DEBUG("Interface finished at timestep %u", current_time().v());
     }
-    ER_TRACE("Interface time: %u", interface_time(0));
+    ER_TRACE("Interface time: %u", interface_time(0).v());
   } else if (transport_goal_type::ekEXISTING_CACHE ==
              fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {

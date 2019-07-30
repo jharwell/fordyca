@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <mutex>
 #include <vector>
 
 #include "fordyca/ds/arena_grid.hpp"
@@ -126,6 +127,9 @@ class arena_map final : public rer::client<arena_map>,
    * the cache from the arena.
    *
    * @param victim The cache about to be deleted.
+   *
+   * @note This operation requires holding the cache and grid mutexes in
+   *       multithreaded contexts.
    */
   void cache_extent_clear(const std::shared_ptr<repr::arena_cache>& victim);
 
@@ -154,6 +158,9 @@ class arena_map final : public rer::client<arena_map>,
   /**
    * @brief Distribute all blocks in the arena. Resets arena state. Should only
    * be called during (re)-initialization.
+   *
+   * @note This operation requires holding the block and grid mutexes in
+   *       multi-threaded contetxts.
    */
   void distribute_all_blocks(void);
 
@@ -162,6 +169,9 @@ class arena_map final : public rer::client<arena_map>,
    * policy was specified in the .argos file.
    *
    * @param block The block to distribute.
+   *
+   * @note This operation requires holding the block and grid mutexes in
+   * multithreaded contexts.
    *
    * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
@@ -254,10 +264,31 @@ class arena_map final : public rer::client<arena_map>,
    */
   bool initialize(support::base_loop_functions* loop);
 
+  /**
+   * @brief Protects simultaneous updates to the underlying grid.
+   */
+  std::mutex& grid_mtx(void) { return m_grid_mtx; }
+
+  /**
+   * @brief Protects simultaneous updates to the caches vector.
+   */
+  std::mutex& cache_mtx(void) { return m_cache_mtx; }
+  std::mutex& cache_mtx(void) const { return m_cache_mtx; }
+
+  /**
+   * @brief Protects simultaneous updates to the blocks vector.
+   */
+  std::mutex& block_mtx(void) { return m_block_mtx; }
+
  private:
   /* clang-format off */
+  mutable std::mutex                   m_grid_mtx{};
+  mutable std::mutex                   m_cache_mtx{};
+  mutable std::mutex                   m_block_mtx{};
+
   block_vector                         m_blocks;
   cache_vector                         m_caches{};
+
   repr::nest                           m_nest;
   support::block_dist::dispatcher      m_block_dispatcher;
   support::block_dist::redist_governor m_redist_governor;

@@ -61,7 +61,7 @@ struct swarm_iterator {
   template <typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
-                               static_order::type>::value)>
+                                            static_order::type>::value)>
   static void controllers(const base_loop_functions* const lf,
                           const TFunction& cb) {
     for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
@@ -80,7 +80,7 @@ struct swarm_iterator {
   template <typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
-                               dynamic_order::type>::value)>
+                                            dynamic_order::type>::value)>
   static void controllers(const base_loop_functions* const lf,
                           const TFunction& cb) {
     auto& ents = lf->GetSpace().GetEntitiesByType("foot-bot");
@@ -96,7 +96,7 @@ struct swarm_iterator {
       auto* controller = dynamic_cast<controller::base_controller*>(
           &robot->GetControllableEntity().GetController());
       cb(controller);
-    }  /* for(i..) */
+    } /* for(i..) */
   }
 
   /**
@@ -108,9 +108,8 @@ struct swarm_iterator {
   template <typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
-                               static_order::type>::value)>
-  static void robots(const base_loop_functions* const lf,
-                     const TFunction& cb) {
+                                            static_order::type>::value)>
+  static void robots(const base_loop_functions* const lf, const TFunction& cb) {
     for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
       auto* robot = argos::any_cast<argos::CFootBotEntity*>(robotp);
       cb(robot);
@@ -127,13 +126,12 @@ struct swarm_iterator {
   template <typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
-                               dynamic_order::type>::value)>
-  static void robots(const base_loop_functions* const lf,
-                     const TFunction& cb) {
+                                            dynamic_order::type>::value)>
+  static void robots(const base_loop_functions* const lf, const TFunction& cb) {
     auto& ents = lf->GetSpace().GetEntitiesByType("foot-bot");
     std::vector<argos::CAny> robots;
     robots.reserve(ents.size());
-    for (auto&[name, robotp] : ents) {
+    for (auto& [name, robotp] : ents) {
       robots.push_back(robotp);
     } /* for(&e..) */
 

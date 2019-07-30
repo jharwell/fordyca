@@ -89,7 +89,7 @@ class nest_block_drop_interactor
    */
   interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+      if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_nest_block_drop(controller, t);
         return interactor_status::ekNestBlockDrop;
       }
@@ -116,10 +116,9 @@ class nest_block_drop_interactor
      * More than 1 robot can drop a block in a timestep, so we have to
      * search for this robot's controller.
      */
-    const tv::temporal_penalty<T>& p = *m_penalty_handler->find(controller);
-
+    const auto& p = *m_penalty_handler->penalty_find(controller);
     perform_nest_block_drop(controller, p, t);
-    m_penalty_handler->remove(p);
+    m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
               "Multiple instances of same controller serving drop penalty");
   }
@@ -136,7 +135,7 @@ class nest_block_drop_interactor
      * the nest block drop event resets block metrics.
      */
     controller.block()->nest_drop_time(t);
-    m_metrics_agg->collect_from_block(controller.block().get());
+    m_metrics_agg->collect_from_block(controller.block());
 
     /*
      * Penalty served needs to be set here rather than in the free block pickup
@@ -145,8 +144,16 @@ class nest_block_drop_interactor
      */
     controller.block_manip_collator()->penalty_served(penalty.penalty());
 
-    events::nest_block_drop_visitor drop_op(controller.block(), t);
+    events::nest_block_drop_visitor drop_op(controller.block_release(), t);
 
+    /*
+     * Order of visitation must be:
+     *
+     * 1. Arena map
+     * 2. Controller
+     *
+     * In order for \ref nest_block_drop to process properly.
+     */
     /* Update arena map state due to a block nest drop */
     drop_op.visit(*m_map);
 

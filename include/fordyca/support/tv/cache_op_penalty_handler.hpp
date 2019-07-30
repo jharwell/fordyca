@@ -31,6 +31,7 @@
 #include "fordyca/support/tv/cache_op_filter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/temporal_penalty_handler.hpp"
+#include "fordyca/support/utils/event_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,8 +58,9 @@ class cache_op_penalty_handler final
       public rer::client<cache_op_penalty_handler<T>> {
  public:
   using temporal_penalty_handler<T>::is_serving_penalty;
-  using temporal_penalty_handler<T>::deconflict_penalty_finish;
-  using temporal_penalty_handler<T>::original_penalty;
+  using temporal_penalty_handler<T>::penalty_finish_uniqueify;
+  using temporal_penalty_handler<T>::penalty_calc;
+  using temporal_penalty_handler<T>::penalty_add;
 
   cache_op_penalty_handler(ds::arena_map* const map,
                            const rct::config::waveform_config* const config,
@@ -80,9 +82,11 @@ class cache_op_penalty_handler final
    * @param robot The robot to check.
    * @param src The penalty source (i.e. what event caused this penalty to be
    *            applied).
-   * @param timestep The current timestep.
+   * @param t The current timestep.
   */
-  op_filter_status penalty_init(T& controller, cache_op_src src, rtypes::timestep t) {
+  op_filter_status penalty_init(T& controller,
+                                cache_op_src src,
+                                const rtypes::timestep& t) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
@@ -93,26 +97,26 @@ class cache_op_penalty_handler final
     }
 
     ER_ASSERT(!is_serving_penalty(controller),
-              "Robot already serving cache penalty?");
+              "%s already serving cache penalty?",
+              controller.GetId().c_str());
 
-    auto penalty = deconflict_penalty_finish(t);
+    rtypes::timestep orig_duration = penalty_calc(t);
+    rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
     int id = utils::robot_on_cache(controller, *m_map);
-    ER_ASSERT(-1 != id, "Robot not in cache?");
+    ER_ASSERT(-1 != id,
+              "%s not in cache?",
+              controller.GetId().c_str());
     ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
-            utils::robot_id(controller),
+            controller.entity_id(),
             id,
             t.v(),
-            original_penalty().v(),
-            penalty.v(),
+            orig_duration.v(),
+            duration.v(),
             static_cast<int>(src));
 
-    penalty_list().push_back(
-        temporal_penalty<T>(&controller, id, penalty, t));
+    penalty_add(temporal_penalty<T>(&controller, id, duration, t));
     return filter;
   }
-
- protected:
-  using temporal_penalty_handler<T>::penalty_list;
 
  private:
   /* clang-format off */

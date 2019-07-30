@@ -67,18 +67,22 @@ scale simulations, will need a different cmake command than the one
 `bootstrap.sh` uses for you. Something like the following, run from the `build`
 directory prior to building will do the trick:
 
-    cmake -DCMAKE_C_COMPILER=gcc-8\
-    -DCMAKE_CXX_COMPILER=g++-8\
-    -DWITH_FOOTBOT_BATTERY=NO\
-    -DWITH_FOOTBOT_RAB=NO\
-    -DWITH_FOOTBOT_LEDS=NO\
-    -DCMAKE_BUILD_TYPE=OPT\
-    -DLIBRA_ER_NREPORT=YES\
+    cmake -DCMAKE_C_COMPILER=gcc-8 \
+    -DCMAKE_CXX_COMPILER=g++-8 \
+    -DWITH_FOOTBOT_BATTERY=NO \
+    -DWITH_FOOTBOT_RAB=NO \
+    -DWITH_FOOTBOT_LEDS=NO \
+    -DCMAKE_BUILD_TYPE=OPT \
+    -DLIBRA_ER_NREPORT=YES \
+    -DLIBRA_OPENMP=YES \
     ..
 
 To get an idea of what some of the non-project specific options mean, head over
 to the [libra](https://github.com/swarm-robotics/libra/tree/devel/README.md)
-repo and look at the README.
+repo and look at the README. *WARNING*: `LIBRA_OPENMP` should only be set to
+`YES` if you are going to be running with really large swarms (> 1000),
+otherwise the overhead from using threads will probably be greater than any
+speedup you will get. YMMV.
 
 `WITH_FOOTBOT_BATTERY`, `WITH_FOOTBOT_RAB`, `WITH_FOOTBOT_LEDS` are things that
 are only needed if you are running experiments which utilize those
@@ -94,8 +98,8 @@ fordyca repo followed by `/build/docs/html/index.html`. For example, if you
 built fordyca under `$HOME/research`, then you would do
 `$HOME/research/build/docs/html/index.html` in the address bar of your browser.
 
-Alternatively, if you would like a .pdf of the documentation, you can navigate to
-the `latex` directory for doxygen and then build said pdf. Again assuming you
+Alternatively, if you would like a .pdf of the documentation, you can navigate
+to the `latex` directory for doxygen and then build said pdf. Again assuming you
 built fordyca in `$HOME/research`, do the following:
 
     cd $HOME/research/fordyca/build/docs/latex

@@ -104,7 +104,14 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   cached_block_pickup& operator=(const cached_block_pickup& op) = delete;
 
   /* depth1 foraging */
+  /**
+   * @brief Perform actual cache block pickup in the arena.
+   *
+   * Assumes caller is holding \ref arena_map cache mutex. Takes \ref arena_map
+   * block mutex, and then releases it after cache updates.
+   */
   void visit(ds::arena_map& map);
+
   void visit(ds::cell2D& cell);
   void visit(fsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
@@ -118,6 +125,12 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   void visit(controller::depth1::gp_mdpo_controller& controller);
   void visit(controller::depth1::gp_odpo_controller& controller);
   void visit(controller::depth1::gp_omdpo_controller& controller);
+
+  /**
+   * @brief Update the cache manager upon cache pickup. Protected by mutex in
+   * order to ensure consistency between concurrent robot updates if multiple
+   * caches are present in the arena.
+   */
   void visit(support::base_cache_manager& manager);
 
   /* depth2 foraging */

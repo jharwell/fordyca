@@ -64,25 +64,20 @@ void goal_acq_metrics_collector::reset(void) {
 
 void goal_acq_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
-  auto[is_exp, true_exp] = m.is_exploring_for_goal();
+  auto [is_exp, true_exp] = m.is_exploring_for_goal();
 
-  m_interval.n_true_exploring_for_goal +=
-      static_cast<uint>(is_exp && true_exp);
+  m_interval.n_true_exploring_for_goal += static_cast<uint>(is_exp && true_exp);
   m_interval.n_false_exploring_for_goal +=
       static_cast<uint>(is_exp && !true_exp);
   m_interval.n_acquiring_goal +=
       static_cast<uint>(is_exp || m.is_vectoring_to_goal());
-  m_interval.n_vectoring_to_goal +=
-      static_cast<uint>(m.is_vectoring_to_goal());
+  m_interval.n_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 
-  m_cum.n_true_exploring_for_goal +=
-      static_cast<uint>(is_exp && true_exp);
-  m_cum.n_false_exploring_for_goal +=
-      static_cast<uint>(is_exp && !true_exp);
+  m_cum.n_true_exploring_for_goal += static_cast<uint>(is_exp && true_exp);
+  m_cum.n_false_exploring_for_goal += static_cast<uint>(is_exp && !true_exp);
   m_cum.n_acquiring_goal +=
       static_cast<uint>(is_exp || m.is_vectoring_to_goal());
-  m_cum.n_vectoring_to_goal +=
-      static_cast<uint>(m.is_vectoring_to_goal());
+  m_cum.n_vectoring_to_goal += static_cast<uint>(m.is_vectoring_to_goal());
 } /* collect() */
 
 bool goal_acq_metrics_collector::csv_line_build(std::string& line) {

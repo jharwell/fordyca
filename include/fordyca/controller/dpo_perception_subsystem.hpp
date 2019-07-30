@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
 #include <memory>
+#include <string>
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"

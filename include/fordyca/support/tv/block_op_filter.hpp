@@ -54,8 +54,8 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 template <typename T>
 class block_op_filter : public rer::client<block_op_filter<T>> {
  public:
-  explicit block_op_filter(ds::arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.block_op_filter"), m_map(map) {}
+  explicit block_op_filter(const ds::arena_map* const map)
+      : ER_CLIENT_INIT("fordyca.support.block_op_filter"), mc_map(map) {}
 
   ~block_op_filter(void) override = default;
   block_op_filter& operator=(const block_op_filter& other) = delete;
@@ -99,7 +99,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    *
    */
   op_filter_status free_pickup_filter(const T& controller) const {
-    int block_id = utils::robot_on_block(controller, *m_map);
+    int block_id = utils::robot_on_block(controller, *mc_map);
     if (!(controller.goal_acquired() &&
           acq_goal_type::ekBLOCK == controller.acquisition_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
@@ -135,8 +135,8 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
     }
 
     int cache_id = utils::new_cache_cache_proximity(controller,
-                                                         *m_map,
-                                                         cache_prox)
+                                                    *mc_map,
+                                                    cache_prox)
                    .entity_id;
     if (-1 != cache_id) {
       return op_filter_status::ekCACHE_PROXIMITY;
@@ -157,9 +157,9 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
     int cache_id = utils::new_cache_cache_proximity(controller,
-                                                         *m_map,
-                                                         cache_prox)
-                       .entity_id;
+                                                    *mc_map,
+                                                    cache_prox)
+                   .entity_id;
     if (-1 != cache_id) {
       return op_filter_status::ekCACHE_PROXIMITY;
     }
@@ -167,7 +167,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   }
 
   /* clang-format off */
-  ds::arena_map* const m_map;
+  const ds::arena_map* const mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

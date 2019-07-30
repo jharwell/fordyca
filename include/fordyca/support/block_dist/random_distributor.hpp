@@ -75,6 +75,17 @@ class random_distributor final : public base_distributor,
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities) override;
 
+  /**
+   * @brief Distribution a single block in the arena.
+   *
+   * @param block The block to distribute.
+   * @param entities Entities that need to be avoided during distribution.
+   *
+   * @note Holding \ref arena_map block, grid mutexes necessary to safely call
+   * this function in multithreaded contexts (not handled internally).
+   *
+   * @return \c TRUE if the distribution was successful, \c FALSE otherwise.
+   */
   bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
   ds::block_cluster_vector block_clusters(void) const override {

@@ -92,7 +92,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
      * this timestep, then actually perform the drop.
      */
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+      if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_cache_site_block_drop(controller);
         return interactor_status::ekFreeBlockDrop;
       }
@@ -113,8 +113,8 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                                                   m_cache_manager->cache_proximity_dist());
     if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
       auto prox_status = utils::new_cache_cache_proximity(controller,
-                                                               *m_map,
-                                                               m_cache_manager->cache_proximity_dist());
+                                                          *m_map,
+                                                          m_cache_manager->cache_proximity_dist());
       ER_ASSERT(-1 != prox_status.entity_id,
                 "No cache too close with CacheProximity return status");
       cache_proximity_notify(controller, prox_status);
@@ -150,7 +150,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    * has acquired a cache site and is looking to drop an object on it.
    */
   void finish_cache_site_block_drop(T& controller) {
-    const tv::temporal_penalty<T>& p = m_penalty_handler->next();
+    const tv::temporal_penalty<T>& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
@@ -159,7 +159,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
               tv::acq_goal_type::ekCACHE_SITE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache site block drop");
     perform_cache_site_block_drop(controller, p);
-    m_penalty_handler->remove(p);
+    m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
   }
@@ -173,7 +173,8 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
                                     rmath::dvec2uvec(controller.position2D(),
                                                      m_map->grid_resolution().v()),
-                                    m_map->grid_resolution());
+                                            m_map->grid_resolution(),
+                                            true);
 
     drop_op.visit(*m_map);
     drop_op.visit(controller);

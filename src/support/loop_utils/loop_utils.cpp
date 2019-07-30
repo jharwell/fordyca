@@ -61,7 +61,7 @@ ds::block_vector free_blocks_calc(const ds::cache_vector& all_caches,
                [&](const auto& b) RCSW_PURE {
                  /* block not carried by robot */
                  return -1 == b->robot_id() &&
-                     /*
+                        /*
                       * Block not inside cache (to catch blocks that were on the
                       * host cell for the cache, and we incorporated into it
                       * during creation).

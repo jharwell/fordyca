@@ -129,31 +129,20 @@ class depth0_loop_functions : public base_loop_functions,
    * - Set its new position, time, LOS from ARGoS.
    * - Have it interact with the environment.
    *
-   * These operations are done in parallel for all robots (lock free).
+   * @note These operations are done in parallel for all robots (lock free).
    */
   void robot_pre_step(argos::CFootBotEntity& robot);
 
   /**
-   * @brief Process a single robot on a timestep, after running its controller,
-   * step1: have it interact with the environment.
+   * @brief Process a single robot on a timestep, after running its controller.
    *
-   * This is done serially for all robots.
+   * - Have it interact with the environment.
+   * - Collect metrics from it.
    *
-   * @todo This is separate from step 2 until robot-arena interactions can be
-   * made thread safe and then they can be recombined.
+   * @note These operations are done in parallel for all robots (with mutual
+   *       exclusion as needed).
    */
-  void robot_post_step1(argos::CFootBotEntity& robot);
-
-  /**
-   * @brief Process a single robot on a timestep, after running its controller,
-   * step2: collect metrics from it.
-   *
-   * This is done in parallel for all robots.
-   *
-   * @todo This is separate from step 1 until robot-arena interactions can be
-   * made thread safe and then they can be recombined.
-   */
-  void robot_post_step2(argos::CFootBotEntity& robot);
+  void robot_post_step(argos::CFootBotEntity& robot);
 
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override RCSW_PURE;
 

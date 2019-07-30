@@ -87,16 +87,11 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_interval.collected, m_interval.transporters);
   line += csv_entry_domavg(m_cum.collected, m_cum.transporters);
 
-  line +=
-      csv_entry_domavg(m_interval.collected, m_interval.transport_time);
-  line +=
-      csv_entry_domavg(m_cum.collected, m_cum.transport_time);
+  line += csv_entry_domavg(m_interval.collected, m_interval.transport_time);
+  line += csv_entry_domavg(m_cum.collected, m_cum.transport_time);
 
-  line += csv_entry_domavg(m_interval.collected,
-                           m_interval.initial_wait_time);
-  line += csv_entry_domavg(m_cum.collected,
-                           m_cum.initial_wait_time,
-                           true);
+  line += csv_entry_domavg(m_interval.collected, m_interval.initial_wait_time);
+  line += csv_entry_domavg(m_cum.collected, m_cum.initial_wait_time, true);
 
   return true;
 } /* csv_line_build() */

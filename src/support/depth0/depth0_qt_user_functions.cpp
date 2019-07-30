@@ -64,7 +64,7 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 
   if (base->is_carrying_block()) {
     block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
-        .draw(base->block().get(), base->GetId().size());
+        .draw(base->block(), base->GetId().size());
   }
   if (nullptr != mdpo && mdpo->display_los()) {
     los_visualizer(this).draw(mdpo->los(),

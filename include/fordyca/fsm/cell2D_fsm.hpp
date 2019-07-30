@@ -26,10 +26,10 @@
  ******************************************************************************/
 #include <string>
 
+#include "fordyca/fsm/cell2D_states.hpp"
 #include "fordyca/nsalias.hpp"
 #include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcsw/common/common.h"
-#include "fordyca/fsm/cell2D_states.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,19 +58,24 @@ class cell2D_fsm final : public rpfsm::simple_fsm,
   void init(void) override;
 
   bool state_is_known(void) const {
-    return current_state() != std::underlying_type<states>::type(states::ekST_UNKNOWN);
+    return current_state() !=
+           std::underlying_type<states>::type(states::ekST_UNKNOWN);
   }
   bool state_has_block(void) const {
-    return current_state() == std::underlying_type<states>::type(states::ekST_HAS_BLOCK);
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_HAS_BLOCK);
   }
   bool state_has_cache(void) const {
-    return current_state() == std::underlying_type<states>::type(states::ekST_HAS_CACHE);
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_HAS_CACHE);
   }
   bool state_in_cache_extent(void) const {
-    return current_state() == std::underlying_type<states>::type(states::ekST_CACHE_EXTENT);
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_CACHE_EXTENT);
   }
   bool state_is_empty(void) const {
-    return current_state() == std::underlying_type<states>::type(states::ekST_EMPTY);
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_EMPTY);
   }
 
   /* events */
@@ -104,7 +109,8 @@ class cell2D_fsm final : public rpfsm::simple_fsm,
     };
     FSM_VERIFY_STATE_MAP(state_map,
                          kSTATE_MAP,
-                         std::underlying_type<states>::type(states::ekST_MAX_STATES));
+                         std::underlying_type<states>::type(
+                             states::ekST_MAX_STATES));
     return &kSTATE_MAP[index];
   }
 

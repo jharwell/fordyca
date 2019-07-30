@@ -95,18 +95,48 @@ class cache_block_drop : public rer::client<cache_block_drop>,
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  cache_block_drop(const std::shared_ptr<repr::base_block>& block,
+  /**
+   * @brief Initialize a cache_block_drop event
+   *
+   * @param robot_block Block to drop (owned by robot).
+   * @param cache Cache to drop into (owned by arena).
+   * @param resolution Arena resolution.
+   *
+   * If you use this constructor, any visitation function is valid.
+   */
+  cache_block_drop(std::unique_ptr<repr::base_block> robot_block,
                    const std::shared_ptr<repr::arena_cache>& cache,
                    rtypes::discretize_ratio resolution);
+
+  /**
+   * @brief Initialize a cache_block_drop event
+   *
+   * @param robot_block Block to drop (owned by arena).
+   * @param cache Cache to drop into (owned by arena).
+   * @param resolution Arena resolution.
+   *
+   * If you use this constructor, only \ref arena_map visitation functions are
+   * valid.
+   */
+  cache_block_drop(const std::shared_ptr<repr::base_block>& robot_block,
+                   const std::shared_ptr<repr::arena_cache>& cache,
+                   rtypes::discretize_ratio resolution);
+
   ~cache_block_drop(void) override = default;
 
   cache_block_drop(const cache_block_drop& op) = delete;
   cache_block_drop& operator=(const cache_block_drop& op) = delete;
 
   /* depth1 foraging */
+  /**
+   * @brief Perform actual cache block drop in the arena.
+   *
+   * Assumes \ref arena_map cache mutex held by the caller. Takes \ref arena_map
+   * block mutex to perform block updates and releases afterwards.
+   */
+  void visit(ds::arena_map& map);
   void visit(class ds::cell2D& cell);
   void visit(fsm::cell2D_fsm& fsm);
-  void visit(ds::arena_map& map);
   void visit(ds::dpo_semantic_map& map);
   void visit(repr::base_block& block);
   void visit(repr::arena_cache& cache);
@@ -131,7 +161,8 @@ class cache_block_drop : public rer::client<cache_block_drop>,
                                     controller::cache_sel_matrix* csel_matrix);
 
   const rtypes::discretize_ratio     mc_resolution;
-  std::shared_ptr<repr::base_block>  m_block;
+  std::unique_ptr<repr::base_block>  m_robot_block;
+  std::shared_ptr<repr::base_block>  m_arena_block;
   std::shared_ptr<repr::arena_cache> m_cache;
   /* clang-format on */
 };

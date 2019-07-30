@@ -63,16 +63,13 @@ struct proximity_status_t {
  * Free Functions
  ******************************************************************************/
 /**
- * @brief Return the integer representation of the robot's unique identifier in
- * the simulation.
- */
-int robot_id(const controller::base_controller& controller);
-
-/**
  * @brief Check if a robot is on top of a block. If, so return the block index.
  *
- * @param robot The robot to check.
+ * @param controller The robot to check.
  * @param map \ref arena_map reference.
+ *
+ * @note Holding the arena map block mutex necessary in multi-threaded contexts;
+ *       this is *NOT* handled internally by this function.
  *
  * @return The block index, or -1 if the robot is not on top of a block.
  */
@@ -85,37 +82,46 @@ int robot_on_block(const controller::base_controller& controller,
  * @param robot The robot to check.
  * @param map \ref arena_map reference.
  *
+ * @note Holding the arena map cache mutex necessary in multi-threaded contexts;
+ *       this is *NOT* handled internally by this function.
+ *
  * @return The cache index, or -1 if the robot is not on top of a cache.
  */
 int robot_on_cache(const controller::base_controller& controller,
                    const ds::arena_map& map) RCSW_PURE;
 
+/**
+ * @brief Determine if dropping the specified block at the specified location
+ * will overlap with the specified cache.
+ *
+ * @return \c TRUE if so, \c FALSE otherwise.
+ */
 bool block_drop_overlap_with_cache(
-    const std::shared_ptr<repr::base_block>& block,
+    const repr::base_block* block,
     const std::shared_ptr<repr::arena_cache>& cache,
     const rmath::vector2d& drop_loc) RCSW_CONST;
 
+/**
+ * @brief Determine if dropping the specified block at the specified location
+ * will be too close to arena boundaries.
+ *
+ * @return \c TRUE if so, \c FALSE otherwise.
+ */
 bool block_drop_near_arena_boundary(
     const ds::arena_map& map,
-    const std::shared_ptr<repr::base_block>& block,
-    const rmath::vector2d& drop_loc) RCSW_PURE;
-
-bool block_drop_overlap_with_nest(
-    const std::shared_ptr<repr::base_block>& block,
-    const repr::nest& nest,
+    const repr::base_block* block,
     const rmath::vector2d& drop_loc) RCSW_PURE;
 
 /**
- * @brief Determine if creating dropping a block at the robot's current
- * position will cause a cache to be created because it is too close to other
- * blocks in the arena (blocks that are unknown to the robot).
+ * @brief Determine if dropping the specified block at the specified location
+ * will overlap with the nest.
  *
- * @return (block id of cache that is too close (-1 if none), distance to said
- *         block).
+ * @return \c TRUE if so, \c FALSE otherwise.
  */
-proximity_status_t cache_site_block_proximity(const controller::base_controller& c,
-                                              const ds::arena_map& map,
-                                              rtypes::spatial_dist block_prox);
+bool block_drop_overlap_with_nest(
+    const repr::base_block* block,
+    const repr::nest& nest,
+    const rmath::vector2d& drop_loc) RCSW_PURE;
 
 /**
  * @brief Determine if creating a new cache centered at the robot's current
@@ -124,6 +130,9 @@ proximity_status_t cache_site_block_proximity(const controller::base_controller&
  * constituent blocks is used rather than the robot's current location when
  * creating a new cache, but this should serve as a good check against invalid
  * cache creation.
+ *
+ * @note Holding the arena map cache mutex necessary in multi-threaded contexts;
+ *       this is *NOT* handled internally by this function.
  *
  * @return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).

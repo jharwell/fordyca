@@ -73,17 +73,30 @@ class nest_block_drop : public rer::client<nest_block_drop> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  nest_block_drop(const std::shared_ptr<repr::base_block>& block,
-                  rtypes::timestep t);
+  /**
+   * @brief Initialize a nest block drop event.
+   *
+   * @param robot_block Clone of arena block which it is giving up ownership of
+   *                    for the drop.
+   * @param t Current timestep.
+   */
+  nest_block_drop(std::unique_ptr<repr::base_block> robot_block,
+                  const rtypes::timestep& t);
   ~nest_block_drop(void) override = default;
 
   nest_block_drop(const nest_block_drop& op) = delete;
   nest_block_drop& operator=(const nest_block_drop& op) = delete;
 
-  /* Foraging support */
+  /* Depth0 DPO/MDPO foraging */
+
+  /**
+   * @brief Perform actual nest block drop in the arena.
+   *
+   * Internally takes \ref arena_map block, grid mutexes to protect block
+   * re-distribution and block updates, and releases afterwards. See #594.
+   */
   void visit(ds::arena_map& map);
 
-  /* Depth0 DPO/MDPO foraging */
   void visit(repr::base_block& block);
   void visit(fsm::depth0::crw_fsm& fsm);
   void visit(controller::depth0::crw_controller& controller);
@@ -109,18 +122,14 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   void visit(controller::depth2::grp_odpo_controller& controller);
   void visit(controller::depth2::grp_omdpo_controller& controller);
 
-  /**
-   * @brief Get the handle on the block that has been dropped.
-   */
-  std::shared_ptr<repr::base_block> block(void) const { return m_block; }
-
  private:
   void dispatch_nest_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
   const rtypes::timestep            mc_timestep;
 
-  std::shared_ptr<repr::base_block> m_block;
+  std::unique_ptr<repr::base_block> m_robot_block;
+  std::shared_ptr<repr::base_block> m_arena_block{};
   /* clang-format on */
 };
 

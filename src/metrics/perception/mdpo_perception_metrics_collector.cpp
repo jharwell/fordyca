@@ -47,7 +47,7 @@ std::list<std::string> mdpo_perception_metrics_collector::csv_header_cols(
     void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
-    /* clang-format off */
+      /* clang-format off */
     "int_avg_ST_EMPTY_inaccuracies",
     "int_avg_ST_HAS_BLOCK_inaccuracies",
     "int_avg_ST_HAS_CACHE_inaccuracies",
@@ -60,7 +60,7 @@ std::list<std::string> mdpo_perception_metrics_collector::csv_header_cols(
     "cum_avg_known_percentage",
     "cum_avg_unknown_percentage",
     "cum_avg_knowledge_ratio"
-    /* clang-format on */
+      /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
@@ -76,16 +76,18 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
     return false;
   }
   line += csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_EMPTY]);
-  line += csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_HAS_BLOCK]);
-  line += csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_HAS_CACHE]);
+  line +=
+      csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_HAS_BLOCK]);
+  line +=
+      csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_HAS_CACHE]);
   line += csv_entry_tsavg(m_cum.states[fsm::cell2D_states::ekST_EMPTY]);
   line += csv_entry_tsavg(m_cum.states[fsm::cell2D_states::ekST_HAS_BLOCK]);
   line += csv_entry_tsavg(m_cum.states[fsm::cell2D_states::ekST_HAS_CACHE]);
 
   line += csv_entry_intavg(m_interval.known_percent);
   line += csv_entry_intavg(m_interval.unknown_percent);
-  line +=
-      std::to_string(m_interval.known_percent / m_interval.unknown_percent) + separator();
+  line += std::to_string(m_interval.known_percent / m_interval.unknown_percent) +
+          separator();
   line += csv_entry_tsavg(m_cum.known_percent);
   line += csv_entry_tsavg(m_cum.unknown_percent, true);
   line +=
@@ -96,26 +98,32 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
 void mdpo_perception_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
-  m_interval.states[fsm::cell2D_states::ekST_EMPTY] += m.cell_state_inaccuracies(fsm::cell2D_states::ekST_EMPTY);
-  m_interval.states[fsm::cell2D_states::ekST_HAS_BLOCK] += m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_BLOCK);
-  m_interval.states[fsm::cell2D_states::ekST_HAS_CACHE] += m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_CACHE);
-  m_cum.states[fsm::cell2D_states::ekST_EMPTY] += m.cell_state_inaccuracies(fsm::cell2D_states::ekST_EMPTY);
-  m_cum.states[fsm::cell2D_states::ekST_HAS_BLOCK] += m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_BLOCK);
-  m_cum.states[fsm::cell2D_states::ekST_HAS_CACHE] += m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_CACHE);
+  m_interval.states[fsm::cell2D_states::ekST_EMPTY] +=
+      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_EMPTY);
+  m_interval.states[fsm::cell2D_states::ekST_HAS_BLOCK] +=
+      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_BLOCK);
+  m_interval.states[fsm::cell2D_states::ekST_HAS_CACHE] +=
+      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_CACHE);
+  m_cum.states[fsm::cell2D_states::ekST_EMPTY] +=
+      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_EMPTY);
+  m_cum.states[fsm::cell2D_states::ekST_HAS_BLOCK] +=
+      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_BLOCK);
+  m_cum.states[fsm::cell2D_states::ekST_HAS_CACHE] +=
+      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_CACHE);
 
   auto int_known_percent = m_interval.known_percent.load();
   auto int_unknown_percent = m_interval.unknown_percent.load();
   auto cum_known_percent = m_cum.known_percent.load();
   auto cum_unknown_percent = m_cum.unknown_percent.load();
 
-  m_interval.known_percent.compare_exchange_strong(int_known_percent,
-                                                   int_known_percent + m.known_percentage());
-  m_interval.unknown_percent.compare_exchange_strong(int_unknown_percent,
-                                                     int_unknown_percent + m.unknown_percentage());
-  m_cum.known_percent.compare_exchange_strong(cum_known_percent,
-                                              cum_known_percent + m.known_percentage());
-  m_cum.unknown_percent.compare_exchange_strong(cum_unknown_percent,
-                                                cum_unknown_percent + m.unknown_percentage());
+  m_interval.known_percent.compare_exchange_strong(
+      int_known_percent, int_known_percent + m.known_percentage());
+  m_interval.unknown_percent.compare_exchange_strong(
+      int_unknown_percent, int_unknown_percent + m.unknown_percentage());
+  m_cum.known_percent.compare_exchange_strong(
+      cum_known_percent, cum_known_percent + m.known_percentage());
+  m_cum.unknown_percent.compare_exchange_strong(
+      cum_unknown_percent, cum_unknown_percent + m.unknown_percentage());
   ++m_interval.robots;
   ++m_cum.robots;
 } /* collect() */

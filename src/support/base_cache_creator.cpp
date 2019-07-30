@@ -104,7 +104,7 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
   } /* for(block..) */
 
   for (auto& block : blocks) {
-    events::free_block_drop_visitor op(block, d, m_grid->resolution());
+    events::free_block_drop_visitor op(block, d, m_grid->resolution(), false);
     op.visit(m_grid->access<arena_grid::kCell>(op.x(), op.y()));
   } /* for(block..) */
 

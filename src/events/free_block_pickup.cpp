@@ -71,35 +71,8 @@ free_block_pickup::free_block_pickup(
       m_block(block) {}
 
 /*******************************************************************************
- * Foraging Support
+ * Member Functions
  ******************************************************************************/
-void free_block_pickup::visit(fsm::cell2D_fsm& fsm) {
-  fsm.event_block_pickup();
-} /* visit() */
-
-void free_block_pickup::visit(ds::cell2D& cell) {
-  visit(cell.fsm());
-  cell.entity(nullptr);
-  ER_INFO("cell2D: fb%u block%d from %s",
-          mc_robot_index,
-          m_block->id(),
-          m_block->dloc().to_str().c_str());
-} /* visit() */
-
-void free_block_pickup::visit(ds::arena_map& map) {
-  ER_ASSERT(m_block->dloc() == rmath::vector2u(cell_op::x(), cell_op::y()),
-            "Coordinates for block/cell do not agree");
-  RCSW_UNUSED rmath::vector2d old_r = m_block->rloc();
-  events::cell_empty_visitor op(cell_op::coord());
-  op.visit(map);
-  visit(*m_block);
-  ER_INFO("arena_map: fb%u: block%d@%s/%s",
-          mc_robot_index,
-          m_block->id(),
-          old_r.to_str().c_str(),
-          cell_op::coord().to_str().c_str());
-} /* visit() */
-
 void free_block_pickup::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
   RCSW_UNUSED auto* polled = dynamic_cast<rta::polled_task*>(task);
@@ -113,6 +86,29 @@ void free_block_pickup::dispatch_free_block_interactor(
 /*******************************************************************************
  * CRW Foraging
  ******************************************************************************/
+void free_block_pickup::visit(ds::arena_map& map) {
+  ER_ASSERT(m_block->dloc() == rmath::vector2u(cell_op::x(), cell_op::y()),
+            "Coordinates for block/cell do not agree");
+  RCSW_UNUSED rmath::vector2d old_r = m_block->rloc();
+
+  events::cell_empty_visitor op(cell_op::coord());
+  map.grid_mtx().lock();
+  op.visit(map);
+  map.grid_mtx().unlock();
+
+  /*
+   * Already holding block mutex from \ref free_block_pickup_interactor, though
+   * it is not necessary for block visitation for this event.
+   */
+  visit(*m_block);
+
+  ER_INFO("arena_map: fb%u: block%d@%s/%s",
+          mc_robot_index,
+          m_block->id(),
+          old_r.to_str().c_str(),
+          cell_op::coord().to_str().c_str());
+} /* visit() */
+
 void free_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
   block.add_transporter(mc_robot_index);
@@ -125,7 +121,7 @@ void free_block_pickup::visit(repr::base_block& block) {
 void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
   visit(*controller.fsm());
-  controller.block(m_block);
+  controller.block(m_block->clone());
   controller.block_manip_collator()->free_pickup_event(true);
 
   ER_INFO("Picked up block%d", m_block->id());
@@ -191,7 +187,7 @@ void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
 
   visit(*controller.mdpo_perception()->map());
   visit(*controller.fsm());
-  controller.block(m_block);
+  controller.block(m_block->clone());
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -203,7 +199,7 @@ void free_block_pickup::visit(controller::depth0::omdpo_controller& controller) 
 
   visit(*controller.mdpo_perception()->map());
   visit(*controller.fsm());
-  controller.block(m_block);
+  controller.block(m_block->clone());
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -215,7 +211,7 @@ void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
 
   visit(*controller.dpo_perception()->dpo_store());
   visit(*controller.fsm());
-  controller.block(m_block);
+  controller.block(m_block->clone());
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -227,7 +223,7 @@ void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
 
   visit(*controller.dpo_perception()->dpo_store());
   visit(*controller.fsm());
-  controller.block(m_block);
+  controller.block(m_block->clone());
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -242,7 +238,7 @@ void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller)
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -254,7 +250,7 @@ void free_block_pickup::visit(controller::depth1::gp_mdpo_controller& controller
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -266,7 +262,7 @@ void free_block_pickup::visit(controller::depth1::gp_odpo_controller& controller
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -279,7 +275,7 @@ void free_block_pickup::visit(
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -312,7 +308,7 @@ void free_block_pickup::visit(controller::depth2::grp_dpo_controller& controller
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -325,7 +321,7 @@ void free_block_pickup::visit(
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -338,7 +334,7 @@ void free_block_pickup::visit(
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -351,7 +347,7 @@ void free_block_pickup::visit(
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block);
+  controller.block(m_block->clone());
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 

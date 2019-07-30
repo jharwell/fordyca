@@ -200,11 +200,10 @@ void depth2_loop_functions::private_init(void) {
 
   /* configure robots */
   swarm_iterator::controllers<swarm_iterator::dynamic_order>(
-      this,
-      [&](auto* controller) {
-    boost::apply_visitor(detail::robot_configurer_adaptor(controller),
-                         config_map.at(controller->type_index()));
-  });
+      this, [&](auto* controller) {
+        boost::apply_visitor(detail::robot_configurer_adaptor(controller),
+                             config_map.at(controller->type_index()));
+      });
 } /* private_init() */
 
 void depth2_loop_functions::cache_handling_init(
@@ -223,12 +222,11 @@ void depth2_loop_functions::cache_handling_init(
 std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   swarm_iterator::controllers<swarm_iterator::static_order>(
-      this,
-      [&](auto* controller) {
-    v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
-                                     m_task_extractor_map->at(
-                                         controller->type_index())));
-  });
+      this, [&](auto* controller) {
+        v.push_back(boost::apply_visitor(
+            robot_task_extractor_adaptor(controller),
+            m_task_extractor_map->at(controller->type_index())));
+      });
   return v;
 } /* robot_tasks_extract() */
 
@@ -240,9 +238,9 @@ void depth2_loop_functions::PreStep() {
   base_loop_functions::PreStep();
 
   /* Process all robots */
-  swarm_iterator::robots<swarm_iterator::static_order>(
-      this,
-      [&](auto* robot) { robot_pre_step(*robot); });
+  swarm_iterator::robots<swarm_iterator::static_order>(this, [&](auto* robot) {
+    robot_pre_step(*robot);
+  });
 
   ndc_pop();
 } /* PreStep() */
@@ -251,12 +249,12 @@ void depth2_loop_functions::PostStep(void) {
   ndc_push();
 
   /* Process all robots: environment interactions then metric collection */
-  swarm_iterator::robots<swarm_iterator::static_order>(
-      this,
-      [&](auto* robot) { robot_post_step1(*robot); });
-  swarm_iterator::robots<swarm_iterator::dynamic_order>(
-      this,
-      [&](auto* robot) { robot_post_step2(*robot); });
+  swarm_iterator::robots<swarm_iterator::static_order>(this, [&](auto* robot) {
+    robot_post_step1(*robot);
+  });
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, [&](auto* robot) {
+    robot_post_step2(*robot);
+  });
 
   /* Update block distribution status */
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(

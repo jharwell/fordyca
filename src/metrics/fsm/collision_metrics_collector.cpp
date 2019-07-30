@@ -74,8 +74,7 @@ void collision_metrics_collector::collect(const rmetrics::base_metrics& metrics)
 
   m_interval.n_exited_avoidance +=
       static_cast<uint>(m.exited_collision_avoidance());
-  m_cum.n_exited_avoidance +=
-      static_cast<uint>(m.exited_collision_avoidance());
+  m_cum.n_exited_avoidance += static_cast<uint>(m.exited_collision_avoidance());
 
   if (m.exited_collision_avoidance()) {
     m_interval.avoidance_duration += m.collision_avoidance_duration().v();

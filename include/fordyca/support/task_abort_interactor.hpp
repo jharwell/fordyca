@@ -130,12 +130,14 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
      * (not all 4 wheel sensors will report the color of a block). See #233.
      */
     bool conflict = false;
+    m_map->cache_mtx().lock();
     for (auto& cache : m_map->caches()) {
       if (utils::block_drop_overlap_with_cache(
               controller.block(), cache, controller.position2D())) {
         conflict = true;
       }
     } /* for(cache..) */
+    m_map->cache_mtx().unlock();
 
     /*
      * If the robot is currently right on the edge of the nest, we can't just
@@ -154,20 +156,47 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
             *m_map, controller.block(), controller.position2D())) {
       conflict = true;
     }
+    perform_block_drop(controller, conflict);
+  }
+
+  void perform_block_drop(T& controller, bool drop_conflict) {
+    /*
+     * The robot owns a unique copy of a block originally from the arena, so we
+     * need to look it up rather than implicitly converting its unique_ptr to a
+     * shared_ptr and distributing it--this will cause lots of problems later.
+     * This needs to be *BEFORE* releasing the robot's owned block.
+     *
+     * Holding the block mutex here is not necessary.
+     */
+    auto it = std::find_if(m_map->blocks().begin(),
+                           m_map->blocks().end(),
+                           [&](const auto& b) {
+                             return controller.block()->id() == b->id();
+                           });
+    ER_ASSERT(m_map->blocks().end() != it,
+              "Robot block%d not found in arena map blocks",
+              controller.block()->id());
+
     events::free_block_drop_visitor drop_op(
-        controller.block(),
+        *it,
         rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution().v()),
-        m_map->grid_resolution());
-    if (!conflict) {
-      drop_op.visit(controller);
+        m_map->grid_resolution(),
+        true);
+
+    m_map->grid_mtx().lock();
+    m_map->block_mtx().lock();
+
+    if (!drop_conflict) {
       drop_op.visit(*m_map);
     } else {
-      auto b = controller.block();
-      m_map->distribute_single_block(b);
-      drop_op.visit(controller);
+      m_map->distribute_single_block(*it);
     }
+    m_map->grid_mtx().unlock();
+    m_map->block_mtx().unlock();
+
+    drop_op.visit(controller);
     m_floor->SetChanged();
-  }
+  } /* perform_block_drop() */
 
   /* clang-format off */
   ds::arena_map* const       m_map;

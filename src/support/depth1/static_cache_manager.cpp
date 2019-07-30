@@ -235,7 +235,8 @@ void static_cache_manager::post_creation_blocks_absorb(
         events::free_block_drop_visitor op(
             b,
             rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
-            arena_grid()->resolution());
+            arena_grid()->resolution(),
+            true);
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());

@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <mutex>
 #include <vector>
+
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
@@ -80,6 +82,7 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
     m_caches_created = 0;
     m_depletion_ages.clear();
   }
+  std::mutex& mtx(void) { return m_mutex; }
 
  protected:
   void caches_created(uint c) { m_caches_created += c; }
@@ -91,6 +94,7 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
   uint                          m_caches_created{0};
   std::vector<rtypes::timestep> m_depletion_ages{};
   ds::arena_grid * const        m_grid;
+  std::mutex                    m_mutex{};
   /* clang-format on */
 };
 

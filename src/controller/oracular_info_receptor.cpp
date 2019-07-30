@@ -126,7 +126,8 @@ void oracular_info_receptor::exec_est_update(rta::polled_task* const task) {
             task->name().c_str());
   auto oracle_exec_est = boost::get<rta::time_estimate>(exec_result.get());
   RCSW_UNUSED double exec_old = task->task_exec_estimate().v();
-  task->exec_estimate_update(rtypes::timestep(static_cast<uint>(oracle_exec_est.v())));
+  task->exec_estimate_update(
+      rtypes::timestep(static_cast<uint>(oracle_exec_est.v())));
   ER_INFO("Update 'exec_est.%s' with oracular estimate %f on abort: %f -> %f",
           task->name().c_str(),
           oracle_exec_est.v(),
@@ -141,7 +142,8 @@ void oracular_info_receptor::int_est_update(rta::polled_task* const task) {
             task->name().c_str());
   auto oracle_int_est = boost::get<rta::time_estimate>(int_result.get());
   RCSW_UNUSED double int_old = task->task_interface_estimate(0).v();
-  task->interface_estimate_update(0, rtypes::timestep(static_cast<uint>(oracle_int_est.v())));
+  task->interface_estimate_update(
+      0, rtypes::timestep(static_cast<uint>(oracle_int_est.v())));
   ER_INFO("Update 'int_est.%s' with oracular estimate %f on abort: %f -> %f",
           task->name().c_str(),
           oracle_int_est.v(),

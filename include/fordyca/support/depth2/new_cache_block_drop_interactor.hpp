@@ -87,7 +87,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    */
   interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+      if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         return finish_new_cache_block_drop(controller);
       }
     } else {
@@ -147,7 +147,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    * has acquired a cache site and is looking to drop an object on it.
    */
   interactor_status finish_new_cache_block_drop(T& controller) {
-    const tv::temporal_penalty<T>& p = m_penalty_handler->next();
+    const tv::temporal_penalty<T>& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
@@ -191,7 +191,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
       return interactor_status::ekNoEvent;
     } else {
       perform_new_cache_block_drop(controller, p);
-      m_penalty_handler->remove(p);
+      m_penalty_handler->penalty_remove(p);
       ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
       return interactor_status::ekNewCacheBlockDrop;
@@ -207,7 +207,8 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
                                             rmath::dvec2uvec(controller.position2D(),
                                                              m_map->grid_resolution().v()),
-                                            m_map->grid_resolution());
+                                            m_map->grid_resolution(),
+                                            true);
 
     drop_op.visit(controller);
     drop_op.visit(*m_map);

@@ -77,7 +77,7 @@ cached_block_pickup::cached_block_pickup(
             "< %zu blocks in cache",
             base_cache::kMinBlocks);
   m_pickup_block = m_real_cache->oldest_block();
-  ER_ASSERT(m_pickup_block, "No block in non-empty cache");
+  ER_ASSERT(nullptr != m_pickup_block, "No block in non-empty cache");
 }
 
 /*******************************************************************************
@@ -139,9 +139,8 @@ void cached_block_pickup::visit(ds::cell2D& cell) {
   ER_ASSERT(cell.state_has_cache(), "Cell does not have cache");
   if (nullptr != m_orphan_block) {
     cell.entity(m_orphan_block);
-    ER_DEBUG("Cell (%u, %u) gets orphan block%d",
-             cell_op::x(),
-             cell_op::y(),
+    ER_DEBUG("Cell@%s gets orphan block%d after cache depletion",
+             cell.loc().to_str().c_str(),
              m_orphan_block->id());
   }
   visit(cell.fsm());
@@ -181,8 +180,19 @@ void cached_block_pickup::visit(ds::arena_map& map) {
    * is not a cache.
    */
   if (m_real_cache->n_blocks() > base_cache::kMinBlocks) {
+    /* already holding cache mutex from \ref cached_block_pickup_interactor */
     visit(*m_real_cache);
+
+    /*
+     * Do not need to hold grid mutex because we know we are the only robot
+     * picking up from the cache right now (though others can do it later) this
+     * timestep, and caches by definition have a unique location, AND that it is
+     * not possible for another robot's \ref nest_block_drop to trigger a block
+     * re-distribution to the cache host cell right now (re-distribution avoids
+     * caches).
+     */
     visit(cell);
+
     ER_ASSERT(cell.state_has_cache(),
               "Cell@(%u, %u) with >= %zu blocks does not have cache",
               cell_op::x(),
@@ -198,10 +208,18 @@ void cached_block_pickup::visit(ds::arena_map& map) {
         cell_op::y(),
         rcppsw::to_string(m_real_cache->blocks()).c_str(),
         m_real_cache->n_blocks());
-
   } else {
+    /* Already holding cache mutex from \ref cached_block_pickup_interactor */
     visit(*m_real_cache);
     m_orphan_block = m_real_cache->oldest_block();
+    /*
+     * Do not need to hold grid mutex because we know we are the only robot
+     * picking up from the cache right now (though others can do it later) this
+     * timestep, and caches by definition have a unique location, AND that it is
+     * not possible for another robot's \ref nest_block_drop to trigger a block
+     * re-distribution to the cache host cell right now  (re-distribution avoids
+     * caches).
+     */
     visit(cell);
 
     ER_ASSERT(cell.state_has_block(),
@@ -209,8 +227,15 @@ void cached_block_pickup::visit(ds::arena_map& map) {
               cell_op::x(),
               cell_op::y());
 
+    /*
+     * Already holding cache mutex from \ref cached_block_pickup_interactor,
+     * and grid mutex from above.
+     */
     map.cache_extent_clear(m_real_cache);
+
+    /* Already holding cache mutex from \ref cached_block_pickup_interactor */
     map.cache_remove(m_real_cache, m_loop);
+
     ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [depleted]",
             mc_robot_index,
             m_pickup_block->id(),
@@ -218,6 +243,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
             cell_op::x(),
             cell_op::y());
   }
+  std::scoped_lock lock(map.block_mtx());
   visit(*m_pickup_block);
 } /* visit() */
 
@@ -315,6 +341,7 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
 
 void cached_block_pickup::visit(support::base_cache_manager& manager) {
   if (m_real_cache->n_blocks() == base_cache::kMinBlocks) {
+    std::scoped_lock lock(manager.mtx());
     manager.cache_depleted(mc_timestep - m_real_cache->creation_ts());
   }
 } /* visit() */
@@ -333,7 +360,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -345,7 +372,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -357,7 +384,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -369,7 +396,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -398,7 +425,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
@@ -414,7 +441,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -428,7 +455,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
@@ -444,7 +471,7 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block);
+  controller.block(m_pickup_block->clone());
   controller.block_manip_collator()->cache_pickup_event(true);
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {

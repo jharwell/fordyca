@@ -92,7 +92,7 @@ class cached_block_pickup_interactor
    */
   interactor_status operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+      if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         return finish_cached_block_pickup(controller, t);
       }
     } else {
@@ -111,7 +111,7 @@ class cached_block_pickup_interactor
    */
   interactor_status finish_cached_block_pickup(T& controller,
                                                rtypes::timestep t) {
-    const tv::temporal_penalty<T>& p = m_penalty_handler->next();
+    const tv::temporal_penalty<T>& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
@@ -123,6 +123,20 @@ class cached_block_pickup_interactor
     ER_ASSERT(!controller.is_carrying_block(),
               "Controller is already carrying block%d",
               controller.block()->id());
+    /*
+     * We cannot just lock around the critical arena map updates here in order
+     * to make this section thread safe, and need to lock around the whole
+     * section below. If two threads updating two robots both having finished
+     * serving their penalty this timestep manage to pass the check to actually
+     * perform the block pickup before one of them actually finishes picking up
+     * a block, then the second one will not get the necessary \ref
+     * cache_vanished event. See #594.
+     *
+     * Grid and block mutexes are also required, but only within the actual \ref
+     * cached_block_pickup event visit to the arena map.
+     */
+    m_map->cache_mtx().lock();
+
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
      * same/successive/close together timesteps, then the first robot to serve
@@ -156,16 +170,18 @@ class cached_block_pickup_interactor
        * same/successive/close together timesteps to both be able to start
        * serving their respective penalties (and not violate their respective
        * pickup policies), but that the one who picks up a block first would
-       * cause f* the second one to violate THEIR pickup policy if they picked
-       * up a block (i.e. the cache now has too few blocks for pickup).
+       * cause the second one to violate THEIR pickup policy if they picked up a
+       * block (i.e. the cache now has too few blocks for pickup).
        *
        * In this case, you don't need to do anything, as the change in the
-       * cache's status will be picked up by the robot's LOS next timestep.
+       * cache's status will be picked up by the second robot next timestep.
        */
       fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
                                  controller.cache_sel_matrix(),
                                  true);
       if (v(controller.position2D(), p.id(), t)) {
+        m_map->grid_mtx().lock();
+
         status = perform_cached_block_pickup(controller, p, t);
         m_floor->SetChanged();
       } else {
@@ -174,7 +190,9 @@ class cached_block_pickup_interactor
                 p.id());
       }
     }
-    m_penalty_handler->remove(p);
+    m_map->cache_mtx().unlock();
+
+    m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
               "Multiple instances of same controller serving cache penalty");
     return status;
@@ -196,23 +214,26 @@ class cached_block_pickup_interactor
               "Cache%d from penalty does not exist",
               penalty.id());
     events::cached_block_pickup_visitor pickup_op(
-        m_loop, *it, utils::robot_id(controller), t);
+        m_loop, *it, controller.entity_id(), t);
     (*it)->penalty_served(penalty.penalty());
 
     /*
      * Visitation order must be:
      *
-     * static cache manager (update metrics)
-     * Map (actually remove the cache/ensure proper block decrement)
-     * Controller
+     * 1. Cache manager (update metrics)
+     * 2. Arena map (actually remove the cache/ensure proper block decrement)
+     * 3. Controller
+     *
+     * No need to lock arena map cache mutex--already holding it from parent
+     * function.
      */
-    uint n_caches1 = m_map->caches().size();
+    uint old_n_caches = m_map->caches().size();
+
     pickup_op.visit(*m_cache_manager);
     pickup_op.visit(*m_map);
     pickup_op.visit(controller);
-    uint n_caches2 = m_map->caches().size();
 
-    if (n_caches2 < n_caches1) {
+    if (m_map->caches().size() < old_n_caches) {
       return interactor_status::ekCacheDepletion;
     }
     return interactor_status::ekNoEvent;

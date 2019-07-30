@@ -84,9 +84,15 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   free_block_pickup& operator=(const free_block_pickup& op) = delete;
 
   /* CRW foraging */
+
+  /**
+   * @brief Perform actual block pickup in the arena.
+   *
+   * Takes \ref arena_map grid mutex to protect block re-distribution and block
+   * updates. \ref arena_map block mutex assumed to be held when calling this
+   * function.
+   */
   void visit(ds::arena_map& map);
-  void visit(ds::cell2D& cell);
-  void visit(fsm::cell2D_fsm& fsm);
   void visit(repr::base_block& block);
   void visit(controller::depth0::crw_controller& controller);
   void visit(fsm::depth0::crw_fsm& fsm);

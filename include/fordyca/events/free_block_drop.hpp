@@ -89,13 +89,18 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   using visit_typelist = visit_typelist_impl::value;
 
   /**
-   * @param block The block to drop.
+   * @param block The block to drop, which is already part of the vector owned
+   *              by the \ref arena_map.
    * @param coord The discrete coordinates of the cell to drop the block in.
    * @param resolution The resolution of the arena map.
+   * @param cache_lock Is locking needed around arena map cache accesses, or is
+   *                   that handled by the caller?
    */
   free_block_drop(const std::shared_ptr<repr::base_block>& block,
                   const rmath::vector2u& coord,
-                  rtypes::discretize_ratio resolution);
+                  rtypes::discretize_ratio resolution,
+                  bool cache_lock);
+
   ~free_block_drop(void) override = default;
 
   free_block_drop(const free_block_drop& op) = delete;
@@ -105,6 +110,14 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   void visit(ds::cell2D& cell);
   void visit(repr::base_block& block);
   void visit(fsm::cell2D_fsm& fsm);
+
+  /**
+   * @brief Perform actual free block drop in the arena.
+   *
+   * Assumes caller holds \ref arena_map grid and block mutexes. May lock \ref
+   * arena_map cache mutex, depending on configuration. If it does lock \ref
+   * arena_map cache mutex, it releases it after use. See #594.
+   */
   void visit(ds::arena_map& map);
 
   /* depth1 */
@@ -134,6 +147,8 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
 
   /* clang-format off */
   const rtypes::discretize_ratio    mc_resolution;
+  const bool                        mc_cache_lock;
+
   std::shared_ptr<repr::base_block> m_block;
   /* clang-format on */
 };

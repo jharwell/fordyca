@@ -82,7 +82,7 @@ class existing_cache_block_drop_interactor
    */
   void operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, t)) {
+      if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_cache_block_drop(controller);
       }
     } else {
@@ -98,7 +98,7 @@ class existing_cache_block_drop_interactor
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    const tv::temporal_penalty<T>& p = m_penalty_handler->next();
+    const tv::temporal_penalty<T>& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
@@ -108,6 +108,19 @@ class existing_cache_block_drop_interactor
                   tv::acq_goal_type::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
+    /*
+     * We cannot just lock around the critical arena map updates here in order
+     * to make this section thread safe, and need to lock around the whole
+     * section below. If two threads updating two robots both having finished
+     * serving their penalty this timestep manage to pass the check to actually
+     * perform the cache pickup before one of them actually finishes picking up
+     * a block, then the second one will not get the necessary \ref
+     * cache_vanished event. See #594.
+     *
+     * Grid and block mutexes are also required, but only within the actual \ref
+     * cached_block_pickup event visit to the arena map.
+     */
+    m_map->cache_mtx().lock();
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -126,6 +139,7 @@ class existing_cache_block_drop_interactor
      * we check that the ID of the cache we are sitting in/on when we finish
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
+     *
      */
     int cache_id = utils::robot_on_cache(controller, *m_map);
 
@@ -138,7 +152,9 @@ class existing_cache_block_drop_interactor
     } else {
       perform_cache_block_drop(controller, p);
     }
-    m_penalty_handler->remove(p);
+    m_map->cache_mtx().unlock();
+
+    m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
               "Multiple instances of same controller serving cache penalty");
   }
@@ -149,19 +165,27 @@ class existing_cache_block_drop_interactor
    */
   void perform_cache_block_drop(T& controller,
                                 const tv::temporal_penalty<T>& penalty) {
-    auto it =
+    auto cache_it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == penalty.id(); });
-    ER_ASSERT(it != m_map->caches().end(),
+    ER_ASSERT(cache_it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id());
-    events::cache_block_drop_visitor drop_op(controller.block(),
-                                             *it,
-                                             m_map->grid_resolution());
-    (*it)->penalty_served(penalty.penalty());
 
-    /* Update arena map state due to a cache drop */
+    events::cache_block_drop_visitor drop_op(controller.block_release(),
+                                             *cache_it,
+                                             m_map->grid_resolution());
+    (*cache_it)->penalty_served(penalty.penalty());
+
+    /*
+     * Order of visitation must be:
+     *
+     * 1. Arena map
+     * 2. Controller
+     *
+     * In order for proper \ref events::cache_block_drop processing.
+     */
     drop_op.visit(*m_map);
     drop_op.visit(controller);
   }

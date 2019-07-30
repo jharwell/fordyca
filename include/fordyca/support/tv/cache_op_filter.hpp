@@ -29,7 +29,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/utils/loop_utils.hpp"
+#include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_status.hpp"
 
 /*******************************************************************************
@@ -54,8 +54,8 @@ using transport_goal_type = fsm::block_transporter::goal_type;
 template <typename T>
 class cache_op_filter : public rer::client<cache_op_filter<T>> {
  public:
-  explicit cache_op_filter(ds::arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.cache_op_filter"), m_map(map) {}
+  explicit cache_op_filter(const ds::arena_map* const map)
+      : ER_CLIENT_INIT("fordyca.support.cache_op_filter"), mc_map(map) {}
 
   ~cache_op_filter(void) override = default;
   cache_op_filter& operator=(const cache_op_filter& other) = delete;
@@ -89,7 +89,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    *
    */
   op_filter_status do_filter(const T& controller) const {
-    int cache_id = utils::robot_on_cache(controller, *m_map);
+    int cache_id = utils::robot_on_cache(controller, *mc_map);
     bool ready = (controller.goal_acquired() &&
                   acq_goal_type::ekEXISTING_CACHE ==
                       controller.acquisition_goal() &&
@@ -101,7 +101,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
   }
 
   /* clang-format off */
-  ds::arena_map* const m_map;
+  const ds::arena_map* const mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

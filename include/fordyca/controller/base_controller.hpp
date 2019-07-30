@@ -153,14 +153,20 @@ class base_controller : public argos::CCI_Controller,
    * @brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<repr::base_block> block(void) const { return m_block; }
+  const repr::base_block* block(void) const { return m_block.get(); }
+  repr::base_block* block(void) { return m_block.get(); }
 
   /**
-   * @brief Set the block that the robot is carrying.
+   * @brief Release the held block as part of a drop operation.
    */
-  void block(const std::shared_ptr<repr::base_block>& block) {
-    m_block = block;
-  }
+  std::unique_ptr<repr::base_block> block_release(void);
+
+  /**
+   * @brief Set the block that the robot is carrying. We use a unique_ptr to
+   * convey that the robot owns the block it picks up from a C++ point of
+   * view. In actuality it gets a clone of the block in the arena map.
+   */
+  void block(std::unique_ptr<repr::base_block> block);
 
   void tv_init(const support::tv::tv_manager* tv_manager) RCSW_COLD;
 
@@ -235,7 +241,7 @@ class base_controller : public argos::CCI_Controller,
 
   /* clang-format off */
   bool                                       m_display_id{false};
-  std::shared_ptr<repr::base_block>          m_block{nullptr};
+  std::unique_ptr<repr::base_block>          m_block;
   std::unique_ptr<controller::saa_subsystem> m_saa;
   class block_manip_collator                 m_block_manip{};
   /* clang-format on */

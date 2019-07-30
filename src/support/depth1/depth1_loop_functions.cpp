@@ -246,8 +246,7 @@ void depth1_loop_functions::private_init(void) {
 
   /* configure robots */
   swarm_iterator::controllers<swarm_iterator::dynamic_order>(
-      this,
-      [&](auto* controller) {
+      this, [&](auto* controller) {
         boost::apply_visitor(detail::robot_configurer_adaptor(controller),
                              config_map.at(controller->type_index()));
       });
@@ -363,11 +362,10 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
 std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   swarm_iterator::controllers<swarm_iterator::static_order>(
-      this,
-      [&](const auto* controller) {
-        v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
-                                         m_task_extractor_map->at(
-                                             controller->type_index())));
+      this, [&](const auto* controller) {
+        v.push_back(boost::apply_visitor(
+            robot_task_extractor_adaptor(controller),
+            m_task_extractor_map->at(controller->type_index())));
       });
 
   return v;
@@ -381,9 +379,9 @@ void depth1_loop_functions::PreStep() {
   base_loop_functions::PreStep();
 
   /* Process all robots */
-  swarm_iterator::robots<swarm_iterator::static_order>(
-      this,
-      [&](auto* robot) { robot_pre_step(*robot); });
+  swarm_iterator::robots<swarm_iterator::static_order>(this, [&](auto* robot) {
+    robot_pre_step(*robot);
+  });
 
   ndc_pop();
 } /* PreStep() */
@@ -393,12 +391,12 @@ void depth1_loop_functions::PostStep(void) {
   base_loop_functions::PostStep();
 
   /* Process all robots: interact with environment then collect metrics */
-  swarm_iterator::robots<swarm_iterator::static_order>(
-      this,
-      [&](auto* robot) { robot_post_step1(*robot); });
-  swarm_iterator::robots<swarm_iterator::dynamic_order>(
-      this,
-      [&](auto* robot) { robot_post_step2(*robot); });
+  swarm_iterator::robots<swarm_iterator::static_order>(this, [&](auto* robot) {
+    robot_post_step1(*robot);
+  });
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, [&](auto* robot) {
+    robot_post_step2(*robot);
+  });
 
   /*
    * Manage the static cache and handle cache removal as a result of robot
@@ -581,8 +579,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
    */
   std::pair<uint, uint> counts{0, 0};
   swarm_iterator::controllers<swarm_iterator::static_order>(
-      this,
-      [&](const auto* controller) {
+      this, [&](const auto* controller) {
         auto [is_harvester, is_collector] = boost::apply_visitor(
             detail::d1_subtask_status_extractor_adaptor(controller),
             m_subtask_status_map->at(controller->type_index()));

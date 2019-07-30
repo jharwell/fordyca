@@ -73,8 +73,9 @@ double collector::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-rtypes::timestep collector::interface_time_calc(uint interface,
-                                                const rtypes::timestep& start_time) {
+rtypes::timestep collector::interface_time_calc(
+    uint interface,
+    const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return rtypes::timestep(current_time() - start_time);
 } /* interface_time_calc() */

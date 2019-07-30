@@ -78,9 +78,7 @@ bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_interval.block_density_sum, m_interval.robot_count);
   line += csv_entry_domavg(m_cum.block_density_sum, m_cum.robot_count);
   line += csv_entry_domavg(m_interval.cache_density_sum, m_interval.robot_count);
-  line += csv_entry_domavg(m_cum.cache_density_sum,
-                           m_cum.robot_count,
-                           true);
+  line += csv_entry_domavg(m_cum.cache_density_sum, m_cum.robot_count, true);
   return true;
 } /* csv_line_build() */
 
@@ -98,17 +96,17 @@ void dpo_perception_metrics_collector::collect(
 
   auto int_bsum = m_interval.block_density_sum.load();
   auto int_csum = m_interval.cache_density_sum.load();
-  m_interval.block_density_sum.compare_exchange_strong(int_bsum,
-                                                        int_bsum + m.avg_block_density().v());
-  m_interval.cache_density_sum.compare_exchange_strong(int_csum,
-                                                        int_csum + m.avg_cache_density().v());
+  m_interval.block_density_sum.compare_exchange_strong(
+      int_bsum, int_bsum + m.avg_block_density().v());
+  m_interval.cache_density_sum.compare_exchange_strong(
+      int_csum, int_csum + m.avg_cache_density().v());
 
   auto cum_bsum = m_cum.block_density_sum.load();
   auto cum_csum = m_cum.cache_density_sum.load();
-  m_cum.block_density_sum.compare_exchange_strong(cum_bsum,
-                                                        cum_bsum + m.avg_block_density().v());
-  m_cum.cache_density_sum.compare_exchange_strong(cum_csum,
-                                                        cum_csum + m.avg_cache_density().v());
+  m_cum.block_density_sum.compare_exchange_strong(
+      cum_bsum, cum_bsum + m.avg_block_density().v());
+  m_cum.cache_density_sum.compare_exchange_strong(
+      cum_csum, cum_csum + m.avg_cache_density().v());
 } /* collect() */
 
 void dpo_perception_metrics_collector::reset_after_interval(void) {

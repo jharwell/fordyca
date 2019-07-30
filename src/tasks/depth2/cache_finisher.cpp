@@ -60,8 +60,9 @@ double cache_finisher::abort_prob_calc(void) {
   }
 } /* abort_prob_calc() */
 
-rtypes::timestep cache_finisher::interface_time_calc(uint interface,
-                                                     const rtypes::timestep& start_time) {
+rtypes::timestep cache_finisher::interface_time_calc(
+    uint interface,
+    const rtypes::timestep& start_time) {
   ER_ASSERT(0 == interface, "Bad interface ID: %u", interface);
   return rtypes::timestep(current_time() - start_time);
 } /* interface_time_calc() */
@@ -74,14 +75,14 @@ void cache_finisher::active_interface_update(int) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
-      ER_TRACE("Interface finished at timestep %u", current_time());
+      ER_TRACE("Interface finished at timestep %u", current_time().v());
     }
-    ER_TRACE("Interface time: %u", interface_time(0));
+    ER_TRACE("Interface time: %u", interface_time(0).v());
   } else if (transport_goal_type::ekNEW_CACHE == fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);
-      ER_TRACE("Interface start at timestep %u", current_time());
+      ER_TRACE("Interface start at timestep %u", current_time().v());
     }
   }
 } /* active_interface_update() */
