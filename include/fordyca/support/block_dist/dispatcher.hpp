@@ -76,8 +76,7 @@ class dispatcher {
 
   dispatcher(ds::arena_grid* grid,
              rtypes::discretize_ratio resolution,
-             const config::arena::block_dist_config* config,
-             double arena_padding);
+             const config::arena::block_dist_config* config);
   ~dispatcher(void);
 
   dispatcher(const dispatcher& s) = delete;
@@ -115,17 +114,8 @@ class dispatcher {
   const base_distributor* distributor(void) const { return m_dist.get(); }
 
  private:
-  /**
-   * @brief The minimum X index within the \ref ds::arena_grid handed to the
-   * dispatcher that blocks will be distributed to, in order to avoid robots
-   * repeatedly running into the walls of the arena as they try to acquire a
-   * block that is too close and triggers their obstacle avoidance.
-   */
-  static size_t constexpr kINDEX_MIN = 2;
-
   /* clang-format off */
-  const rtypes::discretize_ratio          mc_resolution;
-  const double                           mc_padding;
+  const rtypes::discretize_ratio         mc_resolution;
   const config::arena::block_dist_config mc_config;
   std::string                            mc_dist_type;
 

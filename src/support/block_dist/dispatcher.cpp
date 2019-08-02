@@ -40,37 +40,35 @@ using ds::arena_grid;
  ******************************************************************************/
 dispatcher::dispatcher(ds::arena_grid* const grid,
                        rtypes::discretize_ratio resolution,
-                       const config::arena::block_dist_config* const config,
-                       double arena_padding)
+                       const config::arena::block_dist_config* const config)
     : mc_resolution(resolution),
-      mc_padding(arena_padding),
       mc_config(*config),
       mc_dist_type(config->dist_type),
       m_grid(grid),
       m_dist(nullptr) {}
+
 dispatcher::~dispatcher(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool dispatcher::initialize(void) {
-  uint padding = static_cast<uint>(mc_padding / m_grid->resolution().v());
-
   /* clang-format off */
   ds::arena_grid::view arena = m_grid->layer<arena_grid::kCell>()->subgrid(
-      kINDEX_MIN + padding,
-      kINDEX_MIN + padding,
-      m_grid->xdsize() - kINDEX_MIN - padding,
-      m_grid->ydsize() - kINDEX_MIN - padding);
+      static_cast<size_t>(m_grid->xdsize() * 0.05),
+      static_cast<size_t>(m_grid->ydsize() * 0.05),
+      static_cast<size_t>(m_grid->xdsize() * 0.95),
+      static_cast<size_t>(m_grid->ydsize() * 0.95));
+
   if (kDistRandom == mc_dist_type) {
     m_dist = std::make_unique<random_distributor>(arena,
-                                                     mc_resolution);
+                                                  mc_resolution);
   } else if (kDistSingleSrc == mc_dist_type) {
     ds::arena_grid::view area = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.80),
-        kINDEX_MIN,
+        static_cast<size_t>(m_grid->ydsize() * 0.05),
         static_cast<size_t>(m_grid->xdsize() * 0.90),
-        m_grid->ydsize() - kINDEX_MIN - padding);
+        static_cast<size_t>(m_grid->ydsize() * 0.95));
     m_dist = std::make_unique<cluster_distributor>(
         area,
         mc_resolution,
@@ -78,14 +76,14 @@ bool dispatcher::initialize(void) {
   } else if (kDistDualSrc == mc_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.10),
-        kINDEX_MIN,
+        static_cast<size_t>(m_grid->ydsize() * 0.05),
         static_cast<size_t>(m_grid->xdsize() * 0.20),
-        m_grid->ydsize() - kINDEX_MIN - padding);
+        static_cast<size_t>(m_grid->ydsize() * 0.95));
     ds::arena_grid::view area_r = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.80),
-        kINDEX_MIN,
+        static_cast<size_t>(m_grid->ydsize() * 0.05),
         static_cast<size_t>(m_grid->xdsize() * 0.90),
-        m_grid->ydsize() - kINDEX_MIN - padding);
+        static_cast<size_t>(m_grid->ydsize() * 0.95));
     std::vector<ds::arena_grid::view> grids{area_l, area_r};
     m_dist = std::make_unique<multi_cluster_distributor>(
         grids,
@@ -95,28 +93,28 @@ bool dispatcher::initialize(void) {
     /*
      * Quad source is a tricky distribution to use with static caches, so we
      * have to tweak the block cluster centers in tandem with the cache
-     * locations to ensure that no segfaults results from cache/cache or
+     * locations to ensure that no segfaults result from cache/cache or
      * cache/cluster overlap. See #581.
      */
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.05),
-        kINDEX_MIN,
+        static_cast<size_t>(m_grid->ydsize() * 0.05),
         static_cast<size_t>(m_grid->xdsize() * 0.15),
-        m_grid->ydsize() - kINDEX_MIN - padding);
+        static_cast<size_t>(m_grid->ydsize() * 0.95));
     ds::arena_grid::view area_r = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.82),
-        kINDEX_MIN,
-        static_cast<size_t>(m_grid->xdsize() * 0.92),
-        m_grid->ydsize() - kINDEX_MIN - padding);
-    ds::arena_grid::view area_b = m_grid->layer<arena_grid::kCell>()->subgrid(
-        kINDEX_MIN,
         static_cast<size_t>(m_grid->ydsize() * 0.05),
-        m_grid->xdsize() - kINDEX_MIN - padding,
+        static_cast<size_t>(m_grid->xdsize() * 0.92),
+        static_cast<size_t>(m_grid->ydsize() * 0.95));
+    ds::arena_grid::view area_b = m_grid->layer<arena_grid::kCell>()->subgrid(
+        static_cast<size_t>(m_grid->xdsize() * 0.05),
+        static_cast<size_t>(m_grid->ydsize() * 0.05),
+        static_cast<size_t>(m_grid->xdsize() * 0.95),
         static_cast<size_t>(m_grid->ydsize() * 0.15));
     ds::arena_grid::view area_u = m_grid->layer<arena_grid::kCell>()->subgrid(
-        kINDEX_MIN,
+        static_cast<size_t>(m_grid->xdsize() * 0.05),
         static_cast<size_t>(m_grid->ydsize() * 0.82),
-        m_grid->xdsize() - kINDEX_MIN - padding,
+        static_cast<size_t>(m_grid->xdsize() * 0.95),
         static_cast<size_t>(m_grid->ydsize() * 0.92));
     std::vector<ds::arena_grid::view> grids{area_l, area_r, area_b, area_u};
     m_dist = std::make_unique<multi_cluster_distributor>(
