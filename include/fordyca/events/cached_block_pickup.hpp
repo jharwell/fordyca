@@ -97,7 +97,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   cached_block_pickup(support::base_loop_functions* loop,
                       const std::shared_ptr<repr::arena_cache>& cache,
                       uint robot_index,
-                      rtypes::timestep t);
+                      const rtypes::timestep& t);
   ~cached_block_pickup(void) override = default;
 
   cached_block_pickup(const cached_block_pickup& op) = delete;

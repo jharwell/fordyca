@@ -77,7 +77,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
 
   free_block_pickup(const std::shared_ptr<repr::base_block>& block,
                     uint robot_index,
-                    rtypes::timestep t);
+                    const rtypes::timestep& t);
   ~free_block_pickup(void) override = default;
 
   free_block_pickup(const free_block_pickup& op) = delete;

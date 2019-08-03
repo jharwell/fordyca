@@ -66,7 +66,7 @@ cached_block_pickup::cached_block_pickup(
     support::base_loop_functions* loop,
     const std::shared_ptr<repr::arena_cache>& cache,
     uint robot_index,
-    rtypes::timestep t)
+    const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
       cell_op(cache->dloc()),
       mc_robot_index(robot_index),
@@ -359,7 +359,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -371,7 +375,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -383,7 +391,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -395,7 +407,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
   dispatch_d1_cache_interactor(controller.current_task());
 
@@ -424,7 +440,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
@@ -440,7 +460,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -454,7 +478,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
@@ -470,7 +498,11 @@ void cached_block_pickup::visit(
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
-  controller.block(m_pickup_block->clone());
+
+  auto robot_block = m_pickup_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->cache_pickup_event(true);
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {

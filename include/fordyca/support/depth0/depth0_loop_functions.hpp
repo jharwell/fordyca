@@ -126,8 +126,7 @@ class depth0_loop_functions : public base_loop_functions,
   /**
    * @brief Process a single robot on a timestep, before running its controller:
    *
-   * - Set its new position, time, LOS from ARGoS.
-   * - Have it interact with the environment.
+   * - Set its new position, time from ARGoS and send it its LOS.
    *
    * @note These operations are done in parallel for all robots (lock free).
    */

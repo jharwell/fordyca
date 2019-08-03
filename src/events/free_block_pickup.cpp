@@ -63,7 +63,7 @@ using ds::occupancy_grid;
 free_block_pickup::free_block_pickup(
     const std::shared_ptr<repr::base_block>& block,
     uint robot_index,
-    rtypes::timestep t)
+    const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
       cell_op(block->dloc()),
       mc_timestep(t),

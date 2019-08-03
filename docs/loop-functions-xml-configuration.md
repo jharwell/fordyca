@@ -114,7 +114,7 @@ type.
 | `perception_mdpo`                 | Metrics from each robot's internal map of the arena.                          |                                                  |
 | `swarm_dist_pos2D`                | Swarm distribution in 2D space.                                               |                                                  |
 | `swarm_convergence`               | Results of swarm convergence calculations.                                    | Requires convergence calculations to be enabled. |
-| `temporal_variance`               | Waveforms of the penalties applied to the swarm.                              | Collected every timestep.                        |
+| `loop_temporal_variance`          | Waveforms of the penalties applied to the swarm.                              | Collected every timestep.                        |
 
 ## `convergence`
 

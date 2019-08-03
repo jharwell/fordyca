@@ -379,7 +379,7 @@ void depth1_loop_functions::PreStep() {
   base_loop_functions::PreStep();
 
   /* Process all robots */
-  swarm_iterator::robots<swarm_iterator::static_order>(this, [&](auto* robot) {
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, [&](auto* robot) {
     robot_pre_step(*robot);
   });
 
@@ -391,11 +391,8 @@ void depth1_loop_functions::PostStep(void) {
   base_loop_functions::PostStep();
 
   /* Process all robots: interact with environment then collect metrics */
-  swarm_iterator::robots<swarm_iterator::static_order>(this, [&](auto* robot) {
-    robot_post_step1(*robot);
-  });
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, [&](auto* robot) {
-    robot_post_step2(*robot);
+    robot_post_step(*robot);
   });
 
   /*
@@ -514,7 +511,7 @@ void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void depth1_loop_functions::robot_post_step1(argos::CFootBotEntity& robot) {
+void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   auto controller = dynamic_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -547,11 +544,6 @@ void depth1_loop_functions::robot_post_step1(argos::CFootBotEntity& robot) {
   if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
     oracle_manager()->update(arena_map());
   }
-} /* robot_post_step1() */
-
-void depth1_loop_functions::robot_post_step2(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::base_controller*>(
-      &robot.GetControllableEntity().GetController());
 
   /*
    * Collect metrics from robot, now that it has finished interacting with the
@@ -562,7 +554,7 @@ void depth1_loop_functions::robot_post_step2(argos::CFootBotEntity& robot) {
   boost::apply_visitor(madaptor,
                        m_metric_extractor_map->at(controller->type_index()));
   controller->block_manip_collator()->reset();
-} /* robot_post_step2() */
+} /* robot_post_step() */
 
 void depth1_loop_functions::static_cache_monitor(void) {
   /* nothing to do--all our managed caches exist */

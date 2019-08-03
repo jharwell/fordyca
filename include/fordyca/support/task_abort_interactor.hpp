@@ -183,8 +183,8 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
         m_map->grid_resolution(),
         true);
 
-    m_map->grid_mtx().lock();
     m_map->block_mtx().lock();
+    m_map->grid_mtx().lock();
 
     if (!drop_conflict) {
       drop_op.visit(*m_map);

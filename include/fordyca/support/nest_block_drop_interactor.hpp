@@ -152,7 +152,7 @@ class nest_block_drop_interactor
      * 1. Arena map
      * 2. Controller
      *
-     * In order for \ref nest_block_drop to process properly.
+     * In order for \ref events::nest_block_drop to process properly.
      */
     /* Update arena map state due to a block nest drop */
     drop_op.visit(*m_map);

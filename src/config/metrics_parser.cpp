@@ -67,9 +67,10 @@ const std::list<std::string> metrics_parser::xml_attr = {
 
     "swarm_dist_pos2D",
     "swarm_convergence",
-    "temporal_variance",
     "perception_mdpo",
     "perception_dpo",
+
+    "loop_temporal_variance",
 };
 
 /*******************************************************************************

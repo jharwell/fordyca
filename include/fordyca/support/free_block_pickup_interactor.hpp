@@ -180,7 +180,7 @@ class free_block_pickup_interactor
     ER_ASSERT(it != m_map->blocks().end(),
               "Block%d from penalty does not exist",
               penalty.id());
-    ER_ASSERT((*it)->rloc() != repr::base_block::kOutOfSightRLoc,
+    ER_ASSERT(!(*it)->is_out_of_sight(),
               "Attempt to pick up out of sight block%d",
               (*it)->id());
     /*
@@ -191,8 +191,16 @@ class free_block_pickup_interactor
     controller.block_manip_collator()->penalty_served(penalty.penalty());
     events::free_block_pickup_visitor pickup_op(*it, controller.entity_id(), t);
 
-    pickup_op.visit(controller);
+    /*
+     * Visitation order must be:
+     *
+     * 1. Arena map
+     * 2. Controller
+     *
+     * In order for \ref events::free_block_pickup to process properly.
+     */
     pickup_op.visit(*m_map);
+    pickup_op.visit(controller);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();

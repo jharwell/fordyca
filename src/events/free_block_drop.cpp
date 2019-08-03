@@ -146,7 +146,7 @@ void free_block_drop::visit(ds::arena_map& map) {
                         mc_resolution);
     op.visit(map);
     if (mc_cache_lock) {
-      map.cache_mtx().lock();
+      map.cache_mtx().unlock();
     }
   } else if (cell.state_has_block()) {
     map.distribute_single_block(m_block);

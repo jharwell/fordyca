@@ -171,7 +171,7 @@ class cached_block_pickup_interactor
        * serving their respective penalties (and not violate their respective
        * pickup policies), but that the one who picks up a block first would
        * cause the second one to violate THEIR pickup policy if they picked up a
-       * block (i.e. the cache now has too few blocks for pickup).
+       * block (e.g. the cache now has too few blocks for pickup).
        *
        * In this case, you don't need to do anything, as the change in the
        * cache's status will be picked up by the second robot next timestep.
@@ -180,8 +180,6 @@ class cached_block_pickup_interactor
                                  controller.cache_sel_matrix(),
                                  true);
       if (v(controller.position2D(), p.id(), t)) {
-        m_map->grid_mtx().lock();
-
         status = perform_cached_block_pickup(controller, p, t);
         m_floor->SetChanged();
       } else {
