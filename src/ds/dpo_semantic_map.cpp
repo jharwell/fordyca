@@ -78,7 +78,7 @@ void dpo_semantic_map::decay_all(void) {
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
     ER_ASSERT(std::fabs((map_density - b.density()).v()) <=
-                  std::numeric_limits<double>::epsilon(),
+              std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP block%d density disagree: %f vs %f",
               loc.to_str().c_str(),
               b.ent()->id(),

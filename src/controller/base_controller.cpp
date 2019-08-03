@@ -76,7 +76,7 @@ void base_controller::discrete_position(const rmath::vector2u& loc) {
 }
 
 void base_controller::Init(ticpp::Element& node) {
-#ifndef LIBRA_ER_NREPORT
+#if(LIBRA_ER == LIBRA_ER_ALL)
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
   } else {
@@ -176,7 +176,7 @@ void base_controller::output_init(const config::output_config* const config) {
     fs::create_directories(output_root);
   }
 
-#ifndef LIBRA_ER_NREPORT
+#if(LIBRA_ER == LIBRA_ER_ALL)
   /*
    * Each file appender is attached to a root category in the FORDYCA
    * namespace. If you give different file appenders the same file, then the

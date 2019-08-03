@@ -111,17 +111,17 @@ void free_block_pickup::visit(ds::arena_map& map) {
 
 void free_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
-  block.add_transporter(mc_robot_index);
+  block.robot_pickup_event(mc_robot_index);
   block.first_pickup_time(mc_timestep);
-
-  block.move_out_of_sight();
   ER_INFO("Block%d is now carried by fb%u", m_block->id(), mc_robot_index);
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
   visit(*controller.fsm());
-  controller.block(m_block->clone());
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
   controller.block_manip_collator()->free_pickup_event(true);
 
   ER_INFO("Picked up block%d", m_block->id());
@@ -187,7 +187,11 @@ void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
 
   visit(*controller.mdpo_perception()->map());
   visit(*controller.fsm());
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -199,7 +203,11 @@ void free_block_pickup::visit(controller::depth0::omdpo_controller& controller) 
 
   visit(*controller.mdpo_perception()->map());
   visit(*controller.fsm());
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -211,7 +219,11 @@ void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
 
   visit(*controller.dpo_perception()->dpo_store());
   visit(*controller.fsm());
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -223,7 +235,11 @@ void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
 
   visit(*controller.dpo_perception()->dpo_store());
   visit(*controller.fsm());
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   controller.block_manip_collator()->free_pickup_event(true);
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -238,7 +254,11 @@ void free_block_pickup::visit(controller::depth1::gp_dpo_controller& controller)
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -250,7 +270,11 @@ void free_block_pickup::visit(controller::depth1::gp_mdpo_controller& controller
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -262,7 +286,11 @@ void free_block_pickup::visit(controller::depth1::gp_odpo_controller& controller
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -275,7 +303,11 @@ void free_block_pickup::visit(
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -308,7 +340,11 @@ void free_block_pickup::visit(controller::depth2::grp_dpo_controller& controller
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -321,7 +357,11 @@ void free_block_pickup::visit(
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -334,7 +374,11 @@ void free_block_pickup::visit(
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 
@@ -347,7 +391,11 @@ void free_block_pickup::visit(
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
-  controller.block(m_block->clone());
+
+  auto robot_block = m_block->clone();
+  robot_block->robot_id(mc_robot_index);
+  controller.block(std::move(robot_block));
+
   dispatch_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id());
 

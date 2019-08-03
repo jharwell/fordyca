@@ -110,12 +110,18 @@ class base_block : public unicell_movable_entity,
   rtypes::timestep initial_wait_time(void) const override RCSW_PURE;
 
   /**
-   * @brief Increment the # of carries this block has undergone on its way back
-   * to the nest.
+   * @brief Update a block's state given that it has been picked up by a robot:
+   *
+   * - Increment the # of carries this block has undergone on its way back
+   *   to the nest.
+   * - Set its reference to the robot that carries it.
+   * - Move the block's position out of sight so that it is not discoverable by
+   *   robots.
    */
-  void add_transporter(int robot_id) {
+  void robot_pickup_event(int robot_id) {
     ++m_transporters;
     m_robot_id = robot_id;
+    move_out_of_sight();
   }
 
   /**
@@ -146,12 +152,6 @@ class base_block : public unicell_movable_entity,
   void reset_robot_id(void) { m_robot_id = -1; }
 
   /**
-   * @brief change the base_block's location to something outside the visitable
-   * space in the arena when it is being carried by robot.
-   */
-  void move_out_of_sight(void);
-
-  /**
    * @brief Determine if the base_block is currently out of sight.
    *
    * This should only happen if the base_block is being carried by a robot.
@@ -167,8 +167,15 @@ class base_block : public unicell_movable_entity,
    * block.
    */
   int robot_id(void) const { return m_robot_id; }
+  void robot_id(int id) { m_robot_id = id; }
 
  private:
+  /**
+   * @brief Change the block's location to something outside the visitable space
+   * in the arena when it is being carried by robot.
+   */
+  void move_out_of_sight(void);
+
   /* clang-format off */
   int              m_robot_id{-1};
   uint             m_transporters{0};

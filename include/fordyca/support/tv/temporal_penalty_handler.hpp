@@ -84,7 +84,7 @@ class temporal_penalty_handler
   /**
    * @brief Get the name of the penalty handler (for debugging)
    */
-#ifndef LIBRA_ER_NREPORT
+#if(LIBRA_ER == LIBRA_ER_ALL)
   const std::string& name(void) const { return mc_name; }
 #endif
 

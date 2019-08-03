@@ -348,10 +348,9 @@ void cached_block_pickup::visit(support::base_cache_manager& manager) {
 
 void cached_block_pickup::visit(repr::base_block& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
-  block.add_transporter(mc_robot_index);
+  block.robot_pickup_event(mc_robot_index);
   block.first_pickup_time(mc_timestep);
 
-  block.move_out_of_sight();
   ER_INFO("Block%d is now carried by fb%u", block.id(), mc_robot_index);
 } /* visit() */
 

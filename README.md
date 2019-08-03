@@ -73,7 +73,7 @@ directory prior to building will do the trick:
     -DWITH_FOOTBOT_RAB=NO \
     -DWITH_FOOTBOT_LEDS=NO \
     -DCMAKE_BUILD_TYPE=OPT \
-    -DLIBRA_ER_NREPORT=YES \
+    -DLIBRA_ER=LIBRA_ER_NONE \
     -DLIBRA_OPENMP=YES \
     ..
 
@@ -168,8 +168,8 @@ After successful compilation, follow these steps to run a foraging scenario:
    somewhere else, then update the path above accordingly.
 
 3. Unless you compile out event reporting (built fordyca with optimizations
-   *AND* with `LIBRA_ER_NREPORT=YES` passed to cmake), you will need to set the
-   path to the log4cxx configuration file, which tells fordyca which classes
+   *AND* with `LIBRA_ER=LIBRA_ER_NONE` passed to cmake), you will need to set
+   the path to the log4cxx configuration file, which tells fordyca which classes
    should have logging turned on, and how verbose to be. On bash that is:
 
         export LOG4CXX_CONFIGURATION=$HOME/git/fordyca/log4cxx.xml
