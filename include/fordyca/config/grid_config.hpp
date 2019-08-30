@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

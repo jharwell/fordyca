@@ -24,11 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/types/discretize_ratio.hpp"
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_list.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/repr/grid_view_entity.hpp"
-#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces

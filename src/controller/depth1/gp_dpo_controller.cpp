@@ -22,7 +22,11 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
+
 #include <fstream>
+
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
@@ -30,14 +34,11 @@
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
-#include "rcppsw/ta/bi_tdgraph.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +67,7 @@ void gp_dpo_controller::ControlStep(void) {
 
   dpo_perception()->update(nullptr);
   executive()->run();
-
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
@@ -110,7 +111,7 @@ void gp_dpo_controller::private_init(
   /* task executive */
   m_executive = tasking_initializer(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
-                                    saa_subsystem(),
+                                    saa(),
                                     perception())(config_repo);
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
@@ -152,17 +153,18 @@ void gp_dpo_controller::executive(
 RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
                           block_transport_goal,
                           current_task(),
-                          transport_goal_type::ekNONE,
+                          fsm::foraging_transport_goal::ekNONE,
                           const);
 
 /*******************************************************************************
  * Goal Acquisition
  ******************************************************************************/
-RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
-                          acquisition_goal,
-                          current_task(),
-                          acq_goal_type::ekNONE,
-                          const);
+RCPPSW_WRAP_OVERRIDE_DEFP(
+    gp_dpo_controller,
+    acquisition_goal,
+    current_task(),
+    cfmetrics::goal_acq_metrics::goal_type(fsm::foraging_acq_goal::ekNONE),
+    const);
 
 RCPPSW_WRAP_OVERRIDE_DEFP(gp_dpo_controller,
                           goal_acquired,

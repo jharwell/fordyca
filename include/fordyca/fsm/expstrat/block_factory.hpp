@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/factory/factory.hpp"
-#include "fordyca/nsalias.hpp"
-#include "fordyca/fsm/expstrat/base_expstrat.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -37,8 +37,8 @@ NS_START(fordyca, fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 class block_factory :
-    public rpfactory::releasing_factory<base_expstrat,
-                                       const base_expstrat::params*> {
+    public rpfactory::releasing_factory<expstrat::foraging_expstrat,
+                                        const expstrat::foraging_expstrat::params*> {
  public:
   static constexpr char kCRW[] = "CRW";
   static constexpr char kLikelihoodSearch[] = "likelihood_search";

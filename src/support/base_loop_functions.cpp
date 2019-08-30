@@ -22,8 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_loop_functions.hpp"
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
+#include "rcppsw/algorithm/closest_pair2D.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
@@ -38,16 +43,13 @@
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
-#include "rcppsw/algorithm/closest_pair2D.hpp"
-#include "rcppsw/math/vector2.hpp"
-#include "rcppsw/swarm/convergence/config/convergence_config.hpp"
-#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
+#include "cosm/convergence/config/convergence_config.hpp"
+#include "cosm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace rswc = rcppsw::swarm::convergence;
 
 /*******************************************************************************
  * Constructors/Destructors
@@ -81,7 +83,8 @@ void base_loop_functions::Init(ticpp::Element& node) {
   arena_map_init(config());
 
   /* initialize convergence calculations */
-  convergence_init(m_config.config_get<rswc::config::convergence_config>());
+  convergence_init(
+      m_config.config_get<cconvergence::config::convergence_config>());
 
   /* initialize temporal variance injection */
   tv_init(config()->config_get<config::tv::tv_manager_config>());
@@ -107,7 +110,7 @@ void base_loop_functions::output_init(const config::output_config* const output)
     m_output_root = output->output_root + "/" + output->output_dir;
   }
 
-#if(LIBRA_ER == LIBRA_ER_ALL)
+#if (LIBRA_ER == LIBRA_ER_ALL)
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
                       m_output_root + "/events.log");
   client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
@@ -122,11 +125,11 @@ void base_loop_functions::output_init(const config::output_config* const output)
 } /* output_init() */
 
 void base_loop_functions::convergence_init(
-    const rswc::config::convergence_config* const config) {
+    const cconvergence::config::convergence_config* const config) {
   if (nullptr == config) {
     return;
   }
-  m_conv_calc = std::make_unique<rswc::convergence_calculator>(
+  m_conv_calc = std::make_unique<cconvergence::convergence_calculator>(
       config,
       std::bind(&base_loop_functions::calc_robot_headings,
                 this,

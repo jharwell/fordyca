@@ -26,8 +26,9 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/events/cell_op.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces

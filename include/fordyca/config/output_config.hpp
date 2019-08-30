@@ -25,8 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/config/metrics_config.hpp"
+
 #include "rcppsw/config/base_config.hpp"
+
+#include "fordyca/config/metrics_config.hpp"
 
 /*******************************************************************************
  * Namespaces

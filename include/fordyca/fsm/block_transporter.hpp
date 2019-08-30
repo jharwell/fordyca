@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
 
+#include "fordyca/fsm/foraging_goal_type.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -44,36 +46,6 @@ NS_START(fordyca, fsm);
  */
 class block_transporter {
  public:
-  enum class goal_type {
-    /**
-     * @brief No goal--robot is probably not carrying a block.
-     */
-    ekNONE,
-
-    /**
-     * @brief A robot has acquired a block and is currently taking it back to
-     * the nest.
-     */
-    ekNEST,
-
-    /**
-     * @brief A robot is currently transporting an acquired block to its
-     * existing cache of choice.
-     */
-    ekEXISTING_CACHE,
-
-    /**
-     * @brief A robot is currently transporting an acquired block to its new
-     * cache of choice.
-     */
-    ekNEW_CACHE,
-
-    /**
-     * @brief A robot is currently transporting an acquired block to its cache
-     * site of choice.
-     */
-    ekCACHE_SITE
-  };
   block_transporter(void) = default;
   virtual ~block_transporter(void) = default;
 
@@ -81,7 +53,7 @@ class block_transporter {
    * @brief All tasks must define method to determine what they are currently
    * doing with a block (if they are carrying one).
    */
-  virtual goal_type block_transport_goal(void) const = 0;
+  virtual foraging_transport_goal::type block_transport_goal(void) const = 0;
 };
 
 NS_END(fsm, fordyca);

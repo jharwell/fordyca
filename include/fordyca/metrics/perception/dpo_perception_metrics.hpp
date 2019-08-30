@@ -25,8 +25,8 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
-#include "fordyca/nsalias.hpp"
+#include "cosm/repr/pheromone_density.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,13 +64,13 @@ class dpo_perception_metrics : public virtual rmetrics::base_metrics {
    * @brief Return the average block pheromone density for the blocks the robot
    * currently knows about.
    */
-  virtual rswarm::pheromone_density avg_block_density(void) const = 0;
+  virtual crepr::pheromone_density avg_block_density(void) const = 0;
 
   /**
    * @brief Return the average cache pheromone density for the caches the robot
    * currently knows about.
    */
-  virtual rswarm::pheromone_density avg_cache_density(void) const = 0;
+  virtual crepr::pheromone_density avg_cache_density(void) const = 0;
 };
 
 NS_END(perception, metrics, fordyca);

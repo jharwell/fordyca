@@ -29,11 +29,17 @@
 #include <random>
 #include <utility>
 
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
+#include "fordyca/fordyca.hpp"
+
+#include "cosm/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::robots::footbot {
+class footbot_saa_subsystem;
+} /* namespace cosm::robots::footbot */
+
 NS_START(fordyca);
 
 namespace controller {
@@ -48,6 +54,10 @@ class dpo_store;
 
 NS_START(fsm);
 
+namespace expstrat {
+class foraging_expstrat;
+} /* namespace expstrat */
+
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
@@ -60,7 +70,7 @@ NS_START(fsm);
  */
 class acquire_existing_cache_fsm
     : public rer::client<acquire_existing_cache_fsm>,
-      public acquire_goal_fsm {
+      public cfsm::acquire_goal_fsm {
  public:
   /**
    * @param matrix The matrix of cache selection info.
@@ -70,9 +80,9 @@ class acquire_existing_cache_fsm
    * @param for_pickup Are we acquiring a cache for pickup or block drop?
    */
   acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
-                             controller::saa_subsystem* saa,
+                             crfootbot::footbot_saa_subsystem* saa,
                              ds::dpo_store* store,
-                             std::unique_ptr<expstrat::base_expstrat> behavior,
+                             std::unique_ptr<expstrat::foraging_expstrat> behavior,
                              bool for_pickup);
 
   ~acquire_existing_cache_fsm(void) override = default;
@@ -86,7 +96,9 @@ class acquire_existing_cache_fsm
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acq_goal_type acq_goal_internal(void) const RCSW_CONST;
+  static cfmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
+      RCSW_CONST;
+
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const RCSW_PURE;
   boost::optional<acq_loc_type> calc_acq_location(void);

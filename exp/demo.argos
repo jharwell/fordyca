@@ -24,6 +24,7 @@
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
+        <differential_steering implementation="default" />
         <footbot_proximity implementation="default" show_rays="true" />
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
@@ -37,7 +38,8 @@
           output_root="output"
           output_dir="__current_date__"
           />
-        <perception>
+        <perception
+            los_dim="0.4">
           <grid resolution="0.2"
                 size="12, 6, 2"/>
           <pheromone rho="0.00001"
@@ -49,20 +51,25 @@
         <exploration
             block_strategy="CRW"
             cache_strategy="ledtaxis_search"/>
-        <sensing
-            los_dim="0.4">
-          <proximity_sensor angle_range="-1.1:1.1"
-                            delta="0.0001" />
-          </sensing>
-        <actuation>
-          <block_carry_throttle>
-            <waveform
-                type="Null"
-                frequency="100"
-                amplitude="0.4"
-                offset="0.1"/>
-          </block_carry_throttle>
-          <steering2D>
+        <sensing_subsystem2D>
+                     <!-- -5pi/6 : 5pi/6 -->
+          <proximity_sensor fov="-2.61:2.61"
+                            delta="0.1" />
+
+          <ground_sensor>
+          <!-- NEST: The nest is a relatively light gray. -->
+            <nest range="0.6:0.8"
+                  consensus="3"/>
+          <!-- BLOCK: Blocks are black. -->
+            <block range="-0.05:0.05"
+                   consensus="4"/>
+          <!-- CACHE: Caches are dark gray. -->
+            <cache range="0.3:0.5"
+                   consensus="3"/>
+          </ground_sensor>
+          </sensing_subsystem2D>
+          <actuation_subsystem2D>
+          <force_calculator>
             <avoidance_force lookahead="0.5"
                              max="8"/>
             <arrival_force slowing_radius="0.2"
@@ -75,11 +82,11 @@
                           interval="1"
                           normal_dist="false"/>
             <phototaxis_force max="8"/>
-          </steering2D>
+          </force_calculator>
 
-          <differential_drive soft_turn_max="15"
+          <diff_drive soft_turn_max="15"
                               max_speed="10.0" />
-        </actuation>
+        </actuation_subsystem2D>
       </params>
     </dpo_controller>
 
@@ -94,7 +101,7 @@
             output_dir="__current_date__">
       <metrics
           output_dir="metrics"
-          collect_interval="1000"
+          output_interval="1000"
           block_transport="block-transport.csv"
           fsm_collision_counts_fname="fsm-collision-counts.csv"
           fsm_collision_locs_fname="fsm-collision-locs.csv"

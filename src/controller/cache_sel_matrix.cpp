@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/cache_sel_matrix.hpp"
+
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
 
 /*******************************************************************************

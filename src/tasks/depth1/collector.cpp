@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth1/collector.hpp"
 
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -31,11 +30,12 @@
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
 
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth1);
-using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -82,7 +82,7 @@ rtypes::timestep collector::interface_time_calc(
 
 void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (acq_goal_type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
+  if (fsm::foraging_acq_goal::type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
     return;
   }
 
@@ -170,7 +170,8 @@ RCPPSW_WRAP_OVERRIDE_DEF(collector,
  ******************************************************************************/
 bool collector::task_at_interface(void) const {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  return !(transport_goal_type::ekNEST == fsm->block_transport_goal());
+  return !(fsm::foraging_transport_goal::type::ekNEST ==
+           fsm->block_transport_goal());
 } /* task_at_interface() */
 
 NS_END(depth1, tasks, fordyca);

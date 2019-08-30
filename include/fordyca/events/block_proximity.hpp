@@ -25,12 +25,14 @@
  * Includes
  ******************************************************************************/
 #include <memory>
-#include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/fsm/fsm_fwd.hpp"
-#include "fordyca/nsalias.hpp"
-#include "fordyca/tasks/tasks_fwd.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
+
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -27,18 +27,16 @@
 #include <string>
 
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
 #include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_status.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, tv);
-
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
-using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Classes
@@ -101,7 +99,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   op_filter_status free_pickup_filter(const T& controller) const {
     int block_id = utils::robot_on_block(controller, *mc_map);
     if (!(controller.goal_acquired() &&
-          acq_goal_type::ekBLOCK == controller.acquisition_goal())) {
+          fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     } else if (-1 == block_id) {
       return op_filter_status::ekROBOT_NOT_ON_BLOCK;
@@ -115,7 +113,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    */
   op_filter_status nest_drop_filter(const T& controller) const {
     if (!(controller.in_nest() && controller.goal_acquired() &&
-          transport_goal_type::ekNEST == controller.block_transport_goal())) {
+          fsm::foraging_transport_goal::ekNEST == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
     return op_filter_status::ekSATISFIED;
@@ -129,8 +127,8 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   op_filter_status cache_site_drop_filter(const T& controller,
                                           rtypes::spatial_dist cache_prox) const {
     if (!(controller.goal_acquired() &&
-          acq_goal_type::ekCACHE_SITE == controller.acquisition_goal() &&
-          transport_goal_type::ekCACHE_SITE == controller.block_transport_goal())) {
+          fsm::foraging_acq_goal::ekCACHE_SITE == controller.acquisition_goal() &&
+          fsm::foraging_transport_goal::ekCACHE_SITE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
 
@@ -152,8 +150,8 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   op_filter_status new_cache_drop_filter(const T& controller,
                                          rtypes::spatial_dist cache_prox) const {
     if (!(controller.goal_acquired() &&
-          acq_goal_type::ekNEW_CACHE == controller.acquisition_goal() &&
-          transport_goal_type::ekNEW_CACHE == controller.block_transport_goal())) {
+          fsm::foraging_acq_goal::ekNEW_CACHE == controller.acquisition_goal() &&
+          fsm::foraging_transport_goal::ekNEW_CACHE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
     int cache_id = utils::new_cache_cache_proximity(controller,

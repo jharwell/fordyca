@@ -23,10 +23,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/nsalias.hpp"
-#include "fordyca/support/robot_metric_extractor.hpp"
 #include "rcppsw/ds/type_map.hpp"
+
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/support/robot_metric_extractor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

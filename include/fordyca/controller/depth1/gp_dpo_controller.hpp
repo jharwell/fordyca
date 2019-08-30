@@ -87,10 +87,14 @@ class gp_dpo_controller : public depth0::dpo_controller,
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const final);
-  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const final);
+  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+                            acquisition_goal,
+                            const final);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const final);
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+                            block_transport_goal,
+                            const final);
 
   /**
    * @brief Get the current task the controller is executing.

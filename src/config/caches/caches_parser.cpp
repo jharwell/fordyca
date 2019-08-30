@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/caches/caches_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -59,9 +60,9 @@ bool caches_parser::validate(void) const {
     return true;
   }
 
-  CHECK(m_config->dimension > 0.0);
-  CHECK(m_dynamic.validate());
-  CHECK(m_static.validate());
+  RCSW_CHECK(m_config->dimension > 0.0);
+  RCSW_CHECK(m_dynamic.validate());
+  RCSW_CHECK(m_static.validate());
   return true;
 
 error:

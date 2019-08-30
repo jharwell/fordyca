@@ -22,9 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/fsm/base_foraging_fsm.hpp"
+
 #include "rcppsw/ta/config/task_alloc_config.hpp"
+
+#include "fordyca/fordyca.hpp"
+
+#include "cosm/fsm/util_hfsm.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,12 +50,12 @@ foraging_task::foraging_task(const std::string& name,
  * Member Functions
  ******************************************************************************/
 rtypes::timestep foraging_task::current_time(void) const {
-  return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
-      ->sensors()
+  return dynamic_cast<cfsm::util_hfsm*>(polled_task::mechanism())
+      ->sensing()
       ->tick();
 } /* current_time() */
 
-bool foraging_task::task_in_depth2(const polled_task* const task) {
+bool foraging_task::task_in_depth2(const rta::polled_task* const task) {
   return task->name() == kCacheStarterName ||
          task->name() == kCacheFinisherName ||
          task->name() == kCacheTransfererName ||

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/caches/static_cache_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -52,8 +53,8 @@ bool static_cache_parser::validate(void) const {
     return true;
   }
 
-  CHECK(m_config->size > 0);
-  CHECK(m_config->respawn_scale_factor > 0);
+  RCSW_CHECK(m_config->size > 0);
+  RCSW_CHECK(m_config->respawn_scale_factor > 0);
   return true;
 
 error:

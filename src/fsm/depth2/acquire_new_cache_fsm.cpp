@@ -24,10 +24,13 @@
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/repr/base_cache.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,9 +42,9 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const controller::cache_sel_matrix* matrix,
-    controller::saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem* saa,
     ds::dpo_store* const store,
-    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
+    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
       acquire_goal_fsm(
           saa,
@@ -73,22 +76,20 @@ bool acquire_new_cache_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exsti() */
 
-boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_select(
-    void) const {
+boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
+    cache_select(void) const {
   controller::depth2::new_cache_selector selector(mc_matrix);
 
   /* A "new" cache is the same as a single block  */
   if (auto best = selector(
-          mc_store->blocks(), mc_store->caches(), sensors()->position())) {
+          mc_store->blocks(), mc_store->caches(), sensing()->position())) {
     ER_INFO("Select new cache%d@%s/%s,density=%f for acquisition",
             best->ent()->id(),
             best->ent()->rloc().to_str().c_str(),
             best->ent()->dloc().to_str().c_str(),
             best->density().v());
-    return boost::make_optional(
-        acquire_goal_fsm::candidate_type(best->ent()->rloc(),
-                                         vector_fsm::kNEW_CACHE_ARRIVAL_TOL,
-                                         best->ent()->id()));
+    return boost::make_optional(acquire_goal_fsm::candidate_type(
+        best->ent()->rloc(), kNEW_CACHE_ARRIVAL_TOL, best->ent()->id()));
   } else {
     /*
      * If this happens, all the blocks we know of are ineligible for us to
@@ -100,10 +101,9 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::cache_s
 
 bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
   ER_ASSERT(!explore_result, "New cache acquisition via exploration?");
-  rmath::vector2d position = saa_subsystem()->sensing()->position();
+  rmath::vector2d position = saa()->sensing()->position();
   for (auto& b : mc_store->blocks().const_values_range()) {
-    if ((b.ent()->rloc() - position).length() <=
-        vector_fsm::kNEW_CACHE_ARRIVAL_TOL) {
+    if ((b.ent()->rloc() - position).length() <= kNEW_CACHE_ARRIVAL_TOL) {
       return true;
     }
   } /* for(&b..) */
@@ -115,8 +115,10 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acq_goal_type acquire_new_cache_fsm::acquisition_goal_internal(void) const {
-  return acq_goal_type::ekNEW_CACHE;
+cfmetrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
+    acquisition_goal_internal(void) const {
+  return cfmetrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekNEW_CACHE);
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

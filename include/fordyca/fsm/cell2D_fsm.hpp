@@ -26,10 +26,12 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/fsm/cell2D_states.hpp"
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
 #include "rcsw/common/common.h"
+
+#include "rcppsw/patterns/fsm/simple_fsm.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/cell2D_states.hpp"
 
 /*******************************************************************************
  * Namespaces

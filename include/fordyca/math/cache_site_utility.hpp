@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/sigmoid.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +57,7 @@ NS_START(fordyca, math);
  * of the circle formed by the nest center and distance to the ideal
  * point. We do this via exponential falloff on either side of the arc.
  */
-class cache_site_utility : public rcppsw::math::sigmoid,
+class cache_site_utility : public rmath::sigmoid,
                            public rer::client<cache_site_utility> {
  public:
   cache_site_utility(const rmath::vector2d& position,

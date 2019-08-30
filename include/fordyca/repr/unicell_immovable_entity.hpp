@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/repr/unicell_entity.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
+
+#include "fordyca/repr/unicell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces

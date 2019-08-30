@@ -27,7 +27,7 @@
 #include <map>
 #include <string>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

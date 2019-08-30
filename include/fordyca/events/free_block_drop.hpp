@@ -26,13 +26,14 @@
  ******************************************************************************/
 #include <memory>
 
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces

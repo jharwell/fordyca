@@ -22,13 +22,17 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
+
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"
+#include "fordyca/config/exploration_config.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/repr/base_block.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +57,7 @@ void mdpo_controller::ControlStep(void) {
             block()->id(),
             block()->robot_id());
   perception()->update(nullptr);
-
+  saa()->steer_force2D_apply();
   fsm()->run();
   ndc_pop();
 } /* ControlStep() */
@@ -103,12 +107,11 @@ void mdpo_controller::private_init(
     const config::depth0::mdpo_controller_repository& config_repo) {
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
-  fsm::expstrat::base_expstrat::params p{nullptr,
-                                         saa_subsystem(),
-                                         perception()->dpo_store()};
+  fsm::expstrat::foraging_expstrat::params p(
+      saa(), nullptr, nullptr, perception()->dpo_store());
   dpo_controller::fsm(std::make_unique<fsm::depth0::dpo_fsm>(
       block_sel_matrix(),
-      base_controller::saa_subsystem(),
+      base_controller::saa(),
       perception()->dpo_store(),
       f.create(exp_config->block_strategy, &p)));
 } /* private_init() */
@@ -123,11 +126,14 @@ const mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) const {
 } /* perception() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(mdpo_controller, "mdpo_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(depth0, controller, fordyca);

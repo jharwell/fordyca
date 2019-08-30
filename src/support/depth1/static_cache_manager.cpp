@@ -21,6 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_manager.hpp"
+
 #include <chrono>
 
 #include "fordyca/ds/arena_grid.hpp"

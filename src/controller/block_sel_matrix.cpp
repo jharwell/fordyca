@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_sel_matrix.hpp"
+
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 
 /*******************************************************************************

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
+
 #include <algorithm>
 
 #include "fordyca/controller/los_proc_verify.hpp"
@@ -48,6 +49,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
     const config::perception::perception_config* const config,
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
+      base_perception_subsystem(config),
       m_cell_stats(fsm::cell2D_states::ekST_MAX_STATES),
       m_los(),
       m_map(std::make_unique<ds::dpo_semantic_map>(config, id)) {}

@@ -24,29 +24,31 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/floor_entity.h>
-#include <argos3/core/simulator/loop_functions.h>
-#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "fordyca/config/loop_function_repository.hpp"
-#include "fordyca/nsalias.hpp"
+#include <argos3/core/simulator/entity/floor_entity.h>
+#include <argos3/core/simulator/loop_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/utils/color.hpp"
 
+#include "fordyca/config/loop_function_repository.hpp"
+#include "fordyca/fordyca.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace swarm { namespace convergence {
+namespace cosm::convergence {
 class convergence_calculator;
 namespace config {
 struct convergence_config;
 } /* namespace config */
-}}} // namespace rcppsw::swarm::convergence
+} /* namespace cosm::convergence */
 
 NS_START(fordyca);
 
@@ -106,7 +108,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   }
   void ndc_pop(void) { ER_NDC_POP(); }
   const tv::tv_manager* tv_manager(void) const { return m_tv_manager.get(); }
-  const rsc::convergence_calculator* conv_calculator(void) const {
+  const cconvergence::convergence_calculator* conv_calculator(void) const {
     return m_conv_calc.get();
   }
 
@@ -121,7 +123,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   config::loop_function_repository* config(void) { return &m_config; }
   const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
   ds::arena_map* arena_map(void) { return m_arena_map.get(); }
-  rsc::convergence_calculator* conv_calculator(void) {
+  cconvergence::convergence_calculator* conv_calculator(void) {
     return m_conv_calc.get();
   }
   const oracle::oracle_manager* oracle_manager(void) const {
@@ -137,7 +139,8 @@ class base_loop_functions : public argos::CLoopFunctions,
    *
    * @param config Parsed convergence parameters.
    */
-  void convergence_init(const rsc::config::convergence_config* config) RCSW_COLD;
+  void convergence_init(
+      const cconvergence::config::convergence_config* config) RCSW_COLD;
 
   /**
    * @brief Initialize logging for all support/loop function code.
@@ -172,13 +175,13 @@ class base_loop_functions : public argos::CLoopFunctions,
   std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
 
   /* clang-format off */
-  argos::CFloorEntity*                         m_floor{nullptr};
-  std::string                                  m_output_root{};
-  config::loop_function_repository             m_config{};
-  std::unique_ptr<ds::arena_map>               m_arena_map;
-  std::unique_ptr<tv::tv_manager>              m_tv_manager;
-  std::unique_ptr<rsc::convergence_calculator> m_conv_calc;
-  std::unique_ptr<oracle::oracle_manager>      m_oracle_manager;
+  argos::CFloorEntity*                                  m_floor{nullptr};
+  std::string                                           m_output_root{};
+  config::loop_function_repository                      m_config{};
+  std::unique_ptr<ds::arena_map>                        m_arena_map;
+  std::unique_ptr<tv::tv_manager>                       m_tv_manager;
+  std::unique_ptr<cconvergence::convergence_calculator> m_conv_calc;
+  std::unique_ptr<oracle::oracle_manager>               m_oracle_manager;
   /* clang-format on */
 };
 

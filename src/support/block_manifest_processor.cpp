@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_manifest_processor.hpp"
+
 #include "fordyca/repr/cube_block.hpp"
 #include "fordyca/repr/ramp_block.hpp"
 

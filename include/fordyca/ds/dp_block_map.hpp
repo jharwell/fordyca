@@ -27,7 +27,7 @@
 #include <string>
 
 #include "fordyca/ds/dpo_map.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -27,10 +27,12 @@
 #include <string>
 #include <tuple>
 
-#include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+
+#include "fordyca/ds/cell2D.hpp"
+
+#include "cosm/repr/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,7 +44,7 @@ struct perception_config;
 }} // namespace config::perception
 
 NS_START(ds);
-using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
+using robot_layer_stack = std::tuple<crepr::pheromone_density, cell2D>;
 
 /*******************************************************************************
  * Class Definitions
@@ -56,10 +58,10 @@ using robot_layer_stack = std::tuple<rcppsw::swarm::pheromone_density, cell2D>;
  * decisions in how they execute their tasks.
  */
 class occupancy_grid : public rer::client<occupancy_grid>,
-                       public rcppsw::ds::stacked_grid<robot_layer_stack> {
+                       public rds::stacked_grid<robot_layer_stack> {
  public:
   /**
-   * @brief The index of the \ref rcppsw::swarm::pheromone_density layer.
+   * @brief The index of the \ref crepr::pheromone_density layer.
    */
   constexpr static uint kPheromone = 0;
 

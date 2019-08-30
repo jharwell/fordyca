@@ -22,10 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
+
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/repr/base_block.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +55,7 @@ void omdpo_controller::ControlStep(void) {
 
   mdpo_perception()->update(m_receptor.get());
   fsm()->run();
-
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
@@ -62,11 +65,14 @@ void omdpo_controller::oracle_init(
 } /* oracle_init() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(omdpo_controller, "omdpo_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(depth0, controller, fordyca);

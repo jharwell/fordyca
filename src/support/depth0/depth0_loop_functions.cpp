@@ -30,8 +30,10 @@
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
-#include <argos3/core/utility/configuration/argos_configuration.h>
+
 #include <boost/mpl/for_each.hpp>
+
+#include <argos3/core/utility/configuration/argos_configuration.h>
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/output_config.hpp"
@@ -55,7 +57,7 @@
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
 
-#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
+#include "cosm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

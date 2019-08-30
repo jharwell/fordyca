@@ -22,8 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/depth2/controller_repository.hpp"
-#include "fordyca/nsalias.hpp"
+
 #include "rcppsw/ta/config/xml/task_alloc_parser.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -22,11 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/oracle/entities_oracle.hpp"
+
 #include <numeric>
-#include "fordyca/repr/base_block.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 #include "fordyca/config/oracle/entities_oracle_config.hpp"
+#include "fordyca/repr/base_block.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

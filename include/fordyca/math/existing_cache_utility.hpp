@@ -24,10 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/expression.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+
+#include "fordyca/fordyca.hpp"
+
+#include "cosm/repr/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,16 +54,16 @@ NS_START(fordyca, math);
  * - Pheromone density associated with the cache information (higher is
  *   better).
  */
-class existing_cache_utility : public rcppsw::math::expression<double> {
+class existing_cache_utility : public rmath::expression<double> {
  public:
   existing_cache_utility(const rmath::vector2d& cache_loc,
                          const rmath::vector2d& nest_loc);
 
   double calc(const rmath::vector2d& rloc,
-              const rswarm::pheromone_density& density,
+              const crepr::pheromone_density& density,
               size_t n_blocks = 1);
   double operator()(const rmath::vector2d& rloc,
-                    const rswarm::pheromone_density& density,
+                    const crepr::pheromone_density& density,
                     size_t n_blocks) {
     return calc(rloc, density, n_blocks);
   }

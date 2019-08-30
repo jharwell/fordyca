@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

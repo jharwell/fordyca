@@ -28,18 +28,18 @@
 #include <memory>
 #include <vector>
 
+#include "rcppsw/patterns/prototype/clonable.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
+
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/colored_entity.hpp"
 #include "fordyca/repr/unicell_immovable_entity.hpp"
-#include "rcppsw/patterns/prototype/clonable.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, repr);
-namespace prototype = rcppsw::patterns::prototype;
 
 /*******************************************************************************
  * Class Definitions
@@ -56,7 +56,7 @@ namespace prototype = rcppsw::patterns::prototype;
  */
 class base_cache : public unicell_immovable_entity,
                    public colored_entity,
-                   public prototype::clonable<base_cache> {
+                   public rpprototype::clonable<base_cache> {
  public:
   /**
    * @param dimension The size of the cache. Does not have to be a multiple of

@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/expression.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,7 +47,7 @@ NS_START(fordyca, math);
  *
  * - A scaling factor > 0 that influences the probability distribution shape.
  */
-class cache_respawn_probability : public rcppsw::math::expression<double> {
+class cache_respawn_probability : public rmath::expression<double> {
  public:
   explicit cache_respawn_probability(double scale_factor);
 

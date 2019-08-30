@@ -29,7 +29,7 @@
 
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/config/base_config.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

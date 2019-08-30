@@ -22,9 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -41,7 +41,7 @@ void ledtaxis_cache_search::task_execute(void) {
    * a cache signal in this cache, as it will not serve any purpose. Instead,
    * wander until the cache becomes suitable or something else changes.
    */
-  if (saa_subsystem()->sensing()->cache_detected()) {
+  if (saa()->sensing()->ground()->detect("cache")) {
     if (m_taxis.task_running()) {
       m_taxis.task_reset();
     }
@@ -64,12 +64,12 @@ void ledtaxis_cache_search::task_execute(void) {
 } /* task_execute() */
 
 void ledtaxis_cache_search::task_start(const rta::taskable_argument*) {
-  saa_subsystem()->sensing()->blobs().enable();
+  saa()->sensing()->blobs()->enable();
   m_taxis.task_start(nullptr);
 } /* task_start() */
 
 void ledtaxis_cache_search::task_reset(void) {
-  saa_subsystem()->sensing()->blobs().disable();
+  saa()->sensing()->blobs()->disable();
   m_taxis.task_reset();
   m_crw.task_reset();
 } /* task_reset() */

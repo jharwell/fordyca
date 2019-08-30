@@ -27,8 +27,9 @@
 #include <map>
 #include <string>
 
-#include "fordyca/config/grid_config.hpp"
 #include "rcppsw/config/base_config.hpp"
+
+#include "fordyca/config/grid_config.hpp"
 
 /*******************************************************************************
  * Namespaces

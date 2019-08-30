@@ -26,9 +26,11 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fsm/expstrat/base_expstrat.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/fsm/collision_tracker.hpp"
+#include "cosm/fsm/collision_tracker.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,17 +47,12 @@ NS_START(fordyca, fsm, expstrat);
  * @brief Roam around using Correlated Random Walk looking for something until
  * you happen to stumble across it.
  */
-class crw final
-    : public base_expstrat,
-      public rer::client<crw> {
+class crw final : public foraging_expstrat,
+                  public rer::client<crw> {
  public:
-  explicit crw(const base_expstrat::params* const c_params)
-      : crw(c_params->saa) {}
+  explicit crw(const fsm::expstrat::foraging_expstrat::params* const c_params);
 
-  explicit crw(controller::saa_subsystem* saa)
-      : base_expstrat(saa),
-        ER_CLIENT_INIT("fordyca.fsm.expstrat.crw"),
-        m_tracker(saa) {}
+  explicit crw(crfootbot::footbot_saa_subsystem* saa);
 
   ~crw(void) override = default;
   crw(const crw&) = delete;
@@ -76,8 +73,8 @@ class crw final
   void task_execute(void) override final;
 
     /* prototype overrides */
-  std::unique_ptr<base_expstrat> clone(void) const override {
-    return std::make_unique<crw>(saa_subsystem());
+  std::unique_ptr<foraging_expstrat> clone(void) const override {
+    return std::make_unique<crw>(saa());
   }
 
  private:
@@ -99,8 +96,8 @@ class crw final
   void ca_exit(void);
 
   /* clang-format off */
-  bool              m_task_running{false};
-  collision_tracker m_tracker;
+  bool                     m_task_running{false};
+  cfsm::collision_tracker m_tracker;
   /* clang-format on */
 
  public:

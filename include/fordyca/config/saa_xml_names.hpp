@@ -37,7 +37,7 @@ NS_START(fordyca, config);
  * Struct Definitions
  ******************************************************************************/
 struct saa_xml_names {
-  const std::string diff_steering_actuator = "differential_steering";
+  const std::string diff_steering_saa = "differential_steering";
   const std::string leds_saa = "leds";
   const std::string rab_saa = "range_and_bearing";
   const std::string prox_sensor = "footbot_proximity";

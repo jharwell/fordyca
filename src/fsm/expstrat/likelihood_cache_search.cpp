@@ -22,7 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/likelihood_cache_search.hpp"
+
 #include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,7 +37,7 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 void likelihood_cache_search::task_start(const rta::taskable_argument*) {
   if (auto loc = mc_store->last_cache_loc()) {
-    tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, *loc);
+    tasks::vector_argument v(kCACHE_ARRIVAL_TOL, *loc);
     localized_search::task_start(&v);
   } else {
     localized_search::task_start(nullptr);

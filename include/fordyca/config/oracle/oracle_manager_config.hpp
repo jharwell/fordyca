@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/config/base_config.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/config/oracle/tasking_oracle_config.hpp"
 #include "fordyca/config/oracle/entities_oracle_config.hpp"
 

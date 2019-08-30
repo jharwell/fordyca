@@ -22,23 +22,27 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
+
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
 
+using goal_type = cfmetrics::goal_acq_metrics::goal_type;
+
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 free_block_to_nest_fsm::free_block_to_nest_fsm(
     const controller::block_sel_matrix* sel_matrix,
-    controller::saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem* const saa,
     ds::dpo_store* const store,
-    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
-    : base_foraging_fsm(saa, ekST_MAX_STATES),
+    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior)
+    : util_hfsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.free_block_to_nest"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
@@ -129,26 +133,26 @@ RCSW_CONST FSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
  ******************************************************************************/
 bool free_block_to_nest_fsm::in_collision_avoidance(void) const {
   return (m_block_fsm.task_running() && m_block_fsm.in_collision_avoidance()) ||
-         base_foraging_fsm::in_collision_avoidance();
+         cfsm::util_hfsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
 bool free_block_to_nest_fsm::entered_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.entered_collision_avoidance()) ||
-         base_foraging_fsm::entered_collision_avoidance();
+         cfsm::util_hfsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 bool free_block_to_nest_fsm::exited_collision_avoidance(void) const {
   return (m_block_fsm.task_running() &&
           m_block_fsm.exited_collision_avoidance()) ||
-         base_foraging_fsm::exited_collision_avoidance();
+         cfsm::util_hfsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 rtypes::timestep free_block_to_nest_fsm::collision_avoidance_duration(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.collision_avoidance_duration();
   } else {
-    return base_foraging_fsm::collision_avoidance_duration();
+    return cfsm::util_hfsm::collision_avoidance_duration();
   }
 } /* collision_avoidance_duration() */
 
@@ -156,7 +160,7 @@ rmath::vector2u free_block_to_nest_fsm::avoidance_loc(void) const {
   if (m_block_fsm.task_running()) {
     return m_block_fsm.avoidance_loc();
   } else {
-    return base_foraging_fsm::avoidance_loc();
+    return cfsm::util_hfsm::avoidance_loc();
   }
 } /* collision_avoidance_duration() */
 
@@ -186,18 +190,18 @@ RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
                          m_block_fsm,
                          const);
 
-acq_goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
+goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
-    return acq_goal_type::ekBLOCK;
+    return goal_type(foraging_acq_goal::type::ekBLOCK);
   }
-  return acq_goal_type::ekNONE;
+  return goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 bool free_block_to_nest_fsm::goal_acquired(void) const {
-  if (acq_goal_type::ekBLOCK == acquisition_goal()) {
+  if (foraging_acq_goal::type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;
-  } else if (transport_goal_type::ekNEST == block_transport_goal()) {
+  } else if (foraging_transport_goal::type::ekNEST == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_DROP;
   }
   return false;
@@ -207,7 +211,7 @@ bool free_block_to_nest_fsm::goal_acquired(void) const {
  * General Member Functions
  ******************************************************************************/
 void free_block_to_nest_fsm::init(void) {
-  base_foraging_fsm::init();
+  cfsm::util_hfsm::init();
   m_block_fsm.task_reset();
 } /* init() */
 
@@ -216,12 +220,13 @@ void free_block_to_nest_fsm::task_execute(void) {
                rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
-transport_goal_type free_block_to_nest_fsm::block_transport_goal(void) const {
+foraging_transport_goal::type free_block_to_nest_fsm::block_transport_goal(
+    void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_DROP == current_state()) {
-    return transport_goal_type::ekNEST;
+    return foraging_transport_goal::type::ekNEST;
   }
-  return transport_goal_type::ekNONE;
+  return foraging_transport_goal::type::ekNONE;
 } /* acquisition_goal() */
 
 NS_END(depth0, fsm, fordyca);

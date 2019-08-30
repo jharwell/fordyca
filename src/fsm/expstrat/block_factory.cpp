@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/block_factory.hpp"
+
 #include "fordyca/fsm/expstrat/crw.hpp"
 #include "fordyca/fsm/expstrat/likelihood_block_search.hpp"
 

@@ -22,27 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
+
 #include <boost/mpl/for_each.hpp>
 #include <vector>
-
-#include "fordyca/config/metrics_config.hpp"
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
-#include "fordyca/metrics/caches/location_metrics.hpp"
-#include "fordyca/metrics/caches/location_metrics_collector.hpp"
-#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
-#include "fordyca/metrics/collector_registerer.hpp"
-#include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "fordyca/metrics/fsm/current_explore_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/current_vector_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acq_locs_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics_collector.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/support/base_cache_manager.hpp"
-#include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "fordyca/tasks/depth1/foraging_task.hpp"
 
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
@@ -53,32 +35,51 @@
 #include "rcppsw/ta/bi_tab.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
+#include "fordyca/config/metrics_config.hpp"
+#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
+#include "fordyca/metrics/caches/location_metrics.hpp"
+#include "fordyca/metrics/caches/location_metrics_collector.hpp"
+#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
+#include "fordyca/metrics/collector_registerer.hpp"
+#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/support/base_cache_manager.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
+
+#include "cosm/fsm/metrics/collision_metrics.hpp"
+#include "cosm/fsm/metrics/current_explore_locs_metrics_collector.hpp"
+#include "cosm/fsm/metrics/current_vector_locs_metrics_collector.hpp"
+#include "cosm/fsm/metrics/goal_acq_locs_metrics_collector.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics_collector.hpp"
+#include "cosm/fsm/metrics/movement_metrics.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1, detail);
 
-using collector_typelist =
-    rmpl::typelist<metrics::collector_registerer::type_wrap<
-                       metrics::fsm::goal_acq_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::fsm::goal_acq_locs_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::fsm::current_explore_locs_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::fsm::current_vector_locs_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       rmetrics::tasks::execution_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       rmetrics::tasks::bi_tab_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       rmetrics::tasks::bi_tdgraph_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::caches::utilization_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::caches::lifecycle_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::caches::location_metrics_collector> >;
+using collector_typelist = rmpl::typelist<
+    metrics::collector_registerer::type_wrap<cfmetrics::goal_acq_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        cfmetrics::goal_acq_locs_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        cfmetrics::current_explore_locs_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        cfmetrics::current_vector_locs_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        rmetrics::tasks::execution_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        rmetrics::tasks::bi_tab_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        rmetrics::tasks::bi_tdgraph_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        metrics::caches::utilization_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        metrics::caches::lifecycle_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        metrics::caches::location_metrics_collector> >;
 NS_END(detail);
 
 using task0 = tasks::depth0::foraging_task;
@@ -93,16 +94,16 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
     : depth0_metrics_aggregator(mconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   metrics::collector_registerer::creatable_set creatable_set = {
-      {typeid(metrics::fsm::goal_acq_metrics_collector),
+      {typeid(cfmetrics::goal_acq_metrics_collector),
        "cache_acq_counts",
        "caches::acq_counts"},
-      {typeid(metrics::fsm::goal_acq_locs_metrics_collector),
+      {typeid(cfmetrics::goal_acq_locs_metrics_collector),
        "cache_acq_locs",
        "caches::acq_locs"},
-      {typeid(metrics::fsm::current_explore_locs_metrics_collector),
+      {typeid(cfmetrics::current_explore_locs_metrics_collector),
        "cache_acq_explore_locs",
        "caches::acq_explore_locs"},
-      {typeid(metrics::fsm::current_vector_locs_metrics_collector),
+      {typeid(cfmetrics::current_vector_locs_metrics_collector),
        "cache_acq_vector_locs",
        "caches::acq_vector_locs"},
       {typeid(rmetrics::tasks::execution_metrics_collector),

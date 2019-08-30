@@ -22,7 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
+
 #include <boost/mpl/for_each.hpp>
+
+#include "rcppsw/mpl/typelist.hpp"
 
 #include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
@@ -36,15 +39,14 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
 #include "fordyca/repr/base_block.hpp"
 
-#include "rcppsw/mpl/typelist.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/movement_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -121,8 +123,9 @@ void depth0_metrics_aggregator::collect_from_controller(
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
-               return acq_goal_type::ekBLOCK == m.acquisition_goal() &&
+                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
+               return fsm::foraging_acq_goal::type::ekBLOCK ==
+                          m.acquisition_goal() &&
                       m.goal_acquired();
              });
 
@@ -134,14 +137,14 @@ void depth0_metrics_aggregator::collect_from_controller(
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
+                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
                return m.is_exploring_for_goal().first;
              });
   collect_if("blocks::acq_vector_locs",
              *controller,
              [&](const rmetrics::base_metrics& metrics) {
                auto& m =
-                   dynamic_cast<const metrics::fsm::goal_acq_metrics&>(metrics);
+                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
                return m.is_vectoring_to_goal();
              });
   /*

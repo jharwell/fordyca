@@ -22,11 +22,13 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
+
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/expstrat/crw.hpp"
+
+#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,9 +38,9 @@ NS_START(fordyca, fsm, depth0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(controller::saa_subsystem* const saa,
-                 std::unique_ptr<expstrat::base_expstrat> exp_behavior)
-    : base_foraging_fsm(saa, ekST_MAX_STATES),
+crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
+                 std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior)
+    : util_hfsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -129,25 +131,25 @@ crw_fsm::exp_status crw_fsm::is_exploring_for_goal(void) const {
 } /* is_exploring_for_goal() */
 
 bool crw_fsm::goal_acquired(void) const {
-  if (acq_goal_type::ekBLOCK == acquisition_goal()) {
+  if (foraging_acq_goal::type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_PICKUP;
-  } else if (transport_goal_type::ekNEST == block_transport_goal()) {
+  } else if (foraging_transport_goal::type::ekNEST == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_DROP;
   }
   return false;
 } /* goal_acquired() */
 
 rmath::vector2u crw_fsm::acquisition_loc(void) const {
-  return saa_subsystem()->sensing()->discrete_position();
+  return saa()->sensing()->discrete_position();
 } /* acquisition_loc() */
 
 rmath::vector2u crw_fsm::current_explore_loc(void) const {
-  return saa_subsystem()->sensing()->discrete_position();
+  return saa()->sensing()->discrete_position();
 } /* current_explore_loc() */
 
 rmath::vector2u crw_fsm::current_vector_loc(void) const {
   ER_FATAL_SENTINEL("CRW_FSM current vector location undefined");
-  return saa_subsystem()->sensing()->discrete_position();
+  return saa()->sensing()->discrete_position();
 } /* current_vector_loc() */
 
 /*******************************************************************************
@@ -156,39 +158,39 @@ rmath::vector2u crw_fsm::current_vector_loc(void) const {
 bool crw_fsm::in_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.in_collision_avoidance()) ||
-         base_foraging_fsm::in_collision_avoidance();
+         cfsm::util_hfsm::in_collision_avoidance();
 } /* in_collision_avoidance() */
 
 bool crw_fsm::entered_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.entered_collision_avoidance()) ||
-         base_foraging_fsm::entered_collision_avoidance();
+         cfsm::util_hfsm::entered_collision_avoidance();
 } /* entered_collision_avoidance() */
 
 bool crw_fsm::exited_collision_avoidance(void) const {
   return (m_explore_fsm.task_running() &&
           m_explore_fsm.exited_collision_avoidance()) ||
-         base_foraging_fsm::exited_collision_avoidance();
+         cfsm::util_hfsm::exited_collision_avoidance();
 } /* exited_collision_avoidance() */
 
 rtypes::timestep crw_fsm::collision_avoidance_duration(void) const {
   if (m_explore_fsm.task_running()) {
     return m_explore_fsm.collision_avoidance_duration();
   } else {
-    return base_foraging_fsm::collision_avoidance_duration();
+    return cfsm::util_hfsm::collision_avoidance_duration();
   }
   return rtypes::timestep(0);
 } /* collision_avoidance_duration() */
 
 rmath::vector2u crw_fsm::avoidance_loc(void) const {
-  return saa_subsystem()->sensing()->discrete_position();
+  return saa()->sensing()->discrete_position();
 } /* avoidance_loc() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void crw_fsm::init(void) {
-  base_foraging_fsm::init();
+  cfsm::util_hfsm::init();
   m_explore_fsm.init();
 } /* init() */
 
@@ -198,23 +200,25 @@ void crw_fsm::run(void) {
 } /* run() */
 
 bool crw_fsm::block_detected(void) const {
-  return saa_subsystem()->sensing()->block_detected();
+  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
+      "block");
 } /* block_detected() */
 
-transport_goal_type crw_fsm::block_transport_goal(void) const {
+foraging_transport_goal::type crw_fsm::block_transport_goal(void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::ekNEST;
+    return foraging_transport_goal::type::ekNEST;
   }
-  return transport_goal_type::ekNONE;
+  return foraging_transport_goal::type::ekNONE;
 } /* block_transport_goal() */
 
-acq_goal_type crw_fsm::acquisition_goal(void) const {
+cfmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acq_goal_type::ekBLOCK;
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekBLOCK);
   }
-  return acq_goal_type::ekNONE;
+  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* block_transport_goal() */
 
 NS_END(depth0, fsm, fordyca);

@@ -25,13 +25,13 @@
  * Includes
  ******************************************************************************/
 
-#include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/nsalias.hpp"
-#include "fordyca/repr/base_entity.hpp"
-
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
+
+#include "fordyca/ds/arena_grid.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/repr/base_entity.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -27,9 +27,10 @@
 #include <memory>
 #include <string>
 
-#include "fordyca/fsm/cell2D_fsm.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
+
+#include "fordyca/fsm/cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces

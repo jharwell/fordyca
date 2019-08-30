@@ -22,15 +22,17 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_block.hpp"
 
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,6 +77,7 @@ void gp_mdpo_controller::ControlStep(void) {
 
   perception()->update(nullptr);
   executive()->run();
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
@@ -97,10 +100,8 @@ void gp_mdpo_controller::shared_init(
    * gp_dpo_controller, we have to replace it because we have our own perception
    * subsystem, which is used to create the executive's graph.
    */
-  executive(tasking_initializer(block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa_subsystem(),
-                                perception())(config_repo));
+  executive(tasking_initializer(
+      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo));
   executive()->task_abort_notify(std::bind(
       &gp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 

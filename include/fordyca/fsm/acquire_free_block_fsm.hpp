@@ -26,22 +26,26 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
-#include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/ta/taskable.hpp"
+
+#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
+
+#include "cosm/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace fsm::expstrat {
+class foraging_expstrat;
+} /* namespace fsm::expstrat */
+
 namespace ds {
 class dpo_store;
 }
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
-namespace rta = rcppsw::ta;
 
 NS_START(fsm);
 
@@ -60,12 +64,13 @@ NS_START(fsm);
  * signals that it has completed its task.
  */
 class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
-                               public acquire_goal_fsm {
+                               public cfsm::acquire_goal_fsm {
  public:
-  acquire_free_block_fsm(const controller::block_sel_matrix* matrix,
-                         controller::saa_subsystem* saa,
-                         ds::dpo_store* store,
-                         std::unique_ptr<expstrat::base_expstrat> exp_behavior);
+  acquire_free_block_fsm(
+      const controller::block_sel_matrix* matrix,
+      crfootbot::footbot_saa_subsystem* saa,
+      ds::dpo_store* store,
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior);
 
   ~acquire_free_block_fsm(void) override = default;
 
@@ -76,7 +81,8 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acq_goal_type acq_goal_internal(void) const RCSW_CONST;
+  static cfmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
+      RCSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
   bool candidates_exist(void) const RCSW_PURE;
   bool block_exploration_term_cb(void) const;

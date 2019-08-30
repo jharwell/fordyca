@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
+
 #include "fordyca/metrics/blocks/transport_metrics.hpp"
 
 /*******************************************************************************

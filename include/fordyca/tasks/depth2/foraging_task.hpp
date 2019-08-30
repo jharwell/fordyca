@@ -34,7 +34,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta { namespace config { struct task_alloc_config; }}}
+namespace rcppsw::ta::config { struct task_alloc_config; }
 NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************

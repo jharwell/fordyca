@@ -29,9 +29,12 @@
  * they do it's 100% OK to crash with an exception.
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
+#include "fordyca/support/tv/tv_manager.hpp"
+
 #include <boost/mpl/for_each.hpp>
 
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
 #include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -49,7 +52,6 @@
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -167,7 +169,7 @@ double tv_manager::swarm_motion_throttle(void) const {
 
   support::swarm_iterator::controllers<swarm_iterator::static_order>(
       mc_lf, [&](auto& controller) {
-        accum += controller->applied_motion_throttle();
+        accum += controller->applied_movement_throttle();
       });
   return accum / robots.size();
 } /* swarm_motion_throttle() */
@@ -182,7 +184,8 @@ rtypes::timestep tv_manager::env_block_manipulation(void) const {
 rtypes::timestep tv_manager::env_cache_usage(void) const {
   rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
   return penalty_handler<controller::depth1::gp_dpo_controller>(
-             cache_op_src::ekEXISTING_CACHE_PICKUP)->penalty_calc(t);
+             cache_op_src::ekEXISTING_CACHE_PICKUP)
+      ->penalty_calc(t);
 } /* env_cache_usage() */
 
 void tv_manager::register_controller(int robot_id) {

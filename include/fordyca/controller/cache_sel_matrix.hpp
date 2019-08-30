@@ -29,13 +29,14 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
-#include "fordyca/controller/cache_sel_exception.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
+
+#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
+#include "fordyca/controller/cache_sel_exception.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

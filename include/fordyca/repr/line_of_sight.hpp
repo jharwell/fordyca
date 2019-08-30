@@ -27,11 +27,13 @@
 #include <boost/multi_array.hpp>
 #include <list>
 #include <utility>
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/ds/cache_list.hpp"
+
 #include "rcppsw/ds/base_grid2D.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -66,8 +68,8 @@ class base_cache;
  */
 class line_of_sight final : public rer::client<line_of_sight> {
  public:
-  using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
-  using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
+  using grid_view = rds::base_grid2D<ds::cell2D>::grid_view;
+  using const_grid_view = rds::base_grid2D<ds::cell2D>::const_grid_view;
 
   line_of_sight(const const_grid_view& c_view, const rmath::vector2u& center)
       : ER_CLIENT_INIT("fordyca.repr.line_of_sight"),

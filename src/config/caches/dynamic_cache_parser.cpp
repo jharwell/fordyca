@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/caches/dynamic_cache_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -52,8 +53,8 @@ bool dynamic_cache_parser::validate(void) const {
   if (!is_parsed() || (is_parsed() && !m_config->enable)) {
     return true;
   }
-  CHECK(m_config->min_dist > 0);
-  CHECK(m_config->min_blocks > 0);
+  RCSW_CHECK(m_config->min_dist > 0);
+  RCSW_CHECK(m_config->min_blocks > 0);
   return true;
 
 error:

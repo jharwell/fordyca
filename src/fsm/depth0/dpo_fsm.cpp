@@ -22,8 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
+
 #include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,10 +35,10 @@ NS_START(fordyca, fsm, depth0);
  * Constructors/Destructors
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const controller::block_sel_matrix* const sel_matrix,
-                 controller::saa_subsystem* const saa,
+                 crfootbot::footbot_saa_subsystem* const saa,
                  ds::dpo_store* const store,
-                 std::unique_ptr<expstrat::base_expstrat> exp_behavior)
-    : base_foraging_fsm(saa, ekST_MAX_STATES),
+                 std::unique_ptr<expstrat::foraging_expstrat> exp_behavior)
+    : util_hfsm(saa, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.dpo"),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
@@ -110,7 +111,7 @@ RCPPSW_WRAP_DEF(dpo_fsm, current_vector_loc, m_block_fsm, const);
  * General Member Functions
  ******************************************************************************/
 void dpo_fsm::init(void) {
-  base_foraging_fsm::init();
+  cfsm::util_hfsm::init();
   m_block_fsm.task_reset();
 } /* init() */
 

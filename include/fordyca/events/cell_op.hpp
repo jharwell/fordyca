@@ -26,9 +26,10 @@
  ******************************************************************************/
 #include <boost/variant/static_visitor.hpp>
 
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

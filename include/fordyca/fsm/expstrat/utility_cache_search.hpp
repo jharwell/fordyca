@@ -52,13 +52,13 @@ NS_START(fsm, expstrat);
  */
 class utility_cache_search : public localized_search {
  public:
-  explicit utility_cache_search(const base_expstrat::params* const c_params)
+  explicit utility_cache_search(const foraging_expstrat::params* const c_params)
       : utility_cache_search(c_params->csel_matrix,
-                             c_params->store,
+                             c_params->dpo_store,
                              c_params->saa) {}
   utility_cache_search(const controller::cache_sel_matrix* csel_matrix,
                        const ds::dpo_store* store,
-                       controller::saa_subsystem* saa)
+                       crfootbot::footbot_saa_subsystem* saa)
       : localized_search(saa),
         mc_matrix(csel_matrix),
         mc_store(store) {}
@@ -71,10 +71,10 @@ class utility_cache_search : public localized_search {
   void task_start(const rta::taskable_argument*) override;
 
   /* prototype overrides */
-  std::unique_ptr<base_expstrat> clone(void) const override {
+  std::unique_ptr<foraging_expstrat> clone(void) const override {
     return std::make_unique<utility_cache_search>(mc_matrix,
                                                      mc_store,
-                                                     saa_subsystem());
+                                                     saa());
   }
 
  private:

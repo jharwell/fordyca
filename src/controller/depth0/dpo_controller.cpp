@@ -22,20 +22,21 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/dpo_controller.hpp"
+
 #include <fstream>
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/depth0/dpo_controller_repository.hpp"
+#include "fordyca/config/exploration_config.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
-#include "fordyca/config/sensing_config.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/repr/base_block.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,7 +74,7 @@ void dpo_controller::los(std::unique_ptr<repr::line_of_sight> new_los) {
 }
 
 double dpo_controller::los_dim(void) const {
-  return saa_subsystem()->sensing()->los_dim();
+  return perception()->los_dim();
 } /* los_dim() */
 
 void dpo_controller::ControlStep(void) {
@@ -85,6 +86,7 @@ void dpo_controller::ControlStep(void) {
 
   m_perception->update(nullptr);
   m_fsm->run();
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
@@ -132,12 +134,10 @@ void dpo_controller::private_init(
     const config::depth0::dpo_controller_repository& config_repo) {
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
-  fsm::expstrat::base_expstrat::params p{nullptr,
-                                         saa_subsystem(),
-                                         perception()->dpo_store()};
+  fsm::expstrat::foraging_expstrat::params p(saa(), nullptr, nullptr, nullptr);
   m_fsm = std::make_unique<fsm::depth0::dpo_fsm>(
       m_block_sel_matrix.get(),
-      base_controller::saa_subsystem(),
+      base_controller::saa(),
       m_perception->dpo_store(),
       f.create(exp_config->block_strategy, &p));
 } /* private_init() */
@@ -168,11 +168,14 @@ RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, current_vector_loc, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, current_explore_loc, *m_fsm, const);
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(dpo_controller, "dpo_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(depth0, controller, fordyca);

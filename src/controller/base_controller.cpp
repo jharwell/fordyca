@@ -27,16 +27,17 @@
 #include <experimental/filesystem>
 #include <fstream>
 
-#include "fordyca/config/actuation_config.hpp"
 #include "fordyca/config/base_controller_repository.hpp"
 #include "fordyca/config/output_config.hpp"
 #include "fordyca/config/saa_xml_names.hpp"
-#include "fordyca/config/sensing_config.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/steer2D/config/force_calculator_config.hpp"
+#include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
+#include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
+#include "cosm/subsystem/saa_subsystem2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,11 +59,12 @@ base_controller::~base_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 bool base_controller::in_nest(void) const {
-  return m_saa->sensing()->in_nest();
+  return m_saa->sensing()->ground()->detect(
+      chal::sensors::ground_sensor::kNestTarget);
 } /* in_nest() */
 
 bool base_controller::block_detected(void) const {
-  return m_saa->sensing()->block_detected();
+  return m_saa->sensing()->ground()->detect("block");
 } /* block_detected() */
 
 void base_controller::position(const rmath::vector2d& loc) {
@@ -76,7 +78,7 @@ void base_controller::discrete_position(const rmath::vector2u& loc) {
 }
 
 void base_controller::Init(ticpp::Element& node) {
-#if(LIBRA_ER == LIBRA_ER_ALL)
+#if (LIBRA_ER == LIBRA_ER_ALL)
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
   } else {
@@ -99,8 +101,9 @@ void base_controller::Init(ticpp::Element& node) {
   output_init(config);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  saa_init(config_repo.config_get<config::actuation_config>(),
-           config_repo.config_get<config::sensing_config>());
+  saa_init(
+      config_repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
+      config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
   ndc_pop();
 } /* Init() */
 
@@ -109,54 +112,87 @@ void base_controller::Reset(void) {
   m_block.reset();
 } /* Reset() */
 
-void base_controller::saa_init(const config::actuation_config* const actuation_p,
-                               const config::sensing_config* const sensing_p) {
+void base_controller::saa_init(
+    const csubsystem::config::actuation_subsystem2D_config* actuation_p,
+    const csubsystem::config::sensing_subsystem2D_config* sensing_p) {
   auto saa_names = config::saa_xml_names();
-  actuator_list alist = {
-      .wheels = rrhal::actuators::differential_drive_actuator(
-          GetActuator<argos::CCI_DifferentialSteeringActuator>(
-              saa_names.diff_steering_actuator)),
-#ifdef FORDYCA_WITH_ROBOT_LEDS
-      .leds = rrhal::actuators::led_actuator(
-          GetActuator<argos::CCI_LEDsActuator>(saa_names.leds_saa)),
+#ifdef FORDYCA_WITH_ROBOT_RAB
+  auto rabs = chal::sensors::wifi_sensor(
+      GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names.rab_saa));
 #else
-      .leds = rrhal::actuators::led_actuator(nullptr),
+  auto rabs = chal::sensors::wifi_sensor(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_RAB */
+
+#ifdef FORDYCA_WITH_ROBOT_BATTERY
+  auto battery = chal::sensors::battery_sensor(
+      GetSensor<argos::CCI_BatterySensor>(saa_names.battery_sensor));
+#else
+  auto battery = chal::sensors::battery_sensor(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_BATTERY */
+
+  auto proximity = chal::sensors::proximity_sensor(
+      GetSensor<argos::CCI_FootBotProximitySensor>(saa_names.prox_sensor),
+      &sensing_p->proximity);
+  auto blobs = chal::sensors::colored_blob_camera_sensor(
+      GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
+          saa_names.camera_sensor));
+  auto light = chal::sensors::light_sensor(
+      GetSensor<argos::CCI_FootBotLightSensor>(saa_names.light_sensor));
+  auto ground = chal::sensors::ground_sensor(
+      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names.ground_sensor),
+      &sensing_p->ground);
+  auto diff_drives = chal::sensors::diff_drive_sensor(
+      GetSensor<argos::CCI_DifferentialSteeringSensor>(
+          saa_names.diff_steering_saa));
+
+  auto sensors = csubsystem::sensing_subsystem2D::sensor_map{
+      csubsystem::sensing_subsystem2D::map_entry_create(rabs),
+      csubsystem::sensing_subsystem2D::map_entry_create(battery),
+      csubsystem::sensing_subsystem2D::map_entry_create(proximity),
+      csubsystem::sensing_subsystem2D::map_entry_create(blobs),
+      csubsystem::sensing_subsystem2D::map_entry_create(light),
+      csubsystem::sensing_subsystem2D::map_entry_create(ground),
+      csubsystem::sensing_subsystem2D::map_entry_create(diff_drives)};
+
+  auto diff_drivea = ckin2D::governed_diff_drive(
+      &actuation_p->diff_drive,
+      chal::actuators::diff_drive_actuator(
+          GetActuator<argos::CCI_DifferentialSteeringActuator>(
+              saa_names.diff_steering_saa)),
+      ckin2D::governed_diff_drive::drive_type::kFSMDrive);
+
+#ifdef FORDYCA_WITH_ROBOT_LEDS
+  auto leds = chal::actuators::led_actuator(
+      GetActuator<argos::CCI_LEDsActuator>(saa_names.leds_saa));
+#else
+  auto leds = chal::actuators::led_actuator(nullptr);
 #endif /* FORDYCA_WITH_ROBOT_LEDS */
 
 #ifdef FORDYCA_WITH_ROBOT_RAB
-      .wifi = rrhal::actuators::wifi_actuator(
-          GetActuator<argos::CCI_RangeAndBearingActuator>(saa_names.rab_saa)),
-#else
-      .wifi = rrhal::actuators::wifi_actuator(nullptr)
-#endif /* FORDYCA_WITH_ROBOT_RAB */
-  };
+  auto raba = chal::actuators::wifi_actuator(
+      GetActuator<argos::CCI_RangeAndBearingActuator>(saa_names.rab_saa));
 
-  sensor_list slist = {
-#ifdef FORDYCA_WITH_ROBOT_RAB
-      .rabs = rrhal::sensors::rab_wifi_sensor(
-          GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names.rab_saa)),
 #else
-      .rabs = rrhal::sensors::rab_wifi_sensor(nullptr),
-#endif /* FORDYCA_WITH_ROBOT_RAB */
-      .proximity = rrhal::sensors::proximity_sensor(
-          GetSensor<argos::CCI_FootBotProximitySensor>(saa_names.prox_sensor)),
-      .blobs = rrhal::sensors::colored_blob_camera_sensor(
-          GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
-              saa_names.camera_sensor)),
-      .light = rrhal::sensors::light_sensor(
-          GetSensor<argos::CCI_FootBotLightSensor>(saa_names.light_sensor)),
-      .ground = rrhal::sensors::ground_sensor(
-          GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-              saa_names.ground_sensor)),
-#ifdef FORDYCA_WITH_ROBOT_BATTERY
-      .battery = rrhal::sensors::battery_sensor(
-          GetSensor<argos::CCI_BatterySensor>(saa_names.battery_sensor)),
-#else
-      .battery = rrhal::sensors::battery_sensor(nullptr),
-#endif /* FORDYCA_WITH_ROBOT_BATTERY */
-  };
-  m_saa = std::make_unique<controller::saa_subsystem>(
-      actuation_p, sensing_p, &alist, &slist);
+  auto raba = chal::actuators::wifi_actuator(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_RABS */
+
+  auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
+
+      /*
+     * We put the governed differential drive in the actuator map twice because
+     * some of the reusable components use the base class differential drive
+     * instead of the governed entry (no robust way to inform that we want to
+     * use the governed version).n
+     */
+      csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
+      {typeid(chal::actuators::diff_drive_actuator),
+       csubsystem::actuation_subsystem2D::variant_type(diff_drivea)},
+
+      csubsystem::actuation_subsystem2D::map_entry_create(leds),
+      csubsystem::actuation_subsystem2D::map_entry_create(raba)};
+
+  m_saa = std::make_unique<crfootbot::footbot_saa_subsystem>(
+      sensors, actuators, &actuation_p->steering);
 } /* saa_init() */
 
 void base_controller::output_init(const config::output_config* const config) {
@@ -176,7 +212,7 @@ void base_controller::output_init(const config::output_config* const config) {
     fs::create_directories(output_root);
   }
 
-#if(LIBRA_ER == LIBRA_ER_ALL)
+#if (LIBRA_ER == LIBRA_ER_ALL)
   /*
    * Each file appender is attached to a root category in the FORDYCA
    * namespace. If you give different file appenders the same file, then the
@@ -216,13 +252,13 @@ void base_controller::ndc_pusht(void) {
               std::string("] [") + GetId() + std::string("]"));
 }
 
-double base_controller::applied_motion_throttle(void) const {
-  return saa_subsystem()->actuation()->differential_drive().applied_throttle();
-} /* applied_motion_throttle() */
+double base_controller::applied_movement_throttle(void) const {
+  return saa()->actuation()->governed_diff_drive()->applied_throttle();
+} /* applied_movement_throttle() */
 
 void base_controller::tv_init(const support::tv::tv_manager* tv_manager) {
   if (tv_manager->movement_throttling_enabled()) {
-    saa_subsystem()->actuation()->differential_drive().throttling(
+    saa()->actuation()->governed_diff_drive()->tv_generator(
         tv_manager->movement_throttling_handler(entity_id()));
   }
 } /* tv_init() */
@@ -242,9 +278,8 @@ rtypes::spatial_dist base_controller::distance(void) const {
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
    */
-  if (saa_subsystem()->sensing()->tick() > 1) {
-    return rtypes::spatial_dist(
-        saa_subsystem()->sensing()->tick_travel().length());
+  if (saa()->sensing()->tick() > 1) {
+    return rtypes::spatial_dist(saa()->sensing()->tick_travel().length());
   }
   return rtypes::spatial_dist(0.0);
 } /* distance() */
@@ -254,8 +289,8 @@ rmath::vector2d base_controller::velocity(void) const {
    * If you allow distance gathering at timesteps < 1, you get a big jump
    * because of the prev/current location not being set up properly yet.
    */
-  if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->linear_velocity();
+  if (saa()->sensing()->tick() > 1) {
+    return saa()->linear_velocity();
   }
   return {0, 0};
 } /* velocity() */

@@ -27,10 +27,11 @@
 #include <memory>
 #include <string>
 
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
+
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,8 +69,8 @@ class dpo_perception_subsystem final
   /* DPO perception metrics */
   uint n_known_blocks(void) const override RCSW_PURE;
   uint n_known_caches(void) const override RCSW_PURE;
-  rswarm::pheromone_density avg_block_density(void) const override;
-  rswarm::pheromone_density avg_cache_density(void) const override;
+  crepr::pheromone_density avg_block_density(void) const override;
+  crepr::pheromone_density avg_cache_density(void) const override;
 
   /**
    * @brief Update the robot's perception of the environment, passing it its

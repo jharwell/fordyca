@@ -24,12 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/plugins/simulator/entities/light_entity.h>
 #include <list>
+
+#include <argos3/plugins/simulator/entities/light_entity.h>
+
+#include "rcppsw/types/discretize_ratio.hpp"
 
 #include "fordyca/repr/colored_entity.hpp"
 #include "fordyca/repr/unicell_immovable_entity.hpp"
-#include "rcppsw/types/discretize_ratio.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/block_acq_validator.hpp"
+
 #include <numeric>
 
 #include "fordyca/controller/block_sel_matrix.hpp"

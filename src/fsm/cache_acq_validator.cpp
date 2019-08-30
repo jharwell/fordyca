@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/cache_acq_validator.hpp"
+
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"

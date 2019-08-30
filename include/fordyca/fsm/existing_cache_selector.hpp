@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/dp_cache_map.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
+
+#include "fordyca/ds/dp_cache_map.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
+
 #include <numeric>
 
 #include "fordyca/fsm/cell2D_states.hpp"

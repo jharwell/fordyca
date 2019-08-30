@@ -27,8 +27,9 @@
 #include <list>
 #include <string>
 
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/metrics/base_metrics_collector.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

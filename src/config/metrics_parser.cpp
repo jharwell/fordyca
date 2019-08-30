@@ -97,7 +97,7 @@ void metrics_parser::parse(const ticpp::Element& node) {
 
 bool metrics_parser::validate(void) const {
   if (is_parsed()) {
-    CHECK(m_config->output_interval > 0);
+    RCSW_CHECK(m_config->output_interval > 0);
   }
   return true;
 

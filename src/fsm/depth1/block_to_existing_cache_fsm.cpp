@@ -22,9 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
+
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/fsm/expstrat/cache_factory.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
@@ -44,50 +45,57 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
           c_params->store,
           expstrat::cache_factory().create(
               c_params->exp_config.cache_strategy,
-              std::make_unique<expstrat::base_expstrat::params>(
-                  c_params->csel_matrix,
+              std::make_unique<expstrat::foraging_expstrat::params>(
                   c_params->saa,
+                  nullptr,
+                  c_params->csel_matrix,
                   c_params->store,
                   support::light_type_index()[support::light_type_index::kCache])
                   .get()),
           false),
-      m_block_fsm(
-          c_params->bsel_matrix,
-          c_params->saa,
-          c_params->store,
-          expstrat::block_factory().create(
-              c_params->exp_config.block_strategy,
-              std::make_unique<expstrat::base_expstrat::params>(nullptr,
-                                                                c_params->saa,
-                                                                c_params->store)
-                  .get())) {}
+      m_block_fsm(c_params->bsel_matrix,
+                  c_params->saa,
+                  c_params->store,
+                  expstrat::block_factory().create(
+                      c_params->exp_config.block_strategy,
+                      std::make_unique<expstrat::foraging_expstrat::params>(
+                          c_params->saa,
+                          nullptr,
+                          nullptr,
+                          c_params->store)
+                          .get())) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acq_goal_type block_to_existing_cache_fsm::acquisition_goal(void) const {
+cfmetrics::goal_acq_metrics::goal_type block_to_existing_cache_fsm::acquisition_goal(
+    void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acq_goal_type::ekBLOCK;
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekBLOCK);
   } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
              ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return acq_goal_type::ekEXISTING_CACHE;
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekEXISTING_CACHE);
   }
-  return acq_goal_type::ekNONE;
+  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
-transport_goal_type block_to_existing_cache_fsm::block_transport_goal(void) const {
+foraging_transport_goal::type block_to_existing_cache_fsm::block_transport_goal(
+    void) const {
   if (ekST_TRANSPORT_TO_GOAL == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::ekEXISTING_CACHE;
+    return foraging_transport_goal::type::ekEXISTING_CACHE;
   }
-  return transport_goal_type::ekNONE;
+  return foraging_transport_goal::type::ekNONE;
 } /* acquisition_goal() */
 
 bool block_to_existing_cache_fsm::goal_acquired(void) const {
-  if (acq_goal_type::ekBLOCK == acquisition_goal()) {
+  if (foraging_acq_goal::type::ekBLOCK == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_PICKUP;
-  } else if (transport_goal_type::ekEXISTING_CACHE == block_transport_goal()) {
+  } else if (foraging_transport_goal::type::ekEXISTING_CACHE ==
+             block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_BLOCK_DROP;
   }
   return false;

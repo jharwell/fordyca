@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/dpo_semantic_map.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/repr/base_cache.hpp"
@@ -74,11 +75,11 @@ void dpo_semantic_map::decay_all(void) {
 
   for (auto& b : m_store.blocks().const_values_range()) {
     const rmath::vector2u& loc = b.ent()->dloc();
-    rswarm::pheromone_density& map_density =
+    crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
     ER_ASSERT(std::fabs((map_density - b.density()).v()) <=
-              std::numeric_limits<double>::epsilon(),
+                  std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP block%d density disagree: %f vs %f",
               loc.to_str().c_str(),
               b.ent()->id(),
@@ -88,7 +89,7 @@ void dpo_semantic_map::decay_all(void) {
 
   for (auto&& c : m_store.caches().const_values_range()) {
     const rmath::vector2u& loc = c.ent()->dloc();
-    rswarm::pheromone_density& map_density =
+    crepr::pheromone_density& map_density =
         decoratee().access<occupancy_grid::kPheromone>(loc);
 
     ER_ASSERT(std::fabs((map_density - c.density()).v()) <=

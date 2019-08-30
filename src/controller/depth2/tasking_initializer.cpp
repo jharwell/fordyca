@@ -22,13 +22,17 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
+
 #include <chrono>
 
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/config/task_alloc_config.hpp"
+#include "rcppsw/ta/config/task_executive_config.hpp"
+
 #include "fordyca/config/depth2/controller_repository.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/config/exploration_config.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
@@ -41,11 +45,6 @@
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
-#include "rcppsw/ta/bi_tdgraph.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/config/task_alloc_config.hpp"
-#include "rcppsw/ta/config/task_executive_config.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -57,7 +56,7 @@ NS_START(fordyca, controller, depth2);
 tasking_initializer::tasking_initializer(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
-    controller::saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem* const saa,
     base_perception_subsystem* const perception)
     : depth1::tasking_initializer(bsel_matrix, csel_matrix, saa, perception),
       ER_CLIENT_INIT("fordyca.controller.depth2.tasking_initializer") {}
@@ -74,14 +73,13 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
-  fsm::expstrat::base_expstrat::params expbp(cache_sel_matrix(),
-                                             saa_subsystem(),
-                                             perception()->dpo_store());
+  fsm::expstrat::foraging_expstrat::params expbp(
+      saa(), nullptr, cache_sel_matrix(), perception()->dpo_store());
   auto cache_starter_fsm =
       std::make_unique<fsm::depth2::block_to_cache_site_fsm>(
           block_sel_matrix(),
           cache_sel_matrix(),
-          saa_subsystem(),
+          saa(),
           perception()->dpo_store(),
           block_factory.create(exp_config->block_strategy, &expbp));
 
@@ -89,21 +87,21 @@ tasking_initializer::tasking_map tasking_initializer::depth2_tasks_create(
       std::make_unique<fsm::depth2::block_to_new_cache_fsm>(
           block_sel_matrix(),
           cache_sel_matrix(),
-          saa_subsystem(),
+          saa(),
           perception()->dpo_store(),
           block_factory.create(exp_config->block_strategy, &expbp));
 
   auto cache_transferer_fsm =
       std::make_unique<fsm::depth2::cache_transferer_fsm>(
           cache_sel_matrix(),
-          saa_subsystem(),
+          saa(),
           perception()->dpo_store(),
           cache_factory.create(exp_config->cache_strategy, &expbp));
 
   auto cache_collector_fsm =
       std::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
           cache_sel_matrix(),
-          saa_subsystem(),
+          saa(),
           perception()->dpo_store(),
           cache_factory.create(exp_config->cache_strategy, &expbp));
 

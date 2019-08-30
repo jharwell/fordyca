@@ -27,10 +27,10 @@
 #include <memory>
 
 #include "rcppsw/ta/taskable.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 
-#include "fordyca/fsm/base_foraging_fsm.hpp"
+#include "cosm/fsm/util_hfsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
 /*******************************************************************************
@@ -40,10 +40,11 @@ NS_START(fordyca);
 
 namespace ds { class dpo_semantic_map; }
 
-NS_START(fsm, depth0);
+namespace fsm::expstrat {
+class foraging_expstrat;
+} /* namespace fsm::expstrat */
 
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
-using transport_goal_type = block_transporter::goal_type;
+NS_START(fsm, depth0);
 
 /*******************************************************************************
  * Class Definitions
@@ -54,17 +55,17 @@ using transport_goal_type = block_transporter::goal_type;
  *
  * @brief FILL ME IN!
  */
-class free_block_to_nest_fsm final : public base_foraging_fsm,
+class free_block_to_nest_fsm final : public cfsm::util_hfsm,
                                      public rer::client<free_block_to_nest_fsm>,
-                                     public metrics::fsm::goal_acq_metrics,
+                                     public cfmetrics::goal_acq_metrics,
                                      public block_transporter,
                                      public rta::taskable {
  public:
   free_block_to_nest_fsm(
       const controller::block_sel_matrix* sel_matrix,
-      controller::saa_subsystem* saa,
+      crfootbot::footbot_saa_subsystem* saa,
       ds::dpo_store* store,
-      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior);
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -93,10 +94,10 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   bool goal_acquired(void) const override RCSW_PURE;
-  acq_goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override RCSW_PURE;
+  fsm::foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
   void init(void) override;
 
@@ -118,14 +119,14 @@ class free_block_to_nest_fsm final : public base_foraging_fsm,
 
  private:
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm, leaving_nest,
+  HFSM_STATE_INHERIT(cfsm::util_hfsm, leaving_nest,
                      rpfsm::event_data);
-  HFSM_STATE_INHERIT(base_foraging_fsm, transport_to_nest,
+  HFSM_STATE_INHERIT(cfsm::util_hfsm, transport_to_nest,
                      rpfsm::event_data);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
-  HFSM_EXIT_INHERIT(base_foraging_fsm, exit_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
+  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_wait_for_signal);
+  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_transport_to_nest);
+  HFSM_EXIT_INHERIT(cfsm::util_hfsm, exit_transport_to_nest);
+  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_leaving_nest);
   HFSM_STATE_DECLARE(free_block_to_nest_fsm, start, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(free_block_to_nest_fsm,

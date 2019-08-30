@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
+
 #include <numeric>
 
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"

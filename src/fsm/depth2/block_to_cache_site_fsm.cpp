@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -34,9 +36,9 @@ NS_START(fordyca, fsm, depth2);
 block_to_cache_site_fsm::block_to_cache_site_fsm(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
-    controller::saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem* const saa,
     ds::dpo_store* const store,
-    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
+    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior)
     : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
       m_cache_fsm(csel_matrix, saa, store),
       m_block_fsm(bsel_matrix, saa, store, std::move(exp_behavior)) {}
@@ -44,23 +46,27 @@ block_to_cache_site_fsm::block_to_cache_site_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acq_goal_type block_to_cache_site_fsm::acquisition_goal(void) const {
+cfmetrics::goal_acq_metrics::goal_type block_to_cache_site_fsm::acquisition_goal(
+    void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acq_goal_type::ekBLOCK;
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekBLOCK);
   } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
              ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return acq_goal_type::ekCACHE_SITE;
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekCACHE_SITE);
   }
-  return acq_goal_type::ekNONE;
+  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
-transport_goal_type block_to_cache_site_fsm::block_transport_goal(void) const {
+foraging_transport_goal::type block_to_cache_site_fsm::block_transport_goal(
+    void) const {
   if (ekST_TRANSPORT_TO_GOAL == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::ekCACHE_SITE;
+    return foraging_transport_goal::type::ekCACHE_SITE;
   }
-  return transport_goal_type::ekNONE;
+  return foraging_transport_goal::type::ekNONE;
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

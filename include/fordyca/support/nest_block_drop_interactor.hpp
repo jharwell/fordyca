@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/floor_entity.h>
 #include <string>
+
+#include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -38,8 +39,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-
-using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Classes
@@ -108,7 +107,8 @@ class nest_block_drop_interactor
    */
   void finish_nest_block_drop(T& controller, rtypes::timestep t) {
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
-    ER_ASSERT(transport_goal_type::ekNEST == controller.block_transport_goal(),
+    ER_ASSERT(fsm::foraging_transport_goal::type::ekNEST ==
+                  controller.block_transport_goal(),
               "Controller still has nest as goal");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving drop penalty");

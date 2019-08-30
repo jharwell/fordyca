@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/los_proc_verify.hpp"
+
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/repr/base_block.hpp"

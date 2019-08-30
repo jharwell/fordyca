@@ -24,9 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
-#include "fordyca/repr/unicell_entity.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/repr/unicell_entity.hpp"
 
 /*******************************************************************************
  * Namespaces

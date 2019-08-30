@@ -1,7 +1,7 @@
 /**
- * @file actuation_config.hpp
+ * @file fordyca.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,35 +18,17 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_ACTUATION_CONFIG_HPP_
-#define INCLUDE_FORDYCA_CONFIG_ACTUATION_CONFIG_HPP_
+#ifndef INCLUDE_FORDYCA_FORDYCA_HPP_
+#define INCLUDE_FORDYCA_FORDYCA_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/config/base_config.hpp"
-#include "rcppsw/robotics/kin2D/config/differential_drive_config.hpp"
-#include "rcppsw/robotics/steer2D/config/force_calculator_config.hpp"
+#include "cosm/cosm.hpp"
+#include "rcppsw/rcppsw.hpp"
 
 /*******************************************************************************
- * Namespaces
- ******************************************************************************/
-NS_START(fordyca, config);
-
-/*******************************************************************************
- * Structure Definitions
+ * Namespaces/Decls
  ******************************************************************************/
 
-/**
- * @struct actuation_config
- * @ingroup fordyca config
- */
-struct actuation_config : public rconfig::base_config {
-  rrkin2D::config::differential_drive_config differential_drive{};
-  rrsteer2D::config::force_calculator_config steering{};
-};
-
-NS_END(config, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONFIG_ACTUATION_CONFIG_HPP_ */
+#endif /* INCLUDE_FORDYCA_FORDYCA_HPP_ */

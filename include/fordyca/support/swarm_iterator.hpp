@@ -26,9 +26,10 @@
  ******************************************************************************/
 #include <vector>
 
+#include "rcppsw/common/common.hpp"
+
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
-#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

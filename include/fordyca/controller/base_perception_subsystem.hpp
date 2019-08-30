@@ -26,7 +26,8 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
@@ -50,7 +51,10 @@ class oracular_info_receptor;
  */
 class base_perception_subsystem {
  public:
-  base_perception_subsystem(void) = default;
+  explicit base_perception_subsystem(
+      const config::perception::perception_config* const pconfig)
+      : mc_los_dim(pconfig->los_dim) {}
+
   virtual ~base_perception_subsystem(void) = default;
 
   /**
@@ -84,8 +88,12 @@ class base_perception_subsystem {
    */
   const repr::line_of_sight* los(void) const { return m_los.get(); }
 
+  double los_dim(void) const { return mc_los_dim; }
+
  private:
   /* clang-format off */
+  const double mc_los_dim;
+
   std::unique_ptr<repr::line_of_sight> m_los{nullptr};
   /* clang-format on */
 };

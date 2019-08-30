@@ -26,9 +26,10 @@
  ******************************************************************************/
 #include <memory>
 
+#include "rcppsw/er/client.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
-#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces

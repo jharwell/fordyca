@@ -30,7 +30,7 @@
 #include "fordyca/config/grid_parser.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/config/perception/pheromone_parser.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
 /*******************************************************************************

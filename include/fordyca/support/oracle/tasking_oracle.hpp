@@ -30,7 +30,7 @@
 #include <map>
 #include <string>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/ta/time_estimate.hpp"
 

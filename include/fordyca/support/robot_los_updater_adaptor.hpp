@@ -24,7 +24,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/support/robot_los_updater.hpp"
 
 /*******************************************************************************

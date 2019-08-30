@@ -24,8 +24,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/nsalias.hpp"
+
 #include "rcppsw/er/client.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,8 +40,6 @@ class logical_task;
 }} // namespace rcppsw::ta
 
 NS_START(fordyca, support);
-
-namespace rta = rcppsw::ta;
 
 /*******************************************************************************
  * Classes

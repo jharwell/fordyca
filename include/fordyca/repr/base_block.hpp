@@ -24,12 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/blocks/transport_metrics.hpp"
-#include "fordyca/repr/colored_entity.hpp"
-#include "fordyca/repr/unicell_movable_entity.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/types/timestep.hpp"
+
+#include "fordyca/metrics/blocks/transport_metrics.hpp"
+#include "fordyca/repr/colored_entity.hpp"
+#include "fordyca/repr/unicell_movable_entity.hpp"
 
 /*******************************************************************************
  * Namespaces

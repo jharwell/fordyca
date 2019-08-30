@@ -28,10 +28,11 @@
 #include <string>
 #include <tuple>
 
-#include "fordyca/metrics/base_metrics_aggregator.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/base_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

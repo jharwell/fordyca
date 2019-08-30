@@ -26,9 +26,10 @@
  ******************************************************************************/
 #include <tuple>
 
-#include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
+
+#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,10 +48,10 @@ using arena_layer_stack = std::tuple<cell2D>;
  * @brief 2D grid of \ref cell2D objects containing the state of the geometrical
  * extent of the arena floor.
  */
-class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
+class arena_grid : public rds::stacked_grid<arena_layer_stack> {
  public:
-  using view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
-  using const_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
+  using view = rds::base_grid2D<ds::cell2D>::grid_view;
+  using const_view = rds::base_grid2D<ds::cell2D>::const_grid_view;
 
   constexpr static size_t kCell = 0;
 

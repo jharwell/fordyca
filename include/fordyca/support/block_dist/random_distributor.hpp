@@ -30,7 +30,7 @@
 #include <boost/optional.hpp>
 #include <memory>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
