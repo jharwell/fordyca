@@ -22,7 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth1/harvester.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+
+#include "rcppsw/ta/config/task_alloc_config.hpp"
+
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
@@ -33,13 +35,13 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-#include "rcppsw/ta/config/task_alloc_config.hpp"
+
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth1);
-using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -83,14 +85,15 @@ void harvester::active_interface_update(int) {
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
 
   if (fsm->goal_acquired() &&
-      transport_goal_type::ekEXISTING_CACHE == fsm->block_transport_goal()) {
+      fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
+          fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
       ER_DEBUG("Interface finished at timestep %u", current_time().v());
     }
     ER_TRACE("Interface time: %u", interface_time(0).v());
-  } else if (transport_goal_type::ekEXISTING_CACHE ==
+  } else if (fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
              fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
@@ -173,7 +176,8 @@ RCPPSW_WRAP_OVERRIDE_DEF(harvester,
 bool harvester::task_at_interface(void) const {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
-  return transport_goal_type::ekEXISTING_CACHE == fsm->block_transport_goal();
+  return fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
+         fsm->block_transport_goal();
 } /* task_at_interface()() */
 
 NS_END(depth1, tasks, fordyca);

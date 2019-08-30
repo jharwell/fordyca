@@ -15,6 +15,9 @@
 # $3 - The root directory for ARGoS installation
 # $4 - # cores to use when compiling
 
+# Exit when any command fails
+set -e
+
 mkdir -p $1 && cd $1
 
 fordyca_pkgs=(qtbase5-dev libnlopt-dev libnlopt-cxx-dev libfreeimageplus-dev
@@ -37,6 +40,7 @@ sudo -H pip3 install  "${python_pkgs[@]}"
 git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
 mkdir -p build && cd build
+git checkout devel
 cmake -DCMAKE_BUILD_TYPE=Release \
       -DARGOS_BUILD_FOR=simulator\
       -DARGOS_BUILD_NATIVE=ON\
@@ -85,3 +89,6 @@ make documentation
 if [ "$YES" = "$2" ]; then
     sudo chown $SUDO_USER:$SUDO_USER -R $1
 fi;
+
+# Made it!
+echo "Bootstrap successful!"

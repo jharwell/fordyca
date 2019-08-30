@@ -29,7 +29,7 @@
 
 #include "fordyca/config/arena/block_manifest.hpp"
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
 /*******************************************************************************

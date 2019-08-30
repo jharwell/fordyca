@@ -24,8 +24,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/nsalias.hpp"
+
 #include "rcppsw/er/client.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

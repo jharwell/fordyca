@@ -24,27 +24,38 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/control_interface/ci_controller.h>
 #include <memory>
 #include <string>
 #include <typeindex>
 
-#include "fordyca/controller/block_manip_collator.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
+#include <argos3/core/control_interface/ci_controller.h>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
 
+#include "fordyca/controller/block_manip_collator.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
+
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/metrics/spatial_dist2D_metrics.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::subsystem::config {
+struct actuation_subsystem2D_config;
+struct sensing_subsystem2D_config;
+} // namespace cosm::subsystem::config
+namespace cosm::steer2D::config {
+struct force_calculator_config;
+}
 NS_START(fordyca);
-namespace support { namespace tv {
+namespace support::tv {
 class tv_manager;
-}} // namespace support::tv
+} // namespace support::tv
 
 namespace repr {
 class base_block;
@@ -52,13 +63,10 @@ class line_of_sight;
 } // namespace repr
 namespace config {
 struct output_config;
-struct sensing_config;
-struct actuation_config;
 } // namespace config
 
 NS_START(controller);
 class base_perception_subsystem;
-class saa_subsystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -74,9 +82,9 @@ class saa_subsystem;
  * overlays.
  */
 class base_controller : public argos::CCI_Controller,
-                        public metrics::fsm::movement_metrics,
-                        public metrics::fsm::goal_acq_metrics,
-                        public metrics::spatial::swarm_dist2D_metrics,
+                        public cfmetrics::movement_metrics,
+                        public cfmetrics::goal_acq_metrics,
+                        public cmetrics::spatial_dist2D_metrics,
                         public rer::client<base_controller> {
  public:
   base_controller(void) RCSW_COLD;
@@ -115,10 +123,10 @@ class base_controller : public argos::CCI_Controller,
   virtual base_perception_subsystem* perception(void) { return nullptr; }
 
   /**
-   * @brief Return the applied motion throttling for the robot. This is not
+   * @brief Return the applied movement throttling for the robot. This is not
    * necessarily the same as the active/configured throttling.
    */
-  double applied_motion_throttle(void) const;
+  double applied_movement_throttle(void) const;
 
   /**
    * @brief Get the ID of the entity. Argos also provides this, but it doesn't
@@ -229,21 +237,24 @@ class base_controller : public argos::CCI_Controller,
   void ndc_pop(void) { ER_NDC_POP(); }
 
  protected:
-  class saa_subsystem* saa_subsystem(void) {
+  class crfootbot::footbot_saa_subsystem* saa(void) {
     return m_saa.get();
   }
-  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
+  const class crfootbot::footbot_saa_subsystem* saa(void) const {
+    return m_saa.get();
+  }
 
  private:
   void output_init(const config::output_config* config);
-  void saa_init(const config::actuation_config* actuation_p,
-                const config::sensing_config* sensing_p);
+  void saa_init(
+      const csubsystem::config::actuation_subsystem2D_config* actuation_p,
+      const csubsystem::config::sensing_subsystem2D_config* sensing_p);
 
   /* clang-format off */
-  bool                                       m_display_id{false};
-  std::unique_ptr<repr::base_block>          m_block;
-  std::unique_ptr<controller::saa_subsystem> m_saa;
-  class block_manip_collator                 m_block_manip{};
+  bool                                              m_display_id{false};
+  std::unique_ptr<repr::base_block>                 m_block;
+  std::unique_ptr<crfootbot::footbot_saa_subsystem> m_saa;
+  class block_manip_collator                        m_block_manip{};
   /* clang-format on */
 };
 

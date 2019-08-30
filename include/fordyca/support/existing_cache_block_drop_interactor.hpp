@@ -105,7 +105,7 @@ class existing_cache_block_drop_interactor
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  tv::acq_goal_type::ekEXISTING_CACHE ==
+                  fsm::foraging_acq_goal::type::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
     /*
@@ -139,7 +139,6 @@ class existing_cache_block_drop_interactor
      * we check that the ID of the cache we are sitting in/on when we finish
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
-     *
      */
     int cache_id = utils::robot_on_cache(controller, *m_map);
 

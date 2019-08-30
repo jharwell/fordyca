@@ -27,7 +27,7 @@
 #include <memory>
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
 #include "fordyca/fsm/expstrat/crw.hpp"
-#include "fordyca/fsm/expstrat/base_expstrat.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,14 +45,14 @@ NS_START(fordyca, fsm, expstrat);
  * CRW at that location, with the idea being that the ledtaxis of another
  * cache being nearby is higher, given that you've found one there before.
  */
-class ledtaxis_cache_search : public base_expstrat,
+class ledtaxis_cache_search : public foraging_expstrat,
                               public rer::client<ledtaxis_cache_search> {
  public:
-  explicit ledtaxis_cache_search(const base_expstrat::params* const c_params)
+  explicit ledtaxis_cache_search(const foraging_expstrat::params* const c_params)
       : ledtaxis_cache_search(c_params->saa, c_params->ledtaxis_target) {}
-  explicit ledtaxis_cache_search(controller::saa_subsystem* saa,
+  explicit ledtaxis_cache_search(crfootbot::footbot_saa_subsystem* saa,
                                  const rutils::color& ledtaxis_target)
-      : base_expstrat(saa),
+      : foraging_expstrat(saa),
         ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis_cache_search"),
         m_crw(saa),
         m_taxis(saa, ledtaxis_target) {}
@@ -95,9 +95,9 @@ class ledtaxis_cache_search : public base_expstrat,
   rmath::vector2u avoidance_loc(void) const override final RCSW_PURE;
 
   /* prototype overrides */
-  std::unique_ptr<base_expstrat> clone(void) const override {
-    return std::make_unique<ledtaxis_cache_search>(saa_subsystem(),
-                                                      m_taxis.target());
+  std::unique_ptr<foraging_expstrat> clone(void) const override {
+    return std::make_unique<ledtaxis_cache_search>(saa(),
+                                                   m_taxis.target());
   }
 
  private:

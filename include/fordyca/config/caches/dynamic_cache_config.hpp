@@ -28,7 +28,7 @@
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

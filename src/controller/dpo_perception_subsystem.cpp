@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
@@ -41,6 +42,7 @@ NS_START(fordyca, controller);
 dpo_perception_subsystem::dpo_perception_subsystem(
     const config::perception::perception_config* const config)
     : ER_CLIENT_INIT("fordyca.controller.dpo_perception"),
+      base_perception_subsystem(config),
       m_store(std::make_unique<ds::dpo_store>(&config->pheromone)) {}
 
 dpo_perception_subsystem::~dpo_perception_subsystem(void) = default;
@@ -276,28 +278,28 @@ uint dpo_perception_subsystem::n_known_caches(void) const {
   return m_store->caches().size();
 } /* n_known_caches() */
 
-rswarm::pheromone_density dpo_perception_subsystem::avg_block_density(void) const {
+crepr::pheromone_density dpo_perception_subsystem::avg_block_density(void) const {
   auto range = m_store->blocks().const_values_range();
   if (m_store->blocks().empty()) {
-    return rswarm::pheromone_density();
+    return crepr::pheromone_density();
   }
   return std::accumulate(range.begin(),
                          range.end(),
-                         rswarm::pheromone_density(),
+                         crepr::pheromone_density(),
                          [&](const auto& accum, const auto& block) {
                            return accum + block.density();
                          }) /
          m_store->blocks().size();
 } /* avg_block_density() */
 
-rswarm::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
+crepr::pheromone_density dpo_perception_subsystem::avg_cache_density(void) const {
   auto range = m_store->caches().const_values_range();
   if (m_store->caches().empty()) {
-    return rswarm::pheromone_density();
+    return crepr::pheromone_density();
   }
   return std::accumulate(range.begin(),
                          range.end(),
-                         rswarm::pheromone_density(),
+                         crepr::pheromone_density(),
                          [&](const auto& accum, const auto& cache) {
                            return accum + cache.density();
                          }) /

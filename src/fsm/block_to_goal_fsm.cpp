@@ -22,11 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
+
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
+#include "fordyca/tasks/argument.hpp"
+
+#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,11 +39,11 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-block_to_goal_fsm::block_to_goal_fsm(acquire_goal_fsm* const goal_fsm,
-                                     acquire_goal_fsm* const block_fsm,
-                                     controller::saa_subsystem* saa)
+block_to_goal_fsm::block_to_goal_fsm(cfsm::acquire_goal_fsm* const goal_fsm,
+                                     cfsm::acquire_goal_fsm* const block_fsm,
+                                     crfootbot::footbot_saa_subsystem* saa)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
-      base_foraging_fsm(saa, ekST_MAX_STATES),
+      util_hfsm(saa, ekST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
@@ -87,7 +90,7 @@ HFSM_STATE_DEFINE_ND(block_to_goal_fsm, acquire_block) {
 HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
   if (m_goal_fsm->task_finished()) {
     m_goal_fsm->task_reset();
-    saa_subsystem()->actuation()->differential_drive().stop();
+    saa()->actuation()->actuator<ckin2D::governed_diff_drive>()->reset();
     internal_event(ekST_WAIT_FOR_BLOCK_DROP);
   } else {
     m_goal_fsm->task_execute();
@@ -126,23 +129,23 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
 HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_drop,
                   rpfsm::event_data* data) {
-  saa_subsystem()->actuation()->differential_drive().stop();
+  saa()->actuation()->actuator<ckin2D::governed_diff_drive>()->reset();
   if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
     ER_DEBUG("Block drop signal received");
     internal_event(ekST_FINISHED);
   } else if (controller::foraging_signal::ekBLOCK_PROXIMITY == data->signal()) {
-    ER_ASSERT(acq_goal_type::ekCACHE_SITE == acquisition_goal(),
+    ER_ASSERT(foraging_acq_goal::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on block proximity");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::ekCACHE_VANISHED == data->signal()) {
-    ER_ASSERT(acq_goal_type::ekEXISTING_CACHE == acquisition_goal(),
+    ER_ASSERT(foraging_acq_goal::ekEXISTING_CACHE == acquisition_goal(),
               "Non-existing cache vanished? ");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
   } else if (controller::foraging_signal::ekCACHE_PROXIMITY == data->signal()) {
-    ER_ASSERT(acq_goal_type::ekNEW_CACHE == acquisition_goal() ||
-                  acq_goal_type::ekCACHE_SITE == acquisition_goal(),
+    ER_ASSERT(foraging_acq_goal::ekNEW_CACHE == acquisition_goal() ||
+                  foraging_acq_goal::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on cache proxmity");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
@@ -218,13 +221,14 @@ bool block_to_goal_fsm::goal_acquired(void) const {
          (ekST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
-acq_goal_type block_to_goal_fsm::acquisition_goal(void) const {
+cfmetrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
+    void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->acquisition_goal();
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->acquisition_goal();
   }
-  return acq_goal_type::ekNONE;
+  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {
@@ -232,17 +236,17 @@ rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {
 } /* acquisition_loc() */
 
 rmath::vector2u block_to_goal_fsm::current_explore_loc(void) const {
-  return saa_subsystem()->sensing()->discrete_position();
+  return saa()->sensing()->discrete_position();
 } /* current_explore_loc() */
 
 rmath::vector2u block_to_goal_fsm::current_vector_loc(void) const {
-  return saa_subsystem()->sensing()->discrete_position();
+  return saa()->sensing()->discrete_position();
 } /* current_vector_loc() */
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void block_to_goal_fsm::init(void) {
-  base_foraging_fsm::init();
+  cfsm::util_hfsm::init();
   m_goal_fsm->task_reset();
   m_block_fsm->task_reset();
 } /* init() */

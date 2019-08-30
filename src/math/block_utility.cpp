@@ -39,7 +39,7 @@ block_utility::block_utility(const rmath::vector2d& block_loc,
  * Member Functions
  ******************************************************************************/
 double block_utility::calc(const rmath::vector2d& rloc,
-                           const rswarm::pheromone_density& density,
+                           const crepr::pheromone_density& density,
                            double priority) {
   return eval(
       ((mc_block_loc - mc_nest_loc).length() / (mc_block_loc - rloc).length()) *

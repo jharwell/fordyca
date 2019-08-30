@@ -27,7 +27,7 @@
 #include <string>
 #include <memory>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/config/caches/dynamic_cache_config.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 

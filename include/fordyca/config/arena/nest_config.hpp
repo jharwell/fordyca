@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

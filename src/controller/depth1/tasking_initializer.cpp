@@ -22,16 +22,20 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth1/tasking_initializer.hpp"
+
 #include <chrono>
 #include <vector>
 
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/config/task_alloc_config.hpp"
+#include "rcppsw/ta/config/task_executive_config.hpp"
+
 #include "fordyca/config/depth1/controller_repository.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
+#include "fordyca/config/exploration_config.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
@@ -42,10 +46,8 @@
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 
-#include "rcppsw/ta/bi_tdgraph.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/config/task_alloc_config.hpp"
-#include "rcppsw/ta/config/task_executive_config.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,7 +60,7 @@ NS_START(fordyca, controller, depth1);
 tasking_initializer::tasking_initializer(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
-    controller::saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem* const saa,
     base_perception_subsystem* const perception)
     : ER_CLIENT_INIT("fordyca.controller.depth1.tasking_initializer"),
       m_saa(saa),
@@ -78,9 +80,8 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
-  fsm::expstrat::base_expstrat::params expbp(mc_csel_matrix,
-                                             saa_subsystem(),
-                                             m_perception->dpo_store());
+  fsm::expstrat::foraging_expstrat::params expbp(
+      saa(), nullptr, mc_csel_matrix, m_perception->dpo_store());
 
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
@@ -92,14 +93,14 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
       block_factory.create(exp_config->block_strategy, &expbp));
   auto collector_fsm = std::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
       cache_sel_matrix(),
-      saa_subsystem(),
+      saa(),
       m_perception->dpo_store(),
       cache_factory.create(exp_config->cache_strategy, &expbp));
 
   fsm::depth1::block_to_existing_cache_fsm::params harvestorp = {
       .bsel_matrix = block_sel_matrix(),
       .csel_matrix = mc_csel_matrix,
-      .saa = saa_subsystem(),
+      .saa = saa(),
       .store = m_perception->dpo_store(),
       .exp_config = *exp_config};
 

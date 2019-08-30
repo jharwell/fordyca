@@ -55,19 +55,19 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm {
   block_to_cache_site_fsm(
       const controller::block_sel_matrix* bsel_matrix,
       const controller::cache_sel_matrix* csel_matrix,
-      controller::saa_subsystem* saa,
+      crfootbot::footbot_saa_subsystem* saa,
       ds::dpo_store* store,
-      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
+      std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
 
   ~block_to_cache_site_fsm(void) override = default;
   block_to_cache_site_fsm(const block_to_cache_site_fsm&) = delete;
   block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acq_goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
  private:
   /* clang-format off */

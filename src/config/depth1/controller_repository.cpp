@@ -22,10 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/depth1/controller_repository.hpp"
-#include "fordyca/config/cache_sel/cache_sel_matrix_parser.hpp"
-#include "fordyca/nsalias.hpp"
+
 #include "rcppsw/ta/config/xml/task_alloc_parser.hpp"
 #include "rcppsw/ta/config/xml/task_executive_parser.hpp"
+
+#include "fordyca/config/cache_sel/cache_sel_matrix_parser.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

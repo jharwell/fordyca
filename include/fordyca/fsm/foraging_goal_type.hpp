@@ -1,5 +1,5 @@
 /**
- * @file actuator_list.hpp
+ * @file foraging_goal_type.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,36 +18,66 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_FORAGING_GOAL_TYPE_HPP_
+#define INCLUDE_FORDYCA_FSM_FORAGING_GOAL_TYPE_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/robotics/hal/actuators/differential_drive_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/led_actuator.hpp"
-#include "rcppsw/robotics/hal/actuators/wifi_actuator.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
- * Struct Definitions
+ * Type Definitions
  ******************************************************************************/
-/**
- * @struct actuator_list
- * @brief The list of actuators used by the footbots in FORDYCA.
- * @ingroup fordyca controller
- */
-struct actuator_list {
-  rrhal::actuators::differential_drive_actuator wheels;
-  rrhal::actuators::led_actuator leds;
-  rrhal::actuators::wifi_actuator wifi;
+struct foraging_acq_goal {
+  enum type {
+    ekNONE = -1,
+    ekBLOCK,
+    ekNEST,
+    ekCACHE_SITE,
+    ekNEW_CACHE,
+    ekEXISTING_CACHE
+  };
 };
 
-NS_END(controller, fordyca);
+struct foraging_transport_goal {
+  enum type {
+    /**
+     * @brief No goal--robot is probably not carrying a block.
+     */
+    ekNONE = -1,
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_ACTUATOR_LIST_HPP_ */
+    /**
+     * @brief A robot has acquired a block and is currently taking it back to
+     * the nest.
+     */
+    ekNEST,
+
+    /**
+     * @brief A robot is currently transporting an acquired block to its
+     * existing cache of choice.
+     */
+    ekEXISTING_CACHE,
+
+    /**
+     * @brief A robot is currently transporting an acquired block to its new
+     * cache of choice.
+     */
+    ekNEW_CACHE,
+
+    /**
+     * @brief A robot is currently transporting an acquired block to its cache
+     * site of choice.
+     */
+    ekCACHE_SITE
+  };
+};
+
+NS_END(fsm, fordyca);
+
+#endif /* INCLUDE_FORDYCA_FSM_FORAGING_GOAL_TYPE_HPP_ */

@@ -23,11 +23,12 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth0/generalist.hpp"
 
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
+
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +52,7 @@ double generalist::abort_prob_calc(void) {
 rtypes::timestep generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::free_block_to_nest_fsm*>(
              polled_task::mechanism())
-      ->sensors()
+      ->sensing()
       ->tick();
 } /* current_time() */
 

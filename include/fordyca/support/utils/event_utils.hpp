@@ -27,7 +27,7 @@
 #include <memory>
 
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************

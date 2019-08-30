@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_dist/random_distributor.hpp"
+
 #include <algorithm>
 
 #include "fordyca/ds/cell2D.hpp"
@@ -95,10 +96,7 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
     ER_ASSERT(!cell->state_in_cache_extent(),
               "Destination cell part of cache extent");
 
-    events::free_block_drop_visitor op(block,
-                                       coords->abs,
-                                       mc_resolution,
-                                       false);
+    events::free_block_drop_visitor op(block, coords->abs, mc_resolution, false);
     op.visit(*cell);
     if (verify_block_dist(block.get(), entities, cell)) {
       ER_DEBUG("Block%d,ptr=%p distributed@%s/%s",

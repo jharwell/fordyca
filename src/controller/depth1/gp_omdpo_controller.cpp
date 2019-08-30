@@ -23,11 +23,13 @@
  ******************************************************************************/
 #include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
 
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/repr/base_block.hpp"
 
-#include "fordyca/controller/oracular_info_receptor.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +57,7 @@ void gp_omdpo_controller::ControlStep(void) {
 
   mdpo_perception()->update(m_receptor.get());
   executive()->run();
-
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 

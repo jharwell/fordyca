@@ -26,10 +26,11 @@
  ******************************************************************************/
 #include <random>
 
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

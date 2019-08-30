@@ -28,13 +28,13 @@
 #include <string>
 #include <vector>
 
+#include "rcppsw/er/client.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
-
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces

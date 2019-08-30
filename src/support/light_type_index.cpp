@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/light_type_index.hpp"
+
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/nest.hpp"
 

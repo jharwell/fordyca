@@ -24,14 +24,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/floor_entity.h>
 #include <list>
+
+#include <argos3/core/simulator/entity/floor_entity.h>
+
+#include "rcppsw/ta/logical_task.hpp"
+#include "rcppsw/ta/polled_task.hpp"
+
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/tasks/task_status.hpp"
-#include "rcppsw/ta/logical_task.hpp"
-#include "rcppsw/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces

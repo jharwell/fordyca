@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
+
 #include "fordyca/metrics/caches/utilization_metrics.hpp"
 
 /*******************************************************************************

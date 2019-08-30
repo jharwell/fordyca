@@ -22,21 +22,20 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
+
 #include <fstream>
 
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+
 #include "fordyca/config/depth2/controller_repository.hpp"
-#include "fordyca/config/sensing_config.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth2/tasking_initializer.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,8 +58,8 @@ void grp_dpo_controller::ControlStep(void) {
             block()->id(),
             block()->robot_id());
   dpo_perception()->update(nullptr);
-
   executive()->run();
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
@@ -89,10 +88,8 @@ void grp_dpo_controller::private_init(
    * Rebind executive to use depth2 task decomposition graph instead of depth1
    * version.
    */
-  executive(tasking_initializer(block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa_subsystem(),
-                                perception())(config_repo));
+  executive(tasking_initializer(
+      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo));
 
   /*
    * Set task alloction callback, rebind task abort callback (original was lost

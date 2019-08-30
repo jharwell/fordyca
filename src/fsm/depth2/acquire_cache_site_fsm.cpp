@@ -25,10 +25,12 @@
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/repr/base_block.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +43,7 @@ using cselm = controller::cache_sel_matrix;
  ******************************************************************************/
 acquire_cache_site_fsm::acquire_cache_site_fsm(
     const controller::cache_sel_matrix* matrix,
-    controller::saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem* const saa,
     ds::dpo_store* const store)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
@@ -77,23 +79,23 @@ bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
   return false;
 } /* site_exploration_term_cb() */
 
-boost::optional<acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::site_select(
-    void) const {
-  if (auto best = controller::depth2::cache_site_selector(
-          mc_matrix)(mc_store->caches(),
-                     mc_store->blocks(),
-                     saa_subsystem()->sensing()->position())) {
+boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
+    site_select(void) const {
+  if (auto best = controller::depth2::cache_site_selector(mc_matrix)(
+          mc_store->caches(), mc_store->blocks(), saa()->sensing()->position())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
-    return boost::make_optional(acquire_goal_fsm::candidate_type(
-        *best, vector_fsm::kCACHE_SITE_ARRIVAL_TOL, -1));
+    return boost::make_optional(
+        acquire_goal_fsm::candidate_type(*best, kCACHE_SITE_ARRIVAL_TOL, -1));
   } else {
     ER_WARN("No cache site selected for acquisition--internal error?")
     return boost::optional<acquire_goal_fsm::candidate_type>();
   }
 } /* site_select() */
 
-acq_goal_type acquire_cache_site_fsm::acquisition_goal_internal(void) const {
-  return acq_goal_type::ekCACHE_SITE;
+cfmetrics::goal_acq_metrics::goal_type acquire_cache_site_fsm::
+    acquisition_goal_internal(void) const {
+  return cfmetrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekCACHE_SITE);
 } /* acquisition_goal_internal() */
 
 NS_END(depth2, controller, fordyca);

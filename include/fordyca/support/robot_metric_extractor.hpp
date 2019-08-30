@@ -24,7 +24,8 @@
  * Includes
  ******************************************************************************/
 #include <boost/variant/static_visitor.hpp>
-#include "fordyca/nsalias.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

@@ -26,11 +26,12 @@
  ******************************************************************************/
 #include <memory>
 
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
+
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_map.hpp"
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/math/vector2.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

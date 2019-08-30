@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/block_sel/block_sel_matrix_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************

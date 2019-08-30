@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/math/cache_site_utility.hpp"
+
 #include <cmath>
 #include <limits>
 

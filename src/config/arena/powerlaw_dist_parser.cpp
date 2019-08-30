@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/arena/powerlaw_dist_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -47,9 +48,9 @@ bool powerlaw_dist_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }
-  CHECK(m_config->pwr_min > 2);
-  CHECK(m_config->pwr_max >= m_config->pwr_min);
-  CHECK(m_config->n_clusters > 0);
+  RCSW_CHECK(m_config->pwr_min > 2);
+  RCSW_CHECK(m_config->pwr_max >= m_config->pwr_min);
+  RCSW_CHECK(m_config->n_clusters > 0);
   return true;
 
 error:

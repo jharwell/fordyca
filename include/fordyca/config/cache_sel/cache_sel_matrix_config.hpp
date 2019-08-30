@@ -27,7 +27,7 @@
 #include <string>
 
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/types/spatial_dist.hpp"

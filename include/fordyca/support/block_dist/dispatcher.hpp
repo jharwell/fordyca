@@ -28,7 +28,7 @@
 #include <string>
 #include <memory>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/entity_list.hpp"
 #include "fordyca/ds/block_vector.hpp"

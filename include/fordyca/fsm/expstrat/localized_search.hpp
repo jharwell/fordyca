@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/expstrat/base_expstrat.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/fsm/vector_fsm.hpp"
+#include "cosm/fsm/vector_fsm.hpp"
 #include "fordyca/fsm/expstrat/crw.hpp"
 
 /*******************************************************************************
@@ -45,14 +45,14 @@ NS_START(fordyca, fsm, expstrat);
  * then begin correlated random walk exploration there via \ref crw. Falls back
  * to vanilla \ref crw if a specific location is not given during at task start.
  */
-class localized_search : public base_expstrat,
+class localized_search : public foraging_expstrat,
                          public rer::client<localized_search> {
  public:
-  explicit localized_search(const base_expstrat::params* const c_params)
+  localized_search(const foraging_expstrat::params* const c_params)
       : localized_search(c_params->saa) {}
 
-  explicit localized_search(controller::saa_subsystem* saa)
-      : base_expstrat(saa),
+  localized_search(crfootbot::footbot_saa_subsystem* saa)
+      : foraging_expstrat(saa),
         ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
         m_vfsm(saa),
         m_crw(saa) {}
@@ -100,14 +100,14 @@ class localized_search : public base_expstrat,
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<base_expstrat> clone(void) const override {
-    return std::make_unique<localized_search>(saa_subsystem());
+  std::unique_ptr<foraging_expstrat> clone(void) const override {
+    return std::make_unique<localized_search>(saa());
   }
 
  private:
   /* clang-format off */
-  vector_fsm m_vfsm;
-  crw        m_crw;
+  cfsm::vector_fsm m_vfsm;
+  crw               m_crw;
   /* clang-format on */
 };
 

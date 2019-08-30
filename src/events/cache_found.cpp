@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
+
 #include "fordyca/controller/depth2/grp_dpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
@@ -76,7 +77,7 @@ void cache_found::visit(ds::dpo_store& store) {
   } /* while(it..) */
 
   auto known = store.find(m_cache);
-  rswarm::pheromone_density density(store.pheromone_rho());
+  crepr::pheromone_density density(store.pheromone_rho());
   if (nullptr != known) {
     density = known->density();
 
@@ -85,7 +86,7 @@ void cache_found::visit(ds::dpo_store& store) {
      * reset the pheromone density to make because we have seen the cache again.
      */
     if (store.repeat_deposit()) {
-      density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+      density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
     } else {
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
@@ -140,7 +141,7 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 
 void cache_found::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  rswarm::pheromone_density& density =
+  crepr::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
   if (!cell.state_is_known()) {
     map.known_cells_inc();
@@ -199,14 +200,14 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   }
 
   if (map.pheromone_repeat_deposit()) {
-    density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+    density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
   } else {
     /*
      * Seeing a new cache on empty square or one that used to contain a block.
      */
     if (!cell.state_has_cache()) {
       density.reset();
-      density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+      density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
     } else { /* Seeing a known cache again--set its relevance to the max */
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }

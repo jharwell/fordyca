@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
+
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -34,8 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
-using transport_goal_type = fsm::block_transporter::goal_type;
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor

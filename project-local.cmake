@@ -41,6 +41,7 @@ endif()
 
 # RCPPSW
 add_subdirectory(ext/rcppsw)
+add_subdirectory(ext/cosm)
 
 ################################################################################
 # Includes                                                                     #
@@ -69,8 +70,10 @@ set(argos3_LIBRARIES
 
 # Define link libraries
 set(${target}_LIBRARIES
+  cosm
   rcppsw
   nlopt
+  ${cosm_LIBRARIES}
   ${rcppsw_LIBRARIES}
   ${argos3_LIBRARIES}
   stdc++fs
@@ -81,7 +84,8 @@ set(${target}_LIBRARY_DIRS
   /usr/lib/argos3
   /usr/local/lib/argos3
   ${LOCAL_INSTALL_PREFIX}/lib/argos3
-  ${rcppsw_LIBRARY_DIRS})
+  ${rcppsw_LIBRARY_DIRS}
+  ${cosm_LIBRARY_DIRS})
 
 # Qt not reliably available on MSI
 if (NOT BUILD_FOR_MSI)

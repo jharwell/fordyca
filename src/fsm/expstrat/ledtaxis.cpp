@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+
 #include "fordyca/support/light_type_index.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,31 +33,41 @@
 NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem* saa,
+                   const rutils::color& target)
+    : foraging_expstrat(saa),
+      ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis"),
+      m_tracker(saa->sensing()),
+      m_target(target) {}
+
+/*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void ledtaxis::task_execute(void) {
-  saa_subsystem()->steer2D_force_calc().wander();
+  saa()->steer_force2D().accum(saa()->steer_force2D().wander());
 
-  if (auto obs = saa_subsystem()->sensing()->avg_obstacle_within_prox()) {
+  if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
     m_tracker.ca_enter();
 
     ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
              obs->to_str().c_str(),
              obs->angle().value(),
              obs->length());
-    saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
-    saa_subsystem()->steer2D_force_calc().avoidance(*obs);
+    saa()->actuation()->leds()->set_color(-1, rutils::color::kRED);
+    saa()->steer_force2D().accum(saa()->steer_force2D().avoidance(*obs));
 
   } else {
     m_tracker.ca_exit();
 
     ER_DEBUG("No threatening obstacle found");
-    saa_subsystem()->actuation()->leds_set_color(rutils::color::kMAGENTA);
-    saa_subsystem()->steer2D_force_calc().phototaxis(
-        saa_subsystem()->sensing()->blobs().readings(),
+    saa()->actuation()->leds()->set_color(-1, rutils::color::kMAGENTA);
+    auto force = saa()->steer_force2D().phototaxis(
+        saa()->sensing()->blobs()->readings(),
         support::light_type_index()[support::light_type_index::kCache]);
+    saa()->steer_force2D().accum(force);
   }
-  saa_subsystem()->steer2D_force_apply();
 } /* task_execute() */
 
 bool ledtaxis::task_finished(void) const {
@@ -68,7 +78,7 @@ bool ledtaxis::task_finished(void) const {
     return true;
   }
 
-  for (auto& r : saa_subsystem()->sensing()->blobs().readings()) {
+  for (auto& r : saa()->sensing()->blobs()->readings()) {
     if (r.color == m_target) {
       accum += r.vec;
       ++count;

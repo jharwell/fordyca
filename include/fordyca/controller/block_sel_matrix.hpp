@@ -29,9 +29,10 @@
 #include <string>
 #include <vector>
 
-#include "fordyca/config/block_sel/block_pickup_policy_config.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/config/block_sel/block_pickup_policy_config.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

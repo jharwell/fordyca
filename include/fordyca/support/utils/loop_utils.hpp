@@ -32,7 +32,7 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 

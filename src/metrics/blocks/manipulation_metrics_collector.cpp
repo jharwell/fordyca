@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 
 /*******************************************************************************

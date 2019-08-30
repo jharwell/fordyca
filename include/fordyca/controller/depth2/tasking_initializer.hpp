@@ -54,7 +54,7 @@ class tasking_initializer : public depth1::tasking_initializer,
  public:
   tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
-                      controller::saa_subsystem* saa,
+                      crfootbot::footbot_saa_subsystem* saa,
                       base_perception_subsystem* perception) RCSW_COLD;
   ~tasking_initializer(void) override RCSW_COLD;
 

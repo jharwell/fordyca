@@ -27,6 +27,9 @@
 #include <mutex>
 #include <vector>
 
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/decorator/decorator.hpp"
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
@@ -35,9 +38,6 @@
 #include "fordyca/repr/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
 #include "fordyca/support/block_dist/redist_governor.hpp"
-
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/patterns/decorator/decorator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,6 @@ class base_loop_functions;
 NS_START(ds);
 
 class cell2D;
-namespace decorator = rcppsw::patterns::decorator;
 
 /*******************************************************************************
  * Class Definitions
@@ -72,10 +71,10 @@ namespace decorator = rcppsw::patterns::decorator;
  * data in manages from the algorithms that operate on that data.
  */
 class arena_map final : public rer::client<arena_map>,
-                        public decorator::decorator<arena_grid> {
+                        public rpdecorator::decorator<arena_grid> {
  public:
-  using grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::grid_view;
-  using const_grid_view = rcppsw::ds::base_grid2D<ds::cell2D>::const_grid_view;
+  using grid_view = rds::base_grid2D<ds::cell2D>::grid_view;
+  using const_grid_view = rds::base_grid2D<ds::cell2D>::const_grid_view;
 
   explicit arena_map(const config::arena::arena_map_config* config);
 

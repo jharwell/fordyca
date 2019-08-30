@@ -35,8 +35,13 @@ NS_START(fordyca);
 
 namespace ds { class dpo_store; }
 
-NS_START(fsm, depth2);
-using transport_goal_type = fsm::block_transporter::goal_type;
+NS_START(fsm);
+
+namespace expstrat {
+class foraging_expstrat;
+} /* namespace expstrat */
+
+NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -54,19 +59,19 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(
       const controller::cache_sel_matrix* matrix,
-      controller::saa_subsystem* saa,
+      crfootbot::footbot_saa_subsystem* saa,
       ds::dpo_store* store,
-      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
+      std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
   ~cache_transferer_fsm(void) override = default;
 
   cache_transferer_fsm(const cache_transferer_fsm&) = delete;
   cache_transferer_fsm& operator=(const cache_transferer_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acq_goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
   bool is_acquiring_dest_cache(void) const RCSW_PURE;
   bool is_acquiring_src_cache(void) const RCSW_PURE;

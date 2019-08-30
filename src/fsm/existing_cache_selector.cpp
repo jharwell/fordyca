@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/existing_cache_selector.hpp"
+
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/math/existing_cache_utility.hpp"

@@ -22,14 +22,16 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/oracular_info_receptor.hpp"
+
+#include "rcppsw/ta/polled_task.hpp"
+#include "rcppsw/ta/time_estimate.hpp"
+
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
-#include "rcppsw/ta/polled_task.hpp"
-#include "rcppsw/ta/time_estimate.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/depth0/dpo_controller_repository.hpp"
+
 #include "fordyca/config/block_sel/block_sel_matrix_parser.hpp"
 #include "fordyca/config/perception/perception_parser.hpp"
 

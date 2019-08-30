@@ -28,8 +28,9 @@
 #include <string>
 #include <memory>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,7 +71,7 @@ class tasking_initializer : public rer::client<tasking_initializer> {
  public:
   tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
-                      controller::saa_subsystem* saa,
+                      crfootbot::footbot_saa_subsystem* saa,
                       base_perception_subsystem* perception) RCSW_COLD;
 
   ~tasking_initializer(void) override RCSW_COLD;
@@ -86,7 +87,10 @@ class tasking_initializer : public rer::client<tasking_initializer> {
   RCSW_COLD const base_perception_subsystem* perception(void) const { return m_perception; }
   RCSW_COLD base_perception_subsystem* perception(void) { return m_perception; }
 
-  RCSW_COLD controller::saa_subsystem* saa_subsystem(void) const { return m_saa; }
+  RCSW_COLD crfootbot::footbot_saa_subsystem* saa(void) const {
+    return m_saa;
+  }
+
   RCSW_COLD const class block_sel_matrix* block_sel_matrix(void) const { return mc_bsel_matrix; }
 
   RCSW_COLD tasking_map depth1_tasks_create(
@@ -100,7 +104,7 @@ class tasking_initializer : public rer::client<tasking_initializer> {
 
  private:
   /* clang-format off */
-  controller::saa_subsystem* const          m_saa;
+  crfootbot::footbot_saa_subsystem* const  m_saa;
   base_perception_subsystem* const          m_perception;
   const controller::cache_sel_matrix* const mc_csel_matrix;
   const controller::block_sel_matrix* const mc_bsel_matrix;

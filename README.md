@@ -16,7 +16,8 @@ This is the main entry point for getting started on the project.
 
 2. J. Harwell and M. Gini, "Swarm Engineering Through Quantitative Measurement
    of Swarm Robotic Principles in a 10,000 Robot Swarm," 2019 Joint Conference
-   of Artificial Intelligence (IJCAI), Macau, China, 2019, pp. XXX-XXX.
+   of Artificial Intelligence (IJCAI), Macau,
+   China, 2019. [Link](https://www.ijcai.org/proceedings/2019/0048.pdf)
 
 3. A. Chen, J. Harwell, M. Gini, "Maximizing Energy Efficiency in Swarm
    Robotics," arXiv:1906.01957 [cs.MA], June 2019.
@@ -52,18 +53,29 @@ running the script so that if there are errors it is easier to track them down
 (the script generates a LOT of output, which usually overflows terminal
 ringbuffers).
 
-The script assumes you have sudo privileges on the machine you want to install
-the project on. If you do not, you will have to build a *lot* more stuff from
-source manually.
+The script assumes:
+
+- You have sudo privileges on the machine you want to install the project on. If
+  you do not, you will have to build a *lot* more stuff from source manually.
+
+- You are running on a debian-based linux environment. If you are running on
+  something else (OSX, WSL, etc) you will have to manually modify the script to
+  work on your target platform.
 
 *IMPORTANT* If you want to build an _optimized_ version of fordyca (necessary
 for large swarms), you will need to either manually modify the `bootstrap.sh`
 script that you copied, or re-run `cmake` and `make` as shown below.
 
+The script is configured such that it will stop if any command fails. So if the
+script makes it all the way through and you see a `BOOTSTRAP SUCCESS!` line at
+the end of the `output.txt`, then you know everything worked. Otherwise look in
+the `output.txt` for the error and fix it and try running the script again (the
+script *should* be idempotent).
+
 # Setup (Optimized Build)
 
 To build forydca with optimizations (necessary for using sierra or running large
-scale simulations, will need a different cmake command than the one
+scale simulations), will need a different cmake command than the one
 `bootstrap.sh` uses for you. Something like the following, run from the `build`
 directory prior to building will do the trick:
 

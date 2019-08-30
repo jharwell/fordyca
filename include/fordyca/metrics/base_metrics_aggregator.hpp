@@ -28,10 +28,11 @@
 #include <string>
 #include <typeindex>
 
-#include "fordyca/config/metrics_config.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
+
+#include "fordyca/config/metrics_config.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

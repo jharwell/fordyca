@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/occupancy_grid.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell_unknown.hpp"
 
@@ -94,7 +95,7 @@ void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {
 } /* cell_init() */
 
 void occupancy_grid::cell_state_update(uint i, uint j) {
-  rcppsw::swarm::pheromone_density& density = access<kPheromone>(i, j);
+  crepr::pheromone_density& density = access<kPheromone>(i, j);
   cell2D& cell = access<kCell>(i, j);
 
   if (!m_pheromone_repeat_deposit) {

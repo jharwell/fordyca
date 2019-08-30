@@ -23,7 +23,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "rcppsw/ds/type_map.hpp"
 #include "fordyca/support/depth1/robot_configurer_adaptor.hpp"

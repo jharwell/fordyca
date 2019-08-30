@@ -28,7 +28,7 @@
 
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "rcppsw/patterns/state_machine/base_fsm.hpp"
+#include "rcppsw/patterns/fsm/base_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,10 +37,7 @@ NS_START(fordyca);
 
 namespace fsm { namespace depth0 { class crw_fsm; }}
 
-NS_START(controller);
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
-using transport_goal_type = fsm::block_transporter::goal_type;
-NS_START(depth0);
+NS_START(controller, depth0);
 
 /*******************************************************************************
  * Class Definitions
@@ -72,13 +69,17 @@ class crw_controller : public base_controller,
   bool is_vectoring_to_goal(void) const override { return false; }
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(acq_goal_type, acquisition_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+                            acquisition_goal,
+                            const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(transport_goal_type, block_transport_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+                            block_transport_goal,
+                            const);
 
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }

@@ -28,7 +28,7 @@
 #include <memory>
 
 #include "fordyca/config/perception/pheromone_config.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 
 /*******************************************************************************

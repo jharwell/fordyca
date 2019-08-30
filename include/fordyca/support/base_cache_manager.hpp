@@ -27,12 +27,13 @@
 #include <mutex>
 #include <vector>
 
-#include "fordyca/ds/block_vector.hpp"
-#include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/metrics/caches/lifecycle_metrics.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/timestep.hpp"
+
+#include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces

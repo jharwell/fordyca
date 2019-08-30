@@ -27,11 +27,12 @@
 #include <list>
 #include <string>
 
+#include "rcppsw/patterns/decorator/decorator.hpp"
+
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
-#include "rcppsw/patterns/decorator/decorator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -42,8 +43,6 @@ struct perception_config;
 }} // namespace config::perception
 
 NS_START(ds);
-
-namespace decorator = rcppsw::patterns::decorator;
 
 /*******************************************************************************
  * Class Definitions
@@ -66,7 +65,7 @@ namespace decorator = rcppsw::patterns::decorator;
  * what the robots need (as of 9/14/18 anyway).
  */
 class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
-                               public decorator::decorator<occupancy_grid> {
+                               public rpdecorator::decorator<occupancy_grid> {
  public:
   dpo_semantic_map(const config::perception::perception_config* c_config,
                    const std::string& robot_id);

@@ -23,10 +23,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/ds/type_map.hpp"
 #include "rcppsw/types/timestep.hpp"
+
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

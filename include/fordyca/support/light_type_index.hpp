@@ -27,8 +27,9 @@
 #include <map>
 #include <string>
 
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/utils/color.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

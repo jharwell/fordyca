@@ -4,16 +4,16 @@ The following root XML tags are defined under the `<params>` tag for all
 controller types:
 
 
-| Root XML tag       | Mandatory For?      | Description                                                                                                                       |
-|--------------------|---------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `output`           | All controllers     | Paramaters for simulation outputs across all runs.                                                                                |
-| `perception`       | All but CRW         | Parameters pertaining to a robots discretization of the continuous world into a grid, and/or the objects it tracks within it.     |
-| `task_executive`   | [`depth1`,`depth2`] | Parameters pertaining to the task executive (the entitity responsible for managing/running tasks after they have been allocated). |
-| `task_alloc`       | [`depth1`,`depth2`] | Parameters pertaining to task allocation.                                                                                         |
-| `block_sel_matrix` | All but CRW         | Parameters used by robots when selecting which block to acquire/obtain as part of the task they are currently executing.          |
-| `cache_sel_matrix` | [`depth1`,`depth2`] | Parameters used by robots when selecting which cache to acquire/obtain as part of the task they are currently executing.          |
-| `sensing`          | All controllers     | Parameters for robot sensors.                                                                                                     |
-| `actuation`        | All controllers     | Parameters for robot actuators.                                                                                                   |
+| Root XML tag            | Mandatory For?      | Description                                                                                                                       |
+|-------------------------|---------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `output`                | All controllers     | Paramaters for simulation outputs across all runs.                                                                                |
+| `perception`            | All but CRW         | Parameters pertaining to a robots discretization of the continuous world into a grid, and/or the objects it tracks within it.     |
+| `task_executive`        | [`depth1`,`depth2`] | Parameters pertaining to the task executive (the entitity responsible for managing/running tasks after they have been allocated). |
+| `task_alloc`            | [`depth1`,`depth2`] | Parameters pertaining to task allocation.                                                                                         |
+| `block_sel_matrix`      | All but CRW         | Parameters used by robots when selecting which block to acquire/obtain as part of the task they are currently executing.          |
+| `cache_sel_matrix`      | [`depth1`,`depth2`] | Parameters used by robots when selecting which cache to acquire/obtain as part of the task they are currently executing.          |
+| `sensing_subsystem2D`   | All controllers     | Parameters for robot sensing subsystem.                                                                                           |
+| `actuation_subsystem2D` | All controllers     | Parameters for robot actuation subsystem.                                                                                         |
 
 In the subsections below, multiple choices for an XML attribute value are
 separated by a `|` in example XML, and attributes that should be floating point
@@ -54,7 +54,7 @@ XML configuration:
 ## `perception`
 
 - Required by: All but the CRW controller.
-- Required child attributes if present: none.
+- Required child attributes if present: [`los_dim`].
 - Required child tags if present: `pheromone`.
 - Optional child tags: `grid`. Required by [`MDPO`, `GP-MDPO`, `GRP-MDPO`]
   controllers.
@@ -65,7 +65,8 @@ XML configuration:
 ```xml
 <params>
 ...
-<perception>
+<perception
+    los_dim="INTEGER">
     <pheromone>
     ...
     <pheromone/>
@@ -76,6 +77,8 @@ XML configuration:
 ...
 </params>
 ```
+
+- `los_dim` The dimension of robot LOS (LOS is a square).
 
 ### `pheromone`
 
@@ -112,6 +115,8 @@ XML configuration:
 - Required child tags if present: none.
 - Optional child attributes: none.
 - Optional child tags: none.
+
+XML configuration:
 
 ```xml
 <perception>
@@ -217,6 +222,8 @@ XML configuration:
 Many child tags in `<task_alloc>` use sigmoid- based functions for choosing
 between alternatives, with the input src and sigmoid method varying. For such
 tags, all child attributes and tags are required.
+
+XML configuration:
 
 ```xml
 ...
@@ -360,6 +367,8 @@ subtask selection if partitioning is employed.
 - Optional child attributes: all. Only the task names used by the loaded task
   decomposition graph are required; others are ignored.
 - Optional child tags: none.
+
+XML configuration:
 
 ```xml
 <task_alloc>
@@ -648,23 +657,27 @@ XML configuration:
                         perform LEDtaxis towards it, and then perform CRW once a
                         robot is sufficiently close.
 
-## `sensing`
+## `sensing_subsystem2D`
 
 - Required by: all.
-- Required child attributes if present: `los_dim`.
-- Required child tags if present: `proximity_sensor`
+- Required child attributes if present: none.
+- Required child tags if present: [`proximity_sensor`, `ground_sensor`].
 - Optional child attributes: none.
 - Optional child tags: none.
+
+XML configuration:
 
 ```xml
 <params>
 ...
-<sensing
-    los_dim="0.4">
+<sensing_subsystem2D>
     <proximity_sensor>
     ...
     </proximity_sensor>
-</sensing>
+    <ground_sensor>
+    ...
+    </ground_sensor>
+</sensing_subsystem2D>
 ...
 </params>
 ```
@@ -672,52 +685,85 @@ XML configuration:
 ### `proximity_sensor`
 
 - Required by: all.
-- Required child attributes if present: `los_dim`.
-- Required child tags if present: `proximity_sensor`
+- Required child attributes if present: [`fov`, `delta`].
+- Required child tags if present: none.
 - Optional child attributes: none.
 - Optional child tags: none.
 
 ```xml
-<sensing>
+<sensing_subsystem2D>
     ...
     <proximity_sensor
-        angle_range="FLOAT:FLOAT"
+        fov="FLOAT:FLOAT"
         delta="FLOAT"/>
-</sensing>
+</sensing_subsystem2D>
 ```
-- `angle_range` - The angle range to the left/right of center (90 degrees on a
-                  unit circle) in which obstacles are not ignored (outside of
-                  this range they are ignored, assuming the robot will be able
-                  to drive by them). Takes a pair like so: `-1:1`. Specified in
-                  radians.
+- `fov` - The angle range to the left/right of center (90 degrees on a unit
+          circle) in which obstacles are not ignored (outside of this range they
+          are ignored, assuming the robot will be able to drive by them). Takes
+          a pair like so: `-1:1`. Specified in radians.
 
 - `delta` - Tripping threshold for exponential distance calculations for
             obstacle detection.
 
-## `actuation`
+### `fround_sensor`
 
 - Required by: all.
 - Required child attributes if present: none.
-- Required child tags if present: [`steering2D`, `differential_drive`]
+- Required child tags if present: [`nest`, `block`, `cache`].
 - Optional child attributes: none.
 - Optional child tags: none.
+
+XML configuration:
+
+```xml
+<sensing_subsystem2D>
+    ...
+    <ground_sensor>
+      <nest range="FLOAT:FLOAT"
+            consensus="INTEGER"/>
+      <block range="FLOAT:FLOAT"
+            consensus="INTEGER"/>
+      <cache range="FLOAT:FLOAT"
+            consensus="INTEGER"/>
+    </ground_sensor>
+</sensing_subsystem2D>
+```
+For each of [`nest`, `block`, `cache`], the following child attributes are
+required:
+
+- `range` - The range of ground sensor values used to detect the object. Should
+            be unique among all the types of objects to detect.
+
+- `consensus` - How many of the ground sensors must have readings within the
+          specified range in order for a detection to be triggered.
+
+## `actuation_subsystem2D`
+
+- Required by: all.
+- Required child attributes if present: none.
+- Required child tags if present: [`force_calculator`, `diff_drive`]
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
 
 ```xml
 <params>
 ...
-<actuation>
-    <steering2D>
+<actuation_subsystem2D>
+    <force_calculator>
     ...
-    </steering2D>
-    <differential_drive>
+    </force_calculator>
+    <diff_drive>
     ...
-    </differential_drive>
-</actuation>
+    </diff_drive>
+</actuation_subsystem2D>
 ...
 </params>
 ```
 
-### `steering2D`
+### `force_calculator`
 
 - Required by: all.
 - Required child attributes if present: none.
@@ -726,10 +772,12 @@ XML configuration:
 - Optional child attributes: none.
 - Optional child tags: none.
 
+XML configuration:
+
 ```xml
-<actuation>
+<actuation_subsystem2D>
     ...
-    <steering2D>
+    <force_calculator>
     <avoidance_force lookahead="FLOAT"
                      max="FLOAT"/>
     <arrival_force slowing_radius="FLOAT"
@@ -742,9 +790,9 @@ XML configuration:
                   interval="INTEGER"
                   normal_dist="false"/>
     <phototaxis_force max="FLOAT"/>
-    </steering2D>
+    </force_calculator>
     ...
-</actuation>
+</actuation_subsystem2D>
 
 ```
 #### `avoidance_force`
@@ -785,7 +833,7 @@ XML configuration:
 
 - `max` - Max value for the force.
 
-### `differential_drive`
+### `diff_drive`
 
 - Required by: all.
 - Required child attributes if present: none.
@@ -794,13 +842,15 @@ XML configuration:
 - Optional child attributes: none.
 - Optional child tags: none.
 
+XML configuration:
+
 ```xml
-<actuation>
+<actuation_subsystem2D>
     ...
-    <differential_drive soft_turn_max="FLOAT"
-                        max_speed="FLOAT"/>
+    <diff_drive soft_turn_max="FLOAT"
+                max_speed="FLOAT"/>
     ...
-</actuation>
+</actuation_subsystem2D>
 ```
 
 - `soft_turn_max` - If actuators are told to change to a heading within a

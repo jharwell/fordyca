@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/utils/event_utils.hpp"
+
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 

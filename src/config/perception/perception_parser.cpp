@@ -39,6 +39,8 @@ void perception_parser::parse(const ticpp::Element& node) {
     ticpp::Element onode = node_get(node, kXMLRoot);
     m_config = std::make_unique<config_type>();
 
+    XML_PARSE_ATTR(onode, m_config, los_dim);
+
     m_occupancy.parse(onode);
     m_pheromone.parse(onode);
     m_config->occupancy_grid =

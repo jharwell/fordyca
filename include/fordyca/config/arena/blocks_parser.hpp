@@ -28,7 +28,7 @@
 #include <string>
 
 #include "fordyca/config/arena/blocks_config.hpp"
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
 #include "rcppsw/control/config/xml/waveform_parser.hpp"
 #include "fordyca/config/arena/block_dist_parser.hpp"

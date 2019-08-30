@@ -25,7 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/types/timestep.hpp"

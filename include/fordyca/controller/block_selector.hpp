@@ -26,10 +26,11 @@
  ******************************************************************************/
 #include <list>
 
-#include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/ds/dp_block_map.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/arena/block_manifest_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -42,8 +43,8 @@ void block_manifest_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 bool block_manifest_parser::validate(void) const {
-  CHECK(m_config->unit_dim > 0);
-  CHECK(m_config->n_cube > 0 || m_config->n_ramp > 0);
+  RCSW_CHECK(m_config->unit_dim > 0);
+  RCSW_CHECK(m_config->n_cube > 0 || m_config->n_ramp > 0);
   return true;
 
 error:

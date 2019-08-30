@@ -24,13 +24,14 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/floor_entity.h>
 #include <string>
+
+#include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
@@ -39,8 +40,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Classes
@@ -108,7 +107,8 @@ class free_block_pickup_interactor
    */
   void finish_free_block_pickup(T& controller, rtypes::timestep t) {
     ER_ASSERT(controller.goal_acquired() &&
-                  acq_goal_type::ekBLOCK == controller.acquisition_goal(),
+                  fsm::foraging_acq_goal::type::ekBLOCK ==
+                      controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
               "Controller not serving pickup penalty");

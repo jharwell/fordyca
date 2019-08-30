@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/math/existing_cache_utility.hpp"
+
 #include <cmath>
 
 /*******************************************************************************
@@ -40,7 +41,7 @@ existing_cache_utility::existing_cache_utility(const rmath::vector2d& cache_loc,
  * Member Functions
  ******************************************************************************/
 double existing_cache_utility::calc(const rmath::vector2d& rloc,
-                                    const rswarm::pheromone_density& density,
+                                    const crepr::pheromone_density& density,
                                     size_t n_blocks) {
   return eval(
       (std::exp(density.v()) * n_blocks) /

@@ -29,8 +29,8 @@
 #include <atomic>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
-#include "fordyca/nsalias.hpp"
+#include "cosm/repr/pheromone_density.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

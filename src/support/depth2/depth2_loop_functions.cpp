@@ -30,7 +30,12 @@
  */
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/depth2/depth2_loop_functions.hpp"
+
 #include <boost/mpl/for_each.hpp>
+
+#include "rcppsw/ds/type_map.hpp"
+#include "rcppsw/ta/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/output_config.hpp"
@@ -53,10 +58,7 @@
 #include "fordyca/support/robot_task_extractor_adaptor.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
 
-#include "rcppsw/ds/type_map.hpp"
-#include "rcppsw/swarm/convergence/convergence_calculator.hpp"
-#include "rcppsw/ta/bi_tdgraph.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "cosm/convergence/convergence_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

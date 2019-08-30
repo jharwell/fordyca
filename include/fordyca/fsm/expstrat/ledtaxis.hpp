@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fsm/expstrat/base_expstrat.hpp"
-#include "fordyca/fsm/collision_tracker.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "cosm/fsm/collision_tracker.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,17 +45,13 @@ NS_START(fordyca, fsm, expstrat);
  * robots can detect with their blob camera. Performs phototaxis towards the
  * source of the signal if one is found, and performs phototaxis to it.
  */
-class ledtaxis : public base_expstrat,
+class ledtaxis : public foraging_expstrat,
                  public rer::client<ledtaxis> {
  public:
-  explicit ledtaxis(const base_expstrat::params* const c_params)
+  explicit ledtaxis(const foraging_expstrat::params* const c_params)
       : ledtaxis(c_params->saa, c_params->ledtaxis_target) {}
-  explicit ledtaxis(controller::saa_subsystem* saa,
-                    const rutils::color& target)
-      : base_expstrat(saa),
-        ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis"),
-        m_tracker(saa),
-        m_target(target) {}
+  explicit ledtaxis(crfootbot::footbot_saa_subsystem* saa,
+                    const rutils::color& target);
 
   ~ledtaxis(void) override = default;
   ledtaxis(const ledtaxis&) = delete;
@@ -65,17 +61,20 @@ class ledtaxis : public base_expstrat,
   void task_start(const rta::taskable_argument*) override final {
     m_task_running = true;
   }
+
   void task_reset(void) override final {
     m_task_running = false;
   }
+
   bool task_running(void) const override final {
     return m_task_running;
   }
+
   bool task_finished(void) const override final;
   void task_execute(void) override final;
 
   /* prototype overrides */
-  std::unique_ptr<base_expstrat> clone(void) const override {
+  std::unique_ptr<foraging_expstrat> clone(void) const override {
     return nullptr; /* Should not be a top level explore behavior */
   }
 
@@ -89,9 +88,9 @@ class ledtaxis : public base_expstrat,
   static constexpr double kARRIVAL_TOL = 1.0;
 
   /* clang-format off */
-  mutable bool      m_task_running{false};
-  collision_tracker m_tracker;
-  rutils::color     m_target;
+  mutable bool             m_task_running{false};
+  cfsm::collision_tracker m_tracker;
+  rutils::color            m_target;
   /* clang-format on */
 
  public:

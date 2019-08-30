@@ -24,18 +24,19 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "rcppsw/ta/abort_probability.hpp"
 #include "rcppsw/ta/logical_task.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
+
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
-using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Structure Definitions
@@ -48,7 +49,7 @@ using transport_goal_type = fsm::block_transporter::goal_type;
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
 class base_foraging_task : public fsm::block_transporter,
-                           public metrics::fsm::goal_acq_metrics {
+                           public cfmetrics::goal_acq_metrics {
  public:
   base_foraging_task(void) = default;
   ~base_foraging_task(void) override = default;

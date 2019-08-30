@@ -1,5 +1,5 @@
 /**
- * @file collision_locs_metrics_collector.hpp
+ * @file foraging_expstrat.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,47 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_FSM_COLLISION_LOCS_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_FSM_COLLISION_LOCS_METRICS_COLLECTOR_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <list>
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
-#include "fordyca/metrics/spatial/grid2D_avg_metrics_collector.hpp"
-
-/*******************************************************************************
- * Namespaces
- ******************************************************************************/
-NS_START(fordyca, metrics, fsm);
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
- * Class Definitions
+ * Namespaces/Decls
  ******************************************************************************/
-/**
- * @class collision_locs_metrics_collector
- * @ingroup fordyca metrics fsm
- *
- * @brief Collector for \ref collision_metrics as a 2D grid of where robots most
- * frequently encounter other robots.
- */
-class collision_locs_metrics_collector final : public spatial::grid2D_avg_metrics_collector {
- public:
-  /**
-   * @param ofname The output file name.
-   * @param interval Collection interval.
-   * @param dims Dimensions of the arena.
-   */
-  collision_locs_metrics_collector(const std::string& ofname,
-                             uint interval,
-                             const rmath::vector2u& dims) :
-      grid2D_avg_metrics_collector(ofname, interval, dims) {}
+NS_START(fordyca, fsm, expstrat);
 
-    void collect(const rmetrics::base_metrics& metrics) override;
-};
+/*******************************************************************************
+ * Constructors/Destructors
+ ******************************************************************************/
 
-NS_END(fsm, metrics, fordyca);
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) const {
+  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
+} /* saa() */
 
-#endif /* INCLUDE_FORDYCA_METRICS_FSM_COLLISION_LOCS_METRICS_COLLECTOR_HPP_ */
+crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) {
+  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
+} /* saa() */
+
+NS_END(expstrat, fsm, fordyca);

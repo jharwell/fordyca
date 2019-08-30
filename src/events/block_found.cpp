@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
+
 #include "fordyca/controller/depth1/gp_dpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/gp_odpo_controller.hpp"
@@ -36,7 +37,8 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+
+#include "cosm/repr/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -78,7 +80,7 @@ void block_found::visit(ds::dpo_store& store) {
     }
   } /* for(&&c..) */
 
-  rswarm::pheromone_density density(store.pheromone_rho());
+  crepr::pheromone_density density(store.pheromone_rho());
   auto known = store.find(m_block);
   if (nullptr != known) {
     /*
@@ -102,7 +104,7 @@ void block_found::visit(ds::dpo_store& store) {
        * again.
        */
       if (store.repeat_deposit()) {
-        density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+        density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
       } else {
         density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
       }
@@ -136,7 +138,7 @@ void block_found::visit(fsm::cell2D_fsm& fsm) {
 
 void block_found::visit(ds::dpo_semantic_map& map) {
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
-  rswarm::pheromone_density& density =
+  crepr::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
 
   if (!cell.state_is_known()) {
@@ -181,18 +183,18 @@ void block_found::visit(ds::dpo_semantic_map& map) {
 } /* visit() */
 
 void block_found::pheromone_update(ds::dpo_semantic_map& map) {
-  rswarm::pheromone_density& density =
+  crepr::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
   ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   if (map.pheromone_repeat_deposit()) {
-    density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+    density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
   } else {
     /*
      * Seeing a new block on empty square or one that used to contain a cache.
      */
     if (!cell.state_has_block()) {
       density.reset();
-      density.pheromone_add(rswarm::pheromone_density::kUNIT_QUANTITY);
+      density.pheromone_add(crepr::pheromone_density::kUNIT_QUANTITY);
     } else { /* Seeing a known block again--set its relevance to the max */
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }

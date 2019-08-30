@@ -22,13 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/crw_controller.hpp"
+
 #include <fstream>
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/repr/base_block.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,9 +52,9 @@ void crw_controller::Init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
-  fsm::expstrat::base_expstrat::params p{nullptr, saa_subsystem(), nullptr};
+  fsm::expstrat::foraging_expstrat::params p(saa(), nullptr, nullptr, nullptr);
   m_fsm = std::make_unique<fsm::depth0::crw_fsm>(
-      saa_subsystem(),
+      saa(),
       fsm::expstrat::block_factory().create(fsm::expstrat::block_factory::kCRW,
                                             &p));
   ER_INFO("Initialization finished");
@@ -74,6 +75,7 @@ void crw_controller::ControlStep(void) {
             block()->id(),
             block()->robot_id());
   m_fsm->run();
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
@@ -89,11 +91,14 @@ RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_vector_loc, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_explore_loc, *m_fsm, const);
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(crw_controller, "crw_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(depth0, controller, fordyca);

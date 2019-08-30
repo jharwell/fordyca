@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_dist/powerlaw_distributor.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <random>

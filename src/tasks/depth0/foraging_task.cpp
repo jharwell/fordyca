@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
+
 #include "rcppsw/ta/config/task_alloc_config.hpp"
 
 /*******************************************************************************

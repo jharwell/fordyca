@@ -22,14 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
+
 #include <boost/mpl/for_each.hpp>
 
-#include "fordyca/config/metrics_config.hpp"
-#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include "fordyca/metrics/collector_registerer.hpp"
-#include "fordyca/tasks/depth0/foraging_task.hpp"
-#include "fordyca/tasks/depth1/foraging_task.hpp"
-#include "fordyca/tasks/depth2/foraging_task.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
 #include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
@@ -37,6 +32,13 @@
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
 #include "rcppsw/ta/bi_tab.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
+
+#include "fordyca/config/metrics_config.hpp"
+#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/metrics/collector_registerer.hpp"
+#include "fordyca/tasks/depth0/foraging_task.hpp"
+#include "fordyca/tasks/depth1/foraging_task.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +53,6 @@ using collector_typelist =
                        rmetrics::tasks::bi_tdgraph_metrics_collector> >;
 NS_END(detail);
 
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
 using task0 = tasks::depth0::foraging_task;
 using task1 = tasks::depth1::foraging_task;
 using task2 = tasks::depth2::foraging_task;

@@ -30,6 +30,7 @@
 #pragma GCC diagnostic pop
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
+
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"

@@ -24,9 +24,11 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/nsalias.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

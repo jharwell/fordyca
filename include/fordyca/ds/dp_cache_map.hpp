@@ -26,9 +26,10 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/ds/dpo_map.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/ds/dpo_map.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
+
 #include <algorithm>
 
 #include "fordyca/ds/cell2D.hpp"

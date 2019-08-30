@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_unknown.hpp"
+
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
 

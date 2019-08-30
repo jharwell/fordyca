@@ -24,21 +24,25 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acq_metrics.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/ta/taskable.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
+
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/util_hfsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::fsm {
+class acquire_goal_fsm;
+} /* namespace cosm::fsm */
+
 NS_START(fordyca, fsm);
 
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
-using transport_goal_type = fsm::block_transporter::goal_type;
-
-class acquire_goal_fsm;
 class acquire_free_block_fsm;
 
 /*******************************************************************************
@@ -56,14 +60,14 @@ class acquire_free_block_fsm;
  * goal. Once it has done that it will signal that its task is complete.
  */
 class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
-                          public base_foraging_fsm,
+                          public cfsm::util_hfsm,
                           public rta::taskable,
-                          public metrics::fsm::goal_acq_metrics,
+                          public cfmetrics::goal_acq_metrics,
                           public fsm::block_transporter {
  public:
-  block_to_goal_fsm(acquire_goal_fsm* goal_fsm,
-                    acquire_goal_fsm* block_fsm,
-                    controller::saa_subsystem* saa);
+  block_to_goal_fsm(cfsm::acquire_goal_fsm* goal_fsm,
+                    cfsm::acquire_goal_fsm* block_fsm,
+                    crfootbot::footbot_saa_subsystem* saa);
   ~block_to_goal_fsm(void) override = default;
 
   block_to_goal_fsm(const block_to_goal_fsm&) = delete;
@@ -93,7 +97,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   bool is_vectoring_to_goal(void) const override final RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override final RCSW_PURE;
   bool goal_acquired(void) const override RCSW_PURE;
-  acq_goal_type acquisition_goal(void) const override;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override;
   rmath::vector2u current_explore_loc(void) const override final;
   rmath::vector2u current_vector_loc(void) const override final;
 
@@ -111,7 +115,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
     ekST_ACQUIRE_BLOCK,
 
     /**
-ppp     * A block has been acquired--wait for area to send the block pickup signal.
+     * A block has been acquired--wait for area to send the block pickup signal.
      */
     ekST_WAIT_FOR_BLOCK_PICKUP,
 
@@ -132,12 +136,12 @@ ppp     * A block has been acquired--wait for area to send the block pickup sign
     ekST_MAX_STATES,
   };
 
-  const acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
-  const acquire_goal_fsm* block_fsm(void) const { return m_block_fsm; }
+  const cfsm::acquire_goal_fsm* goal_fsm(void) const { return m_goal_fsm; }
+  const cfsm::acquire_goal_fsm* block_fsm(void) const { return m_block_fsm; }
 
  private:
   /* inherited states */
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
+  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_wait_for_signal);
 
   /* block to goal states */
   HFSM_STATE_DECLARE(block_to_goal_fsm, start, rpfsm::event_data);
@@ -158,8 +162,8 @@ ppp     * A block has been acquired--wait for area to send the block pickup sign
   }
 
   /* clang-format off */
-  acquire_goal_fsm* const  m_goal_fsm;
-  acquire_goal_fsm * const m_block_fsm;
+  cfsm::acquire_goal_fsm* const  m_goal_fsm;
+  cfsm::acquire_goal_fsm * const m_block_fsm;
   /* clang-format on */
 
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);

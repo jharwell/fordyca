@@ -35,9 +35,11 @@
 #include "fordyca/metrics/temporal_variance_metrics.hpp"
 #include "fordyca/support/tv/block_op_penalty_handler.hpp"
 #include "fordyca/support/tv/cache_op_penalty_handler.hpp"
-#include "fordyca/support/tv/motion_throttling_handler.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
+
+#include "cosm/tv/switchable_tv_generator.hpp"
+
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/ds/type_map.hpp"
 
@@ -164,7 +166,7 @@ class tv_manager final : public rer::client<tv_manager>,
   bool movement_throttling_enabled(void) const {
     return (mc_motion_throttle_config) ? true : false;
   }
-  const motion_throttling_handler* movement_throttling_handler(int robot_id) const {
+  const ctv::switchable_tv_generator* movement_throttling_handler(int robot_id) const {
     return &m_motion_throttling.at(robot_id);
   }
 
@@ -219,7 +221,7 @@ class tv_manager final : public rer::client<tv_manager>,
   rds::type_map<fb_drop_handler_typelist>        m_new_cache{};
   rds::type_map<fb_drop_handler_typelist>        m_cache_site{};
 
-  std::map<int, motion_throttling_handler>       m_motion_throttling{};
+  std::map<int, ctv::switchable_tv_generator>   m_motion_throttling{};
   /* clang-format on */
 };
 

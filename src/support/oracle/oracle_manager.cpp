@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/oracle/oracle_manager.hpp"
+
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"

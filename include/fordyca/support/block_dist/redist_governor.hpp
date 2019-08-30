@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "fordyca/config/arena/block_redist_governor_config.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/timestep.hpp"

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/cache_acq_point_selector.hpp"
+
 #include <algorithm>
 #include <list>
 

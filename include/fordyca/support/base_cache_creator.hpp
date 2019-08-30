@@ -31,15 +31,16 @@
 #include <utility>
 #include <vector>
 
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/types/timestep.hpp"
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_cluster_vector.hpp"
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/math/vector2.hpp"
-#include "rcppsw/types/spatial_dist.hpp"
-#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces

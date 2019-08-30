@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/foraging_signal.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/ta/taskable.hpp"
 #include "rcppsw/ta/taskable_argument.hpp"
+
+#include "fordyca/controller/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces

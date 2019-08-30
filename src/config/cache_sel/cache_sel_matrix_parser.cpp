@@ -55,10 +55,10 @@ bool cache_sel_matrix_parser::validate(void) const {
   if (!is_parsed()) {
     return true;
   }
-  CHECK(m_pickup_policy.validate());
-  CHECK(m_config->cache_prox_dist > 0.0);
-  CHECK(m_config->block_prox_dist > 0.0);
-  CHECK(m_config->nest_prox_dist > 0.0);
+  RCSW_CHECK(m_pickup_policy.validate());
+  RCSW_CHECK(m_config->cache_prox_dist > 0.0);
+  RCSW_CHECK(m_config->block_prox_dist > 0.0);
+  RCSW_CHECK(m_config->nest_prox_dist > 0.0);
   return true;
 
 error:

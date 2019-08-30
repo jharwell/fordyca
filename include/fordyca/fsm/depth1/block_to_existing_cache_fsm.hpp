@@ -29,7 +29,7 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
-#include "fordyca/fsm/expstrat/base_expstrat.hpp"
+#include "fordyca/config/exploration_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,7 +63,7 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
   struct params {
     const controller::block_sel_matrix* bsel_matrix;
     const controller::cache_sel_matrix* csel_matrix;
-    controller::saa_subsystem*          saa;
+    crfootbot::footbot_saa_subsystem*  saa;
     ds::dpo_store*                      store;
     fordyca::config::exploration_config exp_config;
   };
@@ -75,11 +75,11 @@ class block_to_existing_cache_fsm final : public block_to_goal_fsm {
   block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acq_goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   bool goal_acquired(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
  private:
   /* clang-format off */

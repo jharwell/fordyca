@@ -26,7 +26,9 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
+#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +38,13 @@ NS_START(fordyca);
 namespace controller { class cache_sel_matrix; }
 namespace ds { class dpo_store; }
 
-NS_START(fsm, depth2);
+NS_START(fsm);
+
+namespace expstrat {
+class foraging_expstrat;
+} /* namespace expstrat */
+
+NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -52,13 +60,13 @@ NS_START(fsm, depth2);
  * signals that it has completed its task.
  */
 class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
-                              public acquire_goal_fsm {
+                              public cfsm::acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(
       const controller::cache_sel_matrix* matrix,
-      controller::saa_subsystem* saa,
+      crfootbot::footbot_saa_subsystem* saa,
       ds::dpo_store* store,
-      std::unique_ptr<expstrat::base_expstrat> exp_behavior);
+      std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
   ~acquire_new_cache_fsm(void) override = default;
 
   acquire_new_cache_fsm(const acquire_new_cache_fsm& fsm) = delete;
@@ -68,7 +76,7 @@ class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acq_goal_type acquisition_goal_internal(void) const RCSW_CONST;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
   boost::optional<acquire_goal_fsm::candidate_type> cache_select(void) const;
   bool candidates_exist(void) const RCSW_PURE;
   bool cache_acquired_cb(bool explore_result) const;

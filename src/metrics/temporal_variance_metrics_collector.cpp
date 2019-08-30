@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
+
 #include "fordyca/metrics/temporal_variance_metrics.hpp"
 
 /*******************************************************************************

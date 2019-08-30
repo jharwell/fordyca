@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/grid_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -52,9 +53,9 @@ void grid_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 bool grid_parser::validate(void) const {
-  CHECK(m_config->resolution.v() > 0.0);
-  CHECK(m_config->upper.x() > 0.0);
-  CHECK(m_config->upper.y() > 0.0);
+  RCSW_CHECK(m_config->resolution.v() > 0.0);
+  RCSW_CHECK(m_config->upper.x() > 0.0);
+  RCSW_CHECK(m_config->upper.y() > 0.0);
   return true;
 
 error:

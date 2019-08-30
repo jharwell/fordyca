@@ -153,7 +153,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              tv::acq_goal_type::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
+              fsm::foraging_acq_goal::type::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for new cache block drop");
     auto status = utils::new_cache_cache_proximity(controller,
                                                        *m_map,

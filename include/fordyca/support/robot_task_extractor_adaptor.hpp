@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <boost/variant/static_visitor.hpp>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
 

@@ -22,10 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 
 /*******************************************************************************

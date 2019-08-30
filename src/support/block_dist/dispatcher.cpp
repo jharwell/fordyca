@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_dist/dispatcher.hpp"
+
 #include <limits>
 
 #include "fordyca/support/block_dist/cluster_distributor.hpp"

@@ -22,6 +22,7 @@
  * Includes
  *****************************************************************************/
 #include "fordyca/repr/line_of_sight.hpp"
+
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/repr/base_cache.hpp"
 

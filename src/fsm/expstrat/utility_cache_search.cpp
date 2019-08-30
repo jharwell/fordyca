@@ -22,13 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/utility_cache_search.hpp"
+
 #include <numeric>
 
 #include "fordyca/controller/depth2/cache_site_selector.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/repr/base_block.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -50,11 +51,11 @@ void utility_cache_search::task_start(const rta::taskable_argument*) {
                                }) /
                boost::size(range);
   } else {
-    position = saa_subsystem()->sensing()->position();
+    position = saa()->sensing()->position();
   }
   controller::depth2::cache_site_selector sel(mc_matrix);
   if (auto site = sel(mc_store->caches(), mc_store->blocks(), position)) {
-    tasks::vector_argument v(vector_fsm::kCACHE_ARRIVAL_TOL, *site);
+    tasks::vector_argument v(kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);
   } else {
     localized_search::task_start(nullptr);

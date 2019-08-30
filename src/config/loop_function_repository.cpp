@@ -22,20 +22,22 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/loop_function_repository.hpp"
+
+#include "rcppsw/control/config/xml/waveform_parser.hpp"
+
 #include "fordyca/config/arena/arena_map_parser.hpp"
 #include "fordyca/config/caches/caches_parser.hpp"
 #include "fordyca/config/oracle/oracle_manager_parser.hpp"
 #include "fordyca/config/output_parser.hpp"
 #include "fordyca/config/tv/tv_manager_parser.hpp"
 #include "fordyca/config/visualization_parser.hpp"
-#include "rcppsw/control/config/xml/waveform_parser.hpp"
-#include "rcppsw/swarm/convergence/config/xml/convergence_parser.hpp"
+
+#include "cosm/convergence/config/xml/convergence_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, config);
-namespace rswc = rswarm::convergence;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -53,9 +55,9 @@ loop_function_repository::loop_function_repository(void) noexcept {
       oracle::oracle_manager_parser::kXMLRoot);
   parser_register<caches::caches_parser, caches::caches_config>(
       caches::caches_parser::kXMLRoot);
-  parser_register<rswc::config::xml::convergence_parser,
-                  rswc::config::convergence_config>(
-      rswc::config::xml::convergence_parser::kXMLRoot);
+  parser_register<cconvergence::config::xml::convergence_parser,
+                  cconvergence::config::convergence_config>(
+      cconvergence::config::xml::convergence_parser::kXMLRoot);
 }
 
 NS_END(config, fordyca);

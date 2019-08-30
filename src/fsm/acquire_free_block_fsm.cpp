@@ -23,14 +23,17 @@
  ******************************************************************************/
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
 
-#include "fordyca/controller/actuation_subsystem.hpp"
 #include "fordyca/controller/block_selector.hpp"
 #include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
 #include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/block_acq_validator.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/repr/base_block.hpp"
+
+#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,16 +45,16 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
     const controller::block_sel_matrix* const matrix,
-    controller::saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem* const saa,
     ds::dpo_store* const store,
-    std::unique_ptr<expstrat::base_expstrat> exp_behavior)
+    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
           saa,
           std::move(exp_behavior),
           acquire_goal_fsm::hook_list{
               .acquisition_goal =
-                  std::bind(&acquire_free_block_fsm::acq_goal_internal, this),
+                  std::bind(&acquire_free_block_fsm::acq_goal_internal),
               .goal_select =
                   std::bind(&acquire_free_block_fsm::block_select, this),
               .candidates_exist =
@@ -72,10 +75,20 @@ acquire_free_block_fsm::acquire_free_block_fsm(
       mc_store(store) {}
 
 /*******************************************************************************
+ * Non-Member Functions
+ ******************************************************************************/
+cfmetrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
+    void) {
+  return cfmetrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekBLOCK);
+} /* acq_goal_internal() */
+
+/*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool acquire_free_block_fsm::block_exploration_term_cb(void) const {
-  return saa_subsystem()->sensing()->block_detected();
+  return saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
+      "block");
 } /* block_exploration_term_cb() */
 
 bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
@@ -84,7 +97,8 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
               "No block detected after successful exploration?");
     return true;
   } else {
-    if (saa_subsystem()->sensing()->block_detected()) {
+    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
+            "block")) {
       return true;
     }
     ER_WARN("Robot arrived at goal, but no block was detected.");
@@ -92,14 +106,13 @@ bool acquire_free_block_fsm::block_acquired_cb(bool explore_result) const {
   }
 } /* block_acquired_cb() */
 
-boost::optional<acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
+boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
     block_select(void) const {
   controller::block_selector selector(mc_matrix);
 
-  if (auto best = selector(mc_store->blocks(),
-                           saa_subsystem()->sensing()->position())) {
+  if (auto best = selector(mc_store->blocks(), saa()->sensing()->position())) {
     return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->ent()->rloc(), vector_fsm::kBLOCK_ARRIVAL_TOL, best->ent()->id()));
+        best->ent()->rloc(), kBLOCK_ARRIVAL_TOL, best->ent()->id()));
   } else {
     return boost::optional<acquire_goal_fsm::candidate_type>();
   }
@@ -108,10 +121,6 @@ boost::optional<acquire_goal_fsm::candidate_type> acquire_free_block_fsm::
 bool acquire_free_block_fsm::candidates_exist(void) const {
   return !mc_store->blocks().empty();
 } /* candidates_exist() */
-
-acq_goal_type acquire_free_block_fsm::acq_goal_internal(void) const {
-  return acq_goal_type::ekBLOCK;
-} /* acq_goal() */
 
 bool acquire_free_block_fsm::block_acq_valid(const rmath::vector2d& loc,
                                              uint id) const {

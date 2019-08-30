@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/cell2D.hpp"
+
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
 

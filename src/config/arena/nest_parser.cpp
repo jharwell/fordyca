@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/arena/nest_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -49,8 +50,8 @@ void nest_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 bool nest_parser::validate(void) const {
-  CHECK(m_config->center.is_pd());
-  CHECK(m_config->dims.is_pd());
+  RCSW_CHECK(m_config->center.is_pd());
+  RCSW_CHECK(m_config->dims.is_pd());
   return true;
 
 error:

@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/arena/block_dist_parser.hpp"
+
 #include "rcppsw/utils/line_parser.hpp"
 
 /*******************************************************************************
@@ -56,13 +57,8 @@ void block_dist_parser::parse(const ticpp::Element& node) {
 } /* parse() */
 
 bool block_dist_parser::validate(void) const {
-  CHECK(true == m_powerlaw.validate());
-  CHECK(true == m_manifest.validate());
-  CHECK(true == m_redist_governor.validate());
-  return true;
-
-error:
-  return false;
+  return m_powerlaw.validate() && m_manifest.validate() &&
+         m_redist_governor.validate();
 } /* validate() */
 
 NS_END(arena, config, fordyca);

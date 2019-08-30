@@ -27,7 +27,8 @@
 #include <string>
 #include <list>
 
-#include "fordyca/metrics/spatial/grid2D_avg_metrics_collector.hpp"
+#include "rcppsw/metrics/spatial/grid2D_avg_metrics_collector.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +45,7 @@ NS_START(fordyca, metrics, caches);
  * @brief Collector for \ref location_metrics.
  */
 class location_metrics_collector final :
-    public spatial::grid2D_avg_metrics_collector {
+    public rmetrics::spatial::grid2D_avg_metrics_collector {
  public:
   /**
    * @param ofname The output file name.

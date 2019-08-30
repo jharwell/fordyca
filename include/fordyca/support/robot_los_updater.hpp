@@ -27,9 +27,10 @@
 #include <boost/variant/static_visitor.hpp>
 #include <limits>
 
+#include "rcppsw/er/client.hpp"
+
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
-#include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

@@ -1,7 +1,7 @@
 /**
- * @file swarm_pos2D_metrics_collector.cpp
+ * @file subsystem_fwd.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,30 +18,23 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
+#ifndef INCLUDE_FORDYCA_FSM_SUBSYSTEM_FWD_HPP_
+#define INCLUDE_FORDYCA_FSM_SUBSYSTEM_FWD_HPP_
+
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/spatial/swarm_pos2D_metrics_collector.hpp"
-#include "fordyca/metrics/spatial/swarm_dist2D_metrics.hpp"
+#include "rcppsw/rcppsw.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, metrics, spatial);
+NS_START(cosm, robots, footbot);
 
-/*******************************************************************************
- * Member Functions
- ******************************************************************************/
-void swarm_pos2D_metrics_collector::collect(
-    const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const swarm_dist2D_metrics&>(metrics);
-  inc_total_count();
+class footbot_saa_subsystem;
+class footbot_sensing_subsystem;
+class footbot_actuation_subsystem;
 
-  for (size_t i = 0; i < xsize(); ++i) {
-    for (size_t j = 0; j < ysize(); ++j) {
-      inc_cell_count(i, j, m.discrete_position2D() == rmath::vector2u(i, j));
-    } /* for(j..) */
-  }   /* for(i..) */
-} /* collect() */
+NS_END(footbot, robots, cosm);
 
-NS_END(spatial, metrics, fordyca);
+#endif /* INCLUDE_FORDYCA_FSM_SUBSYSTEM_FWD_HPP_ */

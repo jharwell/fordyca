@@ -22,12 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/oracle/tasking_oracle.hpp"
+
 #include <functional>
 
-#include "fordyca/config/oracle/tasking_oracle_config.hpp"
 #include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/polled_task.hpp"
+
+#include "fordyca/config/oracle/tasking_oracle_config.hpp"
 
 /*******************************************************************************
  * Namespaces

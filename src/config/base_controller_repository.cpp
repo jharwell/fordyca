@@ -22,24 +22,30 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/config/base_controller_repository.hpp"
-#include "fordyca/config/actuation_parser.hpp"
+
 #include "fordyca/config/exploration_parser.hpp"
 #include "fordyca/config/output_parser.hpp"
-#include "fordyca/config/sensing_parser.hpp"
+
+#include "cosm/subsystem/config/xml/actuation_subsystem2D_parser.hpp"
+#include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, config);
+namespace rrsconfig = csubsystem::config;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 base_controller_repository::base_controller_repository(void) {
   parser_register<output_parser, output_config>(output_parser::kXMLRoot);
-  parser_register<actuation_parser, actuation_config>(
-      actuation_parser::kXMLRoot);
-  parser_register<sensing_parser, sensing_config>(sensing_parser::kXMLRoot);
+  parser_register<rrsconfig::xml::actuation_subsystem2D_parser,
+                  rrsconfig::actuation_subsystem2D_config>(
+      rrsconfig::xml::actuation_subsystem2D_parser::kXMLRoot);
+  parser_register<rrsconfig::xml::sensing_subsystem2D_parser,
+                  rrsconfig::sensing_subsystem2D_config>(
+      rrsconfig::xml::sensing_subsystem2D_parser::kXMLRoot);
   parser_register<exploration_parser, exploration_config>(
       exploration_parser::kXMLRoot);
 }

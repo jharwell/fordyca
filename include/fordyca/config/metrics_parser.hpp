@@ -28,9 +28,10 @@
 #include <memory>
 #include <string>
 
-#include "fordyca/config/metrics_config.hpp"
-#include "fordyca/nsalias.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
+
+#include "fordyca/config/metrics_config.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces

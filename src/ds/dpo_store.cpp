@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/dpo_store.hpp"
+
 #include <boost/range/adaptor/map.hpp>
 #include <numeric>
 

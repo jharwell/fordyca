@@ -21,6 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/arena_map.hpp"
+
 #include <argos3/plugins/simulator/media/led_medium.h>
 
 #include "fordyca/config/arena/arena_map_config.hpp"

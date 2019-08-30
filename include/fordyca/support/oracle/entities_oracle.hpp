@@ -31,7 +31,7 @@
 #include <vector>
 #include <memory>
 
-#include "fordyca/nsalias.hpp"
+#include "fordyca/fordyca.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************

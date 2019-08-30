@@ -22,9 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/crw.hpp"
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
+
+#include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,35 +33,44 @@
 NS_START(fordyca, fsm, expstrat);
 
 /*******************************************************************************
+ * Constructors/Destructor
+ ******************************************************************************/
+crw::crw(const fsm::expstrat::foraging_expstrat::params* const c_params)
+    : crw(static_cast<crfootbot::footbot_saa_subsystem*>(c_params->saa)) {}
+
+crw::crw(crfootbot::footbot_saa_subsystem* saa)
+    : foraging_expstrat(saa),
+      ER_CLIENT_INIT("fordyca.fsm.expstrat.crw"),
+      m_tracker(saa->sensing()) {}
+
+/*******************************************************************************
  * General Member Functions
  ******************************************************************************/
 void crw::task_execute(void) {
-  saa_subsystem()->steer2D_force_calc().wander();
+  saa()->steer_force2D().accum(saa()->steer_force2D().wander());
 
-  if (auto obs = saa_subsystem()->sensing()->avg_obstacle_within_prox()) {
+  if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
     m_tracker.ca_enter();
-    saa_subsystem()->steer2D_force_calc().avoidance(*obs);
+    saa()->steer_force2D().accum(saa()->steer_force2D().avoidance(*obs));
 
     ER_DEBUG("Found threatening obstacle: %s@%f [%f]",
              obs->to_str().c_str(),
              obs->angle().value(),
              obs->length());
-    saa_subsystem()->actuation()->leds_set_color(rutils::color::kRED);
+    saa()->actuation()->leds()->set_color(-1, rutils::color::kRED);
   } else {
     m_tracker.ca_exit();
 
     ER_DEBUG("No threatening obstacle found");
-    saa_subsystem()->actuation()->leds_set_color(rutils::color::kMAGENTA);
-    rmath::vector2d force = saa_subsystem()->steer2D_force_calc().value();
+    saa()->actuation()->leds()->set_color(-1, rutils::color::kMAGENTA);
+    rmath::vector2d force = saa()->steer_force2D().value();
     /*
      * This can be 0 if the wander force is not active this timestep.
      */
     if (force.length() >= std::numeric_limits<double>::epsilon()) {
-      saa_subsystem()->steer2D_force_calc().value(
-          saa_subsystem()->steer2D_force_calc().value() * 0.7);
+      saa()->steer_force2D().value(saa()->steer_force2D().value() * 0.7);
     }
   }
-  saa_subsystem()->steer2D_force_apply();
 } /* task_execute() */
 
 NS_END(expstrat, fsm, fordyca);

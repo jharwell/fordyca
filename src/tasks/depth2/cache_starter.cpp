@@ -22,12 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/cache_starter.hpp"
+
 #include "fordyca/events/block_proximity.hpp"
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
-
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -35,8 +35,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks, depth2);
-using acq_goal_type = metrics::fsm::goal_acq_metrics::goal_type;
-using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -72,15 +70,16 @@ rtypes::timestep cache_starter::interface_time_calc(
 void cache_starter::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::block_to_cache_site_fsm*>(mechanism());
 
-  if (fsm->goal_acquired() &&
-      transport_goal_type::ekCACHE_SITE == fsm->block_transport_goal()) {
+  if (fsm->goal_acquired() && fsm::foraging_transport_goal::type::ekCACHE_SITE ==
+                                  fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
       interface_time_mark_finish(0);
       ER_TRACE("Interface finished at timestep %u", current_time().v());
     }
     ER_TRACE("Interface time: %u", interface_time(0).v());
-  } else if (transport_goal_type::ekCACHE_SITE == fsm->block_transport_goal()) {
+  } else if (fsm::foraging_transport_goal::type::ekCACHE_SITE ==
+             fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
       interface_time_mark_start(0);

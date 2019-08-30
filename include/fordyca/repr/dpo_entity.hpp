@@ -26,8 +26,9 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/nsalias.hpp"
-#include "rcppsw/swarm/pheromone_density.hpp"
+#include "fordyca/fordyca.hpp"
+
+#include "cosm/repr/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +53,7 @@ class dpo_entity {
  public:
   dpo_entity(void) = default;
   dpo_entity(const std::shared_ptr<T>& ent,
-             const rcppsw::swarm::pheromone_density& density)
+             const crepr::pheromone_density& density)
       : m_ent(ent), m_density(density) {}
 
   /**
@@ -69,17 +70,15 @@ class dpo_entity {
   T* ent(void) { return m_ent.get(); }
   const T* ent(void) const { return m_ent.get(); }
 
-  const rswarm::pheromone_density& density(void) const { return m_density; }
-  rswarm::pheromone_density& density(void) { return m_density; }
+  const crepr::pheromone_density& density(void) const { return m_density; }
+  crepr::pheromone_density& density(void) { return m_density; }
 
-  void density(const rswarm::pheromone_density& density) {
-    m_density = density;
-  }
+  void density(const crepr::pheromone_density& density) { m_density = density; }
 
  private:
   /* clang-format off */
-  std::shared_ptr<T>        m_ent;
-  rswarm::pheromone_density m_density;
+  std::shared_ptr<T>       m_ent;
+  crepr::pheromone_density m_density;
   /* clang-format on */
 };
 

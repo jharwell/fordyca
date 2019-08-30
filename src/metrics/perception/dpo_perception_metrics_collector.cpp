@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
+
 #include <numeric>
 
 #include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
