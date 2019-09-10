@@ -35,13 +35,13 @@ NS_START(fordyca, fsm);
  * @brief The tolerance within which a robot's location has to be in order to
  * be considered having arrived at the specified block's location.
  */
-constexpr static double kBLOCK_ARRIVAL_TOL = 0.02;
+static constexpr double kBLOCK_ARRIVAL_TOL = 0.02;
 
 /**
  * @brief The tolerance within which a robot's location has to be in order to
  * be considered having arrived at the specified cache's location.
  */
-constexpr static double kCACHE_ARRIVAL_TOL = 0.02;
+static constexpr double kCACHE_ARRIVAL_TOL = 0.02;
 
 /**
  * @brief The tolerance within which a robot's location has to be in order to
@@ -49,13 +49,13 @@ constexpr static double kCACHE_ARRIVAL_TOL = 0.02;
  * relaxed than the tolerance for cache arrivals, as we are creating a cache,
  * and things can be much more approximate.
  */
-constexpr static double kNEW_CACHE_ARRIVAL_TOL = 0.4;
+static constexpr double kNEW_CACHE_ARRIVAL_TOL = 0.4;
 
 /**
  * @brief The tolerance within which a robot's location has to be in order to
  * be considered to have arrived at the specified cache site.
  */
-constexpr static double kCACHE_SITE_ARRIVAL_TOL = 0.02;
+static constexpr double kCACHE_SITE_ARRIVAL_TOL = 0.02;
 
 NS_END(fordyca, fsm);
 

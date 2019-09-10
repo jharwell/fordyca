@@ -102,7 +102,7 @@ class cache_op_penalty_handler final
     ER_ASSERT(-1 != id,
               "%s not in cache?",
               controller.GetId().c_str());
-    ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
+    ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.entity_id(),
             id,
             t.v(),

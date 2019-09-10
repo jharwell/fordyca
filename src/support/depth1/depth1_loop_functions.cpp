@@ -33,8 +33,8 @@
 
 #include <boost/mpl/for_each.hpp>
 
-#include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
@@ -76,7 +76,7 @@ NS_START(detail);
 
 template <class ControllerType>
 struct d1_subtask_status_extractor
-    : boost::static_visitor<std::pair<bool, bool>> {
+    : public boost::static_visitor<std::pair<bool, bool>> {
   using controller_type = ControllerType;
 
   std::pair<bool, bool> operator()(const ControllerType* const c) const {
@@ -269,8 +269,8 @@ void depth1_loop_functions::oracle_init(void) {
     const auto& controller0 =
         dynamic_cast<controller::depth1::gp_mdpo_controller&>(
             robot0.GetControllableEntity().GetController());
-    auto* bigraph =
-        dynamic_cast<const rta::bi_tdgraph*>(controller0.executive()->graph());
+    auto* bigraph = dynamic_cast<const rta::ds::bi_tdgraph*>(
+        controller0.executive()->graph());
     oracle_manager()->tasking_oracle(
         std::make_unique<support::oracle::tasking_oracle>(&oraclep->tasking,
                                                           bigraph));
@@ -604,10 +604,14 @@ void depth1_loop_functions::static_cache_monitor(void) {
 } /* static_cache_monitor() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_LOOP_FUNCTIONS(depth1_loop_functions, "depth1_loop_functions");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
+
 NS_END(depth1, support, fordyca);

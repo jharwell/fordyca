@@ -90,8 +90,8 @@ class robot_configurer {
         std::bind(&TAggregator::task_finish_or_abort_cb,
                   m_agg,
                   std::placeholders::_1));
-    c->executive()->task_alloc_notify(
-        std::bind(&TAggregator::task_alloc_cb,
+    c->executive()->task_start_notify(
+        std::bind(&TAggregator::task_start_cb,
                   m_agg,
                   std::placeholders::_1,
                   std::placeholders::_2));

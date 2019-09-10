@@ -117,7 +117,7 @@ class unicell_entity : public base_entity {
       : base_entity(id), m_dim(dim), m_rloc(), m_dloc() {}
 
   template <typename T, typename = bool>
-  struct entity_is_movable : std::false_type {};
+  struct entity_is_movable : public std::false_type {};
 
   /**
    * @brief In order for a derived class to be considered movable and be able to
@@ -128,7 +128,7 @@ class unicell_entity : public base_entity {
   struct entity_is_movable<
       T,
       RCPPSW_SFINAE_TYPE(!std::is_same<decltype(T::kIsMovable), void>::value)>
-      : std::true_type {};
+      : public std::true_type {};
 
   /**
    * @brief SFINAE to allow only derived classes that mark themselves as movable

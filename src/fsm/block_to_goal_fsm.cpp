@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
-#include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/argument.hpp"
 
 #include "cosm/fsm/acquire_goal_fsm.hpp"
@@ -67,16 +67,16 @@ block_to_goal_fsm::block_to_goal_fsm(cfsm::acquire_goal_fsm* const goal_fsm,
 
 HFSM_STATE_DEFINE(block_to_goal_fsm, start, rpfsm::event_data* data) {
   if (rpfsm::event_type::ekNORMAL == data->type()) {
-    if (controller::foraging_signal::ekACQUIRE_FREE_BLOCK == data->signal() ||
-        controller::foraging_signal::ekACQUIRE_CACHED_BLOCK == data->signal()) {
+    if (fsm::foraging_signal::ekACQUIRE_FREE_BLOCK == data->signal() ||
+        fsm::foraging_signal::ekACQUIRE_CACHED_BLOCK == data->signal()) {
       internal_event(ekST_ACQUIRE_BLOCK);
-      return controller::foraging_signal::ekHANDLED;
+      return fsm::foraging_signal::ekHANDLED;
     }
   } else {
     ER_FATAL_SENTINEL("Unhandled child signal %d", data->signal());
-    return controller::foraging_signal::ekUNHANDLED;
+    return fsm::foraging_signal::ekUNHANDLED;
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 HFSM_STATE_DEFINE_ND(block_to_goal_fsm, acquire_block) {
   if (m_block_fsm->task_finished()) {
@@ -84,7 +84,7 @@ HFSM_STATE_DEFINE_ND(block_to_goal_fsm, acquire_block) {
   } else {
     m_block_fsm->task_execute();
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
@@ -95,17 +95,17 @@ HFSM_STATE_DEFINE_ND(block_to_goal_fsm, transport_to_goal) {
   } else {
     m_goal_fsm->task_execute();
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_pickup,
                   rpfsm::event_data* data) {
-  if (controller::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
+  if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     ER_DEBUG("Block pickup signal received");
     m_block_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
-    return controller::foraging_signal::ekHANDLED;
+    return fsm::foraging_signal::ekHANDLED;
   }
   /**
    * It is possible that robots can be waiting indefinitely for a block
@@ -118,43 +118,43 @@ HFSM_STATE_DEFINE(block_to_goal_fsm,
    * Similar things can happen for a cache to vanish while a robot is waiting to
    * pick up a block from it.
    */
-  if (controller::foraging_signal::ekBLOCK_VANISHED == data->signal() ||
-      controller::foraging_signal::ekCACHE_VANISHED == data->signal()) {
+  if (fsm::foraging_signal::ekBLOCK_VANISHED == data->signal() ||
+      fsm::foraging_signal::ekCACHE_VANISHED == data->signal()) {
     m_block_fsm->task_reset();
     internal_event(ekST_ACQUIRE_BLOCK);
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE(block_to_goal_fsm,
                   wait_for_block_drop,
                   rpfsm::event_data* data) {
   saa()->actuation()->actuator<ckin2D::governed_diff_drive>()->reset();
-  if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
+  if (fsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
     ER_DEBUG("Block drop signal received");
     internal_event(ekST_FINISHED);
-  } else if (controller::foraging_signal::ekBLOCK_PROXIMITY == data->signal()) {
+  } else if (fsm::foraging_signal::ekBLOCK_PROXIMITY == data->signal()) {
     ER_ASSERT(foraging_acq_goal::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on block proximity");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
-  } else if (controller::foraging_signal::ekCACHE_VANISHED == data->signal()) {
+  } else if (fsm::foraging_signal::ekCACHE_VANISHED == data->signal()) {
     ER_ASSERT(foraging_acq_goal::ekEXISTING_CACHE == acquisition_goal(),
               "Non-existing cache vanished? ");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
-  } else if (controller::foraging_signal::ekCACHE_PROXIMITY == data->signal()) {
+  } else if (fsm::foraging_signal::ekCACHE_PROXIMITY == data->signal()) {
     ER_ASSERT(foraging_acq_goal::ekNEW_CACHE == acquisition_goal() ||
                   foraging_acq_goal::ekCACHE_SITE == acquisition_goal(),
               "Bad goal on cache proxmity");
     m_goal_fsm->task_reset();
     internal_event(ekST_TRANSPORT_TO_GOAL);
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 RCSW_CONST HFSM_STATE_DEFINE_ND(block_to_goal_fsm, finished) {
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 /*******************************************************************************
@@ -258,8 +258,7 @@ void block_to_goal_fsm::task_start(const rta::taskable_argument* const arg) {
 }
 
 void block_to_goal_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::ekFSM_RUN,
-               rpfsm::event_type::ekNORMAL);
+  inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 NS_END(fsm, fordyca);

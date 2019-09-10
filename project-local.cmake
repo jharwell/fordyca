@@ -88,7 +88,7 @@ set(${target}_LIBRARY_DIRS
   ${cosm_LIBRARY_DIRS})
 
 # Qt not reliably available on MSI
-if (NOT BUILD_FOR_MSI)
+if (NOT BUILD_FOR_MSI AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
   set(${target}_LIBRARIES ${${target}_LIBRARIES}
     Qt5::Widgets
     Qt5::Core
@@ -99,7 +99,7 @@ endif()
 # Force failures at build time rather than runtime
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 
-if (BUILD_FOR_MSI)
+if (BUILD_FOR_MSI OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
   # For nlopt
   set(${target}_LIBRARY_DIRS ${${target}_LIBRARY_DIRS}
     ${LOCAL_INSTALL_PREFIX}/lib
@@ -127,6 +127,8 @@ target_include_directories(${target} SYSTEM PUBLIC
   ${Qt5Widgets_INCLUDE_DIRS}
   ${${target}_SYS_INCLUDE_DIRS}
   )
+set(CMAKE_CXX_STANDARD 17)
+
 target_link_libraries(${target} ${${target}_LIBRARIES})
 
 ################################################################################

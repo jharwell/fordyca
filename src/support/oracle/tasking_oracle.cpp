@@ -25,8 +25,8 @@
 
 #include <functional>
 
-#include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/ds/bi_tdgraph.hpp"
 #include "rcppsw/ta/polled_task.hpp"
 
 #include "fordyca/config/oracle/tasking_oracle_config.hpp"
@@ -41,7 +41,7 @@ NS_START(fordyca, support, oracle);
  ******************************************************************************/
 tasking_oracle::tasking_oracle(
     const config::oracle::tasking_oracle_config* const config,
-    const rta::bi_tdgraph* const graph)
+    const rta::ds::bi_tdgraph* const graph)
     : ER_CLIENT_INIT("fordyca.support.tasking_oracle"),
       mc_exec_ests(config->task_exec_ests),
       mc_int_ests(config->task_interface_ests) {

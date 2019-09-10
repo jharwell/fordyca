@@ -60,9 +60,9 @@ NS_START(depth0);
  * (i.e. it loops indefinitely).
  */
 class dpo_fsm final : public cfsm::util_hfsm,
-                     rer::client<dpo_fsm>,
-                     public cfmetrics::goal_acq_metrics,
-                     public block_transporter {
+                      public rer::client<dpo_fsm>,
+                      public cfmetrics::goal_acq_metrics,
+                      public block_transporter {
  public:
   dpo_fsm(const controller::block_sel_matrix* sel_matrix,
           crfootbot::footbot_saa_subsystem* saa,

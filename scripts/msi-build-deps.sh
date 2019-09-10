@@ -8,6 +8,7 @@
 # $1 - The directory to clone and build dependencies out of
 # $2 - The install prefix (things will be installed to the $MSICLUSTER directory
 #      under here).
+# $3 - How many cores to use when building
 #
 cd $1
 
@@ -21,13 +22,15 @@ cmake -DCMAKE_INSTALL_PREFIX=$2/$MSICLUSTER \
       -DNLOPT_GUILE=NO\
       -DNLOPT_SWIG=NO\
       ..
-make -j 8 && make install
+make -j $3 && make install
 
 cd ../..
 
 # Next, ARGoS
 git clone https://github.com/swarm-robotics/argos3.git
-cd argos3 && mkdir -p build && cd build
+cd argos3
+git checkout devel
+mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=$2/$MSICLUSTER \
       -DARGOS_BUILD_FOR=simulator \
@@ -36,5 +39,6 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DARGOS_DYNAMIC_LOADING=ON \
       -DARGOS_USE_DOUBLE=ON \
       -DARGOS_INSTALL_LDSOCONF=OFF \
+      -DARGOS_WITH_LUA=OFF\
       ../src
-make -j 8 && make doc && make install
+make -j $3 && make doc && make install

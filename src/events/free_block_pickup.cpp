@@ -37,7 +37,6 @@
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -46,6 +45,7 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
@@ -131,7 +131,7 @@ void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
@@ -161,7 +161,7 @@ void free_block_pickup::visit(ds::dpo_semantic_map& map) {
             cell.loc().to_str().c_str());
 
   ER_ASSERT(m_block->id() == cell.block()->id(),
-            "Pickup/cell block mismatch: %u vs %u",
+            "Pickup/cell block mismatch: %d vs %d",
             m_block->id(),
             cell.block()->id());
   /*
@@ -180,7 +180,7 @@ void free_block_pickup::visit(ds::dpo_semantic_map& map) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
@@ -325,12 +325,12 @@ void free_block_pickup::visit(tasks::depth1::harvester& task) {
 } /* visit() */
 
 void free_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 

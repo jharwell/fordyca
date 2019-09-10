@@ -52,8 +52,8 @@ class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator
   depth2_metrics_aggregator(const config::metrics_config* mconfig,
                             const std::string& output_root);
 
-  void task_alloc_cb(const rta::polled_task* task,
-                     const rta::bi_tab* tab);
+  void task_start_cb(const rta::polled_task* task,
+                     const rta::ds::bi_tab* tab);
   void task_finish_or_abort_cb(const rta::polled_task* task);
 
   /**

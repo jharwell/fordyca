@@ -62,8 +62,8 @@ class crw_fsm final : public cfsm::util_hfsm,
                       public cfmetrics::goal_acq_metrics,
                       public block_transporter {
  public:
-  explicit crw_fsm(crfootbot::footbot_saa_subsystem* saa,
-                   std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
+  crw_fsm(crfootbot::footbot_saa_subsystem* saa,
+          std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
 
   crw_fsm(const crw_fsm& fsm) = delete;
   crw_fsm& operator=(const crw_fsm& fsm) = delete;

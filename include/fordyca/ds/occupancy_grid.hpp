@@ -63,12 +63,12 @@ class occupancy_grid : public rer::client<occupancy_grid>,
   /**
    * @brief The index of the \ref crepr::pheromone_density layer.
    */
-  constexpr static uint kPheromone = 0;
+  static constexpr uint kPheromone = 0;
 
   /**
    * @brief The index of the \ref cell2D layer.
    */
-  constexpr static uint kCell = 1;
+  static constexpr uint kCell = 1;
 
   occupancy_grid(const config::perception::perception_config* c_config,
                  const std::string& robot_id);

@@ -51,6 +51,7 @@ build
 docs/html
 docs/latex
 ext/rcppsw
+ext/cosm
 node_modules
 
 # Runtime

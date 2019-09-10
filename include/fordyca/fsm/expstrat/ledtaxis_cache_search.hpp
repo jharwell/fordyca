@@ -50,8 +50,8 @@ class ledtaxis_cache_search : public foraging_expstrat,
  public:
   explicit ledtaxis_cache_search(const foraging_expstrat::params* const c_params)
       : ledtaxis_cache_search(c_params->saa, c_params->ledtaxis_target) {}
-  explicit ledtaxis_cache_search(crfootbot::footbot_saa_subsystem* saa,
-                                 const rutils::color& ledtaxis_target)
+  ledtaxis_cache_search(crfootbot::footbot_saa_subsystem* saa,
+                        const rutils::color& ledtaxis_target)
       : foraging_expstrat(saa),
         ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis_cache_search"),
         m_crw(saa),

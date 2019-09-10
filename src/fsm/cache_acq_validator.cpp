@@ -90,7 +90,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
-    ER_WARN("Cache%d invalid for acquisition: policy=%s, %d < %d",
+    ER_WARN("Cache%d invalid for acquisition: policy=%s, %u < %u",
             id,
             config.policy.c_str(),
             t.v(),
@@ -98,7 +98,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
     return false;
   } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {
-    ER_WARN("Cache%d invalid for acquisition: policy=%s, %zu < %d",
+    ER_WARN("Cache%d invalid for acquisition: policy=%s, %zu < %u",
             id,
             config.policy.c_str(),
             cache->n_blocks(),

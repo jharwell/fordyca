@@ -36,12 +36,12 @@
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -119,12 +119,12 @@ void block_vanished::visit(controller::depth0::omdpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::crw_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_VANISHED,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_VANISHED,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
@@ -173,12 +173,12 @@ void block_vanished::visit(tasks::depth1::harvester& task) {
 } /* visit() */
 
 void block_vanished::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_VANISHED,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_VANISHED,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_VANISHED,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 

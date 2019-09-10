@@ -141,7 +141,7 @@ XML configuration:
 - Required child attributes if present: none.
 - Required child tags if present: none.
 - Optional child attributes: [`update_exec_ests`, `update_interface_ests`,
-  `tab_init_method`]
+        `tab_init_method`, `alloc_policy`]
 - Optional child tags: none.
 
 XML configuration:
@@ -152,7 +152,8 @@ XML configuration:
     <task_executive
         update_exec_ests="false",
         update_interface_ests="false",
-        tab_init_method="root"/>
+        tab_init_method="root",
+        alloc_policy="random"/>
 ...
 </params>
 ```
@@ -167,12 +168,12 @@ XML configuration:
                             interface estimate for the task. Estimate is updated
                             on both abort and completion.
 
-- `tab_init_method` - When performing initial task allocation, an active Task
-                      Allocation Block (TAB), consisting of a root has and two
-                      sequentially interdependent subtasks has to be
-                      selected. This parameter controls the selection
-                      method. This tag is only required for depth2
-                      controllers. Valid values are:
+- `tab_init_method` - When performing initial task allocation, how should the
+                      initial Task Allocation Block (TAB), consisting of a root
+                      has and two sequentially interdependent subtasks, be
+                      selected. This tag is only required for depth2 controllers
+                      AND when `alloc_policy` is `matroid_stoch_nbhd`. Valid
+                      values are:
 
     - `root` - Use the root TAB as the initially active TAB.
 
@@ -182,46 +183,42 @@ XML configuration:
                     within the task decomposition graph that is passed to the
                     executive.
 
+- `alloc_policy` - When performing task allocation, how should tasks be
+                   selected?
+
+    - `random` - Choose a random task each time.
+    - `matroid_global` - A pure greedy matroid optimization approach.
+    - `matroid_stoch_nbhd` - A pure greedy matroid optimization approach within
+                             the neighborhood of the most recently executed task
+                             (max distance is 1).
 ## `task_alloc`
 
-XML configuration:
-
-- Required by: [depth1, depth2] controllers.
+- Required by: none. Used by all [depth1, depth2] controllers with the default
+               values shown below if it is omitted.
 - Required child attributes if present: none.
-- Required child tags if present: [`task_abort`, `task_partition`, `subtask_sel`].
+- Required child tags if present: [`task_abort`].
 - Optional child attributes: none.
-- Optional child tags: [`task_exec_estimates`, `tab_sel` (required by depth2
-  controllers)].
-
-XML configuration:
-
-```xml
+- Optional child tags: [`matroid_stoch_nbhd`, `task_exec_estimates`].
+```
 <params>
 ...
-<task_alloc>
-    <task_abort>
-    ...
-    </task_abort>
-    <task_partition>
-    ...
-    </task_partition>
-    <subtask_sel>
-    ...
-    </subtask_sel>
-    <task_exec_estimates>
-    ...
-    </task_exec_estimates>
-    <tab_sel>
-    ...
-    </tab_sel>
-
-</task_alloc>
+    <task_alloc>
+        <matroid_stoch_nbhd>
+        ...
+        </matroid_stoch_nbhd>
+        <task_exec_estimates>
+    	...
+    	</task_exec_estimates>
+        <task_abort>
+    	...
+    	</task_abort>
+    </task_alloc
 ...
 </params>
 ```
 Many child tags in `<task_alloc>` use sigmoid- based functions for choosing
 between alternatives, with the input src and sigmoid method varying. For such
-tags, all child attributes and tags are required.
+tags, all child attributes and tags are required unless specified otherwise.
 
 XML configuration:
 
@@ -257,7 +254,6 @@ XML configuration:
 - `gamma` - A scaling factor that is applied to the overall calculated
             probability.
 
-
 ### `task_abort`
 
 - Required by: [depth1, depth2] controllers.
@@ -271,7 +267,6 @@ XML configuration:
 XML configuration:
 
 ```xml
-
 <task_alloc>
     ...
     <task_abort>
@@ -285,79 +280,9 @@ XML configuration:
             <sigmoid_sel/>
         </src_sigmoid_sel>
     </task_abort>
-</task_alloc>
-...
-</params>
-```
-
-### `task_partition`
-
-- Required by: [depth1, depth2[] controllers.
-- Required child attributes if present: none.
-- Required child tags if present: `src_sigmoid_sel`.
-- Optional child attributes: [`always_partition`, `never_partition`].
-- Optional child tags: none.
-
-XML configuration:
-
-```xml
-<task_alloc>
-    ...
-    <task_partition
-        always_partition="false"
-        never_partition="false">
-        <src_sigmoid_sel
-            input_src="exec|interface">
-            <sigmoid_sel
-                method="pini2011">
-                <sigmoid reactivity="FLOAT"
-                         offset="FLOAT"
-                         gamma="FLOAT"/>
-            <sigmoid_sel/>
-        </src_sigmoid_sel>
-    </task_partition>
-</task_alloc>
-```
-
-- `always_partition` - If `true`, then robots will always choose to partition a
-                       task, given the chance. Default=`false`.
-
-- `never_partition` - If `true`, then robots will never choose to partition a
-                       task, given the chance. Default=`false`.
-
-`method` tag can be one of [`pini2011`] for performing the stochastic
-partitioning decision. Calculated once upon each task allocation, after the
-previous task is finished or aborted.
-
-### `subtask_sel`
-
-- Required by: [depth1, depth2] controllers.
-- Required child attributes if present: none.
-- Required child tags if present: `src_sigmoid_sel`.
-- Optional child attributes: none.
-- Optional child tags: none.
-
-XML configuration:
-
-```xml
-<task_alloc>
-    ...
-    <subtask_sel>
-        <src_sigmoid_sel
-            input_src="exec|interface">
-            <sigmoid_sel
-                method="harwell2018|random">
-                <sigmoid reactivity="FLOAT"
-                         offset="FLOAT"
-                         gamma="FLOAT"/>
-            <sigmoid_sel/>
-        </src_sigmoid_sel>
-    </subtask_sel>
     ...
 </task_alloc>
 ```
-`method` tag can be one of [`harwell2018`,`random`] to perform stochastic
-subtask selection if partitioning is employed.
 
 ### `task_exec_estimates`
 
@@ -399,7 +324,104 @@ XML configuration:
 - `alpha`- Parameter for exponential weighting of a moving time estimate of the
            true execution/interface time of a task. Must be < 1.0.
 
-### `tab_sel`
+### `matroid_stoch_nbhd`
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: [`task_abort`, `task_partition`, `subtask_sel`].
+- Optional child attributes: none.
+- Optional child tags: [`task_exec_estimates`, `tab_sel` (required by depth2
+  controllers)].
+
+XML configuration:
+
+```xml
+<task_alloc>
+    ...
+    <matroid_stoch_nbhd>
+    	<task_partition>
+    	...
+    	</task_partition>
+    	<subtask_sel>
+    	...
+    	</subtask_sel>
+    	<tab_sel>
+    	...
+    	</tab_sel>
+    </matroid_stoch_nbhd>
+    ...
+</task_alloc>
+```
+#### `task_partition`
+
+- Required by: [depth1, depth2[] controllers.
+- Required child attributes if present: none.
+- Required child tags if present: `src_sigmoid_sel`.
+- Optional child attributes: [`always_partition`, `never_partition`].
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<matroid_stoch_nbhd>
+    ...
+    <task_partition
+        always_partition="false"
+        never_partition="false">
+        <src_sigmoid_sel
+            input_src="exec|interface">
+            <sigmoid_sel
+                method="pini2011">
+                <sigmoid reactivity="FLOAT"
+                         offset="FLOAT"
+                         gamma="FLOAT"/>
+            <sigmoid_sel/>
+        </src_sigmoid_sel>
+    </task_partition>
+</matroid_stoch_nbhd>
+```
+
+- `always_partition` - If `true`, then robots will always choose to partition a
+                       task, given the chance. Default=`false`.
+
+- `never_partition` - If `true`, then robots will never choose to partition a
+                       task, given the chance. Default=`false`.
+
+`method` tag can be one of [`pini2011`] for performing the stochastic
+partitioning decision. Calculated once upon each task allocation, after the
+previous task is finished or aborted.
+
+#### `subtask_sel`
+
+- Required by: [depth1, depth2] controllers.
+- Required child attributes if present: none.
+- Required child tags if present: `src_sigmoid_sel`.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+XML configuration:
+
+```xml
+<matroid_stoch_nbhd>
+    ...
+    <subtask_sel>
+        <src_sigmoid_sel
+            input_src="exec|interface">
+            <sigmoid_sel
+                method="harwell2018|random">
+                <sigmoid reactivity="FLOAT"
+                         offset="FLOAT"
+                         gamma="FLOAT"/>
+            <sigmoid_sel/>
+        </src_sigmoid_sel>
+    </subtask_sel>
+    ...
+</matroid_stoch_nbhd>
+```
+`method` tag can be one of [`harwell2018`,`random`] to perform stochastic
+subtask selection if partitioning is employed.
+
+#### `tab_sel`
 
 - Required by: Depth2 controllers.
 - Required child attributes if present: `src_sigmoid_sel`.
@@ -410,7 +432,7 @@ XML configuration:
 XML configuration:
 
 ```xml
-<task_alloc>
+<matroid_stoch_nbhd>
     ...
     <tab_sel>
         <src_sigmoid_sel
@@ -424,7 +446,7 @@ XML configuration:
         </src_sigmoid_sel>
     </tab_sel>
     ...
-</task_alloc>
+</matroid_stoch_nbhd>
 ```
 
 `method` tag that can be one of [`harwell2019`].
@@ -454,7 +476,6 @@ XML configuration:
 ...
 </params>
 ```
-
 `nest` - The location of the nest.
 
 ### `block_priorities`

@@ -110,7 +110,7 @@ class block_vanished : public rer::client<block_vanished> {
   void dispatch_free_block_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  uint m_block_id;
+  int m_block_id;
   /* clang-format on */
 };
 

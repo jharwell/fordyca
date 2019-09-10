@@ -37,11 +37,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta {
-class bi_tdgraph;
+namespace rcppsw::ta {
 class bi_tdgraph_executive;
 class polled_task;
-}} // namespace rcppsw::ta
+namespace ds {
+class bi_tdgraph;
+} /* namespace ds */
+} // namespace rcppsw::ta
 
 NS_START(fordyca);
 namespace config {
@@ -67,7 +69,7 @@ class tasking_oracle final : public rer::client<tasking_oracle> {
   using variant_type = boost::variant<rta::time_estimate>;
 
   tasking_oracle(const config::oracle::tasking_oracle_config* config,
-                 const rta::bi_tdgraph* graph);
+                 const rta::ds::bi_tdgraph* graph);
 
   /**
    * @brief Ask the oracle something.

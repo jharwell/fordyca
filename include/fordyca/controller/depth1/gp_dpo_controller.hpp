@@ -37,12 +37,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta {
+namespace rcppsw::ta {
 class bi_tdgraph_executive;
-class bi_tab;
 class executable_task;
 class polled_task;
-}}
+namespace ds {
+class bi_tab;
+} /* namespace ds */
+}
 
 NS_START(fordyca);
 
@@ -116,7 +118,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  const rta::bi_tab* active_tab(void) const RCSW_PURE;
+  const rta::ds::bi_tab* active_tab(void) const RCSW_PURE;
 
   /*
    * Public to setup metric collection from tasks.
@@ -175,13 +177,13 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void task_abort_cb(const rta::polled_task*);
 
   /**
-   * @brief Callback for task alloc. Needed to reset the task state of the
+   * @brief Callback for task start. Needed to reset the task state of the
    * controller (not the task, which is handled by the executive) in the case
    * that the previous task was aborted. Not reseting this results in erroneous
    * handling of the newly allocated task as if it was aborted by the loop
    * functions, resulting in inconsistent state with the robot's executive.
    */
-  void task_alloc_cb(const rta::polled_task*);
+  void task_start_cb(const rta::polled_task*);
 
  private:
   void private_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;

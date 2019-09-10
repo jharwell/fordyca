@@ -36,12 +36,12 @@
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
@@ -116,7 +116,7 @@ void nest_block_drop::visit(controller::depth0::crw_controller& controller) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::crw_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
@@ -143,7 +143,7 @@ void nest_block_drop::visit(controller::depth0::odpo_controller& controller) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
@@ -225,12 +225,12 @@ void nest_block_drop::visit(tasks::depth1::collector& task) {
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 

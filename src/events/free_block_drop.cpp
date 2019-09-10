@@ -35,12 +35,12 @@
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
@@ -243,7 +243,7 @@ void free_block_drop::visit(tasks::depth2::cache_finisher& task) {
 } /* visit() */
 
 void free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_DROP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 

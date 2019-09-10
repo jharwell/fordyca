@@ -54,8 +54,7 @@ collector::collector(const rta::config::task_alloc_config* const config,
  * Member Functions
  ******************************************************************************/
 void collector::task_start(const rta::taskable_argument* const) {
-  foraging_signal_argument a(
-      controller::foraging_signal::ekACQUIRE_CACHED_BLOCK);
+  foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_CACHED_BLOCK);
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 

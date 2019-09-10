@@ -32,8 +32,8 @@
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
 #include "rcppsw/mpl/typelist.hpp"
-#include "rcppsw/ta/bi_tab.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/ds/bi_tab.hpp"
 
 #include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
@@ -166,8 +166,8 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
           dynamic_cast<const rmetrics::tasks::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-void depth1_metrics_aggregator::task_alloc_cb(const rta::polled_task* const,
-                                              const rta::bi_tab* const tab) {
+void depth1_metrics_aggregator::task_start_cb(const rta::polled_task* const,
+                                              const rta::ds::bi_tab* const tab) {
   /*
    * Depth [0,1,2] metrics aggregators are registered on the same executive,
    * so this function will be called for the task allocations for any depth,
@@ -177,6 +177,6 @@ void depth1_metrics_aggregator::task_alloc_cb(const rta::polled_task* const,
     return;
   }
   collect("tasks::tab::generalist", *tab);
-} /* task_alloc_cb() */
+} /* task_start_cb() */
 
 NS_END(depth1, support, fordyca);

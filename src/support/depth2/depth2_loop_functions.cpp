@@ -34,8 +34,8 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/ds/type_map.hpp"
-#include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/output_config.hpp"
@@ -433,10 +433,14 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
 } /* cache_creation_handle() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_LOOP_FUNCTIONS(depth2_loop_functions, "depth2_loop_functions");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
+
 NS_END(depth2, support, fordyca);

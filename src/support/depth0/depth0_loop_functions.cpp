@@ -317,10 +317,14 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
 } /* robot_post_step() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_LOOP_FUNCTIONS(depth0_loop_functions, "depth0_loop_functions");
-#pragma clang diagnostic pop;
+
+RCPPSW_WARNING_DISABLE_POP()
+
 NS_END(depth0, support, fordyca);

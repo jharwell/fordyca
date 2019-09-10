@@ -67,10 +67,14 @@ void gp_omdpo_controller::oracle_init(
 } /* oracle_init() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(gp_omdpo_controller, "gp_omdpo_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
+
 NS_END(depth1, controller, fordyca);

@@ -68,6 +68,13 @@ git checkout devel
 git submodule update --init --recursive --remote
 cd ..
 
+# Bootstrap cosm
+git clone https://github.com/swarm-robotics/cosm.git
+cd cosm
+git checkout devel
+git submodule update --init --recursive --remote
+cd ..
+
 # Bootstrap fordyca
 git clone https://github.com/swarm-robotics/fordyca.git
 cd fordyca
@@ -76,7 +83,9 @@ git submodule update --init --recursive --remote
 npm install
 
 rm -rf ext/rcppsw
+rm -rf ext/cosm
 ln -s $1/rcppsw ext/rcppsw
+ln -s $1/cosm ext/cosm
 
 # Build fordyca and documentation
 mkdir -p build && cd build

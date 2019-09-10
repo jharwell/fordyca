@@ -165,7 +165,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
    * pick a different block than the one that got it into this predicament, and
    * the system will be able to continue profitably.
    */
-  constexpr static uint kPICKUP_TIMEOUT = 100;
+  static constexpr uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
   HFSM_STATE_INHERIT(cfsm::util_hfsm,

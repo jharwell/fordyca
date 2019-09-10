@@ -104,7 +104,7 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
               "Cell@%s not in HAS_BLOCK state",
               block->dloc().to_str().c_str());
     ER_ASSERT(cell.block()->id() == block->id(),
-              "Cell@%s has wrong block ID (%u vs %u)",
+              "Cell@%s has wrong block ID (%d vs %d)",
               block->dloc().to_str().c_str(),
               block->id(),
               cell.block()->id());

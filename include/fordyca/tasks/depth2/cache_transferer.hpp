@@ -48,8 +48,8 @@ NS_START(fordyca, tasks, depth2);
  * one at each cache it interacts with.
  */
 class cache_transferer final : public foraging_task,
-                         public events::existing_cache_interactor,
-                         rer::client<cache_transferer> {
+                               public events::existing_cache_interactor,
+                               public rer::client<cache_transferer> {
  public:
   cache_transferer(const struct rta::config::task_alloc_config* config,
                    std::unique_ptr<rta::taskable> mechanism);

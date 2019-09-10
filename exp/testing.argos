@@ -48,7 +48,8 @@
         <task_executive
             update_exec_ests="true"
             update_interface_ests="true"
-            tab_init_method="max_depth"
+            tab_init_policy="max_depth"
+            alloc_policy="matroid_stoch_nbhd"
             />
         <task_alloc>
           <task_abort>
@@ -62,6 +63,19 @@
               </sigmoid_sel>
               </src_sigmoid_sel>
           </task_abort>
+          <task_exec_estimates
+              seed_enabled="true"
+              generalist="2000:4000"
+              collector="1000:2000"
+              harvester="1000:2000"
+              cache_starter="1000:2000"
+              cache_finisher="1000:2000"
+              cache_collector="1000:2000"
+              cache_transferer="1000:2000">
+            <ema alpha="0.8"/>
+          </task_exec_estimates>
+
+          <matroid_stoch_nbhd>
           <task_partition
               always_partition="true"
               never_partition="false">
@@ -88,17 +102,6 @@
               </sigmoid_sel>
             </src_sigmoid_sel>
           </subtask_sel>
-          <task_exec_estimates
-              seed_enabled="true"
-              generalist="2000:4000"
-              collector="1000:2000"
-              harvester="1000:2000"
-              cache_starter="1000:2000"
-              cache_finisher="1000:2000"
-              cache_collector="1000:2000"
-              cache_transferer="1000:2000">
-            <ema alpha="0.8"/>
-          </task_exec_estimates>
           <tab_sel>
             <src_sigmoid_sel
                 input_src="exec">
@@ -111,6 +114,7 @@
               </sigmoid_sel>
             </src_sigmoid_sel>
           </tab_sel>
+          </matroid_stoch_nbhd>
         </task_alloc>
         <block_sel_matrix
               nest="6, 3">

@@ -28,12 +28,12 @@
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/repr/base_cache.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
@@ -126,7 +126,7 @@ void cache_proximity::visit(tasks::depth2::cache_starter& task) {
 } /* visit() */
 
 void cache_proximity::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekCACHE_PROXIMITY,
+  fsm.inject_event(fsm::foraging_signal::ekCACHE_PROXIMITY,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 

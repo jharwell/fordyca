@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,24 +57,23 @@ HFSM_STATE_DEFINE(dpo_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
   if (rpfsm::event_type::ekNORMAL == data->type()) {
     internal_event(ekST_BLOCK_TO_NEST);
-    return controller::foraging_signal::ekHANDLED;
+    return fsm::foraging_signal::ekHANDLED;
   }
   if (rpfsm::event_type::ekCHILD == data->type()) {
-    if (controller::foraging_signal::ekLEFT_NEST == data->signal()) {
+    if (fsm::foraging_signal::ekLEFT_NEST == data->signal()) {
       internal_event(ekST_BLOCK_TO_NEST);
-      return controller::foraging_signal::ekHANDLED;
+      return fsm::foraging_signal::ekHANDLED;
     }
   }
   ER_FATAL_SENTINEL("Unhandled signal");
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
-  if (nullptr != data &&
-      controller::foraging_signal::ekFSM_RUN != data->signal() &&
+  if (nullptr != data && fsm::foraging_signal::ekRUN != data->signal() &&
       rpfsm::event_signal::ekIGNORED != data->signal()) {
     m_block_fsm.inject_event(data->signal(), rpfsm::event_type::ekNORMAL);
-    return controller::foraging_signal::ekHANDLED;
+    return fsm::foraging_signal::ekHANDLED;
   }
   if (m_block_fsm.task_finished()) {
     m_block_fsm.task_reset();
@@ -82,7 +81,7 @@ HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
   } else {
     m_block_fsm.task_execute();
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 /*******************************************************************************
@@ -116,8 +115,7 @@ void dpo_fsm::init(void) {
 } /* init() */
 
 void dpo_fsm::run(void) {
-  inject_event(controller::foraging_signal::ekFSM_RUN,
-               rpfsm::event_type::ekNORMAL);
+  inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* run() */
 
 NS_END(depth0, fsm, fordyca);

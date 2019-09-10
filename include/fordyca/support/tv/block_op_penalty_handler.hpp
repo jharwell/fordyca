@@ -97,7 +97,7 @@ class block_op_penalty_handler final
     int id = penalty_id_calc(controller, src, cache_prox);
     rtypes::timestep orig_duration = penalty_calc(t);
     rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
-    ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%d src=%d",
+    ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
             id,
             t.v(),

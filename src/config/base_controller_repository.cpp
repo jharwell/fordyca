@@ -33,21 +33,31 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, config);
-namespace rrsconfig = csubsystem::config;
+namespace csconfig = csubsystem::config;
+namespace cscxml = csconfig::xml;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 base_controller_repository::base_controller_repository(void) {
   parser_register<output_parser, output_config>(output_parser::kXMLRoot);
-  parser_register<rrsconfig::xml::actuation_subsystem2D_parser,
-                  rrsconfig::actuation_subsystem2D_config>(
-      rrsconfig::xml::actuation_subsystem2D_parser::kXMLRoot);
-  parser_register<rrsconfig::xml::sensing_subsystem2D_parser,
-                  rrsconfig::sensing_subsystem2D_config>(
-      rrsconfig::xml::sensing_subsystem2D_parser::kXMLRoot);
+  parser_register<cscxml::actuation_subsystem2D_parser,
+                  csconfig::actuation_subsystem2D_config>(
+      cscxml::actuation_subsystem2D_parser::kXMLRoot);
+  parser_register<cscxml::sensing_subsystem2D_parser,
+                  csconfig::sensing_subsystem2D_config>(
+      cscxml::sensing_subsystem2D_parser::kXMLRoot);
   parser_register<exploration_parser, exploration_config>(
       exploration_parser::kXMLRoot);
+  parser_find<cscxml::sensing_subsystem2D_parser>(
+      cscxml::sensing_subsystem2D_parser::kXMLRoot)
+      ->ground_detection_add("nest");
+  parser_find<cscxml::sensing_subsystem2D_parser>(
+      cscxml::sensing_subsystem2D_parser::kXMLRoot)
+      ->ground_detection_add("block");
+  parser_find<cscxml::sensing_subsystem2D_parser>(
+      cscxml::sensing_subsystem2D_parser::kXMLRoot)
+      ->ground_detection_add("cache");
 }
 
 NS_END(config, fordyca);

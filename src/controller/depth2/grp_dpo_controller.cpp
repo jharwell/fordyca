@@ -95,7 +95,7 @@ void grp_dpo_controller::private_init(
    * Set task alloction callback, rebind task abort callback (original was lost
    * when we replaced the executive).
    */
-  executive()->task_alloc_notify(std::bind(&grp_dpo_controller::task_alloc_cb,
+  executive()->task_start_notify(std::bind(&grp_dpo_controller::task_start_cb,
                                            this,
                                            std::placeholders::_1,
                                            std::placeholders::_2));
@@ -103,8 +103,8 @@ void grp_dpo_controller::private_init(
       &grp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* private_init() */
 
-void grp_dpo_controller::task_alloc_cb(const rta::polled_task* const task,
-                                       const rta::bi_tab* const) {
+void grp_dpo_controller::task_start_cb(const rta::polled_task* const task,
+                                       const rta::ds::bi_tab* const) {
   /**
    * @brief Callback for task alloc. Needed to reset the task state of the
    * controller (not the task, which is handled by the executive) in the case
@@ -137,12 +137,15 @@ void grp_dpo_controller::task_alloc_cb(const rta::polled_task* const task,
 } /* task_alloc_cb() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(grp_dpo_controller,
                     "grp_dpo_controller"); // NOLINT
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(depth2, controller, fordyca);

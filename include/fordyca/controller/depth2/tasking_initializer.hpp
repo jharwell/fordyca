@@ -66,11 +66,11 @@ class tasking_initializer : public depth1::tasking_initializer,
  protected:
   tasking_map depth2_tasks_create(
       const config::depth2::controller_repository& config_repo,
-      rta::bi_tdgraph* graph) RCSW_COLD;
+      rta::ds::bi_tdgraph* graph) RCSW_COLD;
 
   void depth2_exec_est_init(const config::depth2::controller_repository& config_repo,
                             const tasking_map& map,
-                            rta::bi_tdgraph* graph) RCSW_COLD;
+                            rta::ds::bi_tdgraph* graph) RCSW_COLD;
 };
 
 NS_END(depth2, controller, fordyca);

@@ -28,7 +28,7 @@
 #include "rcppsw/ta/taskable.hpp"
 #include "rcppsw/ta/taskable_argument.hpp"
 
-#include "fordyca/controller/foraging_signal.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,13 +71,13 @@ class vector_argument : public rta::taskable_argument {
  */
 class foraging_signal_argument : public rta::taskable_argument {
  public:
-  explicit foraging_signal_argument(controller::foraging_signal::type s)
+  explicit foraging_signal_argument(fsm::foraging_signal::type s)
       : m_signal(s) {}
 
-  controller::foraging_signal::type signal(void) const { return m_signal; }
+  fsm::foraging_signal::type signal(void) const { return m_signal; }
 
  private:
-  controller::foraging_signal::type m_signal;
+  fsm::foraging_signal::type m_signal;
 };
 
 NS_END(tasks, fordyca);

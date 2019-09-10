@@ -31,9 +31,9 @@
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
@@ -108,12 +108,12 @@ void cache_vanished::visit(tasks::depth1::harvester& task) {
 } /* visit() */
 
 void cache_vanished::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekCACHE_VANISHED,
+  fsm.inject_event(fsm::foraging_signal::ekCACHE_VANISHED,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekCACHE_VANISHED,
+  fsm.inject_event(fsm::foraging_signal::ekCACHE_VANISHED,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 

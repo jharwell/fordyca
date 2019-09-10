@@ -18,44 +18,54 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_SIGNAL_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_SIGNAL_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_FORAGING_SIGNAL_HPP_
+#define INCLUDE_FORDYCA_FSM_FORAGING_SIGNAL_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/fsm/event.hpp"
-
 #include "fordyca/fordyca.hpp"
+
+#include "cosm/fsm/util_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class foraging_signal
- * @ingroup fordyca controller
+ * @ingroup fordyca fsm
  *
- * @brief Signals that sub-states can return in order to notify their super
- * states that a condition that they do not know how to handle has arisen.
+ * @brief Signals that FSMs can use to communicate between sub/super states, and
+ * that can be used to direct them in some way.
  */
-class foraging_signal : public rpfsm::event_signal {
+class foraging_signal : public cfsm::util_signal {
  public:
   enum type {
     /**
-     * The signal sent to FSMs during nominal operation.
+     * @brief A robot has picked up a block
      */
-    ekFSM_RUN = rpfsm::event_signal::ekEXTERNAL_SIGNALS,
-    ekBLOCK_PICKUP, /// A robot has picked up a block
-    ekBLOCK_DROP,   /// A robot has dropped a block in {cache, nest, arena}
-    ekLEFT_NEST,    /// A robot has left the nest
-    ekENTERED_NEST, /// A robot has entered the nest
-    ekACQUIRE_FREE_BLOCK, /// Direct a robot to acquire a free block in the arena
-    ekACQUIRE_CACHED_BLOCK, /// Direct a robot to acquire a block from a cache.
+    ekBLOCK_PICKUP = cfsm::util_signal::type::ekEXTERNAL_SIGNALS,
+
+    /**
+     * @brief A robot has dropped a block in {cache, nest, arena}
+     */
+    ekBLOCK_DROP,
+
+    /**
+     * @brief Direct a robot to acquire a free block in the arena
+     */
+    ekACQUIRE_FREE_BLOCK,
+
+    /**
+     * @brief Direct a robot to acquire a block from a cache.
+     */
+    ekACQUIRE_CACHED_BLOCK,
+
     /**
      * @brief The block a robot was waiting to pickup from has vanished (see
      * #411).
@@ -83,4 +93,4 @@ class foraging_signal : public rpfsm::event_signal {
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_SIGNAL_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_FORAGING_SIGNAL_HPP_ */

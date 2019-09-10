@@ -35,7 +35,6 @@
 #include "fordyca/controller/depth2/grp_odpo_controller.hpp"
 #include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -44,6 +43,7 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
@@ -424,12 +424,12 @@ void cached_block_pickup::visit(tasks::depth1::collector& task) {
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::ekBLOCK_PICKUP,
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 

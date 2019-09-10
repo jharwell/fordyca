@@ -37,11 +37,11 @@ anywhere), with the following arguments:
 
 - 1st arg: Is the root directory for the project (all repos will be cloned/built
   in here, and it *must* be an absolute path).
-- 2nd arg is `YES` if you want to install ARGoS system wide (you probably do)
+- 2nd arg: `YES` if you want to install ARGoS system wide (you probably do)
   and `NO` otherwise.
-- 3rd arg is the location ARGoS should be installed into, and 4th arg is the \#
-  of cores to use when building ARGoS/FORDYCA (should be set to \# cores on your
-  machine).
+- 3rd arg: Location ARGoS should be installed into
+- 4th arg: The \# of cores to use when building ARGoS/FORDYCA (should be set to
+  \# cores on your machine).
 
 For example:
 
@@ -100,6 +100,20 @@ speedup you will get. YMMV.
 are only needed if you are running experiments which utilize those
 sensors/actuators, otherwise they slow things down a *LOT* with large swarms
 (which is why you are compiling with optimizations on in the first place).
+
+# Build Notes
+
+- If you do a build with the intel compiler toolchain, then Qt graphical
+  displays are disabled (cmake 3.10 does not correctly handle the icpc for
+  C++17).
+
+- Whatever compiler you use to build FORDYCA *should* be the same compiler that
+  you use to build ARGoS, otherwise ARGoS will be unable to load
+  `libfordyca.so`. Why? Because the ABI compatability documentation between icpc
+  and gcc/clang LIES when it promises compability (has to do with ARGoS using
+  dlopen() and C++ name mangling I *think*). gcc and clang interoperability
+  sometimes is OK (i.e. build ARGoS with one, and then build FORDYCA with the
+  other), depending on the versions used.
 
 # Viewing The Documentation
 

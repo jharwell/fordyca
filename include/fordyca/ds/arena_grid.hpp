@@ -53,7 +53,7 @@ class arena_grid : public rds::stacked_grid<arena_layer_stack> {
   using view = rds::base_grid2D<ds::cell2D>::grid_view;
   using const_view = rds::base_grid2D<ds::cell2D>::const_grid_view;
 
-  constexpr static size_t kCell = 0;
+  static constexpr size_t kCell = 0;
 
   /**
    * @param resolution The arena resolution (i.e. what is the size of 1 cell in

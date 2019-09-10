@@ -63,8 +63,8 @@ class grp_dpo_controller : public depth1::gp_dpo_controller,
   void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
  private:
-  void task_alloc_cb(const rta::polled_task* task,
-                     const rta::bi_tab*);
+  void task_start_cb(const rta::polled_task* task,
+                     const rta::ds::bi_tab*);
   void private_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 
 

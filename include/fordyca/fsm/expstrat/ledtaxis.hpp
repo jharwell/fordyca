@@ -50,8 +50,8 @@ class ledtaxis : public foraging_expstrat,
  public:
   explicit ledtaxis(const foraging_expstrat::params* const c_params)
       : ledtaxis(c_params->saa, c_params->ledtaxis_target) {}
-  explicit ledtaxis(crfootbot::footbot_saa_subsystem* saa,
-                    const rutils::color& target);
+  ledtaxis(crfootbot::footbot_saa_subsystem* saa,
+           const rutils::color& target);
 
   ~ledtaxis(void) override = default;
   ledtaxis(const ledtaxis&) = delete;

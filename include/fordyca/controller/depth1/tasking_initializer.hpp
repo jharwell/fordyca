@@ -35,11 +35,13 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta {
+namespace rcppsw::ta {
 class polled_task;
 class bi_tdgraph_executive;
+namespace ds {
 class bi_tdgraph;
-}}
+} /* namespace ds */
+}
 NS_START(fordyca);
 namespace config {
 struct oracle_config;
@@ -95,11 +97,11 @@ class tasking_initializer : public rer::client<tasking_initializer> {
 
   RCSW_COLD tasking_map depth1_tasks_create(
       const config::depth1::controller_repository& config_repo,
-      rta::bi_tdgraph* graph);
+      rta::ds::bi_tdgraph* graph);
   RCSW_COLD void depth1_exec_est_init(
       const config::depth1::controller_repository& config_repo,
       const tasking_map& map,
-      rta::bi_tdgraph* graph);
+      rta::ds::bi_tdgraph* graph);
   const class cache_sel_matrix* cache_sel_matrix(void) const { return mc_csel_matrix; }
 
  private:

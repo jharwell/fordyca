@@ -51,7 +51,8 @@ using configurer_map_type = rds::type_map<
  */
 class robot_configurer_adaptor {
  public:
-  robot_configurer_adaptor(controller::base_controller* const c) : controller(c) {}
+  explicit robot_configurer_adaptor( controller::base_controller* const c)
+      : controller(c) {}
 
   void operator()(robot_configurer<controller::depth0::crw_controller>& ) const {}
 

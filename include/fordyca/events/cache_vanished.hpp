@@ -91,7 +91,7 @@ class cache_vanished : public rer::client<cache_vanished> {
  private:
   /* clang-format off */
   void dispatch_cache_interactor(tasks::base_foraging_task* task);
-  uint m_cache_id;
+  int m_cache_id;
   /* clang-format on */
 };
 

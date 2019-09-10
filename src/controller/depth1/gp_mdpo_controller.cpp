@@ -117,10 +117,14 @@ const mdpo_perception_subsystem* gp_mdpo_controller::mdpo_perception(void) const
 } /* perception() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(gp_mdpo_controller, "gp_mdpo_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
+
 NS_END(depth1, controller, fordyca);

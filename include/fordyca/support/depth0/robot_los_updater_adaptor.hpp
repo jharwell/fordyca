@@ -52,7 +52,8 @@ using los_updater_map_type = rds::type_map<
  */
 class robot_los_updater_adaptor {
  public:
-  robot_los_updater_adaptor(controller::base_controller* const c) : controller(c) {}
+  explicit robot_los_updater_adaptor(controller::base_controller* const c)
+      : controller(c) {}
 
   void operator()(robot_los_updater<controller::depth0::crw_controller>& ) const {}
 

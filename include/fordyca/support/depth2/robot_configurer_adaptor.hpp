@@ -54,8 +54,8 @@ using configurer_map_type = rds::type_map<
  */
 class robot_configurer_adaptor {
  public:
-  robot_configurer_adaptor(controller::base_controller* const c) : controller(c) {}
-
+  explicit robot_configurer_adaptor(controller::base_controller* const c)
+      : controller(c) {}
 
   template<typename TController, typename TAggregator>
   void operator()(robot_configurer<TController, TAggregator>& configurer) const {

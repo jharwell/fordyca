@@ -30,8 +30,8 @@
 #include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics.hpp"
 #include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/ta/bi_tab.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/ds/bi_tab.hpp"
 
 #include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
@@ -100,9 +100,9 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void depth2_metrics_aggregator::task_alloc_cb(
+void depth2_metrics_aggregator::task_start_cb(
     RCSW_UNUSED const rta::polled_task* const task,
-    const rta::bi_tab* const tab) {
+    const rta::ds::bi_tab* const tab) {
   if (task0::kGeneralistName == tab->root()->name()) {
     collect("tasks::tab::generalist", *tab);
   } else if (task1::kHarvesterName == tab->root()->name()) {
@@ -112,7 +112,7 @@ void depth2_metrics_aggregator::task_alloc_cb(
   } else {
     ER_FATAL_SENTINEL("Bad task name '%s'", task->name().c_str());
   }
-} /* task_alloc_cb() */
+} /* task_start_cb() */
 
 void depth2_metrics_aggregator::task_finish_or_abort_cb(
     const rta::polled_task* const task) {

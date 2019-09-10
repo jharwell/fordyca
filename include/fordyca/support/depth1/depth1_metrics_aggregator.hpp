@@ -41,9 +41,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta {
+namespace rcppsw::ta {
+namespace ds {
 class bi_tab;
-}}
+} /* namespace ds */
+}
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class gp_mdpo_controller; }}
@@ -89,7 +91,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    */
   void task_finish_or_abort_cb(const rta::polled_task* task);
 
-  void task_alloc_cb(const rta::polled_task*, const rta::bi_tab* tab);
+  void task_start_cb(const rta::polled_task*, const rta::ds::bi_tab* tab);
 
     /**
    * @brief Collect metrics from the depth1 controller.

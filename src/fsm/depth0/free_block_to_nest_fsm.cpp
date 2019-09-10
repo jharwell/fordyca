@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
 
-#include "fordyca/controller/foraging_signal.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,16 +72,16 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm, start, rpfsm::event_data* data) {
   /* first time running FSM */
   if (rpfsm::event_type::ekNORMAL == data->type()) {
     internal_event(ekST_ACQUIRE_BLOCK);
-    return controller::foraging_signal::ekHANDLED;
+    return fsm::foraging_signal::ekHANDLED;
   }
   if (rpfsm::event_type::ekCHILD == data->type()) {
-    if (controller::foraging_signal::ekENTERED_NEST == data->signal()) {
+    if (fsm::foraging_signal::ekENTERED_NEST == data->signal()) {
       internal_event(ekST_WAIT_FOR_DROP);
-      return controller::foraging_signal::ekHANDLED;
+      return fsm::foraging_signal::ekHANDLED;
     }
   }
   ER_FATAL_SENTINEL("Unhandled signal %d", data->signal());
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
@@ -90,7 +90,7 @@ HFSM_STATE_DEFINE_ND(free_block_to_nest_fsm, acquire_block) {
   } else {
     m_block_fsm.task_execute();
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_pickup,
@@ -105,27 +105,27 @@ HFSM_STATE_DEFINE(free_block_to_nest_fsm,
    *
    * In both cases, treat the block as vanished and try again.
    */
-  if (controller::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
+  if (fsm::foraging_signal::ekBLOCK_PICKUP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ekST_TRANSPORT_TO_NEST);
-  } else if (controller::foraging_signal::ekBLOCK_VANISHED == data->signal()) {
+  } else if (fsm::foraging_signal::ekBLOCK_VANISHED == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ekST_ACQUIRE_BLOCK);
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 HFSM_STATE_DEFINE(free_block_to_nest_fsm,
                   wait_for_drop,
                   rpfsm::event_data* data) {
-  if (controller::foraging_signal::ekBLOCK_DROP == data->signal()) {
+  if (fsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_block_fsm.task_reset();
     internal_event(ekST_FINISHED);
   }
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 RCSW_CONST FSM_STATE_DEFINE_ND(free_block_to_nest_fsm, finished) {
-  return controller::foraging_signal::ekHANDLED;
+  return fsm::foraging_signal::ekHANDLED;
 }
 
 /*******************************************************************************
@@ -216,8 +216,7 @@ void free_block_to_nest_fsm::init(void) {
 } /* init() */
 
 void free_block_to_nest_fsm::task_execute(void) {
-  inject_event(controller::foraging_signal::ekFSM_RUN,
-               rpfsm::event_type::ekNORMAL);
+  inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* task_execute() */
 
 foraging_transport_goal::type free_block_to_nest_fsm::block_transport_goal(

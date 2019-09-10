@@ -48,10 +48,10 @@ NS_START(fordyca, fsm, expstrat);
 class localized_search : public foraging_expstrat,
                          public rer::client<localized_search> {
  public:
-  localized_search(const foraging_expstrat::params* const c_params)
+  explicit localized_search(const foraging_expstrat::params* const c_params)
       : localized_search(c_params->saa) {}
 
-  localized_search(crfootbot::footbot_saa_subsystem* saa)
+  explicit localized_search(crfootbot::footbot_saa_subsystem* saa)
       : foraging_expstrat(saa),
         ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
         m_vfsm(saa),

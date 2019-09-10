@@ -71,9 +71,9 @@ ds::cache_vector static_cache_creator::create_all(
 
     if (static_cast<uint>(std::distance(it, c_alloc_blocks.end())) <
         base_cache::kMinBlocks) {
-      ER_WARN("Not enough blocks provided to construct cache@%s: %zu < %zu",
+      ER_WARN("Not enough blocks provided to construct cache@%s: %u < %zu",
               center.to_str().c_str(),
-              std::distance(it, c_alloc_blocks.end()),
+              static_cast<uint>(std::distance(it, c_alloc_blocks.end())),
               base_cache::kMinBlocks);
       continue;
     }

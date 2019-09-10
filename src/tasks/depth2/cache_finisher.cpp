@@ -47,7 +47,7 @@ cache_finisher::cache_finisher(const struct rta::config::task_alloc_config* conf
  * Member Functions
  ******************************************************************************/
 void cache_finisher::task_start(const rta::taskable_argument* const) {
-  foraging_signal_argument a(controller::foraging_signal::ekACQUIRE_FREE_BLOCK);
+  foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_FREE_BLOCK);
   rta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 

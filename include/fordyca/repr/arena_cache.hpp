@@ -56,8 +56,7 @@ class arena_cache final : public base_cache,
                           public metrics::caches::utilization_metrics,
                           public metrics::caches::location_metrics {
  public:
-  explicit arena_cache(const base_cache::params& p,
-                       const rutils::color& light_color);
+  arena_cache(const base_cache::params& p, const rutils::color& light_color);
   ~arena_cache(void) override = default;
 
   arena_cache(const arena_cache& other) = delete;

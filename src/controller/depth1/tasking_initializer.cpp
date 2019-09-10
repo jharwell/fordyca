@@ -26,10 +26,10 @@
 #include <chrono>
 #include <vector>
 
-#include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/config/task_alloc_config.hpp"
 #include "rcppsw/ta/config/task_executive_config.hpp"
+#include "rcppsw/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -75,7 +75,7 @@ tasking_initializer::~tasking_initializer(void) = default;
  ******************************************************************************/
 tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
     const config::depth1::controller_repository& config_repo,
-    rta::bi_tdgraph* const graph) {
+    rta::ds::bi_tdgraph* const graph) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
@@ -121,7 +121,7 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
   generalist->set_atomic(false);
 
   graph->set_root(std::move(generalist));
-  rta::bi_tdgraph::vertex_vector children;
+  rta::ds::bi_tdgraph::vertex_vector children;
   children.push_back(std::move(harvester));
   children.push_back(std::move(collector));
   graph->install_tab(tasks::depth0::foraging_task::kGeneralistName,
@@ -138,7 +138,7 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
 void tasking_initializer::depth1_exec_est_init(
     const config::depth1::controller_repository& config_repo,
     const tasking_map& map,
-    rta::bi_tdgraph* const graph) {
+    rta::ds::bi_tdgraph* const graph) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   if (!task_config->exec_est.seed_enabled) {
     return;
@@ -188,20 +188,22 @@ void tasking_initializer::depth1_exec_est_init(
 std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
     const config::depth1::controller_repository& config_repo) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
-  auto graph = std::make_unique<rta::bi_tdgraph>(task_config);
-  auto map = depth1_tasks_create(config_repo, graph.get());
+  auto variant =
+      std::make_unique<rta::ds::ds_variant>(rta::ds::bi_tdgraph(task_config));
+  auto graph = boost::get<rta::ds::bi_tdgraph>(variant.get());
+  auto map = depth1_tasks_create(config_repo, graph);
   const auto* execp =
-      std::make_unique<rta::config::task_executive_config>().get();
+      config_repo.config_get<rta::config::task_executive_config>();
 
   /* can be omitted if the user wants the default values */
-  if (nullptr != execp) {
-    execp = config_repo.config_get<rta::config::task_executive_config>();
+  if (nullptr == execp) {
+    execp = std::make_unique<rta::config::task_executive_config>().get();
   }
 
-  graph->active_tab_init(execp->tab_init_method);
-  depth1_exec_est_init(config_repo, map, graph.get());
+  graph->active_tab_init(execp->tab_init_policy);
+  depth1_exec_est_init(config_repo, map, graph);
 
-  return std::make_unique<rta::bi_tdgraph_executive>(execp, std::move(graph));
+  return std::make_unique<rta::bi_tdgraph_executive>(execp, std::move(variant));
 } /* initialize() */
 
 NS_END(depth1, controller, fordyca);

@@ -70,7 +70,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
     dynamic_cache_manager* cache_manager;
     base_loop_functions* loop;
   };
-  robot_arena_interactor(const params& p)
+  explicit robot_arena_interactor(const params& p)
       : ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
         m_tv_manager(p.tv_manager),
         m_free_pickup_interactor(p.map, p.floor, p.tv_manager),

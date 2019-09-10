@@ -25,8 +25,8 @@
 
 #include <fstream>
 
-#include "rcppsw/ta/bi_tdgraph.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "rcppsw/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
@@ -115,21 +115,21 @@ void gp_dpo_controller::private_init(
                                     perception())(config_repo);
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
-  executive()->task_alloc_notify(
-      std::bind(&gp_dpo_controller::task_alloc_cb, this, std::placeholders::_1));
+  executive()->task_start_notify(
+      std::bind(&gp_dpo_controller::task_start_cb, this, std::placeholders::_1));
 } /* private_init() */
 
 void gp_dpo_controller::task_abort_cb(const rta::polled_task*) {
   m_task_status = tasks::task_status::ekAbortPending;
 } /* task_abort_cb() */
 
-void gp_dpo_controller::task_alloc_cb(const rta::polled_task*) {
+void gp_dpo_controller::task_start_cb(const rta::polled_task*) {
   if (tasks::task_status::ekAbortPending != m_task_status) {
     m_task_status = tasks::task_status::ekRunning;
   }
-} /* task_abort_cb() */
+} /* task_start_cb() */
 
-const rta::bi_tab* gp_dpo_controller::active_tab(void) const {
+const rta::ds::bi_tab* gp_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
@@ -194,15 +194,19 @@ int gp_dpo_controller::task_id(const std::string& task_name) const {
 } /* task_id() */
 
 int gp_dpo_controller::current_task_tab(void) const {
-  return dynamic_cast<const rta::bi_tdgraph*>(executive()->graph())
+  return dynamic_cast<const rta::ds::bi_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(gp_dpo_controller, "gp_dpo_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
+
 NS_END(depth1, controller, fordyca);
