@@ -33,6 +33,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
+#include "rcppsw/math/rng.hpp"
 
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"
@@ -52,6 +53,10 @@ struct sensing_subsystem2D_config;
 namespace cosm::steer2D::config {
 struct force_calculator_config;
 }
+namespace rcppsw::math::config {
+struct rng_config;
+} /* namespace rcppsw::math */
+
 NS_START(fordyca);
 namespace support::tv {
 class tv_manager;
@@ -244,17 +249,22 @@ class base_controller : public argos::CCI_Controller,
     return m_saa.get();
   }
 
+  rmath::rng* rng(void) { return m_rng; }
+
  private:
   void output_init(const config::output_config* config);
   void saa_init(
       const csubsystem::config::actuation_subsystem2D_config* actuation_p,
       const csubsystem::config::sensing_subsystem2D_config* sensing_p);
 
+  void rng_init(const rmath::config::rng_config* config);
+
   /* clang-format off */
   bool                                              m_display_id{false};
+  class block_manip_collator                        m_block_manip{};
   std::unique_ptr<repr::base_block>                 m_block;
   std::unique_ptr<crfootbot::footbot_saa_subsystem> m_saa;
-  class block_manip_collator                        m_block_manip{};
+  rmath::rng*                                       m_rng{nullptr};
   /* clang-format on */
 };
 

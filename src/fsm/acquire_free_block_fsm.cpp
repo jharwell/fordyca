@@ -44,14 +44,15 @@ NS_START(fordyca, fsm);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
-    const controller::block_sel_matrix* const matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
-    ds::dpo_store* const store,
-    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior)
+    const fsm_ro_params* c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
       acquire_goal_fsm(
           saa,
           std::move(exp_behavior),
+          rng,
           acquire_goal_fsm::hook_list{
               .acquisition_goal =
                   std::bind(&acquire_free_block_fsm::acq_goal_internal),
@@ -71,8 +72,8 @@ acquire_free_block_fsm::acquire_free_block_fsm(
                             this,
                             std::placeholders::_1,
                             std::placeholders::_2)}),
-      mc_matrix(matrix),
-      mc_store(store) {}
+      mc_matrix(c_params->bsel_matrix),
+      mc_store(c_params->store) {}
 
 /*******************************************************************************
  * Non-Member Functions

@@ -43,7 +43,7 @@ NS_START(fordyca, fsm);
 rmath::vector2d cache_acq_point_selector::operator()(
     const rmath::vector2d& robot_loc,
     const repr::base_cache* const cache,
-    std::default_random_engine& rd) {
+    rmath::rng* rng) {
   auto xspan = cache->xspan();
   auto yspan = cache->yspan();
   auto xrange =
@@ -51,9 +51,7 @@ rmath::vector2d cache_acq_point_selector::operator()(
   auto yrange =
       rmath::ranged(yspan.lb() + m_arrival_tol, yspan.ub() - m_arrival_tol);
 
-  std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
-  std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
-  rmath::vector2d loc(xrnd(rd), yrnd(rd));
+  rmath::vector2d loc(rng->uniform(xrange), rng->uniform(yrange));
 
   ER_ASSERT(cache->contains_point(loc),
             "Cache%d@%s/%s with xspan=%s,yspan=%s does not contain %s",

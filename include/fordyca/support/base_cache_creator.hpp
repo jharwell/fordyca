@@ -27,7 +27,6 @@
 #include <boost/optional.hpp>
 #include <list>
 #include <memory>
-#include <random>
 #include <utility>
 #include <vector>
 
@@ -37,10 +36,8 @@
 #include "rcppsw/types/timestep.hpp"
 
 #include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/ds/block_cluster_vector.hpp"
-#include "fordyca/ds/block_list.hpp"
+#include "fordyca/support/cache_create_ro_params.hpp"
 #include "fordyca/ds/block_vector.hpp"
-#include "fordyca/ds/cache_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -77,22 +74,15 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   base_cache_creator& operator=(const base_cache_creator& other) = delete;
 
   /**
-   * @brief Create new caches.
+   * @brief (Potentially) create new caches.
    *
-   * @param c_existing_caches Vector of current caches in the arena, for use in
-   *                          avoiding overlaps during new cache creation.
-   * @param c_clusters Vector of block clusters in the arena, for use in
-   *                   avoiding overlaps during cache creation.
-   * @param c_alloc_blocks The vector of free blocks that may be used in
-   *                       cache creation.
-   * @param timestep The current timestep.
+   * @param c_alloc_blocks The blocks that have been allocated for cache
+   * creation this timestep for all caches.
    *
    * @return A vector of created caches.
    */
-  virtual ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
-                                      const ds::block_cluster_vector& c_clusters,
-                                      const ds::block_vector& c_alloc_blocks,
-                                      rtypes::timestep t) = 0;
+  virtual ds::cache_vector create_all(const cache_create_ro_params& c_params,
+                                      const ds::block_vector&  c_alloc_blocks) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact
@@ -148,7 +138,6 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   /* clang-format off */
   const rtypes::spatial_dist         mc_cache_dim;
   ds::arena_grid*                    m_grid;
-  mutable std::default_random_engine m_rng;
   /* clang-format on */
 };
 NS_END(support, fordyca);

@@ -21,10 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth2/cache_site_selector.hpp"
-
-#include <chrono>
-
+#include "fordyca/fsm/depth2/cache_site_selector.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
 #include "fordyca/repr/base_cache.hpp"
@@ -32,8 +29,8 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth2);
-using cselm = cache_sel_matrix;
+NS_START(fordyca, fsm, depth2);
+using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -41,8 +38,7 @@ using cselm = cache_sel_matrix;
 cache_site_selector::cache_site_selector(
     const controller::cache_sel_matrix* const matrix)
     : ER_CLIENT_INIT("fordyca.controller.depth2.cache_site_selector"),
-      mc_matrix(matrix),
-      m_reng(std::chrono::system_clock::now().time_since_epoch().count()) {}
+      mc_matrix(matrix) {}
 
 /*******************************************************************************
  * Member Functions
@@ -50,12 +46,14 @@ cache_site_selector::cache_site_selector(
 boost::optional<rmath::vector2d> cache_site_selector::operator()(
     const ds::dp_cache_map& known_caches,
     const ds::dp_block_map& known_blocks,
-    rmath::vector2d position) {
+    rmath::vector2d position,
+    rmath::rng* rng) {
   double max_utility;
   std::vector<double> point;
   struct site_utility_data u;
   rmath::vector2d site;
-  opt_initialize(known_caches, known_blocks, position, &u, &point);
+  opt_init_conditions init_cond{known_caches, known_blocks, position};
+  opt_initialize(&init_cond, &u, &point, rng);
 
   /*
    * @bug Sometimes NLopt just fails with a generic error code and I don't
@@ -114,23 +112,21 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
   return true;
 } /* verify_site() */
 
-void cache_site_selector::opt_initialize(
-    const ds::dp_cache_map& known_caches,
-    const ds::dp_block_map& known_blocks,
-    rmath::vector2d position,
-    struct site_utility_data* const utility_data,
-    std::vector<double>* const initial_guess) {
-  rmath::vector2d nest_loc =
+void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
+                                         struct site_utility_data* utility_data,
+                                         std::vector<double>* initial_guess,
+                                         rmath::rng* rng) {
+      rmath::vector2d nest_loc =
       boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
 
-  ER_INFO("Known blocks: [%s]", rcppsw::to_string(known_blocks).c_str());
-  ER_INFO("Known caches: [%s]", rcppsw::to_string(known_caches).c_str());
+  ER_INFO("Known blocks: [%s]", rcppsw::to_string(cond->known_blocks).c_str());
+  ER_INFO("Known caches: [%s]", rcppsw::to_string(cond->known_caches).c_str());
 
   /*
    * If there are no constraints on the problem, the COBYLA method hangs, BUT
    * that is OK because we always have at least the nest proximity constraint.
    */
-  constraints_create(known_caches, known_blocks, nest_loc);
+  constraints_create(cond->known_caches, cond->known_blocks, nest_loc);
   ER_INFO("Calculated %zu cache, %zu block, %zu nest constraints",
           std::get<0>(m_constraints).size(),
           std::get<1>(m_constraints).size(),
@@ -140,7 +136,7 @@ void cache_site_selector::opt_initialize(
       boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteXRange)->second);
   auto yrange =
       boost::get<rmath::rangeu>(mc_matrix->find(cselm::kSiteYRange)->second);
-  *utility_data = {position, nest_loc};
+  *utility_data = {cond->position, nest_loc};
   m_alg.set_max_objective(&__site_utility_func, utility_data);
   m_alg.set_ftol_rel(kUTILITY_TOL);
   m_alg.set_stopval(1000000);
@@ -154,8 +150,8 @@ void cache_site_selector::opt_initialize(
   /* Initial guess: random point in the arena */
   std::uniform_int_distribution<> xdist(xrange.lb(), xrange.ub());
   std::uniform_int_distribution<> ydist(yrange.lb(), yrange.ub());
-  uint x = xdist(m_reng);
-  uint y = ydist(m_reng);
+  uint x = rng->uniform(xrange);
+  uint y = rng->uniform(yrange);
 
   *initial_guess = {static_cast<double>(x), static_cast<double>(y)};
   ER_INFO("Initial guess: (%u,%u), xrange=%s, yrange=%s",
@@ -292,4 +288,4 @@ double __site_utility_func(const std::vector<double>& x,
   return math::cache_site_utility(d->position, d->nest_loc)(point);
 } /* __site_utility_func() */
 
-NS_END(depth2, controller, fordyca);
+NS_END(depth2, fsm, fordyca);

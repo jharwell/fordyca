@@ -25,7 +25,7 @@
 
 #include <numeric>
 
-#include "fordyca/controller/depth2/cache_site_selector.hpp"
+#include "fordyca/fsm/depth2/cache_site_selector.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/repr/base_block.hpp"
@@ -53,8 +53,8 @@ void utility_cache_search::task_start(const rta::taskable_argument*) {
   } else {
     position = saa()->sensing()->position();
   }
-  controller::depth2::cache_site_selector sel(mc_matrix);
-  if (auto site = sel(mc_store->caches(), mc_store->blocks(), position)) {
+  depth2::cache_site_selector sel(mc_matrix);
+  if (auto site = sel(mc_store->caches(), mc_store->blocks(), position, rng())) {
     tasks::vector_argument v(kCACHE_ARRIVAL_TOL, *site);
     localized_search::task_start(&v);
   } else {

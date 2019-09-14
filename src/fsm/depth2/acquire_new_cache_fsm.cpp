@@ -41,14 +41,15 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
-    const controller::cache_sel_matrix* matrix,
+    const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    ds::dpo_store* const store,
-    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior)
+    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
       acquire_goal_fsm(
           saa,
           std::move(exp_behavior),
+          rng,
           acquire_goal_fsm::hook_list{
               .acquisition_goal =
                   std::bind(&acquire_new_cache_fsm::acquisition_goal_internal,
@@ -66,8 +67,8 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
               }), /* new caches never acquired via exploration */
               .goal_valid_cb = [](const rmath::vector2d&,
                                   uint) { return true; }}),
-      mc_matrix(matrix),
-      mc_store(store) {}
+      mc_matrix(c_params->csel_matrix),
+      mc_store(c_params->store) {}
 
 /*******************************************************************************
  * General Member Functions

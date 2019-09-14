@@ -31,6 +31,7 @@
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 
@@ -67,10 +68,10 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
                                public cfsm::acquire_goal_fsm {
  public:
   acquire_free_block_fsm(
-      const controller::block_sel_matrix* matrix,
+      const fsm_ro_params* c_params,
       crfootbot::footbot_saa_subsystem* saa,
-      ds::dpo_store* store,
-      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior);
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      rmath::rng* rng);
 
   ~acquire_free_block_fsm(void) override = default;
 

@@ -30,6 +30,7 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
 #include "fordyca/config/exploration_config.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,14 +61,9 @@ NS_START(fsm, depth1);
  */
 class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
-  struct params {
-    const controller::block_sel_matrix* bsel_matrix;
-    const controller::cache_sel_matrix* csel_matrix;
-    crfootbot::footbot_saa_subsystem*  saa;
-    ds::dpo_store*                      store;
-    fordyca::config::exploration_config exp_config;
-  };
-  explicit block_to_existing_cache_fsm(const params* c_params);
+   block_to_existing_cache_fsm(const fsm_ro_params* c_params,
+                               crfootbot::footbot_saa_subsystem* saa,
+                               rmath::rng* rng);
 
   ~block_to_existing_cache_fsm(void) override = default;
 

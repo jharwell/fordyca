@@ -1,5 +1,5 @@
 /**
- * @file cache_factory.hpp
+ * @file cache_create_ro_params.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,37 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_EXPSTRAT_CACHE_FACTORY_HPP_
-#define INCLUDE_FORDYCA_FSM_EXPSTRAT_CACHE_FACTORY_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_CACHE_CREATE_RO_PARAMS_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_CACHE_CREATE_RO_PARAMS_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/factory/factory.hpp"
-#include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/cache_vector.hpp"
+#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, fsm, expstrat);
+NS_START(fordyca, support);
 
 /*******************************************************************************
- * Class Definitions
+ * Struct Definitions
  ******************************************************************************/
-class cache_factory :
-    public rpfactory::releasing_factory<foraging_expstrat,
-                                        const foraging_expstrat::params*,
-                                        rmath::rng*> {
- public:
-  static constexpr char kCRW[] = "CRW";
-  static constexpr char kLikelihoodSearch[] = "likelihood_search";
-  static constexpr char kUtilitySearch[] = "utility_search";
-  static constexpr char kLEDTaxisSearch[] = "ledtaxis_search";
+/**
+ * @struct cache_create_ro_params
+ * @ingroup fordyca support
+ *
+ * @brief Parameters for cache creation, to reduce # of arguments to
+ * functions. Contains all parameters that will *NOT* change during creation.
+ */
+struct cache_create_ro_params {
+  /**
+   * @brief Currently existing caches in the arena. For use in avoiding
+   * overlaps during cache creation.
+   */
+  ds::cache_vector         current_caches;
 
-  cache_factory(void);
+  /**
+   * @brief The block clusters in the arena. For use in avoiding overlaps
+   * during cache creation.
+   */
+  ds::block_cluster_vector clusters;
+
+  /**
+   * @brief The current timestep.
+   */
+  rtypes::timestep         t;
 };
 
-NS_END(expstrat, fsm, fordyca);
+NS_END(support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_EXPSTRAT_CACHE_FACTORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_CACHE_CREATE_RO_PARAMS_HPP_ */

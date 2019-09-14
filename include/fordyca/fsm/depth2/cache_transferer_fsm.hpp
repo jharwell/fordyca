@@ -57,11 +57,10 @@ NS_START(depth2);
  */
 class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
-  cache_transferer_fsm(
-      const controller::cache_sel_matrix* matrix,
-      crfootbot::footbot_saa_subsystem* saa,
-      ds::dpo_store* store,
-      std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
+  cache_transferer_fsm(const fsm_ro_params* c_params,
+                       crfootbot::footbot_saa_subsystem* saa,
+                       std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+                       rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;
 
   cache_transferer_fsm(const cache_transferer_fsm&) = delete;

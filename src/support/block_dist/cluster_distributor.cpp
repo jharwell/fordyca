@@ -38,10 +38,12 @@ NS_START(fordyca, support, block_dist);
  ******************************************************************************/
 cluster_distributor::cluster_distributor(const ds::arena_grid::view& view,
                                          rtypes::discretize_ratio resolution,
-                                         uint capacity)
+                                         uint capacity,
+                                         rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.support.block_dist.cluster"),
+      base_distributor(rng),
       m_clust(view, resolution, capacity),
-      m_impl(view, resolution) {}
+      m_impl(view, resolution, rng) {}
 
 /*******************************************************************************
  * Member Functions

@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
-
-#include <chrono>
-
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/cache_acq_point_selector.hpp"
@@ -47,30 +44,31 @@ using cselm = controller::cache_sel_matrix;
  * Constructors/Destructors
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
-    const controller::cache_sel_matrix* matrix,
+    const fsm_ro_params* c_params,
     crfootbot::footbot_saa_subsystem* saa,
-    ds::dpo_store* store,
-    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng,
     bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
       acquire_goal_fsm(
           saa,
           std::move(exp_behavior),
+          rng,
           acquire_goal_fsm::hook_list{
-              .acquisition_goal =
-                  std::bind(&acquire_existing_cache_fsm::acq_goal_internal),
-              .goal_select =
-                  std::bind(&acquire_existing_cache_fsm::existing_cache_select,
-                            this),
-              .candidates_exist =
-                  std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
+            .acquisition_goal =
+                std::bind(&acquire_existing_cache_fsm::acq_goal_internal),
+                .goal_select =
+                std::bind(&acquire_existing_cache_fsm::existing_cache_select,
+                          this),
+                .candidates_exist =
+                std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
 
-              .goal_acquired_cb =
-                  std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
+                .goal_acquired_cb =
+                std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
 
-                            this,
-                            std::placeholders::_1),
-              /*
+                          this,
+                          std::placeholders::_1),
+                /*
                  * We never ever want to be able to acquire a cache via
                  * exploration, because if we are near/inside a cache exploring,
                  * it is because that cache is not currently suitable for
@@ -78,16 +76,15 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                  * policy). Allowing acquisition via exploration can result in
                  * violations of the pickup policy.
                  */
-              .explore_term_cb = std::bind([]() noexcept { return false; }),
-              .goal_valid_cb =
-                  std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
-                            this,
-                            std::placeholders::_1,
-                            std::placeholders::_2)}),
+                .explore_term_cb = std::bind([]() noexcept { return false; }),
+                .goal_valid_cb =
+                std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
+                          this,
+                          std::placeholders::_1,
+                          std::placeholders::_2)}),
       mc_for_pickup(for_pickup),
-      mc_matrix(matrix),
-      mc_store(store),
-      m_rd(std::chrono::system_clock::now().time_since_epoch().count()) {}
+      mc_matrix(c_params->csel_matrix),
+      mc_store(c_params->store) {}
 
 /*******************************************************************************
  * Non-Member Functions
@@ -115,7 +112,7 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
             best->density().v());
 
     rmath::vector2d point = cache_acq_point_selector(kFOOTBOT_CACHE_ACQ_FACTOR)(
-        saa()->sensing()->position(), best->ent(), m_rd);
+        saa()->sensing()->position(), best->ent(), rng());
 
     return boost::make_optional(std::make_pair(best->ent()->id(), point));
   } else {

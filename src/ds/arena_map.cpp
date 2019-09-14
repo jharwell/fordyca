@@ -71,12 +71,13 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool arena_map::initialize(support::base_loop_functions* loop) {
+bool arena_map::initialize(support::base_loop_functions* loop,
+                           rmath::rng* rng) {
   for (auto& l : m_nest.lights()) {
     loop->AddEntity(*l);
   } /* for(&l..) */
 
-  return m_block_dispatcher.initialize();
+  return m_block_dispatcher.initialize(rng);
 } /* initialize() */
 
 void arena_map::caches_add(const cache_vector& caches,

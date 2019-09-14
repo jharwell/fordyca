@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
-
-#include <chrono>
-
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -47,8 +44,7 @@ base_cache_creator::base_cache_creator(ds::arena_grid* const grid,
                                        rtypes::spatial_dist cache_dim)
     : ER_CLIENT_INIT("fordyca.support.base_cache_creator"),
       mc_cache_dim(cache_dim),
-      m_grid(grid),
-      m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
+      m_grid(grid) {}
 
 /*******************************************************************************
  * Member Functions

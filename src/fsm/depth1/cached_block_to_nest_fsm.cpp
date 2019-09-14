@@ -35,11 +35,11 @@ NS_START(fordyca, fsm, depth1);
  * Constructors/Destructors
  ******************************************************************************/
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
-    const controller::cache_sel_matrix* sel_matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
-    ds::dpo_store* const store,
-    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior)
-    : util_hfsm(saa, ekST_MAX_STATES),
+    const fsm_ro_params* const c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng)
+    : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth1.cached_block_to_nest"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -48,7 +48,11 @@ cached_block_to_nest_fsm::cached_block_to_nest_fsm(
       HFSM_CONSTRUCT_STATE(wait_for_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
-      m_cache_fsm(sel_matrix, saa, store, std::move(exp_behavior), true),
+      m_cache_fsm(c_params,
+                  saa,
+                  std::move(exp_behavior),
+                  rng,
+                  true),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
                    HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_pickup,

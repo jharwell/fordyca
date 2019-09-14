@@ -39,6 +39,9 @@
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
 
+#include "rcppsw/math/config/rng_config.hpp"
+#include "rcppsw/math/rngm.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -87,23 +90,26 @@ void base_controller::Init(ticpp::Element& node) {
   }
 #endif
 
-  config::base_controller_repository config_repo;
-  config_repo.parse_all(node);
+  config::base_controller_repository repo;
+  repo.parse_all(node);
 
   ndc_push();
-  if (!config_repo.validate_all()) {
+  if (!repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
+  /* initialize RNG */
+  rng_init(repo.config_get<rmath::config::rng_config>());
+
   /* initialize output */
-  auto* config = config_repo.config_get<config::output_config>();
+  auto* config = repo.config_get<config::output_config>();
   output_init(config);
 
   /* initialize sensing and actuation (SAA) subsystem */
   saa_init(
-      config_repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
-      config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
+      repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
+      repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
   ndc_pop();
 } /* Init() */
 
@@ -238,6 +244,16 @@ void base_controller::output_init(const config::output_config* const config) {
                       output_root + "/saa.log");
 #endif
 } /* output_init() */
+
+void base_controller::rng_init(const rmath::config::rng_config* config) {
+  rmath::rngm::instance().register_type<rmath::rng>("footbot");
+  if (nullptr == config || (nullptr != config &&-1 == config->seed)) {
+    m_rng = rmath::rngm::instance().create("footbot",
+                                           std::chrono::system_clock::now().time_since_epoch().count());
+  } else {
+    m_rng = rmath::rngm::instance().create("footbot", config->seed);
+  }
+} /* rng_init() */
 
 void base_controller::tick(rtypes::timestep tick) {
   m_saa->sensing()->tick(tick);

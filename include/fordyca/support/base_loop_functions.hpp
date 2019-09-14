@@ -36,6 +36,8 @@
 #include "rcppsw/math/radians.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/utils/color.hpp"
+#include "rcppsw/math/rng.hpp"
+#include "rcppsw/math/config/rng_config.hpp"
 
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/fordyca.hpp"
@@ -133,6 +135,8 @@ class base_loop_functions : public argos::CLoopFunctions,
     return m_oracle_manager.get();
   }
 
+  rmath::rng* rng(void) { return m_rng; }
+
  private:
   /**
    * @brief Initialize convergence calculations.
@@ -170,6 +174,12 @@ class base_loop_functions : public argos::CLoopFunctions,
    */
   void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
 
+  /**
+   * @brief Initialize random number generation for loop function use. Currently
+   * *NOT* shared between loop functions and robots.
+   */
+  void rng_init(const rmath::config::rng_config* config) RCSW_COLD;
+
   std::vector<double> calc_robot_nn(uint n_threads) const;
   std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;
   std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
@@ -178,6 +188,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   argos::CFloorEntity*                                  m_floor{nullptr};
   std::string                                           m_output_root{};
   config::loop_function_repository                      m_config{};
+  rmath::rng*                                           m_rng{nullptr};
   std::unique_ptr<ds::arena_map>                        m_arena_map;
   std::unique_ptr<tv::tv_manager>                       m_tv_manager;
   std::unique_ptr<cconvergence::convergence_calculator> m_conv_calc;

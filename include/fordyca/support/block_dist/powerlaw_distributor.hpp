@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <random>
 #include <vector>
 #include <map>
 #include <utility>
@@ -63,14 +62,15 @@ NS_START(support, block_dist);
  * - Blocks are assumed to be the same size as arena resolution (this is not
  *   checked).
  */
-class powerlaw_distributor final : public base_distributor,
-                             public rer::client<powerlaw_distributor> {
+class powerlaw_distributor final : public rer::client<powerlaw_distributor>,
+                                   public base_distributor {
  public:
   /**
    * @brief Initialize the distributor.
    */
   powerlaw_distributor(const config::arena::powerlaw_dist_config* config,
-                       rtypes::discretize_ratio resolution);
+                       rtypes::discretize_ratio resolution,
+                       rmath::rng* rng);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;

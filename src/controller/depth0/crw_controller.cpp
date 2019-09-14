@@ -56,7 +56,9 @@ void crw_controller::Init(ticpp::Element& node) {
   m_fsm = std::make_unique<fsm::depth0::crw_fsm>(
       saa(),
       fsm::expstrat::block_factory().create(fsm::expstrat::block_factory::kCRW,
-                                            &p));
+                                            &p,
+                                            rng()),
+      rng());
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */

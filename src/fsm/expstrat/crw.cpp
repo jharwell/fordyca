@@ -35,11 +35,13 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-crw::crw(const fsm::expstrat::foraging_expstrat::params* const c_params)
-    : crw(static_cast<crfootbot::footbot_saa_subsystem*>(c_params->saa)) {}
+crw::crw(const fsm::expstrat::foraging_expstrat::params* const c_params,
+         rmath::rng* rng)
+    : crw(static_cast<crfootbot::footbot_saa_subsystem*>(c_params->saa), rng) {}
 
-crw::crw(crfootbot::footbot_saa_subsystem* saa)
-    : foraging_expstrat(saa),
+crw::crw(crfootbot::footbot_saa_subsystem* saa,
+         rmath::rng* rng)
+    : foraging_expstrat(saa, rng),
       ER_CLIENT_INIT("fordyca.fsm.expstrat.crw"),
       m_tracker(saa->sensing()) {}
 
@@ -47,7 +49,7 @@ crw::crw(crfootbot::footbot_saa_subsystem* saa)
  * General Member Functions
  ******************************************************************************/
 void crw::task_execute(void) {
-  saa()->steer_force2D().accum(saa()->steer_force2D().wander());
+  saa()->steer_force2D().accum(saa()->steer_force2D().wander(rng()));
 
   if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
     m_tracker.ca_enter();

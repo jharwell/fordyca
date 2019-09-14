@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_dist/multi_cluster_distributor.hpp"
-
-#include <random>
-
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/repr/base_block.hpp"
 
@@ -39,10 +36,12 @@ NS_START(fordyca, support, block_dist);
 multi_cluster_distributor::multi_cluster_distributor(
     std::vector<ds::arena_grid::view>& grids,
     rtypes::discretize_ratio resolution,
-    uint maxsize)
-    : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster") {
+    uint maxsize,
+    rmath::rng* rng)
+    : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster"),
+      base_distributor(rng) {
   for (auto& g : grids) {
-    m_dists.emplace_back(g, resolution, maxsize);
+    m_dists.emplace_back(g, resolution, maxsize, rng);
   } /* for(i..) */
 }
 
@@ -54,8 +53,7 @@ bool multi_cluster_distributor::distribute_block(
     ds::const_entity_list& entities) {
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
     /* -1 because we are working with array indices */
-    std::uniform_int_distribution<size_t> rng_dist(0, m_dists.size() - 1);
-    uint idx = rng_dist(rng());
+    uint idx = rng()->uniform(0, m_dists.size() - 1);
     cluster_distributor& dist = m_dists[idx];
 
     /* Always/only 1 cluster per cluster distributor, so this is safe to do */

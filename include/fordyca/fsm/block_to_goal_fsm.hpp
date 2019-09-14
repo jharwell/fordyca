@@ -67,7 +67,8 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
  public:
   block_to_goal_fsm(cfsm::acquire_goal_fsm* goal_fsm,
                     cfsm::acquire_goal_fsm* block_fsm,
-                    crfootbot::footbot_saa_subsystem* saa);
+                    crfootbot::footbot_saa_subsystem* saa,
+                    rmath::rng* rng);
   ~block_to_goal_fsm(void) override = default;
 
   block_to_goal_fsm(const block_to_goal_fsm&) = delete;

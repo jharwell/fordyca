@@ -53,7 +53,7 @@ dispatcher::~dispatcher(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool dispatcher::initialize(void) {
+bool dispatcher::initialize(rmath::rng* rng) {
   /* clang-format off */
   ds::arena_grid::view arena = m_grid->layer<arena_grid::kCell>()->subgrid(
       static_cast<size_t>(m_grid->xdsize() * 0.05),
@@ -63,7 +63,7 @@ bool dispatcher::initialize(void) {
 
   if (kDistRandom == mc_dist_type) {
     m_dist = std::make_unique<random_distributor>(arena,
-                                                  mc_resolution);
+                                                  mc_resolution, rng);
   } else if (kDistSingleSrc == mc_dist_type) {
     ds::arena_grid::view area = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.80),
@@ -73,7 +73,8 @@ bool dispatcher::initialize(void) {
     m_dist = std::make_unique<cluster_distributor>(
         area,
         mc_resolution,
-        std::numeric_limits<uint>::max());
+        std::numeric_limits<uint>::max(),
+        rng);
   } else if (kDistDualSrc == mc_dist_type) {
     ds::arena_grid::view area_l = m_grid->layer<arena_grid::kCell>()->subgrid(
         static_cast<size_t>(m_grid->xdsize() * 0.10),
@@ -89,7 +90,8 @@ bool dispatcher::initialize(void) {
     m_dist = std::make_unique<multi_cluster_distributor>(
         grids,
         mc_resolution,
-        std::numeric_limits<uint>::max());
+        std::numeric_limits<uint>::max(),
+        rng);
   } else if (kDistQuadSrc == mc_dist_type) {
     /*
      * Quad source is a tricky distribution to use with static caches, so we
@@ -121,10 +123,12 @@ bool dispatcher::initialize(void) {
     m_dist = std::make_unique<multi_cluster_distributor>(
         grids,
         mc_resolution,
-        std::numeric_limits<uint>::max());
+        std::numeric_limits<uint>::max(),
+        rng);
   } else if (kDistPowerlaw == mc_dist_type) {
     auto p = std::make_unique<powerlaw_distributor>(&mc_config.powerlaw,
-                                                       mc_resolution);
+                                                    mc_resolution,
+                                                    rng);
     if (!p->map_clusters(m_grid)) {
       return false;
     }

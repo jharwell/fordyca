@@ -29,6 +29,7 @@
 
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/math/rngm.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
@@ -64,7 +65,7 @@ base_loop_functions::base_loop_functions(void)
 base_loop_functions::~base_loop_functions(void) = default;
 
 /*******************************************************************************
- * Member Functions
+ * Initialization Functions
  ******************************************************************************/
 void base_loop_functions::Init(ticpp::Element& node) {
   ndc_push();
@@ -75,6 +76,9 @@ void base_loop_functions::Init(ticpp::Element& node) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
+
+  /* initialize RNG */
+  rng_init(m_config.config_get<rmath::config::rng_config>());
 
   /* initialize output and metrics collection */
   output_init(m_config.config_get<config::output_config>());
@@ -91,6 +95,7 @@ void base_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize oracle, if configured */
   oracle_init(config()->config_get<config::oracle::oracle_manager_config>());
+
 
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
@@ -140,6 +145,75 @@ void base_loop_functions::convergence_init(
                 std::placeholders::_1));
 } /* convergence_init() */
 
+void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
+  /*
+   * Even if temporal variance is not requested in teh input file, we still
+   * need to create the manager in order to deconflict pickups/drops/etc
+   */
+  if (nullptr == tvp) {
+    m_tv_manager = std::make_unique<tv::tv_manager>(
+        std::make_unique<config::tv::tv_manager_config>().get(),
+        this,
+        arena_map());
+  } else {
+    ER_INFO("Creating temporal variance manager");
+    m_tv_manager = std::make_unique<tv::tv_manager>(tvp, this, arena_map());
+  }
+
+  /*
+   * Register all controllers with temporal variance manager in order to be
+   * able to apply sensing/actuation variances if configured.
+   */
+  swarm_iterator::controllers<swarm_iterator::static_order>(this, [&](auto* c) {
+      m_tv_manager->register_controller(c->entity_id());
+      c->tv_init(m_tv_manager.get());
+    });
+} /* tv_init() */
+
+void base_loop_functions::arena_map_init(
+    const config::loop_function_repository* const repo) {
+  auto* aconfig = repo->config_get<config::arena::arena_map_config>();
+  auto* vconfig = repo->config_get<config::visualization_config>();
+
+  m_arena_map = std::make_unique<ds::arena_map>(aconfig);
+  if (!m_arena_map->initialize(this, rng())) {
+    ER_ERR("Could not initialize arena map");
+    std::exit(EXIT_FAILURE);
+  }
+
+  m_arena_map->distribute_all_blocks();
+
+  /*
+   * If null, visualization has been disabled.
+   */
+  if (nullptr != vconfig) {
+    for (auto& block : m_arena_map->blocks()) {
+      block->vis_id(vconfig->block_id);
+    } /* for(&block..) */
+  }
+} /* arena_map_init() */
+
+void base_loop_functions::oracle_init(
+    const config::oracle::oracle_manager_config* const oraclep) {
+  if (nullptr != oraclep) {
+    ER_INFO("Creating oracle manager");
+    m_oracle_manager = std::make_unique<oracle::oracle_manager>(oraclep);
+  }
+} /* oracle_init() */
+
+void base_loop_functions::rng_init(const rmath::config::rng_config* config) {
+  rmath::rngm::instance().register_type<rmath::rng>("loop");
+  if (nullptr == config || (nullptr != config &&-1 == config->seed)) {
+    m_rng = rmath::rngm::instance().create("loop",
+                                           std::chrono::system_clock::now().time_since_epoch().count());
+  } else {
+    m_rng = rmath::rngm::instance().create("loop", config->seed);
+  }
+} /* rng_init() */
+
+/*******************************************************************************
+ * ARGoS Hooks
+ ******************************************************************************/
 void base_loop_functions::PreStep(void) {
   /*
    * Needs to be before robot controllers are run, so they run with the correct
@@ -164,61 +238,6 @@ void base_loop_functions::PostStep(void) {
   }
 } /* PostStep() */
 
-void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
-  /*
-   * Even if temporal variance is not requested in teh input file, we still
-   * need to create the manager in order to deconflict pickups/drops/etc
-   */
-  if (nullptr == tvp) {
-    m_tv_manager = std::make_unique<tv::tv_manager>(
-        std::make_unique<config::tv::tv_manager_config>().get(),
-        this,
-        arena_map());
-  } else {
-    ER_INFO("Creating temporal variance manager");
-    m_tv_manager = std::make_unique<tv::tv_manager>(tvp, this, arena_map());
-  }
-
-  /*
-   * Register all controllers with temporal variance manager in order to be
-   * able to apply sensing/actuation variances if configured.
-   */
-  swarm_iterator::controllers<swarm_iterator::static_order>(this, [&](auto* c) {
-    m_tv_manager->register_controller(c->entity_id());
-    c->tv_init(m_tv_manager.get());
-  });
-} /* tv_init() */
-
-void base_loop_functions::arena_map_init(
-    const config::loop_function_repository* const repo) {
-  auto* aconfig = repo->config_get<config::arena::arena_map_config>();
-  auto* vconfig = repo->config_get<config::visualization_config>();
-
-  m_arena_map = std::make_unique<ds::arena_map>(aconfig);
-  if (!m_arena_map->initialize(this)) {
-    ER_ERR("Could not initialize arena map");
-    std::exit(EXIT_FAILURE);
-  }
-
-  m_arena_map->distribute_all_blocks();
-
-  /*
-   * If null, visualization has been disabled.
-   */
-  if (nullptr != vconfig) {
-    for (auto& block : m_arena_map->blocks()) {
-      block->vis_id(vconfig->block_id);
-    } /* for(&block..) */
-  }
-} /* arena_map_init() */
-
-void base_loop_functions::oracle_init(
-    const config::oracle::oracle_manager_config* const oraclep) {
-  if (nullptr != oraclep) {
-    ER_INFO("Creating oracle manager");
-    m_oracle_manager = std::make_unique<oracle::oracle_manager>(oraclep);
-  }
-} /* oracle_init() */
 
 void base_loop_functions::Reset(void) {
   m_arena_map->distribute_all_blocks();

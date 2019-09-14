@@ -25,7 +25,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <random>
 
 #include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/arena_grid.hpp"
@@ -42,8 +41,10 @@ using fordyca::ds::arena_grid;
  ******************************************************************************/
 powerlaw_distributor::powerlaw_distributor(
     const config::arena::powerlaw_dist_config* const config,
-    rtypes::discretize_ratio resolution)
+    rtypes::discretize_ratio resolution,
+    rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.support.block_dist.powerlaw"),
+      base_distributor(rng),
       mc_resolution(resolution),
       m_n_clusters(config->n_clusters),
       m_pwrdist(config->pwr_min, config->pwr_max, 2) {}
@@ -85,13 +86,10 @@ powerlaw_distributor::cluster_paramvec powerlaw_distributor::guess_cluster_place
   cluster_paramvec config;
 
   for (size_t i = 0; i < clust_sizes.size(); ++i) {
-    std::uniform_int_distribution<int> xgen(
-        clust_sizes[i] / 2 + 1, grid->xdsize() - clust_sizes[i] / 2 - 1);
-    std::uniform_int_distribution<int> ygen(
-        clust_sizes[i] / 2 + 1, grid->ydsize() - clust_sizes[i] / 2 - 1);
-
-    uint x = xgen(rng());
-    uint y = ygen(rng());
+    uint x = rng()->uniform(clust_sizes[i] / 2 + 1,
+                            grid->xdsize() - clust_sizes[i] / 2 - 1);
+    uint y = rng()->uniform(clust_sizes[i] / 2 + 1,
+                            grid->ydsize() - clust_sizes[i] / 2 - 1);
     uint x_max = x + static_cast<uint>(std::sqrt(clust_sizes[i]));
     uint y_max = y + clust_sizes[i] / (x_max - x);
 
@@ -184,7 +182,8 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
   for (auto& bclustp : config) {
     m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
                                               mc_resolution,
-                                              bclustp.capacity);
+                                              bclustp.capacity,
+                                              rng());
   } /* for(i..) */
   for (auto& [clust_size, dist_list] : m_dist_map) {
     ER_INFO("Mapped %zu clusters of capacity %u", dist_list.size(), clust_size);

@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_CACHE_SITE_SELECTOR_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_CACHE_SITE_SELECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_SITE_SELECTOR_HPP_
+#define INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_SITE_SELECTOR_HPP_
 
 /*******************************************************************************
  * Includes
@@ -28,13 +28,13 @@
 #include <tuple>
 #include <functional>
 #include <vector>
-#include <random>
 #include <string>
 #include <nlopt.hpp>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/math/rng.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -42,16 +42,20 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller);
+NS_START(fordyca);
+
+namespace controller {
 class cache_sel_matrix;
-NS_START(depth2);
+} /* namespace controller */
+
+NS_START(fsm, depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
  * @class cache_site_selector
- * @ingroup fordyca controller depth2
+ * @ingroup fordyca fsm depth2
  *
  * @brief Selects the best cache site between the location of the block pickup
  * and the nest (ideally the halfway point), subject to constraints such as it
@@ -100,7 +104,8 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   boost::optional<rmath::vector2d> operator()(
       const ds::dp_cache_map& known_caches,
       const ds::dp_block_map& known_blocks,
-      rmath::vector2d position);
+      rmath::vector2d position,
+      rmath::rng* rng);
 
  private:
   /*
@@ -135,6 +140,12 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    */
   static constexpr uint kMAX_ITERATIONS = 10000;
 
+  struct opt_init_conditions {
+    const ds::dp_cache_map& known_caches;
+    const ds::dp_block_map& known_blocks;
+    rmath::vector2d position;
+  };
+
   using constraint_set = std::tuple<cache_constraint_vector,
                                     block_constraint_vector,
                                     nest_constraint_vector>;
@@ -148,11 +159,10 @@ class cache_site_selector: public rer::client<cache_site_selector> {
                           const rmath::vector2d& nest_loc);
 
 
-  void opt_initialize(const ds::dp_cache_map& known_caches,
-                      const ds::dp_block_map& known_blocks,
-                      rmath::vector2d position,
+  void opt_initialize(const opt_init_conditions* cond,
                       struct site_utility_data* utility_data,
-                      std::vector<double>* initial_guess);
+                      std::vector<double>* initial_guess,
+                      rmath::rng* rng);
 
   bool verify_site(const rmath::vector2d& site,
                    const ds::dp_cache_map& known_caches,
@@ -162,9 +172,9 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
   /* clang-format off */
   const controller::cache_sel_matrix* const              mc_matrix;
-  nlopt::opt     m_alg{nlopt::algorithm::GN_ISRES, 2};
-  constraint_set                                         m_constraints{};
-  std::default_random_engine                             m_reng;
+
+  nlopt::opt      m_alg{nlopt::algorithm::GN_ISRES, 2};
+  constraint_set  m_constraints{};
   /* clang-format on */
 };
 
@@ -183,6 +193,6 @@ double __site_utility_func(const std::vector<double>& x,
                            std::vector<double>& ,
                            void *data) RCSW_PURE;
 
-NS_END(depth2, controller, fordyca);
+NS_END(depth2, fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_CACHE_SITE_SELECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_DEPTH2_CACHE_SITE_SELECTOR_HPP_ */

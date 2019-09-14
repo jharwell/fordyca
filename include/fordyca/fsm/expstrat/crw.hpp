@@ -50,9 +50,10 @@ NS_START(fordyca, fsm, expstrat);
 class crw final : public foraging_expstrat,
                   public rer::client<crw> {
  public:
-  explicit crw(const fsm::expstrat::foraging_expstrat::params* const c_params);
+  crw(const fsm::expstrat::foraging_expstrat::params* const c_params,
+      rmath::rng* rng);
 
-  explicit crw(crfootbot::footbot_saa_subsystem* saa);
+  crw(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng);
 
   ~crw(void) override = default;
   crw(const crw&) = delete;
@@ -74,7 +75,7 @@ class crw final : public foraging_expstrat,
 
     /* prototype overrides */
   std::unique_ptr<foraging_expstrat> clone(void) const override {
-    return std::make_unique<crw>(saa());
+    return std::make_unique<crw>(saa(), rng());
   }
 
  private:

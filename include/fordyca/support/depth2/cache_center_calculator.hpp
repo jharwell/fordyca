@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <random>
 #include <utility>
 #include <vector>
 #include <boost/optional.hpp>
@@ -38,6 +37,7 @@
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/ds/block_cluster_vector.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
+#include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,7 +75,8 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * @param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  cache_center_calculator(ds::arena_grid* grid, rtypes::spatial_dist cache_dim);
+  cache_center_calculator(ds::arena_grid* grid,
+                          rtypes::spatial_dist cache_dim);
 
   cache_center_calculator(const cache_center_calculator& other) = delete;
   cache_center_calculator& operator=(const cache_center_calculator& other) = delete;
@@ -97,7 +98,8 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
   boost::optional<rmath::vector2u> operator()(
       const ds::block_vector& c_cache_i_blocks,
       const ds::cache_vector& c_existing_caches,
-      const ds::block_cluster_vector& c_clusters) const;
+      const ds::block_cluster_vector& c_clusters,
+      rmath::rng* rng) const;
 
  private:
   /**
@@ -109,7 +111,8 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
   boost::optional<rmath::vector2u> deconflict_loc(
       const ds::cache_vector& c_existing_caches,
       const ds::block_cluster_vector& c_clusters,
-      const rmath::vector2u& c_center) const;
+      const rmath::vector2u& c_center,
+      rmath::rng* rng) const;
 
   /**
    * @brief Given the size of the cache-to-be and its tentative location in the
@@ -138,13 +141,13 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    */
   boost::optional<rmath::vector2u> deconflict_loc_entity(
       const repr::base_entity* ent,
-      const rmath::vector2u& center) const;
+      const rmath::vector2u& center,
+      rmath::rng* rng) const;
 
  private:
   /* clang-format off */
-  const rtypes::spatial_dist         mc_cache_dim;
-  ds::arena_grid*                    m_grid;
-  mutable std::default_random_engine m_rng;
+  const rtypes::spatial_dist mc_cache_dim;
+  ds::arena_grid*            m_grid;
   /* clang-format on */
 };
 NS_END(depth2, support, fordyca);

@@ -1,5 +1,5 @@
 /**
- * @file depth2/tasking_initializer.hpp
+ * @file depth2/task_executive_builder.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASKING_INITIALIZER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASKING_INITIALIZER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASK_EXECUTIVE_BUILDER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_TASK_EXECUTIVE_BUILDER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,7 +27,7 @@
 #include <string>
 #include <memory>
 
-#include "fordyca/controller/depth1/tasking_initializer.hpp"
+#include "fordyca/controller/depth1/task_executive_builder.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,36 +43,39 @@ NS_START(controller, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class tasking_initializer
+ * @class task_executive_builder
  * @ingroup fordyca controller depth2
  *
- * @brief A helper class to offload initialization of the task tree for depth2
- * foraging.
+ * @brief A helper class to offload initialization of the task tree and
+ * executive for depth2 foraging.
  */
-class tasking_initializer : public depth1::tasking_initializer,
-                            public rer::client<tasking_initializer> {
+class task_executive_builder : public depth1::task_executive_builder,
+                            public rer::client<task_executive_builder> {
  public:
-  tasking_initializer(const controller::block_sel_matrix* bsel_matrix,
+  task_executive_builder(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
                       crfootbot::footbot_saa_subsystem* saa,
                       base_perception_subsystem* perception) RCSW_COLD;
-  ~tasking_initializer(void) override RCSW_COLD;
+  ~task_executive_builder(void) override RCSW_COLD;
 
   std::unique_ptr<rta::bi_tdgraph_executive>
-  operator()(const config::depth2::controller_repository& config_repo) RCSW_COLD;
+  operator()(const config::depth2::controller_repository& config_repo,
+             rmath::rng* rng) RCSW_COLD;
 
-  using depth1::tasking_initializer::tasking_map;
+  using depth1::task_executive_builder::tasking_map;
 
  protected:
   tasking_map depth2_tasks_create(
       const config::depth2::controller_repository& config_repo,
-      rta::ds::bi_tdgraph* graph) RCSW_COLD;
+      rta::ds::bi_tdgraph* graph,
+      rmath::rng* rng) RCSW_COLD;
 
   void depth2_exec_est_init(const config::depth2::controller_repository& config_repo,
                             const tasking_map& map,
-                            rta::ds::bi_tdgraph* graph) RCSW_COLD;
+                            rta::ds::bi_tdgraph* graph,
+                            rmath::rng* rng) RCSW_COLD;
 };
 
 NS_END(depth2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_TASKING_INITIALIZER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_TASK_EXECUTIVE_BUILDER_HPP_ */

@@ -287,14 +287,15 @@ void depth1_loop_functions::cache_handling_init(
    * initial caches.
    */
   m_cache_manager = std::make_unique<static_cache_manager>(
-      cachep, &arena_map()->decoratee(), calc_cache_locs(distp));
+      cachep, &arena_map()->decoratee(), calc_cache_locs(distp), rng());
 
-  auto clusters = arena_map()->block_distributor()->block_clusters();
-  if (auto created = m_cache_manager->create(
-          arena_map()->caches(),
-          clusters,
-          arena_map()->blocks(),
-          rtypes::timestep(GetSpace().GetSimulationClock()))) {
+  cache_create_ro_params ccp = {
+    .current_caches = arena_map()->caches(),
+    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+  };
+  if (auto created = m_cache_manager->create(ccp,
+                                             arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -443,12 +444,13 @@ void depth1_loop_functions::Reset() {
   base_loop_functions::Reset();
   m_metrics_agg->reset_all();
 
-  auto clusters = arena_map()->block_distributor()->block_clusters();
-  if (auto created = m_cache_manager->create(
-          arena_map()->caches(),
-          clusters,
-          arena_map()->blocks(),
-          rtypes::timestep(GetSpace().GetSimulationClock()))) {
+cache_create_ro_params ccp = {
+    .current_caches = arena_map()->caches(),
+    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+  };
+
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -581,15 +583,16 @@ void depth1_loop_functions::static_cache_monitor(void) {
         counts.second += is_collector;
       });
 
-  auto clusters = arena_map()->block_distributor()->block_clusters();
-  auto created = m_cache_manager->create_conditional(
-      arena_map()->caches(),
-      clusters,
-      arena_map()->blocks(),
-      rtypes::timestep(GetSpace().GetSimulationClock()),
-      counts.first,
-      counts.second);
-  if (created) {
+  cache_create_ro_params ccp = {
+    .current_caches = arena_map()->caches(),
+    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+  };
+
+  if (auto created = m_cache_manager->create_conditional(ccp,
+                                                         arena_map()->blocks(),
+                                                         counts.first,
+                                                         counts.second)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return;

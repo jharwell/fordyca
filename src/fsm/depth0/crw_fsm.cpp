@@ -39,8 +39,9 @@ NS_START(fordyca, fsm, depth0);
  * Constructors/Destructors
  ******************************************************************************/
 crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
-                 std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior)
-    : util_hfsm(saa, ekST_MAX_STATES),
+                 std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+                 rmath::rng* rng)
+    : util_hfsm(saa, rng, ekST_MAX_STATES),
       ER_CLIENT_INIT("fordyca.fsm.depth0.crw"),
       HFSM_CONSTRUCT_STATE(transport_to_nest, &start),
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
@@ -50,6 +51,7 @@ crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       m_explore_fsm(saa,
                     std::move(exp_behavior),
+                    rng,
                     std::bind(&crw_fsm::block_detected, this)),
       mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
                    HFSM_STATE_MAP_ENTRY_EX(&acquire_block),

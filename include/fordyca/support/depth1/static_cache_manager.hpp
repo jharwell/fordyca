@@ -24,7 +24,6 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <random>
 #include <vector>
 #include <boost/optional.hpp>
 
@@ -35,8 +34,9 @@
 #include "fordyca/ds/block_cluster_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "rcppsw/math/vector2.hpp"
-
+#include "rcppsw/math/rng.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/support/cache_create_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,29 +63,25 @@ class static_cache_manager final : public base_cache_manager,
  public:
   static_cache_manager(const config::caches::caches_config* config,
                        ds::arena_grid* arena_grid,
-                       const std::vector<rmath::vector2d>& cache_locs);
+                       const std::vector<rmath::vector2d>& cache_locs,
+                       rmath::rng* rng);
+  static_cache_manager(const static_cache_manager&) = delete;
+  static_cache_manager& operator=(const static_cache_manager&) = delete;
 
   /**
    * @brief (Re)-create the static cache in the arena (depth 1 only).
-   *
-   * @param blocks The total block vector for the arena.
-   * @param timestep The current timestep.
    *
    * @return The created caches. Non-fatal failures to create the static cache
    * can occur if, for example, all blocks are currently being carried by robots
    * and there are not enough free blocks with which to create a cache of the
    * specified minimum size.
    */
-  boost::optional<ds::cache_vector> create(const ds::cache_vector& existing_caches,
-                                           const ds::block_cluster_vector& clusters,
-                                           const ds::block_vector& blocks,
-                                           rtypes::timestep t);
+  boost::optional<ds::cache_vector> create(const cache_create_ro_params& c_params,
+                                           const ds::block_vector&  c_alloc_blocks);
 
   boost::optional<ds::cache_vector> create_conditional(
-      const ds::cache_vector& existing_caches,
-      const ds::block_cluster_vector& clusters,
-      const ds::block_vector& blocks,
-      rtypes::timestep t,
+      const cache_create_ro_params& c_params,
+      const ds::block_vector&  c_alloc_blocks,
       uint n_harvesters,
       uint n_collectors);
 
@@ -161,7 +157,7 @@ class static_cache_manager final : public base_cache_manager,
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;
   const std::vector<rmath::vector2d>  mc_cache_locs;
-  std::default_random_engine          m_reng;
+  rmath::rng*                         m_rng;
   /* clang-format on */
 };
 

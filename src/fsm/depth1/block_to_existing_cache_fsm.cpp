@@ -37,33 +37,36 @@ NS_START(fordyca, fsm, depth1);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_existing_cache_fsm::block_to_existing_cache_fsm(
-    const params* const c_params)
-    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, c_params->saa),
+    const fsm_ro_params* const c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    rmath::rng* rng)
+    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
       m_cache_fsm(
-          c_params->csel_matrix,
-          c_params->saa,
-          c_params->store,
+          c_params,
+          saa,
           expstrat::cache_factory().create(
               c_params->exp_config.cache_strategy,
               std::make_unique<expstrat::foraging_expstrat::params>(
-                  c_params->saa,
+                  saa,
                   nullptr,
                   c_params->csel_matrix,
                   c_params->store,
                   support::light_type_index()[support::light_type_index::kCache])
-                  .get()),
+              .get(),
+              rng),
+          rng,
           false),
-      m_block_fsm(c_params->bsel_matrix,
-                  c_params->saa,
-                  c_params->store,
+      m_block_fsm(c_params,
+                  saa,
                   expstrat::block_factory().create(
                       c_params->exp_config.block_strategy,
                       std::make_unique<expstrat::foraging_expstrat::params>(
-                          c_params->saa,
+                          saa,
                           nullptr,
                           nullptr,
-                          c_params->store)
-                          .get())) {}
+                          c_params->store).get(),
+                      rng),
+                  rng) {}
 
 /*******************************************************************************
  * FSM Metrics

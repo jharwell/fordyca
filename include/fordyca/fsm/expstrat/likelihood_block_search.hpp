@@ -51,12 +51,16 @@ NS_START(fsm, expstrat);
  */
 class likelihood_block_search : public localized_search {
  public:
-  explicit likelihood_block_search(const foraging_expstrat::params* const c_params)
-      : likelihood_block_search(c_params->saa, c_params->dpo_store) {}
+  likelihood_block_search(const foraging_expstrat::params* const c_params,
+                          rmath::rng* rng)
+      : likelihood_block_search(c_params->saa,
+                                c_params->dpo_store,
+                                rng) {}
 
   likelihood_block_search(crfootbot::footbot_saa_subsystem* saa,
-                          const ds::dpo_store* store)
-      : localized_search(saa),
+                          const ds::dpo_store* store,
+                          rmath::rng* rng)
+      : localized_search(saa, rng),
         mc_store(store) {}
 
   ~likelihood_block_search(void) override = default;
@@ -68,7 +72,9 @@ class likelihood_block_search : public localized_search {
 
   /* prototype overrides */
   std::unique_ptr<foraging_expstrat> clone(void) const override {
-    return std::make_unique<likelihood_block_search>(saa(), mc_store);
+    return std::make_unique<likelihood_block_search>(saa(),
+                                                     mc_store,
+                                                     rng());
   }
 
  private:

@@ -1,5 +1,5 @@
 /**
- * @file tasking_initializer.cpp
+ * @file task_executive_builder.cpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,9 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1/tasking_initializer.hpp"
+#include "fordyca/controller/depth1/task_executive_builder.hpp"
 
-#include <chrono>
 #include <vector>
 
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
@@ -57,25 +56,26 @@ NS_START(fordyca, controller, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-tasking_initializer::tasking_initializer(
+task_executive_builder::task_executive_builder(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
     crfootbot::footbot_saa_subsystem* const saa,
     base_perception_subsystem* const perception)
-    : ER_CLIENT_INIT("fordyca.controller.depth1.tasking_initializer"),
-      m_saa(saa),
-      m_perception(perception),
+    : ER_CLIENT_INIT("fordyca.controller.depth1.task_executive_builder"),
       mc_csel_matrix(csel_matrix),
-      mc_bsel_matrix(bsel_matrix) {}
+      mc_bsel_matrix(bsel_matrix),
+      m_saa(saa),
+      m_perception(perception) {}
 
-tasking_initializer::~tasking_initializer(void) = default;
+task_executive_builder::~task_executive_builder(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
+task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
     const config::depth1::controller_repository& config_repo,
-    rta::ds::bi_tdgraph* const graph) {
+    rta::ds::bi_tdgraph* const graph,
+    rmath::rng* rng) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
@@ -86,26 +86,28 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
 
-  auto generalist_fsm = std::make_unique<fsm::depth0::free_block_to_nest_fsm>(
-      mc_bsel_matrix,
-      m_saa,
-      m_perception->dpo_store(),
-      block_factory.create(exp_config->block_strategy, &expbp));
-  auto collector_fsm = std::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
-      cache_sel_matrix(),
-      saa(),
-      m_perception->dpo_store(),
-      cache_factory.create(exp_config->cache_strategy, &expbp));
+  fsm::fsm_ro_params params = {
+    .bsel_matrix = block_sel_matrix(),
+    .csel_matrix = mc_csel_matrix,
+    .store = m_perception->dpo_store(),
+    .exp_config = *exp_config
+  };
 
-  fsm::depth1::block_to_existing_cache_fsm::params harvestorp = {
-      .bsel_matrix = block_sel_matrix(),
-      .csel_matrix = mc_csel_matrix,
-      .saa = saa(),
-      .store = m_perception->dpo_store(),
-      .exp_config = *exp_config};
+  auto generalist_fsm = std::make_unique<fsm::depth0::free_block_to_nest_fsm>(
+      &params,
+      saa(),
+      block_factory.create(exp_config->block_strategy, &expbp, rng),
+      rng);
+  auto collector_fsm = std::make_unique<fsm::depth1::cached_block_to_nest_fsm>(
+      &params,
+      saa(),
+      cache_factory.create(exp_config->cache_strategy, &expbp, rng),
+      rng);
 
   auto harvester_fsm =
-      std::make_unique<fsm::depth1::block_to_existing_cache_fsm>(&harvestorp);
+      std::make_unique<fsm::depth1::block_to_existing_cache_fsm>(&params,
+                                                                 saa(),
+                                                                 rng);
 
   auto collector =
       std::make_unique<tasks::depth1::collector>(task_config,
@@ -125,7 +127,7 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
   children.push_back(std::move(harvester));
   children.push_back(std::move(collector));
   graph->install_tab(tasks::depth0::foraging_task::kGeneralistName,
-                     std::move(children));
+                     std::move(children), rng);
   return tasking_map{
       {"generalist",
        graph->find_vertex(tasks::depth0::foraging_task::kGeneralistName)},
@@ -135,10 +137,11 @@ tasking_initializer::tasking_map tasking_initializer::depth1_tasks_create(
        graph->find_vertex(tasks::depth1::foraging_task::kHarvesterName)}};
 } /* depth1_tasks_create() */
 
-void tasking_initializer::depth1_exec_est_init(
+void task_executive_builder::depth1_exec_est_init(
     const config::depth1::controller_repository& config_repo,
     const tasking_map& map,
-    rta::ds::bi_tdgraph* const graph) {
+    rta::ds::bi_tdgraph* const graph,
+    rmath::rng* rng) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   if (!task_config->exec_est.seed_enabled) {
     return;
@@ -151,16 +154,7 @@ void tasking_initializer::depth1_exec_est_init(
   auto collector = map.find("collector")->second;
   auto generalist = map.find("generalist")->second;
 
-  /*
-   * As part of seeding exec estimates, we set the last executed subtask for a
-   * TAB. It's OK to declare/use here as local variables as this code only
-   * runs during initialization.
-   */
-  std::default_random_engine eng(
-      std::chrono::system_clock::now().time_since_epoch().count());
-  std::uniform_int_distribution<> dist(0, 1);
-
-  if (0 == dist(eng)) {
+  if (0 == rng->uniform(0, 1)) {
     graph->root_tab()->last_subtask(harvester);
   } else {
     graph->root_tab()->last_subtask(collector);
@@ -180,18 +174,19 @@ void tasking_initializer::depth1_exec_est_init(
           h_bounds.to_str().c_str(),
           collector->name().c_str(),
           c_bounds.to_str().c_str());
-  generalist->exec_estimate_init(g_bounds);
-  harvester->exec_estimate_init(h_bounds);
-  collector->exec_estimate_init(c_bounds);
+  generalist->exec_estimate_init(g_bounds, rng);
+  harvester->exec_estimate_init(h_bounds, rng);
+  collector->exec_estimate_init(c_bounds, rng);
 } /* depth1_exec_est_init() */
 
-std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
-    const config::depth1::controller_repository& config_repo) {
+std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
+    const config::depth1::controller_repository& config_repo,
+    rmath::rng* rng) {
   auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
   auto variant =
       std::make_unique<rta::ds::ds_variant>(rta::ds::bi_tdgraph(task_config));
   auto graph = boost::get<rta::ds::bi_tdgraph>(variant.get());
-  auto map = depth1_tasks_create(config_repo, graph);
+  auto map = depth1_tasks_create(config_repo, graph, rng);
   const auto* execp =
       config_repo.config_get<rta::config::task_executive_config>();
 
@@ -200,10 +195,12 @@ std::unique_ptr<rta::bi_tdgraph_executive> tasking_initializer::operator()(
     execp = std::make_unique<rta::config::task_executive_config>().get();
   }
 
-  graph->active_tab_init(execp->tab_init_policy);
-  depth1_exec_est_init(config_repo, map, graph);
+  graph->active_tab_init(execp->tab_init_policy, rng);
+  depth1_exec_est_init(config_repo, map, graph, rng);
 
-  return std::make_unique<rta::bi_tdgraph_executive>(execp, std::move(variant));
+  return std::make_unique<rta::bi_tdgraph_executive>(execp,
+                                                     std::move(variant),
+                                                     rng);
 } /* initialize() */
 
 NS_END(depth1, controller, fordyca);

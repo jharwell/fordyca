@@ -26,13 +26,12 @@
  ******************************************************************************/
 #include <algorithm>
 #include <vector>
-#include <random>
-#include <chrono>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/entity_list.hpp"
 #include "fordyca/ds/block_cluster_vector.hpp"
+#include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,9 +55,12 @@ class base_distributor {
    */
   static constexpr uint kMAX_DIST_TRIES = 100;
 
-  base_distributor(void) :
-      m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
+  explicit base_distributor(rmath::rng* rng) : m_rng(rng) {}
   virtual ~base_distributor(void) = default;
+
+  /* Needed for use in \ref multi_cluster_distributor */
+  base_distributor(const base_distributor&) = default;
+  base_distributor& operator=(const base_distributor&) = delete;
 
   /**
    * @brief Distribute a block in the specified area by trying each random
@@ -95,11 +97,11 @@ class base_distributor {
                          return distribute_block(b, entities);
                        });
   }
-  std::default_random_engine& rng(void) { return m_rng; }
+  rmath::rng* rng(void) { return m_rng; }
 
  private:
   /* clang-format off */
-  std::default_random_engine m_rng;
+  rmath::rng* m_rng;
   /* clang-format on */
 };
 

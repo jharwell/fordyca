@@ -32,6 +32,9 @@
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/ds/block_cluster_vector.hpp"
+#include "fordyca/support/cache_create_ro_params.hpp"
+
+#include "rcppsw/math/rng.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -60,25 +63,19 @@ class dynamic_cache_manager final : public base_cache_manager,
                               public rer::client<dynamic_cache_manager> {
  public:
   dynamic_cache_manager(const config::caches::caches_config* config,
-                        ds::arena_grid* arena_grid);
+                        ds::arena_grid* arena_grid,
+                        rmath::rng* rng);
+  dynamic_cache_manager(const dynamic_cache_manager&) = delete;
+  dynamic_cache_manager& operator=(const dynamic_cache_manager&) = delete;
 
   /**
    * @brief Create caches in the arena as needed according to free block
    * configurations.
    *
-   * @param existing_caches The list of current caches in the arena.
-   * @param clusters The total block clusters in the arena, for use in
-   *                 disallowing cache creation within their boundaries,
-   *                 depending on  configuration.
-   * @param blocks The total block vector for the arena.
-   * @param timestep The current timestep.
-   *
    * @return The created caches (if any were created).
    */
-  boost::optional<ds::cache_vector> create(const ds::cache_vector& c_existing_caches,
-                                           const ds::block_cluster_vector& c_clusters,
-                                           const ds::block_vector& blocks,
-                                           rtypes::timestep t);
+  boost::optional<ds::cache_vector> create(const cache_create_ro_params& c_params,
+                                           const ds::block_vector&  c_alloc_blocks);
 
   /**
    * @brief Get the minimum distance that must be maintained between two caches
@@ -108,6 +105,7 @@ class dynamic_cache_manager final : public base_cache_manager,
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;
+  rmath::rng*                         m_rng;
   /* clang-format on */
 };
 

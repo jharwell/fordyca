@@ -25,7 +25,6 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include <random>
 
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
@@ -47,12 +46,13 @@ NS_START(fordyca, support, block_dist);
  * clusters bounds randomly, using \ref random_distributor within
  * each cluster to do the actual distribution.
  */
-class multi_cluster_distributor final : public base_distributor,
-                                  public rer::client<multi_cluster_distributor> {
+class multi_cluster_distributor final : public rer::client<multi_cluster_distributor>,
+                                        public base_distributor {
  public:
   multi_cluster_distributor(std::vector<ds::arena_grid::view>& grids,
                             rtypes::discretize_ratio resolution,
-                            uint maxsize);
+                            uint maxsize,
+                            rmath::rng* rng);
 
   multi_cluster_distributor& operator=(const multi_cluster_distributor& s) = delete;
 

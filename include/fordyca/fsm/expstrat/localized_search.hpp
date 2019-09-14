@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "cosm/fsm/vector_fsm.hpp"
@@ -48,14 +50,15 @@ NS_START(fordyca, fsm, expstrat);
 class localized_search : public foraging_expstrat,
                          public rer::client<localized_search> {
  public:
-  explicit localized_search(const foraging_expstrat::params* const c_params)
-      : localized_search(c_params->saa) {}
+  localized_search(const foraging_expstrat::params* const c_params,
+                   rmath::rng* rng)
+      : localized_search(c_params->saa, rng) {}
 
-  explicit localized_search(crfootbot::footbot_saa_subsystem* saa)
-      : foraging_expstrat(saa),
+  localized_search(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng)
+      : foraging_expstrat(saa, rng),
         ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
-        m_vfsm(saa),
-        m_crw(saa) {}
+        m_vfsm(saa, rng),
+        m_crw(saa, rng) {}
 
   ~localized_search(void) override = default;
   localized_search(const localized_search& other) = delete;
@@ -101,7 +104,7 @@ class localized_search : public foraging_expstrat,
 
   /* prototype overrides */
   std::unique_ptr<foraging_expstrat> clone(void) const override {
-    return std::make_unique<localized_search>(saa());
+    return std::make_unique<localized_search>(saa(), rng());
   }
 
  private:

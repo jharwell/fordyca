@@ -22,9 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
-
-#include <chrono>
-
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -46,8 +43,7 @@ cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
                                                  rtypes::spatial_dist cache_dim)
     : ER_CLIENT_INIT("fordyca.support.depth2.cache_center_calculator"),
       mc_cache_dim(cache_dim),
-      m_grid(grid),
-      m_rng(std::chrono::system_clock::now().time_since_epoch().count()) {}
+      m_grid(grid) {}
 
 /*******************************************************************************
  * Member Functions
@@ -55,7 +51,8 @@ cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
 boost::optional<rmath::vector2u> cache_center_calculator::operator()(
     const ds::block_vector& c_cache_i_blocks,
     const ds::cache_vector& c_existing_caches,
-    const ds::block_cluster_vector& c_clusters) const {
+    const ds::block_cluster_vector& c_clusters,
+    rmath::rng* rng) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),
                                 c_cache_i_blocks.end(),
                                 0.0,
@@ -94,7 +91,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
   uint i = 0;
   while (i++ < kOVERLAP_SEARCH_MAX_TRIES) {
     if (auto new_center =
-            deconflict_loc(c_existing_caches, c_clusters, center)) {
+        deconflict_loc(c_existing_caches, c_clusters, center, rng)) {
       center = new_center.get();
     } else {
       break;
@@ -118,7 +115,8 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
 boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
     const ds::cache_vector& c_existing_caches,
     const ds::block_cluster_vector& c_clusters,
-    const rmath::vector2u& c_center) const {
+    const rmath::vector2u& c_center,
+    rmath::rng* rng) const {
   bool conflict = false;
   rmath::vector2u new_center = c_center;
   for (size_t i = 0; i < c_clusters.size(); ++i) {
@@ -131,12 +129,12 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
 
       /* check the current cache */
       if (auto new_loc =
-              deconflict_loc_entity(c_existing_caches[j].get(), c_center)) {
+          deconflict_loc_entity(c_existing_caches[j].get(), c_center, rng)) {
         new_center = new_loc.get();
         conflict = true;
       }
       /* check the current block cluster */
-      if (auto new_loc = deconflict_loc_entity(c_clusters[i], c_center)) {
+      if (auto new_loc = deconflict_loc_entity(c_clusters[i], c_center, rng)) {
         new_center = new_loc.get();
         conflict = true;
       }
@@ -200,7 +198,8 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundar
 
 boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
     const repr::base_entity* ent,
-    const rmath::vector2u& center) const {
+    const rmath::vector2u& center,
+    rmath::rng* rng) const {
   /*
    * The cache center is already a "real" coordinate, just one that has been
    * truncated to an integer.
@@ -233,10 +232,10 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
    * X or Y, in order to preserve having the block location be on an even
    * multiple of the grid size, which makes handling creation much easier.
    */
-  std::uniform_real_distribution<double> xrnd(-1.0, 1.0);
-  std::uniform_real_distribution<double> yrnd(-1.0, 1.0);
-  double x_delta = std::copysign(m_grid->resolution().v(), xrnd(m_rng));
-  double y_delta = std::copysign(m_grid->resolution().v(), yrnd(m_rng));
+  double x_delta = std::copysign(m_grid->resolution().v(),
+                                 rng->uniform(-1.0, 1.0));
+  double y_delta = std::copysign(m_grid->resolution().v(),
+                                 rng->uniform(-1.0, 1.0));
 
   /*
    * Need to pass cache dimensions rather than dimensions of the entity, which

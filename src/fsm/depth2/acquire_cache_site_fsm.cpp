@@ -24,7 +24,7 @@
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/depth2/cache_site_selector.hpp"
+#include "fordyca/fsm/depth2/cache_site_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
@@ -41,14 +41,14 @@ using cselm = controller::cache_sel_matrix;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_cache_site_fsm::acquire_cache_site_fsm(
-    const controller::cache_sel_matrix* matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
-    ds::dpo_store* const store)
+acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
+                                               crfootbot::footbot_saa_subsystem* saa,
+                                               rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
           saa,
           nullptr, /* never explore for cache sites */
+          rng,
           acquire_goal_fsm::hook_list{
             .acquisition_goal = std::bind(&acquire_cache_site_fsm::acquisition_goal_internal,
                                           this),
@@ -63,8 +63,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(
                 .goal_valid_cb = [](const rmath::vector2d&, uint) noexcept { return true;
 }
 }),
-      mc_matrix(matrix),
-      mc_store(store) {}
+      mc_matrix(c_params->csel_matrix),
+      mc_store(c_params->store) {}
 
 /*******************************************************************************
  * Member Functions
@@ -80,9 +80,11 @@ bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
 } /* site_exploration_term_cb() */
 
 boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
-    site_select(void) const {
-  if (auto best = controller::depth2::cache_site_selector(mc_matrix)(
-          mc_store->caches(), mc_store->blocks(), saa()->sensing()->position())) {
+    site_select(void) {
+  if (auto best = cache_site_selector(mc_matrix)(mc_store->caches(),
+                                                 mc_store->blocks(),
+                                                 saa()->sensing()->position(),
+                                                 rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(*best, kCACHE_SITE_ARRIVAL_TOL, -1));

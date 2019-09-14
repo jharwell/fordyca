@@ -41,8 +41,10 @@ NS_START(fordyca, support, block_dist);
  * Constructors/Destructor
  ******************************************************************************/
 random_distributor::random_distributor(const ds::arena_grid::view& grid,
-                                       rtypes::discretize_ratio resolution)
+                                       rtypes::discretize_ratio resolution,
+                                       rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.support.block_dist.random"),
+      base_distributor(rng),
       mc_resolution(resolution),
       mc_origin(grid.origin()->loc()),
       mc_xspan(mc_origin.x(), mc_origin.x() + grid.shape()[0]),
@@ -178,8 +180,10 @@ boost::optional<random_distributor::coord_search_res_t> random_distributor::
    * arena. You only have a finite number of tries, for obvious reasons.
    */
   do {
-    uint x = area_xrange.span() > 0 ? xdist(rng()) : m_grid.index_bases()[0];
-    uint y = area_xrange.span() > 0 ? ydist(rng()) : m_grid.index_bases()[1];
+    uint x = area_xrange.span() > 0 ? rng()->uniform(area_xrange.lb(),
+                                                     area_xrange.ub() - 1) : m_grid.index_bases()[0];
+    uint y = area_xrange.span() > 0 ? rng()->uniform(area_yrange.lb(),
+                                                     area_yrange.ub() - 1) : m_grid.index_bases()[1];
     rel = {x, y};
     abs = {rel.x() + mc_origin.x(), rel.y() + mc_origin.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {

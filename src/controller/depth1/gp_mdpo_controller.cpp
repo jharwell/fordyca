@@ -27,7 +27,7 @@
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
-#include "fordyca/controller/depth1/tasking_initializer.hpp"
+#include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_block.hpp"
@@ -100,8 +100,10 @@ void gp_mdpo_controller::shared_init(
    * gp_dpo_controller, we have to replace it because we have our own perception
    * subsystem, which is used to create the executive's graph.
    */
-  executive(tasking_initializer(
-      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo));
+  executive(task_executive_builder(block_sel_matrix(),
+                                cache_sel_matrix(),
+                                saa(),
+                                perception())(config_repo, rng()));
   executive()->task_abort_notify(std::bind(
       &gp_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 

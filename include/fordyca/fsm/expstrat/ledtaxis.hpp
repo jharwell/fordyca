@@ -48,10 +48,14 @@ NS_START(fordyca, fsm, expstrat);
 class ledtaxis : public foraging_expstrat,
                  public rer::client<ledtaxis> {
  public:
-  explicit ledtaxis(const foraging_expstrat::params* const c_params)
-      : ledtaxis(c_params->saa, c_params->ledtaxis_target) {}
+  explicit ledtaxis(const foraging_expstrat::params* const c_params,
+                    rmath::rng* rng)
+      : ledtaxis(c_params->saa,
+                 c_params->ledtaxis_target,
+                 rng) {}
   ledtaxis(crfootbot::footbot_saa_subsystem* saa,
-           const rutils::color& target);
+           const rutils::color& target,
+           rmath::rng* rng);
 
   ~ledtaxis(void) override = default;
   ledtaxis(const ledtaxis&) = delete;

@@ -33,8 +33,8 @@
 #include "fordyca/ds/entity_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
-
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -89,7 +89,7 @@ class dispatcher {
    *
    * @return \c TRUE if initialization successful, \c FALSE otherwise.
    */
-  bool initialize(void);
+  bool initialize(rmath::rng* rng);
 
   /**
    * @brief Distribute a block in the arena.

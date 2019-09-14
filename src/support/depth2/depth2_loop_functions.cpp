@@ -213,7 +213,9 @@ void depth2_loop_functions::cache_handling_init(
   ER_ASSERT(nullptr != cachep && cachep->dynamic.enable,
             "FATAL: Caches not enabled in depth2 loop functions");
   m_cache_manager =
-      std::make_unique<dynamic_cache_manager>(cachep, &arena_map()->decoratee());
+      std::make_unique<dynamic_cache_manager>(cachep,
+                                              &arena_map()->decoratee(),
+                                              rng());
 
   cache_creation_handle(false);
 } /* cache_handlng_init() */
@@ -419,12 +421,13 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
     ER_INFO("Not performing dynamic cache creation: no robot block drop");
     return false;
   }
-  auto created =
-      m_cache_manager->create(arena_map()->caches(),
-                              arena_map()->block_distributor()->block_clusters(),
-                              arena_map()->blocks(),
-                              rtypes::timestep(GetSpace().GetSimulationClock()));
-  if (created) {
+  cache_create_ro_params ccp = {
+    .current_caches = arena_map()->caches(),
+    .clusters = arena_map()->block_distributor()->block_clusters(),
+    .t = rtypes::timestep(GetSpace().GetSimulationClock())
+  };
+
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;

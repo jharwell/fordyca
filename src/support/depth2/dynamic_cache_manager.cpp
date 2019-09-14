@@ -41,30 +41,31 @@ using ds::arena_grid;
  ******************************************************************************/
 dynamic_cache_manager::dynamic_cache_manager(
     const config::caches::caches_config* config,
-    ds::arena_grid* const arena_grid)
+    ds::arena_grid* const arena_grid,
+    rmath::rng* rng)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_manager"),
-      mc_cache_config(*config) {}
+      mc_cache_config(*config),
+      m_rng(rng) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 boost::optional<ds::cache_vector> dynamic_cache_manager::create(
-    const ds::cache_vector& c_existing_caches,
-    const ds::block_cluster_vector& c_clusters,
-    const ds::block_vector& blocks,
-    rtypes::timestep t) {
+    const cache_create_ro_params& c_params,
+    const ds::block_vector&  c_alloc_blocks) {
   if (auto to_use =
-          calc_blocks_for_creation(c_existing_caches, c_clusters, blocks)) {
+          calc_blocks_for_creation(c_params.current_caches,
+                                   c_params.clusters,
+                                   c_alloc_blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
         .grid = arena_grid(),
         .cache_dim = mc_cache_config.dimension,
         .min_dist = mc_cache_config.dynamic.min_dist,
         .min_blocks = mc_cache_config.dynamic.min_blocks};
-    support::depth2::dynamic_cache_creator creator(&params);
+    support::depth2::dynamic_cache_creator creator(&params, m_rng);
 
-    ds::cache_vector created =
-        creator.create_all(c_existing_caches, c_clusters, *to_use, t);
+    ds::cache_vector created = creator.create_all(c_params, *to_use);
     caches_created(created.size());
 
     /*

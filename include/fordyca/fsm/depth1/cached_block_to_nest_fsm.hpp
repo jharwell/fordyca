@@ -30,6 +30,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "rcppsw/ta/taskable.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -73,10 +74,10 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
                                        public rta::taskable {
  public:
   cached_block_to_nest_fsm(
-      const controller::cache_sel_matrix* sel_matrix,
+      const fsm_ro_params* c_params,
       crfootbot::footbot_saa_subsystem* saa,
-      ds::dpo_store* store,
-      std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      rmath::rng *rng);
   ~cached_block_to_nest_fsm(void) override = default;
 
   cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;

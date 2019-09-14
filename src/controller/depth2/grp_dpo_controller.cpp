@@ -30,7 +30,7 @@
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/depth2/tasking_initializer.hpp"
+#include "fordyca/controller/depth2/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
@@ -88,8 +88,10 @@ void grp_dpo_controller::private_init(
    * Rebind executive to use depth2 task decomposition graph instead of depth1
    * version.
    */
-  executive(tasking_initializer(
-      block_sel_matrix(), cache_sel_matrix(), saa(), perception())(config_repo));
+  executive(task_executive_builder(block_sel_matrix(),
+                                cache_sel_matrix(),
+                                saa(),
+                                perception())(config_repo, rng()));
 
   /*
    * Set task alloction callback, rebind task abort callback (original was lost

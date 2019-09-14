@@ -59,7 +59,10 @@ NS_START(fsm, expstrat);
 class foraging_expstrat : public cfsm::expstrat::base_expstrat,
                           public rpprototype::clonable<foraging_expstrat> {
  public:
-  using cfsm::expstrat::base_expstrat::base_expstrat;
+  foraging_expstrat(crfootbot::footbot_saa_subsystem* saa,
+                    rmath::rng* rng) :
+      base_expstrat(saa),
+      m_rng(rng) {}
 
   struct params {
     params(crfootbot::footbot_saa_subsystem* const saa_in,
@@ -85,6 +88,13 @@ class foraging_expstrat : public cfsm::expstrat::base_expstrat,
  protected:
   crfootbot::footbot_saa_subsystem* saa(void) const;
   crfootbot::footbot_saa_subsystem* saa(void);
+  rmath::rng* rng(void) { return m_rng; }
+  rmath::rng* rng(void) const { return m_rng; }
+
+ private:
+  /* clang-format off */
+  rmath::rng* m_rng;
+  /* clang-format on */
 };
 
 NS_END(expstrat, fsm, fordyca);

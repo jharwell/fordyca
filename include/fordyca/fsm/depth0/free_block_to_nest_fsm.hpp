@@ -29,6 +29,7 @@
 #include "rcppsw/ta/taskable.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 #include "cosm/fsm/util_hfsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
@@ -62,10 +63,10 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
                                      public rta::taskable {
  public:
   free_block_to_nest_fsm(
-      const controller::block_sel_matrix* sel_matrix,
+      const fsm_ro_params* c_params,
       crfootbot::footbot_saa_subsystem* saa,
-      ds::dpo_store* store,
-      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior);
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      rmath::rng* rng);
 
   /* taskable overrides */
   void task_execute(void) override;

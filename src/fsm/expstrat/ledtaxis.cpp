@@ -36,8 +36,9 @@ NS_START(fordyca, fsm, expstrat);
  * Constructors/Destructor
  ******************************************************************************/
 ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem* saa,
-                   const rutils::color& target)
-    : foraging_expstrat(saa),
+                   const rutils::color& target,
+                   rmath::rng* rng)
+    : foraging_expstrat(saa, rng),
       ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis"),
       m_tracker(saa->sensing()),
       m_target(target) {}
@@ -46,7 +47,7 @@ ledtaxis::ledtaxis(crfootbot::footbot_saa_subsystem* saa,
  * General Member Functions
  ******************************************************************************/
 void ledtaxis::task_execute(void) {
-  saa()->steer_force2D().accum(saa()->steer_force2D().wander());
+  saa()->steer_force2D().accum(saa()->steer_force2D().wander(rng()));
 
   if (auto obs = saa()->sensing()->proximity()->avg_prox_obj()) {
     m_tracker.ca_enter();

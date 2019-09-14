@@ -32,7 +32,7 @@
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/controller/depth1/tasking_initializer.hpp"
+#include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_block.hpp"
@@ -109,10 +109,10 @@ void gp_dpo_controller::shared_init(
 void gp_dpo_controller::private_init(
     const config::depth1::controller_repository& config_repo) {
   /* task executive */
-  m_executive = tasking_initializer(block_sel_matrix(),
+  m_executive = task_executive_builder(block_sel_matrix(),
                                     m_cache_sel_matrix.get(),
                                     saa(),
-                                    perception())(config_repo);
+                                    perception())(config_repo, rng());
   executive()->task_abort_notify(
       std::bind(&gp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
   executive()->task_start_notify(

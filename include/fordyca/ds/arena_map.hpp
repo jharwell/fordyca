@@ -261,7 +261,8 @@ class arena_map final : public rer::client<arena_map>,
    * - The block distributor
    * - Nest lights
    */
-  bool initialize(support::base_loop_functions* loop);
+  bool initialize(support::base_loop_functions* loop,
+                  rmath::rng* rng);
 
   /**
    * @brief Protects simultaneous updates to the underlying grid.

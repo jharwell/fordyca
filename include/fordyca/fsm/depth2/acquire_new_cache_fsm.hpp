@@ -29,6 +29,7 @@
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -62,11 +63,10 @@ NS_START(depth2);
 class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
                               public cfsm::acquire_goal_fsm {
  public:
-  acquire_new_cache_fsm(
-      const controller::cache_sel_matrix* matrix,
-      crfootbot::footbot_saa_subsystem* saa,
-      ds::dpo_store* store,
-      std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
+  acquire_new_cache_fsm(const fsm_ro_params* c_params,
+                        crfootbot::footbot_saa_subsystem* saa,
+                        std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+                        rmath::rng* rng);
   ~acquire_new_cache_fsm(void) override = default;
 
   acquire_new_cache_fsm(const acquire_new_cache_fsm& fsm) = delete;

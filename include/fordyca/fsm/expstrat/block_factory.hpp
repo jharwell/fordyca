@@ -38,7 +38,8 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 class block_factory :
     public rpfactory::releasing_factory<expstrat::foraging_expstrat,
-                                        const expstrat::foraging_expstrat::params*> {
+                                        const expstrat::foraging_expstrat::params*,
+                                        rmath::rng*> {
  public:
   static constexpr char kCRW[] = "CRW";
   static constexpr char kLikelihoodSearch[] = "likelihood_search";

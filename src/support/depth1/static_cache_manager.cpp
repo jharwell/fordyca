@@ -21,9 +21,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_manager.hpp"
-
-#include <chrono>
-
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
@@ -45,28 +42,27 @@ using ds::arena_grid;
 static_cache_manager::static_cache_manager(
     const config::caches::caches_config* config,
     ds::arena_grid* const arena_grid,
-    const std::vector<rmath::vector2d>& cache_locs)
+    const std::vector<rmath::vector2d>& cache_locs,
+    rmath::rng* rng)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_manager"),
       mc_cache_config(*config),
       mc_cache_locs(cache_locs),
-      m_reng(std::chrono::system_clock::now().time_since_epoch().count()) {}
+      m_rng(rng) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 boost::optional<ds::cache_vector> static_cache_manager::create(
-    const ds::cache_vector& existing_caches,
-    const ds::block_cluster_vector& clusters,
-    const ds::block_vector& blocks,
-    rtypes::timestep t) {
+    const cache_create_ro_params& c_params,
+    const ds::block_vector&  c_alloc_blocks) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= repr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
             mc_cache_config.static_.size,
             repr::base_cache::kMinBlocks);
 
-  auto to_use = blocks_alloc(existing_caches, blocks);
+  auto to_use = blocks_alloc(c_params.current_caches, c_alloc_blocks);
   if (!to_use) {
     ER_WARN("Unable to create static cache(s): Not enough free blocks");
     return boost::optional<ds::cache_vector>();
@@ -75,18 +71,19 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
                                mc_cache_locs,
                                mc_cache_config.dimension);
 
-  auto created = creator.create_all(
-      existing_caches, ds::block_cluster_vector(), *to_use, t);
+  auto created = creator.create_all(c_params, *to_use);
 
   /*
    * Fix hidden blocks and update host cells. Host cell updating must be second,
    * otherwise the cache host cell will have a block as its entity!
    */
-  post_creation_blocks_absorb(created, blocks);
+  post_creation_blocks_absorb(created, c_alloc_blocks);
   creator.update_host_cells(created);
 
-  auto free_blocks = utils::free_blocks_calc(created, blocks);
-  ER_ASSERT(creator.creation_sanity_checks(created, free_blocks, clusters),
+  auto free_blocks = utils::free_blocks_calc(created, c_alloc_blocks);
+  ER_ASSERT(creator.creation_sanity_checks(created,
+                                           free_blocks,
+                                           c_params.clusters),
             "One or more bad caches on creation");
 
   caches_created(created.size());
@@ -94,18 +91,15 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
 } /* create() */
 
 boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
-    const ds::cache_vector& existing_caches,
-    const ds::block_cluster_vector& clusters,
-    const ds::block_vector& blocks,
-    rtypes::timestep t,
+    const cache_create_ro_params& c_params,
+    const ds::block_vector&  c_alloc_blocks,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
       mc_cache_config.static_.respawn_scale_factor);
-  std::uniform_real_distribution<> dist(0.0, 1.0);
 
-  if (p.calc(n_harvesters, n_collectors) >= dist(m_reng)) {
-    return create(existing_caches, clusters, blocks, t);
+  if (p.calc(n_harvesters, n_collectors) >= m_rng->uniform(0.0, 1.0)) {
+    return create(c_params, c_alloc_blocks);
   } else {
     return boost::optional<ds::cache_vector>();
   }
@@ -161,7 +155,7 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
                              return !c->contains_block(b);
                            }) &&
                /* not already on a cell where cache will be re-created, or
-                  * on the cell where ANOTHER cache *might* be recreated */
+                * on the cell where ANOTHER cache *might* be recreated */
                std::all_of(mc_cache_locs.begin(),
                            mc_cache_locs.end(),
                            [&](const auto& l) {

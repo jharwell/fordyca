@@ -48,14 +48,18 @@ NS_START(fordyca, fsm, expstrat);
 class ledtaxis_cache_search : public foraging_expstrat,
                               public rer::client<ledtaxis_cache_search> {
  public:
-  explicit ledtaxis_cache_search(const foraging_expstrat::params* const c_params)
-      : ledtaxis_cache_search(c_params->saa, c_params->ledtaxis_target) {}
+  explicit ledtaxis_cache_search(const foraging_expstrat::params* const c_params,
+                                 rmath::rng* rng)
+      : ledtaxis_cache_search(c_params->saa,
+                              c_params->ledtaxis_target,
+                              rng) {}
   ledtaxis_cache_search(crfootbot::footbot_saa_subsystem* saa,
-                        const rutils::color& ledtaxis_target)
-      : foraging_expstrat(saa),
+                        const rutils::color& ledtaxis_target,
+                        rmath::rng* rng)
+      : foraging_expstrat(saa, rng),
         ER_CLIENT_INIT("fordyca.fsm.expstrat.ledtaxis_cache_search"),
-        m_crw(saa),
-        m_taxis(saa, ledtaxis_target) {}
+        m_crw(saa, rng),
+        m_taxis(saa, ledtaxis_target, rng) {}
 
   ~ledtaxis_cache_search(void) override = default;
   ledtaxis_cache_search(const ledtaxis_cache_search&) = delete;
@@ -97,7 +101,8 @@ class ledtaxis_cache_search : public foraging_expstrat,
   /* prototype overrides */
   std::unique_ptr<foraging_expstrat> clone(void) const override {
     return std::make_unique<ledtaxis_cache_search>(saa(),
-                                                   m_taxis.target());
+                                                   m_taxis.target(),
+                                                   rng());
   }
 
  private:

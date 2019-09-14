@@ -34,13 +34,13 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 cache_transferer_fsm::cache_transferer_fsm(
-    const controller::cache_sel_matrix* const matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
-    ds::dpo_store* const store,
-    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior)
-    : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa),
-      m_src_cache_fsm(matrix, saa, store, exp_behavior->clone(), true),
-      m_dest_cache_fsm(matrix, saa, store, exp_behavior->clone(), false) {}
+    const fsm_ro_params* c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng)
+    : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa, rng),
+      m_src_cache_fsm(c_params, saa, exp_behavior->clone(), rng, true),
+      m_dest_cache_fsm(c_params, saa, exp_behavior->clone(), rng, false) {}
 
 /*******************************************************************************
  * FSM Metrics

@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include <list>
 #include <vector>
-#include <random>
 #include <boost/optional.hpp>
 #include <memory>
 
@@ -64,11 +63,12 @@ NS_START(support, block_dist);
  *   the arena map the blocks are being distributed into some part of (this is
  *   not checked).
  */
-class random_distributor final : public base_distributor,
-                           public rer::client<random_distributor> {
+class random_distributor final : public rer::client<random_distributor>,
+                                 public base_distributor {
  public:
   random_distributor(const ds::arena_grid::view& grid,
-                     rtypes::discretize_ratio resolution);
+                     rtypes::discretize_ratio resolution,
+                     rmath::rng* rng);
 
   random_distributor& operator=(const random_distributor& s) = delete;
 

@@ -41,9 +41,10 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 block_to_goal_fsm::block_to_goal_fsm(cfsm::acquire_goal_fsm* const goal_fsm,
                                      cfsm::acquire_goal_fsm* const block_fsm,
-                                     crfootbot::footbot_saa_subsystem* saa)
+                                     crfootbot::footbot_saa_subsystem* saa,
+                                     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
-      util_hfsm(saa, ekST_MAX_STATES),
+      util_hfsm(saa, rng, ekST_MAX_STATES),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),

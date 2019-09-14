@@ -27,6 +27,7 @@
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,9 +56,9 @@ NS_START(fsm, depth2);
 class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
                                public cfsm::acquire_goal_fsm {
  public:
-  acquire_cache_site_fsm(const controller::cache_sel_matrix* matrix,
+  acquire_cache_site_fsm(const fsm_ro_params* c_params,
                          crfootbot::footbot_saa_subsystem* saa,
-                         ds::dpo_store* store);
+                         rmath::rng* rng);
   ~acquire_cache_site_fsm(void) override = default;
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
@@ -68,7 +69,7 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
   cfmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
-  boost::optional<acquire_goal_fsm::candidate_type> site_select(void) const;
+  boost::optional<acquire_goal_fsm::candidate_type> site_select(void);
   bool candidates_exist(void) const { return true; }
   bool site_exploration_term_cb(void) const RCSW_CONST;
   bool site_acquired_cb(bool explore_result) const RCSW_CONST;

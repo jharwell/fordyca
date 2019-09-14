@@ -57,10 +57,8 @@ class static_cache_creator : public base_cache_creator,
    * the locations of the static caches do not change and are known to be
    * conflict free.
    */
-  ds::cache_vector create_all(const ds::cache_vector& c_existing_caches,
-                              const ds::block_cluster_vector&,
-                              const ds::block_vector& c_alloc_blocks,
-                              rtypes::timestep t) override;
+  ds::cache_vector create_all(const cache_create_ro_params& c_params,
+                              const ds::block_vector&  c_alloc_blocks) override;
 
  private:
   /* clang-format off */

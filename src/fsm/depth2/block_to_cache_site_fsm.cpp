@@ -22,7 +22,6 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth2/block_to_cache_site_fsm.hpp"
-
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
@@ -34,14 +33,13 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_cache_site_fsm::block_to_cache_site_fsm(
-    const controller::block_sel_matrix* bsel_matrix,
-    const controller::cache_sel_matrix* csel_matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
-    ds::dpo_store* const store,
-    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior)
-    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
-      m_cache_fsm(csel_matrix, saa, store),
-      m_block_fsm(bsel_matrix, saa, store, std::move(exp_behavior)) {}
+    const fsm_ro_params* c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng)
+    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
+      m_cache_fsm(c_params, saa, rng),
+      m_block_fsm(c_params, saa, std::move(exp_behavior), rng) {}
 
 /*******************************************************************************
  * FSM Metrics

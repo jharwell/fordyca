@@ -52,12 +52,10 @@ NS_START(fordyca, fsm, depth2);
  */
 class block_to_cache_site_fsm final : public block_to_goal_fsm {
  public:
-  block_to_cache_site_fsm(
-      const controller::block_sel_matrix* bsel_matrix,
-      const controller::cache_sel_matrix* csel_matrix,
-      crfootbot::footbot_saa_subsystem* saa,
-      ds::dpo_store* store,
-      std::unique_ptr<expstrat::foraging_expstrat> exp_behavior);
+  block_to_cache_site_fsm(const fsm_ro_params* c_params,
+                          crfootbot::footbot_saa_subsystem* saa,
+                          std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+                          rmath::rng* rng);
 
   ~block_to_cache_site_fsm(void) override = default;
   block_to_cache_site_fsm(const block_to_cache_site_fsm&) = delete;

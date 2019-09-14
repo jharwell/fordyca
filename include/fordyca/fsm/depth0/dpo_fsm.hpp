@@ -29,6 +29,7 @@
 
 #include "cosm/fsm/util_hfsm.hpp"
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,12 +38,7 @@ NS_START(fordyca);
 
 namespace ds { class dpo_store; }
 
-NS_START(fsm);
-namespace expstrat {
-class foraging_expstrat;
-} /* namespace expstrat */
-
-NS_START(depth0);
+NS_START(fsm, depth0);
 
 /*******************************************************************************
  * Class Definitions
@@ -64,10 +60,10 @@ class dpo_fsm final : public cfsm::util_hfsm,
                       public cfmetrics::goal_acq_metrics,
                       public block_transporter {
  public:
-  dpo_fsm(const controller::block_sel_matrix* sel_matrix,
+  dpo_fsm(const fsm_ro_params * params,
           crfootbot::footbot_saa_subsystem* saa,
-          ds::dpo_store* store,
-          std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior);
+          std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+          rmath::rng* rng);
   ~dpo_fsm(void) override = default;
 
   /* collision metrics */

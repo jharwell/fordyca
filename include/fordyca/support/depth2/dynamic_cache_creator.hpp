@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
 #include "fordyca/ds/block_cluster_vector.hpp"
+#include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,16 +52,16 @@ class dynamic_cache_creator : public base_cache_creator,
     rtypes::spatial_dist min_dist;
     uint                 min_blocks;
   };
-  explicit dynamic_cache_creator(const struct params* p);
+  dynamic_cache_creator(const params* p, rmath::rng* rng);
+  dynamic_cache_creator(const dynamic_cache_creator&) = delete;
+  dynamic_cache_creator& operator=(const dynamic_cache_creator&) = delete;
 
   /**
    * @brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  ds::cache_vector create_all(const ds::cache_vector& c_previous_caches,
-                              const ds::block_cluster_vector& c_clusters,
-                              const ds::block_vector& candidate_blocks,
-                              rtypes::timestep t) override;
+  ds::cache_vector create_all(const cache_create_ro_params& c_params,
+                              const ds::block_vector&  c_alloc_blocks) override;
 
  private:
   /**
@@ -69,19 +70,19 @@ class dynamic_cache_creator : public base_cache_creator,
    *
    * @param used_blocks The blocks that have been used to successfully create
    *                    other caches during this invocation of the creator.
-   * @param candidates The total list of all blocks available for cache creation
-   *                    when the creator was called.
+   * @param alloc_blocks The total list of all blocks available for cache
+   *                     creation when the creator was called.
    * @param index Our current index within the candidate vector.
    */
   ds::block_vector cache_i_blocks_alloc(const ds::block_vector& c_used_blocks,
-                                        const ds::block_vector& candidates,
+                                        const ds::block_vector& c_alloc_blocks,
                                         uint index) const;
 
   /**
    * @brief Calculate the blocks a cache will absorb as a result of its center
    * beyond moved to deconflict with other caches/clusters/etc.
    *
-   * @param candidate_blocks The total list of all blocks available for cache
+   * @param alloc_blocks     The total list of all blocks available for cache
    *                         creation when the creator was called.
    * @param cache_i_blocks   The blocks to be used in creating the new cache.
    * @param used_blocks      The blocks already used to create other caches.
@@ -93,7 +94,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * problems. See #578.
    */
   ds::block_vector absorb_blocks_calc(
-      const ds::block_vector& c_candidate_blocks,
+      const ds::block_vector& c_alloc_blocks,
       const ds::block_vector& c_cache_i_blocks,
       const ds::block_vector& c_used_blocks,
       const rmath::vector2u& c_center,
@@ -111,6 +112,7 @@ class dynamic_cache_creator : public base_cache_creator,
   /* clang-format off */
   const rtypes::spatial_dist mc_min_dist;
   const uint                 mc_min_blocks;
+  rmath::rng*                m_rng;
   /* clang-format on */
 };
 

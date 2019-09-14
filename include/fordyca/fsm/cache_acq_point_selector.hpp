@@ -24,11 +24,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <random>
-
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/math/rng.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -36,6 +35,7 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca);
+
 namespace repr {
 class base_cache;
 } /* namespace repr */
@@ -70,7 +70,7 @@ class cache_acq_point_selector : public rer::client<cache_acq_point_selector> {
 
   rmath::vector2d operator()(const rmath::vector2d& robot_loc,
                              const repr::base_cache* cache,
-                             std::default_random_engine& rd);
+                             rmath::rng* rng);
 
  private:
   /* clang-format off */

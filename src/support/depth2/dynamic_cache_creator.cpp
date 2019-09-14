@@ -39,32 +39,32 @@ NS_START(fordyca, support, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-dynamic_cache_creator::dynamic_cache_creator(const struct params* const p)
+dynamic_cache_creator::dynamic_cache_creator(const params* const p,
+                                             rmath::rng* rng)
     : base_cache_creator(p->grid, p->cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_creator"),
       mc_min_dist(p->min_dist),
-      mc_min_blocks(p->min_blocks) {}
+      mc_min_blocks(p->min_blocks),
+      m_rng(rng) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 ds::cache_vector dynamic_cache_creator::create_all(
-    const ds::cache_vector& c_previous_caches,
-    const ds::block_cluster_vector& c_clusters,
-    const ds::block_vector& candidate_blocks,
-    rtypes::timestep t) {
+    const cache_create_ro_params& c_params,
+    const ds::block_vector&  c_alloc_blocks) {
   ds::cache_vector created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
            mc_min_dist.v(),
            mc_min_blocks,
-           rcppsw::to_string(candidate_blocks).c_str(),
-           candidate_blocks.size());
+           rcppsw::to_string(c_alloc_blocks).c_str(),
+           c_alloc_blocks.size());
 
   ds::block_vector used_blocks;
-  for (size_t i = 0; i < candidate_blocks.size() - 1; ++i) {
+  for (size_t i = 0; i < c_alloc_blocks.size() - 1; ++i) {
     ds::block_vector cache_i_blocks =
-        cache_i_blocks_alloc(used_blocks, candidate_blocks, i);
+        cache_i_blocks_alloc(used_blocks, c_alloc_blocks, i);
 
     /*
      * We now have all the blocks that are close enough to block i to be
@@ -72,10 +72,10 @@ ds::cache_vector dynamic_cache_creator::create_all(
      */
     if (cache_i_blocks.size() >= mc_min_blocks) {
       ds::cache_vector c_avoid =
-          avoidance_caches_calc(c_previous_caches, created_caches);
+          avoidance_caches_calc(c_params.current_caches, created_caches);
 
       if (auto center = cache_center_calculator(grid(), cache_dim())(
-              cache_i_blocks, c_avoid, c_clusters)) {
+              cache_i_blocks, c_avoid, c_params.clusters, m_rng)) {
         /*
          * If we found a conflict free cache center, we need to check if there
          * are free blocks that are now within the extent of the cache to be due
@@ -83,7 +83,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * the new cache.
          */
         auto absorb_blocks = absorb_blocks_calc(
-            candidate_blocks, cache_i_blocks, used_blocks, *center, cache_dim());
+            c_alloc_blocks, cache_i_blocks, used_blocks, *center, cache_dim());
         ER_DEBUG("Absorb blocks=[%s]", rcppsw::to_string(absorb_blocks).c_str());
 
         cache_i_blocks.insert(cache_i_blocks.end(),
@@ -96,7 +96,9 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * creation, which can happen otherwise.
          */
         auto cache_p = std::shared_ptr<repr::arena_cache>(
-            create_single_cache(rmath::uvec2dvec(*center), cache_i_blocks, t));
+            create_single_cache(rmath::uvec2dvec(*center),
+                                cache_i_blocks,
+                                c_params.t));
         created_caches.push_back(cache_p);
       }
 
@@ -109,9 +111,9 @@ ds::cache_vector dynamic_cache_creator::create_all(
   } /* for(i..) */
 
   ds::block_vector free_blocks =
-      utils::free_blocks_calc(created_caches, candidate_blocks);
+      utils::free_blocks_calc(created_caches, c_alloc_blocks);
 
-  ER_ASSERT(creation_sanity_checks(created_caches, free_blocks, c_clusters),
+  ER_ASSERT(creation_sanity_checks(created_caches, free_blocks, c_params.clusters),
             "One or more bad caches on creation");
   return created_caches;
 } /* create_all() */
@@ -125,14 +127,14 @@ ds::cache_vector dynamic_cache_creator::avoidance_caches_calc(
 } /* avoidance_caches_calc() */
 
 ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
-    const ds::block_vector& c_candidate_blocks,
+    const ds::block_vector& c_alloc_blocks,
     const ds::block_vector& c_cache_i_blocks,
     const ds::block_vector& c_used_blocks,
     const rmath::vector2u& c_center,
     rtypes::spatial_dist cache_dim) const {
   ds::block_vector absorb_blocks;
-  std::copy_if(c_candidate_blocks.begin(),
-               c_candidate_blocks.end(),
+  std::copy_if(c_alloc_blocks.begin(),
+               c_alloc_blocks.end(),
                std::back_inserter(absorb_blocks),
                [&](const auto& b) RCSW_PURE {
                  auto xspan = rmath::ranged(c_center.x() - cache_dim.v() / 2.0,
@@ -154,7 +156,7 @@ ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
 
 ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
     const ds::block_vector& c_used_blocks,
-    const ds::block_vector& c_candidates,
+    const ds::block_vector& c_alloc_blocks,
     uint index) const {
   ds::block_vector src_blocks;
 
@@ -163,7 +165,7 @@ ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
    */
   if (std::find(c_used_blocks.begin(),
                 c_used_blocks.end(),
-                c_candidates[index]) != c_used_blocks.end()) {
+                c_alloc_blocks[index]) != c_used_blocks.end()) {
     return src_blocks;
   }
   /*
@@ -173,28 +175,28 @@ ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
    * anyway.
    */
   ER_TRACE("Add anchor block%d@%s to src list",
-           c_candidates[index]->id(),
-           c_candidates[index]->rloc().to_str().c_str());
-  src_blocks.push_back(c_candidates[index]);
-  for (size_t i = index + 1; i < c_candidates.size(); ++i) {
+           c_alloc_blocks[index]->id(),
+           c_alloc_blocks[index]->rloc().to_str().c_str());
+  src_blocks.push_back(c_alloc_blocks[index]);
+  for (size_t i = index + 1; i < c_alloc_blocks.size(); ++i) {
     /*
      * If we find a block that is close enough to our anchor/target block, then
      * add to the src list.
      */
     if (mc_min_dist >=
-        (c_candidates[index]->rloc() - c_candidates[i]->rloc()).length()) {
+        (c_alloc_blocks[index]->rloc() - c_alloc_blocks[i]->rloc()).length()) {
       ER_ASSERT(std::find(src_blocks.begin(),
                           src_blocks.end(),
-                          c_candidates[i]) == src_blocks.end(),
+                          c_alloc_blocks[i]) == src_blocks.end(),
                 "Block%d already on src list",
-                c_candidates[i]->id());
+                c_alloc_blocks[i]->id());
       if (std::find(c_used_blocks.begin(),
                     c_used_blocks.end(),
-                    c_candidates[i]) == c_used_blocks.end()) {
+                    c_alloc_blocks[i]) == c_used_blocks.end()) {
         ER_TRACE("Add block %d@%s to src list",
-                 c_candidates[i]->id(),
-                 c_candidates[i]->rloc().to_str().c_str());
-        src_blocks.push_back(c_candidates[i]);
+                 c_alloc_blocks[i]->id(),
+                 c_alloc_blocks[i]->rloc().to_str().c_str());
+        src_blocks.push_back(c_alloc_blocks[i]);
       }
     }
   } /* for(i..) */
