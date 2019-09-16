@@ -93,16 +93,16 @@ class block_vanished : public rer::client<block_vanished> {
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth1::harvester& task);
-  void visit(controller::depth1::gp_dpo_controller& controller);
-  void visit(controller::depth1::gp_mdpo_controller& controller);
-  void visit(controller::depth1::gp_odpo_controller& controller);
-  void visit(controller::depth1::gp_omdpo_controller& controller);
+  void visit(controller::depth1::bitd_dpo_controller& controller);
+  void visit(controller::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::depth1::bitd_odpo_controller& controller);
+  void visit(controller::depth1::bitd_omdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& controller);
-  void visit(controller::depth2::grp_mdpo_controller& controller);
-  void visit(controller::depth2::grp_odpo_controller& controller);
-  void visit(controller::depth2::grp_omdpo_controller& controller);
+  void visit(controller::depth2::birtd_dpo_controller& controller);
+  void visit(controller::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::depth2::birtd_odpo_controller& controller);
+  void visit(controller::depth2::birtd_omdpo_controller& controller);
   void visit(tasks::depth2::cache_starter& task);
   void visit(tasks::depth2::cache_finisher& task);
 

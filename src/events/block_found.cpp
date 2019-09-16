@@ -23,14 +23,14 @@
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
 
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -233,7 +233,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void block_found::visit(controller::depth2::grp_mdpo_controller& c) {
+void block_found::visit(controller::depth2::birtd_mdpo_controller& c) {
   c.ndc_push();
 
   visit(*c.mdpo_perception()->map());
@@ -241,7 +241,7 @@ void block_found::visit(controller::depth2::grp_mdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void block_found::visit(controller::depth2::grp_dpo_controller& c) {
+void block_found::visit(controller::depth2::birtd_dpo_controller& c) {
   c.ndc_push();
 
   visit(*c.dpo_perception()->dpo_store());
@@ -249,7 +249,7 @@ void block_found::visit(controller::depth2::grp_dpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void block_found::visit(controller::depth2::grp_omdpo_controller& c) {
+void block_found::visit(controller::depth2::birtd_omdpo_controller& c) {
   c.ndc_push();
 
   visit(*c.mdpo_perception()->map());
@@ -257,7 +257,7 @@ void block_found::visit(controller::depth2::grp_omdpo_controller& c) {
   c.ndc_pop();
 } /* visit() */
 
-void block_found::visit(controller::depth2::grp_odpo_controller& c) {
+void block_found::visit(controller::depth2::birtd_odpo_controller& c) {
   c.ndc_push();
 
   visit(*c.dpo_perception()->dpo_store());

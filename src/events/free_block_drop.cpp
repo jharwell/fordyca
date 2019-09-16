@@ -27,14 +27,14 @@
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -162,26 +162,26 @@ void free_block_drop::visit(ds::arena_map& map) {
 /*******************************************************************************
  * Depth1
  ******************************************************************************/
-void free_block_drop::visit(controller::depth1::gp_mdpo_controller& controller) {
+void free_block_drop::visit(controller::depth1::bitd_mdpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
-void free_block_drop::visit(controller::depth1::gp_omdpo_controller& controller) {
+void free_block_drop::visit(controller::depth1::bitd_omdpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
-void free_block_drop::visit(controller::depth1::gp_dpo_controller& controller) {
+void free_block_drop::visit(controller::depth1::bitd_dpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
-void free_block_drop::visit(controller::depth1::gp_odpo_controller& controller) {
+void free_block_drop::visit(controller::depth1::bitd_odpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
 /*******************************************************************************
  * Depth2
  ******************************************************************************/
-void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller) {
+void free_block_drop::visit(controller::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -193,7 +193,7 @@ void free_block_drop::visit(controller::depth2::grp_mdpo_controller& controller)
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_drop::visit(controller::depth2::grp_dpo_controller& controller) {
+void free_block_drop::visit(controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -205,7 +205,7 @@ void free_block_drop::visit(controller::depth2::grp_dpo_controller& controller) 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_drop::visit(controller::depth2::grp_omdpo_controller& controller) {
+void free_block_drop::visit(controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -217,7 +217,7 @@ void free_block_drop::visit(controller::depth2::grp_omdpo_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_drop::visit(controller::depth2::grp_odpo_controller& controller) {
+void free_block_drop::visit(controller::depth2::birtd_odpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),

@@ -1,7 +1,7 @@
 /**
- * @file gp_odpo_controller.hpp
+ * @file birtd_odpo_controller.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * @copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,43 +18,41 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_ODPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_ODPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_ODPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_ODPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
 class oracular_info_receptor;
-NS_START(depth1);
+NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class gp_odpo_controller
- * @ingroup fordyca controller depth1
+ * @class birtd_odpo_controller
+ * @ingroup fordyca controller depth2
  *
- * @brief A foraging controller built on \ref gp_dpo_controller
- * that has perfect information about on or more of the following, depending on
+ * @brief A foraging controller built on \ref birtd_dpo_controller that has
+ * perfect information about one or more of the following, depending on
  * configuration:
  *
  * - Block/cache locations
- * - Task durations/estimates
+ * - Task duration/estimates
  */
-class gp_odpo_controller : public depth1::gp_dpo_controller,
-                          public rer::client<gp_odpo_controller> {
+class birtd_odpo_controller : public depth2::birtd_dpo_controller,
+                            public rer::client<birtd_odpo_controller> {
  public:
-  using gp_dpo_controller::perception;
-
-  gp_odpo_controller(void) RCSW_COLD;
-  ~gp_odpo_controller(void) override RCSW_COLD;
+  birtd_odpo_controller(void) RCSW_COLD;
+  ~birtd_odpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
   void ControlStep(void) override;
@@ -69,6 +67,6 @@ class gp_odpo_controller : public depth1::gp_dpo_controller,
   /* clang-format on */
 };
 
-NS_END(depth1, controller, fordyca);
+NS_END(depth2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_ODPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_ODPO_CONTROLLER_HPP_ */

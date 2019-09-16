@@ -172,7 +172,7 @@ XML configuration:
                       initial Task Allocation Block (TAB), consisting of a root
                       has and two sequentially interdependent subtasks, be
                       selected. This tag is only required for depth2 controllers
-                      AND when `alloc_policy` is `matroid_stoch_nbhd`. Valid
+                      AND when `alloc_policy` is `stoch_greedy_nbhd`. Valid
                       values are:
 
     - `root` - Use the root TAB as the initially active TAB.
@@ -187,10 +187,10 @@ XML configuration:
                    selected?
 
     - `random` - Choose a random task each time.
-    - `matroid_global` - A pure greedy matroid optimization approach.
-    - `matroid_stoch_nbhd` - A pure greedy matroid optimization approach within
-                             the neighborhood of the most recently executed task
-                             (max distance is 1).
+    - `greedy_global` - A pure greedy matroid optimization approach.
+    - `stoch_greedy_nbhd` - A stochastic greedy approach within the neighborhood
+                             of the most recently executed task (max distance is
+                             1).
 ## `task_alloc`
 
 - Required by: none. Used by all [depth1, depth2] controllers with the default

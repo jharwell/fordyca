@@ -122,16 +122,16 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   void visit(ds::arena_map& map);
 
   /* depth1 */
-  void visit(controller::depth1::gp_dpo_controller&);
-  void visit(controller::depth1::gp_mdpo_controller&);
-  void visit(controller::depth1::gp_odpo_controller&);
-  void visit(controller::depth1::gp_omdpo_controller&);
+  void visit(controller::depth1::bitd_dpo_controller&);
+  void visit(controller::depth1::bitd_mdpo_controller&);
+  void visit(controller::depth1::bitd_odpo_controller&);
+  void visit(controller::depth1::bitd_omdpo_controller&);
 
   /* depth2 */
-  void visit(controller::depth2::grp_dpo_controller&);
-  void visit(controller::depth2::grp_mdpo_controller&);
-  void visit(controller::depth2::grp_odpo_controller&);
-  void visit(controller::depth2::grp_omdpo_controller&);
+  void visit(controller::depth2::birtd_dpo_controller&);
+  void visit(controller::depth2::birtd_mdpo_controller&);
+  void visit(controller::depth2::birtd_odpo_controller&);
+  void visit(controller::depth2::birtd_omdpo_controller&);
   void visit(tasks::depth2::cache_starter&);
   void visit(tasks::depth2::cache_finisher&);
   void visit(fsm::block_to_goal_fsm&);

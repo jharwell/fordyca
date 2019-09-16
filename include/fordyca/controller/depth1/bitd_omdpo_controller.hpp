@@ -1,7 +1,7 @@
 /**
- * @file grp_odpo_controller.hpp
+ * @file bitd_omdpo_controller.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * @copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,41 +18,43 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_ODPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_ODPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_OMDPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_OMDPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <memory>
-#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
 class oracular_info_receptor;
-NS_START(depth2);
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class grp_odpo_controller
- * @ingroup fordyca controller depth2
+ * @class bitd_omdpo_controller
+ * @ingroup fordyca controller depth1
  *
- * @brief A foraging controller built on \ref grp_dpo_controller that has
- * perfect information about one or more of the following, depending on
+ * @brief A foraging controller built on \ref bitd_mdpo_controller
+ * that has perfect information about on or more of the following, depending on
  * configuration:
  *
  * - Block/cache locations
- * - Task duration/estimates
+ * - Task durations/estimates
  */
-class grp_odpo_controller : public depth2::grp_dpo_controller,
-                            public rer::client<grp_odpo_controller> {
+class bitd_omdpo_controller : public depth1::bitd_mdpo_controller,
+                            public rer::client<bitd_omdpo_controller> {
  public:
-  grp_odpo_controller(void) RCSW_COLD;
-  ~grp_odpo_controller(void) override RCSW_COLD;
+  using bitd_dpo_controller::perception;
+
+  bitd_omdpo_controller(void) RCSW_COLD;
+  ~bitd_omdpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
   void ControlStep(void) override;
@@ -67,6 +69,6 @@ class grp_odpo_controller : public depth2::grp_dpo_controller,
   /* clang-format on */
 };
 
-NS_END(depth2, controller, fordyca);
+NS_END(depth1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_ODPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_OMDPO_CONTROLLER_HPP_ */

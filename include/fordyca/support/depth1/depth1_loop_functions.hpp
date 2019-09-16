@@ -103,13 +103,13 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
                                 robot_task_extractor>::type>;
   using metric_extractor_typelist = rmpl::typelist<
     robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::gp_dpo_controller>,
+                           controller::depth1::bitd_dpo_controller>,
     robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::gp_odpo_controller>,
+                           controller::depth1::bitd_odpo_controller>,
     robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::gp_mdpo_controller>,
+                           controller::depth1::bitd_mdpo_controller>,
     robot_metric_extractor<depth1_metrics_aggregator,
-                           controller::depth1::gp_omdpo_controller>
+                           controller::depth1::bitd_omdpo_controller>
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 

@@ -34,7 +34,7 @@
 #include "rcppsw/ta/ds/bi_tab.hpp"
 
 #include "fordyca/config/metrics_config.hpp"
-#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"

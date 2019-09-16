@@ -1,5 +1,5 @@
 /**
- * @file gp_mdpo_controller.hpp
+ * @file bitd_mdpo_controller.hpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_MDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_MDPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_MDPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_MDPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,24 +37,27 @@ NS_START(depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class gp_mdpo_controller
+ * @class bitd_mdpo_controller
  * @ingroup fordyca controller depth1
  *
- * @brief A Greedy Partitioning (GP) controller that switches between \ref generalist,
- * \ref harvester, and \ref collector tasks, according to dynamic changes in the
- * environment and/or execution/interface times of the tasks, and uses a Mapped
- * DPO (MDPO) data store for tracking arena state and object relavance.
+ * @brief A controller defining the task allocation space via BIfurcating Task
+ * Decomposition (BITD) and spliting the \ref generalist task into the \ref
+ * harvester, and \ref collector tasks, according to dynamic changes in the
+ * environment and/or execution/interface times of the tasks.
+ *
+ * Uses a Mapped DPO (MDPO) data store for tracking arena state and object
+ * relavance.
  *
  * Note that this class does not inherit from \ref depth0::mdpo_controller,
  * because that would mean duplicating all of the executive setup
- * logic/callbacks that are also present in the \ref depth1::gp_dpo_controller.
+ * logic/callbacks that are also present in the \ref depth1::bitd_dpo_controller.
  * Cleaner to do it this way.
  */
-class gp_mdpo_controller : public depth1::gp_dpo_controller,
-                           public rer::client<gp_mdpo_controller> {
+class bitd_mdpo_controller : public depth1::bitd_dpo_controller,
+                           public rer::client<bitd_mdpo_controller> {
  public:
-  gp_mdpo_controller(void) RCSW_COLD;
-  ~gp_mdpo_controller(void) override RCSW_COLD;
+  bitd_mdpo_controller(void) RCSW_COLD;
+  ~bitd_mdpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override RCSW_COLD;
@@ -84,4 +87,4 @@ class gp_mdpo_controller : public depth1::gp_dpo_controller,
 
 NS_END(depth1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_MDPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_MDPO_CONTROLLER_HPP_ */

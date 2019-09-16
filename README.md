@@ -139,21 +139,21 @@ following programs:
 - Texlive fonts (`texlive-fonts-extra` on ubuntu)
 
 # Available Controllers
-| Controller | Status | Loop functions | Notes                                                                                                                                 |
-|------------|--------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| crw        | Stable | depth0         | CRW = Correlated Random Walk.                                                                                                         |
-| dpo        | Stable | depth0         | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                            |
-| mdpo       | Stable | depth0         | MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena tracking relevance of individual cells within it.           |
-| odpo       | Stable | depth0         | ODPO = Oracular DPO. Has perfect information about blocks in thye arena.                                                              |
-| omdpo      | Stable | depth0         | OMDPO = Oracular MDPO. Has perfect information about blocks in the arena.                                                             |
-| gp\_dpo    | Stable | depth1         | Greedy task partitioning + DPO. Requires static caches to also be enabled.                                                            |
-| gp\_odpo   | Stable | depth1         | Greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.             |
-| gp\_mdpo   | Stable | depth1         | Greedy task partitioning + MDPO. Requires static caches, oracle to be enabled.                                                        |
-| gp\_omdpo  | Stable | depth1         | Greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.            |
-| grp\_dpo   | Stable | depth2         | Recursive greedy task partitioning + DPO. Requires dynamic caches to be enabled.                                                      |
-| grp\_mdpo  | Stable | depth2         | Recursive greedy task partitioning + MDPO. Requires dynamic caches to be enabled.                                                     |
-| grp\_odpo  | Stable | depth2         | Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled.  |
-| grp\_omdpo | Stable | depth2         | Recursive greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled. |
+| Controller   | Status | Loop functions | Notes                                                                                                                                 |
+|--------------|--------|----------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| crw          | Stable | depth0         | CRW = Correlated Random Walk.                                                                                                         |
+| dpo          | Stable | depth0         | DPO = Mapped Decaying Pheromone Object. Uses pheromones to track objects within the arena.                                            |
+| mdpo         | Stable | depth0         | MDPO = Mapped Decaying Pheromone Object. DPO + mapped extent of the arena tracking relevance of individual cells within it.           |
+| odpo         | Stable | depth0         | ODPO = Oracular DPO. Has perfect information about blocks in thye arena.                                                              |
+| omdpo        | Stable | depth0         | OMDPO = Oracular MDPO. Has perfect information about blocks in the arena.                                                             |
+| bitd\_dpo    | Stable | depth1         | Greedy task partitioning + DPO. Requires static caches to also be enabled.                                                            |
+| bitd\_odpo   | Stable | depth1         | Greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.             |
+| bitd\_mdpo   | Stable | depth1         | Greedy task partitioning + MDPO. Requires static caches, oracle to be enabled.                                                        |
+| bitd\_omdpo  | Stable | depth1         | Greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires static caches, oracle to be enabled.            |
+| birtd\_dpo   | Stable | depth2         | Recursive greedy task partitioning + DPO. Requires dynamic caches to be enabled.                                                      |
+| birtd\_mdpo  | Stable | depth2         | Recursive greedy task partitioning + MDPO. Requires dynamic caches to be enabled.                                                     |
+| birtd\_odpo  | Stable | depth2         | Recursive greedy task partitioning + DPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled.  |
+| birtd\_omdpo | Stable | depth2         | Recursive greedy task partitioning + MDPO + oracle (perfect knowledge, as configured). Requires dynamic caches, oracle to be enabled. |
 
 # Configuring Simulations
 

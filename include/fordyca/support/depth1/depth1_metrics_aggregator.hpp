@@ -48,7 +48,7 @@ class bi_tab;
 }
 NS_START(fordyca);
 
-namespace controller { namespace depth1 { class gp_mdpo_controller; }}
+namespace controller { namespace depth1 { class bitd_mdpo_controller; }}
 namespace repr { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);

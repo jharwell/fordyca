@@ -71,10 +71,10 @@ class cache_proximity : public rer::client<cache_proximity> {
   cache_proximity& operator=(const cache_proximity& op) = delete;
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& c);
-  void visit(controller::depth2::grp_odpo_controller& c);
-  void visit(controller::depth2::grp_mdpo_controller& c);
-  void visit(controller::depth2::grp_omdpo_controller& c);
+  void visit(controller::depth2::birtd_dpo_controller& c);
+  void visit(controller::depth2::birtd_odpo_controller& c);
+  void visit(controller::depth2::birtd_mdpo_controller& c);
+  void visit(controller::depth2::birtd_omdpo_controller& c);
   void visit(tasks::depth2::cache_finisher& task);
   void visit(tasks::depth2::cache_starter& task);
   void visit(fsm::block_to_goal_fsm& fsm);

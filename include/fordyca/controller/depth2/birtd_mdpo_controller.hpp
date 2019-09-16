@@ -1,5 +1,5 @@
 /**
- * @file ogrp_mdpo_controller.hpp
+ * @file birtd_mdpo_controller.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,53 +18,51 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_OGRP_MDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_OGRP_MDPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_MDPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_MDPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace support {
-class tasking_oracle;
-}
-namespace config { namespace depth2 { class controller_repository; }}
-
-NS_START(controller, depth2);
-
+NS_START(fordyca, controller);
+class mdpo_perception_subsystem;
+NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class ogrp_mdpo_controller
+ * @class birtd_mdpo_controller
  * @ingroup fordyca controller depth2
  *
- * @brief A Greedy Recursive Partitioning controller which also has perfect
- * information about:
+ * @brief A controller defining the task allocation space via BIfurcating
+ * Recursive Task Decomposition (BIRTD) and spliting the \ref generalist task
+ * into the \ref harvester, and \ref collector tasks, and then each of the \ref
+ * harvest and \ref collector tasks into two subtasks as well, according to
+ * dynamic changes in the environment and/or execution/interface times of the
+ * tasks.
  *
- * - Average task durations
- *
- * for use in task allocation.
+ * Uses a Mapped DPO data store for tracking arena state and object relevance.
  */
-class ogrp_mdpo_controller : public depth1::gp_omdpo_controller,
-                             public rer::client<ogrp_mdpo_controller> {
+class birtd_mdpo_controller : public depth2::birtd_dpo_controller,
+                            public rer::client<birtd_mdpo_controller> {
  public:
-  RCSW_COLD ogrp_mdpo_controller(void)
-      : ER_CLIENT_INIT("fordyca.controller.depth2.ogrp_mdpo") {}
+  birtd_mdpo_controller(void) RCSW_COLD;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override RCSW_COLD;
 
   void shared_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
+
+  mdpo_perception_subsystem* mdpo_perception(void) RCSW_PURE;
+  const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;
 };
 
 NS_END(depth2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_OGRP_MDPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_MDPO_CONTROLLER_HPP_ */

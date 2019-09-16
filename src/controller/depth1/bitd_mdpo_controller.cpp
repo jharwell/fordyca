@@ -1,5 +1,5 @@
 /**
- * @file grp_mdpo_controller.cpp
+ * @file bitd_mdpo_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,33 +21,42 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 
-#include "fordyca/config/depth2/controller_repository.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+
+#include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
+#include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/repr/base_block.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, controller, depth2);
+NS_START(fordyca, controller, depth1);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-grp_mdpo_controller::grp_mdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.depth2.grp_mdpo") {}
+bitd_mdpo_controller::bitd_mdpo_controller(void)
+    : ER_CLIENT_INIT("fordyca.controller.depth1.bitd_mdpo") {}
+
+bitd_mdpo_controller::~bitd_mdpo_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grp_mdpo_controller::Init(ticpp::Element& node) {
+void bitd_mdpo_controller::Init(ticpp::Element& node) {
   base_controller::Init(node);
-  ndc_push();
-  ER_INFO("Initializing");
 
-  config::depth2::controller_repository config_repo;
+  ndc_push();
+  ER_INFO("Initializing...");
+  config::depth1::controller_repository config_repo;
+
   config_repo.parse_all(node);
   if (!config_repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
@@ -55,15 +64,27 @@ void grp_mdpo_controller::Init(ticpp::Element& node) {
   }
 
   shared_init(config_repo);
-
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* Init() */
 
-void grp_mdpo_controller::shared_init(
-    const config::depth2::controller_repository& config_repo) {
+void bitd_mdpo_controller::ControlStep(void) {
+  ndc_pusht();
+  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id(),
+            block()->robot_id());
+
+  perception()->update(nullptr);
+  executive()->run();
+  saa()->steer_force2D_apply();
+  ndc_pop();
+} /* ControlStep() */
+
+void bitd_mdpo_controller::shared_init(
+    const config::depth1::controller_repository& config_repo) {
   /* block/cache selection matrices, executive  */
-  grp_dpo_controller::shared_init(config_repo);
+  bitd_dpo_controller::shared_init(config_repo);
 
   /* MDPO perception subsystem */
   config::perception::perception_config p =
@@ -71,18 +92,31 @@ void grp_mdpo_controller::shared_init(
   p.occupancy_grid.upper.x(p.occupancy_grid.upper.x() + 1);
   p.occupancy_grid.upper.y(p.occupancy_grid.upper.y() + 1);
 
-  gp_dpo_controller::perception(
+  bitd_dpo_controller::perception(
       std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
+
+  /*
+   * Task executive. Even though we use the same executive as the \ref
+   * bitd_dpo_controller, we have to replace it because we have our own perception
+   * subsystem, which is used to create the executive's graph.
+   */
+  executive(task_executive_builder(block_sel_matrix(),
+                                cache_sel_matrix(),
+                                saa(),
+                                perception())(config_repo, rng()));
+  executive()->task_abort_notify(std::bind(
+      &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
+
 } /* shared_init() */
 
-mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void) {
+mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
-} /* mdpo_perception() */
+} /* perception() */
 
-const mdpo_perception_subsystem* grp_mdpo_controller::mdpo_perception(void) const {
+const mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
-} /* mdpo_perception() */
+} /* perception() */
 
 using namespace argos; // NOLINT
 
@@ -91,9 +125,8 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_CONTROLLER(grp_mdpo_controller,
-                    "grp_mdpo_controller"); // NOLINT
+REGISTER_CONTROLLER(bitd_mdpo_controller, "bitd_mdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
 
-NS_END(depth2, controller, fordyca);
+NS_END(depth1, controller, fordyca);

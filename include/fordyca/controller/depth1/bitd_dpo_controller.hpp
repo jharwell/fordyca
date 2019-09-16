@@ -1,5 +1,5 @@
 /**
- * @file gp_dpo_controller.hpp
+ * @file bitd_dpo_controller.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_DPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_DPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_DPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_DPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -61,22 +61,24 @@ NS_START(depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class gp_dpo_controller
+ * @class bitd_dpo_controller
  * @ingroup fordyca controller depth1
  *
- * @brief A Greedy Partitioning (GP) controller that switches between \ref
- * generalist, \ref harvester, and \ref collector tasks, according to dynamic
- * changes in the environment and/or execution/interface times of the tasks, and
- * uses a DPO data store for tracking arena state and object relavance.
+ * @brief A controller defining the task allocation space via BIfurcating Task
+ * Decomposition (BITD) and spliting the \ref generalist task into the \ref
+ * harvester, and \ref collector tasks, according to dynamic changes in the
+ * environment and/or execution/interface times of the tasks.
+ *
+ * Uses a DPO data store for tracking arena state and object relavance.
  */
-class gp_dpo_controller : public depth0::dpo_controller,
-                          public rer::client<gp_dpo_controller>,
+class bitd_dpo_controller : public depth0::dpo_controller,
+                          public rer::client<bitd_dpo_controller>,
                           public rmetrics::tasks::bi_tdgraph_metrics {
  public:
   using dpo_controller::perception;
 
-  gp_dpo_controller(void) RCSW_COLD;
-  ~gp_dpo_controller(void) override RCSW_COLD;
+  bitd_dpo_controller(void) RCSW_COLD;
+  ~bitd_dpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override RCSW_COLD;
@@ -163,7 +165,7 @@ class gp_dpo_controller : public depth0::dpo_controller,
   void shared_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
   /*
-   * The \ref gp_dpo_controller owns the executive, but derived classes can
+   * The \ref bitd_dpo_controller owns the executive, but derived classes can
    * access it and set it to whatever they want (strategy pattern). This is done
    * to reduce the amount of function overriding that would have to be performed
    * otherwise if derived controllers each had private executives.
@@ -198,4 +200,4 @@ class gp_dpo_controller : public depth0::dpo_controller,
 
 NS_END(depth1, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_GP_DPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH1_BITD_DPO_CONTROLLER_HPP_ */

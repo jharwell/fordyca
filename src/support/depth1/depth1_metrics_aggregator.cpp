@@ -36,7 +36,7 @@
 #include "rcppsw/ta/ds/bi_tab.hpp"
 
 #include "fordyca/config/metrics_config.hpp"
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/caches/location_metrics.hpp"
 #include "fordyca/metrics/caches/location_metrics_collector.hpp"

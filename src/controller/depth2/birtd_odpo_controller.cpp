@@ -1,5 +1,5 @@
 /**
- * @file grp_omdpo_controller.cpp
+ * @file birtd_odpo_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,11 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
 
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
-#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/repr/base_block.hpp"
 
@@ -39,28 +39,28 @@ NS_START(fordyca, controller, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-grp_omdpo_controller::grp_omdpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.depth2.grp_dpo"),
+birtd_odpo_controller::birtd_odpo_controller(void)
+    : ER_CLIENT_INIT("fordyca.controller.depth2.birtd_dpo"),
       m_receptor(nullptr) {}
 
-grp_omdpo_controller::~grp_omdpo_controller(void) = default;
+birtd_odpo_controller::~birtd_odpo_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grp_omdpo_controller::ControlStep(void) {
+void birtd_odpo_controller::ControlStep(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id(),
             block()->robot_id());
-  mdpo_perception()->update(m_receptor.get());
-  saa()->steer_force2D_apply();
+  dpo_perception()->update(m_receptor.get());
   executive()->run();
+  saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
-void grp_omdpo_controller::oracle_init(
+void birtd_odpo_controller::oracle_init(
     std::unique_ptr<oracular_info_receptor> receptor) {
   m_receptor = std::move(receptor);
 } /* oracle_init() */
@@ -72,7 +72,7 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_CONTROLLER(grp_omdpo_controller, "grp_omdpo_controller"); // NOLINT
+REGISTER_CONTROLLER(birtd_odpo_controller, "birtd_odpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
 

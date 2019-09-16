@@ -1,5 +1,5 @@
 /**
- * @file gp_odpo_controller.cpp
+ * @file bitd_omdpo_controller.cpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *
@@ -21,11 +21,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
 
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
-#include "fordyca/controller/dpo_perception_subsystem.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/repr/base_block.hpp"
 
@@ -39,29 +39,29 @@ NS_START(fordyca, controller, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-gp_odpo_controller::gp_odpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.depth1.gp_odpo"),
+bitd_omdpo_controller::bitd_omdpo_controller(void)
+    : ER_CLIENT_INIT("fordyca.controller.depth1.bitd_omdpo"),
       m_receptor(nullptr) {}
 
-gp_odpo_controller::~gp_odpo_controller(void) = default;
+bitd_omdpo_controller::~bitd_omdpo_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void gp_odpo_controller::ControlStep(void) {
+void bitd_omdpo_controller::ControlStep(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id(),
             block()->robot_id());
 
-  dpo_perception()->update(m_receptor.get());
+  mdpo_perception()->update(m_receptor.get());
   executive()->run();
   saa()->steer_force2D_apply();
   ndc_pop();
 } /* ControlStep() */
 
-void gp_odpo_controller::oracle_init(
+void bitd_omdpo_controller::oracle_init(
     std::unique_ptr<oracular_info_receptor> receptor) {
   m_receptor = std::move(receptor);
 } /* oracle_init() */
@@ -73,7 +73,7 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_CONTROLLER(gp_odpo_controller, "gp_odpo_controller");
+REGISTER_CONTROLLER(bitd_omdpo_controller, "bitd_omdpo_controller");
 
 RCPPSW_WARNING_DISABLE_POP()
 

@@ -1,5 +1,5 @@
 /**
- * @file grp_dpo_controller.cpp
+ * @file birtd_dpo_controller.cpp
  *
  * @copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 
 #include <fstream>
 
@@ -45,13 +45,13 @@ NS_START(fordyca, controller, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-grp_dpo_controller::grp_dpo_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.depth2.grp_dpo") {}
+birtd_dpo_controller::birtd_dpo_controller(void)
+    : ER_CLIENT_INIT("fordyca.controller.depth2.birtd_dpo") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void grp_dpo_controller::ControlStep(void) {
+void birtd_dpo_controller::ControlStep(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -63,7 +63,7 @@ void grp_dpo_controller::ControlStep(void) {
   ndc_pop();
 } /* ControlStep() */
 
-void grp_dpo_controller::Init(ticpp::Element& node) {
+void birtd_dpo_controller::Init(ticpp::Element& node) {
   base_controller::Init(node);
   ndc_push();
   ER_INFO("Initializing");
@@ -82,7 +82,7 @@ void grp_dpo_controller::Init(ticpp::Element& node) {
   ndc_pop();
 } /* Init() */
 
-void grp_dpo_controller::private_init(
+void birtd_dpo_controller::private_init(
     const config::depth2::controller_repository& config_repo) {
   /*
    * Rebind executive to use depth2 task decomposition graph instead of depth1
@@ -97,15 +97,15 @@ void grp_dpo_controller::private_init(
    * Set task alloction callback, rebind task abort callback (original was lost
    * when we replaced the executive).
    */
-  executive()->task_start_notify(std::bind(&grp_dpo_controller::task_start_cb,
+  executive()->task_start_notify(std::bind(&birtd_dpo_controller::task_start_cb,
                                            this,
                                            std::placeholders::_1,
                                            std::placeholders::_2));
   executive()->task_abort_notify(std::bind(
-      &grp_dpo_controller::task_abort_cb, this, std::placeholders::_1));
+      &birtd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* private_init() */
 
-void grp_dpo_controller::task_start_cb(const rta::polled_task* const task,
+void birtd_dpo_controller::task_start_cb(const rta::polled_task* const task,
                                        const rta::ds::bi_tab* const) {
   /**
    * @brief Callback for task alloc. Needed to reset the task state of the
@@ -145,8 +145,8 @@ RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
 RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
 RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
 
-REGISTER_CONTROLLER(grp_dpo_controller,
-                    "grp_dpo_controller"); // NOLINT
+REGISTER_CONTROLLER(birtd_dpo_controller,
+                    "birtd_dpo_controller"); // NOLINT
 
 RCPPSW_WARNING_DISABLE_POP()
 

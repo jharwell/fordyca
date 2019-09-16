@@ -1,5 +1,5 @@
 /**
- * @file grp_dpo_controller.hpp
+ * @file birtd_dpo_controller.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,13 +18,13 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_DPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_DPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_DPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_DPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,18 +42,22 @@ NS_START(controller, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class grp_dpo_controller
+ * @class birtd_dpo_controller
  * @ingroup fordyca controller depth2
  *
- * @brief A Greedy Recursive Partitioning controller that moves through a depth2
- * recursive task decomposition graph, changing task according to dynamic
- * changes in the environment and/or execution/interface times of the tasks, and
- * using a DPO data store for tracking arena state and object relevance.
+ * @brief A controller defining the task allocation space via BIfurcating
+ * Recursive Task Decomposition (BIRTD) and spliting the \ref generalist task
+ * into the \ref harvester, and \ref collector tasks, and then each of the \ref
+ * harvest and \ref collector tasks into two subtasks as well, according to
+ * dynamic changes in the environment and/or execution/interface times of the
+ * tasks.
+ *
+ * Uses a DPO data store for tracking arena state and object relevance.
  */
-class grp_dpo_controller : public depth1::gp_dpo_controller,
-                           public rer::client<grp_dpo_controller> {
+class birtd_dpo_controller : public depth1::bitd_dpo_controller,
+                           public rer::client<birtd_dpo_controller> {
  public:
-  grp_dpo_controller(void) RCSW_COLD;
+  birtd_dpo_controller(void) RCSW_COLD;
 
   /* CCI_Controller overrides */
   void Init(ticpp::Element& node) override RCSW_COLD;
@@ -82,4 +86,4 @@ class grp_dpo_controller : public depth1::gp_dpo_controller,
 
 NS_END(depth2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_DPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_DPO_CONTROLLER_HPP_ */

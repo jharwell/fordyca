@@ -88,10 +88,10 @@ class cache_found : public cell_op, public rer::client<cache_found> {
   void visit(fsm::cell2D_fsm& fsm);
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& controller);
-  void visit(controller::depth2::grp_mdpo_controller& c);
-  void visit(controller::depth2::grp_odpo_controller& controller);
-  void visit(controller::depth2::grp_omdpo_controller& c);
+  void visit(controller::depth2::birtd_dpo_controller& controller);
+  void visit(controller::depth2::birtd_mdpo_controller& c);
+  void visit(controller::depth2::birtd_odpo_controller& controller);
+  void visit(controller::depth2::birtd_omdpo_controller& c);
 
  private:
   std::shared_ptr<repr::base_cache> m_cache;

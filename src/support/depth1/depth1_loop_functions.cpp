@@ -40,10 +40,10 @@
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
 #include "fordyca/config/output_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/repr/block_cluster.hpp"
@@ -267,7 +267,7 @@ void depth1_loop_functions::oracle_init(void) {
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
     const auto& controller0 =
-        dynamic_cast<controller::depth1::gp_mdpo_controller&>(
+        dynamic_cast<controller::depth1::bitd_mdpo_controller&>(
             robot0.GetControllableEntity().GetController());
     auto* bigraph = dynamic_cast<const rta::ds::bi_tdgraph*>(
         controller0.executive()->graph());

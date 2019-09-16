@@ -109,19 +109,19 @@ class nest_block_drop : public rer::client<nest_block_drop> {
 
   /* Depth1 foraging */
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
-  void visit(controller::depth1::gp_dpo_controller& controller);
-  void visit(controller::depth1::gp_mdpo_controller& controller);
-  void visit(controller::depth1::gp_odpo_controller& controller);
-  void visit(controller::depth1::gp_omdpo_controller& controller);
+  void visit(controller::depth1::bitd_dpo_controller& controller);
+  void visit(controller::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::depth1::bitd_odpo_controller& controller);
+  void visit(controller::depth1::bitd_omdpo_controller& controller);
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
   void visit(tasks::depth1::collector& task);
   void visit(tasks::depth0::generalist& task);
 
   /* depth2 foraging */
-  void visit(controller::depth2::grp_dpo_controller& controller);
-  void visit(controller::depth2::grp_mdpo_controller& controller);
-  void visit(controller::depth2::grp_odpo_controller& controller);
-  void visit(controller::depth2::grp_omdpo_controller& controller);
+  void visit(controller::depth2::birtd_dpo_controller& controller);
+  void visit(controller::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::depth2::birtd_odpo_controller& controller);
+  void visit(controller::depth2::birtd_omdpo_controller& controller);
 
  private:
   void dispatch_nest_interactor(tasks::base_foraging_task* task);

@@ -42,14 +42,14 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_dpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_mdpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_odpo_controller.hpp"
-#include "fordyca/controller/depth1/gp_omdpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_mdpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_odpo_controller.hpp"
-#include "fordyca/controller/depth2/grp_omdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
 
@@ -183,7 +183,7 @@ rtypes::timestep tv_manager::env_block_manipulation(void) const {
 
 rtypes::timestep tv_manager::env_cache_usage(void) const {
   rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
-  return penalty_handler<controller::depth1::gp_dpo_controller>(
+  return penalty_handler<controller::depth1::bitd_dpo_controller>(
              cache_op_src::ekEXISTING_CACHE_PICKUP)
       ->penalty_calc(t);
 } /* env_cache_usage() */

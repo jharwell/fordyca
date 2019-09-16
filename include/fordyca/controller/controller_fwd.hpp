@@ -43,22 +43,22 @@
   DEPTH0_NON_ORACULAR_CONTROLLER_TYPES, DEPTH0_ORACULAR_CONTROLLER_TYPES
 
 #define DEPTH1_ORACULAR_CONTROLLER_TYPES  \
-  controller::depth1::gp_odpo_controller, \
-      controller::depth1::gp_omdpo_controller
+  controller::depth1::bitd_odpo_controller, \
+      controller::depth1::bitd_omdpo_controller
 
 #define DEPTH1_NON_ORACULAR_CONTROLLER_TYPES \
-  controller::depth1::gp_dpo_controller, controller::depth1::gp_mdpo_controller
+  controller::depth1::bitd_dpo_controller, controller::depth1::bitd_mdpo_controller
 
 #define DEPTH1_CONTROLLER_TYPES \
   DEPTH1_NON_ORACULAR_CONTROLLER_TYPES, DEPTH1_ORACULAR_CONTROLLER_TYPES
 
 #define DEPTH2_ORACULAR_CONTROLLER_TYPES   \
-  controller::depth2::grp_odpo_controller, \
-      controller::depth2::grp_omdpo_controller
+  controller::depth2::birtd_odpo_controller, \
+      controller::depth2::birtd_omdpo_controller
 
 #define DEPTH2_NON_ORACULAR_CONTROLLER_TYPES \
-  controller::depth2::grp_dpo_controller,    \
-      controller::depth2::grp_mdpo_controller
+  controller::depth2::birtd_dpo_controller,    \
+      controller::depth2::birtd_mdpo_controller
 
 #define DEPTH2_CONTROLLER_TYPES \
   DEPTH2_NON_ORACULAR_CONTROLLER_TYPES, DEPTH2_ORACULAR_CONTROLLER_TYPES
@@ -92,19 +92,19 @@ using typelist = rmpl::typelist<DEPTH0_ORACULAR_CONTROLLER_TYPES,
                                 DEPTH0_NON_ORACULAR_CONTROLLER_TYPES>;
 } // namespace depth0
 namespace depth1 {
-class gp_dpo_controller;
-class gp_mdpo_controller;
-class gp_odpo_controller;
-class gp_omdpo_controller;
+class bitd_dpo_controller;
+class bitd_mdpo_controller;
+class bitd_odpo_controller;
+class bitd_omdpo_controller;
 using oracular_typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES>;
 using typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES,
                                 DEPTH1_NON_ORACULAR_CONTROLLER_TYPES>;
 } // namespace depth1
 namespace depth2 {
-class grp_dpo_controller;
-class grp_mdpo_controller;
-class grp_odpo_controller;
-class grp_omdpo_controller;
+class birtd_dpo_controller;
+class birtd_mdpo_controller;
+class birtd_odpo_controller;
+class birtd_omdpo_controller;
 using oracular_typelist = rmpl::typelist<DEPTH2_ORACULAR_CONTROLLER_TYPES>;
 using typelist = rmpl::typelist<DEPTH2_ORACULAR_CONTROLLER_TYPES,
                                 DEPTH2_NON_ORACULAR_CONTROLLER_TYPES>;

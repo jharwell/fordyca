@@ -1,5 +1,5 @@
 /**
- * @file grp_mdpo_controller.hpp
+ * @file birtd_omdpo_controller.hpp
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,47 +18,55 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_MDPO_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_MDPO_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_OMDPO_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_OMDPO_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/depth2/grp_dpo_controller.hpp"
+#include <memory>
+#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-class mdpo_perception_subsystem;
+class oracular_info_receptor;
 NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class grp_mdpo_controller
+ * @class birtd_omdpo_controller
  * @ingroup fordyca controller depth2
  *
- * @brief A Greedy Recursive Partitioning controller that moves through a depth2
- * recursive task decomposition graph, changing task according to dynamic
- * changes in the environment and/or execution/interface times of the tasks, and
- * using a Mapped DPO data store for tracking arena state and object relevance.
+ * @brief A foraging controller built on \ref birtd_mdpo_controller that has
+ * perfect information about one or more of the following, depending on
+ * configuration:
+ *
+ * - Block/cache locations
+ * - Task duration/estimates
  */
-class grp_mdpo_controller : public depth2::grp_dpo_controller,
-                            public rer::client<grp_mdpo_controller> {
+class birtd_omdpo_controller : public depth2::birtd_mdpo_controller,
+                            public rer::client<birtd_omdpo_controller> {
  public:
-  grp_mdpo_controller(void) RCSW_COLD;
+  birtd_omdpo_controller(void) RCSW_COLD;
+  ~birtd_omdpo_controller(void) override RCSW_COLD;
 
   /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
+  void ControlStep(void) override;
 
-  void shared_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
+  std::type_index type_index(void) const override { return {typeid(*this)}; }
 
-  mdpo_perception_subsystem* mdpo_perception(void) RCSW_PURE;
-  const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;
+  void oracle_init(std::unique_ptr<oracular_info_receptor> receptor) RCSW_COLD;
+
+ private:
+  /* clang-format off */
+  std::unique_ptr<oracular_info_receptor> m_receptor;
+  /* clang-format on */
 };
 
 NS_END(depth2, controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_GRP_MDPO_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_DEPTH2_BIRTD_OMDPO_CONTROLLER_HPP_ */
