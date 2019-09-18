@@ -40,7 +40,7 @@ NS_START(fordyca, config, perception);
  * @struct perception_grid_config
  * @ingroup fordyca config perception
  */
-struct perception_config : public rconfig::base_config {
+struct perception_config final : public rconfig::base_config {
   double los_dim{-1};
   struct grid_config occupancy_grid {};
   struct pheromone_config pheromone {};

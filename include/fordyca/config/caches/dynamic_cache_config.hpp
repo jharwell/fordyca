@@ -42,7 +42,7 @@ NS_START(fordyca, config, caches);
  * @struct dynamic_cache_config
  * @ingroup fordyca config cache
  */
-struct dynamic_cache_config : public rconfig::base_config {
+struct dynamic_cache_config final : public rconfig::base_config {
   bool   enable{false};
 
   /**

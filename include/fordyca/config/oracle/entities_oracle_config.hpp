@@ -41,7 +41,7 @@ NS_START(fordyca, config, oracle);
  *
  * @brief Parameters for all-seeing oracle of entity location/size/etc.
  */
-struct entities_oracle_config : public rconfig::base_config {
+struct entities_oracle_config final : public rconfig::base_config {
   bool caches{false};
   bool blocks{false};
 };

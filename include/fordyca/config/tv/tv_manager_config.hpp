@@ -40,7 +40,7 @@ NS_START(fordyca, config, tv);
  * @struct tv_manager_config
  * @ingroup fordyca config tv
  */
-struct tv_manager_config : public rconfig::base_config {
+struct tv_manager_config final : public rconfig::base_config {
   rct::config::waveform_config block_manipulation_penalty{};
   rct::config::waveform_config block_carry_throttle{};
   rct::config::waveform_config cache_usage_penalty{};

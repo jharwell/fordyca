@@ -204,9 +204,11 @@ void base_loop_functions::oracle_init(
 void base_loop_functions::rng_init(const rmath::config::rng_config* config) {
   rmath::rngm::instance().register_type<rmath::rng>("loop");
   if (nullptr == config || (nullptr != config &&-1 == config->seed)) {
+    ER_INFO("Using time seeded RNG");
     m_rng = rmath::rngm::instance().create("loop",
                                            std::chrono::system_clock::now().time_since_epoch().count());
   } else {
+    ER_INFO("Using user seeded RNG");
     m_rng = rmath::rngm::instance().create("loop", config->seed);
   }
 } /* rng_init() */

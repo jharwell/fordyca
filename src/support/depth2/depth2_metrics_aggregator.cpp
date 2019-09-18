@@ -103,6 +103,11 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 void depth2_metrics_aggregator::task_start_cb(
     RCSW_UNUSED const rta::polled_task* const task,
     const rta::ds::bi_tab* const tab) {
+
+  /* Not using stochastic greedy nbhd policy */
+  if (nullptr == tab) {
+    return;
+  }
   if (task0::kGeneralistName == tab->root()->name()) {
     collect("tasks::tab::generalist", *tab);
   } else if (task1::kHarvesterName == tab->root()->name()) {

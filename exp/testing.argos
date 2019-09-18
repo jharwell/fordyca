@@ -6,7 +6,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="4" />
+    <system threads="0" />
     <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <gp_dpo_controller id="ffc"
+    <bitd_dpo_controller id="ffc"
                     library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -50,7 +50,7 @@
             update_exec_ests="true"
             update_interface_ests="true"
             tab_init_policy="max_depth"
-            alloc_policy="matroid_stoch_nbhd"
+            alloc_policy="stoch_greedy_nbhd"
             />
         <task_alloc>
           <task_abort>
@@ -76,9 +76,9 @@
             <ema alpha="0.8"/>
           </task_exec_estimates>
 
-          <matroid_stoch_nbhd>
+          <stoch_greedy_nbhd>
           <task_partition
-              always_partition="true"
+              always_partition="false"
               never_partition="false">
             <src_sigmoid_sel
                 input_src="exec">
@@ -115,7 +115,7 @@
               </sigmoid_sel>
             </src_sigmoid_sel>
           </tab_sel>
-          </matroid_stoch_nbhd>
+          </stoch_greedy_nbhd>
         </task_alloc>
         <block_sel_matrix
               nest="6, 3">
@@ -179,7 +179,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </gp_dpo_controller>
+    </bitd_dpo_controller>
 
   </controllers>
 

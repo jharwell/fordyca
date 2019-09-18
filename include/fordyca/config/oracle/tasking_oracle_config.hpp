@@ -41,7 +41,7 @@ NS_START(fordyca, config, oracle);
  *
  * @brief Parameters for all-seeing task allocation oracle.
  */
-struct tasking_oracle_config : public rconfig::base_config {
+struct tasking_oracle_config final : public rconfig::base_config {
   bool enabled{false};
   /**
    * @brief Should the all-knowing oracle be used when updating task execution

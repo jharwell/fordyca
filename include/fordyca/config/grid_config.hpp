@@ -42,7 +42,7 @@ NS_START(fordyca, config);
  * @struct grid_config
  * @ingroup fordyca config perception
  */
-struct grid_config : public rconfig::base_config {
+struct grid_config final : public rconfig::base_config {
   rtypes::discretize_ratio resolution{0.0};
   rmath::vector2d upper{};
   rmath::vector2d lower{};

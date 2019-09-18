@@ -42,7 +42,7 @@ NS_START(fordyca, config, arena);
  * @struct block_redist_governor_config
  * @ingroup fordyca config arena
  */
-struct block_redist_governor_config : public rconfig::base_config {
+struct block_redist_governor_config final : public rconfig::base_config {
   rtypes::timestep timestep{0};
   uint             block_count{0};
   std::string      trigger{};

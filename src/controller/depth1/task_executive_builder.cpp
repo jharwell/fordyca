@@ -29,6 +29,7 @@
 #include "rcppsw/ta/config/task_alloc_config.hpp"
 #include "rcppsw/ta/config/task_executive_config.hpp"
 #include "rcppsw/ta/ds/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_allocator.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -195,7 +196,13 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
     execp = std::make_unique<rta::config::task_executive_config>().get();
   }
 
-  graph->active_tab_init(execp->tab_init_policy, rng);
+  /*
+   * Only necessary if we are using the stochastic greedy neighborhood policy;
+   * causes segfaults due to asserts otherwise.
+   */
+  if (rta::bi_tdgraph_allocator::kPolicyStochGreedyNBHD == execp->alloc_policy) {
+    graph->active_tab_init(execp->tab_init_policy, rng);
+  }
   depth1_exec_est_init(config_repo, map, graph, rng);
 
   return std::make_unique<rta::bi_tdgraph_executive>(execp,

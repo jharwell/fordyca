@@ -40,7 +40,7 @@ NS_START(fordyca, config);
  * @struct visualization_config
  * @ingroup fordyca config
  */
-struct visualization_config : public rconfig::base_config {
+struct visualization_config final : public rconfig::base_config {
   bool robot_id{false};
   bool robot_los{false};
   bool robot_task{false};

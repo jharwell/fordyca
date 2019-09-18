@@ -46,7 +46,7 @@ NS_START(fordyca, config);
  * Each member represents the filename to which a specific type of metrics
  * should be logged. Empty filename=no metrics of that type will be collected.
  */
-struct metrics_config : public rconfig::base_config {
+struct metrics_config final : public rconfig::base_config {
   using enabled_map_type = std::map<std::string, std::string>;
 
   std::string output_dir{};

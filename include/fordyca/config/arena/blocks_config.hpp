@@ -39,7 +39,7 @@ NS_START(fordyca, config, arena);
  * @struct blocks_config
  * @ingroup fordyca config arena
  */
-struct blocks_config : public rconfig::base_config {
+struct blocks_config final : public rconfig::base_config {
   struct block_dist_config dist{};
 };
 

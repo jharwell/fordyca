@@ -104,7 +104,7 @@ base_metrics_aggregator::base_metrics_aggregator(
        "fsm::collision_counts"},
       {typeid(cfmetrics::goal_acq_metrics_collector),
        "block_acq_counts",
-       "blocks::acq_countsppp"},
+       "blocks::acq_counts"},
       {typeid(cfmetrics::goal_acq_locs_metrics_collector),
        "block_acq_locs",
        "blocks::acq_locs"},

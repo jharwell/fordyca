@@ -36,7 +36,7 @@ NS_START(fordyca, config, block_sel);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
-struct block_pickup_policy_config : public rconfig::base_config {
+struct block_pickup_policy_config final : public rconfig::base_config {
   std::string policy{};
   double      prox_dist{0};
 };

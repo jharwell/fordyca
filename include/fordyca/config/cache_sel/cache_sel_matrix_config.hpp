@@ -46,7 +46,7 @@ NS_START(fordyca, config, cache_sel);
  *
  * @brief XML parameters for the \ref cache_sel_matrix
  */
-struct cache_sel_matrix_config : public rconfig::base_config {
+struct cache_sel_matrix_config final : public rconfig::base_config {
   rtypes::spatial_dist         cache_prox_dist{0.0};
   rtypes::spatial_dist         block_prox_dist{0.0};
   rtypes::spatial_dist         nest_prox_dist{0.0};

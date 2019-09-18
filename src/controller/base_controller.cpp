@@ -248,10 +248,19 @@ void base_controller::output_init(const config::output_config* const config) {
 void base_controller::rng_init(const rmath::config::rng_config* config) {
   rmath::rngm::instance().register_type<rmath::rng>("footbot");
   if (nullptr == config || (nullptr != config &&-1 == config->seed)) {
+    ER_INFO("Using time seeded RNG");
     m_rng = rmath::rngm::instance().create("footbot",
                                            std::chrono::system_clock::now().time_since_epoch().count());
   } else {
-    m_rng = rmath::rngm::instance().create("footbot", config->seed);
+    /*
+     * We add the entity ID to the configured seed to ensure that all robots
+     * have unique random number sequences they are drawing from (otherwise they
+     * can all chose to allocate the same initial task, for example), while
+     * still maintaining reproducibility.
+     */
+    ER_INFO("Using user seeded RNG");
+    m_rng = rmath::rngm::instance().create("footbot",
+                                           config->seed);
   }
 } /* rng_init() */
 

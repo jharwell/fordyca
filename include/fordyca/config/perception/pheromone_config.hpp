@@ -39,7 +39,7 @@ NS_START(fordyca, config, perception);
  * @struct pheromone_config
  * @ingroup fordyca config perception
  */
-struct pheromone_config : public rconfig::base_config {
+struct pheromone_config final : public rconfig::base_config {
   double rho{0.0};
   bool repeat_deposit{false};
 };

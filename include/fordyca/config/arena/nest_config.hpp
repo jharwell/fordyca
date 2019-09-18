@@ -40,7 +40,7 @@ NS_START(fordyca, config);
  * @struct nest_config
  * @ingroup fordyca config arena
  */
-struct nest_config : public rconfig::base_config {
+struct nest_config final : public rconfig::base_config {
   rmath::vector2d center{};
   rmath::vector2d dims{};
 };

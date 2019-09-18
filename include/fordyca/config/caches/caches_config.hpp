@@ -43,7 +43,7 @@ NS_START(fordyca, config, caches);
  *
  * @brief Contains parameters for both static and dynamic caches in the arena.
  */
-struct caches_config : public rconfig::base_config {
+struct caches_config final : public rconfig::base_config {
   /**
    * @brief How large are cache (geometrical area), when created (same for
    * static and dynamic) ?

@@ -42,7 +42,7 @@ NS_START(fordyca, config, arena);
  * @brief Params of what types of blocks and how many of each should be
  * created, as well as size and other characteristics.
  */
-struct block_manifest : public rconfig::base_config {
+struct block_manifest final : public rconfig::base_config {
   uint n_cube{0};  /// # cube blocks to distribute in arena
   uint n_ramp{0};  /// # ramp blocks to distribute in arena
 

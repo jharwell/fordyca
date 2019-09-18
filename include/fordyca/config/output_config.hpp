@@ -42,7 +42,7 @@ NS_START(fordyca, config);
  * @struct output_config
  * @ingroup fordyca config
  */
-struct output_config : public rconfig::base_config {
+struct output_config final : public rconfig::base_config {
   std::string output_root{};
   std::string output_dir{};
   struct metrics_config metrics {};

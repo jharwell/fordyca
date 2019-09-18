@@ -44,7 +44,7 @@ NS_START(fordyca, config, oracle);
  * @brief Parameters for the various oracles that can be employed during
  * simulation.
  */
-struct oracle_manager_config : public rconfig::base_config {
+struct oracle_manager_config final : public rconfig::base_config {
   struct tasking_oracle_config tasking{};
   struct entities_oracle_config entities{};
 };

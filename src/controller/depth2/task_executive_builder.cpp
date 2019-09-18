@@ -27,6 +27,7 @@
 #include "rcppsw/ta/config/task_alloc_config.hpp"
 #include "rcppsw/ta/config/task_executive_config.hpp"
 #include "rcppsw/ta/ds/bi_tdgraph.hpp"
+#include "rcppsw/ta/bi_tdgraph_allocator.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -167,11 +168,8 @@ void task_executive_builder::depth2_exec_est_init(
   }
   /*
    * As part of seeding exec estimates, we set the last executed subtask for a
-   * TAB. It's OK to declare/use here as local variables as this code only
-   * runs during initialization.
-   *
-   * Collector, harvester not partitionable in depth 1 initialization, so they
-   * have only been initialized as atomic tasks.
+   * TAB. Collector, harvester not partitionable in depth 1 initialization, so
+   * they have only been initialized as atomic tasks.
    */
   if (0 == rng->uniform(0, 1)) {
     graph->tab_child(graph->root_tab(), graph->root_tab()->child1())
@@ -231,7 +229,13 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
   auto map2 = depth2_tasks_create(config_repo, graph, rng);
   depth2_exec_est_init(config_repo, map2, graph, rng);
 
-  graph->active_tab_init(execp->tab_init_policy, rng);
+  /*
+   * Only necessary if we are using the stochastic greedy neighborhood policy;
+   * causes segfaults due to asserts otherwise.p
+   */
+  if (rta::bi_tdgraph_allocator::kPolicyStochGreedyNBHD == execp->alloc_policy) {
+    graph->active_tab_init(execp->tab_init_policy, rng);
+  }
   return std::make_unique<rta::bi_tdgraph_executive>(execp,
                                                      std::move(variant),
                                                      rng);

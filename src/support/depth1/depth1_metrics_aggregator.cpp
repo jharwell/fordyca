@@ -168,6 +168,10 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
 
 void depth1_metrics_aggregator::task_start_cb(const rta::polled_task* const,
                                               const rta::ds::bi_tab* const tab) {
+  /* Not using stochastic greedy nbhd policy */
+  if (nullptr == tab) {
+    return;
+  }
   /*
    * Depth [0,1,2] metrics aggregators are registered on the same executive,
    * so this function will be called for the task allocations for any depth,

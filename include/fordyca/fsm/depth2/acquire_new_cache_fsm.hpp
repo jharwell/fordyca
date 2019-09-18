@@ -60,7 +60,7 @@ NS_START(depth2);
  * cache or via exploration). Once the chosen new cache has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_new_cache_fsm : public rer::client<acquire_new_cache_fsm>,
+class acquire_new_cache_fsm final : public rer::client<acquire_new_cache_fsm>,
                               public cfsm::acquire_goal_fsm {
  public:
   acquire_new_cache_fsm(const fsm_ro_params* c_params,

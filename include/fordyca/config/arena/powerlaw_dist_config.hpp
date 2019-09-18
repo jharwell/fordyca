@@ -39,7 +39,7 @@ NS_START(fordyca, config, arena);
  * @struct powerlaw_dist_config
  * @ingroup fordyca config arena
  */
-struct powerlaw_dist_config : public rconfig::base_config {
+struct powerlaw_dist_config final : public rconfig::base_config {
   /**
    * @brief Min power of 2 for distribution.
    */

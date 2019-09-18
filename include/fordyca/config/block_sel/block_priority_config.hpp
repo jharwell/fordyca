@@ -40,7 +40,7 @@ NS_START(fordyca, config);
  * @struct block_priority_config
  * @ingroup fordyca config block_sel
  */
-struct block_priority_config : public rconfig::base_config {
+struct block_priority_config final : public rconfig::base_config {
   double cube{-1.0};
   double ramp{-1.0};
 };
