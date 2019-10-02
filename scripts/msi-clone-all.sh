@@ -11,6 +11,7 @@
 mkdir -p $1 && cd $1
 
 # Clone RCPPSW
+if [ -d rcppsw ]; then rm -rf rcppsw; fi
 git clone https://github.com/swarm-robotics/rcppsw.git
 cd rcppsw
 git checkout devel
@@ -19,26 +20,33 @@ cd ..
 
 
 # Clone COSM
+if [ -d cosm ]; then rm -rf cosm; fi
 git clone https://github.com/swarm-robotics/cosm.git
 cd cosm
 git checkout devel
 git submodule update --init --recursive --remote
+
 ln -s ../../rcppsw ext/
+
 cd ..
 
 
 # Clone FORDYCA
+if [ -d fordyca ]; then rm -rf fordyca; fi
 git clone https://github.com/swarm-robotics/fordyca.git
 cd fordyca
 git checkout devel
 git submodule update --init --recursive --remote
-mkdir -p ext
+
 ln -s ../../rcppsw ext/
 ln -s ../../cosm ext/
 
-mkdir build
+mkdir -p build
 
 cd ..
+
+# Clone SIERRA
+if [ -d sierra ]; then rm -rf sierra; fi
 git clone https://github.com/swarm-robotics/sierra.git
 cd sierra
 git checkout devel

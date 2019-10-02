@@ -175,7 +175,7 @@
             <phototaxis_force max="8"/>
           </force_calculator>
 
-          <diff_drive soft_turn_max="15"
+          <diff_drive soft_turn_max="25"
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
@@ -222,7 +222,7 @@
           perception_mdpo="perception-mdpo.csv"
           swarm_dist_pos2D="swarm-dist-pos2D.csv"
           swarm_convergence="swarm-convergence.csv"
-          temporal_variance="temporal-variance.csv"
+          loop_temporal_variance="temporal-variance.csv"
           output_interval="1000">
       </metrics>
     </output>

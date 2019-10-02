@@ -15,9 +15,6 @@
 # $3 - The root directory for ARGoS installation
 # $4 - # cores to use when compiling
 
-# Exit when any command fails
-set -e
-
 mkdir -p $1 && cd $1
 
 fordyca_pkgs=(qtbase5-dev libnlopt-dev libnlopt-cxx-dev libfreeimageplus-dev
@@ -36,10 +33,18 @@ done
 
 sudo -H pip3 install  "${python_pkgs[@]}"
 
+# Exit when any command after this fails. Can't be before the package installs,
+# because it is not an error if some of the packages are not found (I just put a
+# list of possible packages that might exist on debian systems to satisfy
+# project requirements).
+set -e
+
 # Install ARGoS
+if [ -d argos3 ]; then rm -rf argos3; fi
 git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
 mkdir -p build && cd build
+
 git checkout devel
 cmake -DCMAKE_BUILD_TYPE=Release \
       -DARGOS_BUILD_FOR=simulator\
@@ -62,6 +67,7 @@ fi;
 cd ../../
 
 # Bootstrap rcppsw
+if [ -d rcppsw ]; then rm -rf rcppsw; fi
 git clone https://github.com/swarm-robotics/rcppsw.git
 cd rcppsw
 git checkout devel
@@ -69,13 +75,18 @@ git submodule update --init --recursive --remote
 cd ..
 
 # Bootstrap cosm
+if [ -d cosm ]; then rm -rf cosm; fi
 git clone https://github.com/swarm-robotics/cosm.git
 cd cosm
 git checkout devel
 git submodule update --init --recursive --remote
+
+ln -s $1/rcppsw ext/rcppsw
+
 cd ..
 
 # Bootstrap fordyca
+if [ -d fordyca ]; then rm -rf fordyca; fi
 git clone https://github.com/swarm-robotics/fordyca.git
 cd fordyca
 git checkout devel
