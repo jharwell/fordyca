@@ -1,19 +1,20 @@
 #!/bin/bash
 #
-# This script builds the necessar dependencies for the project from scratch,
+# This script builds the necessary dependencies for the project from scratch,
 # targeting the MSI cluster it is run on. You need to source the build
-# environment setup file before running this script. MUST be run from an cluster
-# node (NOT a login node).
+# environment setup file before running this script, AND have already run the
+# cloning script. MUST be run from a logine node (NOT a cluster node, because
+# those don't always have internet access).
 #
-# $1 - The directory to clone and build dependencies out of
+# $1 - The directory dependencies were cloned into.
 # $2 - The install prefix (things will be installed to the $MSICLUSTER directory
 #      under here).
-# $3 - How many cores to use when building
+# $3 - How many cores to use when building.
 #
+set -e
 cd $1
 
 # First, NLopt
-git clone https://github.com/stevengj/nlopt.git
 cd nlopt && mkdir -p build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=$2/$MSICLUSTER \
       -DNLOPT_PYTHON=NO\
@@ -27,9 +28,7 @@ make -j $3 && make install
 cd ../..
 
 # Next, ARGoS
-git clone https://github.com/swarm-robotics/argos3.git
 cd argos3
-git checkout devel
 mkdir -p build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=$2/$MSICLUSTER \

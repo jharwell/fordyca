@@ -217,6 +217,8 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
   auto graph = boost::get<rta::ds::bi_tdgraph>(variant.get());
   const auto* execp =
       config_repo.config_get<rta::config::task_executive_config>();
+  const auto* allocp =
+      config_repo.config_get<rta::config::task_alloc_config>();
 
   /* can be omitted if the user wants the default values */
   if (nullptr == execp) {
@@ -233,10 +235,11 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
    * Only necessary if we are using the stochastic greedy neighborhood policy;
    * causes segfaults due to asserts otherwise.p
    */
-  if (rta::bi_tdgraph_allocator::kPolicyStochGreedyNBHD == execp->alloc_policy) {
-    graph->active_tab_init(execp->tab_init_policy, rng);
+  if (rta::bi_tdgraph_allocator::kPolicyStochGreedyNBHD == allocp->policy) {
+    graph->active_tab_init(allocp->stoch_greedy_nbhd.tab_init_policy, rng);
   }
   return std::make_unique<rta::bi_tdgraph_executive>(execp,
+                                                     allocp,
                                                      std::move(variant),
                                                      rng);
 } /* initialize() */

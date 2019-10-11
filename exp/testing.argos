@@ -17,7 +17,7 @@
   <controllers>
 
     <bitd_dpo_controller id="ffc"
-                    library="libfordyca">
+                         library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <!-- <leds implementation="default" medium="leds" /> -->
@@ -36,9 +36,9 @@
       <params>
         <rng seed="123"/>
         <output
-          output_root="output"
-          output_dir="__current_date__"
-          />
+            output_root="output"
+            output_dir="__current_date__"
+            />
         <perception
             los_dim="0.4">
           <grid resolution="0.2"
@@ -49,10 +49,9 @@
         <task_executive
             update_exec_ests="true"
             update_interface_ests="true"
-            tab_init_policy="max_depth"
-            alloc_policy="stoch_greedy_nbhd"
             />
-        <task_alloc>
+        <task_alloc
+            policy="epsilon_greedy">
           <task_abort>
             <src_sigmoid_sel
                 input_src="exec">
@@ -62,10 +61,10 @@
                          offset="3"
                          gamma="1.0"/>
               </sigmoid_sel>
-              </src_sigmoid_sel>
+            </src_sigmoid_sel>
           </task_abort>
           <task_exec_estimates
-              seed_enabled="true"
+              seed_enabled="false"
               generalist="2000:4000"
               collector="1000:2000"
               harvester="1000:2000"
@@ -76,57 +75,59 @@
             <ema alpha="0.8"/>
           </task_exec_estimates>
 
-          <stoch_greedy_nbhd>
-          <task_partition
-              always_partition="false"
-              never_partition="false">
-            <src_sigmoid_sel
-                input_src="exec">
-              <sigmoid_sel
-                  method="pini2011">
-                <sigmoid
-                    reactivity="4"
-                    offset="1.0"
-                    gamma="1.0"/>
-              </sigmoid_sel>
-            </src_sigmoid_sel>
-          </task_partition>
-          <subtask_sel>
-            <src_sigmoid_sel
-                input_src="exec">
-              <sigmoid_sel
-                  method="harwell2018">
-                <sigmoid
-                    reactivity="8"
-                    offset="1.25"
-                    gamma="1.0"/>
-              </sigmoid_sel>
-            </src_sigmoid_sel>
-          </subtask_sel>
-          <tab_sel>
-            <src_sigmoid_sel
-                input_src="exec">
-              <sigmoid_sel
-                  method="harwell2019">
-                <sigmoid
-                    reactivity="4"
-                    offset="1.0"
-                    gamma="1.0"/>
-              </sigmoid_sel>
-            </src_sigmoid_sel>
-          </tab_sel>
+          <epsilon_greedy epsilon="0.4"/>
+          <stoch_greedy_nbhd
+              tab_init_policy="max_depth">
+            <task_partition
+                always_partition="false"
+                never_partition="false">
+              <src_sigmoid_sel
+                  input_src="exec">
+                <sigmoid_sel
+                    method="pini2011">
+                  <sigmoid
+                      reactivity="4"
+                      offset="1.0"
+                      gamma="1.0"/>
+                </sigmoid_sel>
+              </src_sigmoid_sel>
+            </task_partition>
+            <subtask_sel>
+              <src_sigmoid_sel
+                  input_src="exec">
+                <sigmoid_sel
+                    method="harwell2018">
+                  <sigmoid
+                      reactivity="8"
+                      offset="1.25"
+                      gamma="1.0"/>
+                </sigmoid_sel>
+              </src_sigmoid_sel>
+            </subtask_sel>
+            <tab_sel>
+              <src_sigmoid_sel
+                  input_src="exec">
+                <sigmoid_sel
+                    method="harwell2019">
+                  <sigmoid
+                      reactivity="4"
+                      offset="1.0"
+                      gamma="1.0"/>
+                </sigmoid_sel>
+              </src_sigmoid_sel>
+            </tab_sel>
           </stoch_greedy_nbhd>
         </task_alloc>
         <block_sel_matrix
-              nest="6, 3">
-        <!--       <block_priorities -->
-        <!--           cube="1.0" -->
-        <!--           ramp="1.0" -->
-        <!--           /> -->
-        <!--       <pickup_policy -->
-        <!--           policy="cluster_proximity" -->
-        <!--           prox_dist="3.0" -->
-        <!--           /> -->
+            nest="6, 3">
+          <!--       <block_priorities -->
+          <!--           cube="1.0" -->
+          <!--           ramp="1.0" -->
+          <!--           /> -->
+          <!--       <pickup_policy -->
+          <!--           policy="cluster_proximity" -->
+          <!--           prox_dist="3.0" -->
+          <!--           /> -->
         </block_sel_matrix>
         <cache_sel_matrix
             cache_prox_dist="1.6"
@@ -143,22 +144,22 @@
             block_strategy="CRW"
             cache_strategy="ledtaxis_search"/>
         <sensing_subsystem2D>
-           <!-- -5pi/6 : 5pi/6 -->
+          <!-- -5pi/6 : 5pi/6 -->
           <proximity_sensor fov="-2.61:2.61"
                             delta="0.1" />
 
           <ground_sensor>
-          <!-- NEST: The nest is a relatively light gray. -->
+            <!-- NEST: The nest is a relatively light gray. -->
             <nest range="0.6:0.8"
                   consensus="3"/>
-          <!-- BLOCK: Blocks are black. -->
+            <!-- BLOCK: Blocks are black. -->
             <block range="-0.05:0.05"
                    consensus="4"/>
-          <!-- CACHE: Caches are dark gray. -->
+            <!-- CACHE: Caches are dark gray. -->
             <cache range="0.3:0.5"
                    consensus="3"/>
           </ground_sensor>
-          </sensing_subsystem2D>
+        </sensing_subsystem2D>
         <actuation_subsystem2D>
           <force_calculator>
             <avoidance_force lookahead="0.5"
@@ -193,7 +194,6 @@
         output_dir="__current_date__">
       <metrics
           output_dir="metrics"
-
           block_acq_counts="block-acq-counts.csv"
           block_acq_locs="block-acq-locs.csv"
           block_acq_explore_locs="block-acq-explore-locs.csv"
@@ -249,34 +249,34 @@
     <!--       caches="true"/> -->
     <!--   </oracle_manager> -->
     <!-- <temporal_variance> -->
-      <!-- <blocks> -->
-      <!--   <manipulation_penalty> -->
-      <!--     <waveform -->
-      <!--         type="Null" -->
-      <!--         frequency="0.01" -->
-      <!--         amplitude="50" -->
-      <!--         offset="50" -->
-      <!--         phase="0"/> -->
-      <!--   </manipulation_penalty> -->
-      <!--   <carry_throttle> -->
-      <!--     <waveform -->
-      <!--         type="Sine" -->
-      <!--         frequency="0.004" -->
-      <!--         amplitude="0.4" -->
-      <!--         offset="0.4" -->
-      <!--         phase="0"/> -->
-      <!--   </carry_throttle> -->
-      <!-- </blocks> -->
-      <!-- <caches> -->
-      <!--   <usage_penalty> -->
-      <!--     <waveform -->
-      <!--         type="Null" -->
-      <!--         frequency="100" -->
-      <!--         amplitude="500" -->
-      <!--         offset="10" -->
-      <!--         phase="0"/> -->
-      <!--   </usage_penalty> -->
-      <!-- </caches> -->
+    <!-- <blocks> -->
+    <!--   <manipulation_penalty> -->
+    <!--     <waveform -->
+    <!--         type="Null" -->
+    <!--         frequency="0.01" -->
+    <!--         amplitude="50" -->
+    <!--         offset="50" -->
+    <!--         phase="0"/> -->
+    <!--   </manipulation_penalty> -->
+    <!--   <carry_throttle> -->
+    <!--     <waveform -->
+    <!--         type="Sine" -->
+    <!--         frequency="0.004" -->
+    <!--         amplitude="0.4" -->
+    <!--         offset="0.4" -->
+    <!--         phase="0"/> -->
+    <!--   </carry_throttle> -->
+    <!-- </blocks> -->
+    <!-- <caches> -->
+    <!--   <usage_penalty> -->
+    <!--     <waveform -->
+    <!--         type="Null" -->
+    <!--         frequency="100" -->
+    <!--         amplitude="500" -->
+    <!--         offset="10" -->
+    <!--         phase="0"/> -->
+    <!--   </usage_penalty> -->
+    <!-- </caches> -->
     <!-- </temporal_variance> -->
 
     <arena_map>
@@ -314,11 +314,11 @@
                robot_drop_only="false"/>
     </caches>
 
-  <!--   <visualization robot_id="true" -->
-  <!--                  robot_los="true" -->
-  <!--                  robot_task="true" -->
-  <!--                  block_id="false" -->
-  <!--                  /> -->
+    <!--   <visualization robot_id="true" -->
+    <!--                  robot_los="true" -->
+    <!--                  robot_task="true" -->
+    <!--                  block_id="false" -->
+    <!--                  /> -->
   </loop_functions>
 
   <!-- *********************** -->
@@ -360,29 +360,29 @@
   <!-- ******************* -->
   <physics_engines>
     <dynamics2d id="dyn2d0">
-    <!--  <boundaries> -->
-    <!--     <top height="1" /> -->
-    <!--     <bottom height="0" /> -->
-    <!--     <sides> -->
-    <!--       <vertex point="0,0" /> -->
-    <!--       <vertex point="6,0" /> -->
-    <!--       <vertex point="6,6" /> -->
-    <!--       <vertex point="0,6" /> -->
-    <!--     </sides> -->
-    <!--  </boundaries> -->
-    <!-- </dynamics2d> -->
-    <!-- <dynamics2d id="dyn2d1"> -->
-    <!--  <boundaries> -->
-    <!--     <top height="1" /> -->
-    <!--     <bottom height="0" /> -->
-    <!--     <sides> -->
-    <!--       <vertex point="6,0" /> -->
-    <!--       <vertex point="12,0" /> -->
-    <!--       <vertex point="12,6" /> -->
-    <!--       <vertex point="6,6" /> -->
-    <!--     </sides> -->
-    <!--  </boundaries> -->
-     </dynamics2d>
+      <!--  <boundaries> -->
+      <!--     <top height="1" /> -->
+      <!--     <bottom height="0" /> -->
+      <!--     <sides> -->
+      <!--       <vertex point="0,0" /> -->
+      <!--       <vertex point="6,0" /> -->
+      <!--       <vertex point="6,6" /> -->
+      <!--       <vertex point="0,6" /> -->
+      <!--     </sides> -->
+      <!--  </boundaries> -->
+      <!-- </dynamics2d> -->
+      <!-- <dynamics2d id="dyn2d1"> -->
+      <!--  <boundaries> -->
+      <!--     <top height="1" /> -->
+      <!--     <bottom height="0" /> -->
+      <!--     <sides> -->
+      <!--       <vertex point="6,0" /> -->
+      <!--       <vertex point="12,0" /> -->
+      <!--       <vertex point="12,6" /> -->
+      <!--       <vertex point="6,6" /> -->
+      <!--     </sides> -->
+      <!--  </boundaries> -->
+    </dynamics2d>
   </physics_engines>
 
   <!-- ********* -->

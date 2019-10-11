@@ -65,3 +65,7 @@ frames/*.png
 # Tags
 .tag*
 tags
+
+# Sphinx
+docs/_build/
+docs/api

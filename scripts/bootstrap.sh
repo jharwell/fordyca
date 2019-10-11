@@ -23,7 +23,7 @@ rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache python3-pip)
 libra_pkgs=(make cmake git npm graphviz doxygen cppcheck cmake make gcc-8 g++-8
             libclang-6.0-dev clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)
 
-python_pkgs=(cpplint)
+python_pkgs=(cpplint breathe)
 
 # Install packages (must be loop to ignore ones that don't exist)
 for pkg in "${libra_pkgs[@]}" "${rcppsw_pkgs[@]}" "${fordyca_pkgs[@]}"
