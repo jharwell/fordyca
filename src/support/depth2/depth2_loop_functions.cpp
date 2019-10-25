@@ -212,10 +212,8 @@ void depth2_loop_functions::cache_handling_init(
     const config::caches::caches_config* const cachep) {
   ER_ASSERT(nullptr != cachep && cachep->dynamic.enable,
             "FATAL: Caches not enabled in depth2 loop functions");
-  m_cache_manager =
-      std::make_unique<dynamic_cache_manager>(cachep,
-                                              &arena_map()->decoratee(),
-                                              rng());
+  m_cache_manager = std::make_unique<dynamic_cache_manager>(
+      cachep, &arena_map()->decoratee(), rng());
 
   cache_creation_handle(false);
 } /* cache_handlng_init() */
@@ -422,10 +420,9 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
     return false;
   }
   cache_create_ro_params ccp = {
-    .current_caches = arena_map()->caches(),
-    .clusters = arena_map()->block_distributor()->block_clusters(),
-    .t = rtypes::timestep(GetSpace().GetSimulationClock())
-  };
+      .current_caches = arena_map()->caches(),
+      .clusters = arena_map()->block_distributor()->block_clusters(),
+      .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);

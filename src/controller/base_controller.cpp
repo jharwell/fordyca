@@ -27,6 +27,9 @@
 #include <experimental/filesystem>
 #include <fstream>
 
+#include "rcppsw/math/config/rng_config.hpp"
+#include "rcppsw/math/rngm.hpp"
+
 #include "fordyca/config/base_controller_repository.hpp"
 #include "fordyca/config/output_config.hpp"
 #include "fordyca/config/saa_xml_names.hpp"
@@ -38,9 +41,6 @@
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
-
-#include "rcppsw/math/config/rng_config.hpp"
-#include "rcppsw/math/rngm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -107,9 +107,8 @@ void base_controller::Init(ticpp::Element& node) {
   output_init(config);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  saa_init(
-      repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
-      repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
+  saa_init(repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
+           repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
   ndc_pop();
 } /* Init() */
 
@@ -247,10 +246,10 @@ void base_controller::output_init(const config::output_config* const config) {
 
 void base_controller::rng_init(const rmath::config::rng_config* config) {
   rmath::rngm::instance().register_type<rmath::rng>("footbot");
-  if (nullptr == config || (nullptr != config &&-1 == config->seed)) {
+  if (nullptr == config || (nullptr != config && -1 == config->seed)) {
     ER_INFO("Using time seeded RNG");
-    m_rng = rmath::rngm::instance().create("footbot",
-                                           std::chrono::system_clock::now().time_since_epoch().count());
+    m_rng = rmath::rngm::instance().create(
+        "footbot", std::chrono::system_clock::now().time_since_epoch().count());
   } else {
     /*
      * We add the entity ID to the configured seed to ensure that all robots
@@ -259,8 +258,7 @@ void base_controller::rng_init(const rmath::config::rng_config* config) {
      * still maintaining reproducibility.
      */
     ER_INFO("Using user seeded RNG");
-    m_rng = rmath::rngm::instance().create("footbot",
-                                           config->seed);
+    m_rng = rmath::rngm::instance().create("footbot", config->seed);
   }
 } /* rng_init() */
 

@@ -110,13 +110,13 @@ void bitd_dpo_controller::private_init(
     const config::depth1::controller_repository& config_repo) {
   /* task executive */
   m_executive = task_executive_builder(block_sel_matrix(),
-                                    m_cache_sel_matrix.get(),
-                                    saa(),
-                                    perception())(config_repo, rng());
-  executive()->task_abort_notify(
-      std::bind(&bitd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
-  executive()->task_start_notify(
-      std::bind(&bitd_dpo_controller::task_start_cb, this, std::placeholders::_1));
+                                       m_cache_sel_matrix.get(),
+                                       saa(),
+                                       perception())(config_repo, rng());
+  executive()->task_abort_notify(std::bind(
+      &bitd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
+  executive()->task_start_notify(std::bind(
+      &bitd_dpo_controller::task_start_cb, this, std::placeholders::_1));
 } /* private_init() */
 
 void bitd_dpo_controller::task_abort_cb(const rta::polled_task*) {

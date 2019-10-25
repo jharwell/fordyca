@@ -33,11 +33,11 @@
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/config/rng_config.hpp"
 #include "rcppsw/math/radians.hpp"
+#include "rcppsw/math/rng.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/utils/color.hpp"
-#include "rcppsw/math/rng.hpp"
-#include "rcppsw/math/config/rng_config.hpp"
 
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/fordyca.hpp"

@@ -101,9 +101,9 @@ void bitd_mdpo_controller::shared_init(
    * subsystem, which is used to create the executive's graph.
    */
   executive(task_executive_builder(block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa(),
-                                perception())(config_repo, rng()));
+                                   cache_sel_matrix(),
+                                   saa(),
+                                   perception())(config_repo, rng()));
   executive()->task_abort_notify(std::bind(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
 
@@ -113,7 +113,8 @@ mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) {
   return static_cast<mdpo_perception_subsystem*>(dpo_controller::perception());
 } /* perception() */
 
-const mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) const {
+const mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(
+    void) const {
   return static_cast<const mdpo_perception_subsystem*>(
       dpo_controller::perception());
 } /* perception() */

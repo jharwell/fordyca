@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
+
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************

@@ -30,8 +30,8 @@
 
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
 
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 

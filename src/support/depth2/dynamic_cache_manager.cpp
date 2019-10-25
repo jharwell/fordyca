@@ -53,11 +53,9 @@ dynamic_cache_manager::dynamic_cache_manager(
  ******************************************************************************/
 boost::optional<ds::cache_vector> dynamic_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const ds::block_vector&  c_alloc_blocks) {
-  if (auto to_use =
-          calc_blocks_for_creation(c_params.current_caches,
-                                   c_params.clusters,
-                                   c_alloc_blocks)) {
+    const ds::block_vector& c_alloc_blocks) {
+  if (auto to_use = calc_blocks_for_creation(
+          c_params.current_caches, c_params.clusters, c_alloc_blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
         .grid = arena_grid(),
         .cache_dim = mc_cache_config.dimension,

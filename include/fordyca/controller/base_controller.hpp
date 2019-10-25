@@ -31,9 +31,9 @@
 #include <argos3/core/control_interface/ci_controller.h>
 
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/rng.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
-#include "rcppsw/math/rng.hpp"
 
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"
@@ -55,7 +55,7 @@ struct force_calculator_config;
 }
 namespace rcppsw::math::config {
 struct rng_config;
-} /* namespace rcppsw::math */
+} // namespace rcppsw::math::config
 
 NS_START(fordyca);
 namespace support::tv {

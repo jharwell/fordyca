@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/repr/base_block.hpp"
 
 /*******************************************************************************
@@ -54,10 +56,11 @@ class cube_block final : public base_block {
     return repr::block_type::ekCUBE;
   }
   std::unique_ptr<base_block> clone(void) const override {
-    std::unique_ptr<base_block> tmp = std::make_unique<cube_block>(dims(), id());
+    auto tmp = std::make_unique<cube_block>(dims(), id());
     tmp->dloc(this->dloc());
     tmp->rloc(this->rloc());
     tmp->reset_robot_id();
+    tmp->copy_metrics(*this);
     return tmp;
   } /* clone() */
 };

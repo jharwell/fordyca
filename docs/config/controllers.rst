@@ -205,7 +205,7 @@ XML configuration:
 - Required child attributes if present: ``policy`` .
 - Required child tags if present: ``task_abort``.
 - Optional child attributes: none.
-- Optional child tags: [``matroid_stoch_nbhd``, ``task_exec_estimates``,
+- Optional child tags: [``stoch_nbhd1``, ``task_exec_estimates``,
   ``epsilon_greedy`` ].
 
 XML configuration:
@@ -213,7 +213,7 @@ XML configuration:
 .. code-block:: XML
 
    <task_alloc
-       policy="random|epsilon_greedy|strict_greedy|stoch_greedy_nbhd">
+       policy="random|epsilon_greedy|strict_greedy|stoch_nbhd1|ucb1">
        <matroid_stoch_nbhd>
        ...
        </matroid_stoch_nbhd>
@@ -229,11 +229,18 @@ XML configuration:
   selected?
 
     - ``random`` - Choose a random task each time.
+
     - ``epsilon_greedy`` - Choose the greedy best with probability 1 - epsilon,
-      otherwise choose a random task.
+      otherwise choose a random task. Has provably bounds on regret, treating
+      task allocation as a multi-armed bandit problem.
+
     - ``strict_greedy`` - A pure greedy matroid optimization approach.
-    - ``stoch_greedy_nbhd`` - A stochastic greedy approach within the
+
+    - ``stoch_nbhd1`` - A stochastic greedy approach within the
       neighborhood of the most recently executed task (max distance is 1).
+
+    - ``UCB1`` - A deterministic greedy approach based on regret minimization
+      (has provable logarithmic bound).
 
 Many child tags in ``<task_alloc>`` use sigmoid-based functions for choosing
 between alternatives, with the input src and sigmoid method varying. For such
@@ -371,7 +378,7 @@ XML configuration:
 ``task_alloc/epsilon_greedy``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Required by: none.
-- Required child attributes if present: ``epsilon``.
+- Required child attributes if present: ``epsilon``, ``regret_bound``.
 - Required child tags if present: none.
 - Optional child attributes: none.
 - Optional child tags: none.
@@ -381,23 +388,27 @@ XML configuration:
     <task_alloc>
         ...
         <epsilon_greedy
-            epsilon="FLOAT"/>
+            epsilon="FLOAT"
+        regret_bound="log|linear"/>
         ...
     </task_alloc>
 
 - ``epsilon`` - Used to control exploration of the method. Must be between 0.0 and
   1.0.
 
-``task_alloc/matroid_stoch_nbhd``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- ``regret_bound`` - What is the provable bound on regret?
+
+  - ``log`` - Logarithmic bounded.
+  - ``linear`` - Linearly bounded (more regret).
+
+``task_alloc/stoch_nbhd1``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Required by: none.
 - Required child attributes if present: ``tab_init_policy``.
-- Required child tags if present: [``task_abort``, ``task_partition``,
-  ``subtask_sel`` ].
+- Required child tags if present: [ ``task_partition``, ``subtask_sel`` ]. 
 - Optional child attributes: none.
-- Optional child tags: [``task_exec_estimates``, ``tab_sel`` (required by depth2
-  controllers)].
+- Optional child tags: [``tab_sel`` (required by depth2 controllers)].
 
 XML configuration:
 
@@ -405,7 +416,7 @@ XML configuration:
 
     <task_alloc>
         ...
-        <matroid_stoch_nbhd
+        <stoch_nbhd1
             tab_init_policy="root|max_depth|random">
         	<task_partition>
         	...
@@ -416,7 +427,7 @@ XML configuration:
         	<tab_sel>
         	...
         	</tab_sel>
-        </matroid_stoch_nbhd>
+        </stoch_nbhd1>
         ...
     </task_alloc>
 
@@ -432,8 +443,8 @@ XML configuration:
       within the task decomposition graph that is passed to the executive.
 
 
-``task_alloc/stoch_greedy_nbhd/task_partition``
-"""""""""""""""""""""""""""""""""""""""""""""""
+``task_alloc/stoch_nbhd1/task_partition``
+"""""""""""""""""""""""""""""""""""""""""
 
 - Required by: [depth1, depth2[] controllers.
 - Required child attributes if present: none.
@@ -445,7 +456,7 @@ XML configuration:
 
 .. code-block:: XML
 
-    <matroid_stoch_nbhd>
+    <stoch_nbhd1>
         ...
         <task_partition
             always_partition="false"
@@ -460,7 +471,7 @@ XML configuration:
                 <sigmoid_sel/>
             </src_sigmoid_sel>
         </task_partition>
-    </matroid_stoch_nbhd>
+    </stoch_nbhd1>
 
 
 - ``always_partition`` - If `true`, then robots will always choose to
@@ -473,8 +484,8 @@ XML configuration:
 partitioning decision. Calculated once upon each task allocation, after the
 previous task is finished or aborted.
 
-``task_alloc/stoch_greedy_nbhd/subtask_sel``
-""""""""""""""""""""""""""""""""""""""""""""
+``task_alloc/stoch_nbhd1/subtask_sel``
+""""""""""""""""""""""""""""""""""""""
 
 - Required by: [depth1, depth2] controllers.
 - Required child attributes if present: none.
@@ -486,7 +497,7 @@ XML configuration:
 
 .. code-block:: XML
 
-    <matroid_stoch_nbhd>
+    <stoch_nbhd1>
         ...
         <subtask_sel>
             <src_sigmoid_sel
@@ -500,13 +511,13 @@ XML configuration:
             </src_sigmoid_sel>
         </subtask_sel>
         ...
-    </matroid_stoch_nbhd>
+    </stoch_nbhd1>
 
 ``method`` tag can be one of [``harwell2018``, ``random`` ] to perform stochastic
 subtask selection if partitioning is employed.
 
-``task_alloc/stoch_greedy_nbhd/tab_sel``
-""""""""""""""""""""""""""""""""""""""""
+``task_alloc/stoch_nbhd1/tab_sel``
+""""""""""""""""""""""""""""""""""
 
 - Required by: Depth2 controllers.
 - Required child attributes if present: ``src_sigmoid_sel``.
@@ -518,7 +529,7 @@ XML configuration:
 
 .. code-block:: XML
 
-    <matroid_stoch_nbhd>
+    <stoch_nbhd1>
         ...
         <tab_sel>
             <src_sigmoid_sel
@@ -532,7 +543,7 @@ XML configuration:
             </src_sigmoid_sel>
         </tab_sel>
         ...
-    </matroid_stoch_nbhd>
+    </stoch_nbhd1>
 
 
 ``method`` tag that can be one of [ ``harwell2019`` ].

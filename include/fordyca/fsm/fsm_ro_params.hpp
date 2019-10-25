@@ -27,6 +27,7 @@
 #include <memory>
 
 #include "rcppsw/common/common.hpp"
+
 #include "fordyca/config/exploration_config.hpp"
 #include "fordyca/fordyca.hpp"
 
@@ -57,9 +58,9 @@ NS_START(fsm);
  * by the FSM at run-time; not all FSMs need all members.
  */
 struct fsm_ro_params {
-  const controller::block_sel_matrix*       bsel_matrix;
-  const controller::cache_sel_matrix*       csel_matrix;
-  const ds::dpo_store*                      store;
+  const controller::block_sel_matrix* bsel_matrix;
+  const controller::cache_sel_matrix* csel_matrix;
+  const ds::dpo_store* store;
   const fordyca::config::exploration_config exp_config;
 };
 

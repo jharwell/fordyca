@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
+
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/cell_cache_extent.hpp"
 #include "fordyca/events/cell_empty.hpp"
@@ -91,7 +92,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
   uint i = 0;
   while (i++ < kOVERLAP_SEARCH_MAX_TRIES) {
     if (auto new_center =
-        deconflict_loc(c_existing_caches, c_clusters, center, rng)) {
+            deconflict_loc(c_existing_caches, c_clusters, center, rng)) {
       center = new_center.get();
     } else {
       break;
@@ -129,7 +130,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
 
       /* check the current cache */
       if (auto new_loc =
-          deconflict_loc_entity(c_existing_caches[j].get(), c_center, rng)) {
+              deconflict_loc_entity(c_existing_caches[j].get(), c_center, rng)) {
         new_center = new_loc.get();
         conflict = true;
       }
@@ -232,10 +233,10 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
    * X or Y, in order to preserve having the block location be on an even
    * multiple of the grid size, which makes handling creation much easier.
    */
-  double x_delta = std::copysign(m_grid->resolution().v(),
-                                 rng->uniform(-1.0, 1.0));
-  double y_delta = std::copysign(m_grid->resolution().v(),
-                                 rng->uniform(-1.0, 1.0));
+  double x_delta =
+      std::copysign(m_grid->resolution().v(), rng->uniform(-1.0, 1.0));
+  double y_delta =
+      std::copysign(m_grid->resolution().v(), rng->uniform(-1.0, 1.0));
 
   /*
    * Need to pass cache dimensions rather than dimensions of the entity, which

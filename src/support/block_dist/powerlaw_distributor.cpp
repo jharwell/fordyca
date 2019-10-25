@@ -180,10 +180,8 @@ bool powerlaw_distributor::map_clusters(ds::arena_grid* const grid) {
   }
 
   for (auto& bclustp : config) {
-    m_dist_map[bclustp.capacity].emplace_back(bclustp.view,
-                                              mc_resolution,
-                                              bclustp.capacity,
-                                              rng());
+    m_dist_map[bclustp.capacity].emplace_back(
+        bclustp.view, mc_resolution, bclustp.capacity, rng());
   } /* for(i..) */
   for (auto& [clust_size, dist_list] : m_dist_map) {
     ER_INFO("Mapped %zu clusters of capacity %u", dist_list.size(), clust_size);

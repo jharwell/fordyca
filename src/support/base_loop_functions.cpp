@@ -28,8 +28,8 @@
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
 #include "rcppsw/algorithm/closest_pair2D.hpp"
-#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/math/rngm.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
@@ -95,7 +95,6 @@ void base_loop_functions::Init(ticpp::Element& node) {
 
   /* initialize oracle, if configured */
   oracle_init(config()->config_get<config::oracle::oracle_manager_config>());
-
 
   m_floor = &GetSpace().GetFloorEntity();
   std::srand(std::time(nullptr));
@@ -165,9 +164,9 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * able to apply sensing/actuation variances if configured.
    */
   swarm_iterator::controllers<swarm_iterator::static_order>(this, [&](auto* c) {
-      m_tv_manager->register_controller(c->entity_id());
-      c->tv_init(m_tv_manager.get());
-    });
+    m_tv_manager->register_controller(c->entity_id());
+    c->tv_init(m_tv_manager.get());
+  });
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
@@ -203,10 +202,10 @@ void base_loop_functions::oracle_init(
 
 void base_loop_functions::rng_init(const rmath::config::rng_config* config) {
   rmath::rngm::instance().register_type<rmath::rng>("loop");
-  if (nullptr == config || (nullptr != config &&-1 == config->seed)) {
+  if (nullptr == config || (nullptr != config && -1 == config->seed)) {
     ER_INFO("Using time seeded RNG");
-    m_rng = rmath::rngm::instance().create("loop",
-                                           std::chrono::system_clock::now().time_since_epoch().count());
+    m_rng = rmath::rngm::instance().create(
+        "loop", std::chrono::system_clock::now().time_since_epoch().count());
   } else {
     ER_INFO("Using user seeded RNG");
     m_rng = rmath::rngm::instance().create("loop", config->seed);
@@ -239,7 +238,6 @@ void base_loop_functions::PostStep(void) {
     m_conv_calc->update();
   }
 } /* PostStep() */
-
 
 void base_loop_functions::Reset(void) {
   m_arena_map->distribute_all_blocks();

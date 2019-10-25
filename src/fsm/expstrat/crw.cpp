@@ -39,8 +39,7 @@ crw::crw(const fsm::expstrat::foraging_expstrat::params* const c_params,
          rmath::rng* rng)
     : crw(static_cast<crfootbot::footbot_saa_subsystem*>(c_params->saa), rng) {}
 
-crw::crw(crfootbot::footbot_saa_subsystem* saa,
-         rmath::rng* rng)
+crw::crw(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng)
     : foraging_expstrat(saa, rng),
       ER_CLIENT_INIT("fordyca.fsm.expstrat.crw"),
       m_tracker(saa->sensing()) {}

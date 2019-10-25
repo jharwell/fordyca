@@ -144,7 +144,8 @@ void cache_vanished::visit(controller::depth2::birtd_odpo_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void cache_vanished::visit(controller::depth2::birtd_omdpo_controller& controller) {
+void cache_vanished::visit(
+    controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_push();
 
   dispatch_cache_interactor(controller.current_task());

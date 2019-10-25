@@ -205,7 +205,8 @@ void nest_block_drop::visit(controller::depth1::bitd_mdpo_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void nest_block_drop::visit(controller::depth1::bitd_omdpo_controller& controller) {
+void nest_block_drop::visit(
+    controller::depth1::bitd_omdpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);
@@ -237,7 +238,8 @@ void nest_block_drop::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(controller::depth2::birtd_mdpo_controller& controller) {
+void nest_block_drop::visit(
+    controller::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);
@@ -259,7 +261,8 @@ void nest_block_drop::visit(controller::depth2::birtd_dpo_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void nest_block_drop::visit(controller::depth2::birtd_odpo_controller& controller) {
+void nest_block_drop::visit(
+    controller::depth2::birtd_odpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);
@@ -270,7 +273,8 @@ void nest_block_drop::visit(controller::depth2::birtd_odpo_controller& controlle
   controller.ndc_pop();
 } /* visit() */
 
-void nest_block_drop::visit(controller::depth2::birtd_omdpo_controller& controller) {
+void nest_block_drop::visit(
+    controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_push();
 
   controller.block(nullptr);

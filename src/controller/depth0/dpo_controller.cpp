@@ -134,16 +134,12 @@ void dpo_controller::private_init(
     const config::depth0::dpo_controller_repository& config_repo) {
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory f;
-  fsm::expstrat::foraging_expstrat::params expstrat_params(saa(),
-                                                           nullptr,
-                                                           nullptr,
-                                                           nullptr);
-  fsm::fsm_ro_params fsm_ro_params = {
-      .bsel_matrix = block_sel_matrix(),
-      .csel_matrix = nullptr,
-      .store = perception()->dpo_store(),
-      .exp_config = *exp_config
-  };
+  fsm::expstrat::foraging_expstrat::params expstrat_params(
+      saa(), nullptr, nullptr, nullptr);
+  fsm::fsm_ro_params fsm_ro_params = {.bsel_matrix = block_sel_matrix(),
+                                      .csel_matrix = nullptr,
+                                      .store = perception()->dpo_store(),
+                                      .exp_config = *exp_config};
   m_fsm = std::make_unique<fsm::depth0::dpo_fsm>(
       &fsm_ro_params,
       saa(),

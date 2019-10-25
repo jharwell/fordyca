@@ -168,7 +168,7 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
 
 void depth1_metrics_aggregator::task_start_cb(const rta::polled_task* const,
                                               const rta::ds::bi_tab* const tab) {
-  /* Not using stochastic greedy nbhd policy */
+  /* Not using stochastic nbhd policy */
   if (nullptr == tab) {
     return;
   }

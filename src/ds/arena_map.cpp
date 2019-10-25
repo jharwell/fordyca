@@ -71,8 +71,7 @@ arena_map::arena_map(const config::arena::arena_map_config* config)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool arena_map::initialize(support::base_loop_functions* loop,
-                           rmath::rng* rng) {
+bool arena_map::initialize(support::base_loop_functions* loop, rmath::rng* rng) {
   for (auto& l : m_nest.lights()) {
     loop->AddEntity(*l);
   } /* for(&l..) */

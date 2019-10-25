@@ -53,7 +53,7 @@
     <priority value ="debug" />
   </category>
   <category name="fordyca.support.depth1.static_cache_manager" >
-    <priority value ="debug" />
+    <priority value ="trace" />
   </category>
     <category name="fordyca.tasks.depth2.cache_starter" >
     <priority value ="info" />

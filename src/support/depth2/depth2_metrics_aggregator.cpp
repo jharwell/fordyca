@@ -103,8 +103,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
 void depth2_metrics_aggregator::task_start_cb(
     RCSW_UNUSED const rta::polled_task* const task,
     const rta::ds::bi_tab* const tab) {
-
-  /* Not using stochastic greedy nbhd policy */
+  /* Not using stochastic nbhd policy */
   if (nullptr == tab) {
     return;
   }

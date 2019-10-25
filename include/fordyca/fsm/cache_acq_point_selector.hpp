@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/math/vector2.hpp"
 #include "rcppsw/math/rng.hpp"
+#include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/fordyca.hpp"
 

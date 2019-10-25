@@ -36,8 +36,8 @@
 #include "rcppsw/types/timestep.hpp"
 
 #include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/support/cache_create_ro_params.hpp"
 #include "fordyca/ds/block_vector.hpp"
+#include "fordyca/support/cache_create_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -82,7 +82,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * @return A vector of created caches.
    */
   virtual ds::cache_vector create_all(const cache_create_ro_params& c_params,
-                                      const ds::block_vector&  c_alloc_blocks) = 0;
+                                      const ds::block_vector& c_alloc_blocks) = 0;
 
   /**
    * @brief Update the cells for all newly created caches to reflect the fact

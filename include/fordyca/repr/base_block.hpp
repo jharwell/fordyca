@@ -131,19 +131,19 @@ class base_block : public unicell_movable_entity,
    *
    * @param time The current simulation time.
    */
-  void first_pickup_time(rtypes::timestep t);
+  void first_pickup_time(const rtypes::timestep& t);
 
   /**
    * @brief Set the time that the base_block dropped in the nest.
    *
    * @param time The current simulation time.
    */
-  void nest_drop_time(rtypes::timestep t) { m_nest_drop_time = t; }
+  void nest_drop_time(const rtypes::timestep& t) { m_nest_drop_time = t; }
 
   /**
    * @brief Set the time that the base_block was distributed in the arena.
    */
-  void distribution_time(rtypes::timestep t) { m_dist_time = t; }
+  void distribution_time(const rtypes::timestep& t) { m_dist_time = t; }
 
   /**
    * @brief Reset the the base_blocks carried/not carried state when it is not
@@ -170,9 +170,22 @@ class base_block : public unicell_movable_entity,
   int robot_id(void) const { return m_robot_id; }
   void robot_id(int id) { m_robot_id = id; }
 
+ protected:
+  /**
+   * @brief Provided to derived classes implementing \ref clone() so that they
+   * can correctly clone block metadata/metrics.
+   */
+  void copy_metrics(const base_block& other) {
+    this->m_transporters = other.m_transporters;
+    this->m_first_pickup_time = other.m_first_pickup_time;
+    this->m_first_pickup = other.m_first_pickup;
+    this->m_dist_time = other.m_dist_time;
+    this->m_nest_drop_time = other.m_nest_drop_time;
+  }
+
  private:
   /**
-   * @brief Change the block's location to something outside the visitable space
+   * @brief Change the block's location to sometnnnhing outside the visitable space
    * in the arena when it is being carried by robot.
    */
   void move_out_of_sight(void);

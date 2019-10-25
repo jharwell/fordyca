@@ -166,7 +166,8 @@ void free_block_drop::visit(controller::depth1::bitd_mdpo_controller& controller
   controller.block(nullptr);
 } /* visit() */
 
-void free_block_drop::visit(controller::depth1::bitd_omdpo_controller& controller) {
+void free_block_drop::visit(
+    controller::depth1::bitd_omdpo_controller& controller) {
   controller.block(nullptr);
 } /* visit() */
 
@@ -181,7 +182,8 @@ void free_block_drop::visit(controller::depth1::bitd_odpo_controller& controller
 /*******************************************************************************
  * Depth2
  ******************************************************************************/
-void free_block_drop::visit(controller::depth2::birtd_mdpo_controller& controller) {
+void free_block_drop::visit(
+    controller::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -205,7 +207,8 @@ void free_block_drop::visit(controller::depth2::birtd_dpo_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_drop::visit(controller::depth2::birtd_omdpo_controller& controller) {
+void free_block_drop::visit(
+    controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -217,7 +220,8 @@ void free_block_drop::visit(controller::depth2::birtd_omdpo_controller& controll
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_drop::visit(controller::depth2::birtd_odpo_controller& controller) {
+void free_block_drop::visit(
+    controller::depth2::birtd_odpo_controller& controller) {
   controller.ndc_push();
 
   if (dispatch_free_block_interactor(controller.current_task(),

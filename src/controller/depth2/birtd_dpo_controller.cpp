@@ -89,9 +89,9 @@ void birtd_dpo_controller::private_init(
    * version.
    */
   executive(task_executive_builder(block_sel_matrix(),
-                                cache_sel_matrix(),
-                                saa(),
-                                perception())(config_repo, rng()));
+                                   cache_sel_matrix(),
+                                   saa(),
+                                   perception())(config_repo, rng()));
 
   /*
    * Set task alloction callback, rebind task abort callback (original was lost
@@ -106,7 +106,7 @@ void birtd_dpo_controller::private_init(
 } /* private_init() */
 
 void birtd_dpo_controller::task_start_cb(const rta::polled_task* const task,
-                                       const rta::ds::bi_tab* const) {
+                                         const rta::ds::bi_tab* const) {
   /**
    * @brief Callback for task alloc. Needed to reset the task state of the
    * controller (not the task, which is handled by the executive) in the case

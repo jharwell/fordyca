@@ -60,6 +60,7 @@ class ramp_block final : public base_block {
     tmp->dloc(this->dloc());
     tmp->rloc(this->rloc());
     tmp->reset_robot_id();
+    tmp->copy_metrics(*this);
     return tmp;
   } /* clone() */
 };

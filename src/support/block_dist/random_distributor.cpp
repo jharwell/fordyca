@@ -180,10 +180,12 @@ boost::optional<random_distributor::coord_search_res_t> random_distributor::
    * arena. You only have a finite number of tries, for obvious reasons.
    */
   do {
-    uint x = area_xrange.span() > 0 ? rng()->uniform(area_xrange.lb(),
-                                                     area_xrange.ub() - 1) : m_grid.index_bases()[0];
-    uint y = area_xrange.span() > 0 ? rng()->uniform(area_yrange.lb(),
-                                                     area_yrange.ub() - 1) : m_grid.index_bases()[1];
+    uint x = area_xrange.span() > 0
+                 ? rng()->uniform(area_xrange.lb(), area_xrange.ub() - 1)
+                 : m_grid.index_bases()[0];
+    uint y = area_xrange.span() > 0
+                 ? rng()->uniform(area_yrange.lb(), area_yrange.ub() - 1)
+                 : m_grid.index_bases()[1];
     rel = {x, y};
     abs = {rel.x() + mc_origin.x(), rel.y() + mc_origin.y()};
   } while (std::any_of(entities.begin(), entities.end(), [&](const auto* ent) {

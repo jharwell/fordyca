@@ -12,13 +12,13 @@ then right clicking and doing ``Save As``. After downloading, mark the script as
 executable (``chmod +x bootstrap.sh``) and then run it (it can be run from
 anywhere), with the following arguments:
 
-- 1st arg: Is the root directory for the project (all repos will be cloned/built
+- 1st arg: The root directory for the project (all repos will be cloned/built
   in here, and it **must** be an absolute path).
 - 2nd arg: ``YES`` if you want to install ARGoS system wide (you probably do)
   and ``NO`` otherwise.
 - 3rd arg: Location ARGoS should be installed into
-- 4th arg: The \# of cores to use when building ARGoS/FORDYCA (should be set to
-  \# cores on your machine).
+- 4th arg: The # of cores to use when building ARGoS/FORDYCA (should be set to
+  # cores on your machine).
 
 For example::
 

@@ -201,7 +201,8 @@ void block_vanished::visit(controller::depth2::birtd_dpo_controller& controller)
   controller.ndc_pop();
 } /* visit() */
 
-void block_vanished::visit(controller::depth2::birtd_omdpo_controller& controller) {
+void block_vanished::visit(
+    controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_push();
 
   dispatch_free_block_interactor(controller.current_task());

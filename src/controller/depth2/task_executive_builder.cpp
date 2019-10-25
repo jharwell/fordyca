@@ -23,11 +23,11 @@
  ******************************************************************************/
 #include "fordyca/controller/depth2/task_executive_builder.hpp"
 
+#include "rcppsw/ta/bi_tdgraph_allocator.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/config/task_alloc_config.hpp"
 #include "rcppsw/ta/config/task_executive_config.hpp"
 #include "rcppsw/ta/ds/bi_tdgraph.hpp"
-#include "rcppsw/ta/bi_tdgraph_allocator.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -76,12 +76,10 @@ task_executive_builder::tasking_map task_executive_builder::depth2_tasks_create(
   fsm::expstrat::foraging_expstrat::params expbp(
       saa(), nullptr, cache_sel_matrix(), perception()->dpo_store());
 
-  fsm::fsm_ro_params params = {
-      .bsel_matrix = block_sel_matrix(),
-      .csel_matrix = cache_sel_matrix(),
-      .store = perception()->dpo_store(),
-      .exp_config = *exp_config
-  };
+  fsm::fsm_ro_params params = {.bsel_matrix = block_sel_matrix(),
+                               .csel_matrix = cache_sel_matrix(),
+                               .store = perception()->dpo_store(),
+                               .exp_config = *exp_config};
   auto cache_starter_fsm =
       std::make_unique<fsm::depth2::block_to_cache_site_fsm>(
           &params,
@@ -217,8 +215,7 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
   auto graph = boost::get<rta::ds::bi_tdgraph>(variant.get());
   const auto* execp =
       config_repo.config_get<rta::config::task_executive_config>();
-  const auto* allocp =
-      config_repo.config_get<rta::config::task_alloc_config>();
+  const auto* allocp = config_repo.config_get<rta::config::task_alloc_config>();
 
   /* can be omitted if the user wants the default values */
   if (nullptr == execp) {
@@ -232,16 +229,14 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
   depth2_exec_est_init(config_repo, map2, graph, rng);
 
   /*
-   * Only necessary if we are using the stochastic greedy neighborhood policy;
-   * causes segfaults due to asserts otherwise.p
+   * Only necessary if we are using the stochastic neighborhood policy; causes
+   * segfaults due to asserts otherwise.
    */
-  if (rta::bi_tdgraph_allocator::kPolicyStochGreedyNBHD == allocp->policy) {
-    graph->active_tab_init(allocp->stoch_greedy_nbhd.tab_init_policy, rng);
+  if (rta::bi_tdgraph_allocator::kPolicyStochNBHD1 == allocp->policy) {
+    graph->active_tab_init(allocp->stoch_nbhd1.tab_init_policy, rng);
   }
-  return std::make_unique<rta::bi_tdgraph_executive>(execp,
-                                                     allocp,
-                                                     std::move(variant),
-                                                     rng);
+  return std::make_unique<rta::bi_tdgraph_executive>(
+      execp, allocp, std::move(variant), rng);
 } /* initialize() */
 
 NS_END(depth2, controller, fordyca);

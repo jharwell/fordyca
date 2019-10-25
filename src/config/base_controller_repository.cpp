@@ -23,13 +23,13 @@
  ******************************************************************************/
 #include "fordyca/config/base_controller_repository.hpp"
 
+#include "rcppsw/math/config/xml/rng_parser.hpp"
+
 #include "fordyca/config/exploration_parser.hpp"
 #include "fordyca/config/output_parser.hpp"
 
 #include "cosm/subsystem/config/xml/actuation_subsystem2D_parser.hpp"
 #include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
-
-#include "rcppsw/math/config/xml/rng_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,9 +51,8 @@ base_controller_repository::base_controller_repository(void) {
       cscxml::sensing_subsystem2D_parser::kXMLRoot);
   parser_register<exploration_parser, exploration_config>(
       exploration_parser::kXMLRoot);
-  parser_register<rmath::config::xml::rng_parser,
-                  rmath::config::rng_config>(
-                      rmath::config::xml::rng_parser::kXMLRoot);
+  parser_register<rmath::config::xml::rng_parser, rmath::config::rng_config>(
+      rmath::config::xml::rng_parser::kXMLRoot);
 
   parser_find<cscxml::sensing_subsystem2D_parser>(
       cscxml::sensing_subsystem2D_parser::kXMLRoot)

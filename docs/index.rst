@@ -9,9 +9,10 @@ Welcome to FORDYCA's documentation!
    config/index.rst
    contributing/index.rst
 
-Other Projects
---------------
+Other Projects (in descending probability of interest)
+------------------------------------------------------
 
 - `SIERRA <https://sierra.readthedocs.io>`_
+- `COSM <https://cosm.readthedocs.io>`_
 - `RCPPSW <https://rcppsw.readthedocs.io>`_
 - `RCSW <https://rcsw.readthedocs.io>`_

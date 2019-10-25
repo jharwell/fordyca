@@ -24,9 +24,9 @@
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
-#include "fordyca/fsm/depth2/cache_site_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/fsm/depth2/cache_site_selector.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/repr/base_block.hpp"
 

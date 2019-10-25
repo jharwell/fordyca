@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth2/cache_site_selector.hpp"
+
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/cache_site_utility.hpp"
 #include "fordyca/repr/base_cache.hpp"
@@ -116,7 +117,7 @@ void cache_site_selector::opt_initialize(const opt_init_conditions* cond,
                                          struct site_utility_data* utility_data,
                                          std::vector<double>* initial_guess,
                                          rmath::rng* rng) {
-      rmath::vector2d nest_loc =
+  rmath::vector2d nest_loc =
       boost::get<rmath::vector2d>(mc_matrix->find(cselm::kNestLoc)->second);
 
   ER_INFO("Known blocks: [%s]", rcppsw::to_string(cond->known_blocks).c_str());

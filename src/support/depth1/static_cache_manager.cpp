@@ -21,6 +21,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_manager.hpp"
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
@@ -55,7 +56,7 @@ static_cache_manager::static_cache_manager(
  ******************************************************************************/
 boost::optional<ds::cache_vector> static_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const ds::block_vector&  c_alloc_blocks) {
+    const ds::block_vector& c_alloc_blocks) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= repr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
@@ -64,7 +65,11 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
 
   auto to_use = blocks_alloc(c_params.current_caches, c_alloc_blocks);
   if (!to_use) {
-    ER_WARN("Unable to create static cache(s): Not enough free blocks");
+    ER_WARN(
+        "Unable to create static cache(s): Not enough free blocks "
+        "(n_caches=%zu,n_alloc_blocks=%zu)",
+        c_params.current_caches.size(),
+        c_alloc_blocks.size());
     return boost::optional<ds::cache_vector>();
   }
   static_cache_creator creator(arena_grid(),
@@ -81,10 +86,9 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
   creator.update_host_cells(created);
 
   auto free_blocks = utils::free_blocks_calc(created, c_alloc_blocks);
-  ER_ASSERT(creator.creation_sanity_checks(created,
-                                           free_blocks,
-                                           c_params.clusters),
-            "One or more bad caches on creation");
+  ER_ASSERT(
+      creator.creation_sanity_checks(created, free_blocks, c_params.clusters),
+      "One or more bad caches on creation");
 
   caches_created(created.size());
   return boost::make_optional(created);
@@ -92,7 +96,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
 
 boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
     const cache_create_ro_params& c_params,
-    const ds::block_vector&  c_alloc_blocks,
+    const ds::block_vector& c_alloc_blocks,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
@@ -215,6 +219,7 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
         mc_cache_config.static_.size);
     return boost::optional<ds::block_vector>();
   }
+  printf("Cache i blocks: %zu", cache_i_blocks.size());
   return boost::make_optional(cache_i_blocks);
 } /* cache_i_blocks_alloc() */
 

@@ -51,7 +51,7 @@ void base_block::reset_metrics(void) {
   m_nest_drop_time = rtypes::timestep(0);
 } /* reset_metrics(); */
 
-void base_block::first_pickup_time(rtypes::timestep time) {
+void base_block::first_pickup_time(const rtypes::timestep& time) {
   if (!m_first_pickup) {
     m_first_pickup_time = time;
     m_first_pickup = true;

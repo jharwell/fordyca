@@ -49,7 +49,7 @@ static_cache_creator::static_cache_creator(
  ******************************************************************************/
 ds::cache_vector static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const ds::block_vector&  c_alloc_blocks) {
+    const ds::block_vector& c_alloc_blocks) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
@@ -61,9 +61,10 @@ ds::cache_vector static_cache_creator::create_all(
       return rmath::dvec2uvec(center, grid()->resolution().v()) == c->dloc();
     };
     /* static cache already exists */
-    if (c_params.current_caches.end() != std::find_if(c_params.current_caches.begin(),
-                                                      c_params.current_caches.end(),
-                                                      filter)) {
+    if (c_params.current_caches.end() !=
+        std::find_if(c_params.current_caches.begin(),
+                     c_params.current_caches.end(),
+                     filter)) {
       continue;
     }
 

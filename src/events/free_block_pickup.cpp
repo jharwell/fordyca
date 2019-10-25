@@ -251,7 +251,8 @@ void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
 /*******************************************************************************
  * DPO/MDPO Depth1 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(controller::depth1::bitd_dpo_controller& controller) {
+void free_block_pickup::visit(
+    controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -267,7 +268,8 @@ void free_block_pickup::visit(controller::depth1::bitd_dpo_controller& controlle
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(controller::depth1::bitd_mdpo_controller& controller) {
+void free_block_pickup::visit(
+    controller::depth1::bitd_mdpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.mdpo_perception()->map());
@@ -283,7 +285,8 @@ void free_block_pickup::visit(controller::depth1::bitd_mdpo_controller& controll
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(controller::depth1::bitd_odpo_controller& controller) {
+void free_block_pickup::visit(
+    controller::depth1::bitd_odpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -337,7 +340,8 @@ void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 /*******************************************************************************
  * DPO/MDPO Depth2 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(controller::depth2::birtd_dpo_controller& controller) {
+void free_block_pickup::visit(
+    controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_push();
 
   visit(*controller.dpo_perception()->dpo_store());

@@ -290,12 +290,10 @@ void depth1_loop_functions::cache_handling_init(
       cachep, &arena_map()->decoratee(), calc_cache_locs(distp), rng());
 
   cache_create_ro_params ccp = {
-    .current_caches = arena_map()->caches(),
-    .clusters = arena_map()->block_distributor()->block_clusters(),
-    .t = rtypes::timestep(GetSpace().GetSimulationClock())
-  };
-  if (auto created = m_cache_manager->create(ccp,
-                                             arena_map()->blocks())) {
+      .current_caches = arena_map()->caches(),
+      .clusters = arena_map()->block_distributor()->block_clusters(),
+      .t = rtypes::timestep(GetSpace().GetSimulationClock())};
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -330,9 +328,13 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
     auto clusters = arena_map()->block_distributor()->block_clusters();
     for (auto& c : clusters) {
       bool on_center_y =
-          std::fabs(c->xspan().center() - arena_map()->nest().rloc().x()) < 0.1;
+          std::fabs(c->xspan().center() - arena_map()->nest().rloc().x()) < 0.5;
       bool on_center_x =
-          std::fabs(c->yspan().center() - arena_map()->nest().rloc().y()) < 0.1;
+          std::fabs(c->yspan().center() - arena_map()->nest().rloc().y()) < 0.5;
+      ER_ASSERT(on_center_y || on_center_x,
+                "Cluster@%f,%f not centered in arena X or Y",
+                c->xspan().center(),
+                c->yspan().center());
       if (on_center_x &&
           c->xspan().center() < arena_map()->nest().rloc().x()) { /* west */
         cache_locs.push_back(
@@ -444,11 +446,10 @@ void depth1_loop_functions::Reset() {
   base_loop_functions::Reset();
   m_metrics_agg->reset_all();
 
-cache_create_ro_params ccp = {
-    .current_caches = arena_map()->caches(),
-    .clusters = arena_map()->block_distributor()->block_clusters(),
-    .t = rtypes::timestep(GetSpace().GetSimulationClock())
-  };
+  cache_create_ro_params ccp = {
+      .current_caches = arena_map()->caches(),
+      .clusters = arena_map()->block_distributor()->block_clusters(),
+      .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
@@ -584,15 +585,12 @@ void depth1_loop_functions::static_cache_monitor(void) {
       });
 
   cache_create_ro_params ccp = {
-    .current_caches = arena_map()->caches(),
-    .clusters = arena_map()->block_distributor()->block_clusters(),
-    .t = rtypes::timestep(GetSpace().GetSimulationClock())
-  };
+      .current_caches = arena_map()->caches(),
+      .clusters = arena_map()->block_distributor()->block_clusters(),
+      .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create_conditional(ccp,
-                                                         arena_map()->blocks(),
-                                                         counts.first,
-                                                         counts.second)) {
+  if (auto created = m_cache_manager->create_conditional(
+          ccp, arena_map()->blocks(), counts.first, counts.second)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return;

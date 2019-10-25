@@ -24,10 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/types/timestep.hpp"
+
 #include "fordyca/ds/block_cluster_vector.hpp"
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "rcppsw/types/timestep.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -49,7 +50,7 @@ struct cache_create_ro_params {
    * @brief Currently existing caches in the arena. For use in avoiding
    * overlaps during cache creation.
    */
-  ds::cache_vector         current_caches;
+  ds::cache_vector current_caches;
 
   /**
    * @brief The block clusters in the arena. For use in avoiding overlaps
@@ -60,7 +61,7 @@ struct cache_create_ro_params {
   /**
    * @brief The current timestep.
    */
-  rtypes::timestep         t;
+  rtypes::timestep t;
 };
 
 NS_END(support, fordyca);

@@ -25,11 +25,11 @@
 
 #include <vector>
 
+#include "rcppsw/ta/bi_tdgraph_allocator.hpp"
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/config/task_alloc_config.hpp"
 #include "rcppsw/ta/config/task_executive_config.hpp"
 #include "rcppsw/ta/ds/bi_tdgraph.hpp"
-#include "rcppsw/ta/bi_tdgraph_allocator.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -87,12 +87,10 @@ task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
   ER_ASSERT(nullptr != mc_bsel_matrix, "NULL block selection matrix");
   ER_ASSERT(nullptr != mc_csel_matrix, "NULL cache selection matrix");
 
-  fsm::fsm_ro_params params = {
-    .bsel_matrix = block_sel_matrix(),
-    .csel_matrix = mc_csel_matrix,
-    .store = m_perception->dpo_store(),
-    .exp_config = *exp_config
-  };
+  fsm::fsm_ro_params params = {.bsel_matrix = block_sel_matrix(),
+                               .csel_matrix = mc_csel_matrix,
+                               .store = m_perception->dpo_store(),
+                               .exp_config = *exp_config};
 
   auto generalist_fsm = std::make_unique<fsm::depth0::free_block_to_nest_fsm>(
       &params,
@@ -128,7 +126,8 @@ task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
   children.push_back(std::move(harvester));
   children.push_back(std::move(collector));
   graph->install_tab(tasks::depth0::foraging_task::kGeneralistName,
-                     std::move(children), rng);
+                     std::move(children),
+                     rng);
   return tasking_map{
       {"generalist",
        graph->find_vertex(tasks::depth0::foraging_task::kGeneralistName)},
@@ -190,8 +189,7 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
   auto map = depth1_tasks_create(config_repo, graph, rng);
   const auto* execp =
       config_repo.config_get<rta::config::task_executive_config>();
-  const auto* allocp =
-      config_repo.config_get<rta::config::task_alloc_config>();
+  const auto* allocp = config_repo.config_get<rta::config::task_alloc_config>();
 
   /* can be omitted if the user wants the default values */
   if (nullptr == execp) {
@@ -199,18 +197,16 @@ std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
   }
 
   /*
-   * Only necessary if we are using the stochastic greedy neighborhood policy;
-   * causes segfaults due to asserts otherwise.
+   * Only necessary if we are using the stochastic neighborhood policy; causes
+   * segfaults due to asserts otherwise.
    */
-  if (rta::bi_tdgraph_allocator::kPolicyStochGreedyNBHD == allocp->policy) {
-    graph->active_tab_init(allocp->stoch_greedy_nbhd.tab_init_policy, rng);
+  if (rta::bi_tdgraph_allocator::kPolicyStochNBHD1 == allocp->policy) {
+    graph->active_tab_init(allocp->stoch_nbhd1.tab_init_policy, rng);
   }
   depth1_exec_est_init(config_repo, map, graph, rng);
 
-  return std::make_unique<rta::bi_tdgraph_executive>(execp,
-                                                     allocp,
-                                                     std::move(variant),
-                                                     rng);
+  return std::make_unique<rta::bi_tdgraph_executive>(
+      execp, allocp, std::move(variant), rng);
 } /* initialize() */
 
 NS_END(depth1, controller, fordyca);

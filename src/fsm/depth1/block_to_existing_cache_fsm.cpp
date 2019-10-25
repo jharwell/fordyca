@@ -52,7 +52,7 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
                   c_params->csel_matrix,
                   c_params->store,
                   support::light_type_index()[support::light_type_index::kCache])
-              .get(),
+                  .get(),
               rng),
           rng,
           false),
@@ -64,7 +64,8 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
                           saa,
                           nullptr,
                           nullptr,
-                          c_params->store).get(),
+                          c_params->store)
+                          .get(),
                       rng),
                   rng) {}
 

@@ -52,7 +52,7 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
  ******************************************************************************/
 ds::cache_vector dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const ds::block_vector&  c_alloc_blocks) {
+    const ds::block_vector& c_alloc_blocks) {
   ds::cache_vector created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
@@ -95,10 +95,8 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * which keeps asserts about cache extent from triggering right after
          * creation, which can happen otherwise.
          */
-        auto cache_p = std::shared_ptr<repr::arena_cache>(
-            create_single_cache(rmath::uvec2dvec(*center),
-                                cache_i_blocks,
-                                c_params.t));
+        auto cache_p = std::shared_ptr<repr::arena_cache>(create_single_cache(
+            rmath::uvec2dvec(*center), cache_i_blocks, c_params.t));
         created_caches.push_back(cache_p);
       }
 
@@ -113,8 +111,9 @@ ds::cache_vector dynamic_cache_creator::create_all(
   ds::block_vector free_blocks =
       utils::free_blocks_calc(created_caches, c_alloc_blocks);
 
-  ER_ASSERT(creation_sanity_checks(created_caches, free_blocks, c_params.clusters),
-            "One or more bad caches on creation");
+  ER_ASSERT(
+      creation_sanity_checks(created_caches, free_blocks, c_params.clusters),
+      "One or more bad caches on creation");
   return created_caches;
 } /* create_all() */
 
