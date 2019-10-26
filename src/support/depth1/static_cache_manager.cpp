@@ -219,7 +219,6 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
         mc_cache_config.static_.size);
     return boost::optional<ds::block_vector>();
   }
-  printf("Cache i blocks: %zu", cache_i_blocks.size());
   return boost::make_optional(cache_i_blocks);
 } /* cache_i_blocks_alloc() */
 

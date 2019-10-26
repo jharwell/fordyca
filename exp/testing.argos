@@ -75,8 +75,11 @@
             <ema alpha="0.8"/>
           </task_exec_estimates>
 
-          <epsilon_greedy epsilon="0.4"
+          <epsilon_greedy epsilon="0.11"
                           regret_bound="linear"/>
+
+          <ucb1 gamma="1000"/>
+
           <stoch_nbhd1
               tab_init_policy="max_depth">
             <task_partition

@@ -28,11 +28,16 @@
 
 #include "fordyca/config/cache_sel/cache_sel_matrix_parser.hpp"
 #include "fordyca/fordyca.hpp"
+#include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, config, depth1);
+namespace csconfig = csubsystem::config;
+namespace cscxml = csconfig::xml;
+namespace rtconfig = rta::config;
+namespace rtcxml = rta::config::xml;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -41,22 +46,22 @@ controller_repository::controller_repository(void) {
   parser_register<cache_sel::cache_sel_matrix_parser,
                   cache_sel::cache_sel_matrix_config>(
       cache_sel::cache_sel_matrix_parser::kXMLRoot);
-  parser_register<rta::config::xml::task_alloc_parser,
-                  rta::config::task_alloc_config>(
-      rta::config::xml::task_alloc_parser::kXMLRoot);
-  parser_register<rta::config::xml::task_executive_parser,
-                  rta::config::task_executive_config>(
-      rta::config::xml::task_executive_parser::kXMLRoot);
+  parser_register<rtcxml::task_alloc_parser, rtconfig::task_alloc_config>(
+      rtcxml::task_alloc_parser::kXMLRoot);
+  parser_register<rtcxml::task_executive_parser,
+                  rtconfig::task_executive_config>(
+      rtcxml::task_executive_parser::kXMLRoot);
 
-  parser_find<rta::config::xml::task_alloc_parser>(
-      rta::config::xml::task_alloc_parser::kXMLRoot)
+  parser_find<rtcxml::task_alloc_parser>(rtcxml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("generalist");
-  parser_find<rta::config::xml::task_alloc_parser>(
-      rta::config::xml::task_alloc_parser::kXMLRoot)
+  parser_find<rtcxml::task_alloc_parser>(rtcxml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("collector");
-  parser_find<rta::config::xml::task_alloc_parser>(
-      rta::config::xml::task_alloc_parser::kXMLRoot)
+  parser_find<rtcxml::task_alloc_parser>(rtcxml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("harvester");
+
+  parser_find<cscxml::sensing_subsystem2D_parser>(
+      cscxml::sensing_subsystem2D_parser::kXMLRoot)
+      ->ground_detection_add("cache");
 }
 
 NS_END(depth1, config, fordyca);

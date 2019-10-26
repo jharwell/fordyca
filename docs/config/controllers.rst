@@ -401,6 +401,30 @@ XML configuration:
   - ``log`` - Logarithmic bounded.
   - ``linear`` - Linearly bounded (more regret).
 
+``task_alloc/ucb1``
+^^^^^^^^^^^^^^^^^^^
+- Required by: none.
+- Required child attributes if present: ``gamma``.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: none.
+
+.. code-block:: XML
+
+    <task_alloc>
+        ...
+        <ucb1 gamma="FLOAT"/>
+        ...
+    </task_alloc>
+
+- ``gamma`` - Weighting factor to controll how much exploration of the method. Must be between 0.0 and
+  1.0.
+
+- ``regret_bound`` - What is the provable bound on regret?
+
+  - ``log`` - Logarithmic bounded.
+  - ``linear`` - Linearly bounded (more regret).
+
 ``task_alloc/stoch_nbhd1``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

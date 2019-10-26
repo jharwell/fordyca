@@ -60,9 +60,6 @@ base_controller_repository::base_controller_repository(void) {
   parser_find<cscxml::sensing_subsystem2D_parser>(
       cscxml::sensing_subsystem2D_parser::kXMLRoot)
       ->ground_detection_add("block");
-  parser_find<cscxml::sensing_subsystem2D_parser>(
-      cscxml::sensing_subsystem2D_parser::kXMLRoot)
-      ->ground_detection_add("cache");
 }
 
 NS_END(config, fordyca);
