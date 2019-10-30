@@ -55,7 +55,7 @@ class collector_registerer : public rer::client<collector_registerer> {
    * @brief Collectors are not default constructible, and therefore cannot be
    * used with boost::mpl::for_each as is. But because all we need is the type
    * of the collector during registration in order to construct it, and do not
-   * need access to any of its method, we can add a layer of indirection with a
+   * need access to any of its methods, we can add a layer of indirection with a
    * simple struct that IS default constructible that we CAN use.
    */
   template <typename T>

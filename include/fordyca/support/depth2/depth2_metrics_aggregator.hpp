@@ -27,6 +27,7 @@
 #include <string>
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,8 +44,9 @@ NS_START(fordyca, support, depth2);
  * @brief Aggregates and metrics collection for depth2 foraging. That
  * includes everything from \ref depth1_metrics_aggregator, and also:
  *
- * - TAB metrics (rooted at harvester)
- * - TAB metrics (rooted at collector)
+ * - TAB metrics (rooted at Harvester)
+ * - TAB metrics (rooted at Collector)
+ * - Cache site selection
  */
 class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator,
                                   public rer::client<depth2_metrics_aggregator> {
@@ -62,6 +64,14 @@ class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator
   template<class ControllerType>
   void collect_from_controller(const ControllerType* c) {
     depth1::depth1_metrics_aggregator::collect_from_controller(c);
+
+    auto task = dynamic_cast<const rta::polled_task*>(c->current_task());
+
+    /* only Cache Starter implements these metrics */
+    if (nullptr != task &&
+        tasks::depth2::foraging_task::kCacheStarterName == task->name()) {
+      collect("caches::site_selection", *task);
+    }
   }
 };
 

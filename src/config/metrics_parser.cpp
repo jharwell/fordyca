@@ -50,6 +50,7 @@ const std::list<std::string> metrics_parser::xml_attr = {
     "cache_utilization",
     "cache_lifecycle",
     "cache_locations",
+    "cache_site_selection",
 
     "task_execution_generalist",
     "task_execution_collector",

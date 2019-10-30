@@ -35,6 +35,7 @@
 
 #include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -50,7 +51,9 @@ using collector_typelist =
                    metrics::collector_registerer::type_wrap<
                        rmetrics::tasks::execution_metrics_collector>,
                    metrics::collector_registerer::type_wrap<
-                       rmetrics::tasks::bi_tdgraph_metrics_collector> >;
+                       rmetrics::tasks::bi_tdgraph_metrics_collector>,
+                   metrics::collector_registerer::type_wrap<
+                       metrics::caches::site_selection_metrics_collector> >;
 NS_END(detail);
 
 using task0 = tasks::depth0::foraging_task;
@@ -86,7 +89,10 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
        "tasks::execution::" + std::string(task2::kCacheCollectorName)},
       {typeid(rmetrics::tasks::bi_tdgraph_metrics_collector),
        "task_distribution",
-       "tasks::distribution"}};
+       "tasks::distribution"},
+      {typeid(metrics::caches::site_selection_metrics_collector),
+       "cache_site_selection",
+       "caches::site_selection"}};
 
   /* Overwrite depth1; we have a deeper decomposition now */
   collector_remove("tasks::distribution");

@@ -68,6 +68,7 @@ boost::optional<rmath::vector2d> cache_site_selector::operator()(
             nlopt_ret_str(res).c_str(),
             max_utility);
     ER_ASSERT(res >= 1, "NLopt failed with code %d", res);
+    m_nlopt_res = res;
   } catch (std::runtime_error&) {
     ER_FATAL_SENTINEL("NLopt failed");
     return boost::optional<rmath::vector2d>();

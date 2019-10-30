@@ -55,7 +55,7 @@ NS_START(controller, depth2);
  * Uses a DPO data store for tracking arena state and object relevance.
  */
 class birtd_dpo_controller : public depth1::bitd_dpo_controller,
-                           public rer::client<birtd_dpo_controller> {
+                             public rer::client<birtd_dpo_controller> {
  public:
   birtd_dpo_controller(void) RCSW_COLD;
 

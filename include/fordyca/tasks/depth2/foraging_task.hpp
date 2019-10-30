@@ -54,6 +54,7 @@ NS_START(fordyca, tasks, depth2);
 class foraging_task
     : public base_foraging_task,
       public rta::polled_task {
+
  public:
   foraging_task(const std::string& name,
                 const rta::config::task_alloc_config *config,

@@ -28,6 +28,8 @@
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics.hpp"
+#include <nlopt.hpp>
 
 /*******************************************************************************
  * Namespaces
@@ -54,7 +56,8 @@ NS_START(fsm, depth2);
  * done, it signals that it has completed its task.
  */
 class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
-                               public cfsm::acquire_goal_fsm {
+                               public cfsm::acquire_goal_fsm,
+                               public metrics::caches::site_selection_metrics {
  public:
   acquire_cache_site_fsm(const fsm_ro_params* c_params,
                          crfootbot::footbot_saa_subsystem* saa,
@@ -63,6 +66,15 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
   acquire_cache_site_fsm& operator=(const acquire_cache_site_fsm& fsm) = delete;
+
+  /* site selection metrics overrides */
+  bool site_select_exec(void) const override { return m_sel_exec; }
+  bool site_select_success(void) const override { return m_sel_success; }
+  nlopt::result nlopt_result(void) const override { return m_nlopt_res; }
+  void reset_metrics(void) override {
+    m_sel_success = false;
+    m_sel_exec = false;
+  }
 
  private:
   /*
@@ -75,6 +87,9 @@ class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
   bool site_acquired_cb(bool explore_result) const RCSW_CONST;
 
   /* clang-format off */
+  bool                                      m_sel_success{false};
+  bool                                      m_sel_exec{false};
+  nlopt::result                             m_nlopt_res{};
   const controller::cache_sel_matrix* const mc_matrix;
   const ds::dpo_store*      const           mc_store;
   /* clang-format on */

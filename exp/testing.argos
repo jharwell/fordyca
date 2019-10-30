@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <dpo_controller id="ffc"
+    <birtd_dpo_controller id="ffc"
                          library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -51,7 +51,7 @@
             update_interface_ests="true"
             />
         <task_alloc
-            policy="UCB1">
+            policy="stoch_nbhd1">
           <task_abort>
             <src_sigmoid_sel
                 input_src="exec">
@@ -83,7 +83,7 @@
           <stoch_nbhd1
               tab_init_policy="max_depth">
             <task_partition
-                always_partition="false"
+                always_partition="true"
                 never_partition="false">
               <src_sigmoid_sel
                   input_src="exec">
@@ -184,7 +184,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </dpo_controller>
+    </birtd_dpo_controller>
 
   </controllers>
 
@@ -192,7 +192,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth0_loop_functions">
+                  label="depth2_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -211,6 +211,7 @@
           cache_utilization="cache-utilization.csv"
           cache_lifecycle="cache-lifecycle.csv"
           cache_locations="cache-locations.csv"
+          cache_site_selection="cache-site-selection.csv"
           task_execution_generalist="task-execution-generalist.csv"
           task_execution_collector="task-execution-collector.csv"
           task_execution_harvester="task-execution-harvester.csv"
@@ -288,7 +289,7 @@
             size="12, 6, 2"/>
       <blocks>
         <distribution
-            dist_type="dual_source">
+            dist_type="single_source">
           <!-- <redist_governor -->
           <!--     trigger="Null" -->
           <!--     recurrence_policy="multi" -->
@@ -300,8 +301,8 @@
           <!--     n_clusters="15" -->
           <!--     /> -->
           <manifest
-              n_cube="20"
-              n_ramp="20"
+              n_cube="10"
+              n_ramp="10"
               unit_dim="0.2"
               />
         </distribution>

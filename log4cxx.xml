@@ -25,12 +25,6 @@
   <category name="rcppsw.robotics.steer2D.force_calculator" >
     <priority value ="info" />
   </category>
-  <category name="rcppsw.algorithm.clustering" >
-    <priority value ="off" />
-  </category>
-    <category name="fordyca.support.tasking_oracle" >
-    <priority value ="debug" />
-  </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
@@ -71,8 +65,8 @@
   <category name="fordyca.controller.dpo_perception" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.controller.saa_subsystem" >
-    <priority value ="info" />
+  <category name="fordyca.controller.metrics.collector_registerer" >
+    <priority value ="trace" />
   </category>
   <category name="fordyca.controller.oracular_info_receptor" >
     <priority value ="info" />

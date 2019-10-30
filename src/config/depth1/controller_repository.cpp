@@ -28,6 +28,7 @@
 
 #include "fordyca/config/cache_sel/cache_sel_matrix_parser.hpp"
 #include "fordyca/fordyca.hpp"
+
 #include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
 
 /*******************************************************************************
@@ -48,8 +49,7 @@ controller_repository::controller_repository(void) {
       cache_sel::cache_sel_matrix_parser::kXMLRoot);
   parser_register<rtcxml::task_alloc_parser, rtconfig::task_alloc_config>(
       rtcxml::task_alloc_parser::kXMLRoot);
-  parser_register<rtcxml::task_executive_parser,
-                  rtconfig::task_executive_config>(
+  parser_register<rtcxml::task_executive_parser, rtconfig::task_executive_config>(
       rtcxml::task_executive_parser::kXMLRoot);
 
   parser_find<rtcxml::task_alloc_parser>(rtcxml::task_alloc_parser::kXMLRoot)

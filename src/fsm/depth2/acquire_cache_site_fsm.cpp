@@ -55,6 +55,7 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
                 .goal_select = std::bind(&acquire_cache_site_fsm::site_select, this),
                 .candidates_exist = std::bind(&acquire_cache_site_fsm::candidates_exist,
                                               this),
+                .begin_acq_cb = std::bind(&acquire_cache_site_fsm::reset_metrics, this),
                 .goal_acquired_cb = std::bind(&acquire_cache_site_fsm::site_acquired_cb,
                                               this,
                                               std::placeholders::_1),
@@ -81,15 +82,21 @@ bool acquire_cache_site_fsm::site_exploration_term_cb(void) const {
 
 boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
     site_select(void) {
-  if (auto best = cache_site_selector(mc_matrix)(mc_store->caches(),
-                                                 mc_store->blocks(),
-                                                 saa()->sensing()->position(),
-                                                 rng())) {
+  auto selector = cache_site_selector(mc_matrix);
+  if (auto best = selector(mc_store->caches(),
+                           mc_store->blocks(),
+                           saa()->sensing()->position(),
+                           rng())) {
     ER_INFO("Select cache site@%s for acquisition", best->to_str().c_str());
+    m_sel_success = true;
+    m_sel_exec = true;
+    m_nlopt_res = selector.nlopt_res();
     return boost::make_optional(
         acquire_goal_fsm::candidate_type(*best, kCACHE_SITE_ARRIVAL_TOL, -1));
   } else {
-    ER_WARN("No cache site selected for acquisition--internal error?")
+    ER_WARN("No cache site selected for acquisition--internal error?");
+    m_sel_success = false;
+    m_sel_exec = true;
     return boost::optional<acquire_goal_fsm::candidate_type>();
   }
 } /* site_select() */

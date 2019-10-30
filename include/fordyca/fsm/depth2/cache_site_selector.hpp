@@ -107,6 +107,8 @@ class cache_site_selector: public rer::client<cache_site_selector> {
       rmath::vector2d position,
       rmath::rng* rng);
 
+  nlopt::result nlopt_res(void) const { return m_nlopt_res; }
+
  private:
   /*
    * @brief The amount of violation of cache constraints that is considered
@@ -130,7 +132,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * @brief The difference between utilities evaluated on subsequent timesteps
    * that will be considered indicative of convergence.
    */
-  static constexpr double kUTILITY_TOL = 1E-4;
+  static constexpr double kUTILITY_TOL = 1E-2;
 
   /**
    * @brief The maximum # of iterations that the optimizer will run. Needed so
@@ -138,7 +140,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * chugs. We *should* be able to get something good enough in this many
    * iterations.
    */
-  static constexpr uint kMAX_ITERATIONS = 10000;
+  static constexpr uint kMAX_ITERATIONS = 5000;
 
   struct opt_init_conditions {
     const ds::dp_cache_map& known_caches;
@@ -171,8 +173,9 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   std::string nlopt_ret_str(nlopt::result res) const;
 
   /* clang-format off */
-  const controller::cache_sel_matrix* const              mc_matrix;
+  const controller::cache_sel_matrix* const mc_matrix;
 
+  nlopt::result   m_nlopt_res{};
   nlopt::opt      m_alg{nlopt::algorithm::GN_ISRES, 2};
   constraint_set  m_constraints{};
   /* clang-format on */

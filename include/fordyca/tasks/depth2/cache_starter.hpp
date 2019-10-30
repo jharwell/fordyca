@@ -30,6 +30,7 @@
 #include "fordyca/events/free_block_interactor.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,9 +48,10 @@ NS_START(fordyca, tasks, depth2);
  * start a new cache. It is abortable, and has one task interface.
  */
 class cache_starter final : public foraging_task,
-                      public events::free_block_interactor,
-                      public events::dynamic_cache_interactor,
-                      public rer::client<cache_starter> {
+                            public rer::client<cache_starter>,
+                            public events::free_block_interactor,
+                            public events::dynamic_cache_interactor,
+                            public metrics::caches::site_selection_metrics {
  public:
   cache_starter(const struct rta::config::task_alloc_config* config,
                 std::unique_ptr<rta::taskable> mechanism);
@@ -67,7 +69,6 @@ class cache_starter final : public foraging_task,
   void accept(events::detail::block_proximity& visitor) override;
   void accept(events::detail::cache_proximity&) override;
 
-
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
@@ -83,6 +84,11 @@ class cache_starter final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
                             block_transport_goal,
                             const);
+
+  /* site selection metrics overrides */
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, site_select_exec, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, site_select_success, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(nlopt::result, nlopt_result, const);
 
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }

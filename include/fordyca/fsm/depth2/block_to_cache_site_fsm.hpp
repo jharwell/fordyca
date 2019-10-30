@@ -29,6 +29,7 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +51,8 @@ NS_START(fordyca, fsm, depth2);
  * then drop the block there. Once it has done that it will signal that its task
  * is complete.
  */
-class block_to_cache_site_fsm final : public block_to_goal_fsm {
+class block_to_cache_site_fsm final : public block_to_goal_fsm,
+                                      public virtual metrics::caches::site_selection_metrics {
  public:
   block_to_cache_site_fsm(const fsm_ro_params* c_params,
                           crfootbot::footbot_saa_subsystem* saa,
@@ -72,6 +74,12 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm {
   acquire_cache_site_fsm m_cache_fsm;
   acquire_free_block_fsm m_block_fsm;
   /* clang-format on */
+
+ public:
+  /* cache site selection overrides */
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(site_select_exec, m_cache_fsm, const);
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(site_select_success, m_cache_fsm, const);
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(nlopt_result, m_cache_fsm, const);
 };
 
 NS_END(depth2, fsm, fordyca);

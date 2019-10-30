@@ -138,6 +138,24 @@ RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
                              polled_task::mechanism()),
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
+                         site_select_exec,
+                         *static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
+                         site_select_success,
+                         *static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(cache_starter,
+                         nlopt_result,
+                         *static_cast<fsm::depth2::block_to_cache_site_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
