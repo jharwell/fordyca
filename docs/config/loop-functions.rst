@@ -333,7 +333,7 @@ XML configuration:
 - Required by: none.
 - Required child attributes if present: none.
 - Required child tags if present: none.
-- Optional child attributes: [ ``task_exec_est``,``task_interface_est`` ].
+- Optional child attributes: [ ``task_exec_ests``, ``task_interface_ests`` ].
 - Optional child tags: none.
 
 XML configuration:
@@ -343,19 +343,19 @@ XML configuration:
    <oracle_manager>
        ...
        <tasking_oracle
-           task_exec_est="false"
-           task_interface_est="false"/>
+           task_exec_ests="false"
+           task_interface_ests="false"/>
        ...
    </oracle_manager>
 
 
 All attributes default as shown above if omitted.
 
-- ``task_exec_est`` - If enabled, then this will inject perfect estimates of
+- ``task_exec_ests`` - If enabled, then this will inject perfect estimates of
   task execution time based on the performance of the entire swarm into each
   robot when it performs task allocation.
 
-- ``task_interface_est`` - If enabled, then this will inject perfect estimates
+- ``task_interface_ests`` - If enabled, then this will inject perfect estimates
   of task interface time based on the performance of the entire swarm into each
   robot when it performs task allocation.
 

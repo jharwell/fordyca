@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
@@ -111,14 +113,6 @@ class robot_configurer {
   void controller_config_oracle(controller_type *const c) const {
     if (nullptr != m_tasking_oracle) {
       m_tasking_oracle->listener_add(c->executive());
-      c->executive()->task_finish_notify(
-          std::bind(&oracle::tasking_oracle::task_finish_cb,
-                    m_tasking_oracle,
-                    std::placeholders::_1));
-      c->executive()->task_abort_notify(
-          std::bind(&oracle::tasking_oracle::task_abort_cb,
-                    m_tasking_oracle,
-                    std::placeholders::_1));
     }
     if (nullptr != m_tasking_oracle || nullptr != m_ent_oracle) {
       auto receptor = std::make_unique<controller::oracular_info_receptor>(

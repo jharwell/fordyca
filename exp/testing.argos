@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <birtd_dpo_controller id="ffc"
+    <birtd_odpo_controller id="ffc"
                          library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -184,7 +184,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </birtd_dpo_controller>
+    </birtd_odpo_controller>
 
   </controllers>
 
@@ -244,15 +244,15 @@
     <!--   <!-\- <angular_order enable="false"/> -\-> -->
     <!-- </convergence> -->
 
-    <!-- <oracle_manager> -->
-    <!--   <tasking_oracle -->
-    <!--       task_exec_est="false" -->
-    <!--       task_interface_est="false" -->
-    <!--       /> -->
-    <!--   <entities_oracle -->
-    <!--       blocks="true" -->
-    <!--       caches="true"/> -->
-    <!--   </oracle_manager> -->
+    <oracle_manager>
+      <tasking_oracle
+          task_exec_ests="true"
+          task_interface_ests="true"
+          />
+      <entities_oracle
+          blocks="true"
+          caches="true"/>
+      </oracle_manager>
     <!-- <temporal_variance> -->
     <!-- <blocks> -->
     <!--   <manipulation_penalty> -->

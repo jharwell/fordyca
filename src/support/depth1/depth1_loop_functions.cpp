@@ -259,7 +259,7 @@ void depth1_loop_functions::oracle_init(void) {
   if (nullptr == oraclep || nullptr == oracle_manager()) {
     return;
   }
-  if (oraclep->tasking.enabled) {
+  if (oraclep->tasking.task_exec_ests || oraclep->tasking.task_interface_ests) {
     /*
      * We just need a copy of the task decomposition graph the robots are
      * using--any robot will do.
@@ -267,7 +267,7 @@ void depth1_loop_functions::oracle_init(void) {
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
         GetSpace().GetEntitiesByType("foot-bot").begin()->second);
     const auto& controller0 =
-        dynamic_cast<controller::depth1::bitd_mdpo_controller&>(
+        dynamic_cast<controller::depth1::bitd_dpo_controller&>(
             robot0.GetControllableEntity().GetController());
     auto* bigraph = dynamic_cast<const rta::ds::bi_tdgraph*>(
         controller0.executive()->graph());
@@ -417,11 +417,23 @@ void depth1_loop_functions::PostStep(void) {
       collector.cum_collected(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
-  /* Collect metrics from/about caches */
+  /* Collect metrics from/about existing caches */
   for (auto& c : arena_map()->caches()) {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
+
+  /*
+   * Collect metrics from/about zombie caches (caches that have been depleted
+   * this timestep). These are not captured by the usual metric collection
+   * process as they have been depleted and do not exist anymore in the \ref
+   * arena_map::caches() array.
+   */
+  for (auto& c : arena_map()->zombie_caches()) {
+    m_metrics_agg->collect_from_cache(c.get());
+    c->reset_metrics();
+  } /* for(&c..) */
+  arena_map()->zombie_caches_clear();
 
   m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
   m_cache_manager->reset_metrics();

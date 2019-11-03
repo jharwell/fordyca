@@ -279,6 +279,17 @@ class arena_map final : public rer::client<arena_map>,
    */
   std::mutex& block_mtx(void) { return m_block_mtx; }
 
+  /**
+   * @brief Clear the list of caches that have been removed this timestep.
+   *
+   * Having such a list is necessary in order to be able to correctly gather
+   * metrics from caches that have been depleted THIS timestep about block
+   * pickups. Normal cache metric collection does not encompass such zombie
+   * caches.
+   */
+  void zombie_caches_clear(void) { m_zombie_caches.clear(); }
+  const cache_vector& zombie_caches(void) const { return m_zombie_caches; }
+
  private:
   /* clang-format off */
   mutable std::mutex                   m_grid_mtx{};
@@ -287,6 +298,7 @@ class arena_map final : public rer::client<arena_map>,
 
   block_vector                         m_blocks;
   cache_vector                         m_caches{};
+  cache_vector                         m_zombie_caches{};
 
   repr::nest                           m_nest;
   support::block_dist::dispatcher      m_block_dispatcher;

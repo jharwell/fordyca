@@ -25,6 +25,7 @@
 
 #include "rcppsw/ta/polled_task.hpp"
 #include "rcppsw/ta/time_estimate.hpp"
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
@@ -103,6 +104,14 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
   }
 } /* dpo_store_update() */
 
+void oracular_info_receptor::tasking_hooks_register(
+    rta::bi_tdgraph_executive* const executive) {
+  executive->task_abort_notify(std::bind(
+      &oracular_info_receptor::task_abort_cb, this, std::placeholders::_1));
+  executive->task_finish_notify(std::bind(
+      &oracular_info_receptor::task_finish_cb, this, std::placeholders::_1));
+} /* tasking_hooks_register() */
+
 void oracular_info_receptor::task_abort_cb(rta::polled_task* const task) {
   if (m_tasking_oracle->update_exec_ests()) {
     exec_est_update(task);
@@ -127,10 +136,9 @@ void oracular_info_receptor::exec_est_update(rta::polled_task* const task) {
             "Bad oracle query 'exec_est.%s': no such task",
             task->name().c_str());
   auto oracle_exec_est = boost::get<rta::time_estimate>(exec_result.get());
-  RCSW_UNUSED double exec_old = task->task_exec_estimate().v();
-  task->exec_estimate_update(
-      rtypes::timestep(static_cast<uint>(oracle_exec_est.v())));
-  ER_INFO("Update 'exec_est.%s' with oracular estimate %f on abort: %f -> %f",
+  RCSW_UNUSED int exec_old = task->task_exec_estimate().v();
+  task->exec_estimate_update(rtypes::timestep(oracle_exec_est.v()));
+  ER_INFO("Update 'exec_est.%s' with oracular estimate %d: %d -> %d",
           task->name().c_str(),
           oracle_exec_est.v(),
           exec_old,
@@ -138,15 +146,14 @@ void oracular_info_receptor::exec_est_update(rta::polled_task* const task) {
 } /* exec_est_update() */
 
 void oracular_info_receptor::int_est_update(rta::polled_task* const task) {
-  auto int_result = m_tasking_oracle->ask("int_est." + task->name());
+  auto int_result = m_tasking_oracle->ask("interface_est." + task->name());
   ER_ASSERT(int_result,
-            "Bad oracle query 'int_est.%s': no such task",
+            "Bad oracle query 'interface_est.%s': no such task",
             task->name().c_str());
   auto oracle_int_est = boost::get<rta::time_estimate>(int_result.get());
-  RCSW_UNUSED double int_old = task->task_interface_estimate(0).v();
-  task->interface_estimate_update(
-      0, rtypes::timestep(static_cast<uint>(oracle_int_est.v())));
-  ER_INFO("Update 'int_est.%s' with oracular estimate %f on abort: %f -> %f",
+  RCSW_UNUSED int int_old = task->task_interface_estimate(0).v();
+  task->interface_estimate_update(0, rtypes::timestep(oracle_int_est.v()));
+  ER_INFO("Update 'interface_est.%s' with oracular estimate %d: %d -> %d",
           task->name().c_str(),
           oracle_int_est.v(),
           int_old,
@@ -159,6 +166,10 @@ bool oracular_info_receptor::entities_blocks_enabled(void) const {
 
 bool oracular_info_receptor::entities_caches_enabled(void) const {
   return m_entities_oracle->caches_enabled();
-} /* entities_blocks_enabled() */
+} /* entities_caches_enabled() */
+
+bool oracular_info_receptor::tasking_enabled(void) const {
+  return nullptr != m_tasking_oracle;
+} /* tasking_enabled() */
 
 NS_END(controller, fordyca);

@@ -188,6 +188,7 @@ void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
   /* Remove cache */
   size_t before = caches().size();
   RCSW_UNUSED int id = victim->id();
+  m_zombie_caches.push_back(victim);
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
   ER_ASSERT(caches().size() == before - 1, "Cache%d not removed", id);
 } /* cache_remove() */

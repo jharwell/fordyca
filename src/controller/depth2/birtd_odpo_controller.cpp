@@ -63,6 +63,9 @@ void birtd_odpo_controller::ControlStep(void) {
 void birtd_odpo_controller::oracle_init(
     std::unique_ptr<oracular_info_receptor> receptor) {
   m_receptor = std::move(receptor);
+  if (m_receptor->tasking_enabled()) {
+    m_receptor->tasking_hooks_register(executive());
+  }
 } /* oracle_init() */
 
 using namespace argos; // NOLINT

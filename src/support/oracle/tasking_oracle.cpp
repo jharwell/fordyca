@@ -46,6 +46,7 @@ tasking_oracle::tasking_oracle(
       mc_exec_ests(config->task_exec_ests),
       mc_int_ests(config->task_interface_ests) {
   auto cb = [&](const rta::polled_task* task) {
+    printf("task name: %s\n", task->name().c_str());
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
     m_map.insert(
         {"interface_est." + task->name(), task->task_interface_estimate(0)});
@@ -72,27 +73,27 @@ void tasking_oracle::listener_add(rta::bi_tdgraph_executive* const executive) {
 } /* listener_add() */
 
 void tasking_oracle::task_finish_cb(const rta::polled_task* task) {
-  auto& est = boost::get<rta::time_estimate>(
+  auto& exec_est = boost::get<rta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
-  RCSW_UNUSED double old = est.v();
-  est.calc(task->task_exec_estimate());
+  RCSW_UNUSED int exec_old = exec_est.v();
+  exec_est.calc(task->task_exec_estimate());
 
-  ER_DEBUG("Update exec_est.%s on finish: %f -> %f",
+  ER_DEBUG("Update exec_est.%s on finish: %d -> %d",
            task->name().c_str(),
-           old,
-           est.v());
+           exec_old,
+           exec_est.v());
 
-  est = boost::get<rta::time_estimate>(
+  auto& int_est = boost::get<rta::time_estimate>(
       m_map.find("interface_est." + task->name())->second);
-  old = est.v();
+  RCSW_UNUSED int int_old = int_est.v();
 
   /* Assuming 1 interface! */
-  est.calc(task->task_interface_estimate(0));
+  int_est.calc(task->task_interface_estimate(0));
 
-  ER_DEBUG("Update interface_est.%s on finish: %f -> %f",
+  ER_DEBUG("Update interface_est.%s on finish: %d -> %d",
            task->name().c_str(),
-           old,
-           est.v());
+           int_old,
+           int_est.v());
 } /* task_finish_cb() */
 
 void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
@@ -100,33 +101,33 @@ void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
    * @todo Updating task exec/interface estimates on abort is a little dicey, as
    * it can cause tasks that just failed to be re-attempted because they have a
    * much lower estimate than successful tasks. This is the current non-oracle
-   * behavior, so we duplicate it here; it should be less of an issues, as we
+   * behavior, so we duplicate it here; it should be less of an issue, as we
    * should have a lot of updates coming in.
    *
    * Whether updating estimates on abort actually matters is tracked by #416,
    * and will be eventually be implemented.
    */
-  auto& est = boost::get<rta::time_estimate>(
+  auto& exec_est = boost::get<rta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
-  RCSW_UNUSED double old = est.v();
-  est.calc(task->task_exec_estimate());
+  RCSW_UNUSED int exec_old = exec_est.v();
+  exec_est.calc(task->task_exec_estimate());
 
-  ER_DEBUG("Update exec_est.%s on abort: %f -> %f",
+  ER_DEBUG("Update exec_est.%s on abort: %d -> %d",
            task->name().c_str(),
-           old,
-           est.v());
+           exec_old,
+           exec_est.v());
 
-  est = boost::get<rta::time_estimate>(
+  auto& int_est = boost::get<rta::time_estimate>(
       m_map.find("interface_est." + task->name())->second);
-  old = est.v();
+  RCSW_UNUSED int int_old = int_est.v();
 
   /* Assuming 1 interface! */
-  est.calc(task->task_interface_estimate(0));
+  int_est.calc(task->task_interface_estimate(0));
 
-  ER_DEBUG("Update interface_est.%s on abort: %f -> %f",
+  ER_DEBUG("Update interface_est.%s on abort: %d -> %d",
            task->name().c_str(),
-           old,
-           est.v());
+           int_old,
+           int_est.v());
 } /* task_abort_cb() */
 
 NS_END(oracle, support, fordyca);

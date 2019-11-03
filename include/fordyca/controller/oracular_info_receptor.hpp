@@ -34,6 +34,7 @@
  ******************************************************************************/
 namespace rcppsw { namespace ta {
 class polled_task;
+class bi_tdgraph_executive;
 }} // namespace rcppsw::ta
 
 NS_START(fordyca);
@@ -83,6 +84,9 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
 
   bool entities_blocks_enabled(void) const RCSW_PURE;
   bool entities_caches_enabled(void) const RCSW_PURE;
+  bool tasking_enabled(void) const RCSW_PURE;
+
+  void tasking_hooks_register(rta::bi_tdgraph_executive* executive);
 
  private:
   /**
