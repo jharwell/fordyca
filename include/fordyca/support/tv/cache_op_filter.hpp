@@ -83,7 +83,6 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * @brief Filter out spurious penalty initializations for existing cache
    * operations (e.g. pickup/drop) (i.e. controller not ready/not intending to
    * use an existing cache).
-   *
    */
   op_filter_status do_filter(const T& controller) const {
     int cache_id = utils::robot_on_cache(controller, *mc_map);

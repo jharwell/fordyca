@@ -37,8 +37,10 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -104,6 +106,18 @@ void bitd_dpo_controller::shared_init(
   /* cache selection matrix */
   m_cache_sel_matrix =
       std::make_unique<class cache_sel_matrix>(cache_mat, block_mat->nest);
+
+  /*
+   * Cache detection via ground sensors. This is *NOT* enabled by the
+   * initialization in the base controller, and needs to happen here when we
+   * have an XML repository with the correct configuration init.
+   */
+  auto saa_names = config::saa_xml_names();
+  auto sensing_p = config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>();
+  auto ground = chal::sensors::ground_sensor(
+      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names.ground_sensor),
+      &sensing_p->ground);
+  saa()->sensing()->replace(ground);
 } /* shared_init() */
 
 void bitd_dpo_controller::private_init(

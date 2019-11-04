@@ -46,7 +46,6 @@ tasking_oracle::tasking_oracle(
       mc_exec_ests(config->task_exec_ests),
       mc_int_ests(config->task_interface_ests) {
   auto cb = [&](const rta::polled_task* task) {
-    printf("task name: %s\n", task->name().c_str());
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
     m_map.insert(
         {"interface_est." + task->name(), task->task_interface_estimate(0)});

@@ -87,12 +87,12 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
 
   line += csv_entry_intavg(m_interval.known_percent);
   line += csv_entry_intavg(m_interval.unknown_percent);
-  line += std::to_string(m_interval.known_percent / m_interval.unknown_percent) +
-          separator();
+  line += csv_entry_domavg(m_interval.known_percent, m_interval.unknown_percent);
   line += csv_entry_tsavg(m_cum.known_percent);
-  line += csv_entry_tsavg(m_cum.unknown_percent, true);
-  line +=
-      std::to_string(m_cum.known_percent / m_cum.unknown_percent) + separator();
+  line += csv_entry_tsavg(m_cum.unknown_percent);
+  line += csv_entry_domavg(m_interval.known_percent,
+                           m_interval.unknown_percent,
+                           true);
   return true;
 } /* csv_line_build() */
 

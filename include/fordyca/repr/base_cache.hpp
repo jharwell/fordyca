@@ -120,7 +120,7 @@ class base_cache : public unicell_immovable_entity,
              return b->id() == c_block->id();
            }) != m_blocks.end();
   }
-  virtual size_t n_blocks(void) const { return blocks().size(); }
+  size_t n_blocks(void) const { return blocks().size(); }
 
   /**
    * @brief Get a list of the blocks currently in the cache.

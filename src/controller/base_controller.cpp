@@ -146,6 +146,8 @@ void base_controller::saa_init(
   auto ground = chal::sensors::ground_sensor(
       GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names.ground_sensor),
       &sensing_p->ground);
+
+
   auto diff_drives = chal::sensors::diff_drive_sensor(
       GetSensor<argos::CCI_DifferentialSteeringSensor>(
           saa_names.diff_steering_saa));

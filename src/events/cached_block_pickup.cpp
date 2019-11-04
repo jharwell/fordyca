@@ -173,7 +173,6 @@ void cached_block_pickup::visit(ds::arena_map& map) {
             cell.loc().to_str().c_str(),
             m_real_cache->n_blocks(),
             cell.block_count());
-
   /*
    * If there are more than kMinBlocks blocks in cache, just remove one, and
    * update the underlying cell. If there are only kMinBlocks left, do the same

@@ -147,7 +147,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
             "cache")) {
       return true;
     }
-    ER_WARN("Robot arrived at goal, but no cache was detected.");
+    ER_WARN("Robot arrived at goal, but no cache was detected");
     return false;
   }
 } /* cache_acquired_cb() */
