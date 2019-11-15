@@ -77,7 +77,7 @@ double dpo_controller::los_dim(void) const {
   return perception()->los_dim();
 } /* los_dim() */
 
-void dpo_controller::ControlStep(void) {
+void dpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -88,14 +88,14 @@ void dpo_controller::ControlStep(void) {
   m_fsm->run();
   saa()->steer_force2D_apply();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
-void dpo_controller::Init(ticpp::Element& node) {
+void dpo_controller::init(ticpp::Element& node) {
   /*
-   * Note that we do not call \ref crw_controller::Init()--there
+   * Note that we do not call \ref crw_controller::init()--there
    * is nothing in there that we need.
    */
-  base_controller::Init(node);
+  base_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -114,7 +114,7 @@ void dpo_controller::Init(ticpp::Element& node) {
 
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
 void dpo_controller::shared_init(
     const config::depth0::dpo_controller_repository& config_repo) {
@@ -155,10 +155,10 @@ const dpo_perception_subsystem* dpo_controller::dpo_perception(void) const {
   return static_cast<const dpo_perception_subsystem*>(m_perception.get());
 } /* dpo_perception() */
 
-void dpo_controller::Reset(void) {
+void dpo_controller::reset(void) {
   crw_controller::Reset();
   m_perception->reset();
-} /* Reset() */
+} /* reset() */
 
 /*******************************************************************************
  * FSM Metrics

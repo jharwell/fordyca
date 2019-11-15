@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <vector>
+#include <string>
 
 #include "rcppsw/common/common.hpp"
 
@@ -43,7 +44,8 @@ NS_START(fordyca, support);
  * @struct swarm_iterator
  * @ingroup fordyca support
  *
- * @brief Iterate over the swarm (robots or controllers), and perform an action.
+ * @brief Iterate over the swarm (robots or controllers), and perform an action
+ * within the ARGoS simulator.
  *
  * The selected action can be specified to be performed in static order
  * (single-threaded execution), or in dynamic order (multi-threaded execution)
@@ -56,36 +58,54 @@ struct swarm_iterator {
   /**
    * @brief Iterate through controllers using static ordering.
    *
-   * @tparam TOrdering \ref static_order or \ref dynamic_order
-   * @tparam TFunction The lambda callback to use.
+   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   *                    the robots in the swarm.
+   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TFunction Type of the lambda callback to use (inferred).
+   *
+   * @param lf Handle to the \ref base_loop_functions.
+   * @param cb Function to run on each robot in the swarm.
+   * @param entity_name Name associated with the robot type within ARGoS.
    */
-  template <typename TOrdering,
+  template <typename TRobotType,
+            typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             static_order::type>::value)>
   static void controllers(const base_loop_functions* const lf,
-                          const TFunction& cb) {
-    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
-      auto* robot = argos::any_cast<argos::CFootBotEntity*>(robotp);
+                          const TFunction& cb,
+                          const std::string& entity_name) {
+    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType(entity_name)) {
+      auto* robot = ::argos::any_cast<TRobotType*>(robotp);
       auto* controller = dynamic_cast<controller::base_controller*>(
           &robot->GetControllableEntity().GetController());
       cb(controller);
     } /* for(...) */
   }
+
   /**
-   * @brief Iterate through robots using dynamic ordering.
+   * @brief Iterate through robots using dynamic ordering (OpenMP
+   * implementation).
    *
-   * @tparam TOrdering \ref static_order or \ref dynamic_order
-   * @tparam TFunction The lambda callback to use.
+   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   *                    the robots in the swarm.
+   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TFunction Type of the lambda callback (inferred).
+   *
+   * @param lf Handle to the \ref base_loop_functions.
+   * @param cb Function to run on each robot in the swarm.
+   * @param entity_name Name associated with the robot type within ARGoS.
    */
-  template <typename TOrdering,
+  template <typename TRobotType,
+            typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             dynamic_order::type>::value)>
   static void controllers(const base_loop_functions* const lf,
-                          const TFunction& cb) {
-    auto& ents = lf->GetSpace().GetEntitiesByType("foot-bot");
-    std::vector<argos::CAny> robots;
+                          const TFunction& cb,
+                          const std::string& entity_name) {
+    auto& ents = lf->GetSpace().GetEntitiesByType(entity_name);
+    std::vector<::argos::CAny> robots;
     robots.reserve(ents.size());
     for (auto& [name, robotp] : ents) {
       robots.push_back(robotp);
@@ -93,7 +113,7 @@ struct swarm_iterator {
 
 #pragma omp parallel for
     for (size_t i = 0; i < robots.size(); ++i) {
-      auto* robot = argos::any_cast<argos::CFootBotEntity*>(robots[i]);
+      auto* robot = ::argos::any_cast<TRobotType*>(robots[i]);
       auto* controller = dynamic_cast<controller::base_controller*>(
           &robot->GetControllableEntity().GetController());
       cb(controller);
@@ -103,16 +123,25 @@ struct swarm_iterator {
   /**
    * @brief Iterate through robots using static ordering.
    *
-   * @tparam TOrdering \ref static_order or \ref dynamic_order
-   * @tparam TFunction The lambda callback to use.
+   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   *                    the robots in the swarm.
+   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TFunction Type of the lambda callback (inferred).
+   *
+   * @param lf Handle to the \ref base_loop_functions.
+   * @param cb Function to run on each robot in the swarm.
+   * @param entity_name Name associated with the robot type within ARGoS.
    */
-  template <typename TOrdering,
+  template <typename TRobotType,
+            typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             static_order::type>::value)>
-  static void robots(const base_loop_functions* const lf, const TFunction& cb) {
-    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType("foot-bot")) {
-      auto* robot = argos::any_cast<argos::CFootBotEntity*>(robotp);
+  static void robots(const base_loop_functions* const lf,
+                     const TFunction& cb,
+                     const std::string& entity_name) {
+    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType(entity_name)) {
+      auto* robot = ::argos::any_cast<TRobotType*>(robotp);
       cb(robot);
     } /* for(...) */
   }
@@ -121,16 +150,25 @@ struct swarm_iterator {
    * @brief Iterate through robots using dynamic ordering (OpenMP
    * implementation).
    *
-   * @tparam TOrdering \ref static_order or \ref dynamic_order
-   * @tparam TFunction The lambda callback to use.
+   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   *                    the robots in the swarm.
+   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TFunction Type of the lambda callback (inferred).
+   *
+   * @param lf Handle to the \ref base_loop_functions.
+   * @param cb Function to run on each robot in the swarm.
+   * @param entity_name Name associated with the robot type within ARGoS.
    */
-  template <typename TOrdering,
+  template <typename TRobotType,
+            typename TOrdering,
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             dynamic_order::type>::value)>
-  static void robots(const base_loop_functions* const lf, const TFunction& cb) {
-    auto& ents = lf->GetSpace().GetEntitiesByType("foot-bot");
-    std::vector<argos::CAny> robots;
+  static void robots(const base_loop_functions* const lf,
+                     const TFunction& cb,
+                     const std::string& entity_name) {
+    auto& ents = lf->GetSpace().GetEntitiesByType(entity_name);
+    std::vector<::argos::CAny> robots;
     robots.reserve(ents.size());
     for (auto& [name, robotp] : ents) {
       robots.push_back(robotp);
@@ -138,7 +176,7 @@ struct swarm_iterator {
 
 #pragma omp parallel for
     for (size_t i = 0; i < robots.size(); ++i) {
-      auto* robot = argos::any_cast<argos::CFootBotEntity*>(robots[i]);
+      auto* robot = ::argos::any_cast<TRobotType*>(robots[i]);
       cb(robot);
     } /* for(i..) */
   }

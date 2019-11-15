@@ -56,14 +56,11 @@ class crw_controller : public base_controller,
   crw_controller(void) RCSW_COLD;
   ~crw_controller(void) override RCSW_COLD;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void ControlStep(void) override;
-  void Reset(void) override RCSW_COLD;
-
-  std::type_index type_index(void) const override {
-    return {typeid(*this)};
-  }
+  /* base_controller overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void control_step(void) override;
+  void reset(void) override RCSW_COLD;
+  std::type_index type_index(void) const override { return typeid(*this); }
 
   /* goal acquisition metrics */
   bool is_vectoring_to_goal(void) const override { return false; }

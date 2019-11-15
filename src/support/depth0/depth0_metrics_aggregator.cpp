@@ -86,7 +86,7 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
   metrics::collector_registerer::creatable_set creatable_set = {
       {typeid(metrics::perception::mdpo_perception_metrics_collector),
        "perception_mdpo",
-       "perception:mdpo"},
+       "perception::mdpo"},
       {typeid(metrics::perception::dpo_perception_metrics_collector),
        "perception_dpo",
        "perception::dpo"}};

@@ -55,7 +55,7 @@ std::list<std::string> temporal_variance_metrics_collector::csv_header_cols(
 } /* csv_header_cols() */
 
 bool temporal_variance_metrics_collector::csv_line_build(std::string& line) {
-  line += std::to_string(m_swarm_motion_throttle) + separator();
+  line += std::to_string(m_avg_motion_throttle) + separator();
   line += std::to_string(m_env_block_manip.v()) + separator();
   line += std::to_string(m_env_cache_usage.v());
   return true;
@@ -64,7 +64,7 @@ bool temporal_variance_metrics_collector::csv_line_build(std::string& line) {
 void temporal_variance_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const temporal_variance_metrics&>(metrics);
-  m_swarm_motion_throttle = m.swarm_motion_throttle();
+  m_avg_motion_throttle = m.avg_motion_throttle();
   m_env_block_manip = m.env_block_manipulation();
   m_env_cache_usage = m.env_cache_usage();
 } /* collect() */

@@ -59,9 +59,10 @@ class bitd_mdpo_controller : public depth1::bitd_dpo_controller,
   bitd_mdpo_controller(void) RCSW_COLD;
   ~bitd_mdpo_controller(void) override RCSW_COLD;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void ControlStep(void) override;
+  /* base_controller overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void control_step(void) override;
+  std::type_index type_index(void) const override { return typeid(*this); }
 
   mdpo_perception_subsystem* mdpo_perception(void) RCSW_PURE;
   const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;

@@ -48,7 +48,7 @@ bitd_odpo_controller::~bitd_odpo_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void bitd_odpo_controller::ControlStep(void) {
+void bitd_odpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -59,7 +59,7 @@ void bitd_odpo_controller::ControlStep(void) {
   executive()->run();
   saa()->steer_force2D_apply();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
 void bitd_odpo_controller::oracle_init(
     std::unique_ptr<oracular_info_receptor> receptor) {

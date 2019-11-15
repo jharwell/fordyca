@@ -47,8 +47,8 @@ crw_controller::~crw_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void crw_controller::Init(ticpp::Element& node) {
-  base_controller::Init(node);
+void crw_controller::init(ticpp::Element& node) {
+  base_controller::init(node);
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -60,16 +60,16 @@ void crw_controller::Init(ticpp::Element& node) {
       rng());
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
-void crw_controller::Reset(void) {
-  base_controller::Reset();
+void crw_controller::reset(void) {
+  base_controller::reset();
   if (nullptr != m_fsm) {
     m_fsm->init();
   }
-} /* Reset() */
+} /* reset() */
 
-void crw_controller::ControlStep(void) {
+void crw_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -78,7 +78,7 @@ void crw_controller::ControlStep(void) {
   m_fsm->run();
   saa()->steer_force2D_apply();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
 /*******************************************************************************
  * FSM Metrics

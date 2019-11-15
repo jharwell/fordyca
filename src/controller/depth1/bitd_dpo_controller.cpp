@@ -60,7 +60,7 @@ bitd_dpo_controller::~bitd_dpo_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void bitd_dpo_controller::ControlStep(void) {
+void bitd_dpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -71,9 +71,9 @@ void bitd_dpo_controller::ControlStep(void) {
   executive()->run();
   saa()->steer_force2D_apply();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
-void bitd_dpo_controller::Init(ticpp::Element& node) {
+void bitd_dpo_controller::init(ticpp::Element& node) {
   base_controller::Init(node);
 
   ndc_push();
@@ -91,7 +91,7 @@ void bitd_dpo_controller::Init(ticpp::Element& node) {
 
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
 void bitd_dpo_controller::shared_init(
     const config::depth1::controller_repository& config_repo) {

@@ -53,9 +53,11 @@ class birtd_mdpo_controller : public depth2::birtd_dpo_controller,
                             public rer::client<birtd_mdpo_controller> {
  public:
   birtd_mdpo_controller(void) RCSW_COLD;
+  ~birtd_mdpo_controller(void) RCSW_COLD;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
+  /* base_controller overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  std::type_index type_index(void) const override { return typeid(*this); }
 
   void shared_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 

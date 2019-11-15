@@ -59,9 +59,10 @@ class birtd_dpo_controller : public depth1::bitd_dpo_controller,
  public:
   birtd_dpo_controller(void) RCSW_COLD;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void ControlStep(void) override;
+  /* base_controller overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void control_step(void) override;
+  std::type_index type_index(void) const override { return typeid(*this); }
 
   void bsel_exception_added(bool b) { m_bsel_exception_added = b; }
   void csel_exception_added(bool b) { m_csel_exception_added = b; }

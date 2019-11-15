@@ -37,6 +37,7 @@
 #include "fordyca/support/tv/cache_op_penalty_handler.hpp"
 #include "fordyca/support/tv/block_op_src.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
+#include "fordyca/support/tv/irv_lf_adaptor.hpp"
 
 #include "cosm/tv/switchable_tv_generator.hpp"
 
@@ -46,6 +47,9 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::tv {
+class irv_manager;
+} /* namespace cosm::tv */
 NS_START(fordyca);
 
 namespace config { namespace tv { struct tv_manager_config; }}
@@ -68,7 +72,7 @@ NS_START(tv);
  */
 
 class tv_manager final : public rer::client<tv_manager>,
-                   public metrics::temporal_variance_metrics {
+                         public metrics::temporal_variance_metrics {
  public:
   template<typename T>
   using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
@@ -81,9 +85,14 @@ class tv_manager final : public rer::client<tv_manager>,
   const tv_manager& operator=(const tv_manager& other) = delete;
 
   /* temporal variance metrics */
-  double swarm_motion_throttle(void) const override;
+  double avg_motion_throttle(void) const override {
+    return m_irv.avg_motion_throttle();
+  }
   rtypes::timestep env_block_manipulation(void) const override;
   rtypes::timestep env_cache_usage(void) const override;
+
+  const irv_lf_adaptor* irv_adaptor(void) const { return &m_irv; }
+  irv_lf_adaptor* irv_adaptor(void) { return &m_irv; }
 
   /**
    * @brief Return non-owning reference to a penalty handler for the specified
@@ -163,13 +172,6 @@ class tv_manager final : public rer::client<tv_manager>,
           };
   }
 
-  bool movement_throttling_enabled(void) const {
-    return (mc_motion_throttle_config) ? true : false;
-  }
-  const ctv::switchable_tv_generator* movement_throttling_handler(int robot_id) const {
-    return &m_motion_throttling.at(robot_id);
-  }
-
   /**
    * @brief Register a robot controller to the temporal variance controller so
    * that all necessary handlers for all possible types of variance that could
@@ -178,17 +180,13 @@ class tv_manager final : public rer::client<tv_manager>,
    * @param robot_id The ID of the robot controller, assumed to be unique (not
    * checked).
    */
-  void register_controller(int robot_id);
+  void register_controller(int robot_id) { m_irv.register_controller(robot_id); }
 
   /**
-   * @brief Update the state of applied variance:
-   *
-   * - Status of all motion throttling handlers, conditioned on whether or not a
-   *   given robot is currently carrying a block.
-   *
-   * Should be called once per timestep.
+   * @brief Update the state of applied variances. Should be called once per
+   * timestep.
    */
-  void update(void);
+  void update(void) { m_irv.update(); }
 
  private:
   template<template<class> class PenaltyHandlerType>
@@ -213,15 +211,13 @@ class tv_manager final : public rer::client<tv_manager>,
 
   /* clang-format off */
   const support::base_loop_functions* const      mc_lf;
-  boost::optional<rct::config::waveform_config>  mc_motion_throttle_config{};
 
+  irv_lf_adaptor                                 m_irv;
   rds::type_map<block_handler_typelist>          m_fb_pickup{};
   rds::type_map<block_handler_typelist>          m_nest_drop{};
   rds::type_map<existing_cache_handler_typelist> m_existing_cache{};
   rds::type_map<fb_drop_handler_typelist>        m_new_cache{};
   rds::type_map<fb_drop_handler_typelist>        m_cache_site{};
-
-  std::map<int, ctv::switchable_tv_generator>   m_motion_throttling{};
   /* clang-format on */
 };
 

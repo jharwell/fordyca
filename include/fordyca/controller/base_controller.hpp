@@ -28,20 +28,12 @@
 #include <string>
 #include <typeindex>
 
-#include <argos3/core/control_interface/ci_controller.h>
-
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/math/rng.hpp"
-#include "rcppsw/math/vector2.hpp"
-#include "rcppsw/types/timestep.hpp"
-
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
 
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/metrics/movement_metrics.hpp"
-#include "cosm/metrics/spatial_dist2D_metrics.hpp"
+#include "cosm/controller/base_controller2D.hpp"
+#include "cosm/controller/irv_recipient_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,14 +45,14 @@ struct sensing_subsystem2D_config;
 namespace cosm::steer2D::config {
 struct force_calculator_config;
 }
+namespace cosm::tv {
+class swarm_irv_manager;
+}
 namespace rcppsw::math::config {
 struct rng_config;
 } // namespace rcppsw::math::config
 
 NS_START(fordyca);
-namespace support::tv {
-class tv_manager;
-} // namespace support::tv
 
 namespace repr {
 class base_block;
@@ -86,11 +78,9 @@ class base_perception_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_controller : public argos::CCI_Controller,
-                        public cfmetrics::movement_metrics,
-                        public cfmetrics::goal_acq_metrics,
-                        public cmetrics::spatial_dist2D_metrics,
-                        public rer::client<base_controller> {
+class base_controller : public ccontroller::base_controller2D,
+                        public ccontroller::irv_recipient_controller,
+                        rer::client<base_controller> {
  public:
   base_controller(void) RCSW_COLD;
   ~base_controller(void) override RCSW_COLD;
@@ -98,20 +88,14 @@ class base_controller : public argos::CCI_Controller,
   base_controller(const base_controller& other) = delete;
   base_controller& operator=(const base_controller& other) = delete;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void Reset(void) override RCSW_COLD;
+  /* base_controller2D overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void reset(void) override RCSW_COLD;
+  int entity_id(void) const override final;
 
-  virtual std::type_index type_index(void) const = 0;
-
-  /* movement metrics */
-  rtypes::spatial_dist distance(void) const override RCSW_PURE;
-  rmath::vector2d velocity(void) const override;
-
-  /* swarm spatial 2D metrics */
-  const rmath::vector2d& position2D(void) const override final RCSW_PURE;
-  const rmath::vector2u& discrete_position2D(void) const override final RCSW_PURE;
-  rmath::vector2d heading2D(void) const override final RCSW_PURE;
+  /* irv_recipient_controller overrides */
+  double applied_movement_throttle(void) const override final;
+  void irv_init(const ctv::swarm_irv_manager* irv_manager) override final;
 
   /**
    * @brief By default controllers have no perception subsystem, and are
@@ -126,30 +110,6 @@ class base_controller : public argos::CCI_Controller,
    * basically blind centipedes.
    */
   virtual base_perception_subsystem* perception(void) { return nullptr; }
-
-  /**
-   * @brief Return the applied movement throttling for the robot. This is not
-   * necessarily the same as the active/configured throttling.
-   */
-  double applied_movement_throttle(void) const;
-
-  /**
-   * @brief Get the ID of the entity. Argos also provides this, but it doesn't
-   * work in gdb, so I provide my own.
-   */
-  int entity_id(void) const;
-
-  /**
-   * @brief Set whether or not a robot is supposed to display it's ID above its
-   * head during simulation.
-   */
-  void display_id(bool display_id) { m_display_id = display_id; }
-
-  /**
-   * @brief If \c TRUE, then the robot should display its ID above its head
-   * during simulation.
-   */
-  bool display_id(void) const { return m_display_id; }
 
   /**
    * @brief If \c TRUE, the robot is currently at least most of the way in the
@@ -181,8 +141,6 @@ class base_controller : public argos::CCI_Controller,
    */
   void block(std::unique_ptr<repr::base_block> block);
 
-  void tv_init(const support::tv::tv_manager* tv_manager) RCSW_COLD;
-
   /**
    * @brief If \c TRUE, then the robot thinks that it is on top of a block.
    *
@@ -195,15 +153,6 @@ class base_controller : public argos::CCI_Controller,
    */
   bool block_detected(void) const;
 
-  /**
-   * @brief Set the current clock tick.
-   *
-   * In a real world, each robot would maintain its own clock tick, and overall
-   * there would no doubt be considerable skew; this is a simulation hack that
-   * makes things much nicer/easier to deal with.
-   */
-  void tick(rtypes::timestep tick);
-
   const class block_manip_collator* block_manip_collator(void) const {
     return &m_block_manip;
   }
@@ -211,60 +160,19 @@ class base_controller : public argos::CCI_Controller,
     return &m_block_manip;
   }
 
-  /**
-   * @brief Set the current location of the robot.
-   *
-   * This is a hack, as real world robot's would have to do their own
-   * localization. This is far superior to that, in terms of ease of
-   * programming. Plus it helps me focus in on my actual research. Ideally,
-   * robots would calculate this from sensor values, rather than it being set by
-   * the loop functions.
-   */
-  void position(const rmath::vector2d& loc);
-  void discrete_position(const rmath::vector2u& loc);
-  void heading(const rmath::radians& h);
-
-  /**
-   * @brief Convenience function to add footbot ID to salient messages during
-   * loop function execution (timestep is already there).
-   */
-  void ndc_push(void) { ER_NDC_PUSH("[" + GetId() + "]"); }
-
-  /**
-   * @brief Convenience function to add footbot ID+timestep to messages during
-   * the control step.
-   */
-  void ndc_pusht(void);
-
-  /**
-   * @brief Remove the last NDC.
-   */
-  void ndc_pop(void) { ER_NDC_POP(); }
-
  protected:
-  class crfootbot::footbot_saa_subsystem* saa(void) {
-    return m_saa.get();
-  }
-  const class crfootbot::footbot_saa_subsystem* saa(void) const {
-    return m_saa.get();
-  }
-
-  rmath::rng* rng(void) { return m_rng; }
+  class crfootbot::footbot_saa_subsystem* saa(void);
+  const class crfootbot::footbot_saa_subsystem* saa(void) const;
 
  private:
-  void output_init(const config::output_config* config);
   void saa_init(
       const csubsystem::config::actuation_subsystem2D_config* actuation_p,
       const csubsystem::config::sensing_subsystem2D_config* sensing_p);
-
-  void rng_init(const rmath::config::rng_config* config);
+  void output_init(const config::output_config* outputp);
 
   /* clang-format off */
-  bool                                              m_display_id{false};
   class block_manip_collator                        m_block_manip{};
   std::unique_ptr<repr::base_block>                 m_block;
-  std::unique_ptr<crfootbot::footbot_saa_subsystem> m_saa;
-  rmath::rng*                                       m_rng{nullptr};
   /* clang-format on */
 };
 

@@ -48,7 +48,7 @@ birtd_omdpo_controller::~birtd_omdpo_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void birtd_omdpo_controller::ControlStep(void) {
+void birtd_omdpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -58,7 +58,7 @@ void birtd_omdpo_controller::ControlStep(void) {
   saa()->steer_force2D_apply();
   executive()->run();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
 void birtd_omdpo_controller::oracle_init(
     std::unique_ptr<oracular_info_receptor> receptor) {

@@ -167,11 +167,14 @@ void depth0_loop_functions::private_init(void) {
   boost::mpl::for_each<controller::depth0::typelist>(f_initializer);
 
   /* configure robots */
-  swarm_iterator::controllers<swarm_iterator::dynamic_order>(
-      this, [&](auto* controller) {
-        boost::apply_visitor(detail::robot_configurer_adaptor(controller),
-                             config_map.at(controller->type_index()));
-      });
+  auto cb = [&](auto* controller) {
+    boost::apply_visitor(detail::robot_configurer_adaptor(controller),
+                         config_map.at(controller->type_index()));
+  };
+  swarm_iterator::controllers<argos::CFootBotEntity,
+                              swarm_iterator::dynamic_order>(this,
+                                                             cb,
+                                                             "foot-bot");
 } /* private_init() */
 
 /*******************************************************************************
@@ -182,10 +185,11 @@ void depth0_loop_functions::PreStep(void) {
   base_loop_functions::PreStep();
 
   /* Process all robots */
-  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, [&](auto* robot) {
-    robot_pre_step(*robot);
-  });
-
+  auto cb = [&](auto* robot) { robot_pre_step(*robot); };
+  swarm_iterator::robots<argos::CFootBotEntity,
+                              swarm_iterator::dynamic_order>(this,
+                                                             cb,
+                                                             "foot-bot");
   ndc_pop();
 } /* PreStep() */
 
@@ -194,9 +198,11 @@ void depth0_loop_functions::PostStep(void) {
   base_loop_functions::PostStep();
 
   /* Process all robots: interact with environment then collect metrics */
-  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, [&](auto* robot) {
-    robot_post_step(*robot);
-  });
+  auto cb = [&](auto* robot) { robot_post_step(*robot); };
+  swarm_iterator::robots<argos::CFootBotEntity,
+                              swarm_iterator::dynamic_order>(this,
+                                                             cb,
+                                                             "foot-bot");
 
   /* Update block distribution status */
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(

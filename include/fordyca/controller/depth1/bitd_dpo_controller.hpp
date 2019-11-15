@@ -72,17 +72,18 @@ NS_START(depth1);
  * Uses a DPO data store for tracking arena state and object relavance.
  */
 class bitd_dpo_controller : public depth0::dpo_controller,
-                          public rer::client<bitd_dpo_controller>,
-                          public rmetrics::tasks::bi_tdgraph_metrics {
+                            public rer::client<bitd_dpo_controller>,
+                            public rmetrics::tasks::bi_tdgraph_metrics {
  public:
   using dpo_controller::perception;
 
   bitd_dpo_controller(void) RCSW_COLD;
   ~bitd_dpo_controller(void) override RCSW_COLD;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void ControlStep(void) override;
+  /* base_controller overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void control_step(void) override;
+  std::type_index type_index(void) const override { return typeid(*this); }
 
   /* task distribution metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(int, current_task_depth, const);

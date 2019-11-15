@@ -39,11 +39,13 @@ NS_START(fordyca, controller, depth2);
 birtd_mdpo_controller::birtd_mdpo_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.depth2.birtd_mdpo") {}
 
+birtd_mdpo_controller::~birtd_mdpo_controller(void) = default;
+
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void birtd_mdpo_controller::Init(ticpp::Element& node) {
-  base_controller::Init(node);
+void birtd_mdpo_controller::init(ticpp::Element& node) {
+  base_controller::init(node);
   ndc_push();
   ER_INFO("Initializing");
 
@@ -58,7 +60,7 @@ void birtd_mdpo_controller::Init(ticpp::Element& node) {
 
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
 void birtd_mdpo_controller::shared_init(
     const config::depth2::controller_repository& config_repo) {

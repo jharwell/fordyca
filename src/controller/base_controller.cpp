@@ -41,6 +41,7 @@
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
+#include "cosm/tv/swarm_irv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,8 +54,7 @@ namespace fs = std::experimental::filesystem;
  ******************************************************************************/
 base_controller::base_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.base"),
-      m_block(nullptr),
-      m_saa(nullptr) {}
+      m_block(nullptr) {}
 
 base_controller::~base_controller(void) = default;
 
@@ -62,25 +62,15 @@ base_controller::~base_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 bool base_controller::in_nest(void) const {
-  return m_saa->sensing()->ground()->detect(
+  return saa()->sensing()->ground()->detect(
       chal::sensors::ground_sensor::kNestTarget);
 } /* in_nest() */
 
 bool base_controller::block_detected(void) const {
-  return m_saa->sensing()->ground()->detect("block");
+  return saa()->sensing()->ground()->detect("block");
 } /* block_detected() */
 
-void base_controller::position(const rmath::vector2d& loc) {
-  m_saa->sensing()->position(loc);
-}
-void base_controller::heading(const rmath::radians& h) {
-  m_saa->sensing()->heading(h);
-}
-void base_controller::discrete_position(const rmath::vector2u& loc) {
-  m_saa->sensing()->discrete_position(loc);
-}
-
-void base_controller::Init(ticpp::Element& node) {
+void base_controller::init(ticpp::Element& node) {
 #if (LIBRA_ER == LIBRA_ER_ALL)
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
@@ -100,22 +90,47 @@ void base_controller::Init(ticpp::Element& node) {
   }
 
   /* initialize RNG */
-  rng_init(repo.config_get<rmath::config::rng_config>());
+  auto rngp = repo.config_get<rmath::config::rng_config>();
+  base_controller2D::rng_init((nullptr == rngp) ? -1: rngp->seed, "footbot");
 
   /* initialize output */
-  auto* config = repo.config_get<config::output_config>();
-  output_init(config);
+  auto* outputp = repo.config_get<config::output_config>();
+  base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
   /* initialize sensing and actuation (SAA) subsystem */
   saa_init(repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
            repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
   ndc_pop();
-} /* Init() */
+} /* init() */
 
-void base_controller::Reset(void) {
-  CCI_Controller::Reset();
+void base_controller::reset(void) {
   m_block.reset();
 } /* Reset() */
+
+void base_controller::output_init(const config::output_config* outputp) {
+  std::string dir = base_controller2D::output_init(outputp->output_root,
+                                                   outputp->output_dir);
+
+#if (LIBRA_ER == LIBRA_ER_ALL)
+  /*
+   * Each file appender is attached to a root category in the COSM
+   * namespace. If you give different file appenders the same file, then the
+   * lines within it are not always ordered, which is not overly helpful for
+   * debugging.
+   */
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("rcppsw.ta"),
+                                       dir + "/ta.log");
+
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.controller"),
+              dir + "/controller.log");
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.ds"), dir + "/ds.log");
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.saa"),
+              dir + "/saa.log");
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+                      dir + "/saa.log");
+#endif
+} /* output_init() */
 
 void base_controller::saa_init(
     const csubsystem::config::actuation_subsystem2D_config* actuation_p,
@@ -185,11 +200,11 @@ void base_controller::saa_init(
 
   auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
 
-      /*
+    /*
      * We put the governed differential drive in the actuator map twice because
      * some of the reusable components use the base class differential drive
      * instead of the governed entry (no robust way to inform that we want to
-     * use the governed version).n
+     * use the governed version).
      */
       csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
       {typeid(chal::actuators::diff_drive_actuator),
@@ -198,95 +213,24 @@ void base_controller::saa_init(
       csubsystem::actuation_subsystem2D::map_entry_create(leds),
       csubsystem::actuation_subsystem2D::map_entry_create(raba)};
 
-  m_saa = std::make_unique<crfootbot::footbot_saa_subsystem>(
-      sensors, actuators, &actuation_p->steering);
+  base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
+      sensors, actuators, &actuation_p->steering));
 } /* saa_init() */
-
-void base_controller::output_init(const config::output_config* const config) {
-  std::string output_root;
-  if ("__current_date__" == config->output_dir) {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    output_root = config->output_root + "/" + std::to_string(now.date().year()) +
-                  "-" + std::to_string(now.date().month()) + "-" +
-                  std::to_string(now.date().day()) + ":" +
-                  std::to_string(now.time_of_day().hours()) + "-" +
-                  std::to_string(now.time_of_day().minutes());
-  } else {
-    output_root = config->output_root + "/" + config->output_dir;
-  }
-
-  if (!fs::exists(output_root)) {
-    fs::create_directories(output_root);
-  }
-
-#if (LIBRA_ER == LIBRA_ER_ALL)
-  /*
-   * Each file appender is attached to a root category in the FORDYCA
-   * namespace. If you give different file appenders the same file, then the
-   * lines within it are not always ordered, which is not overly helpful for
-   * debugging.
-   */
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller"),
-                      output_root + "/controller.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds"),
-                      output_root + "/ds.log");
-
-  client::set_logfile(log4cxx::Logger::getLogger("rcppsw.ta"),
-                      output_root + "/ta.log");
-
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.fsm"),
-                      output_root + "/fsm.log");
-
-  client::set_logfile(log4cxx::Logger::getLogger(
-                          "fordyca.controller.saa_subsystem"),
-                      output_root + "/saa.log");
-  client::set_logfile(log4cxx::Logger::getLogger(
-                          "fordyca.controller.explore_behavior"),
-                      output_root + "/saa.log");
-#endif
-} /* output_init() */
-
-void base_controller::rng_init(const rmath::config::rng_config* config) {
-  rmath::rngm::instance().register_type<rmath::rng>("footbot");
-  if (nullptr == config || (nullptr != config && -1 == config->seed)) {
-    ER_INFO("Using time seeded RNG");
-    m_rng = rmath::rngm::instance().create(
-        "footbot", std::chrono::system_clock::now().time_since_epoch().count());
-  } else {
-    /*
-     * We add the entity ID to the configured seed to ensure that all robots
-     * have unique random number sequences they are drawing from (otherwise they
-     * can all chose to allocate the same initial task, for example), while
-     * still maintaining reproducibility.
-     */
-    ER_INFO("Using user seeded RNG");
-    m_rng = rmath::rngm::instance().create("footbot", config->seed);
-  }
-} /* rng_init() */
-
-void base_controller::tick(rtypes::timestep tick) {
-  m_saa->sensing()->tick(tick);
-} /* tick() */
 
 int base_controller::entity_id(void) const {
   return std::atoi(GetId().c_str() + 2);
 } /* entity_id() */
 
-void base_controller::ndc_pusht(void) {
-  ER_NDC_PUSH(std::string("[t=") + std::to_string(m_saa->sensing()->tick().v()) +
-              std::string("] [") + GetId() + std::string("]"));
-}
-
 double base_controller::applied_movement_throttle(void) const {
   return saa()->actuation()->governed_diff_drive()->applied_throttle();
 } /* applied_movement_throttle() */
 
-void base_controller::tv_init(const support::tv::tv_manager* tv_manager) {
-  if (tv_manager->movement_throttling_enabled()) {
+void base_controller::irv_init(const ctv::swarm_irv_manager* irv_manager) {
+  if (irv_manager->motion_throttling_enabled()) {
     saa()->actuation()->governed_diff_drive()->tv_generator(
-        tv_manager->movement_throttling_handler(entity_id()));
+        irv_manager->motion_throttling_handler(entity_id()));
   }
-} /* tv_init() */
+} /* irv_init() */
 
 void base_controller::block(std::unique_ptr<repr::base_block> block) {
   m_block = std::move(block);
@@ -295,43 +239,11 @@ void base_controller::block(std::unique_ptr<repr::base_block> block) {
 std::unique_ptr<repr::base_block> base_controller::block_release(void) {
   return std::move(m_block);
 }
-/*******************************************************************************
- * Movement Metrics
- ******************************************************************************/
-rtypes::spatial_dist base_controller::distance(void) const {
-  /*
-   * If you allow distance gathering at timesteps < 1, you get a big jump
-   * because of the prev/current location not being set up properly yet.
-   */
-  if (saa()->sensing()->tick() > 1) {
-    return rtypes::spatial_dist(saa()->sensing()->tick_travel().length());
-  }
-  return rtypes::spatial_dist(0.0);
-} /* distance() */
 
-rmath::vector2d base_controller::velocity(void) const {
-  /*
-   * If you allow distance gathering at timesteps < 1, you get a big jump
-   * because of the prev/current location not being set up properly yet.
-   */
-  if (saa()->sensing()->tick() > 1) {
-    return saa()->linear_velocity();
-  }
-  return {0, 0};
-} /* velocity() */
-
-/*******************************************************************************
- * Swarm Spatial Metrics
- ******************************************************************************/
-const rmath::vector2d& base_controller::position2D(void) const {
-  return m_saa->sensing()->position();
+class crfootbot::footbot_saa_subsystem* base_controller::saa(void) {
+  return static_cast<crfootbot::footbot_saa_subsystem*>(base_controller2D::saa());
 }
-const rmath::vector2u& base_controller::discrete_position2D(void) const {
-  return m_saa->sensing()->discrete_position();
+const class crfootbot::footbot_saa_subsystem* base_controller::saa(void) const {
+  return static_cast<const crfootbot::footbot_saa_subsystem*>(base_controller2D::saa());
 }
-
-rmath::vector2d base_controller::heading2D(void) const {
-  return {1.0, m_saa->sensing()->heading()};
-}
-
 NS_END(controller, fordyca);

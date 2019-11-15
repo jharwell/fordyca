@@ -50,7 +50,7 @@ mdpo_controller::~mdpo_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void mdpo_controller::ControlStep(void) {
+void mdpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -60,14 +60,14 @@ void mdpo_controller::ControlStep(void) {
   saa()->steer_force2D_apply();
   fsm()->run();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
-void mdpo_controller::Init(ticpp::Element& node) {
+void mdpo_controller::init(ticpp::Element& node) {
   /*
-   * Note that we do not call \ref crw_controller::Init()--there
+   * Note that we do not call \ref crw_controller::init()--there
    * is nothing in there that we need.
    */
-  base_controller::Init(node);
+  base_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -86,7 +86,7 @@ void mdpo_controller::Init(ticpp::Element& node) {
 
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
 void mdpo_controller::shared_init(
     const config::depth0::mdpo_controller_repository& config_repo) {

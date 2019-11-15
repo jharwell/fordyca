@@ -51,7 +51,7 @@ birtd_dpo_controller::birtd_dpo_controller(void)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void birtd_dpo_controller::ControlStep(void) {
+void birtd_dpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -61,10 +61,10 @@ void birtd_dpo_controller::ControlStep(void) {
   executive()->run();
   saa()->steer_force2D_apply();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
-void birtd_dpo_controller::Init(ticpp::Element& node) {
-  base_controller::Init(node);
+void birtd_dpo_controller::init(ticpp::Element& node) {
+  base_controller::init(node);
   ndc_push();
   ER_INFO("Initializing");
 
@@ -80,7 +80,7 @@ void birtd_dpo_controller::Init(ticpp::Element& node) {
 
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
 void birtd_dpo_controller::private_init(
     const config::depth2::controller_repository& config_repo) {

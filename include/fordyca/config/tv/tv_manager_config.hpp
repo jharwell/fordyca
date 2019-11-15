@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/config/base_config.hpp"
 #include "rcppsw/control/config/waveform_config.hpp"
+#include "cosm/tv/config/swarm_irv_manager_config.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -41,8 +42,8 @@ NS_START(fordyca, config, tv);
  * @ingroup fordyca config tv
  */
 struct tv_manager_config final : public rconfig::base_config {
+  ctv::config::swarm_irv_manager_config irv{};
   rct::config::waveform_config block_manipulation_penalty{};
-  rct::config::waveform_config block_carry_throttle{};
   rct::config::waveform_config cache_usage_penalty{};
 };
 

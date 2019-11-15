@@ -28,10 +28,10 @@
           (add-to-list 'flycheck-clang-args (concat "-isystem" (substitute-in-file-name
                                                                 "$localroot/include")))
           (add-to-list 'flycheck-clang-args (concat "-isystem" "/usr/include/eigen3"))
-          (add-to-list 'flycheck-clang-definitions "HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT")
+          (add-to-list 'flycheck-clang-definitions "COSM_HAL_TARGET=HAL_TARGET_ARGOS_FOOTBOT")
 
           (add-to-list 'flycheck-gcc-args "-fPIC")
-          (add-to-list 'flycheck-gcc-definitions "HAL_CONFIG=HAL_CONFIG_ARGOS_FOOTBOT")
+          (add-to-list 'flycheck-gcc-definitions "COSM_HAL_TARGET=HAL_TARGET_ARGOS_FOOTBOT")
           (add-to-list 'flycheck-gcc-args "-std=c++17")
           (add-to-list 'flycheck-gcc-args (concat "-isystem" (substitute-in-file-name
                                                               "$rcppsw")))

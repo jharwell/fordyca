@@ -52,9 +52,9 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
     }
     if (nullptr != bnode.FirstChild("carry_throttle", false)) {
       m_block_carry.parse(node_get(bnode, "carry_throttle"));
-      m_config->block_carry_throttle =
-          *m_block_carry
-               .config_get<rct::config::xml::waveform_parser::config_type>();
+      auto config = m_block_carry
+                    .config_get<rct::config::xml::waveform_parser::config_type>();
+      m_config->irv.motion_throttle = *config;
     }
   }
 

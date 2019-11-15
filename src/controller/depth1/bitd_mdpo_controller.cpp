@@ -50,8 +50,8 @@ bitd_mdpo_controller::~bitd_mdpo_controller(void) = default;
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void bitd_mdpo_controller::Init(ticpp::Element& node) {
-  base_controller::Init(node);
+void bitd_mdpo_controller::init(ticpp::Element& node) {
+  base_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -66,9 +66,9 @@ void bitd_mdpo_controller::Init(ticpp::Element& node) {
   shared_init(config_repo);
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
-void bitd_mdpo_controller::ControlStep(void) {
+void bitd_mdpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
             "Carried block%d has robot id=%d",
@@ -79,7 +79,7 @@ void bitd_mdpo_controller::ControlStep(void) {
   executive()->run();
   saa()->steer_force2D_apply();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
 void bitd_mdpo_controller::shared_init(
     const config::depth1::controller_repository& config_repo) {

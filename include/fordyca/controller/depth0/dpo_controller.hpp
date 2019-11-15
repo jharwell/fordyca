@@ -59,14 +59,11 @@ class dpo_controller : public crw_controller,
   dpo_controller(void) RCSW_COLD;
   ~dpo_controller(void) override RCSW_COLD;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void ControlStep(void) override;
-  void Reset(void) override RCSW_COLD;
-
-  std::type_index type_index(void) const override {
-    return {typeid(*this)};
-  }
+  /* base_controller overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void control_step(void) override;
+  void reset(void) override RCSW_COLD;
+  std::type_index type_index(void) const override { return typeid(*this); }
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);

@@ -59,7 +59,7 @@ class temporal_variance_metrics : public virtual rmetrics::base_metrics {
    * @brief Return the average motion throttling within the swarm, as a
    * percentage [0, 1.0].
    */
-  virtual double swarm_motion_throttle(void) const = 0;
+  virtual double avg_motion_throttle(void) const = 0;
 
   /**
    * @brief Return the current value of the block manipulation penalty present
