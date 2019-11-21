@@ -52,7 +52,7 @@ NS_START(ds);
  * @ingroup fordyca ds
  *
  * @brief Base repr of a cell on a 2D grid. A combination of FSM +
- * handle to whatever \ref base_cell_entity the cell contains, if any.
+ * handle to whatever @ref repr::base_entity the cell contains, if any.
  */
 class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
  public:

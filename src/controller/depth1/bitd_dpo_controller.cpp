@@ -134,12 +134,12 @@ void bitd_dpo_controller::private_init(
 } /* private_init() */
 
 void bitd_dpo_controller::task_abort_cb(const rta::polled_task*) {
-  m_task_status = tasks::task_status::ekAbortPending;
+  m_task_status = tasks::task_status::ekABORT_PENDING;
 } /* task_abort_cb() */
 
 void bitd_dpo_controller::task_start_cb(const rta::polled_task*) {
-  if (tasks::task_status::ekAbortPending != m_task_status) {
-    m_task_status = tasks::task_status::ekRunning;
+  if (tasks::task_status::ekABORT_PENDING != m_task_status) {
+    m_task_status = tasks::task_status::ekRUNNING;
   }
 } /* task_start_cb() */
 

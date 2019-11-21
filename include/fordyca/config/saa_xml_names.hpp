@@ -36,15 +36,23 @@ NS_START(fordyca, config);
 /*******************************************************************************
  * Struct Definitions
  ******************************************************************************/
+/**
+ * @struct saa_xml_names
+ * @ingroup config
+ *
+ * @brief Collection of names of sensing and actuation component names that
+ * ARGoS expects when asking for handles to robot components. Collected here in
+ * a single place in the interest of DRY.
+ */
 struct saa_xml_names {
-  const std::string diff_steering_saa = "differential_steering";
-  const std::string leds_saa = "leds";
-  const std::string rab_saa = "range_and_bearing";
-  const std::string prox_sensor = "footbot_proximity";
-  const std::string camera_sensor = "colored_blob_omnidirectional_camera";
-  const std::string light_sensor = "footbot_light";
-  const std::string ground_sensor = "footbot_motor_ground";
-  const std::string battery_sensor = "battery";
+  static constexpr char diff_steering_saa[] = "differential_steering";
+  static constexpr char leds_saa[] = "leds";
+  static constexpr char rab_saa[] = "range_and_bearing";
+  static constexpr char prox_sensor[] = "footbot_proximity";
+  static constexpr char camera_sensor[] = "colored_blob_omnidirectional_camera";
+  static constexpr char light_sensor[] = "footbot_light";
+  static constexpr char ground_sensor[] = "footbot_motor_ground";
+  static constexpr char battery_sensor[] = "battery";
 };
 
 NS_END(config, fordyca);

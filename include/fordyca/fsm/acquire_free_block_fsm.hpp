@@ -80,7 +80,7 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
 
  private:
   /*
-   * See \ref acquire_goal_fsm for the purpose of these callbacks.
+   * See @ref acquire_goal_fsm for the purpose of these callbacks.
    */
   static cfmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
       RCSW_CONST;

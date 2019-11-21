@@ -46,7 +46,7 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @lockclass _acq_validator
+ * @class block_acq_validator
  * @ingroup fordyca fsm
  *
  * @brief Determine if the acquisition of a block at a specific location/with a

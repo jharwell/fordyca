@@ -96,7 +96,7 @@ void bitd_mdpo_controller::shared_init(
       std::make_unique<mdpo_perception_subsystem>(&p, GetId()));
 
   /*
-   * Task executive. Even though we use the same executive as the \ref
+   * Task executive. Even though we use the same executive as the @ref
    * bitd_dpo_controller, we have to replace it because we have our own perception
    * subsystem, which is used to create the executive's graph.
    */

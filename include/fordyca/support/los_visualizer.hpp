@@ -67,7 +67,7 @@ class los_visualizer : public rer::client<los_visualizer> {
    * @brief Draw visualizations related to block LOS:
    *
    * @param los The LOS to visualize.
-   * @param grid_resolution The grid resolution for the arena.
+   * @param resolution The grid resolution for the arena.
    */
   void draw(const repr::line_of_sight* los, rtypes::discretize_ratio resolution);
 

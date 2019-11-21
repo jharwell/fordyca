@@ -43,7 +43,7 @@ NS_START(fordyca, config, block_sel);
  * @struct block_sel_matrix_config
  * @ingroup fordyca config block_sel
  *
- * @brief XML parameters for the \ref block_sel_matrix
+ * @brief XML parameters for the @ref block_sel_matrix
  */
 struct block_sel_matrix_config final : public rconfig::base_config {
   rmath::vector2d nest{};

@@ -34,11 +34,36 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @brief The states that a @ref ds::cell2D can be in.
+ */
 enum cell2D_states {
+  /**
+   * @brief The cell's contents is unknown (only used by @ref
+   * depth0::mdpo_controller and its derived variants).
+   */
   ekST_UNKNOWN,
+
+  /**
+   * @brief The cell is empty (does not hold a cache or block).
+   */
   ekST_EMPTY,
+
+  /**
+   * @brief The cell contains a block.
+   */
   ekST_HAS_BLOCK,
+
+  /**
+   * @brief The cell contains a cache.
+   */
   ekST_HAS_CACHE,
+
+  /**
+   * @brief The cell does not contain a cache, but is part of the 2D space
+   * occupied by a cache, in which case it also contains a reference to the
+   * cache it is a part of.
+   */
   ekST_CACHE_EXTENT,
   ekST_MAX_STATES
 };

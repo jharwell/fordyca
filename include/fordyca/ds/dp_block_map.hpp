@@ -42,8 +42,9 @@ NS_START(ds);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dp_block_mapp
+ * @class dp_block_map
  * @ingroup fordyca ds
+ *
  * @brief The block map is a repr of the robot's perception of blocks
  * in the arena. It uses integers as keys, because blocks are mobile (i.e. can
  * move between instants of time where the robot sees them), and

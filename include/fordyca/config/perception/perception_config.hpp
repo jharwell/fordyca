@@ -37,8 +37,10 @@ NS_START(fordyca, config, perception);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct perception_grid_config
+ * @struct perception_config
  * @ingroup fordyca config perception
+ *
+ * @brief Configuration for robot perception.
  */
 struct perception_config final : public rconfig::base_config {
   double los_dim{-1};

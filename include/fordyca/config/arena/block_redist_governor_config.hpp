@@ -41,6 +41,9 @@ NS_START(fordyca, config, arena);
 /**
  * @struct block_redist_governor_config
  * @ingroup fordyca config arena
+ *
+ * @brief Configuration for the governor of block redistribution after
+ * collection.
  */
 struct block_redist_governor_config final : public rconfig::base_config {
   rtypes::timestep timestep{0};

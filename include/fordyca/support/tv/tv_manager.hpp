@@ -144,7 +144,7 @@ class tv_manager final : public rer::client<tv_manager>,
    * Not all handlers are valid/needed for all controllers, and if you don't use
    * SFINAE to control what templates are instantiated for a given controller,
    * you get a bunch of errors from boost::variant at runtime because you are
-   * trying to get a handler for cache pickup/drop for a \ref crw_controller
+   * trying to get a handler for cache pickup/drop for a @ref crw_controller
    * (for example).
    */
   template<typename T,

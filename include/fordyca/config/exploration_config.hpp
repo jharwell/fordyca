@@ -41,6 +41,9 @@ NS_START(fordyca, config);
 /**
   * @struct exploration_config
   * @ingroup fordyca config
+  *
+  * @brief Configuration for exploration strategies that can be employed by
+  * robots.
   */
 struct exploration_config final : public rconfig::base_config {
   std::string block_strategy{};

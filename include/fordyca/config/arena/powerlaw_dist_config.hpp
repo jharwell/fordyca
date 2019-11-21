@@ -38,6 +38,8 @@ NS_START(fordyca, config, arena);
 /**
  * @struct powerlaw_dist_config
  * @ingroup fordyca config arena
+ *
+ * @brief Configuration for powerlaw block distribution.
  */
 struct powerlaw_dist_config final : public rconfig::base_config {
   /**

@@ -49,7 +49,7 @@ struct functor_maps_initializer;
  * Classes
  ******************************************************************************/
 /**
- * @class loop_functions
+ * @class depth2_loop_functions
  * @ingroup fordyca support depth2
  *
  * @brief The loop functions for depth 2 foraging.
@@ -100,11 +100,13 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 
-  /*
-   * These are friend classes because they are basically just pieces of the loop
-   * functions pulled out for increased clarity/modularity, and are not meant to
-   * be used in other contexts. Doing things this way rather than passing 8
-   * parameters to the functors seemed much cleaner.
+  /**
+   * @brief These are friend classes because they are basically just pieces of
+   * the loop functions pulled out for increased clarity/modularity, and are not
+   * meant to be used in other contexts.
+   *
+   * Doing things this way rather than passing 8 parameters to the functors
+   * seemed much cleaner.
    */
   friend detail::functor_maps_initializer;
 

@@ -46,7 +46,7 @@ NS_START(tv);
  * @class irv_lf_adaptor
  * @ingroup fordyca support tv
  *
- * @brief Adapts \ref ctv::swarm_irv_manager to work within the ARGoS simulator.
+ * @brief Adapts @ref ctv::swarm_irv_manager to work within the ARGoS simulator.
  */
 class irv_lf_adaptor final : public rer::client<irv_lf_adaptor>,
                              public ctv::swarm_irv_manager {

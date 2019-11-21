@@ -91,7 +91,7 @@ struct d1_subtask_status_extractor
  * @struct d1_subtask_status_extractor_adaptor
  * @ingroup fordyca support depth1
  *
- * @brief Calculate the \ref collector, \ref harvester task counts for depth1
+ * @brief Calculate the @ref collector, @ref harvester task counts for depth1
  * when a static cache is depleted, for use in determining the static cache
  * respawn probability.
  */
@@ -434,7 +434,7 @@ void depth1_loop_functions::PostStep(void) {
   /*
    * Collect metrics from/about zombie caches (caches that have been depleted
    * this timestep). These are not captured by the usual metric collection
-   * process as they have been depleted and do not exist anymore in the \ref
+   * process as they have been depleted and do not exist anymore in the @ref
    * arena_map::caches() array.
    */
   for (auto& c : arena_map()->zombie_caches()) {
@@ -566,7 +566,7 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    *
    * See #577.
    */
-  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
+  if (interactor_status::ekNO_EVENT != status && nullptr != oracle_manager()) {
     oracle_manager()->update(arena_map());
   }
 

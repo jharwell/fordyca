@@ -106,11 +106,14 @@ class depth0_loop_functions : public base_loop_functions,
     >;
 
   using metric_extraction_map_type = rds::type_map<metric_extraction_typelist>;
-  /*
-   * These are friend classes because they are basically just pieces of the loop
-   * functions pulled out for increased clarity/modularity, and are not meant to
-   * be used in other contexts. Doing things this way rather than passing 8
-   * parameters to the functors seemed much cleaner.
+
+  /**
+   * @brief These are friend classes because they are basically just pieces of
+   * the loop functions pulled out for increased clarity/modularity, and are not
+   * meant to be used in other contexts.
+   *
+   * Doing things this way rather than passing 8 parameters to the functors
+   * seemed much cleaner.
    */
   friend detail::functor_maps_initializer;
 

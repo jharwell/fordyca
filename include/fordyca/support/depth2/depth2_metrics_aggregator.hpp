@@ -42,7 +42,7 @@ NS_START(fordyca, support, depth2);
  * @ingroup fordyca support depth2
  *
  * @brief Aggregates and metrics collection for depth2 foraging. That
- * includes everything from \ref depth1_metrics_aggregator, and also:
+ * includes everything from @ref depth1_metrics_aggregator, and also:
  *
  * - TAB metrics (rooted at Harvester)
  * - TAB metrics (rooted at Collector)

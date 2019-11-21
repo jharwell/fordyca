@@ -76,8 +76,9 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   /**
    * @brief (Potentially) create new caches.
    *
+   * @param c_params Cache creation parameters
    * @param c_alloc_blocks The blocks that have been allocated for cache
-   * creation this timestep for all caches.
+   *                       creation this timestep for all caches.
    *
    * @return A vector of created caches.
    */
@@ -100,10 +101,10 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * - No block that is not currently contained in a cache overlaps any cache.
    * - No cache overlaps a block cluster.
    *
-   * @param caches The created caches.
-   * @param free_blocks Blocks that are not carried by a robot or part of a
-   *                    newly created cache.
-   * @param clusters Current block clusters in the arena.
+   * @param c_caches The created caches.
+   * @param c_free_blocks Blocks that are not carried by a robot or part of a
+   *                     newly created cache.
+   * @param c_clusters Current block clusters in the arena.
    *
    * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
    * otherwise.
@@ -125,7 +126,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * @param blocks Vector of blocks to use to create the cache. Passed by value
    *               because they are (possibly) modified by this function in a
    *               way that callers probably do not want.
-   * @param timestep The current timestep.
+   * @param t The current timestep.
    */
   std::unique_ptr<repr::arena_cache> create_single_cache(
       const rmath::vector2d& center,

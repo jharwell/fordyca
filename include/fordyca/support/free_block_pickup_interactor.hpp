@@ -49,7 +49,7 @@ NS_START(fordyca, support);
  * @class free_block_pickup_interactor
  * @ingroup fordyca support
  *
- * @brief Handle's a robot's (possible) \ref free_block_pickup event on a given
+ * @brief Handle's a robot's (possible) @ref free_block_pickup event on a given
  * timestep.
  */
 template <typename T>
@@ -84,26 +84,26 @@ class free_block_pickup_interactor
    * interaction.
    *
    * @param controller The controller to handle interactions for.
-   * @param timestep The current timestep.
+   * @param t The current timestep.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_free_block_pickup(controller, t);
-        return interactor_status::ekFreeBlockPickup;
+        return interactor_status::ekFREE_BLOCK_PICKUP;
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::block_op_src::ekFREE_PICKUP,
                                       t);
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
   /**
    * @brief Determine if a robot is waiting to pick up a free block, and if it
-   * is actually on a free block, send it the \ref free_block_pickup event.
+   * is actually on a free block, send it the @ref free_block_pickup event.
    */
   void finish_free_block_pickup(T& controller, rtypes::timestep t) {
     ER_ASSERT(controller.goal_acquired() &&
@@ -127,14 +127,14 @@ class free_block_pickup_interactor
      * updating two robots both having finished serving their penalty this
      * timestep manage to pass the check to actually perform the block pickup
      * before one of them actually finishes picking up a block, then the second
-     * one will not get the necessary \ref block_vanished event. See #594.
+     * one will not get the necessary @ref block_vanished event. See #594.
      */
     m_map->block_mtx().lock();
 
     /*
      * If two robots both are serving penalties on the same ramp block (possible
      * because a ramp block spans 2 squares), then whichever robot finishes
-     * first will correctly take the block via \ref free_block_pickup, and the
+     * first will correctly take the block via @ref free_block_pickup, and the
      * second one will attempt to perform the pickup on a block that is already
      * out of sight, resulting in a boost index out of bounds assertion. See
      * #410.
@@ -197,7 +197,7 @@ class free_block_pickup_interactor
      * 1. Arena map
      * 2. Controller
      *
-     * In order for \ref events::free_block_pickup to process properly.
+     * In order for @ref events::free_block_pickup to process properly.
      */
     pickup_op.visit(*m_map);
     pickup_op.visit(controller);

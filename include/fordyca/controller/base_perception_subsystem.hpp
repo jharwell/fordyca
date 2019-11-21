@@ -48,6 +48,9 @@ class oracular_info_receptor;
 /**
  * @class base_perception_subsystem
  * @ingroup fordyca controller
+ *
+ * @brief Base class for robot perception common to all controllers, which is
+ * just the @ref dpo_store of objects.
  */
 class base_perception_subsystem {
  public:

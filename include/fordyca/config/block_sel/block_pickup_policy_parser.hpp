@@ -40,9 +40,9 @@ NS_START(fordyca, config, block_sel);
  ******************************************************************************/
 /**
  * @class block_pickup_policy_parser
- * @ingroup fordyca config
+ * @ingroup config block_sel
  *
- * @brief Parses XML parameters for \ref block_pickup_policy_config at the
+ * @brief Parses XML parameters for @ref block_pickup_policy_config at the
  * start of simulation.
  */
 class block_pickup_policy_parser : public rconfig::xml::xml_config_parser {

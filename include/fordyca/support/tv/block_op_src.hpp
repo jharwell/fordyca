@@ -34,6 +34,9 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
+/**
+ * @brief The different types of operations that can be perform on blocks.
+ */
 enum class block_op_src {
   ekFREE_PICKUP,
   ekNEST_DROP,

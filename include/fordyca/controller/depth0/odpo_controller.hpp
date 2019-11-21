@@ -41,7 +41,7 @@ NS_START(depth0);
  * @class odpo_controller
  * @ingroup fordyca controller depth0
  *
- * @brief A foraging controller derived from \ref dpo_controller that has
+ * @brief A foraging controller derived from @ref dpo_controller that has
  * perfect information about blocks in the arena.
  */
 class odpo_controller : public dpo_controller,

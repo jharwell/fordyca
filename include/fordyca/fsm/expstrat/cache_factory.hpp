@@ -36,6 +36,12 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class cache_factory
+ * @ingroup fsm expstrat
+ *
+ * @brief Factory for creating cache exploration strategies.
+ */
 class cache_factory :
     public rpfactory::releasing_factory<foraging_expstrat,
                                         const foraging_expstrat::params*,

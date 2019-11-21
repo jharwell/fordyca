@@ -46,7 +46,7 @@ NS_START(fordyca, config);
  * @ingroup fordyca config
  *
  * @brief Parses XML parameters relating to simulation output into
- * \ref output_config. This parser is used by both loop functions and robots,
+ * @ref output_config. This parser is used by both loop functions and robots,
  * and so its logic is slighly more complex in order to handle the needs of
  * both.
  */

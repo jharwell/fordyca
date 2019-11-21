@@ -50,8 +50,8 @@ NS_START(fordyca, support);
  *
  * Currently maps:
  *
- * - \ref repr::nest
- * - \ref repr::arena_cache
+ * - @ref repr::nest
+ * - @ref repr::arena_cache
  */
 
 class light_type_index {

@@ -56,7 +56,7 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
+/**
  * @class cached_block_pickup
  * @ingroup fordyca events detail
  *
@@ -107,7 +107,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   /**
    * @brief Perform actual cache block pickup in the arena.
    *
-   * Assumes caller is holding \ref arena_map cache mutex. Takes \ref arena_map
+   * Assumes caller is holding @ref arena_map cache mutex. Takes @ref arena_map
    * block mutex, and then releases it after cache updates.
    */
   void visit(ds::arena_map& map);

@@ -34,7 +34,15 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-enum class task_status { ekNull, ekRunning, ekAbortPending, ekAbortProcessed };
+/**
+ * @brief Enumeration to handle handshaking between robot task abort and arena.
+ */
+enum class task_status {
+  ekNULL,
+  ekRUNNING,
+  ekABORT_PENDING,
+  ekABORT_PROCESSED
+};
 
 NS_END(tasks, fordyca);
 

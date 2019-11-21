@@ -44,7 +44,7 @@ NS_START(fordyca, metrics, perception);
  * @class dpo_perception_metrics_collector
  * @ingroup fordyca metrics blocks
  *
- * @brief Collector for \ref dpo_perception_metrics.
+ * @brief Collector for @ref dpo_perception_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
@@ -70,7 +70,7 @@ class dpo_perception_metrics_collector final
   /**
    * @brief Container for holding collected statistics. Must be atomic so counts
    * are valid in parallel metric collection contexts. Ideally the densities
-   * would be atomic \ref rswarm::pheromone_density, but that type does not meet
+   * would be atomic @ref rswarm::pheromone_density, but that type does not meet
    * the std::atomic requirements.
    */
   struct stats {

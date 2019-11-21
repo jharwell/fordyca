@@ -42,7 +42,7 @@ NS_START(fordyca, metrics, caches);
  * @class site_selection_metrics_collector
  * @ingroup fordyca metrics caches
  *
- * @brief Collector for \ref site_selection_metrics.
+ * @brief Collector for @ref site_selection_metrics.
  *
  * Metrics are output at the specified interval.
  */

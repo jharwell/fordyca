@@ -39,6 +39,9 @@ NS_START(fordyca, config);
 /**
  * @struct block_priority_config
  * @ingroup fordyca config block_sel
+ *
+ * @brief Configuration for setting the block priorities of different block
+ * types.
  */
 struct block_priority_config final : public rconfig::base_config {
   double cube{-1.0};

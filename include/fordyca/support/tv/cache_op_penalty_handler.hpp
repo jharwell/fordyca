@@ -72,10 +72,10 @@ class cache_op_penalty_handler final
 
   /**
    * @brief Check if a robot has acquired a block or is in the nest, and is
-   * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
+   * trying to drop/pickup a block. If so, create a @ref temporal_penalty object
    * and associate it with the robot.
    *
-   * @param robot The robot to check.
+   * @param controller The robot to check.
    * @param src The penalty source (i.e. what event caused this penalty to be
    *            applied).
    * @param t The current timestep.

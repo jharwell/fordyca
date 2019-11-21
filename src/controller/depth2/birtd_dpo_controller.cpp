@@ -115,8 +115,8 @@ void birtd_dpo_controller::task_start_cb(const rta::polled_task* const task,
    * functions, resulting in inconsistent state with the robot's executive. See
    * #532,#587.
    */
-  if (tasks::task_status::ekAbortPending != task_status()) {
-    task_status_update(tasks::task_status::ekRunning);
+  if (tasks::task_status::ekABORT_PENDING != task_status()) {
+    task_status_update(tasks::task_status::ekRUNNING);
   }
 
   if (!m_bsel_exception_added) {

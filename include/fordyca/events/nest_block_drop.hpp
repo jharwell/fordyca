@@ -93,7 +93,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   /**
    * @brief Perform actual nest block drop in the arena.
    *
-   * Internally takes \ref arena_map block, grid mutexes to protect block
+   * Internally takes @ref arena_map block, grid mutexes to protect block
    * re-distribution and block updates, and releases afterwards. See #594.
    */
   void visit(ds::arena_map& map);

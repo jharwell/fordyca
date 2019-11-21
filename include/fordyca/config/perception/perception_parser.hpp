@@ -46,7 +46,7 @@ NS_START(fordyca, config, perception);
  * @ingroup fordyca config perception
  *
  * @brief Parses XML parameters for various perception subsystems into
- * \ref perception_config.
+ * @ref perception_config.
  */
 class perception_parser final : public rconfig::xml::xml_config_parser {
  public:

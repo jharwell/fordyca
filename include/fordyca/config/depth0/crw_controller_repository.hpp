@@ -39,7 +39,7 @@ NS_START(fordyca, config, depth0);
  * @ingroup fordyca config depth0
  *
  * @brief Collection of all parameter parsers and parse results needed by
- * \ref crw_controller.
+ * @ref crw_controller.
  */
 class crw_controller_repository: public base_controller_repository {
  public:

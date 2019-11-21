@@ -65,8 +65,8 @@ NS_START(depth1);
  * @ingroup fordyca controller depth1
  *
  * @brief A controller defining the task allocation space via BIfurcating Task
- * Decomposition (BITD) and spliting the \ref generalist task into the \ref
- * harvester, and \ref collector tasks, according to dynamic changes in the
+ * Decomposition (BITD) and spliting the @ref generalist task into the @ref
+ * harvester, and @ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks.
  *
  * Uses a DPO data store for tracking arena state and object relavance.
@@ -132,7 +132,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   /**
    * @brief Get whether or not a task has been aborted this timestep.
    *
-   * This functionality CANNOT use the abort state of the \ref current_task()
+   * This functionality CANNOT use the abort state of the @ref current_task()
    * because as soon as a task is aborted, the executive allocates a new task
    * the *same* timestep, and so when the loop functions check if a task has
    * been aborted, using the current task's abort status will always return
@@ -155,10 +155,10 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - Block selection matrix (\ref block_sel_matrix)
-   * - Cache selection matrix (\ref cache_sel_matrix)
-   * - Task executive (\ref rta::bi_tdgraph_executive)
-   * - DPO perception subsystem (\ref dpo_perception_subsystem)
+   * - Block selection matrix (@ref block_sel_matrix)
+   * - Cache selection matrix (@ref cache_sel_matrix)
+   * - Task executive (@ref rta::bi_tdgraph_executive)
+   * - DPO perception subsystem (@ref dpo_perception_subsystem)
    *
    * @param config_repo Handle to parameter repository for this controller
    *                   (after parsing and validation).
@@ -166,7 +166,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   void shared_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
   /*
-   * The \ref bitd_dpo_controller owns the executive, but derived classes can
+   * The @ref bitd_dpo_controller owns the executive, but derived classes can
    * access it and set it to whatever they want (strategy pattern). This is done
    * to reduce the amount of function overriding that would have to be performed
    * otherwise if derived controllers each had private executives.
@@ -175,7 +175,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
 
   /**
    * @brief Callback for task abort. Task argument unused for now--only need to
-   * know that a task WAS aborted. \see \ref task_aborted().
+   * know that a task WAS aborted. \see @ref task_aborted().
    */
   void task_abort_cb(const rta::polled_task*);
 
@@ -193,7 +193,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
 
   /* clang-format off */
   bool                                       m_display_task{false};
-  tasks::task_status                         m_task_status{tasks::task_status::ekNull};
+  tasks::task_status                         m_task_status{tasks::task_status::ekNULL};
   std::unique_ptr<class cache_sel_matrix>    m_cache_sel_matrix;
   std::unique_ptr<rta::bi_tdgraph_executive> m_executive;
   /* clang-format on */

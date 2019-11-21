@@ -180,14 +180,14 @@ void cached_block_pickup::visit(ds::arena_map& map) {
    * is not a cache.
    */
   if (m_real_cache->n_blocks() > base_cache::kMinBlocks) {
-    /* already holding cache mutex from \ref cached_block_pickup_interactor */
+    /* already holding cache mutex from @ref cached_block_pickup_interactor */
     visit(*m_real_cache);
 
     /*
      * Do not need to hold grid mutex because we know we are the only robot
      * picking up from the cache right now (though others can do it later) this
      * timestep, and caches by definition have a unique location, AND that it is
-     * not possible for another robot's \ref nest_block_drop to trigger a block
+     * not possible for another robot's @ref nest_block_drop to trigger a block
      * re-distribution to the cache host cell right now (re-distribution avoids
      * caches).
      */
@@ -209,14 +209,14 @@ void cached_block_pickup::visit(ds::arena_map& map) {
         rcppsw::to_string(m_real_cache->blocks()).c_str(),
         m_real_cache->n_blocks());
   } else {
-    /* Already holding cache mutex from \ref cached_block_pickup_interactor */
+    /* Already holding cache mutex from @ref cached_block_pickup_interactor */
     visit(*m_real_cache);
     m_orphan_block = m_real_cache->oldest_block();
     /*
      * Do not need to hold grid mutex because we know we are the only robot
      * picking up from the cache right now (though others can do it later) this
      * timestep, and caches by definition have a unique location, AND that it is
-     * not possible for another robot's \ref nest_block_drop to trigger a block
+     * not possible for another robot's @ref nest_block_drop to trigger a block
      * re-distribution to the cache host cell right now  (re-distribution avoids
      * caches).
      */
@@ -228,12 +228,12 @@ void cached_block_pickup::visit(ds::arena_map& map) {
               cell_op::y());
 
     /*
-     * Already holding cache mutex from \ref cached_block_pickup_interactor,
+     * Already holding cache mutex from @ref cached_block_pickup_interactor,
      * and grid mutex from above.
      */
     map.cache_extent_clear(m_real_cache);
 
-    /* Already holding cache mutex from \ref cached_block_pickup_interactor */
+    /* Already holding cache mutex from @ref cached_block_pickup_interactor */
     map.cache_remove(m_real_cache, m_loop);
 
     ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [depleted]",

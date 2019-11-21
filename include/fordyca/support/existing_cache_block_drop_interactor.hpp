@@ -46,7 +46,7 @@ NS_START(fordyca, support);
  * @class existing_cache_block_drop_interactor
  * @ingroup fordyca support
  *
- * @brief Handles a robot's (possible) \ref cache_block_drop event for existing
+ * @brief Handles a robot's (possible) @ref cache_block_drop event for existing
  * caches on a given timestep.
  */
 template <typename T>
@@ -114,10 +114,10 @@ class existing_cache_block_drop_interactor
      * section below. If two threads updating two robots both having finished
      * serving their penalty this timestep manage to pass the check to actually
      * perform the cache pickup before one of them actually finishes picking up
-     * a block, then the second one will not get the necessary \ref
+     * a block, then the second one will not get the necessary @ref
      * cache_vanished event. See #594.
      *
-     * Grid and block mutexes are also required, but only within the actual \ref
+     * Grid and block mutexes are also required, but only within the actual @ref
      * cached_block_pickup event visit to the arena map.
      */
     m_map->cache_mtx().lock();
@@ -129,7 +129,7 @@ class existing_cache_block_drop_interactor
      * not, depending on if the arena has decided to re-create the static cache
      * yet.
      *
-     * This results in a \ref cached_block_drop with a pointer to a cache that
+     * This results in a @ref cached_block_drop with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      *
      * Furthermore, it is also possible that while a robot is serving its pickup
@@ -183,7 +183,7 @@ class existing_cache_block_drop_interactor
      * 1. Arena map
      * 2. Controller
      *
-     * In order for proper \ref events::cache_block_drop processing.
+     * In order for proper @ref events::cache_block_drop processing.
      */
     drop_op.visit(*m_map);
     drop_op.visit(controller);

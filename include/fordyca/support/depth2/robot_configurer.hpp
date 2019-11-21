@@ -1,5 +1,5 @@
 /**
- * @file robot_configurer.hpp
+ * @file depth2/robot_configurer.hpp
  *
  * @copyright 2019 John Harwell, All rights reserved.
  *

@@ -40,6 +40,8 @@ NS_START(fordyca, config, tv);
 /**
  * @struct tv_manager_config
  * @ingroup fordyca config tv
+ *
+ * @brief Configuration for the @ref tv_manager.
  */
 struct tv_manager_config final : public rconfig::base_config {
   ctv::config::swarm_irv_manager_config irv{};

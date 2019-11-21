@@ -81,7 +81,7 @@ class random_distributor final : public rer::client<random_distributor>,
    * @param block The block to distribute.
    * @param entities Entities that need to be avoided during distribution.
    *
-   * @note Holding \ref arena_map block, grid mutexes necessary to safely call
+   * @note Holding @ref arena_map block, grid mutexes necessary to safely call
    * this function in multithreaded contexts (not handled internally).
    *
    * @return \c TRUE if the distribution was successful, \c FALSE otherwise.

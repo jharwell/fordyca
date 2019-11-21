@@ -53,8 +53,8 @@ NS_START(fsm, depth1);
  * it knows about. Once it has done that it will signal that its task is
  * complete.
  *
- * This FSM takes \ref config::exploration_config as an argument because it
- * needs to be able to use the \ref expstrat::factory to create exploration
+ * This FSM takes @ref config::exploration_config as an argument because it
+ * needs to be able to use the @ref expstrat::factory to create exploration
  * strategies for BOTH blocks and caches, and so you can't cleanly pass the
  * result of factory creation at a higher level into the constructor, like you
  * can with other FSMs.

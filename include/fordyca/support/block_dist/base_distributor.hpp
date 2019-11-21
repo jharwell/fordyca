@@ -58,7 +58,7 @@ class base_distributor {
   explicit base_distributor(rmath::rng* rng) : m_rng(rng) {}
   virtual ~base_distributor(void) = default;
 
-  /* Needed for use in \ref multi_cluster_distributor */
+  /* Needed for use in @ref multi_cluster_distributor */
   base_distributor(const base_distributor&) = default;
   base_distributor& operator=(const base_distributor&) = delete;
 
@@ -78,13 +78,13 @@ class base_distributor {
                                 ds::const_entity_list& entities) = 0;
 
   /**
-   * @brief Return a read-only list of \ref block_clusters for capacity checking
+   * @brief Return a read-only list of @ref block_clusters for capacity checking
    * by external classes.
    */
   virtual ds::block_cluster_vector block_clusters(void) const = 0;
 
   /**
-   * @brief Calls \ref distribute_block on each block.
+   * @brief Calls @ref distribute_block on each block.
    *
    * @return \c TRUE iff all block distributions were successful, \c FALSE
    * otherwise.

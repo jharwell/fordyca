@@ -90,8 +90,11 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * location will cause it to overlap with other caches, and so corrections may
    * be necessary.
    *
-   * @param cache_i_blocks The list of blocks to create a new cache from.
-   * @param existing_caches Vector of existing caches in the arena.
+   * @param c_cache_i_blocks The list of blocks to create a new cache from.
+   * @param c_existing_caches Vector of existing caches in the arena.
+   * @param c_clusters Vector of block clusters in the area.
+   * @param rng RNG to use duration cache center calculation (guess and check if
+   *            initial computed location does not work).
    *
    * @return Coordinates of the new cache, if any were found.
    */
@@ -120,7 +123,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * boundaries if the current one does.
    *
    * This function is provided for derived classes to use when they implement
-   * \ref create_all().
+   * @ref create_all().
    *
    * @param center The tentative location of the cache. It is an integer
    *               location, but it is a *REAL* location (i.e. not

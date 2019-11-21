@@ -307,7 +307,7 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * errors that can result are transient and are corrected the next
    * timestep. See #577.
    */
-  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
+  if (interactor_status::ekNO_EVENT != status && nullptr != oracle_manager()) {
     oracle_manager()->update(arena_map());
   }
 

@@ -39,7 +39,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
+/**
  * @class cache_vanished
  * @ingroup fordyca events detail
  *

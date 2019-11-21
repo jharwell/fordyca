@@ -36,6 +36,12 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_factory
+ * @ingroup fsm expstrat
+ *
+ * @brief Factory for creating block exploration strategies.
+ */
 class block_factory :
     public rpfactory::releasing_factory<expstrat::foraging_expstrat,
                                         const expstrat::foraging_expstrat::params*,

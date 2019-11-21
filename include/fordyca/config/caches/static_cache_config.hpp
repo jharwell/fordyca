@@ -39,6 +39,8 @@ NS_START(fordyca, config, caches);
 /**
  * @struct static_cache_config
  * @ingroup fordyca config caches
+ *
+ * @brief Configuration for static caches in the arena for the loop functions.
  */
 struct static_cache_config final : public rconfig::base_config {
   bool                enable{false};

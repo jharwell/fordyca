@@ -9,5 +9,8 @@
 # $2 - How many cores to use when building
 #
 cd $1/fordyca/build
-cmake -DWITH_FOOTBOT_BATTERY=NO -DWITH_FOOTBOT_RAB=NO -DWITH_FOOTBOT_LEDS=NO -DCMAKE_BUILD_TYPE=OPT -DLIBRA_ER=NONE -DBUILD_FOR_MSI=YES  ..
+cmake -DCMAKE_BUILD_TYPE=OPT\
+      -DLIBRA_ER=NONE\
+      -DLIBRA_BUILD_FOR=MSI\
+      ..
 make -j $2

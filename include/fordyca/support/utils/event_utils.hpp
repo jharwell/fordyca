@@ -66,7 +66,7 @@ struct proximity_status_t {
  * @brief Check if a robot is on top of a block. If, so return the block index.
  *
  * @param controller The robot to check.
- * @param map \ref arena_map reference.
+ * @param map @ref arena_map reference.
  *
  * @note Holding the arena map block mutex necessary in multi-threaded contexts;
  *       this is *NOT* handled internally by this function.
@@ -79,8 +79,8 @@ int robot_on_block(const controller::base_controller& controller,
 /**
  * @brief Check if a robot is on top of a cache. If, so return the cache index.
  *
- * @param robot The robot to check.
- * @param map \ref arena_map reference.
+ * @param controller The robot to check.
+ * @param map @ref arena_map reference.
  *
  * @note Holding the arena map cache mutex necessary in multi-threaded contexts;
  *       this is *NOT* handled internally by this function.

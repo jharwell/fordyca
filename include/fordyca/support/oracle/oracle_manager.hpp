@@ -54,8 +54,8 @@ class tasking_oracle;
  *
  * @brief Thin wrapper around the following oracles:
  *
- * - \ref tasking_oracle
- * - \ref entities_oracle
+ * - @ref tasking_oracle
+ * - @ref entities_oracle
  */
 class oracle_manager {
  public:
@@ -71,7 +71,7 @@ class oracle_manager {
   }
 
   /**
-   * @brief Because the \ref tasking_oracle requires more than just the \ref
+   * @brief Because the @ref tasking_oracle requires more than just the @ref
    * tasking_oracle_config to construct, it is null-constructed by default, and
    * the loop functions are responsible for actually creating it.
    */

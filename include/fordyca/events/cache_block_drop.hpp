@@ -115,7 +115,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
    * @param cache Cache to drop into (owned by arena).
    * @param resolution Arena resolution.
    *
-   * If you use this constructor, only \ref arena_map visitation functions are
+   * If you use this constructor, only @ref arena_map visitation functions are
    * valid.
    */
   cache_block_drop(const std::shared_ptr<repr::base_block>& robot_block,
@@ -131,7 +131,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   /**
    * @brief Perform actual cache block drop in the arena.
    *
-   * Assumes \ref arena_map cache mutex held by the caller. Takes \ref arena_map
+   * Assumes @ref arena_map cache mutex held by the caller. Takes @ref arena_map
    * block mutex to perform block updates and releases afterwards.
    */
   void visit(ds::arena_map& map);

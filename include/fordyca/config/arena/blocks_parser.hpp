@@ -45,7 +45,7 @@ NS_START(fordyca, config, arena);
  * @class blocks_parser
  * @ingroup fordyca config arena
  *
- * @brief Parses XML parameters related to blocks in the arena into \ref
+ * @brief Parses XML parameters related to blocks in the arena into @ref
  * blocks_config.
  */
 class blocks_parser : public rconfig::xml::xml_config_parser {

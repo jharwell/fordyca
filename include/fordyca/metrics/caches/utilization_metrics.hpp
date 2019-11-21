@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
+#include "rcppsw/rcppsw.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +51,7 @@ class utilization_metrics : virtual public rmetrics::base_metrics {
 
   /**
    * @brief Get the # of blocks currently in the cache (independent of any
-   * calls to \ref reset_metrics()).
+   * calls to @ref reset_metrics()).
    */
   virtual size_t n_blocks(void) const = 0;
 

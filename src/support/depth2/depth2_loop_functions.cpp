@@ -385,8 +385,8 @@ void depth2_loop_functions::robot_post_step1(argos::CFootBotEntity& robot) {
   auto status =
       boost::apply_visitor(iadaptor,
                            m_interactor_map->at(controller->type_index()));
-  if (interactor_status::ekNoEvent != status) {
-    if (interactor_status::ekNewCacheBlockDrop & status) {
+  if (interactor_status::ekNO_EVENT != status) {
+    if (interactor_status::ekNEW_CACHE_BLOCK_DROP & status) {
       bool ret = cache_creation_handle(true);
       if (!ret) {
         ER_WARN("Unable to create cache after block drop in new cache");

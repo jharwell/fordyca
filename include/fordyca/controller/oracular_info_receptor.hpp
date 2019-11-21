@@ -73,7 +73,7 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
   oracular_info_receptor& operator=(const oracular_info_receptor& s) = delete;
 
   /**
-   * @brief Update the \ref dpo_store with the current set of oracular entities.
+   * @brief Update the @ref dpo_store with the current set of oracular entities.
    *
    * Unlike the tasking oracle part of the plugin, which processes updates
    * whenever we change tasks (complete/abort), we need to synchronously
@@ -90,13 +90,13 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
 
  private:
   /**
-   * @brief Uses the \ref support::tasking_oracle to update the execution time
+   * @brief Uses the @ref support::tasking_oracle to update the execution time
    * estimate for the task that was just aborted.
    */
   void task_abort_cb(rta::polled_task* task);
 
   /**
-   * @brief Uses the \ref support::tasking_oracle to update the execution time
+   * @brief Uses the @ref support::tasking_oracle to update the execution time
    * estimate for the task that was just finished.
    */
   void task_finish_cb(rta::polled_task* task);

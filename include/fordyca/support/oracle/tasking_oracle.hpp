@@ -76,8 +76,8 @@ class tasking_oracle final : public rer::client<tasking_oracle> {
    *
    * @param query The question to ask. Currently supports:
    *
-   * exec_est.<task name>
-   * interface_est.<task name>
+   * exec_est.\<task name\>
+   * interface_est.\<task name\>
    *
    * @return The answer to the query. Empty answer if query was ill-formed.
    */

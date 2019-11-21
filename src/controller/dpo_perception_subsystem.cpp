@@ -224,7 +224,7 @@ void dpo_perception_subsystem::los_tracking_sync(
    *
    * This logic does NOT handle cases where the tracked block is in our LOS, but
    * has moved since we last saw it (since that is limited to at most a single
-   * block, it is handled by the \ref block_found event).
+   * block, it is handled by the @ref block_found event).
    */
   auto range = m_store->blocks().const_values_range();
   auto it = range.begin();

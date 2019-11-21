@@ -47,6 +47,11 @@ struct cache_sel_matrix_config;
 }} // namespace config::cache_sel
 NS_START(controller);
 
+/**
+ * @brief @ref boost::variant containing all the different object/POD types that
+ * are mapped to within the @ref cache_sel_matrix; multiple entries in the
+ * matrix can have the same type.
+ */
 using cache_sel_variant =
     boost::variant<rtypes::spatial_dist,
                    rmath::vector2d,

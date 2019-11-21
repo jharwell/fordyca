@@ -42,7 +42,7 @@ NS_START(fordyca, config, oracle);
  * @class entities_oracle_parser
  * @ingroup fordyca config oracle
  *
- * @brief Parses XML parameters used for the \ref entities_oracle at the start
+ * @brief Parses XML parameters used for the @ref entities_oracle at the start
  * of simulation.
  */
 class entities_oracle_parser : public rconfig::xml::xml_config_parser {

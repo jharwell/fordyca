@@ -45,7 +45,7 @@ NS_START(fordyca, tasks, depth0);
  *
  * It is decomposable into two subtasks that result in the same net change to
  * the arena state when run in sequence (possibly by two different robots):
- * \ref collector and \ref forager. It is not abortable at task interfaces,
+ * @ref collector and @ref harvester. It is not abortable at task interfaces,
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */

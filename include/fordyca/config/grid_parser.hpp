@@ -45,7 +45,7 @@ NS_START(fordyca, config);
  * @ingroup fordyca config
  *
  * @brief Parses XML parameters for various 2D grid structures into
- * \ref grid_config.
+ * @ref grid_config.
  */
 
 class grid_parser : public rconfig::xml::xml_config_parser {

@@ -42,7 +42,7 @@ NS_START(fordyca, config, cache_sel);
  * @class cache_pickup_policy_parser
  * @ingroup fordyca config
  *
- * @brief Parses XML parameters for \ref cache_pickup_policy_config at the
+ * @brief Parses XML parameters for @ref cache_pickup_policy_config at the
  * start of simulation.
  */
 class cache_pickup_policy_parser : public rconfig::xml::xml_config_parser {

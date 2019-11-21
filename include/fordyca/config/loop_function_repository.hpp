@@ -38,6 +38,12 @@ NS_START(fordyca, config);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class loop_function_repository
+ * @ingroup config
+ *
+ * @brief Collection of all XML parsers used common to all loop functions.
+ */
 class loop_function_repository : public rconfig::xml::xml_config_repository {
  public:
   loop_function_repository(void) noexcept;

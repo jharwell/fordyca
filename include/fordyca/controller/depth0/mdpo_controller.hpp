@@ -52,7 +52,7 @@ NS_START(depth0);
  *   object, etc.)
  * - Models/tracks the seen objects in the environment.
  *
- * It shares the underlying FSM with the \ref dpo_controller so that the metrics
+ * It shares the underlying FSM with the @ref dpo_controller so that the metrics
  * collection functions can be reused.
  */
 class mdpo_controller : public dpo_controller,
@@ -73,8 +73,8 @@ class mdpo_controller : public dpo_controller,
    * @brief Initialization that derived classes may also need to perform, if the
    * want to use any of the following parts of this class's functionality as-is:
    *
-   * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
-   * - Block selection matrix (\ref block_sel_matrix)
+   * - MDPO perception subsystem (@ref mdpo_perception_subsystem)
+   * - Block selection matrix (@ref block_sel_matrix)
    */
   void shared_init(const config::depth0::mdpo_controller_repository& config_repo) RCSW_COLD;
 
@@ -84,7 +84,7 @@ class mdpo_controller : public dpo_controller,
    *
    * - DPO FSM
    *
-   * Called after \ref shared_init() in \ref Init().
+   * Called after @ref shared_init() in @ref Init().
    */
   void private_init(const config::depth0::mdpo_controller_repository& config_repo) RCSW_COLD;
 };

@@ -43,8 +43,8 @@ NS_START(fordyca, config, arena);
  * @class powerlaw_dist_parser
  * @ingroup fordyca config arena
  *
- * @brief Parses XML parameters for related to \ref powerlaw_distributor
- * objects into \ref powerlaw_dist_config.
+ * @brief Parses XML parameters for related to @ref powerlaw_distributor
+ * objects into @ref powerlaw_dist_config.
  */
 class powerlaw_dist_parser final : public rconfig::xml::xml_config_parser {
  public:

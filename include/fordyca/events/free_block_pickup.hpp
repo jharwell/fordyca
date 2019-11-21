@@ -89,8 +89,8 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   /**
    * @brief Perform actual block pickup in the arena.
    *
-   * Takes \ref arena_map grid mutex to protect block re-distribution and block
-   * updates. \ref arena_map block mutex assumed to be held when calling this
+   * Takes @ref arena_map grid mutex to protect block re-distribution and block
+   * updates. @ref arena_map block mutex assumed to be held when calling this
    * function.
    */
   void visit(ds::arena_map& map);

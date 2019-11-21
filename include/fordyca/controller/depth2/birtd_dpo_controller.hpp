@@ -46,9 +46,9 @@ NS_START(controller, depth2);
  * @ingroup fordyca controller depth2
  *
  * @brief A controller defining the task allocation space via BIfurcating
- * Recursive Task Decomposition (BIRTD) and spliting the \ref generalist task
- * into the \ref harvester, and \ref collector tasks, and then each of the \ref
- * harvest and \ref collector tasks into two subtasks as well, according to
+ * Recursive Task Decomposition (BIRTD) and spliting the @ref generalist task
+ * into the @ref harvester, and @ref collector tasks, and then each of the @ref
+ * harvester and @ref collector tasks into two subtasks as well, according to
  * dynamic changes in the environment and/or execution/interface times of the
  * tasks.
  *
@@ -76,7 +76,7 @@ class birtd_dpo_controller : public depth1::bitd_dpo_controller,
   /* clang-format off */
   /**
    * @brief \c TRUE if the controller's most recently completed task involved
-   * the dropping of a free block (i.e. culminated in a \ref free_block_drop).
+   * the dropping of a free block (i.e. culminated in a @ref free_block_drop).
    * Needed so that if the robot's next task requires picking up a free block
    * that the robot does not pick up the same block it just dropped.
    */

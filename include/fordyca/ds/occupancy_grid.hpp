@@ -44,6 +44,11 @@ struct perception_config;
 }} // namespace config::perception
 
 NS_START(ds);
+
+/**
+ * @brief The types of layers used by @ref occupancy_grid (i.e. a heterogeneous
+ * 3D grid).
+ */
 using robot_layer_stack = std::tuple<crepr::pheromone_density, cell2D>;
 
 /*******************************************************************************
@@ -61,12 +66,12 @@ class occupancy_grid : public rer::client<occupancy_grid>,
                        public rds::stacked_grid<robot_layer_stack> {
  public:
   /**
-   * @brief The index of the \ref crepr::pheromone_density layer.
+   * @brief The index of the @ref crepr::pheromone_density layer.
    */
   static constexpr uint kPheromone = 0;
 
   /**
-   * @brief The index of the \ref cell2D layer.
+   * @brief The index of the @ref cell2D layer.
    */
   static constexpr uint kCell = 1;
 

@@ -92,7 +92,7 @@ void dpo_controller::control_step(void) {
 
 void dpo_controller::init(ticpp::Element& node) {
   /*
-   * Note that we do not call \ref crw_controller::init()--there
+   * Note that we do not call @ref crw_controller::init()--there
    * is nothing in there that we need.
    */
   base_controller::init(node);

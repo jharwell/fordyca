@@ -50,7 +50,7 @@ NS_START(fordyca, support);
  * @class cached_block_pickup_interactor
  * @ingroup fordyca support
  *
- * @brief Handles a robot's (possible) \ref cached_block_pickup event on a given
+ * @brief Handles a robot's (possible) @ref cached_block_pickup event on a given
  * timestep.
  */
 template <typename T>
@@ -88,9 +88,9 @@ class cached_block_pickup_interactor
    * @brief The actual handling function for interactions.
    *
    * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestepp.
+   * @param t   The current timestepp.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         return finish_cached_block_pickup(controller, t);
@@ -100,7 +100,7 @@ class cached_block_pickup_interactor
                                       tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
                                       t);
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
@@ -129,10 +129,10 @@ class cached_block_pickup_interactor
      * section below. If two threads updating two robots both having finished
      * serving their penalty this timestep manage to pass the check to actually
      * perform the block pickup before one of them actually finishes picking up
-     * a block, then the second one will not get the necessary \ref
+     * a block, then the second one will not get the necessary @ref
      * cache_vanished event. See #594.
      *
-     * Grid and block mutexes are also required, but only within the actual \ref
+     * Grid and block mutexes are also required, but only within the actual @ref
      * cached_block_pickup event visit to the arena map.
      */
     m_map->cache_mtx().lock();
@@ -144,7 +144,7 @@ class cached_block_pickup_interactor
      * not, depending on if the arena has decided to re-create the static cache
      * yet (for depth 1 simulations).
      *
-     * This results in a \ref cached_block_pickup with a pointer to a cache that
+     * This results in a @ref cached_block_pickup with a pointer to a cache that
      * has already been destructed, and a segfault. See #247.
      *
      * Furthermore, it is also possible that while a robot is serving its pickup
@@ -155,7 +155,7 @@ class cached_block_pickup_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    auto status = interactor_status::ekNoEvent;
+    auto status = interactor_status::ekNO_EVENT;
     if (p.id() != utils::robot_on_cache(controller, *m_map)) {
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
@@ -232,9 +232,9 @@ class cached_block_pickup_interactor
     pickup_op.visit(controller);
 
     if (m_map->caches().size() < old_n_caches) {
-      return interactor_status::ekCacheDepletion;
+      return interactor_status::ekCACHE_DEPLETION;
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:

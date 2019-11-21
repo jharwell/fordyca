@@ -61,7 +61,7 @@ NS_START(metrics);
  * @ingroup fordyca metrics
  *
  * @brief Base class for aggregating collection of metrics for various
- * sources. Extends \ref rmetrics::collector_group to include
+ * sources. Extends @ref rmetrics::collector_group to include
  * initialization bits to make loop functions simpler/clearer.
  */
 class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
@@ -79,7 +79,7 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
   void collect_from_block(const repr::base_block* block);
 
   /**
-   * @brief Collect metrics from \ref base_controller.
+   * @brief Collect metrics from @ref base_controller.
    */
   void collect_from_controller(const controller::base_controller* controller);
 

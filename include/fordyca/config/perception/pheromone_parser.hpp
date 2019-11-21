@@ -44,7 +44,7 @@ NS_START(fordyca, config, perception);
  * @ingroup fordyca config perception
  *
  * @brief Parses XML parameters relating to pheromones into
- * \ref pheromone_config.
+ * @ref pheromone_config.
  */
 class pheromone_parser : public rconfig::xml::xml_config_parser {
  public:

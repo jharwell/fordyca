@@ -73,15 +73,26 @@ class collector_registerer : public rer::client<collector_registerer> {
    * - The name of the collector in the input src (e.g. the XML attribute name)
    *
    * - The scoped name of the collector that will be used to refer to the
-   * created collector during simulation
+   *   created collector during simulation.
    */
   using set_value_type = std::tuple<std::type_index, std::string, std::string>;
 
+  /**
+   * @brief Comparator for @ref set_value_type objects within the @ref
+   * creatable_set.
+   */
   struct set_comparator {
     bool operator()(const set_value_type& lhs, const set_value_type& rhs) const {
       return std::get<0>(lhs) < std::get<0>(rhs);
     }
   };
+
+  /**
+   * @brief Set of @ref set_value_types in which duplicates are allowed, because
+   * when we compare elements, we only use the typeid as the key, which can be
+   * the same between collectors, even if the other parts of each element are
+   * different.
+   */
   using creatable_set = std::multiset<set_value_type, set_comparator>;
 
   /**
@@ -92,7 +103,7 @@ class collector_registerer : public rer::client<collector_registerer> {
       std::is_constructible<T, const std::string&, uint>;
 
   /**
-   * @brief Some metrics collectors (e.g. \ref
+   * @brief Some metrics collectors (e.g. @ref
    * temporal_variance_metrics_collector) do not require the collection interval
    * argument to their constructor, as they MUST be gathered every timestep,
    * regardless of configuration.
@@ -102,7 +113,7 @@ class collector_registerer : public rer::client<collector_registerer> {
       std::is_constructible<T, const std::string&>;
 
   /**
-   * @brief Some metrics collectors (e.g. \ref collision_locs_metrics_collector)
+   * @brief Some metrics collectors (e.g. @ref collision_locs_metrics_collector)
    * require the arena dimensions as an argument to their constructor.
    */
   template <typename T>
@@ -110,7 +121,7 @@ class collector_registerer : public rer::client<collector_registerer> {
       std::is_constructible<T, const std::string&, uint, const rmath::vector2u&>;
 
   /**
-   * @brief Some metrics collectors (e.g. \ref bi_tdgraph_metrics_collector)
+   * @brief Some metrics collectors (e.g. @ref bi_tdgraph_metrics_collector)
    * require an additional integer as an argument to their constructor.
    */
   template <typename T>
@@ -126,6 +137,8 @@ class collector_registerer : public rer::client<collector_registerer> {
    * @param agg The metrics aggregator to register the collectors with.
    *
    * @param create_set Definitions for all the possible collectors to create.
+   * @param decomposition_depth The height of the complete binary tree formed by
+   *                           the task decomposition graph.
    *
    * Both of the maps are necessary to provide an input src agnostic means of
    * mapping collectors to run-time categories, so that this class is general

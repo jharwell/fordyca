@@ -201,7 +201,7 @@ void arena_map::cache_extent_clear(
   /*
    * To reset all cells covered by the cache's extent, we simply send them a
    * CELL_EMPTY event. EXCEPT for the cell that hosted the actual cache, because
-   * it is currently in the HAS_BLOCK state as part of a \ref cached_block_pickup,
+   * it is currently in the HAS_BLOCK state as part of a @ref cached_block_pickup,
    * and clearing it here will trigger an assert later.
    */
   auto xmin = static_cast<uint>(std::ceil(xspan.lb() / grid_resolution().v()));

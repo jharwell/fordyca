@@ -75,10 +75,10 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * @brief The actual handling function for the interactions.
    *
    * @param controller The controller to handle interactions for.
-   * @param timestep The current timestep.
+   * @param t The current timestep.
    */
   template<typename C = T>
-  interactor_status operator()(C& controller, rtypes::timestep t) {
+  interactor_status operator()(C& controller, const rtypes::timestep& t) {
     if (controller.is_carrying_block()) {
       return m_nest_drop_interactor(controller, t);
     } else { /* The foot-bot has no block item */

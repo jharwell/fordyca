@@ -151,8 +151,8 @@ class dpo_controller : public crw_controller,
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - DPO perception subsystem (\ref dpo_perception_subsystem)
-   * - Block selection matrix (\ref block_sel_matrix)
+   * - DPO perception subsystem (@ref dpo_perception_subsystem)
+   * - Block selection matrix (@ref block_sel_matrix)
    */
   void shared_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 
@@ -163,9 +163,9 @@ class dpo_controller : public crw_controller,
    * - FSM used to execute foraging. Note that this is NOT included as part of
    *   the shared initialization, because it requires a reference to a
    *   perception subsystem, and derived classes can override the copy
-   *   instantiated in \ref shared_init if they wish.
+   *   instantiated in @ref shared_init if they wish.
    *
-   * This is called after \ref shared_init() during \ref Init().xo
+   * This is called after @ref shared_init() during @ref Init().xo
    */
   void private_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 

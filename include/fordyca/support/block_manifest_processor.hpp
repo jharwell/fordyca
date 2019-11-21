@@ -44,6 +44,14 @@ NS_START(support);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * @class block_manifest_processor
+ * @ingroup support
+ *
+ * @brief Translates the parsed XML configuration for how many/what type of
+ * blocks should be used in simulation into a heterogeneous vector of actual
+ * blocks.
+ */
 class block_manifest_processor
     : public rpfactory::
           sharing_factory<repr::base_block, const rmath::vector2d&, int> {

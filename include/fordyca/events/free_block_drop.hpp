@@ -91,7 +91,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
 
   /**
    * @param block The block to drop, which is already part of the vector owned
-   *              by the \ref arena_map.
+   *              by the @ref arena_map.
    * @param coord The discrete coordinates of the cell to drop the block in.
    * @param resolution The resolution of the arena map.
    * @param cache_lock Is locking needed around arena map cache accesses, or is
@@ -115,8 +115,8 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   /**
    * @brief Perform actual free block drop in the arena.
    *
-   * Assumes caller holds \ref arena_map grid and block mutexes. May lock \ref
-   * arena_map cache mutex, depending on configuration. If it does lock \ref
+   * Assumes caller holds @ref arena_map grid and block mutexes. May lock @ref
+   * arena_map cache mutex, depending on configuration. If it does lock @ref
    * arena_map cache mutex, it releases it after use. See #594.
    */
   void visit(ds::arena_map& map);

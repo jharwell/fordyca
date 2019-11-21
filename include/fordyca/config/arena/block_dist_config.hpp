@@ -41,6 +41,9 @@ NS_START(fordyca, config, arena);
 /**
  * @struct block_dist_config
  * @ingroup fordyca config arena
+ *
+ * @brief Configuration for block distribution in the arena by the loop
+ * functions.
  */
 struct block_dist_config final : public rconfig::base_config {
   block_manifest manifest{};

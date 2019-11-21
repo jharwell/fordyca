@@ -39,6 +39,9 @@ NS_START(fordyca, config);
 /**
  * @struct visualization_config
  * @ingroup fordyca config
+ *
+ * @brief Configuration for the extended ARGoS visualizations possible within
+ * FORDYCA.
  */
 struct visualization_config final : public rconfig::base_config {
   bool robot_id{false};

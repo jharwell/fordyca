@@ -46,8 +46,8 @@ NS_START(fordyca, controller);
  * @struct dpo_store_updater
  * @ingroup fordyca controller
  *
- * @brief Updates the \ref dpo_store with a single (possibly new) entity from
- * the list of entities we have been handed by the \ref entities_oracle.
+ * @brief Updates the @ref dpo_store with a single (possibly new) entity from
+ * the list of entities we have been handed by the @ref entities_oracle.
  */
 struct dpo_store_updater {
   explicit dpo_store_updater(ds::dpo_store* const s) : store(s) {}

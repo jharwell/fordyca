@@ -63,7 +63,7 @@ class collector : public foraging_task,
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
-   * because when visiting a \ref existing_cache_interactor, you have no way to
+   * because when visiting a @ref existing_cache_interactor, you have no way to
    * way which task the object ACTUALLY is without using a set of if()
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.

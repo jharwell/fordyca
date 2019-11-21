@@ -185,13 +185,29 @@ double __cache_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
                                void *data) RCSW_PURE;
 
+/**
+ * @brief Implements the block nearness constraint for cache site selection, as
+ * described in @todo paper ref. Cannot be a member function because of how
+ * NLopt works, apparently.
+ */
 double __block_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
                                void *data) RCSW_PURE;
+
+/**
+ * @brief Implements the nest nearness constraint for cache site selection, as
+ * described in @todo paper ref. Cannot be a member function because of how
+ * NLopt works, apparently.
+ */
 double __nest_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
                                void *data) RCSW_PURE;
 
+/**
+ * @brief Implements the cache site utility function cache site selection, as
+ * described in @todo paper ref. Cannot be a member function because of how
+ * NLopt works, apparently.
+ */
 double __site_utility_func(const std::vector<double>& x,
                            std::vector<double>& ,
                            void *data) RCSW_PURE;

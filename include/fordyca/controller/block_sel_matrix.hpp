@@ -43,6 +43,11 @@ struct block_sel_matrix_config;
 }} // namespace config::block_sel
 NS_START(controller);
 
+/**
+ * @brief @ref boost::variant containing all the different object/POD types that
+ * are mapped to within the @ref block_sel_matrix; multiple entries in the
+ * matrix can have the same type.
+ */
 using block_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
@@ -60,11 +65,7 @@ using block_sel_variant =
  * functions to calculate the best:
  *
  * - block (of whatever type)
- *
- * This class may be separated into those components in the future if it makes
- * sense.
  */
-
 class block_sel_matrix : public std::map<std::string, block_sel_variant> {
  public:
   static constexpr char kNestLoc[] = "nest_loc";

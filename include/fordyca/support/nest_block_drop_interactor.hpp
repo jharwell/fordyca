@@ -48,7 +48,7 @@ NS_START(fordyca, support);
  * @class nest_block_drop_interactor
  * @ingroup fordyca support
  *
- * @brief Handle's a robot's (possible) \ref nest_block_drop event on a given
+ * @brief Handle's a robot's (possible) @ref nest_block_drop event on a given
  * timestep.
  */
 template <typename T>
@@ -84,26 +84,26 @@ class nest_block_drop_interactor
    * interaction.
    *
    * @param controller The controller to handle interactions for.
-   * @param timestep The current timestep.
+   * @param t The current timestep.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_nest_block_drop(controller, t);
-        return interactor_status::ekNestBlockDrop;
+        return interactor_status::ekNEST_BLOCK_DROP;
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::block_op_src::ekNEST_DROP,
                                       t);
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
   /**
    * @brief Determine if a robot is waiting to drop a block in the nest, and if
-   * so send it the \ref nest_block_drop event.
+   * so send it the @ref nest_block_drop event.
    */
   void finish_nest_block_drop(T& controller, rtypes::timestep t) {
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
@@ -152,7 +152,7 @@ class nest_block_drop_interactor
      * 1. Arena map
      * 2. Controller
      *
-     * In order for \ref events::nest_block_drop to process properly.
+     * In order for @ref events::nest_block_drop to process properly.
      */
     /* Update arena map state due to a block nest drop */
     drop_op.visit(*m_map);

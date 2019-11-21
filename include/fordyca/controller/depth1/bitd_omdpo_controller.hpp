@@ -41,7 +41,7 @@ NS_START(depth1);
  * @class bitd_omdpo_controller
  * @ingroup fordyca controller depth1
  *
- * @brief A foraging controller built on \ref bitd_mdpo_controller
+ * @brief A foraging controller built on @ref bitd_mdpo_controller
  * that has perfect information about on or more of the following, depending on
  * configuration:
  *

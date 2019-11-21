@@ -58,8 +58,8 @@ NS_START(ds);
  *
  * Contains:
  *
- * - A mapped extent divided into identical cells (\ref occupancy_grid).
- * - A set of objects in that extent (\ref dpo_store).
+ * - A mapped extent divided into identical cells (@ref occupancy_grid).
+ * - A set of objects in that extent (@ref dpo_store).
  *
  * Does *NOT* track which cells are in CACHE_EXTENT, as that is irrelevant for
  * what the robots need (as of 9/14/18 anyway).

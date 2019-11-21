@@ -42,7 +42,7 @@ NS_START(fordyca, metrics, caches);
  * @class lifecycle_metrics_collector
  * @ingroup fordyca metrics caches
  *
- * @brief Collector for \ref lifecycle_metrics.
+ * @brief Collector for @ref lifecycle_metrics.
  *
  * Metrics are output at the specified interval.
  */

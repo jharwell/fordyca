@@ -46,7 +46,7 @@ NS_START(fordyca, config);
  * @ingroup fordyca config
  *
  * @brief Parses XML parameters related to metric collection into
- * \ref metrics_config.
+ * @ref metrics_config.
  */
 class metrics_parser final : public rconfig::xml::xml_config_parser {
  public:

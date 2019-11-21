@@ -41,16 +41,16 @@ NS_START(depth1);
  * @ingroup fordyca controller depth1
  *
  * @brief A controller defining the task allocation space via BIfurcating Task
- * Decomposition (BITD) and spliting the \ref generalist task into the \ref
- * harvester, and \ref collector tasks, according to dynamic changes in the
+ * Decomposition (BITD) and spliting the @ref generalist task into the @ref
+ * harvester, and @ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks.
  *
  * Uses a Mapped DPO (MDPO) data store for tracking arena state and object
  * relavance.
  *
- * Note that this class does not inherit from \ref depth0::mdpo_controller,
+ * Note that this class does not inherit from @ref depth0::mdpo_controller,
  * because that would mean duplicating all of the executive setup
- * logic/callbacks that are also present in the \ref depth1::bitd_dpo_controller.
+ * logic/callbacks that are also present in the @ref depth1::bitd_dpo_controller.
  * Cleaner to do it this way.
  */
 class bitd_mdpo_controller : public depth1::bitd_dpo_controller,
@@ -73,10 +73,10 @@ class bitd_mdpo_controller : public depth1::bitd_dpo_controller,
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - Block selection matrix (\ref block_sol_matrix)
-   * - Cache selection matrix (\ref cache_sel_matrix)
-   * - Task executive (\ref rta::bi_tdgraph_executive)
-   * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
+   * - Block selection matrix (@ref block_sel_matrix)
+   * - Cache selection matrix (@ref cache_sel_matrix)
+   * - Task executive (@ref rta::bi_tdgraph_executive)
+   * - MDPO perception subsystem (@ref mdpo_perception_subsystem)
    *
    * @param config_repo Handle to parameter repository for this controller
    *                   (after parsing and validation).

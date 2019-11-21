@@ -274,7 +274,7 @@ std::vector<double> base_loop_functions::calc_robot_nn(
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
-    auto pts = ralg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
+    auto pts = ralg::closest_pair2D<rmath::vector2d>()("recursive", v, dist_func);
     size_t old = v.size();
 #pragma omp critical
     {

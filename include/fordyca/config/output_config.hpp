@@ -41,6 +41,8 @@ NS_START(fordyca, config);
 /**
  * @struct output_config
  * @ingroup fordyca config
+ *
+ * @brief Configuration for robot/loop function logging/metrics.
  */
 struct output_config final : public rconfig::base_config {
   std::string output_root{};

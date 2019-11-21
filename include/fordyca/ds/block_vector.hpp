@@ -43,11 +43,21 @@ using block_vector_type = std::shared_ptr<repr::base_block>;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
+/**
+ * @class block_vector
+ * @ingroup ds
+ *
+ * @brief Specialization of @ref std::vector with an additional @ref to_str()
+ * method.
+ */
 class block_vector : public std::vector<block_vector_type> {
  public:
   using std::vector<block_vector_type>::vector;
   using value_type = std::vector<block_vector_type>::value_type;
 
+  /**
+   * @brief Get a string representation of the vector contents.
+   */
   std::string to_str(void) const;
 };
 

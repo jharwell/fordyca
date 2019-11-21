@@ -43,7 +43,7 @@ NS_START(fordyca, ds);
  * @ingroup fordyca ds
  *
  * @brief The Decaying Pheromone Object (DPO) map stores objects in the arena
- * SEPARATELY from the \ref arena_map where they actually live (clone not
+ * SEPARATELY from the @ref arena_map where they actually live (clone not
  * reference), which decouples/simplifies a lot of the tricky handshaking logic
  * when robots interact with the arena.
  */

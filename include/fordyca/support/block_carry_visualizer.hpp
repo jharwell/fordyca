@@ -71,6 +71,7 @@ class block_carry_visualizer : public rer::client<block_carry_visualizer> {
    * - The block ID
    *
    * @param block The block to draw.
+   * @param id_len Length of the robot ID string.
    */
   void draw(const repr::base_block* block, uint id_len);
 

@@ -92,12 +92,12 @@ class base_block : public unicell_movable_entity,
   bool operator==(const base_block& other) const = delete;
 
   /**
-   * @brief Compare two \ref base_block objects for equality based on their ID.
+   * @brief Compare two @ref base_block objects for equality based on their ID.
    */
   bool idcmp(const base_block& other) const { return this->id() == other.id(); }
 
   /**
-   * @brief Compare two \ref base_block objects for equality based on their
+   * @brief Compare two @ref base_block objects for equality based on their
    * discrete location.
    */
   bool dloccmp(const base_block& other) const {
@@ -129,14 +129,14 @@ class base_block : public unicell_movable_entity,
    * @brief Set the time that the base_block is picked up for the first time
    * after being distributed in the arena.
    *
-   * @param time The current simulation time.
+   * @param t The current simulation time.
    */
   void first_pickup_time(const rtypes::timestep& t);
 
   /**
    * @brief Set the time that the base_block dropped in the nest.
    *
-   * @param time The current simulation time.
+   * @param t The current simulation time.
    */
   void nest_drop_time(const rtypes::timestep& t) { m_nest_drop_time = t; }
 
@@ -172,8 +172,8 @@ class base_block : public unicell_movable_entity,
 
  protected:
   /**
-   * @brief Provided to derived classes implementing \ref clone() so that they
-   * can correctly clone block metadata/metrics.
+   * @brief Provided to derived classes implementing @ref clonable::clone() so
+   * that they can correctly clone block metadata/metrics.
    */
   void copy_metrics(const base_block& other) {
     this->m_transporters = other.m_transporters;
@@ -185,8 +185,8 @@ class base_block : public unicell_movable_entity,
 
  private:
   /**
-   * @brief Change the block's location to sometnnnhing outside the visitable space
-   * in the arena when it is being carried by robot.
+   * @brief Change the block's location to sometnnnhing outside the visitable
+   * space in the arena when it is being carried by robot.
    */
   void move_out_of_sight(void);
 

@@ -122,7 +122,7 @@ class powerlaw_distributor final : public rer::client<powerlaw_distributor>,
 
   /**
    * @brief Perform a "guess and check" cluster placement until you get a
-   * distribution without overlap, or \ref kMAX_DIST_TRIES is exceeded,
+   * distribution without overlap, or @ref kMAX_DIST_TRIES is exceeded,
    * whichever happens first.
    *
    * Cluster sizes are drawn from the internally stored power law distribution.

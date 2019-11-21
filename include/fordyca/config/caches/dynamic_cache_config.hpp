@@ -41,6 +41,9 @@ NS_START(fordyca, config, caches);
 /**
  * @struct dynamic_cache_config
  * @ingroup fordyca config cache
+ *
+ * @brief Configuration for dynamic caches within the arena for the loop
+ * functions.
  */
 struct dynamic_cache_config final : public rconfig::base_config {
   bool   enable{false};
@@ -48,7 +51,7 @@ struct dynamic_cache_config final : public rconfig::base_config {
   /**
    * @brief How close do blocks have to be to each other to be considered for
    * dynamic cache creation (should be >= whatever the threshold value for the
-   * \ref cache_sel_matrix is, or weird behavior will likely result).
+   * @ref cache_sel_matrix is, or weird behavior will likely result).
    */
   rtypes::spatial_dist min_dist{0.0};
 

@@ -34,7 +34,22 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-enum class block_type { ekCUBE, ekRAMP };
+/**
+ * @brief The different types of blocks available in simulation. This
+ * enumeration is used to eliminate the need to include the actual block type
+ * header files everywhere
+ */
+enum class block_type {
+  /**
+   * @brief A simple cubical block, AxA.
+   */
+  ekCUBE,
+
+  /**
+   * @brief A ramp block of dimension AxB, where A = 2B (shaped like a doorstop).
+   */
+  ekRAMP
+};
 
 NS_END(repr, fordyca);
 

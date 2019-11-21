@@ -189,7 +189,7 @@ class arena_map final : public rer::client<arena_map>,
    * While the robots also have their own means of checking if they are on a
    * block or not, there are some false positives, so this function is used as
    * the final arbiter when deciding whether or not to trigger a given event
-   * (such as \ref free_block_pickup) for a particular robot.
+   * (such as @ref free_block_pickup) for a particular robot.
    *
    * @param pos The position of a robot.
    *
@@ -206,7 +206,7 @@ class arena_map final : public rer::client<arena_map>,
    * While the robots also have their own means of checking if they are on a
    * cache or not, there are some false positives, so this function is used as
    * the final arbiter when deciding whether or not to trigger a cache related
-   * event for a particular robot (such as \ref cached_block_pickup).
+   * event for a particular robot (such as @ref cached_block_pickup).
    *
    * @param pos The position of a robot.
    *

@@ -48,7 +48,7 @@ NS_START(fordyca, config, arena);
  * @ingroup fordyca config arena
  *
  * @brief Parses XML parameters related to block distribution
- * into \ref block_dist_config.
+ * into @ref block_dist_config.
  */
 class block_dist_parser : public rconfig::xml::xml_config_parser {
  public:

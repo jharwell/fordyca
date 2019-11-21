@@ -99,7 +99,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
   map.grid_mtx().unlock();
 
   /*
-   * Already holding block mutex from \ref free_block_pickup_interactor, though
+   * Already holding block mutex from @ref free_block_pickup_interactor, though
    * it is not necessary for block visitation for this event.
    */
   visit(*m_block);

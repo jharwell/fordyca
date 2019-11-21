@@ -87,7 +87,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
    */
   bool operator()(T& controller, const penalty_handler_list& penalty_handlers) {
     if (nullptr == controller.current_task() ||
-        tasks::task_status::ekAbortPending != controller.task_status()) {
+        tasks::task_status::ekABORT_PENDING != controller.task_status()) {
       return false;
     }
     RCSW_UNUSED auto polled =
@@ -145,7 +145,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
     /*
      * If the robot is currently right on the edge of the nest, we can't just
      * drop the block in the nest, as it will not be processed as a normal
-     * \ref block_nest_drop, and will be discoverable by a robot via LOS but
+     * @ref block_nest_drop, and will be discoverable by a robot via LOS but
      * not able to be acquired, as its color is hidden by that of the nest.
      *
      * If the robot is really close to a wall, then dropping a block may make

@@ -42,7 +42,7 @@ NS_START(fordyca, tasks);
  * @class vector_argument
  * @ingroup fordyca tasks
  *
- * @brief An argument that can be passed to a \ref
+ * @brief An argument that can be passed to a @ref
  * rta::taskable function which contains a vector, mostly
  * likely representing an arena location.
  */
@@ -64,7 +64,7 @@ class vector_argument : public rta::taskable_argument {
  * @class foraging_signal_argument
  * @ingroup fordyca tasks
  *
- * @brief An argument that can be passed to a \ref
+ * @brief An argument that can be passed to a @ref
  * rta::taskable::task_start() function which contains a
  * foraging signal, for use in specifying initial conditions/commands for
  * certain state machines.

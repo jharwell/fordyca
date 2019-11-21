@@ -42,7 +42,7 @@ NS_START(fordyca, metrics, caches);
  * @class location_metrics_collector
  * @ingroup fordyca metrics caches
  *
- * @brief Collector for \ref location_metrics.
+ * @brief Collector for @ref location_metrics.
  */
 class location_metrics_collector final :
     public rmetrics::spatial::grid2D_avg_metrics_collector {

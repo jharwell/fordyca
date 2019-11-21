@@ -60,10 +60,10 @@ struct swarm_iterator {
    *
    * @tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TOrdering @ref static_order or @ref dynamic_order.
    * @tparam TFunction Type of the lambda callback to use (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
+   * @param lf Handle to the @ref base_loop_functions.
    * @param cb Function to run on each robot in the swarm.
    * @param entity_name Name associated with the robot type within ARGoS.
    */
@@ -89,10 +89,10 @@ struct swarm_iterator {
    *
    * @tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TOrdering @ref static_order or @ref dynamic_order.
    * @tparam TFunction Type of the lambda callback (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
+   * @param lf Handle to the @ref base_loop_functions.
    * @param cb Function to run on each robot in the swarm.
    * @param entity_name Name associated with the robot type within ARGoS.
    */
@@ -125,10 +125,10 @@ struct swarm_iterator {
    *
    * @tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TOrdering @ref static_order or @ref dynamic_order.
    * @tparam TFunction Type of the lambda callback (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
+   * @param lf Handle to the @ref base_loop_functions.
    * @param cb Function to run on each robot in the swarm.
    * @param entity_name Name associated with the robot type within ARGoS.
    */
@@ -152,10 +152,10 @@ struct swarm_iterator {
    *
    * @tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
+   * @tparam TOrdering @ref static_order or @ref dynamic_order.
    * @tparam TFunction Type of the lambda callback (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
+   * @param lf Handle to the @ref base_loop_functions.
    * @param cb Function to run on each robot in the swarm.
    * @param entity_name Name associated with the robot type within ARGoS.
    */

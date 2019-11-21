@@ -41,9 +41,9 @@ NS_START(depth2);
  * @ingroup fordyca controller depth2
  *
  * @brief A controller defining the task allocation space via BIfurcating
- * Recursive Task Decomposition (BIRTD) and spliting the \ref generalist task
- * into the \ref harvester, and \ref collector tasks, and then each of the \ref
- * harvest and \ref collector tasks into two subtasks as well, according to
+ * Recursive Task Decomposition (BIRTD) and spliting the @ref generalist task
+ * into the @ref harvester, and @ref collector tasks, and then each of the @ref
+ * harvester and @ref collector tasks into two subtasks as well, according to
  * dynamic changes in the environment and/or execution/interface times of the
  * tasks.
  *

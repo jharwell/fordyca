@@ -45,7 +45,7 @@ NS_START(controller);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class loc_proc_verify
+ * @class los_proc_verify
  * @ingroup fordyca controller
  *
  * @brief Verifies that a LOS has been processed properly and that the contents

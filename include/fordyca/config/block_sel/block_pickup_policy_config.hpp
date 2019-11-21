@@ -36,6 +36,12 @@ NS_START(fordyca, config, block_sel);
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
+/**
+ * @struct block_pickup_policy_config
+ * @ingroup config block_sel
+ *
+ * @brief Configuration for robot block pickup policies.
+ */
 struct block_pickup_policy_config final : public rconfig::base_config {
   std::string policy{};
   double      prox_dist{0};

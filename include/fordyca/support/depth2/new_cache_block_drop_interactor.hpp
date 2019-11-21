@@ -46,7 +46,7 @@ NS_START(fordyca, support, depth2);
  * @class new_cache_block_drop_interactor
  * @ingroup fordyca support depth2
  *
- * @brief Handles a robot's (possible) \ref free_block_drop event at a new cache
+ * @brief Handles a robot's (possible) @ref free_block_drop event at a new cache
  * on a given timestep.
  */
 template <typename T>
@@ -81,11 +81,11 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    * @brief The actual handling function for interactions.
    *
    * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
+   * @param t   The current timestep.
    *
    * @return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         return finish_new_cache_block_drop(controller);
@@ -112,7 +112,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
         cache_proximity_notify(controller, prox_status);
       }
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
@@ -188,13 +188,13 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                 status.entity_id);
       events::cache_proximity_visitor prox_op(*it);
       prox_op.visit(controller);
-      return interactor_status::ekNoEvent;
+      return interactor_status::ekNO_EVENT;
     } else {
       perform_new_cache_block_drop(controller, p);
       m_penalty_handler->penalty_remove(p);
       ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
-      return interactor_status::ekNewCacheBlockDrop;
+      return interactor_status::ekNEW_CACHE_BLOCK_DROP;
     }
   }
 

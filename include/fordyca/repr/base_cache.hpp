@@ -97,12 +97,12 @@ class base_cache : public unicell_immovable_entity,
   bool operator==(const base_cache& other) const = delete;
 
   /**
-   * @brief Compare two \ref base_cache objects for equality based on their ID.
+   * @brief Compare two @ref base_cache objects for equality based on their ID.
    */
   bool idcmp(const base_cache& other) const { return this->id() == other.id(); }
 
   /**
-   * @brief Compare two \ref base_cache objects for equality based on their
+   * @brief Compare two @ref base_cache objects for equality based on their
    * discrete location.
    */
   bool dloccmp(const base_cache& other) const {

@@ -44,8 +44,8 @@ NS_START(fordyca, fsm, expstrat);
  * @ingroup fordyca fsm expstrat
  *
  * @brief An exploration behavior in which robots vector to a specific location,
- * then begin correlated random walk exploration there via \ref crw. Falls back
- * to vanilla \ref crw if a specific location is not given during at task start.
+ * then begin correlated random walk exploration there via @ref crw. Falls back
+ * to vanilla @ref crw if a specific location is not given during at task start.
  */
 class localized_search : public foraging_expstrat,
                          public rer::client<localized_search> {

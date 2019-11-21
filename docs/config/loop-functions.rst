@@ -631,7 +631,7 @@ XML configuration:
    </arena_map>
 
 ``arena_map/blocks/distribution``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+"""""""""""""""""""""""""""""""""
 
 - Required by: all.
 - Required child attributes if present: ``dist_type``.
@@ -805,7 +805,6 @@ XML configuration:
        center="X, Y"/>
        ...
    </arena_map>
-
 
 - ``size`` - The size of the nest. Must be specified in a tuple like so:
   ``0.5, 0.5``. Note the space--parsing does not work if it is omitted.

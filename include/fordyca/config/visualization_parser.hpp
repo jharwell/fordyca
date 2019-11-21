@@ -45,7 +45,7 @@ NS_START(fordyca, config);
  * @ingroup fordyca config
  *
  * @brief Parses XML parameters relating to visualization in loop functions into
- * \ref visualization_config.
+ * @ref visualization_config.
  */
 class visualization_parser final : public rconfig::xml::xml_config_parser {
  public:

@@ -45,7 +45,7 @@ NS_START(fordyca, config, caches);
  * @class caches_parser
  * @ingroup fordyca config caches
  *
- * @brief Parses XML parameters for relating to cache into \ref caches_config.
+ * @brief Parses XML parameters for relating to cache into @ref caches_config.
  */
 class caches_parser final: public rconfig::xml::xml_config_parser {
  public:

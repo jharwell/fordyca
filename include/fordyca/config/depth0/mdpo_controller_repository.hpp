@@ -39,7 +39,7 @@ NS_START(fordyca, config, depth0);
  * @ingroup fordyca config depth0
  *
  * @brief Collection of all parameter parsers and parse results needed by
- * \ref mdpo_controller.
+ * @ref mdpo_controller.
  */
 class mdpo_controller_repository: public dpo_controller_repository {
  public:

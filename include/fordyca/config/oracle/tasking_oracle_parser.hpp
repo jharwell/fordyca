@@ -42,7 +42,7 @@ NS_START(fordyca, config, oracle);
  * @class tasking_oracle_parser
  * @ingroup fordyca config oracle
  *
- * @brief Parses XML parameters used for \ref tasking_oracle at the start of
+ * @brief Parses XML parameters used for @ref tasking_oracle at the start of
  * simulation.
  */
 class tasking_oracle_parser : public rconfig::xml::xml_config_parser {

@@ -88,7 +88,7 @@ class oracle_manager;
  * This class is not a functional set of loop functions, but it provides
  * functions needed across multiple derived classes, but functionality that
  * could not just be free functions because they require access to members in
- * the \ref argos::CLoopFunctions class.
+ * the @ref argos::CLoopFunctions class.
  */
 class base_loop_functions : public argos::CLoopFunctions,
                             public rer::client<base_loop_functions> {
@@ -170,7 +170,7 @@ class base_loop_functions : public argos::CLoopFunctions,
   /**
    * @brief Initialize oracular information injection.
    *
-   * @param oraclep Parsed \ref oracle_manager parameters.
+   * @param oraclep Parsed @ref oracle_manager parameters.
    */
   void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
 

@@ -3,7 +3,7 @@
  * @ingroup fordyca support utils
  *
  * Helpers for loop functions that CAN be free functions, as they do not require
- * access to anything in \ref argos::CLoopFunctions.
+ * access to anything in @ref argos::CLoopFunctions.
  *
  * @copyright 2018 John Harwell, All rights reserved.
  *

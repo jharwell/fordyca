@@ -36,6 +36,9 @@
  ******************************************************************************/
 NS_START(fordyca, ds);
 
+/**
+ * @brief The types of layers used by @ref arena_grid.
+ */
 using arena_layer_stack = std::tuple<cell2D>;
 
 /*******************************************************************************
@@ -45,7 +48,7 @@ using arena_layer_stack = std::tuple<cell2D>;
  * @class arena_grid
  * @ingroup fordyca ds
  *
- * @brief 2D grid of \ref cell2D objects containing the state of the geometrical
+ * @brief 2D grid of @ref cell2D objects containing the state of the geometrical
  * extent of the arena floor.
  */
 class arena_grid : public rds::stacked_grid<arena_layer_stack> {

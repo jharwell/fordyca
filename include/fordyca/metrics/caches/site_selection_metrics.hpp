@@ -61,7 +61,7 @@ class site_selection_metrics : public virtual rmetrics::base_metrics {
    * @brief Return \c TRUE iff the cache site selection algorithm was
    * successful.
    *
-   * The result of this function is undefined if \ref site_select_exec() did
+   * The result of this function is undefined if @ref site_select_exec() did
    * not return \c TRUE.
    */
   virtual bool site_select_success(void) const = 0;
@@ -70,7 +70,7 @@ class site_selection_metrics : public virtual rmetrics::base_metrics {
    * @brief If the robot successfully selected a cache site, return the nlopt
    * code that led to successful selection.
    *
-   * The result of this function is undefined if \ref site_selected() did not
+   * The result of this function is undefined if @ref site_select_exec() did not
    * return \c TRUE.
    */
   virtual nlopt::result nlopt_result(void) const = 0;

@@ -172,7 +172,7 @@ class temporal_penalty_handler
   }
 
   /**
-   * @brief Determine if a robot has satisfied the \ref temporal_penalty
+   * @brief Determine if a robot has satisfied the @ref temporal_penalty
    * it is currently serving yet.
    *
    * @param controller The robot to check. If the robot is not currently serving

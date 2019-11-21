@@ -43,7 +43,7 @@ NS_START(fordyca, metrics, blocks);
  * @class manipulation_metrics_collector
  * @ingroup fordyca metrics blocks
  *
- * @brief Collector for \ref manipulation_metrics.
+ * @brief Collector for @ref manipulation_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
@@ -63,7 +63,7 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
   /**
    * @brief Container for holding collected statistics. Must be atomic so counts
    * are valid in parallel metric collection contexts. Ideally the penalties
-   * would be atomic \ref rtypes::timestep, but that type does not meet the
+   * would be atomic @ref rtypes::timestep, but that type does not meet the
    * std::atomic requirements.
    */
   struct stats {
