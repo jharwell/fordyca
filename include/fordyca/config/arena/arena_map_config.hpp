@@ -1,7 +1,7 @@
 /**
- * @file arena_map_config.hpp
+ * \file arena_map_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,8 +38,8 @@ NS_START(fordyca, config, arena);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct arena_map_config
- * @ingroup fordyca config arena
+ * \struct arena_map_config
+ * \ingroup fordyca config arena
  */
 struct arena_map_config final : public rconfig::base_config {
   struct grid_config grid {};

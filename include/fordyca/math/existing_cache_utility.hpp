@@ -1,7 +1,7 @@
 /**
- * @file existing_cache_utility.hpp
+ * \file existing_cache_utility.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, math);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class existing_cache_utility
- * @ingroup fordyca math
+ * \class existing_cache_utility
+ * \ingroup fordyca math
  *
- * @brief Calculates the utility associated with an existing cache that the
+ * \brief Calculates the utility associated with an existing cache that the
  * robot knows about.
  *
  * Depends on:

@@ -1,7 +1,7 @@
 /**
- * @file dynamic_cache_manager.cpp
+ * \file dynamic_cache_manager.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -106,7 +106,7 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
 
   if (to_use.size() < mc_cache_config.dynamic.min_blocks) {
     /*
-     * @todo Cannot use std::accumulate for these, because that doesn't work
+     * \todo Cannot use std::accumulate for these, because that doesn't work
      * with C++14/gcc7 when you are accumulating into a different type
      * (e.g. from a set of blocks into an int).
      */

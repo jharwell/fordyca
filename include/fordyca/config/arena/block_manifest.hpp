@@ -1,7 +1,7 @@
 /**
- * @file block_manifest.hpp
+ * \file block_manifest.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,10 +36,10 @@ NS_START(fordyca, config, arena);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct block_manifest
- * @ingroup fordyca config arena
+ * \struct block_manifest
+ * \ingroup fordyca config arena
  *
- * @brief Params of what types of blocks and how many of each should be
+ * \brief Params of what types of blocks and how many of each should be
  * created, as well as size and other characteristics.
  */
 struct block_manifest final : public rconfig::base_config {
@@ -47,7 +47,7 @@ struct block_manifest final : public rconfig::base_config {
   uint n_ramp{0};  /// # ramp blocks to distribute in arena
 
   /**
-   * @brief Size in meters of the unit dimension for blocks. Cube blocks are 1x1
+   * \brief Size in meters of the unit dimension for blocks. Cube blocks are 1x1
    * in this dimension, and ramp blocks are 2x1.
    */
   double unit_dim{0.0};

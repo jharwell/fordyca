@@ -1,7 +1,7 @@
 /**
- * @file cache_site_block_drop_interactor.hpp
+ * \file cache_site_block_drop_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(fordyca, support, depth2);
  * Classes
  ******************************************************************************/
 /**
- * @class cache_site_block_drop_interactor
- * @ingroup fordyca support depth2
+ * \class cache_site_block_drop_interactor
+ * \ingroup fordyca support depth2
  *
- * @brief Handles a robot's (possible) \ref free_block_drop event at a cache
+ * \brief Handles a robot's (possible) \ref free_block_drop event at a cache
  * site on a given timestep.
  */
 template <typename T>
@@ -66,10 +66,10 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
             tv::block_op_src::ekCACHE_SITE_DROP)) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -80,12 +80,12 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
       const cache_site_block_drop_interactor& other) = delete;
 
   /**
-   * @brief The actual handling function for interactions.
+   * \brief The actual handling function for interactions.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
+   * \param controller The controller to handle interactions for.
+   * \param  t  The current timestep.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     /*
      * If the controller was serving a penalty and has not finished yet, nothing
      * to do. If the controller was serving a penalty AND has satisfied it as of
@@ -94,9 +94,9 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_cache_site_block_drop(controller);
-        return interactor_status::ekFreeBlockDrop;
+        return interactor_status::ekFREE_BLOCK_DROP;
       }
-      return interactor_status::ekNoEvent;
+      return interactor_status::ekNO_EVENT;
     }
 
     /*
@@ -119,7 +119,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                 "No cache too close with CacheProximity return status");
       cache_proximity_notify(controller, prox_status);
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
@@ -146,7 +146,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
   }
 
   /**
-   * @brief Handles handshaking between cache, robot, and arena if the robot is
+   * \brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache site and is looking to drop an object on it.
    */
   void finish_cache_site_block_drop(T& controller) {
@@ -165,7 +165,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
   }
 
   /**
-   * @brief Perform the actual dropping of a block in the cache once all
+   * \brief Perform the actual dropping of a block in the cache once all
    * preconditions have been satisfied.
    */
   void perform_cache_site_block_drop(T& controller,

@@ -1,7 +1,7 @@
 /**
- * @file block_acquisition_validator.cpp
+ * \file block_acquisition_validator.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

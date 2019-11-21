@@ -1,7 +1,7 @@
 /**
- * @file metrics_parser.hpp
+ * \file metrics_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, config);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class metrics_parser
- * @ingroup fordyca config
+ * \class metrics_parser
+ * \ingroup fordyca config
  *
- * @brief Parses XML parameters related to metric collection into
+ * \brief Parses XML parameters related to metric collection into
  * \ref metrics_config.
  */
 class metrics_parser final : public rconfig::xml::xml_config_parser {
@@ -53,14 +53,14 @@ class metrics_parser final : public rconfig::xml::xml_config_parser {
   using config_type = metrics_config;
 
   /**
-   * @brief The XML attributes specifying supported metric collectors.
+   * \brief The XML attributes specifying supported metric collectors.
    */
   static const std::list<std::string> xml_attr;
 
   ~metrics_parser(void) override = default;
 
   /**
-   * @brief The root tag that all loop functions relating to metrics parameters
+   * \brief The root tag that all loop functions relating to metrics parameters
    * should lie under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "metrics";

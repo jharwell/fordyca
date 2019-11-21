@@ -1,7 +1,7 @@
 /**
- * @file visualization_parser.hpp
+ * \file visualization_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, config);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class visualization_parser
- * @ingroup fordyca config
+ * \class visualization_parser
+ * \ingroup fordyca config
  *
- * @brief Parses XML parameters relating to visualization in loop functions into
+ * \brief Parses XML parameters relating to visualization in loop functions into
  * \ref visualization_config.
  */
 class visualization_parser final : public rconfig::xml::xml_config_parser {
@@ -52,7 +52,7 @@ class visualization_parser final : public rconfig::xml::xml_config_parser {
   using config_type = visualization_config;
 
   /**
-   * @brief The root tag that all visualization loop functions parameters should
+   * \brief The root tag that all visualization loop functions parameters should
    * lie under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "visualization";

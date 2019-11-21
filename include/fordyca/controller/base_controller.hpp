@@ -1,7 +1,7 @@
 /**
- * @file base_controller.hpp
+ * \file base_controller.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -69,10 +69,10 @@ class base_perception_subsystem;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_controller
- * @ingroup fordyca controller
+ * \class base_controller
+ * \ingroup fordyca controller
  *
- * @brief The base controller foraging class that all FORDYCA controllers derive
+ * \brief The base controller foraging class that all FORDYCA controllers derive
  * from. It holds all functionality common to all controllers, as well that some
  * that is stubbed out here, but overridden in derived classes which allows this
  * class to be used as the robot controller handle when rendering QT graphics
@@ -98,7 +98,7 @@ class base_controller : public ccontroller::base_controller2D,
   void irv_init(const ctv::swarm_irv_manager* irv_manager) override final;
 
   /**
-   * @brief By default controllers have no perception subsystem, and are
+   * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
   virtual const base_perception_subsystem* perception(void) const {
@@ -106,43 +106,43 @@ class base_controller : public ccontroller::base_controller2D,
   }
 
   /**
-   * @brief By default controllers have no perception subsystem, and are
+   * \brief By default controllers have no perception subsystem, and are
    * basically blind centipedes.
    */
   virtual base_perception_subsystem* perception(void) { return nullptr; }
 
   /**
-   * @brief If \c TRUE, the robot is currently at least most of the way in the
+   * \brief If \c TRUE, the robot is currently at least most of the way in the
    * nest, as reported by the sensors.
    */
   bool in_nest(void) const;
 
   /**
-   * @brief Return if the robot is currently carrying a block.
+   * \brief Return if the robot is currently carrying a block.
    */
   bool is_carrying_block(void) const { return nullptr != m_block; }
 
   /**
-   * @brief Return the block robot is carrying, or NULL if the robot is not
+   * \brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
   const repr::base_block* block(void) const { return m_block.get(); }
   repr::base_block* block(void) { return m_block.get(); }
 
   /**
-   * @brief Release the held block as part of a drop operation.
+   * \brief Release the held block as part of a drop operation.
    */
   std::unique_ptr<repr::base_block> block_release(void);
 
   /**
-   * @brief Set the block that the robot is carrying. We use a unique_ptr to
+   * \brief Set the block that the robot is carrying. We use a unique_ptr to
    * convey that the robot owns the block it picks up from a C++ point of
    * view. In actuality it gets a clone of the block in the arena map.
    */
   void block(std::unique_ptr<repr::base_block> block);
 
   /**
-   * @brief If \c TRUE, then the robot thinks that it is on top of a block.
+   * \brief If \c TRUE, then the robot thinks that it is on top of a block.
    *
    * On rare occasions this may be a false positive, which is why it is also
    * checked in the loop functions before passing any events to the

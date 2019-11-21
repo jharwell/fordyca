@@ -1,7 +1,7 @@
 /**
- * @file tv_manager_parser.cpp
+ * \file tv_manager_parser.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -52,8 +52,9 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
     }
     if (nullptr != bnode.FirstChild("carry_throttle", false)) {
       m_block_carry.parse(node_get(bnode, "carry_throttle"));
-      auto config = m_block_carry
-                    .config_get<rct::config::xml::waveform_parser::config_type>();
+      auto config =
+          m_block_carry
+              .config_get<rct::config::xml::waveform_parser::config_type>();
       m_config->irv.motion_throttle = *config;
     }
   }

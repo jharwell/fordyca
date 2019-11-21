@@ -1,7 +1,7 @@
 /**
- * @file cache_sel_matrix_config.hpp
+ * \file cache_sel_matrix_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, config, cache_sel);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct cache_sel_matrix_config
- * @ingroup fordyca config cache_sel
+ * \struct cache_sel_matrix_config
+ * \ingroup fordyca config cache_sel
  *
- * @brief XML parameters for the \ref cache_sel_matrix
+ * \brief XML parameters for the \ref cache_sel_matrix
  */
 struct cache_sel_matrix_config final : public rconfig::base_config {
   rtypes::spatial_dist         cache_prox_dist{0.0};

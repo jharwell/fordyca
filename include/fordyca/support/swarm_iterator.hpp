@@ -1,7 +1,7 @@
 /**
- * @file swarm_iterator.hpp
+ * \file swarm_iterator.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,8 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "rcppsw/common/common.hpp"
 
@@ -41,10 +41,10 @@ NS_START(fordyca, support);
  * Struct Definitions
  ******************************************************************************/
 /**
- * @struct swarm_iterator
- * @ingroup fordyca support
+ * \struct swarm_iterator
+ * \ingroup fordyca support
  *
- * @brief Iterate over the swarm (robots or controllers), and perform an action
+ * \brief Iterate over the swarm (robots or controllers), and perform an action
  * within the ARGoS simulator.
  *
  * The selected action can be specified to be performed in static order
@@ -56,16 +56,16 @@ struct swarm_iterator {
   using dynamic_order = std::false_type;
 
   /**
-   * @brief Iterate through controllers using static ordering.
+   * \brief Iterate through controllers using static ordering.
    *
-   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   * \tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
-   * @tparam TFunction Type of the lambda callback to use (inferred).
+   * \tparam TOrdering \ref static_order or \ref dynamic_order.
+   * \tparam TFunction Type of the lambda callback to use (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
-   * @param cb Function to run on each robot in the swarm.
-   * @param entity_name Name associated with the robot type within ARGoS.
+   * \param lf Handle to the \ref base_loop_functions.
+   * \param cb Function to run on each robot in the swarm.
+   * \param entity_name Name associated with the robot type within ARGoS.
    */
   template <typename TRobotType,
             typename TOrdering,
@@ -84,17 +84,17 @@ struct swarm_iterator {
   }
 
   /**
-   * @brief Iterate through robots using dynamic ordering (OpenMP
+   * \brief Iterate through robots using dynamic ordering (OpenMP
    * implementation).
    *
-   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   * \tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
-   * @tparam TFunction Type of the lambda callback (inferred).
+   * \tparam TOrdering \ref static_order or \ref dynamic_order.
+   * \tparam TFunction Type of the lambda callback (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
-   * @param cb Function to run on each robot in the swarm.
-   * @param entity_name Name associated with the robot type within ARGoS.
+   * \param lf Handle to the \ref base_loop_functions.
+   * \param cb Function to run on each robot in the swarm.
+   * \param entity_name Name associated with the robot type within ARGoS.
    */
   template <typename TRobotType,
             typename TOrdering,
@@ -121,16 +121,16 @@ struct swarm_iterator {
   }
 
   /**
-   * @brief Iterate through robots using static ordering.
+   * \brief Iterate through robots using static ordering.
    *
-   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   * \tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
-   * @tparam TFunction Type of the lambda callback (inferred).
+   * \tparam TOrdering \ref static_order or \ref dynamic_order.
+   * \tparam TFunction Type of the lambda callback (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
-   * @param cb Function to run on each robot in the swarm.
-   * @param entity_name Name associated with the robot type within ARGoS.
+   * \param lf Handle to the \ref base_loop_functions.
+   * \param cb Function to run on each robot in the swarm.
+   * \param entity_name Name associated with the robot type within ARGoS.
    */
   template <typename TRobotType,
             typename TOrdering,
@@ -147,17 +147,17 @@ struct swarm_iterator {
   }
 
   /**
-   * @brief Iterate through robots using dynamic ordering (OpenMP
+   * \brief Iterate through robots using dynamic ordering (OpenMP
    * implementation).
    *
-   * @tparam TRobotType The type of the robot within the ::argos namespace of
+   * \tparam TRobotType The type of the robot within the ::argos namespace of
    *                    the robots in the swarm.
-   * @tparam TOrdering \ref static_order or \ref dynamic_order.
-   * @tparam TFunction Type of the lambda callback (inferred).
+   * \tparam TOrdering \ref static_order or \ref dynamic_order.
+   * \tparam TFunction Type of the lambda callback (inferred).
    *
-   * @param lf Handle to the \ref base_loop_functions.
-   * @param cb Function to run on each robot in the swarm.
-   * @param entity_name Name associated with the robot type within ARGoS.
+   * \param lf Handle to the \ref base_loop_functions.
+   * \param cb Function to run on each robot in the swarm.
+   * \param entity_name Name associated with the robot type within ARGoS.
    */
   template <typename TRobotType,
             typename TOrdering,

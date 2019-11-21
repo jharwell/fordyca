@@ -1,7 +1,7 @@
 /**
- * @file line_of_sight.cpp
+ * \file line_of_sight.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

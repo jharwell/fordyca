@@ -1,7 +1,7 @@
 /**
- * @file bitd_odpo_controller.hpp
+ * \file bitd_odpo_controller.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class bitd_odpo_controller
- * @ingroup fordyca controller depth1
+ * \class bitd_odpo_controller
+ * \ingroup fordyca controller depth1
  *
- * @brief A foraging controller built on \ref bitd_dpo_controller
+ * \brief A foraging controller built on \ref bitd_dpo_controller
  * that has perfect information about on or more of the following, depending on
  * configuration:
  *

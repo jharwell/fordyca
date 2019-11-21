@@ -1,7 +1,7 @@
 /**
- * @file ledtaxis_cache_search.cpp
+ * \file ledtaxis_cache_search.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

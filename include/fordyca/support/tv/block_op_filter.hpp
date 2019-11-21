@@ -1,7 +1,7 @@
 /**
- * @file block_op_filter.hpp
+ * \file block_op_filter.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 
 /**
- * @class block_op_filter
- * @ingroup fordyca support tv
+ * \class block_op_filter
+ * \ingroup fordyca support tv
  *
- * @brief The filter for block operation penalties for robots (e.g. picking
+ * \brief The filter for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
@@ -60,10 +60,10 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   block_op_filter(const block_op_filter& other) = delete;
 
   /**
-   * @brief Filters out controllers that actually are not eligible to start
+   * \brief Filters out controllers that actually are not eligible to start
    * serving penalties.
    *
-   * @return (\c TRUE, penalty_status) iff the controller should be filtered out
+   * \return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
   op_filter_status operator()(T& controller,
@@ -92,7 +92,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
 
  private:
   /**
-   * @brief Filter out spurious penalty initializations for free block pickup
+   * \brief Filter out spurious penalty initializations for free block pickup
    * (i.e. controller not ready/not intending to pickup a free block).
    *
    */
@@ -108,7 +108,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   }
 
   /**
-   * @brief Filter out spurious penalty initializations for nest block drop
+   * \brief Filter out spurious penalty initializations for nest block drop
    * (i.e. controller not ready/not intending to drop a block in the nest).
    */
   op_filter_status nest_drop_filter(const T& controller) const {
@@ -120,7 +120,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   }
 
   /**
-   * @brief Filter out spurious penalty initializations for cache site drop
+   * \brief Filter out spurious penalty initializations for cache site drop
    * (i.e. controller not ready/not intending to drop a block), or another
    * block/cache is too close.
    */
@@ -143,7 +143,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   }
 
   /**
-   * @brief Filter out spurious penalty initializations for new cache drop
+   * \brief Filter out spurious penalty initializations for new cache drop
    * (i.e. controller not ready/not intending to drop a block), or
    * is too close to another cache to do a free block drop at the chosen site.
    */

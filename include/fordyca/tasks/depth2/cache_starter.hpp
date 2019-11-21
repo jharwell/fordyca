@@ -1,7 +1,7 @@
 /**
- * @file cache_starter.hpp
+ * \file cache_starter.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, tasks, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_starter
- * @ingroup fordyca tasks depth2
+ * \class cache_starter
+ * \ingroup fordyca tasks depth2
  *
- * @brief Task in which robots locate a free block and drop it somewhere to
+ * \brief Task in which robots locate a free block and drop it somewhere to
  * start a new cache. It is abortable, and has one task interface.
  */
 class cache_starter final : public foraging_task,

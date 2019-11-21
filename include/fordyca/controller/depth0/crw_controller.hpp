@@ -1,7 +1,7 @@
 /**
- * @file crw_controller.hpp
+ * \file crw_controller.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(controller, depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class crw_controller
- * @ingroup fordyca controller depth0
+ * \class crw_controller
+ * \ingroup fordyca controller depth0
  *
- * @brief The most basic form of a foraging controller: roam around randomly
+ * \brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.
  */
 class crw_controller : public base_controller,

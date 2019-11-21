@@ -1,7 +1,7 @@
 /**
- * @file cell_unknown.hpp
+ * \file cell_unknown.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -48,10 +48,10 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell_unknown
- * @ingroup fordyca events detail
+ * \class cell_unknown
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a cell within an occupancy grid needs to go into an
+ * \brief Created whenever a cell within an occupancy grid needs to go into an
  * unknown state.
  *
  * This happens in two cases:
@@ -79,7 +79,7 @@ class cell_unknown : public cell_op, public rer::client<cell_unknown> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

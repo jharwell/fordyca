@@ -1,7 +1,7 @@
 /**
- * @file cell2D.hpp
+ * \file cell2D.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -48,11 +48,11 @@ NS_START(ds);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell2D
- * @ingroup fordyca ds
+ * \class cell2D
+ * \ingroup fordyca ds
  *
- * @brief Base repr of a cell on a 2D grid. A combination of FSM +
- * handle to whatever \ref base_cell_entity the cell contains, if any.
+ * \brief Base repr of a cell on a 2D grid. A combination of FSM +
+ * handle to whatever \ref repr::base_entity the cell contains, if any.
  */
 class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
  public:
@@ -76,7 +76,7 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
   RCPPSW_DECORATE_FUNC(state_is_empty, const)
 
   /**
-   * @brief Reset the cell to its UNKNOWN state.
+   * \brief Reset the cell to its UNKNOWN state.
    */
   void reset(void) {
     decoratee().init();
@@ -86,7 +86,7 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
   RCPPSW_DECORATE_FUNC(block_count, const);
 
   /**
-   * @brief Set the entity associated with this cell.
+   * \brief Set the entity associated with this cell.
    */
   void entity(const std::shared_ptr<repr::base_entity>& entity) {
     m_entity = entity;
@@ -99,7 +99,7 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
   const rmath::vector2u& loc(void) const { return m_loc; }
 
   /**
-   * @brief Get the block entity associated with this cell.
+   * \brief Get the block entity associated with this cell.
    *
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
@@ -108,7 +108,7 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
   std::shared_ptr<repr::base_block> block(void) RCSW_PURE;
 
   /**
-   * @brief Get the cache entity associated with this cell.
+   * \brief Get the cache entity associated with this cell.
    *
    * Will be NULL unless it contains a cache, so check the cell's state before
    * calling this function.

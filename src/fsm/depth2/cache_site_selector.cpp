@@ -1,7 +1,7 @@
 /**
- * @file cache_site_selector.cpp
+ * \file cache_site_selector.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -278,7 +278,7 @@ double __site_utility_func(const std::vector<double>& x,
                            std::vector<double>&,
                            void* data) {
   /*
-   * @todo If for some reason we get a NaN point, return the worst possible
+   * \todo If for some reason we get a NaN point, return the worst possible
    * utility. Again this should probably not be necessary, but I don't know
    * enough about optimization theory to say for sure.
    */

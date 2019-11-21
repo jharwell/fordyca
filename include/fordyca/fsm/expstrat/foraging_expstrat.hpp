@@ -1,7 +1,7 @@
 /**
- * @file foraging_expstrat.hpp
+ * \file foraging_expstrat.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -50,10 +50,10 @@ NS_START(fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class foraging_expstrat
- * @ingroup fordyca fsm expstrat
+ * \class foraging_expstrat
+ * \ingroup fordyca fsm expstrat
  *
- * @brief Base class for different exploration behaviors that controller can
+ * \brief Base class for different exploration behaviors that controller can
  * exhibit when looking for stuff.
  */
 class foraging_expstrat : public cfsm::expstrat::base_expstrat,

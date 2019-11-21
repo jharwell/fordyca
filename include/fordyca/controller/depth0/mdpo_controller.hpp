@@ -1,7 +1,7 @@
 /**
- * @file mdpo_controller.hpp
+ * \file mdpo_controller.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class mdpo_controller
- * @ingroup fordyca controller depth0
+ * \class mdpo_controller
+ * \ingroup fordyca controller depth0
  *
- * @brief A foraging controller that:
+ * \brief A foraging controller that:
  *
  * - Models/tracks the state of the environment (empty, unknown, contains
  *   object, etc.)
@@ -70,7 +70,7 @@ class mdpo_controller : public dpo_controller,
   const mdpo_perception_subsystem* mdpo_perception(void) const RCSW_PURE;
 
   /**
-   * @brief Initialization that derived classes may also need to perform, if the
+   * \brief Initialization that derived classes may also need to perform, if the
    * want to use any of the following parts of this class's functionality as-is:
    *
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
@@ -80,7 +80,7 @@ class mdpo_controller : public dpo_controller,
 
  private:
   /**
-   * @brief Perform initialization private to this class:
+   * \brief Perform initialization private to this class:
    *
    * - DPO FSM
    *

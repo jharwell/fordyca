@@ -1,7 +1,7 @@
 /**
- * @file depth0/foraging_task.hpp
+ * \file depth0/foraging_task.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,10 +46,10 @@ class generalist;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class foraging_task
- * @ingroup fordyca tasks depth0
+ * \class foraging_task
+ * \ingroup fordyca tasks depth0
  *
- * @brief Interface specifying the visit set for all depth0 foraging tasks in
+ * \brief Interface specifying the visit set for all depth0 foraging tasks in
  * FORDYCA.
  *
  * Not all tasks need all events, but it is convenient both from a design point

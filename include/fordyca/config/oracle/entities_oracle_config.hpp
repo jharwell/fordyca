@@ -1,7 +1,7 @@
 /**
- * @file entities_oracle_config.hpp
+ * \file entities_oracle_config.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,10 +36,10 @@ NS_START(fordyca, config, oracle);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct entities_oracle_config
- * @ingroup fordyca config oracle
+ * \struct entities_oracle_config
+ * \ingroup fordyca config oracle
  *
- * @brief Parameters for all-seeing oracle of entity location/size/etc.
+ * \brief Parameters for all-seeing oracle of entity location/size/etc.
  */
 struct entities_oracle_config final : public rconfig::base_config {
   bool caches{false};

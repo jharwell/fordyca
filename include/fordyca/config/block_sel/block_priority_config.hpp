@@ -1,7 +1,7 @@
 /**
- * @file block_priority_config.hpp
+ * \file block_priority_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,8 +37,11 @@ NS_START(fordyca, config);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct block_priority_config
- * @ingroup fordyca config block_sel
+ * \struct block_priority_config
+ * \ingroup fordyca config block_sel
+ *
+ * \brief Configuration for setting the block priorities of different block
+ * types.
  */
 struct block_priority_config final : public rconfig::base_config {
   double cube{-1.0};

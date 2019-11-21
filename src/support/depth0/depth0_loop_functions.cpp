@@ -1,7 +1,7 @@
 /**
- * @file depth0_loop_functions.cpp
+ * \file depth0_loop_functions.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -71,8 +71,8 @@ using ds::arena_grid;
 NS_START(detail);
 
 /**
- * @struct functor_maps_initializer
- * @ingroup fordyca support depth0 detail
+ * \struct functor_maps_initializer
+ * \ingroup fordyca support depth0 detail
  *
  * Convenience class containing initialization for all of the typeid ->
  * boost::variant maps for all controller types that are used throughout
@@ -186,10 +186,8 @@ void depth0_loop_functions::PreStep(void) {
 
   /* Process all robots */
   auto cb = [&](auto* robot) { robot_pre_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity,
-                              swarm_iterator::dynamic_order>(this,
-                                                             cb,
-                                                             "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
+      this, cb, "foot-bot");
   ndc_pop();
 } /* PreStep() */
 
@@ -199,10 +197,8 @@ void depth0_loop_functions::PostStep(void) {
 
   /* Process all robots: interact with environment then collect metrics */
   auto cb = [&](auto* robot) { robot_post_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity,
-                              swarm_iterator::dynamic_order>(this,
-                                                             cb,
-                                                             "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
+      this, cb, "foot-bot");
 
   /* Update block distribution status */
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
@@ -307,7 +303,7 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * errors that can result are transient and are corrected the next
    * timestep. See #577.
    */
-  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
+  if (interactor_status::ekNO_EVENT != status && nullptr != oracle_manager()) {
     oracle_manager()->update(arena_map());
   }
 

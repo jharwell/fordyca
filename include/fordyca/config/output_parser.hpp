@@ -1,7 +1,7 @@
 /**
- * @file output_parser.hpp
+ * \file output_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, config);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class output_parser
- * @ingroup fordyca config
+ * \class output_parser
+ * \ingroup fordyca config
  *
- * @brief Parses XML parameters relating to simulation output into
+ * \brief Parses XML parameters relating to simulation output into
  * \ref output_config. This parser is used by both loop functions and robots,
  * and so its logic is slighly more complex in order to handle the needs of
  * both.
@@ -55,7 +55,7 @@ class output_parser final : public rconfig::xml::xml_config_parser {
   using config_type = output_config;
 
   /**
-   * @brief The root tag that all output loop functions parameters should lie
+   * \brief The root tag that all output loop functions parameters should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "output";

@@ -1,7 +1,7 @@
 /**
- * @file block_manip_collator.hpp
+ * \file block_manip_collator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, controller);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_manip_collator
- * @ingroup fordyca controller
+ * \class block_manip_collator
+ * \ingroup fordyca controller
  *
- * @brief Collates block manipulation metrics.
+ * \brief Collates block manipulation metrics.
  */
 class block_manip_collator : public metrics::blocks::manipulation_metrics {
  public:

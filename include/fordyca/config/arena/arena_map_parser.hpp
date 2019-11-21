@@ -1,7 +1,7 @@
 /**
- * @file arena_map_parser.hpp
+ * \file arena_map_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,17 +44,17 @@ NS_START(fordyca, config, arena);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class arena_map_parser
- * @ingroup fordyca config arena
+ * \class arena_map_parser
+ * \ingroup fordyca config arena
  *
- * @brief Parses XML parameters for \ref arena_map into \ref arena_map_config.
+ * \brief Parses XML parameters for \ref arena_map into \ref arena_map_config.
  */
 class arena_map_parser final : public rconfig::xml::xml_config_parser {
  public:
   using config_type = arena_map_config;
 
   /**
-   * @brief The root tag that all arena map parameters should lie under in the
+   * \brief The root tag that all arena map parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "arena_map";

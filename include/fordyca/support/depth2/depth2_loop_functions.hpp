@@ -1,7 +1,7 @@
 /**
- * @file depth2_loop_functions.hpp
+ * \file depth2_loop_functions.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -49,10 +49,10 @@ struct functor_maps_initializer;
  * Classes
  ******************************************************************************/
 /**
- * @class loop_functions
- * @ingroup fordyca support depth2
+ * \class depth2_loop_functions
+ * \ingroup fordyca support depth2
  *
- * @brief The loop functions for depth 2 foraging.
+ * \brief The loop functions for depth 2 foraging.
  *
  * Handles all operations robots perform relating to dynamic caches: pickup,
  * drop, creation, depletion, etc.
@@ -70,7 +70,7 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void Destroy(void) override RCSW_COLD;
 
   /**
-   * @brief Initialize depth2 support to be shared with derived classes
+   * \brief Initialize depth2 support to be shared with derived classes
    *
    * - All depth1 shared initialization
    * - Depth2 metric collection
@@ -100,11 +100,13 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 
-  /*
-   * These are friend classes because they are basically just pieces of the loop
-   * functions pulled out for increased clarity/modularity, and are not meant to
-   * be used in other contexts. Doing things this way rather than passing 8
-   * parameters to the functors seemed much cleaner.
+  /**
+   * \brief These are friend classes because they are basically just pieces of
+   * the loop functions pulled out for increased clarity/modularity, and are not
+   * meant to be used in other contexts.
+   *
+   * Doing things this way rather than passing 8 parameters to the functors
+   * seemed much cleaner.
    */
   friend detail::functor_maps_initializer;
 
@@ -113,31 +115,31 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void cache_handling_init(const config::caches::caches_config* cachep) RCSW_COLD;
 
   /**
-   * @brief Handle creation of dynamic caches during initialization, reset, or
+   * \brief Handle creation of dynamic caches during initialization, reset, or
    * when triggered by events during simulation.
    *3a
-   * @param on_drop \c TRUE if caches are to be (potentially) created as a
+   * \param on_drop \c TRUE if caches are to be (potentially) created as a
    * result of a robot block drop. If \c FALSE, then consider dynamic cache
    * creation in other situations.
    *
-   * @return \c TRUE if one or more caches were created, \c FALSE otherwise.
+   * \return \c TRUE if one or more caches were created, \c FALSE otherwise.
    */
   bool cache_creation_handle(bool on_drop);
 
   /**
-   * @brief Extract the numerical ID of the task each robot is currently
+   * \brief Extract the numerical ID of the task each robot is currently
    * executing for use in convergence calculations.
    *
    * Cannot use depth1 version as the binary layout of the controllers is not
    * guaranteed to be the same, AND the task mappers will throw key errors if
    * you try it.
    *
-   * @param uint Unused.
+   * \param uint Unused.
    */
   std::vector<int> robot_tasks_extract(uint) const;
 
     /**
-   * @brief Process a single robot on a timestep, before running its controller:
+   * \brief Process a single robot on a timestep, before running its controller:
    *
    * - Set its new position, time, LOS from ARGoS.
    * - Have it interact with the environment.
@@ -145,23 +147,23 @@ class depth2_loop_functions : public depth1::depth1_loop_functions,
   void robot_pre_step(argos::CFootBotEntity& robot);
 
   /**
-   * @brief Process a single robot on a timestep, after running its controller,
+   * \brief Process a single robot on a timestep, after running its controller,
    * step1: have it interact with the environment.
    *
    * This is done serially for all robots.
    *
-   * @todo This is separate from step 2 until robot-arena interactions can be
+   * \todo This is separate from step 2 until robot-arena interactions can be
    * made thread safe and then they can be recombined.
    */
   void robot_post_step1(argos::CFootBotEntity& robot);
 
   /**
-   * @brief Process a single robot on a timestep, after running its controller,
+   * \brief Process a single robot on a timestep, after running its controller,
    * step 2: collect metrics from it.
    *
    * This is done in parallel for all robots.
    *
-   * @todo This is separate from step 1 until robot-arena interactions can be
+   * \todo This is separate from step 1 until robot-arena interactions can be
    * made thread safe and then they can be recombined.
    */
   void robot_post_step2(argos::CFootBotEntity& robot);

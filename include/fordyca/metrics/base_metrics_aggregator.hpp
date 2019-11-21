@@ -1,7 +1,7 @@
 /**
- * @file base_metrics_aggregator.hpp
+ * \file base_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -57,10 +57,10 @@ NS_START(metrics);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_metrics_aggregator
- * @ingroup fordyca metrics
+ * \class base_metrics_aggregator
+ * \ingroup fordyca metrics
  *
- * @brief Base class for aggregating collection of metrics for various
+ * \brief Base class for aggregating collection of metrics for various
  * sources. Extends \ref rmetrics::collector_group to include
  * initialization bits to make loop functions simpler/clearer.
  */
@@ -74,12 +74,12 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
   void collect_from_loop(const support::base_loop_functions* loop);
 
   /**
-   * @brief Collect metrics from a block right before it is dropped in the nest.
+   * \brief Collect metrics from a block right before it is dropped in the nest.
    */
   void collect_from_block(const repr::base_block* block);
 
   /**
-   * @brief Collect metrics from \ref base_controller.
+   * \brief Collect metrics from \ref base_controller.
    */
   void collect_from_controller(const controller::base_controller* controller);
 

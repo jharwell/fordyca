@@ -1,7 +1,7 @@
 /**
- * @file block_pickup_policy_parser.hpp
+ * \file block_pickup_policy_parser.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, config, block_sel);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_pickup_policy_parser
- * @ingroup fordyca config
+ * \class block_pickup_policy_parser
+ * \ingroup config block_sel
  *
- * @brief Parses XML parameters for \ref block_pickup_policy_config at the
+ * \brief Parses XML parameters for \ref block_pickup_policy_config at the
  * start of simulation.
  */
 class block_pickup_policy_parser : public rconfig::xml::xml_config_parser {
@@ -50,7 +50,7 @@ class block_pickup_policy_parser : public rconfig::xml::xml_config_parser {
   using config_type = block_pickup_policy_config;
 
   /**
-   * @brief The root tag that all block sel matrix parameters should lie
+   * \brief The root tag that all block sel matrix parameters should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "block_pickup_policy";

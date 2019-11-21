@@ -1,7 +1,7 @@
 /**
- * @file cache_pickup_policy_parser.hpp
+ * \file cache_pickup_policy_parser.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, config, cache_sel);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_pickup_policy_parser
- * @ingroup fordyca config
+ * \class cache_pickup_policy_parser
+ * \ingroup fordyca config
  *
- * @brief Parses XML parameters for \ref cache_pickup_policy_config at the
+ * \brief Parses XML parameters for \ref cache_pickup_policy_config at the
  * start of simulation.
  */
 class cache_pickup_policy_parser : public rconfig::xml::xml_config_parser {
@@ -50,7 +50,7 @@ class cache_pickup_policy_parser : public rconfig::xml::xml_config_parser {
   using config_type = cache_pickup_policy_config;
 
   /**
-   * @brief The root tag that all cache sel matrix parameters should lie
+   * \brief The root tag that all cache sel matrix parameters should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "pickup_policy";

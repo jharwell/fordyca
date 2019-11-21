@@ -1,7 +1,7 @@
 /**
- * @file loop_function_repository.cpp
+ * \file loop_function_repository.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

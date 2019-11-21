@@ -1,7 +1,7 @@
 /**
- * @file block_redist_governor_parser.hpp
+ * \file block_redist_governor_parser.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, config, arena);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_redist_governor_parser
- * @ingroup fordyca config arena
+ * \class block_redist_governor_parser
+ * \ingroup fordyca config arena
  *
- * @brief Parses XML parameters related to block redistribution by the \ref
+ * \brief Parses XML parameters related to block redistribution by the \ref
  * redist_governor.
  */
 class block_redist_governor_parser : public rconfig::xml::xml_config_parser {
@@ -52,7 +52,7 @@ class block_redist_governor_parser : public rconfig::xml::xml_config_parser {
   using config_type = block_redist_governor_config;
 
   /**
-   * @brief The root tag that all block redistribution parameters should lie
+   * \brief The root tag that all block redistribution parameters should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "redist_governor";

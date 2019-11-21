@@ -1,7 +1,7 @@
 /**
- * @file robot_task_extractor.hpp
+ * \file robot_task_extractor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -35,10 +35,10 @@ NS_START(fordyca, support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct robot_task_extractor
- * @ingroup fordyca support
+ * \struct robot_task_extractor
+ * \ingroup fordyca support
  *
- * @brief Given a robot controller of type T, extract the ID of its current
+ * \brief Given a robot controller of type T, extract the ID of its current
  * task. This is used in computing task distribution entropy in depth1, depth2
  * in conjunction with boost::variant.
  */

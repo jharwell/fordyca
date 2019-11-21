@@ -1,7 +1,7 @@
 /**
- * @file dpo_map.hpp
+ * \file dpo_map.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, ds);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dpo_map
- * @ingroup fordyca ds
+ * \class dpo_map
+ * \ingroup fordyca ds
  *
- * @brief The Decaying Pheromone Object (DPO) map stores objects in the arena
+ * \brief The Decaying Pheromone Object (DPO) map stores objects in the arena
  * SEPARATELY from the \ref arena_map where they actually live (clone not
  * reference), which decouples/simplifies a lot of the tricky handshaking logic
  * when robots interact with the arena.
@@ -62,7 +62,7 @@ class dpo_map {
   dpo_map(void) : mc_obj_ref(m_obj) {}
 
   /**
-   * @brief Update the densities of all objects in the map. Should be called
+   * \brief Update the densities of all objects in the map. Should be called
    * when one unit of time has passed (e.g. every timestep).
    */
   void decay_all(void) {
@@ -72,7 +72,7 @@ class dpo_map {
   }
 
   /**
-   * @brief Returns a pointer to the object that matches the specified key, or
+   * \brief Returns a pointer to the object that matches the specified key, or
    * nullptr if the key is not found in themap.
    */
   const value_type* find(const key_type& key) const RCSW_PURE {
@@ -85,7 +85,7 @@ class dpo_map {
   }
 
   /**
-   * @brief Returns \c TRUE iff the key is contained in the map, and \c FALSE
+   * \brief Returns \c TRUE iff the key is contained in the map, and \c FALSE
    * otherwise.
    */
   RCSW_PURE bool contains(const key_type& key) const {
@@ -93,7 +93,7 @@ class dpo_map {
   }
 
   /**
-   * @brief Add the specified object from the map of known objects of that
+   * \brief Add the specified object from the map of known objects of that
    * type. If it is already in the map of known objects of that type, the old
    * version is replaced.
    */
@@ -103,7 +103,7 @@ class dpo_map {
   }
 
   /**
-   * @brief Return an iterator for examining, but not modifying the values of
+   * \brief Return an iterator for examining, but not modifying the values of
    * the map.
    */
   auto const_values_range(void) const
@@ -112,7 +112,7 @@ class dpo_map {
   }
 
   /**
-   * @brief Return an iterator for examining, but not modifying, the keys of
+   * \brief Return an iterator for examining, but not modifying, the keys of
    * the map.
    */
   iterator_type<const map_type, decltype(boost::adaptors::map_keys)> keys_range(
@@ -122,7 +122,7 @@ class dpo_map {
   }
 
   /**
-   * @brief Remove the specified object from the map of known objects of that
+   * \brief Remove the specified object from the map of known objects of that
    * type (if it exists). If the argument is not in the map of known objects of
    * that type, no action is performed.
    */
@@ -131,7 +131,7 @@ class dpo_map {
  private:
   /* clang-format off */
   /**
-   * @brief Needed for compiler to correctly deduce wrapped function return
+   * \brief Needed for compiler to correctly deduce wrapped function return
    * types for const qualified contexts (must be BEFORE the wrapping macros in
    * the file).
    */
@@ -145,9 +145,9 @@ class dpo_map {
   RCPPSW_DECLDEF_WRAP(clear, m_obj)
 
   /**
-   * @brief Iterate over mutable values of the map.
+   * \brief Iterate over mutable values of the map.
    *
-   * @todo This has to be AFTER the member variable is declared, because I can't
+   * \todo This has to be AFTER the member variable is declared, because I can't
    * figure out how to get std:declval<map_type>() to be non-const (I think) and
    * have the non-const map_values iterator as the chosen function overload.
    */

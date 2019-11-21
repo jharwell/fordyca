@@ -1,7 +1,7 @@
 /**
- * @file cache_site_selector.hpp
+ * \file cache_site_selector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -54,10 +54,10 @@ NS_START(fsm, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_site_selector
- * @ingroup fordyca fsm depth2
+ * \class cache_site_selector
+ * \ingroup fordyca fsm depth2
  *
- * @brief Selects the best cache site between the location of the block pickup
+ * \brief Selects the best cache site between the location of the block pickup
  * and the nest (ideally the halfway point), subject to constraints such as it
  * can't be too near other known blocks, known caches, or the nest.
  */
@@ -94,11 +94,11 @@ class cache_site_selector: public rer::client<cache_site_selector> {
   cache_site_selector(const cache_site_selector&) = delete;
 
   /**
-   * @brief Given a list of existing caches/blocks that a robot knows about
+   * \brief Given a list of existing caches/blocks that a robot knows about
    * (i.e. have not faded into an unknown state), compute the best site to start
    * a new cache.
    *
-   * @return The location of the best cache site, or (-1, -1) if no best cache
+   * \return The location of the best cache site, or (-1, -1) if no best cache
    * site could be found (can happen if NLopt mysteriously fails).
    */
   boost::optional<rmath::vector2d> operator()(
@@ -111,31 +111,31 @@ class cache_site_selector: public rer::client<cache_site_selector> {
 
  private:
   /*
-   * @brief The amount of violation of cache constraints that is considered
+   * \brief The amount of violation of cache constraints that is considered
    * acceptable.
    */
   static constexpr double kCACHE_CONSTRAINT_TOL = 1E-8;
 
   /*
-   * @brief The amount of violation of block constraints that is considered
+   * \brief The amount of violation of block constraints that is considered
    * acceptable.
    */
   static constexpr double kBLOCK_CONSTRAINT_TOL = 1E-8;
 
   /*
-   * @brief The amount of violation of nest constraints that is considered
+   * \brief The amount of violation of nest constraints that is considered
    * acceptable.
    */
   static constexpr double kNEST_CONSTRAINT_TOL = 1E-8;
 
   /**
-   * @brief The difference between utilities evaluated on subsequent timesteps
+   * \brief The difference between utilities evaluated on subsequent timesteps
    * that will be considered indicative of convergence.
    */
   static constexpr double kUTILITY_TOL = 1E-2;
 
   /**
-   * @brief The maximum # of iterations that the optimizer will run. Needed so
+   * \brief The maximum # of iterations that the optimizer will run. Needed so
    * that it does not bring the simulation to a halt while it chugs and
    * chugs. We *should* be able to get something good enough in this many
    * iterations.
@@ -153,7 +153,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
                                     nest_constraint_vector>;
 
   /**
-   * @brief Create constraints for known caches, known blocks, and relating to
+   * \brief Create constraints for known caches, known blocks, and relating to
    * the nest.
    */
   void constraints_create(const ds::dp_cache_map& known_caches,
@@ -185,13 +185,29 @@ double __cache_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
                                void *data) RCSW_PURE;
 
+/**
+ * \brief Implements the block nearness constraint for cache site selection, as
+ * described in \todo paper ref. Cannot be a member function because of how
+ * NLopt works, apparently.
+ */
 double __block_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
                                void *data) RCSW_PURE;
+
+/**
+ * \brief Implements the nest nearness constraint for cache site selection, as
+ * described in \todo paper ref. Cannot be a member function because of how
+ * NLopt works, apparently.
+ */
 double __nest_constraint_func(const std::vector<double>& x,
                                std::vector<double>& ,
                                void *data) RCSW_PURE;
 
+/**
+ * \brief Implements the cache site utility function cache site selection, as
+ * described in \todo paper ref. Cannot be a member function because of how
+ * NLopt works, apparently.
+ */
 double __site_utility_func(const std::vector<double>& x,
                            std::vector<double>& ,
                            void *data) RCSW_PURE;

@@ -1,7 +1,7 @@
 /**
- * @file depth2_metrics_aggregator.hpp
+ * \file depth2_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, support, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth2_metrics_aggregator
- * @ingroup fordyca support depth2
+ * \class depth2_metrics_aggregator
+ * \ingroup fordyca support depth2
  *
- * @brief Aggregates and metrics collection for depth2 foraging. That
+ * \brief Aggregates and metrics collection for depth2 foraging. That
  * includes everything from \ref depth1_metrics_aggregator, and also:
  *
  * - TAB metrics (rooted at Harvester)
@@ -59,7 +59,7 @@ class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator
   void task_finish_or_abort_cb(const rta::polled_task* task);
 
   /**
-   * @brief Collect metrics from the depth2 controller.
+   * \brief Collect metrics from the depth2 controller.
    */
   template<class ControllerType>
   void collect_from_controller(const ControllerType* c) {

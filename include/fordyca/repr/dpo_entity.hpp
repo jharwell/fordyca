@@ -1,7 +1,7 @@
 /**
- * @file dpo_entity.hpp
+ * \file dpo_entity.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dpo_entity
- * @ingroup fordyca repr
+ * \class dpo_entity
+ * \ingroup fordyca repr
  *
- * @brief A repr of a Decaying Pheromone (DP) entity in the arena,
+ * \brief A repr of a Decaying Pheromone (DP) entity in the arena,
  * which has a pheromone density/relevance associated with it.
  *
  * When performing equality tests between instances, only the underlying entity
@@ -57,7 +57,7 @@ class dpo_entity {
       : m_ent(ent), m_density(density) {}
 
   /**
-   * @brief Compare two entities for equality. We must explicitly invoke
+   * \brief Compare two entities for equality. We must explicitly invoke
    * operator== on the object managed by the shared_ptr, otherwise we get only
    * pointer comparison, which is NOT what we want.
    */

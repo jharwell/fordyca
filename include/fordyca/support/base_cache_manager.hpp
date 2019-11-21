@@ -1,7 +1,7 @@
 /**
- * @file base_cache_manager.hpp
+ * \file base_cache_manager.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -53,10 +53,10 @@ NS_START(support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_cache_manager
- * @ingroup fordyca support depth2
+ * \class base_cache_manager
+ * \ingroup fordyca support depth2
  *
- * @brief Manager for creation, depletion, and metric gathering for base
+ * \brief Manager for creation, depletion, and metric gathering for base
  * caches in the arena, whenever they are enabled.
  */
 class base_cache_manager : public metrics::caches::lifecycle_metrics,

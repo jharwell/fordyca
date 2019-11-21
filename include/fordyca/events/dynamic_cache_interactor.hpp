@@ -1,7 +1,7 @@
 /**
- * @file dynamic_cache_interactor.hpp
+ * \file dynamic_cache_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ class cache_proximity;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class dynamic_cache_interactor
- * @ingroup fordyca events
+ * \class dynamic_cache_interactor
+ * \ingroup fordyca events
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
+ * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with dynamic caches in FORDYCA.
  */
 class dynamic_cache_interactor

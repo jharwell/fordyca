@@ -1,7 +1,7 @@
 /**
- * @file utility_cache_search.hpp
+ * \file utility_cache_search.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class utility_cache_search
- * @ingroup fordyca fsm expstrat
+ * \class utility_cache_search
+ * \ingroup fordyca fsm expstrat
  *
- * @brief Using \ref cache_site_selector and the average location of all known
+ * \brief Using \ref cache_site_selector and the average location of all known
  * blocks (or the robot's current location if there are not any known blocks),
  * compute where a cache would ideally be located, and vector to it, begining
  * performing CRW at that location.

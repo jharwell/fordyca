@@ -1,7 +1,7 @@
 /**
- * @file unicell_immovable_entity.hpp
+ * \file unicell_immovable_entity.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,10 +37,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class unicell_immovable_entity
- * @ingroup fordyca repr
+ * \class unicell_immovable_entity
+ * \ingroup fordyca repr
  *
- * @brief A class representing objects that reside within one or more squares
+ * \brief A class representing objects that reside within one or more squares
  * within a 2D grid whose position CANNOT change during the lifetime of the
  * object.
  */

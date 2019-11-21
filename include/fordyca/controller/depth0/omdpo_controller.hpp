@@ -1,7 +1,7 @@
 /**
- * @file omdpo_controller.hpp
+ * \file omdpo_controller.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class omdpo_controller
- * @ingroup fordyca controller depth0
+ * \class omdpo_controller
+ * \ingroup fordyca controller depth0
  *
- * @brief A foraging controller that has the same properties as \ref
+ * \brief A foraging controller that has the same properties as \ref
  * mdpo_controller, but that also:
  *
  * - Has perfect information about blocks in the arena

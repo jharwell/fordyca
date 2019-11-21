@@ -1,7 +1,7 @@
 /**
- * @file robot_task_extractor_adaptor.hpp
+ * \file robot_task_extractor_adaptor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct robot_task_extractor_adaptor
- * @ingroup fordyca support
+ * \struct robot_task_extractor_adaptor
+ * \ingroup fordyca support
  *
- * @brief Map a controller instance to the task extraction action run during
+ * \brief Map a controller instance to the task extraction action run during
  * convergence calculations.
  */
 struct robot_task_extractor_adaptor : public boost::static_visitor<int> {

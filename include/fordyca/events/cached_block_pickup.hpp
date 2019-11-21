@@ -1,7 +1,7 @@
 /**
- * @file cached_block_pickup.hpp
+ * \file cached_block_pickup.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -56,11 +56,11 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
- * @class cached_block_pickup
- * @ingroup fordyca events detail
+/**
+ * \class cached_block_pickup
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a robpot picks up a block from a cache.
+ * \brief Created whenever a robpot picks up a block from a cache.
  *
  * The cache usage penalty, if there is one, is assessed prior to this event
  * being created, at a higher level.
@@ -105,7 +105,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
 
   /* depth1 foraging */
   /**
-   * @brief Perform actual cache block pickup in the arena.
+   * \brief Perform actual cache block pickup in the arena.
    *
    * Assumes caller is holding \ref arena_map cache mutex. Takes \ref arena_map
    * block mutex, and then releases it after cache updates.
@@ -127,7 +127,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   void visit(controller::depth1::bitd_omdpo_controller& controller);
 
   /**
-   * @brief Update the cache manager upon cache pickup. Protected by mutex in
+   * \brief Update the cache manager upon cache pickup. Protected by mutex in
    * order to ensure consistency between concurrent robot updates if multiple
    * caches are present in the arena.
    */
@@ -154,12 +154,12 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   std::shared_ptr<repr::arena_cache> m_real_cache;
 
   /**
-   * @brief The block that will be picked up by the robot.
+   * \brief The block that will be picked up by the robot.
    */
   std::shared_ptr<repr::base_block>  m_pickup_block{nullptr};
 
   /**
-   * @brief The block that is left over when a cache devolves into a single
+   * \brief The block that is left over when a cache devolves into a single
    * block, that needs to be sent to the cell that the cache used to live on.
    */
   std::shared_ptr<repr::base_block>  m_orphan_block{nullptr};
@@ -167,7 +167,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

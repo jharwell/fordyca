@@ -1,7 +1,7 @@
 /**
- * @file block_vector.cpp
+ * \file block_vector.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

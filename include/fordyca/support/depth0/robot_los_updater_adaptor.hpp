@@ -1,7 +1,7 @@
 /**
- * @file depth0/robot_los_updater_adaptor.hpp
+ * \file depth0/robot_los_updater_adaptor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,10 +44,10 @@ using los_updater_map_type = rds::type_map<
  * Class Definitions
  ******************************************************************************/
 /**
- * @class robot_los_updater_adaptor
- * @ingroup fordyca support depth0
+ * \class robot_los_updater_adaptor
+ * \ingroup fordyca support depth0
  *
- * @brief Wrapping functor to update robot LOS each timestep. Needed for use
+ * \brief Wrapping functor to update robot LOS each timestep. Needed for use
  * with boost::static_visitor.
  */
 class robot_los_updater_adaptor {

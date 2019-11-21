@@ -1,7 +1,7 @@
 /**
- * @file manipulation_metrics_collector.hpp
+ * \file manipulation_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,18 +40,18 @@ NS_START(fordyca, metrics, blocks);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class manipulation_metrics_collector
- * @ingroup fordyca metrics blocks
+ * \class manipulation_metrics_collector
+ * \ingroup fordyca metrics blocks
  *
- * @brief Collector for \ref manipulation_metrics.
+ * \brief Collector for \ref manipulation_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
 class manipulation_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname The output file name.
-   * @param interval Collection interval.
+   * \param ofname The output file name.
+   * \param interval Collection interval.
    */
   manipulation_metrics_collector(const std::string& ofname, uint interval);
 
@@ -61,7 +61,7 @@ class manipulation_metrics_collector final : public rmetrics::base_metrics_colle
 
  private:
   /**
-   * @brief Container for holding collected statistics. Must be atomic so counts
+   * \brief Container for holding collected statistics. Must be atomic so counts
    * are valid in parallel metric collection contexts. Ideally the penalties
    * would be atomic \ref rtypes::timestep, but that type does not meet the
    * std::atomic requirements.

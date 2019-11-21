@@ -1,7 +1,7 @@
 /**
- * @file block_transporter.hpp
+ * \file block_transporter.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,10 +37,10 @@ NS_START(fordyca, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_transporter
- * @ingroup fordyca fsm
+ * \class block_transporter
+ * \ingroup fordyca fsm
  *
- * @brief Interface defining what classes directly involved in transporting
+ * \brief Interface defining what classes directly involved in transporting
  * blocks need to implement in order to successfully interact with the loop
  * functions.
  */
@@ -50,7 +50,7 @@ class block_transporter {
   virtual ~block_transporter(void) = default;
 
   /**
-   * @brief All tasks must define method to determine what they are currently
+   * \brief All tasks must define method to determine what they are currently
    * doing with a block (if they are carrying one).
    */
   virtual foraging_transport_goal::type block_transport_goal(void) const = 0;

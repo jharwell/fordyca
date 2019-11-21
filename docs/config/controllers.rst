@@ -352,9 +352,8 @@ XML configuration:
   - ``cache_transferer``
   - ``cache_collector``
 
-
- ``task_alloc/task_exec_estimates/ema``
-"""""""""""""""""""""""""""""""""""""""
+``task_alloc/task_exec_estimates/ema``
+""""""""""""""""""""""""""""""""""""""
 
 - Required by: none.
 - Required child attributes if present: all.

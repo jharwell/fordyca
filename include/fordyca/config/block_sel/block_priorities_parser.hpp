@@ -1,7 +1,7 @@
 /**
- * @file block_priorities_parser.hpp
+ * \file block_priorities_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, config, block_sel);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_priorities_parser
- * @ingroup fordyca config block_sel
+ * \class block_priorities_parser
+ * \ingroup fordyca config block_sel
  *
- * @brief Parses XML parameters related to block priorties into \ref
+ * \brief Parses XML parameters related to block priorties into \ref
  * block_priority_config.
  */
 class block_priorities_parser final : public rconfig::xml::xml_config_parser {
@@ -51,7 +51,7 @@ class block_priorities_parser final : public rconfig::xml::xml_config_parser {
   using config_type = block_priority_config;
 
   /**
-   * @brief The root tag that all block parameters should lie under in the
+   * \brief The root tag that all block parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "block_priorities";

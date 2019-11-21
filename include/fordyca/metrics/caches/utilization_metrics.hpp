@@ -1,7 +1,7 @@
 /**
- * @file utilization_metrics.hpp
+ * \file utilization_metrics.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/metrics/base_metrics.hpp"
+#include "rcppsw/rcppsw.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,10 +36,10 @@ NS_START(fordyca, metrics, caches);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class utilization_metrics
- * @ingroup fordyca metrics caches
+ * \class utilization_metrics
+ * \ingroup fordyca metrics caches
  *
- * @brief Interface defining utilization metrics that can be collected on
+ * \brief Interface defining utilization metrics that can be collected on
  * static/dynamic caches in the arena during their lifetime.
  */
 class utilization_metrics : virtual public rmetrics::base_metrics {
@@ -49,13 +50,13 @@ class utilization_metrics : virtual public rmetrics::base_metrics {
   utilization_metrics& operator=(const utilization_metrics&) = default;
 
   /**
-   * @brief Get the # of blocks currently in the cache (independent of any
+   * \brief Get the # of blocks currently in the cache (independent of any
    * calls to \ref reset_metrics()).
    */
   virtual size_t n_blocks(void) const = 0;
 
   /**
-   * @brief Should return the # of blocks a given cache has had picked up from
+   * \brief Should return the # of blocks a given cache has had picked up from
    * it this timestep.
    *
    * This is currently always 1, due to limitations/shortcuts taken with the
@@ -64,7 +65,7 @@ class utilization_metrics : virtual public rmetrics::base_metrics {
   virtual uint total_block_pickups(void) const = 0;
 
   /**
-   * @brief Should return the # of blocks a given cache has had dropped in it
+   * \brief Should return the # of blocks a given cache has had dropped in it
    * this timestep.
    *
    * This is currently always 1, due to limitations/shortcuts taken with the

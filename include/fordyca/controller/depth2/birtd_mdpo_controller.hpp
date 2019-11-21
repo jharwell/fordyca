@@ -1,7 +1,7 @@
 /**
- * @file birtd_mdpo_controller.hpp
+ * \file birtd_mdpo_controller.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,13 +37,13 @@ NS_START(depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class birtd_mdpo_controller
- * @ingroup fordyca controller depth2
+ * \class birtd_mdpo_controller
+ * \ingroup fordyca controller depth2
  *
- * @brief A controller defining the task allocation space via BIfurcating
+ * \brief A controller defining the task allocation space via BIfurcating
  * Recursive Task Decomposition (BIRTD) and spliting the \ref generalist task
  * into the \ref harvester, and \ref collector tasks, and then each of the \ref
- * harvest and \ref collector tasks into two subtasks as well, according to
+ * harvester and \ref collector tasks into two subtasks as well, according to
  * dynamic changes in the environment and/or execution/interface times of the
  * tasks.
  *

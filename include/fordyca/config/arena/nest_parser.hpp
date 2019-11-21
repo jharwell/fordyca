@@ -1,7 +1,7 @@
 /**
- * @file nest_parser.hpp
+ * \file nest_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, config, arena);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class nest_parser
- * @ingroup fordyca config arena
+ * \class nest_parser
+ * \ingroup fordyca config arena
  *
- * @brief Parses XML parameters for related to \ref nest objects into
+ * \brief Parses XML parameters for related to \ref nest objects into
  * \ref nest_config.
  */
 class nest_parser : public rconfig::xml::xml_config_parser {
@@ -51,7 +51,7 @@ class nest_parser : public rconfig::xml::xml_config_parser {
   using config_type = nest_config;
 
   /**
-   * @brief The root tag that all nest parameters should lie under in the
+   * \brief The root tag that all nest parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "nest";

@@ -1,7 +1,7 @@
 /**
- * @file block_redist_governor_config.hpp
+ * \file block_redist_governor_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,8 +39,11 @@ NS_START(fordyca, config, arena);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct block_redist_governor_config
- * @ingroup fordyca config arena
+ * \struct block_redist_governor_config
+ * \ingroup fordyca config arena
+ *
+ * \brief Configuration for the governor of block redistribution after
+ * collection.
  */
 struct block_redist_governor_config final : public rconfig::base_config {
   rtypes::timestep timestep{0};

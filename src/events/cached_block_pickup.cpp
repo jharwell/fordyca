@@ -1,7 +1,7 @@
 /**
- * @file cached_block_pickup.cpp
+ * \file cached_block_pickup.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

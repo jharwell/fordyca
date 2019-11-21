@@ -1,7 +1,7 @@
 /**
- * @file depth0_loop_functions.hpp
+ * \file depth0_loop_functions.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -54,10 +54,10 @@ class robot_arena_interactor;
  * Classes
  ******************************************************************************/
 /**
- * @class depth0_loop_functions
- * @ingroup fordyca support depth0
+ * \class depth0_loop_functions
+ * \ingroup fordyca support depth0
  *
- * @brief Contains the simulation support functions for depth0 foraging, such
+ * \brief Contains the simulation support functions for depth0 foraging, such
  * as:
  *
  * - Metric collection from robots
@@ -77,7 +77,7 @@ class depth0_loop_functions : public base_loop_functions,
 
  protected:
   /**
-   * @brief Initialize depth0 support to be shared with derived classes:
+   * \brief Initialize depth0 support to be shared with derived classes:
    *
    * - Depth0 metric collection
    */
@@ -106,16 +106,19 @@ class depth0_loop_functions : public base_loop_functions,
     >;
 
   using metric_extraction_map_type = rds::type_map<metric_extraction_typelist>;
-  /*
-   * These are friend classes because they are basically just pieces of the loop
-   * functions pulled out for increased clarity/modularity, and are not meant to
-   * be used in other contexts. Doing things this way rather than passing 8
-   * parameters to the functors seemed much cleaner.
+
+  /**
+   * \brief These are friend classes because they are basically just pieces of
+   * the loop functions pulled out for increased clarity/modularity, and are not
+   * meant to be used in other contexts.
+   *
+   * Doing things this way rather than passing 8 parameters to the functors
+   * seemed much cleaner.
    */
   friend detail::functor_maps_initializer;
 
   /**
-   * @brief Initialize depth0 support not shared with derived classes:
+   * \brief Initialize depth0 support not shared with derived classes:
    *
    * - Robot interactions with arena
    * - Various maps mapping controller types to metric collection, controller
@@ -124,21 +127,21 @@ class depth0_loop_functions : public base_loop_functions,
   void private_init(void) RCSW_COLD;
 
   /**
-   * @brief Process a single robot on a timestep, before running its controller:
+   * \brief Process a single robot on a timestep, before running its controller:
    *
    * - Set its new position, time from ARGoS and send it its LOS.
    *
-   * @note These operations are done in parallel for all robots (lock free).
+   * \note These operations are done in parallel for all robots (lock free).
    */
   void robot_pre_step(argos::CFootBotEntity& robot);
 
   /**
-   * @brief Process a single robot on a timestep, after running its controller.
+   * \brief Process a single robot on a timestep, after running its controller.
    *
    * - Have it interact with the environment.
    * - Collect metrics from it.
    *
-   * @note These operations are done in parallel for all robots (with mutual
+   * \note These operations are done in parallel for all robots (with mutual
    *       exclusion as needed).
    */
   void robot_post_step(argos::CFootBotEntity& robot);

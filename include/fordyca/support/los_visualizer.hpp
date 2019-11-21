@@ -1,7 +1,7 @@
 /**
- * @file los_visualizer.hpp
+ * \file los_visualizer.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -49,10 +49,10 @@ NS_START(support);
  * Classes
  ******************************************************************************/
 /**
- * @class los_visualizer
- * @ingroup fordyca support
+ * \class los_visualizer
+ * \ingroup fordyca support
  *
- * @brief Renders the LOS for a given robot for visualization/debugging
+ * \brief Renders the LOS for a given robot for visualization/debugging
  * purposes.
  */
 class los_visualizer : public rer::client<los_visualizer> {
@@ -64,10 +64,10 @@ class los_visualizer : public rer::client<los_visualizer> {
   los_visualizer& operator=(const los_visualizer& op) = delete;
 
   /**
-   * @brief Draw visualizations related to block LOS:
+   * \brief Draw visualizations related to block LOS:
    *
-   * @param los The LOS to visualize.
-   * @param grid_resolution The grid resolution for the arena.
+   * \param los The LOS to visualize.
+   * \param resolution The grid resolution for the arena.
    */
   void draw(const repr::line_of_sight* los, rtypes::discretize_ratio resolution);
 

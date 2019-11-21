@@ -1,7 +1,7 @@
 /**
- * @file static_cache_manager.hpp
+ * \file static_cache_manager.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -52,10 +52,10 @@ NS_START(support, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class static_cache_manager
- * @ingroup fordyca support depth1
+ * \class static_cache_manager
+ * \ingroup fordyca support depth1
  *
- * @brief Manager for creation, depletion, and metric gathering for the static
+ * \brief Manager for creation, depletion, and metric gathering for the static
  * cache(s) in the arena.
  */
 class static_cache_manager final : public base_cache_manager,
@@ -69,9 +69,9 @@ class static_cache_manager final : public base_cache_manager,
   static_cache_manager& operator=(const static_cache_manager&) = delete;
 
   /**
-   * @brief (Re)-create the static cache in the arena (depth 1 only).
+   * \brief (Re)-create the static cache in the arena (depth 1 only).
    *
-   * @return The created caches. Non-fatal failures to create the static cache
+   * \return The created caches. Non-fatal failures to create the static cache
    * can occur if, for example, all blocks are currently being carried by robots
    * and there are not enough free blocks with which to create a cache of the
    * specified minimum size.
@@ -86,18 +86,18 @@ class static_cache_manager final : public base_cache_manager,
       uint n_collectors);
 
   /**
-   * @brief Get the # of caches that are being managed.
+   * \brief Get the # of caches that are being managed.
    */
   size_t n_managed(void) const { return mc_cache_locs.size(); }
 
  private:
   /**
-   * @brief Allocate blocks for static cache(s) re-creation.
+   * \brief Allocate blocks for static cache(s) re-creation.
    *
-   * @param existing_caches The caches that currently exist in the arena.
-   * @param blocks Vector of all blocks in the arena.
+   * \param existing_caches The caches that currently exist in the arena.
+   * \param blocks Vector of all blocks in the arena.
    *
-   * @return A vector of all blocks that will be used in the re-creation of
+   * \return A vector of all blocks that will be used in the re-creation of
    * caches in the arena this timestep. There may not be enough free blocks in
    * the arena to meet the desired initial size of at least one cache, which is
    * not an error (all blocks can currently be carried by robots, for example).
@@ -107,7 +107,7 @@ class static_cache_manager final : public base_cache_manager,
       const ds::block_vector& all_blocks) const;
 
   /**
-   * @brief Allocate the blocks that should be used when re-creating cache i.
+   * \brief Allocate the blocks that should be used when re-creating cache i.
    *
    * Only blocks that are not:
    *
@@ -121,14 +121,14 @@ class static_cache_manager final : public base_cache_manager,
    *
    * are eligible.
    *
-   * @param existing_caches Vector of existing static caches.
-   * @param allocated_blocks Vector of blocks that have already been allocated
+   * \param existing_caches Vector of existing static caches.
+   * \param allocated_blocks Vector of blocks that have already been allocated
    *                         to the re-creation of other static caches this
    *                         timestep.
-   * @param all_blocks All blocks available for cache creation (already
+   * \param all_blocks All blocks available for cache creation (already
    *                   allocated blocks are not filtered out).
-   * @param loc The location the new cache is to be created at.
-   * @param n_blocks How many blocks to try to allocate for cache i.
+   * \param loc The location the new cache is to be created at.
+   * \param n_blocks How many blocks to try to allocate for cache i.
    */
   boost::optional<ds::block_vector> cache_i_blocks_alloc(
       const ds::cache_vector& existing_caches,
@@ -138,7 +138,7 @@ class static_cache_manager final : public base_cache_manager,
       size_t n_blocks) const;
 
   /**
-   * @brief Absorb free blocks that are under caches into the newly created
+   * \brief Absorb free blocks that are under caches into the newly created
    * caches.
    *
    * This is necessary for the current static cache creation strategy of

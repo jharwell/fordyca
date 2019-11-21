@@ -1,7 +1,7 @@
 /**
- * @file block_sel_matrix_parser.hpp
+ * \file block_sel_matrix_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, config, block_sel);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_sel_matrix_parser
- * @ingroup fordyca config block_sel
+ * \class block_sel_matrix_parser
+ * \ingroup fordyca config block_sel
  *
- * @brief Parses XML parameters for the \ref block_sel_matrix at the start
+ * \brief Parses XML parameters for the \ref block_sel_matrix at the start
  * of simulation.
  */
 class block_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
@@ -53,7 +53,7 @@ class block_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
   using config_type = block_sel_matrix_config;
 
   /**
-   * @brief The root tag that all block sel matrix parameters should lie
+   * \brief The root tag that all block sel matrix parameters should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "block_sel_matrix";

@@ -1,7 +1,7 @@
 /**
- * @file acquire_new_cache_fsm.hpp
+ * \file acquire_new_cache_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -51,10 +51,10 @@ NS_START(depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_new_cache_fsm
- * @ingroup fordyca fsm depth2
+ * \class acquire_new_cache_fsm
+ * \ingroup fordyca fsm depth2
  *
- * @brief The FSM for an acquiring a NEW cache within the arena.
+ * \brief The FSM for an acquiring a NEW cache within the arena.
  *
  * Each robot executing this FSM will look for a new cache (either a known new
  * cache or via exploration). Once the chosen new cache has been acquired, it

@@ -1,7 +1,7 @@
 /**
- * @file depth0/robot_configurer.hpp
+ * \file depth0/robot_configurer.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, support, depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct robot_configurer
- * @ingroup fordyca support depth0
+ * \struct robot_configurer
+ * \ingroup fordyca support depth0
  *
- * @brief Functor to perform controller configuration during initialization.
+ * \brief Functor to perform controller configuration during initialization.
  */
 template<typename TController>
 class robot_configurer : public boost::static_visitor<void> {

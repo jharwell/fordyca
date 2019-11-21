@@ -1,7 +1,7 @@
 /**
- * @file los_visualizer.cpp
+ * \file los_visualizer.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

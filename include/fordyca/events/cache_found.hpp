@@ -1,7 +1,7 @@
 /**
- * @file cache_found.hpp
+ * \file cache_found.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -50,11 +50,11 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
- * @class cache_found
- * @ingroup fordyca events detail
+/**
+ * \class cache_found
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a NEW cache (i.e. one that is not currently known to
+ * \brief Created whenever a NEW cache (i.e. one that is not currently known to
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
@@ -98,7 +98,7 @@ class cache_found : public cell_op, public rer::client<cache_found> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

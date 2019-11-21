@@ -1,7 +1,7 @@
 /**
- * @file temporal_penalty_handler.hpp
+ * \file temporal_penalty_handler.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,10 +46,10 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 
 /**
- * @class temporal_penalty_handler
- * @ingroup fordyca support tv
+ * \class temporal_penalty_handler
+ * \ingroup fordyca support tv
  *
- * @brief The penalty handler for penalties for robots (e.g. how long they have
+ * \brief The penalty handler for penalties for robots (e.g. how long they have
  * to wait when they pickup/drop a block).
  *
  * Does not do much more than provide the penalty list, and functions for
@@ -62,10 +62,10 @@ class temporal_penalty_handler
   using const_iterator_type = typename std::list<temporal_penalty<T>>::const_iterator;
 
   /**
-   * @brief Initialize the penalty handler.
+   * \brief Initialize the penalty handler.
    *
-   * @param config Parameters for penalty waveform generation.
-   * @param name The name of the handler, for differentiating handler instancces
+   * \param config Parameters for penalty waveform generation.
+   * \param name The name of the handler, for differentiating handler instancces
    * in logging statements.
    */
   temporal_penalty_handler(const rct::config::waveform_config* const config,
@@ -82,14 +82,14 @@ class temporal_penalty_handler
 
 
   /**
-   * @brief Get the name of the penalty handler (for debugging)
+   * \brief Get the name of the penalty handler (for debugging)
    */
 #if(LIBRA_ER == LIBRA_ER_ALL)
   const std::string& name(void) const { return mc_name; }
 #endif
 
   /**
-   * @brief Get the next robot that will satisfy its penalty from the list.
+   * \brief Get the next robot that will satisfy its penalty from the list.
    */
   temporal_penalty<T> penalty_next(void) const {
     std::scoped_lock lock(m_list_mtx);
@@ -97,11 +97,11 @@ class temporal_penalty_handler
   }
 
   /**
-   * @brief Remove the specified penalty from the list once the robot it
+   * \brief Remove the specified penalty from the list once the robot it
    * corresponds to has served its penalty.
    *
-   * @param victim The penalty to remove.
-   * @param lock Is locking required around penalty list modifications or not?
+   * \param victim The penalty to remove.
+   * \param lock Is locking required around penalty list modifications or not?
    *             Should *ALWAYS* be \c TRUE if the function is called external
    *             to this class.
    */
@@ -113,12 +113,12 @@ class temporal_penalty_handler
   }
 
   /**
-   * @brief Abort a robot's serving of its penalty.
+   * \brief Abort a robot's serving of its penalty.
    *
    * This should only be done if the robot aborts its task WHILE also serving a
    * penalty.
    *
-   * @param controller The robot to abort the penalty for.
+   * \param controller The robot to abort the penalty for.
    */
   void penalty_abort(const T& controller) {
     std::scoped_lock lock(m_list_mtx);
@@ -132,15 +132,15 @@ class temporal_penalty_handler
   }
 
   /**
-   * @brief Find the penalty object currently associated with the given
+   * \brief Find the penalty object currently associated with the given
    * controller, if it exists (i.e. if the robot is currently serving a penalty)
    *
-   * @param controller The controller to check.
-   * @param lock Is locking required around penalty list modifications or not?
+   * \param controller The controller to check.
+   * \param lock Is locking required around penalty list modifications or not?
    *             Should *ALWAYS* be \c TRUE if the function is called external
    *             to this class.
    *
-   * @return Iterator pointing to the penalty, or end() if none was found.
+   * \return Iterator pointing to the penalty, or end() if none was found.
    */
   const_iterator_type penalty_find(const T& controller,
                                    bool lock = true) const {
@@ -154,11 +154,11 @@ class temporal_penalty_handler
     return it;
   }
   /**
-   * @brief If \c TRUE, then the specified robot is currently serving a cache
+   * \brief If \c TRUE, then the specified robot is currently serving a cache
    * penalty.
    *
-   * @param controller The controller to check penalty serving for.
-   * @param lock Is locking required around penalty list modifications or not?
+   * \param controller The controller to check penalty serving for.
+   * \param lock Is locking required around penalty list modifications or not?
    *             Should *ALWAYS* be \c TRUE if the function is called external
    *             to this class.
    */
@@ -172,15 +172,15 @@ class temporal_penalty_handler
   }
 
   /**
-   * @brief Determine if a robot has satisfied the \ref temporal_penalty
+   * \brief Determine if a robot has satisfied the \ref temporal_penalty
    * it is currently serving yet.
    *
-   * @param controller The robot to check. If the robot is not currently serving
+   * \param controller The robot to check. If the robot is not currently serving
    *                   a penalty, \c FALSE will be returned.
    *
-   * @param timestep The current timestep.
+   * \param timestep The current timestep.
    *
-   * @return \c TRUE If the robot is currently waiting AND it has satisfied its
+   * \return \c TRUE If the robot is currently waiting AND it has satisfied its
    * penalty.
    */
   RCSW_PURE bool is_penalty_satisfied(const T& controller,
@@ -199,7 +199,7 @@ class temporal_penalty_handler
     m_penalty_list.push_back(penalty);
   }
   /**
-   * @brief Calculate the penalty for a robot to serve for the operation, given
+   * \brief Calculate the penalty for a robot to serve for the operation, given
    * the current timestep and the configured penalty waveform.
    *
    * If the penalty for the robot was zero, we still need to make the robot
@@ -222,15 +222,15 @@ class temporal_penalty_handler
   }
 
   /*
-   * @brief Deconflict penalties such that at most 1 robot finishes
+   * \brief Deconflict penalties such that at most 1 robot finishes
    * serving their penalty per block/cache operation per timestep.
    *
-   * @todo At some point this might need to be removed and concurrent penalty
+   * \todo At some point this might need to be removed and concurrent penalty
    * finishes supported if it becomes a bottleneck (or if it seems to be overly
    * impacting performance from an avg # blocks collected/timestep
    * perspective).
    *
-   * @param penalty The calculated penalty sans deconfliction. Passed by value
+   * \param penalty The calculated penalty sans deconfliction. Passed by value
    *                and modified, in order to make calculations simpler.
    */
   rtypes::timestep penalty_finish_uniqueify(rtypes::timestep penalty) const {
@@ -247,7 +247,7 @@ class temporal_penalty_handler
 
  private:
   /**
-   * @brief *Possibly* lock the penalty list mutex.
+   * \brief *Possibly* lock the penalty list mutex.
    *
    * Needed for switchable locking for functions that are called from other
    * functions in this class, which generally do not need locking, and functions
@@ -260,7 +260,7 @@ class temporal_penalty_handler
   }
 
   /**
-   * @brief *Possibly* unlock the penalty listf mutex.
+   * \brief *Possibly* unlock the penalty listf mutex.
    *
    * Needed for switchable locking for functions that are called from other
    * functions in this class, which generally do not need locking, and functions

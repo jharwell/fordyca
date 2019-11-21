@@ -1,7 +1,7 @@
 /**
- * @file cache_sel_matrix_parser.hpp
+ * \file cache_sel_matrix_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, config, cache_sel);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_sel_matrix_parser
- * @ingroup fordyca config cache_sel
+ * \class cache_sel_matrix_parser
+ * \ingroup fordyca config cache_sel
  *
- * @brief Parses XML parameters for the \ref cache_sel_matrix at the start
+ * \brief Parses XML parameters for the \ref cache_sel_matrix at the start
  * of simulation.
  */
 class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
@@ -51,7 +51,7 @@ class cache_sel_matrix_parser final : public rconfig::xml::xml_config_parser {
   using config_type = cache_sel_matrix_config;
 
   /**
-   * @brief The root tag that all cache sel matrix parameters should lie
+   * \brief The root tag that all cache sel matrix parameters should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "cache_sel_matrix";

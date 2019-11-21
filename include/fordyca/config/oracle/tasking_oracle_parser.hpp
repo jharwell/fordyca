@@ -1,7 +1,7 @@
 /**
- * @file tasking_oracle_parser.hpp
+ * \file tasking_oracle_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, config, oracle);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class tasking_oracle_parser
- * @ingroup fordyca config oracle
+ * \class tasking_oracle_parser
+ * \ingroup fordyca config oracle
  *
- * @brief Parses XML parameters used for \ref tasking_oracle at the start of
+ * \brief Parses XML parameters used for \ref tasking_oracle at the start of
  * simulation.
  */
 class tasking_oracle_parser : public rconfig::xml::xml_config_parser {
@@ -50,7 +50,7 @@ class tasking_oracle_parser : public rconfig::xml::xml_config_parser {
   using config_type = tasking_oracle_config;
 
   /**
-   * @brief The root tag that all cache parameters should lie under in the
+   * \brief The root tag that all cache parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "tasking_oracle";

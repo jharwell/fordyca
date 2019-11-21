@@ -1,7 +1,7 @@
 /**
- * @file oracle_manager.cpp
+ * \file oracle_manager.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

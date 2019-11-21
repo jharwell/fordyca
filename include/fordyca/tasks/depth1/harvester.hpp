@@ -1,7 +1,7 @@
 /**
- * @file harvester.hpp
+ * \file harvester.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(fordyca, tasks, depth1);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class harvester
- * @ingroup fordyca tasks depth1
+ * \class harvester
+ * \ingroup fordyca tasks depth1
  *
- * @brief Task in which robots locate a free block and bring it to a known
+ * \brief Task in which robots locate a free block and bring it to a known
  * cache. It is abortable, and has one task interface.
  */
 class harvester final : public foraging_task,

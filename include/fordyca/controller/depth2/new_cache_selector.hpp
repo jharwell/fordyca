@@ -1,7 +1,7 @@
 /**
- * @file new_cache_selector.hpp
+ * \file new_cache_selector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class new_cache_selector
- * @ingroup fordyca controller depth2
+ * \class new_cache_selector
+ * \ingroup fordyca controller depth2
  *
- * @brief Selects from among "new" caches (which are the same as blocks in the
+ * \brief Selects from among "new" caches (which are the same as blocks in the
  * arena) which are presumed to still exist at this point, although that may not
  * be true as a robot's knowledge of the arena is imperfect).
  */
@@ -59,11 +59,11 @@ class new_cache_selector: public rer::client<new_cache_selector> {
   new_cache_selector(const new_cache_selector& other) = delete;
 
   /**
-   * @brief Given a list of new caches that a robot knows about, compute which
+   * \brief Given a list of new caches that a robot knows about, compute which
    * is the "best", taking into account proximity to known caches alread in
    * existence.
    *
-   * @return The "best" new cache.
+   * \return The "best" new cache.
    */
   boost::optional<ds::dp_block_map::value_type> operator()(
       const ds::dp_block_map& new_caches,

@@ -1,7 +1,7 @@
 /**
- * @file transport_metrics_collector.hpp
+ * \file transport_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,18 +40,18 @@ NS_START(fordyca, metrics, blocks);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class transport_metrics_collector
- * @ingroup fordyca metrics blocks
+ * \class transport_metrics_collector
+ * \ingroup fordyca metrics blocks
  *
- * @brief Collector for \ref transport_metrics.
+ * \brief Collector for \ref transport_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
 class transport_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname The output file name.
-   * @param interval Collection interval.
+   * \param ofname The output file name.
+   * \param interval Collection interval.
    */
   transport_metrics_collector(const std::string& ofname, uint interval);
 
@@ -63,41 +63,41 @@ class transport_metrics_collector final : public rmetrics::base_metrics_collecto
 
  private:
   /**
-   * @brief Container for holding collected statistics. Must be atomic so counts
+   * \brief Container for holding collected statistics. Must be atomic so counts
    * are valid in parallel metric collection contexts. Ideally the times
    * would be atomic \ref rtypes::timestep, but that type does not meet the
    * std::atomic requirements.
    */
   struct stats {
     /**
-     * @brief  Total # blocks collected in interval.
+     * \brief  Total # blocks collected in interval.
      */
     std::atomic_uint collected{0};
 
     /**
-     * @brief  Total # cube blocks collected in interval.
+     * \brief  Total # cube blocks collected in interval.
      */
     std::atomic_uint cube_collected{0};
 
     /**
-     * @brief  Total # ramp blocks collected in interval.
+     * \brief  Total # ramp blocks collected in interval.
      */
     std::atomic_uint ramp_collected{0};
 
     /**
-     * @brief Total # transporters for collected blocks in interval.
+     * \brief Total # transporters for collected blocks in interval.
      */
     std::atomic_uint transporters{0};
 
     /**
-     * @brief Total amount of time taken for all collected blocks to be
+     * \brief Total amount of time taken for all collected blocks to be
      * transported from original distribution locations to the nest within an
      * interval.
      */
     std::atomic_uint transport_time{0};
 
     /**
-     * @brief Total amount of time between original arena distribution and first
+     * \brief Total amount of time between original arena distribution and first
      * pickup for all collected blocks in interval.
      */
     std::atomic_uint initial_wait_time{0};

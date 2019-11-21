@@ -1,7 +1,7 @@
 /**
- * @file free_block_to_nest_fsm.cpp
+ * \file free_block_to_nest_fsm.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

@@ -1,7 +1,7 @@
 /**
- * @file bitd_mdpo_controller.hpp
+ * \file bitd_mdpo_controller.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,10 +37,10 @@ NS_START(depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class bitd_mdpo_controller
- * @ingroup fordyca controller depth1
+ * \class bitd_mdpo_controller
+ * \ingroup fordyca controller depth1
  *
- * @brief A controller defining the task allocation space via BIfurcating Task
+ * \brief A controller defining the task allocation space via BIfurcating Task
  * Decomposition (BITD) and spliting the \ref generalist task into the \ref
  * harvester, and \ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks.
@@ -69,16 +69,16 @@ class bitd_mdpo_controller : public depth1::bitd_dpo_controller,
 
  protected:
   /**
-   * @brief Initialization that derived classes may also need to perform, if
+   * \brief Initialization that derived classes may also need to perform, if
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
-   * - Block selection matrix (\ref block_sol_matrix)
+   * - Block selection matrix (\ref block_sel_matrix)
    * - Cache selection matrix (\ref cache_sel_matrix)
    * - Task executive (\ref rta::bi_tdgraph_executive)
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    *
-   * @param config_repo Handle to parameter repository for this controller
+   * \param config_repo Handle to parameter repository for this controller
    *                   (after parsing and validation).
    */
   void shared_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;

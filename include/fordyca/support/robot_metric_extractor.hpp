@@ -1,7 +1,7 @@
 /**
- * @file robot_metric_extractor.hpp
+ * \file robot_metric_extractor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,10 +36,10 @@ NS_START(fordyca, support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct robot_metric_extractor
- * @ingroup fordyca support
+ * \struct robot_metric_extractor
+ * \ingroup fordyca support
  *
- * @brief Functor to perform metric extraction from a controller on each
+ * \brief Functor to perform metric extraction from a controller on each
  * timestep.
  */
 template <class AggregatorType, class ControllerType>

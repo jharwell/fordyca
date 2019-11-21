@@ -1,7 +1,7 @@
 /**
- * @file manipulation_metrics.hpp
+ * \file manipulation_metrics.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, metrics, blocks);
  ******************************************************************************/
 
 /**
- * @class manipulation_metrics
- * @ingroup fordyca metrics blocks
+ * \class manipulation_metrics
+ * \ingroup fordyca metrics blocks
  *
- * @brief Defines the metrics to be collected from blocks about the process of
+ * \brief Defines the metrics to be collected from blocks about the process of
  * manipulation (pickup, drop, etc.)
  */
 class manipulation_metrics : public virtual rmetrics::base_metrics {
@@ -50,30 +50,30 @@ class manipulation_metrics : public virtual rmetrics::base_metrics {
   ~manipulation_metrics(void) override = default;
 
   /**
-   * @brief If \c TRUE, then a free block was picked up this timestep.
+   * \brief If \c TRUE, then a free block was picked up this timestep.
    */
   virtual bool free_pickup_event(void) const = 0;
 
   /**
-   * @brief If \c TRUE, then a block was dropped in the arena or in the nest
+   * \brief If \c TRUE, then a block was dropped in the arena or in the nest
    * this timestep.
    */
   virtual bool free_drop_event(void) const = 0;
 
   /**
-   * @brief The penalty the robot was subjected to when picking up/dropping a
+   * \brief The penalty the robot was subjected to when picking up/dropping a
    * block. Only valid for the specific manipulation type, as determined by
    * calling the other members of the class.
    */
   virtual rtypes::timestep penalty_served(void) const = 0;
 
   /**
-   * @brief If \c TRUE, then a cached block was picked up this timestep.
+   * \brief If \c TRUE, then a cached block was picked up this timestep.
    */
   virtual bool cache_pickup_event(void) const = 0;
 
   /**
-   * @brief If \c TRUE, then a block was dropped in a cache this timestep by the
+   * \brief If \c TRUE, then a block was dropped in a cache this timestep by the
    * robot.
    */
   virtual bool cache_drop_event(void) const = 0;

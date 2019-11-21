@@ -1,7 +1,7 @@
 /**
- * @file temporal_penalty.hpp
+ * \file temporal_penalty.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,23 +36,23 @@ NS_START(fordyca, support, tv);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class temporal_penalty
- * @ingroup fordyca support tv
+ * \class temporal_penalty
+ * \ingroup fordyca support tv
  *
- * @brief Handles subjecting a robot to a penalty when doing something via a
+ * \brief Handles subjecting a robot to a penalty when doing something via a
  * timeout in which the robot will sit still.
  */
 template <typename T>
 class temporal_penalty {
  public:
   /**
-   * @brief Initialize the penalty.
+   * \brief Initialize the penalty.
    *
-   * @param controller The controller for the robot being subjected to the
+   * \param controller The controller for the robot being subjected to the
    * penalty.
-   * @param id An optional ID to associate with the penalty.
-   * @param penalty The # of timesteps for the penalty.
-   * @param start_time The timestep the penalty will start on.
+   * \param id An optional ID to associate with the penalty.
+   * \param penalty The # of timesteps for the penalty.
+   * \param start_time The timestep the penalty will start on.
    */
   temporal_penalty(const T* const controller,
                    int id,
@@ -73,7 +73,7 @@ class temporal_penalty {
   }
 
   /**
-   * @brief If \c TRUE, then the robot has satisfied the block_manipulation
+   * \brief If \c TRUE, then the robot has satisfied the block_manipulation
    * penalty.
    */
   bool penalty_satisfied(rtypes::timestep current_time) const {

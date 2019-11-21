@@ -1,7 +1,7 @@
 /**
- * @file mdpo_perception_subsystem.cpp
+ * \file mdpo_perception_subsystem.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

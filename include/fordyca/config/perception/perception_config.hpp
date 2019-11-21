@@ -1,7 +1,7 @@
 /**
- * @file perception_config.hpp
+ * \file perception_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,8 +37,10 @@ NS_START(fordyca, config, perception);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct perception_grid_config
- * @ingroup fordyca config perception
+ * \struct perception_config
+ * \ingroup fordyca config perception
+ *
+ * \brief Configuration for robot perception.
  */
 struct perception_config final : public rconfig::base_config {
   double los_dim{-1};

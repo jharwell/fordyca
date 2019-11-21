@@ -1,7 +1,7 @@
 /**
- * @file temporal_variance_metrics.hpp
+ * \file temporal_variance_metrics.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, metrics);
  ******************************************************************************/
 
 /**
- * @class temporal_variance_metrics
- * @ingroup fordyca metrics
+ * \class temporal_variance_metrics
+ * \ingroup fordyca metrics
  *
- * @brief Defines the metrics to be collected from the environment and the swarm
+ * \brief Defines the metrics to be collected from the environment and the swarm
  * about the different types of temporal variance that can be applied to
  * each.
  *
@@ -56,19 +56,19 @@ class temporal_variance_metrics : public virtual rmetrics::base_metrics {
   temporal_variance_metrics(void) = default;
 
   /**
-   * @brief Return the average motion throttling within the swarm, as a
+   * \brief Return the average motion throttling within the swarm, as a
    * percentage [0, 1.0].
    */
   virtual double avg_motion_throttle(void) const = 0;
 
   /**
-   * @brief Return the current value of the block manipulation penalty present
+   * \brief Return the current value of the block manipulation penalty present
    * in the environment.
    */
   virtual rtypes::timestep env_block_manipulation(void) const = 0;
 
   /**
-   * @brief Return the current value of the cache usage penalty present in the
+   * \brief Return the current value of the cache usage penalty present in the
    * environment.
    */
   virtual rtypes::timestep env_cache_usage(void) const = 0;

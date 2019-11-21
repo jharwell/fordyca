@@ -1,7 +1,7 @@
 /**
- * @file base_cache.hpp
+ * \file base_cache.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_cache
- * @ingroup fordyca repr
+ * \class base_cache
+ * \ingroup fordyca repr
  *
- * @brief Base class for representating a cache within the arena. Caches do not
+ * \brief Base class for representating a cache within the arena. Caches do not
  * have state, and if/when a cache becomes empty, it needs to be deleted by an
  * enclosing class. Caches have both real (where they actually live in the
  * world) and discretized locations (where they are mapped to within the arena
@@ -59,13 +59,13 @@ class base_cache : public unicell_immovable_entity,
                    public rpprototype::clonable<base_cache> {
  public:
   /**
-   * @param dimension The size of the cache. Does not have to be a multiple of
+   * \param dimension The size of the cache. Does not have to be a multiple of
    * the arena resolution, but doing so makes it easier.
-   * @param resolution The arena resolution.
-   * @param center (X,Y) coordinates of the center of the cache.
-   * @param blocks The initial block list for the cache.
+   * \param resolution The arena resolution.
+   * \param center (X,Y) coordinates of the center of the cache.
+   * \param blocks The initial block list for the cache.
 
-   * @param id The ID to assign to the cache; -1 for a new cache, which
+   * \param id The ID to assign to the cache; -1 for a new cache, which
    * will generate a new ID, or any positive # to use the same ID as an existing
    * cache (used when cloning a cache into a robot's perception).
    */
@@ -79,7 +79,7 @@ class base_cache : public unicell_immovable_entity,
     /* clang-format on */
   };
   /**
-   * @brief The minimum # of blocks required for a cache to exist (less than
+   * \brief The minimum # of blocks required for a cache to exist (less than
    * this and you just have a bunch of blocks).
    */
   static constexpr size_t kMinBlocks = 2;
@@ -88,7 +88,7 @@ class base_cache : public unicell_immovable_entity,
   ~base_cache(void) override = default;
 
   /**
-   * @brief Disallow direct object comparisons, because we may want to compare
+   * \brief Disallow direct object comparisons, because we may want to compare
    * for equality in terms of IDs or object locations, and it is better to
    * require explicit comparisons for BOTH, rather than just one. It also makes
    * it unecessary to have to remember which type the comparison operator==()
@@ -97,12 +97,12 @@ class base_cache : public unicell_immovable_entity,
   bool operator==(const base_cache& other) const = delete;
 
   /**
-   * @brief Compare two \ref base_cache objects for equality based on their ID.
+   * \brief Compare two \ref base_cache objects for equality based on their ID.
    */
   bool idcmp(const base_cache& other) const { return this->id() == other.id(); }
 
   /**
-   * @brief Compare two \ref base_cache objects for equality based on their
+   * \brief Compare two \ref base_cache objects for equality based on their
    * discrete location.
    */
   bool dloccmp(const base_cache& other) const {
@@ -110,7 +110,7 @@ class base_cache : public unicell_immovable_entity,
   }
 
   /**
-   * @brief \c TRUE iff the cache contains the specified block.
+   * \brief \c TRUE iff the cache contains the specified block.
    */
   RCSW_PURE bool contains_block(const std::shared_ptr<base_block>& c_block) const {
     return contains_block(c_block.get());
@@ -123,13 +123,13 @@ class base_cache : public unicell_immovable_entity,
   size_t n_blocks(void) const { return blocks().size(); }
 
   /**
-   * @brief Get a list of the blocks currently in the cache.
+   * \brief Get a list of the blocks currently in the cache.
    */
   ds::block_vector& blocks(void) { return m_blocks; }
   const ds::block_vector& blocks(void) const { return m_blocks; }
 
   /**
-   * @brief Add a new block to the cache's list of blocks.
+   * \brief Add a new block to the cache's list of blocks.
    *
    * Does not update the block's location.
    */
@@ -138,14 +138,14 @@ class base_cache : public unicell_immovable_entity,
   }
 
   /**
-   * @brief Remove a block from the cache's list of blocks.
+   * \brief Remove a block from the cache's list of blocks.
    *
    * Does not update the block's location.
    */
   void block_remove(const std::shared_ptr<base_block>& block);
 
   /**
-   * @brief Get the oldest block in the cache (the one that has been in the
+   * \brief Get the oldest block in the cache (the one that has been in the
    * cache the longest).
    */
   std::shared_ptr<base_block> oldest_block(void) { return m_blocks.front(); }

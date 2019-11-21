@@ -1,7 +1,7 @@
 /**
- * @file arena_grid.hpp
+ * \file arena_grid.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,16 +36,19 @@
  ******************************************************************************/
 NS_START(fordyca, ds);
 
+/**
+ * \brief The types of layers used by \ref arena_grid.
+ */
 using arena_layer_stack = std::tuple<cell2D>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class arena_grid
- * @ingroup fordyca ds
+ * \class arena_grid
+ * \ingroup fordyca ds
  *
- * @brief 2D grid of \ref cell2D objects containing the state of the geometrical
+ * \brief 2D grid of \ref cell2D objects containing the state of the geometrical
  * extent of the arena floor.
  */
 class arena_grid : public rds::stacked_grid<arena_layer_stack> {
@@ -56,10 +59,10 @@ class arena_grid : public rds::stacked_grid<arena_layer_stack> {
   static constexpr size_t kCell = 0;
 
   /**
-   * @param resolution The arena resolution (i.e. what is the size of 1 cell in
+   * \param resolution The arena resolution (i.e. what is the size of 1 cell in
    *                   the 2D grid).
-   * @param x_max      Size in X of 2D grid.
-   * @param y_max      Size in Y of 2D grid.
+   * \param x_max      Size in X of 2D grid.
+   * \param y_max      Size in Y of 2D grid.
    *
    * The origin of the grid is in the lower left corner at (0,0).
    */
@@ -73,7 +76,7 @@ class arena_grid : public rds::stacked_grid<arena_layer_stack> {
   }
 
   /**
-   * @brief Reset all the cells within the grid, removing all references to old
+   * \brief Reset all the cells within the grid, removing all references to old
    * blocks as well as setting all cells back to an empty state.
    */
   void reset(void) {

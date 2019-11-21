@@ -1,7 +1,7 @@
 /**
- * @file perception_parser.hpp
+ * \file perception_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, config, perception);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class perception_parser
- * @ingroup fordyca config perception
+ * \class perception_parser
+ * \ingroup fordyca config perception
  *
- * @brief Parses XML parameters for various perception subsystems into
+ * \brief Parses XML parameters for various perception subsystems into
  * \ref perception_config.
  */
 class perception_parser final : public rconfig::xml::xml_config_parser {
@@ -53,7 +53,7 @@ class perception_parser final : public rconfig::xml::xml_config_parser {
   using config_type = perception_config;
 
   /**
-   * @brief The root tag that all perception  parameters should lie under in
+   * \brief The root tag that all perception  parameters should lie under in
    * the XML tree.
    */
   static constexpr char kXMLRoot[] = "perception";

@@ -1,7 +1,7 @@
 /**
- * @file nest_interactor.hpp
+ * \file nest_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ class nest_block_drop;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class nest_interactor
- * @ingroup fordyca events
+ * \class nest_interactor
+ * \ingroup fordyca events
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
+ * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with the nest in FORDYCA.
  */
 class nest_interactor

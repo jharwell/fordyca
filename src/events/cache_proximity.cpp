@@ -1,7 +1,7 @@
 /**
- * @file cache_proximity.cpp
+ * \file cache_proximity.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

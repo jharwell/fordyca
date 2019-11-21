@@ -1,7 +1,7 @@
 /**
- * @file block_redist_governor_parser.cpp
+ * \file block_redist_governor_parser.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

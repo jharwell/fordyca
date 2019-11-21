@@ -1,7 +1,7 @@
 /**
- * @file block_to_goal_fsm.hpp
+ * \file block_to_goal_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -49,10 +49,10 @@ class acquire_free_block_fsm;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_to_goal_fsm
- * @ingroup fordyca fsm depth1
+ * \class block_to_goal_fsm
+ * \ingroup fordyca fsm depth1
  *
- * @brief Base FSM for acquiring, picking up a block, and then bringing it
+ * \brief Base FSM for acquiring, picking up a block, and then bringing it
  * somewhere and dropping it.
  *
  * Each robot executing this FSM will locate a free block (either a known block
@@ -103,7 +103,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   rmath::vector2u current_vector_loc(void) const override final;
 
   /**
-   * @brief Reset the FSM
+   * \brief Reset the FSM
    */
   void init(void) override final;
 
@@ -153,7 +153,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
   HFSM_STATE_DECLARE_ND(block_to_goal_fsm, finished);
 
   /**
-   * @brief Defines the state map for the FSM.
+   * \brief Defines the state map for the FSM.
    *
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.

@@ -1,7 +1,7 @@
 /**
- * @file crw_controller_repository.hpp
+ * \file crw_controller_repository.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -35,10 +35,10 @@ NS_START(fordyca, config, depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class crw_controller_repository
- * @ingroup fordyca config depth0
+ * \class crw_controller_repository
+ * \ingroup fordyca config depth0
  *
- * @brief Collection of all parameter parsers and parse results needed by
+ * \brief Collection of all parameter parsers and parse results needed by
  * \ref crw_controller.
  */
 class crw_controller_repository: public base_controller_repository {

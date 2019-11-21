@@ -1,7 +1,7 @@
 /**
- * @file entities_oracle.hpp
+ * \file entities_oracle.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -53,10 +53,10 @@ NS_START(support, oracle);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class entities_oracle
- * @ingroup fordyca support oracle
+ * \class entities_oracle
+ * \ingroup fordyca support oracle
  *
- * @brief Repository of perfect knowledge about entities in the arena (blocks,
+ * \brief Repository of perfect knowledge about entities in the arena (blocks,
  * caches, etc). Used to provide an upper bound on the performance of different
  * foraging methods.
  */
@@ -71,14 +71,14 @@ class entities_oracle final : public rer::client<entities_oracle> {
   explicit entities_oracle(const config::oracle::entities_oracle_config* config);
 
   /**
-   * @brief Ask the oracle something.
+   * \brief Ask the oracle something.
    *
-   * @param query The question to ask. Currently supports:
+   * \param query The question to ask. Currently supports:
    *
    * entities.blocks
    * entities.caches
    *
-   * @return The answer to the query. Empty answer if query was ill-formed.
+   * \return The answer to the query. Empty answer if query was ill-formed.
    */
   boost::optional<variant_vector_type> ask(const std::string& query) const;
 

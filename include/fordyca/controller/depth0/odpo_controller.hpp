@@ -1,7 +1,7 @@
 /**
- * @file odpo_controller.hpp
+ * \file odpo_controller.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class odpo_controller
- * @ingroup fordyca controller depth0
+ * \class odpo_controller
+ * \ingroup fordyca controller depth0
  *
- * @brief A foraging controller derived from \ref dpo_controller that has
+ * \brief A foraging controller derived from \ref dpo_controller that has
  * perfect information about blocks in the arena.
  */
 class odpo_controller : public dpo_controller,

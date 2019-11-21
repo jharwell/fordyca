@@ -1,7 +1,7 @@
 /**
- * @file caches_parser.hpp
+ * \file caches_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,17 +42,17 @@ NS_START(fordyca, config, caches);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class caches_parser
- * @ingroup fordyca config caches
+ * \class caches_parser
+ * \ingroup fordyca config caches
  *
- * @brief Parses XML parameters for relating to cache into \ref caches_config.
+ * \brief Parses XML parameters for relating to cache into \ref caches_config.
  */
 class caches_parser final: public rconfig::xml::xml_config_parser {
  public:
   using config_type = caches_config;
 
   /**
-   * @brief The root tag that all static cache parameters should lie under in
+   * \brief The root tag that all static cache parameters should lie under in
    * the XML tree.
    */
   static constexpr char kXMLRoot[] = "caches";

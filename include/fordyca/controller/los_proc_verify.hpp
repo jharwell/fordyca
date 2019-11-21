@@ -1,7 +1,7 @@
 /**
- * @file los_proc_verify.hpp
+ * \file los_proc_verify.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(controller);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class loc_proc_verify
- * @ingroup fordyca controller
+ * \class los_proc_verify
+ * \ingroup fordyca controller
  *
- * @brief Verifies that a LOS has been processed properly and that the contents
+ * \brief Verifies that a LOS has been processed properly and that the contents
  * of the LOS is now accurately reflected in a robots perception.
  */
 class los_proc_verify : public rer::client<los_proc_verify> {

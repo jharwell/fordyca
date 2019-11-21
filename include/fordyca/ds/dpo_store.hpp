@@ -1,7 +1,7 @@
 /**
- * @file dpo_store.hpp
+ * \file dpo_store.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,10 +46,10 @@ NS_START(ds);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dpo_store
- * @ingroup fordyca ds
+ * \class dpo_store
+ * \ingroup fordyca ds
  *
- * @brief Stores sets of caches and blocks the robot encounters in the arena,
+ * \brief Stores sets of caches and blocks the robot encounters in the arena,
  * along with the pheromone-based relevance for each. Also contains the logic
  * for correctly updating the sets of caches and blocks when updated versions of
  * an entity are encountered (e.g. the real version has vanished and the tracked
@@ -69,7 +69,7 @@ class dpo_store final : public rer::client<dpo_store> {
   };
 
   /**
-   * @brief The result of a applying a DPO store update.
+   * \brief The result of a applying a DPO store update.
    *
    * status: Has the store changed as a result of the applied update?
    * reason: If the store has changed, what is the reason for the change?
@@ -84,7 +84,7 @@ class dpo_store final : public rer::client<dpo_store> {
   };
 
   /**
-   * @brief The maximum pheromone level if repeat deposits of pheromone are not
+   * \brief The maximum pheromone level if repeat deposits of pheromone are not
    * enabled.
    */
   static constexpr double kNRD_MAX_PHEROMONE = 1.0;
@@ -92,14 +92,14 @@ class dpo_store final : public rer::client<dpo_store> {
   explicit dpo_store(const config::perception::pheromone_config* config);
 
   /**
-   * @brief Get all blocks the robot is currently aware of, and their
+   * \brief Get all blocks the robot is currently aware of, and their
    * corresponding pheromone levels.
    */
   ds::dp_block_map& blocks(void) { return m_blocks; }
   const ds::dp_block_map& blocks(void) const { return m_blocks; }
 
   /**
-   * @brief Get all caches the robot is currently aware of, and their
+   * \brief Get all caches the robot is currently aware of, and their
    * corresponding pheromone levels.
    */
   ds::dp_cache_map& caches(void) { return m_caches; }
@@ -108,7 +108,7 @@ class dpo_store final : public rer::client<dpo_store> {
   bool repeat_deposit(void) const { return mc_repeat_deposit; }
 
   /**
-   * @brief Update the densities of all objects in the store (i.e. decay
+   * \brief Update the densities of all objects in the store (i.e. decay
    * them). Should be called when one unit of time has passed (e.g. every
    * timestep).
    */
@@ -126,37 +126,37 @@ class dpo_store final : public rer::client<dpo_store> {
       const std::shared_ptr<repr::base_cache>& cache) const;
 
   /**
-   * @brief Update the known caches set with the new cache.
+   * \brief Update the known caches set with the new cache.
    *
    * If there is already a known cache at the location of the incoming cache, it
    * is removed and replaced with a new one.
    *
-   * @param cache Cache to add.
+   * \param cache Cache to add.
    */
   update_res_t cache_update(const dpo_entity<repr::base_cache>& cache);
 
   /*
-   * @brief Update the known blocks set with the new block.
+   * \brief Update the known blocks set with the new block.
    *
    * If the block is already in our set of known blocks it *MAY* need to be
    * removed, depending on if its location has changed or not. If its location
    * has not changed, then its pheromone count is updated to correspond to the
    * new block, but the block object currently in the set is not replaced.
    *
-   * @return \c TRUE if a block was added, and \c FALSE otherwise.
+   * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
   update_res_t block_update(const dpo_entity<repr::base_block>& block_in);
 
   /**
-   * @brief Remove a cache from the set of of known caches.
+   * \brief Remove a cache from the set of of known caches.
    */
   bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
 
   /*
-   * @brief Remove a block from the set of known blocks. If the victim is not
+   * \brief Remove a block from the set of known blocks. If the victim is not
    * currently in our set of known blocks, no action is performed.
    *
-   * @return \c TRUE if a block was removed, \c FALSE otherwise.
+   * \return \c TRUE if a block was removed, \c FALSE otherwise.
    */
   bool block_remove(const std::shared_ptr<repr::base_block>& victim);
 

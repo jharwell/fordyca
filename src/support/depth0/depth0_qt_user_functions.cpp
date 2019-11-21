@@ -1,7 +1,7 @@
 /**
- * @file depth0_qt_user_functions.cpp
+ * \file depth0_qt_user_functions.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 /*
- * @todo Figure out how to remove this warning properly.
+ * \todo Figure out how to remove this warning properly.
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"

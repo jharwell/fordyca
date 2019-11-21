@@ -1,7 +1,7 @@
 /**
- * @file task_status.hpp
+ * \file task_status.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -34,7 +34,15 @@ NS_START(fordyca, tasks);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-enum class task_status { ekNull, ekRunning, ekAbortPending, ekAbortProcessed };
+/**
+ * \brief Enumeration to handle handshaking between robot task abort and arena.
+ */
+enum class task_status {
+  ekNULL,
+  ekRUNNING,
+  ekABORT_PENDING,
+  ekABORT_PROCESSED
+};
 
 NS_END(tasks, fordyca);
 

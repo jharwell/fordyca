@@ -1,7 +1,7 @@
 /**
- * @file oracle_manager_config.hpp
+ * \file oracle_manager_config.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, config, oracle);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct oracle_manager_config
- * @ingroup fordyca config oracle
+ * \struct oracle_manager_config
+ * \ingroup fordyca config oracle
  *
- * @brief Parameters for the various oracles that can be employed during
+ * \brief Parameters for the various oracles that can be employed during
  * simulation.
  */
 struct oracle_manager_config final : public rconfig::base_config {

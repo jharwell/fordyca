@@ -1,7 +1,7 @@
 /**
- * @file block_vanished.hpp
+ * \file block_vanished.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -34,18 +34,16 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
- * @class block_vanished
- * @ingroup fordyca events detail
+/**
+ * \class block_vanished
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a robot is serving a block pickup penalty, but while
+ * \brief Created whenever a robot is serving a block pickup penalty, but while
  * serving the penalty the block it is waiting for vanishes due to another
  * robot picking it up (ramp blocks only).
  */
@@ -115,7 +113,7 @@ class block_vanished : public rer::client<block_vanished> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

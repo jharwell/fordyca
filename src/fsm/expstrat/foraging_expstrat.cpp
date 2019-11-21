@@ -1,7 +1,7 @@
 /**
- * @file foraging_expstrat.cpp
+ * \file foraging_expstrat.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

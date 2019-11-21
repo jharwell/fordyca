@@ -1,7 +1,7 @@
 /**
- * @file cache_acq_validator.hpp
+ * \file cache_acq_validator.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -48,10 +48,10 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_acq_validator
- * @ingroup fordyca fsm
+ * \class cache_acq_validator
+ * \ingroup fordyca fsm
  *
- * @brief Determine if the acquisition of a cache at a specific location/with a
+ * \brief Determine if the acquisition of a cache at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and
  * current simulation state.
  */

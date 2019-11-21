@@ -1,7 +1,7 @@
 /**
- * @file grid_view_entity.hpp
+ * \file grid_view_entity.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class grid_view_entity
- * @ingroup fordyca repr
+ * \class grid_view_entity
+ * \ingroup fordyca repr
  *
- * @brief Representation of an entity in the arena that:
+ * \brief Representation of an entity in the arena that:
  *
  * - Spans multiple cells in the arena.
  * - Does not "exist" in the sense that it is not detectable by robots. It lives
@@ -68,7 +68,7 @@ class grid_view_entity : public base_entity {
   rtypes::discretize_ratio resolution(void) const { return mc_resolution; }
 
   /**
-   * @brief Get the 2D space spanned by the entity in absolute
+   * \brief Get the 2D space spanned by the entity in absolute
    * coordinates in the arena in X.
    */
   rmath::ranged xspan(void) const override final {
@@ -77,7 +77,7 @@ class grid_view_entity : public base_entity {
   }
 
   /**
-   * @brief Get the 2D space spanned by the grid_cell entity in absolute
+   * \brief Get the 2D space spanned by the grid_cell entity in absolute
    * coordinates in the arena in Y.
    */
   rmath::ranged yspan(void) const override final {
@@ -86,10 +86,10 @@ class grid_view_entity : public base_entity {
   }
 
   /**
-   * @brief Determine if a real-valued point lies within the extent of the
+   * \brief Determine if a real-valued point lies within the extent of the
    * entity.
    *
-   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
+   * \return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const rmath::vector2d& point) const {
     return xspan().contains(point.x()) && yspan().contains(point.y());
@@ -99,20 +99,20 @@ class grid_view_entity : public base_entity {
   double ydimr(void) const override { return yspan().span(); }
 
   /**
-   * @brief Get the cell associated with a particular grid location within the
+   * \brief Get the cell associated with a particular grid location within the
    * LOS. Asserts that both coordinates are within the bounds of the grid
    * underlying the LOS.
    *
-   * @param i The RELATIVE X coord within the LOS.
-   * @param j The RELATIVE Y coord within the LOS.
+   * \param i The RELATIVE X coord within the LOS.
+   * \param j The RELATIVE Y coord within the LOS.
    *
-   * @return A reference to the cell.
+   * \return A reference to the cell.
    */
   const ds::cell2D& cell(uint i, uint j) const { return m_view[i][j]; }
 
  protected:
   /**
-   * @brief Return the size of the entity in discrete coordinates. Only suitable
+   * \brief Return the size of the entity in discrete coordinates. Only suitable
    * for indexing within the entity itself.
    */
   size_t xdimd(void) const { return m_view.shape()[0]; }

@@ -1,7 +1,7 @@
 /**
- * @file fsm_fwd.hpp
+ * \file fsm_fwd.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

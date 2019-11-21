@@ -1,7 +1,7 @@
 /**
- * @file oracle_manager.hpp
+ * \file oracle_manager.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -49,10 +49,10 @@ class tasking_oracle;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class oracle_manager
- * @ingroup fordyca support oracle
+ * \class oracle_manager
+ * \ingroup fordyca support oracle
  *
- * @brief Thin wrapper around the following oracles:
+ * \brief Thin wrapper around the following oracles:
  *
  * - \ref tasking_oracle
  * - \ref entities_oracle
@@ -71,14 +71,14 @@ class oracle_manager {
   }
 
   /**
-   * @brief Because the \ref tasking_oracle requires more than just the \ref
+   * \brief Because the \ref tasking_oracle requires more than just the \ref
    * tasking_oracle_config to construct, it is null-constructed by default, and
    * the loop functions are responsible for actually creating it.
    */
   void tasking_oracle(std::unique_ptr<class tasking_oracle> o);
 
   /**
-   * @brief Update all oracles each timestep (if necessary). Should be called
+   * \brief Update all oracles each timestep (if necessary). Should be called
    * from the loop functions before processing any robots for that timestep (at
    * a minimum).
    */

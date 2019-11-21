@@ -1,7 +1,7 @@
 /**
- * @file mdpo_perception_metrics.hpp
+ * \file mdpo_perception_metrics.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,10 +37,10 @@ NS_START(fordyca, metrics, perception);
  ******************************************************************************/
 
 /**
- * @class mdpo_perception_metrics
- * @ingroup fordyca metrics perception
+ * \class mdpo_perception_metrics
+ * \ingroup fordyca metrics perception
  *
- * @brief Defines the metrics to be collected from robots about their mapped DPO
+ * \brief Defines the metrics to be collected from robots about their mapped DPO
  * world model.
  *
  * Metrics are collected every timestep.
@@ -50,7 +50,7 @@ class mdpo_perception_metrics : public virtual rmetrics::base_metrics {
   mdpo_perception_metrics(void) = default;
 
   /**
-   * @brief Return the total # of times the robot's world model was inaccurate
+   * \brief Return the total # of times the robot's world model was inaccurate
    * regarding which cells in their world model were thought to contain
    * something/not to contain something.
    *
@@ -58,18 +58,18 @@ class mdpo_perception_metrics : public virtual rmetrics::base_metrics {
    * inaccuracy was detected, only that there was one. That may be added later
    * if additional insight is desired.
    *
-   * @param state The state type for which inaccuracies should be reported.
+   * \param state The state type for which inaccuracies should be reported.
    */
   virtual uint cell_state_inaccuracies(uint state) const = 0;
 
   /**
-   * @brief Return the percentage of the arena that is currently in a known
+   * \brief Return the percentage of the arena that is currently in a known
    * state as a fraction of 1.0.
    */
   virtual double known_percentage(void) const = 0;
 
   /**
-   * @brief Return the percentage of the arena that is currently in an unknown
+   * \brief Return the percentage of the arena that is currently in an unknown
    * state, as a fraction of 1.0
    */
   virtual double unknown_percentage(void) const = 0;

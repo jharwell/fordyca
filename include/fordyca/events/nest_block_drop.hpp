@@ -1,7 +1,7 @@
 /**
- * @file nest_block_drop.hpp
+ * \file nest_block_drop.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,10 +44,10 @@ NS_START(fordyca, events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class nest_block_drop
- * @ingroup fordyca events detail
+ * \class nest_block_drop
+ * \ingroup fordyca events detail
  *
- * @brief Fired whenever a robot drops a block in the nest.
+ * \brief Fired whenever a robot drops a block in the nest.
  */
 class nest_block_drop : public rer::client<nest_block_drop> {
  private:
@@ -75,11 +75,11 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   using visit_typelist = visit_typelist_impl::value;
 
   /**
-   * @brief Initialize a nest block drop event.
+   * \brief Initialize a nest block drop event.
    *
-   * @param robot_block Clone of arena block which it is giving up ownership of
+   * \param robot_block Clone of arena block which it is giving up ownership of
    *                    for the drop.
-   * @param t Current timestep.
+   * \param t Current timestep.
    */
   nest_block_drop(std::unique_ptr<repr::base_block> robot_block,
                   const rtypes::timestep& t);
@@ -91,7 +91,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   /* Depth0 DPO/MDPO foraging */
 
   /**
-   * @brief Perform actual nest block drop in the arena.
+   * \brief Perform actual nest block drop in the arena.
    *
    * Internally takes \ref arena_map block, grid mutexes to protect block
    * re-distribution and block updates, and releases afterwards. See #594.
@@ -135,7 +135,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

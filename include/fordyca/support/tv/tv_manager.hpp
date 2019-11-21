@@ -1,7 +1,7 @@
 /**
- * @file tv_manager.hpp
+ * \file tv_manager.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -65,9 +65,9 @@ NS_START(tv);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class tv_manager
- * @ingroup fordyca support tv
- * @brief Orchestrates all application of temporal variance to robot interations
+ * \class tv_manager
+ * \ingroup fordyca support tv
+ * \brief Orchestrates all application of temporal variance to robot interations
  * with the environment/robotic mechanical functioning.
  */
 
@@ -95,7 +95,7 @@ class tv_manager final : public rer::client<tv_manager>,
   irv_lf_adaptor* irv_adaptor(void) { return &m_irv; }
 
   /**
-   * @brief Return non-owning reference to a penalty handler for the specified
+   * \brief Return non-owning reference to a penalty handler for the specified
    * type of block operation; scope of usage must not exceed that of the
    * instance of this class used to generate the reference.
    */
@@ -122,7 +122,7 @@ class tv_manager final : public rer::client<tv_manager>,
   }
 
   /**
-   * @brief Return non-owning reference to a penalty handler for the specified
+   * \brief Return non-owning reference to a penalty handler for the specified
    * type of cache operation; scope of usage must not exceed that of the
    * instance of this class used to generate the reference.
    */
@@ -173,17 +173,17 @@ class tv_manager final : public rer::client<tv_manager>,
   }
 
   /**
-   * @brief Register a robot controller to the temporal variance controller so
+   * \brief Register a robot controller to the temporal variance controller so
    * that all necessary handlers for all possible types of variance that could
    * be applied to a given controller are setup.
    *
-   * @param robot_id The ID of the robot controller, assumed to be unique (not
+   * \param robot_id The ID of the robot controller, assumed to be unique (not
    * checked).
    */
   void register_controller(int robot_id) { m_irv.register_controller(robot_id); }
 
   /**
-   * @brief Update the state of applied variances. Should be called once per
+   * \brief Update the state of applied variances. Should be called once per
    * timestep.
    */
   void update(void) { m_irv.update(); }

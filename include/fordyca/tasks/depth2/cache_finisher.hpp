@@ -1,7 +1,7 @@
 /**
- * @file cache_finisher.hpp
+ * \file cache_finisher.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, tasks, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_finisher
- * @ingroup fordyca tasks depth2
+ * \class cache_finisher
+ * \ingroup fordyca tasks depth2
  *
- * @brief Task in which robots locate a free block and drop it next to/on top of
+ * \brief Task in which robots locate a free block and drop it next to/on top of
  * a free block in the arena to finish the creation of a new cache. It is
  * abortable, and has one task interface.
  */

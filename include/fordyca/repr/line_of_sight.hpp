@@ -1,7 +1,7 @@
 /**
- * @file line_of_sight.hpp
+ * \file line_of_sight.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -52,10 +52,10 @@ class base_cache;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class line_of_sight
- * @ingroup fordyca repr
+ * \class line_of_sight
+ * \ingroup fordyca repr
  *
- * @brief A repr of the robot's current line-of-sight. The robot is
+ * \brief A repr of the robot's current line-of-sight. The robot is
  * only able to update its internal state based on the information present in
  * the per-timestep updates to this object.
  *
@@ -80,9 +80,9 @@ class line_of_sight final : public rer::client<line_of_sight> {
   ds::cache_list caches(void) const;
 
   /**
-   * @brief Get the size of the X dimension for a LOS.
+   * \brief Get the size of the X dimension for a LOS.
    *
-   * @return The X dimension.
+   * \return The X dimension.
    */
   size_t xsize(void) const { return mc_view.shape()[0]; }
 
@@ -92,40 +92,40 @@ class line_of_sight final : public rer::client<line_of_sight> {
   rmath::vector2u abs_ur(void) const RCSW_PURE;
 
   /**
-   * @brief Get the size of the Y dimension for a LOS.
+   * \brief Get the size of the Y dimension for a LOS.
    *
-   * @return The Y dimension.
+   * \return The Y dimension.
    */
   grid_view::size_type ysize(void) const { return mc_view.shape()[1]; }
 
   /**
-   * @brief Determine if the *ABSOLUTE* arena location is contained in the LOS.
+   * \brief Determine if the *ABSOLUTE* arena location is contained in the LOS.
    */
   bool contains_loc(const rmath::vector2u& loc) const RCSW_PURE;
 
   /**
-   * @brief Get the # elements in a LOS.
+   * \brief Get the # elements in a LOS.
    *
-   * @return # elements.
+   * \return # elements.
    */
   grid_view::size_type size(void) const { return mc_view.num_elements(); }
 
   /**
-   * @brief Get the cell associated with a particular grid location within the
+   * \brief Get the cell associated with a particular grid location within the
    * LOS. Asserts that both coordinates are within the bounds of the grid
    * underlying the LOS.
    *
-   * @param i The RELATIVE X coord within the LOS.
-   * @param j The RELATIVE Y coord within the LOS.
+   * \param i The RELATIVE X coord within the LOS.
+   * \param j The RELATIVE Y coord within the LOS.
    *
-   * @return A reference to the cell.
+   * \return A reference to the cell.
    */
   const ds::cell2D& cell(uint i, uint j) const RCSW_PURE;
 
   /**
-   * @brief Get the coordinates for the center of the LOS.
+   * \brief Get the coordinates for the center of the LOS.
    *
-   * @return The center coordinates (discrete version).
+   * \return The center coordinates (discrete version).
    */
   const rmath::vector2u& center(void) const { return mc_center; }
 

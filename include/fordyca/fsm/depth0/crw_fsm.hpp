@@ -1,7 +1,7 @@
 /**
- * @file crw_fsm.hpp
+ * \file crw_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -50,10 +50,10 @@ ppp * Class Definitions
  ******************************************************************************/
 
 /**
- * @class crw_fsm
- * @ingroup fordyca fsm depth0
+ * \class crw_fsm
+ * \ingroup fordyca fsm depth0
  *
- * @brief The FSM for the most basic foraging definition: each robot executing
+ * \brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the
  * block back to the nest, and drops it.
  */
@@ -89,12 +89,12 @@ class crw_fsm final : public cfsm::util_hfsm,
   foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
   /**
-   * @brief (Re)-initialize the FSM.
+   * \brief (Re)-initialize the FSM.
    */
   void init(void) override;
 
   /**
-   * @brief Run the FSM in its current state, without injecting an event.
+   * \brief Run the FSM in its current state, without injecting an event.
    */
   void run(void);
 
@@ -132,7 +132,7 @@ class crw_fsm final : public cfsm::util_hfsm,
                      rpfsm::event_data);
 
   /**
-   * @brief Defines the state map for the FSM.
+   * \brief Defines the state map for the FSM.
    *
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.

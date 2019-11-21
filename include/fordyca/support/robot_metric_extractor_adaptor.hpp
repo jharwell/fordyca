@@ -1,7 +1,7 @@
 /**
- * @file robot_metric_extractor_adaptor.hpp
+ * \file robot_metric_extractor_adaptor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, support);
  * Struct Definitions
  ******************************************************************************/
 /**
- * @struct robot_metric_extractor_adaptor
- * @ingroup fordyca support depth0
+ * \struct robot_metric_extractor_adaptor
+ * \ingroup fordyca support depth0
  *
- * @brief Wrapping functor to perform metric extractor which provides the
+ * \brief Wrapping functor to perform metric extractor which provides the
  * indirection in mapping from templated controller type in operator() to the
  * actual extractor_adaptor implementation (needed for use with
  * boost::static_visitor).

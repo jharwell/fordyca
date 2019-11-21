@@ -1,7 +1,7 @@
 /**
- * @file cache_respawn_probability.hpp
+ * \file cache_respawn_probability.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,10 +37,10 @@ NS_START(fordyca, math);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_respawn_probability
- * @ingroup fordyca math
+ * \class cache_respawn_probability
+ * \ingroup fordyca math
  *
- * @brief Calculate the probability that loop functions should respawn a static
+ * \brief Calculate the probability that loop functions should respawn a static
  * cache after it has been emptied (turned into a single block that is).
  *
  * Depends on:
@@ -52,10 +52,10 @@ class cache_respawn_probability : public rmath::expression<double> {
   explicit cache_respawn_probability(double scale_factor);
 
   /**
-   * @brief Calculate the probability of respawn
+   * \brief Calculate the probability of respawn
    *
-   * @param n_harvesters # robots currently executing Harvester task.
-   * @param n_collectors # robots currently executing Collector task.
+   * \param n_harvesters # robots currently executing Harvester task.
+   * \param n_collectors # robots currently executing Collector task.
    */
   double calc(uint n_harvesters, uint n_collectors);
 

@@ -1,7 +1,7 @@
 /**
- * @file depth1/robot_configurer_adaptor.hpp
+ * \file depth1/robot_configurer_adaptor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ using configurer_map_type = rds::type_map<
  * Class Definitions
  ******************************************************************************/
 /**
- * @class robot_configurer_adaptor
- * @ingroup fordyca support depth1
+ * \class robot_configurer_adaptor
+ * \ingroup fordyca support depth1
  *
- * @brief Wrapping functor to perform robot controller configuration during
+ * \brief Wrapping functor to perform robot controller configuration during
  * initialization.
  */
 class robot_configurer_adaptor {

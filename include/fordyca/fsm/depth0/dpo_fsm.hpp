@@ -1,7 +1,7 @@
 /**
- * @file dpo_fsm.hpp
+ * \file dpo_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,10 +44,10 @@ NS_START(fsm, depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dpo_fsm
- * @ingroup fordyca fsm depth0
+ * \class dpo_fsm
+ * \ingroup fordyca fsm depth0
  *
- * @brief The FSM for an unpartitioned foraging task. Each robot executing this
+ * \brief The FSM for an unpartitioned foraging task. Each robot executing this
  * FSM will locate for a block (either a known block or via exploration), pickup
  * the block and bring it all the way back to the nest.
  *
@@ -92,7 +92,7 @@ class dpo_fsm final : public cfsm::util_hfsm,
   void init(void) override;
 
   /**
-   * @brief Run the FSM in its current state, without injecting an event.
+   * \brief Run the FSM in its current state, without injecting an event.
    */
   void run(void);
 
@@ -115,7 +115,7 @@ class dpo_fsm final : public cfsm::util_hfsm,
   HFSM_STATE_DECLARE(dpo_fsm, block_to_nest, rpfsm::event_data);
 
   /**
-   * @brief Defines the state map for the FSM.
+   * \brief Defines the state map for the FSM.
    *
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.

@@ -1,7 +1,7 @@
 /**
- * @file caches_config.hpp
+ * \file caches_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,14 +38,14 @@ NS_START(fordyca, config, caches);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct caches_config
- * @ingroup fordyca config arena
+ * \struct caches_config
+ * \ingroup fordyca config arena
  *
- * @brief Contains parameters for both static and dynamic caches in the arena.
+ * \brief Contains parameters for both static and dynamic caches in the arena.
  */
 struct caches_config final : public rconfig::base_config {
   /**
-   * @brief How large are cache (geometrical area), when created (same for
+   * \brief How large are cache (geometrical area), when created (same for
    * static and dynamic) ?
    */
   rtypes::spatial_dist dimension{0.0};

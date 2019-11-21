@@ -1,7 +1,7 @@
 /**
- * @file cell2D_fsm.hpp
+ * \file cell2D_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell2D_fsm
- * @ingroup fordyca fsm
+ * \class cell2D_fsm
+ * \ingroup fordyca fsm
  *
- * @brief Per-cell FSM containing the current state of the cell (empty, has a
+ * \brief Per-cell FSM containing the current state of the cell (empty, has a
  * block, has a cache, or unknown, etc.).
  *
  */

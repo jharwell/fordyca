@@ -1,7 +1,7 @@
 /**
- * @file fsm_ro_params.hpp
+ * \file fsm_ro_params.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -51,10 +51,10 @@ NS_START(fsm);
  * Struct Definitions
  ******************************************************************************/
 /**
- * @struct fsm_ro_params
- * @ingroup fordyca fsm
+ * \struct fsm_ro_params
+ * \ingroup fordyca fsm
  *
- * @brief Contains all parameters for FSM initialization that will be read-only
+ * \brief Contains all parameters for FSM initialization that will be read-only
  * by the FSM at run-time; not all FSMs need all members.
  */
 struct fsm_ro_params {

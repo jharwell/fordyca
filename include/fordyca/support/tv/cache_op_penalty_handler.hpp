@@ -1,7 +1,7 @@
 /**
- * @file cache_op_penalty_handler.hpp
+ * \file cache_op_penalty_handler.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 
 /**
- * @class cache_op_penalty_handler
- * @ingroup fordyca support
+ * \class cache_op_penalty_handler
+ * \ingroup fordyca support
  *
- * @brief The handler for block operation penalties for robots (e.g. picking
+ * \brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
 template <typename T>
@@ -71,14 +71,14 @@ class cache_op_penalty_handler final
   cache_op_penalty_handler(const cache_op_penalty_handler& other) = delete;
 
   /**
-   * @brief Check if a robot has acquired a block or is in the nest, and is
+   * \brief Check if a robot has acquired a block or is in the nest, and is
    * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
    *
-   * @param robot The robot to check.
-   * @param src The penalty source (i.e. what event caused this penalty to be
+   * \param controller The robot to check.
+   * \param src The penalty source (i.e. what event caused this penalty to be
    *            applied).
-   * @param t The current timestep.
+   * \param t The current timestep.
   */
   op_filter_status penalty_init(T& controller,
                                 cache_op_src src,

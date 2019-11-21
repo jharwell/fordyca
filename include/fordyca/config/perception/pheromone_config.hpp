@@ -1,7 +1,7 @@
 /**
- * @file pheromone_config.hpp
+ * \file pheromone_config.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,8 +36,10 @@ NS_START(fordyca, config, perception);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct pheromone_config
- * @ingroup fordyca config perception
+ * \struct pheromone_config
+ * \ingroup fordyca config perception
+ *
+ * \brief Configuration for robot virtual pheromones.
  */
 struct pheromone_config final : public rconfig::base_config {
   double rho{0.0};

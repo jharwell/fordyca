@@ -1,7 +1,7 @@
 /**
- * @file dynamic_cache_parser.hpp
+ * \file dynamic_cache_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, config, caches);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dynamic_cache_parser
- * @ingroup fordyca config caches
+ * \class dynamic_cache_parser
+ * \ingroup fordyca config caches
  *
- * @brief Parses XML parameters for relating to dynamic caches into \ref
+ * \brief Parses XML parameters for relating to dynamic caches into \ref
  * dynamic_cache_config.
  */
 class dynamic_cache_parser final: public rconfig::xml::xml_config_parser {
@@ -51,7 +51,7 @@ class dynamic_cache_parser final: public rconfig::xml::xml_config_parser {
   using config_type = dynamic_cache_config;
 
   /**
-   * @brief The root tag that all dynamic cache parameters should lie under in
+   * \brief The root tag that all dynamic cache parameters should lie under in
    * the XML tree.
    */
   static constexpr char kXMLRoot[] = "dynamic";

@@ -1,7 +1,7 @@
 /**
- * @file static_cache_creator.hpp
+ * \file static_cache_creator.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,10 +37,10 @@ NS_START(fordyca, support, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class static_cache_creator
- * @ingroup fordyca support depth1
+ * \class static_cache_creator
+ * \ingroup fordyca support depth1
  *
- * @brief Creates static cache(s) in the arena by taking \ref
+ * \brief Creates static cache(s) in the arena by taking \ref
  * base_cache::kMinBlocks from the allocated blocks and grouping them together
  * at each of the specified cache locations where a cache does not currently
  * exist in order to create a new static cache.
@@ -53,7 +53,7 @@ class static_cache_creator : public base_cache_creator,
                        rtypes::spatial_dist cache_dim);
 
   /**
-   * @brief Re-create all static caches. Ignores block cluster locations because
+   * \brief Re-create all static caches. Ignores block cluster locations because
    * the locations of the static caches do not change and are known to be
    * conflict free.
    */

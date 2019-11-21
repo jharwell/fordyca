@@ -1,7 +1,7 @@
 /**
- * @file depth2/robot_arena_interactor.hpp
+ * \file depth2/robot_arena_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ class dynamic_cache_manager;
  * Classes
  ******************************************************************************/
 /**
- * @class robot_arena_interactor
- * @ingroup fordyca support depth2
+ * \class robot_arena_interactor
+ * \ingroup fordyca support depth2
  *
- * @brief Handles a robot's interactions with the environment on each timestep.
+ * \brief Handles a robot's interactions with the environment on each timestep.
  *
  * Including:
  *
@@ -92,10 +92,10 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
                                     p.cache_manager) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -106,12 +106,12 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
 
   /**
-   * @brief The actual handling function for interactions.
+   * \brief The actual handling function for interactions.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
+   * \param controller The controller to handle interactions for.
+   * \param t The current timestep.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_task_abort_interactor(controller,
                                 m_tv_manager->template all_penalty_handlers<T>())) {
       /*
@@ -120,11 +120,11 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
        * task in the loop functions when the executive has not aborted the newly
        * allocated task *after* the previous task was aborted. See #532,#587.
        */
-      controller.task_status_update(tasks::task_status::ekRunning);
-      return interactor_status::ekTaskAbort;
+      controller.task_status_update(tasks::task_status::ekRUNNING);
+      return interactor_status::ekTASK_ABORT;
     }
 
-    auto status = interactor_status::ekNoEvent;
+    auto status = interactor_status::ekNO_EVENT;
     if (controller.is_carrying_block()) {
       status |= m_nest_drop_interactor(controller, t);
       m_existing_cache_drop_interactor(controller, t);

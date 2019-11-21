@@ -1,7 +1,7 @@
 /**
- * @file existing_cache_block_drop_interactor.hpp
+ * \file existing_cache_block_drop_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(fordyca, support);
  * Classes
  ******************************************************************************/
 /**
- * @class existing_cache_block_drop_interactor
- * @ingroup fordyca support
+ * \class existing_cache_block_drop_interactor
+ * \ingroup fordyca support
  *
- * @brief Handles a robot's (possible) \ref cache_block_drop event for existing
+ * \brief Handles a robot's (possible) \ref cache_block_drop event for existing
  * caches on a given timestep.
  */
 template <typename T>
@@ -61,10 +61,10 @@ class existing_cache_block_drop_interactor
             tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -75,10 +75,10 @@ class existing_cache_block_drop_interactor
       const existing_cache_block_drop_interactor& other) = delete;
 
   /**
-   * @brief The actual handling function for interactions.
+   * \brief The actual handling function for interactions.
    *
-   * @param controller The controller to handle interactions for.
-   * @param t   The current timestep.
+   * \param controller The controller to handle interactions for.
+   * \param t   The current timestep.
    */
   void operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
@@ -94,7 +94,7 @@ class existing_cache_block_drop_interactor
 
  private:
   /**
-   * @brief Handles handshaking between cache, robot, and arena if the robot is
+   * \brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
@@ -159,7 +159,7 @@ class existing_cache_block_drop_interactor
   }
 
   /**
-   * @brief Perform the actual dropping of a block in the cache once all
+   * \brief Perform the actual dropping of a block in the cache once all
    * preconditions have been satisfied.
    */
   void perform_cache_block_drop(T& controller,

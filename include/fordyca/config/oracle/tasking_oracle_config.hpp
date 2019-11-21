@@ -1,7 +1,7 @@
 /**
- * @file tasking_oracle_config.hpp
+ * \file tasking_oracle_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,20 +36,20 @@ NS_START(fordyca, config, oracle);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct tasking_oracle_config
- * @ingroup fordyca config oracle
+ * \struct tasking_oracle_config
+ * \ingroup fordyca config oracle
  *
- * @brief Parameters for all-seeing task allocation oracle.
+ * \brief Parameters for all-seeing task allocation oracle.
  */
 struct tasking_oracle_config final : public rconfig::base_config {
   /**
-   * @brief Should the all-knowing oracle be used when updating task execution
+   * \brief Should the all-knowing oracle be used when updating task execution
    * time estimates? Only applicable to certain controllers.
    */
   bool task_exec_ests{false};
 
   /**
-   * @brief Should the all-knowing oracle be used when updating task interface
+   * \brief Should the all-knowing oracle be used when updating task interface
    * time estimates? Only applicable to certain controllers.
    */
   bool task_interface_ests{false};

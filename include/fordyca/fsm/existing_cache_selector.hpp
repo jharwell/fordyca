@@ -1,7 +1,7 @@
 /**
- * @file existing_cache_selector.hpp
+ * \file existing_cache_selector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class existing_cache_selector
- * @ingroup fordyca fsm
+ * \class existing_cache_selector
+ * \ingroup fordyca fsm
  *
- * @brief Selects from among known caches (which are presumed to still exist at
+ * \brief Selects from among known caches (which are presumed to still exist at
  * this point, although that may not be true as a robot's knowledge of the arena
  * is imperfect), using an internal utility function.
  */
@@ -64,11 +64,11 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
   existing_cache_selector(const existing_cache_selector& other) = delete;
 
   /**
-   * @brief Given a list of existing caches that a robot knows about (i.e. have
+   * \brief Given a list of existing caches that a robot knows about (i.e. have
    * not faded into an unknown state), compute which is the "best", for use in
    * deciding which cache to go to and attempt to pickup from.
    *
-   * @return The "best" existing cache.
+   * \return The "best" existing cache.
    */
   boost::optional<ds::dp_cache_map::value_type> operator()(
       const ds::dp_cache_map& existing_caches,
@@ -77,13 +77,13 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
 
  private:
   /**
-   * @brief Determine if the specified cache is excluded from being considered
+   * \brief Determine if the specified cache is excluded from being considered
    * for selection because:
    *
    * - The robot is currently inside it.
    * - It is on the exception list.
    *
-   * @return \c TRUE if the cache should be excluded, \c FALSE otherwise.
+   * \return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool cache_is_excluded(const rmath::vector2d& position,
                          const repr::base_cache* cache) const;

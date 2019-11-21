@@ -1,7 +1,7 @@
 /**
- * @file output_config.hpp
+ * \file output_config.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,8 +39,10 @@ NS_START(fordyca, config);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct output_config
- * @ingroup fordyca config
+ * \struct output_config
+ * \ingroup fordyca config
+ *
+ * \brief Configuration for robot/loop function logging/metrics.
  */
 struct output_config final : public rconfig::base_config {
   std::string output_root{};

@@ -1,7 +1,7 @@
 /**
- * @file free_block_pickup_interactor.hpp
+ * \file free_block_pickup_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,10 +46,10 @@ NS_START(fordyca, support);
  ******************************************************************************/
 
 /**
- * @class free_block_pickup_interactor
- * @ingroup fordyca support
+ * \class free_block_pickup_interactor
+ * \ingroup fordyca support
  *
- * @brief Handle's a robot's (possible) \ref free_block_pickup event on a given
+ * \brief Handle's a robot's (possible) \ref free_block_pickup event on a given
  * timestep.
  */
 template <typename T>
@@ -66,10 +66,10 @@ class free_block_pickup_interactor
             tv_manager->penalty_handler<T>(tv::block_op_src::ekFREE_PICKUP)) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -80,29 +80,29 @@ class free_block_pickup_interactor
       const free_block_pickup_interactor& other) = delete;
 
   /**
-   * @brief The actual handlipng function for the free block pickup arena-robot
+   * \brief The actual handlipng function for the free block pickup arena-robot
    * interaction.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep The current timestep.
+   * \param controller The controller to handle interactions for.
+   * \param t The current timestep.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_free_block_pickup(controller, t);
-        return interactor_status::ekFreeBlockPickup;
+        return interactor_status::ekFREE_BLOCK_PICKUP;
       }
     } else {
       m_penalty_handler->penalty_init(controller,
                                       tv::block_op_src::ekFREE_PICKUP,
                                       t);
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
   /**
-   * @brief Determine if a robot is waiting to pick up a free block, and if it
+   * \brief Determine if a robot is waiting to pick up a free block, and if it
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
   void finish_free_block_pickup(T& controller, rtypes::timestep t) {
@@ -166,7 +166,7 @@ class free_block_pickup_interactor
   }
 
   /**
-   * @brief Perform the actual picking up of a free block once all
+   * \brief Perform the actual picking up of a free block once all
    * preconditions have been satisfied.
    */
   void perform_free_block_pickup(T& controller,

@@ -10,11 +10,12 @@ XML Configuration
    controllers.rst
    loop-functions.rst
 
-Conventions
------------
+XML Conventions
+---------------
 
 - Multiple choices for an XML attribute value are separated by a ``|`` in the
   example XML.
+
 - XML attributes that should be floating point are specified as ``FLOAT`` in the
-  example XML (acceptable range, if applicable, is documented for
-  each individual attribute).
+  example XML (acceptable range, if applicable, is documented for each
+  individual attribute).

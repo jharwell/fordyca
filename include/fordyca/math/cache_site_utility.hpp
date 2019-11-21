@@ -1,7 +1,7 @@
 /**
- * @file cache_site_utility.hpp
+ * \file cache_site_utility.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, math);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_site_utility
- * @ingroup fordyca math
+ * \class cache_site_utility
+ * \ingroup fordyca math
  *
- * @brief Calculates the utility associated with a cache to a robot as part
+ * \brief Calculates the utility associated with a cache to a robot as part
  * of its decision process for what to do with a block once it has picked it up.
  *
  * Depends on:

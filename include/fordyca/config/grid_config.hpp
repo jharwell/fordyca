@@ -1,7 +1,7 @@
 /**
- * @file grid_config.hpp
+ * \file grid_config.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,8 +39,11 @@ NS_START(fordyca, config);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct grid_config
- * @ingroup fordyca config perception
+ * \struct grid_config
+ * \ingroup fordyca config perception
+ *
+ * \brief Configuration for the 2D grid used to represent the arena by both loop
+ * functions and robots.
  */
 struct grid_config final : public rconfig::base_config {
   rtypes::discretize_ratio resolution{0.0};

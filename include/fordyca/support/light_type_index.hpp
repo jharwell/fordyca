@@ -1,7 +1,7 @@
 /**
- * @file light_type_index.hpp
+ * \file light_type_index.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class light_type_index
- * @ingroup fordyca support
+ * \class light_type_index
+ * \ingroup fordyca support
  *
- * @brief Index mapping an entity type to the color of the light that should be
+ * \brief Index mapping an entity type to the color of the light that should be
  * associated with it, so that what things should have lights of what color is
  * not hardcoded in multiple places in the code, and is instead centralized
  * here. For usage by both robots and loop functions.

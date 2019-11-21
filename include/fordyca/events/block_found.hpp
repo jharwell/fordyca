@@ -1,7 +1,7 @@
 /**
- * @file block_found.hpp
+ * \file block_found.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -52,10 +52,10 @@ NS_START(events, detail);
  ******************************************************************************/
 
 /**
- * @class block_found
- * @ingroup fordyca events detail
+ * \class block_found
+ * \ingroup fordyca events detail
  *
- * @brief Event that is created whenever a block (possibly known, possibly
+ * \brief Event that is created whenever a block (possibly known, possibly
  * unknown) appears in a robot's LOS.
  */
 class block_found : public rer::client<block_found>, public cell_op {
@@ -103,7 +103,7 @@ class block_found : public rer::client<block_found>, public cell_op {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

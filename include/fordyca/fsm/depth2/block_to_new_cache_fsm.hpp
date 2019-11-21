@@ -1,7 +1,7 @@
 /**
- * @file block_to_new_cache_fsm.hpp
+ * \file block_to_new_cache_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, fsm, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_to_new_cache_fsm
- * @ingroup fordyca fsm depth2
+ * \class block_to_new_cache_fsm
+ * \ingroup fordyca fsm depth2
  *
- * @brief The FSM for the block-to-new-cache subtask.
+ * \brief The FSM for the block-to-new-cache subtask.
  *
  * Each robot executing this FSM will locate a free block (either a known block
  * or via exploration), pickup the block and bring it to the best new cache it

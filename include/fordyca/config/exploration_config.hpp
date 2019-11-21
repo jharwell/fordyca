@@ -1,7 +1,7 @@
 /**
- * @file exploration_config.hpp
+ * \file exploration_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,8 +39,11 @@ NS_START(fordyca, config);
   * Structure Definitions
 ******************************************************************************/
 /**
-  * @struct exploration_config
-  * @ingroup fordyca config
+  * \struct exploration_config
+  * \ingroup fordyca config
+  *
+  * \brief Configuration for exploration strategies that can be employed by
+  * robots.
   */
 struct exploration_config final : public rconfig::base_config {
   std::string block_strategy{};

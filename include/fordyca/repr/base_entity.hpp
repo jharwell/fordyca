@@ -1,7 +1,7 @@
 /**
- * @file base_entity.hpp
+ * \file base_entity.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,28 +38,28 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_entity
- * @ingroup fordyca repr
+ * \class base_entity
+ * \ingroup fordyca repr
  *
- * @brief A base class from which all entities in the arena derive.
+ * \brief A base class from which all entities in the arena derive.
  */
 class base_entity {
  public:
   /**
-   * @brief Calculate the span in X of an entity given its location and
+   * \brief Calculate the span in X of an entity given its location and
    * dimension in X.
    *
-   * @return The span in X of the entity.
+   * \return The span in X of the entity.
    */
   static rmath::ranged xspan(const rmath::vector2d& loc, double xdim) {
     return rmath::ranged(loc.x() - 0.5 * xdim, loc.x() + 0.5 * xdim);
   }
 
   /**
-   * @brief Calculate the span in Y of an entity given its location and
+   * \brief Calculate the span in Y of an entity given its location and
    * dimension in Y.
    *
-   * @return The span in Y of the entity.
+   * \return The span in Y of the entity.
    */
   static rmath::ranged yspan(const rmath::vector2d& loc, double ydim) {
     return rmath::ranged(loc.y() - 0.5 * ydim, loc.y() + 0.5 * ydim);
@@ -74,12 +74,12 @@ class base_entity {
   virtual ~base_entity(void) = default;
 
   /**
-   * @brief Set the ID of the object.
+   * \brief Set the ID of the object.
    */
   void id(int id) { m_id = id; }
 
   /**
-   * @brief Get the ID of the object.
+   * \brief Get the ID of the object.
    */
   int id(void) const { return m_id; }
 
@@ -87,28 +87,28 @@ class base_entity {
   bool vis_id(void) const { return m_vis_id; }
 
   /**
-   * @brief Calculate the span in X of an entity given its location and
+   * \brief Calculate the span in X of an entity given its location and
    * dimension in X (objects track their own location and dimension).
    *
-   * @return The span in X of the entity.
+   * \return The span in X of the entity.
    */
   virtual rmath::ranged xspan(void) const = 0;
 
   /**
-   * @brief Calculate the span in Y of an entity given its location and
+   * \brief Calculate the span in Y of an entity given its location and
    * dimension in Y.
    *
-   * @return The span in Y of the entity.
+   * \return The span in Y of the entity.
    */
   virtual rmath::ranged yspan(void) const = 0;
 
   /**
-   * @brief Get the size of the entity in the X direction in real coordinates.
+   * \brief Get the size of the entity in the X direction in real coordinates.
    */
   virtual double xdimr(void) const = 0;
 
   /**
-   * @brief Get the size of the entity in the Y direction in real coordinates.
+   * \brief Get the size of the entity in the Y direction in real coordinates.
    */
   virtual double ydimr(void) const = 0;
 

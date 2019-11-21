@@ -1,7 +1,7 @@
 /**
- * @file block_acq_validator.hpp
+ * \file block_acq_validator.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,10 +46,10 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @lockclass _acq_validator
- * @ingroup fordyca fsm
+ * \class block_acq_validator
+ * \ingroup fordyca fsm
  *
- * @brief Determine if the acquisition of a block at a specific location/with a
+ * \brief Determine if the acquisition of a block at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and
  * current simulation state.
  */

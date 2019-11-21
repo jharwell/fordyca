@@ -1,7 +1,7 @@
 /**
- * @file generalist.hpp
+ * \file generalist.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,15 +37,15 @@ NS_START(fordyca, tasks, depth0);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class generalist
- * @ingroup fordyca tasks
+ * \class generalist
+ * \ingroup fordyca tasks
  *
- * @brief Class representing depth 0 task allocation: Perform the whole foraging
+ * \brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
  *
  * It is decomposable into two subtasks that result in the same net change to
  * the arena state when run in sequence (possibly by two different robots):
- * \ref collector and \ref forager. It is not abortable at task interfaces,
+ * \ref collector and \ref harvester. It is not abortable at task interfaces,
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */

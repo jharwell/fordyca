@@ -1,9 +1,9 @@
 /**
- * @file loop_function_repository.hpp
+ * \file loop_function_repository.hpp
  *
  * Handles parsing of all XML parameters at runtime.
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,6 +38,12 @@ NS_START(fordyca, config);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * \class loop_function_repository
+ * \ingroup config
+ *
+ * \brief Collection of all XML parsers used common to all loop functions.
+ */
 class loop_function_repository : public rconfig::xml::xml_config_repository {
  public:
   loop_function_repository(void) noexcept;

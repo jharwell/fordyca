@@ -1,7 +1,7 @@
 /**
- * @file cache_acq_point_selector.cpp
+ * \file cache_acq_point_selector.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

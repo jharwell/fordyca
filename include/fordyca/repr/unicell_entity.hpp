@@ -1,7 +1,7 @@
 /**
- * @file unicell_entity.hpp
+ * \file unicell_entity.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class unicell_entity
- * @ingroup fordyca repr
+ * \class unicell_entity
+ * \ingroup fordyca repr
  *
- * @brief Representation of an entity in the arena that:
+ * \brief Representation of an entity in the arena that:
  *
  * - Resides in a single cell ("unicell")
  * - Has an extent that can span multiple cells, even though the entity itself
@@ -58,12 +58,12 @@ class unicell_entity : public base_entity {
   ~unicell_entity(void) override = default;
 
   /**
-   * @brief Get the real location (center) of the object.
+   * \brief Get the real location (center) of the object.
    */
   const rmath::vector2d& rloc(void) const { return m_rloc; }
 
   /**
-   * @brief Get the discretized coordinates of the center of the object, which
+   * \brief Get the discretized coordinates of the center of the object, which
    * can be used to index into an arena_map.
    *
    */
@@ -79,15 +79,15 @@ class unicell_entity : public base_entity {
   double ydimr(void) const override final { return m_dim.y(); }
 
   /**
-   * @brief Determine if a real-valued point lies within the extent of the
+   * \brief Determine if a real-valued point lies within the extent of the
    * entity for:
    *
    * 1. Visualization purposes.
    * 2. Determining if a robot is on top of an entity.
    *
-   * @param point The point to check.
+   * \param point The point to check.
    *
-   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
+   * \return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const rmath::vector2d& point) const {
     return xspan().contains(point.x()) && yspan().contains(point.y());
@@ -120,7 +120,7 @@ class unicell_entity : public base_entity {
   struct entity_is_movable : public std::false_type {};
 
   /**
-   * @brief In order for a derived class to be considered movable and be able to
+   * \brief In order for a derived class to be considered movable and be able to
    * change its initial position, it needs to define an "kIsMovable" class
    * constant.
    */
@@ -131,7 +131,7 @@ class unicell_entity : public base_entity {
       : public std::true_type {};
 
   /**
-   * @brief SFINAE to allow only derived classes that mark themselves as movable
+   * \brief SFINAE to allow only derived classes that mark themselves as movable
    * to change the initial position of the entity.
    */
   template <typename T, RCPPSW_SFINAE_FUNC(entity_is_movable<T>::value)>
@@ -140,7 +140,7 @@ class unicell_entity : public base_entity {
   }
 
   /**
-   * @brief SFINAE to allow only derived classes that mark themselves as movable
+   * \brief SFINAE to allow only derived classes that mark themselves as movable
    * to change the initial position of the entity.
    */
   template <typename T, RCPPSW_SFINAE_FUNC(entity_is_movable<T>::value)>

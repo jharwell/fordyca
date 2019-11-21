@@ -1,7 +1,7 @@
 /**
- * @file depth1_metrics_aggregator.hpp
+ * \file depth1_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -57,10 +57,10 @@ NS_START(support, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth1_metrics_aggregator
- * @ingroup fordyca support depth1
+ * \class depth1_metrics_aggregator
+ * \ingroup fordyca support depth1
  *
- * @brief Aggregates and metrics collection for depth1 foraging. That
+ * \brief Aggregates and metrics collection for depth1 foraging. That
  * includes everything from \ref depth0_metrics_aggregator, and also:
  *
  * - FSM cache acquisition metrics
@@ -77,7 +77,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                             const std::string& output_root);
 
   /**
-   * @brief Collect metrics from a finished or aborted task.
+   * \brief Collect metrics from a finished or aborted task.
    *
    * This cannot be collected synchronously per-timestep with the rest of the
    * metrics from the controller, because by the time metric collecting occurs,
@@ -94,7 +94,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
   void task_start_cb(const rta::polled_task*, const rta::ds::bi_tab* tab);
 
     /**
-   * @brief Collect metrics from the depth1 controller.
+   * \brief Collect metrics from the depth1 controller.
    */
     template<class ControllerType>
     void collect_from_controller(const ControllerType* const controller) {
@@ -119,13 +119,13 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     }
 
   /**
-   * @brief Collect utilization metrics from a cache in the arena.
+   * \brief Collect utilization metrics from a cache in the arena.
    */
   void collect_from_cache(
       const repr::arena_cache* cache);
 
   /**
-   * @brief Collect lifecycle metrics across all caches in the arena.
+   * \brief Collect lifecycle metrics across all caches in the arena.
    */
   void collect_from_cache_manager(
       const support::base_cache_manager* manager);

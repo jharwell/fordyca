@@ -1,7 +1,7 @@
 /**
- * @file cache_factory.hpp
+ * \file cache_factory.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,6 +36,12 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * \class cache_factory
+ * \ingroup fsm expstrat
+ *
+ * \brief Factory for creating cache exploration strategies.
+ */
 class cache_factory :
     public rpfactory::releasing_factory<foraging_expstrat,
                                         const foraging_expstrat::params*,

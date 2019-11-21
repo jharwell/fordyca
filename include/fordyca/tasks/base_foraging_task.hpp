@@ -1,7 +1,7 @@
 /**
- * @file base_foraging_task.hpp
+ * \file base_foraging_task.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, tasks);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class base_foraging_task
- * @ingroup fordyca tasks
+ * \class base_foraging_task
+ * \ingroup fordyca tasks
  *
- * @brief Interface specifying the visit set common to all base_foraging tasks
+ * \brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
 class base_foraging_task : public fsm::block_transporter,

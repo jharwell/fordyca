@@ -1,7 +1,7 @@
 /**
- * @file base_loop_functions.hpp
+ * \file base_loop_functions.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -79,10 +79,10 @@ class oracle_manager;
  * Classes
  ******************************************************************************/
 /**
- * @class base_loop_functions
- * @ingroup fordyca support
+ * \class base_loop_functions
+ * \ingroup fordyca support
  *
- * @brief The base loop functions in FORDYCA that all other loop functions
+ * \brief The base loop functions in FORDYCA that all other loop functions
  * inherit from.
  *
  * This class is not a functional set of loop functions, but it provides
@@ -139,43 +139,43 @@ class base_loop_functions : public argos::CLoopFunctions,
 
  private:
   /**
-   * @brief Initialize convergence calculations.
+   * \brief Initialize convergence calculations.
    *
-   * @param config Parsed convergence parameters.
+   * \param config Parsed convergence parameters.
    */
   void convergence_init(
       const cconvergence::config::convergence_config* config) RCSW_COLD;
 
   /**
-   * @brief Initialize logging for all support/loop function code.
+   * \brief Initialize logging for all support/loop function code.
    *
-   * @param output Parsed output parameters.
+   * \param output Parsed output parameters.
    */
   void output_init(const config::output_config* output) RCSW_COLD;
 
   /**
-   * @brief Initialize the arena contents.
+   * \brief Initialize the arena contents.
    *
-   * @param repo Repository of parsed parameters.
+   * \param repo Repository of parsed parameters.
    */
   void arena_map_init(const config::loop_function_repository* repo) RCSW_COLD;
 
   /**
-   * @brief Initialize temporal variance handling.
+   * \brief Initialize temporal variance handling.
    *
-   * @param tvp Parsed TV parameters.
+   * \param tvp Parsed TV parameters.
    */
   void tv_init(const config::tv::tv_manager_config* tvp) RCSW_COLD;
 
   /**
-   * @brief Initialize oracular information injection.
+   * \brief Initialize oracular information injection.
    *
-   * @param oraclep Parsed \ref oracle_manager parameters.
+   * \param oraclep Parsed \ref oracle_manager parameters.
    */
   void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
 
   /**
-   * @brief Initialize random number generation for loop function use. Currently
+   * \brief Initialize random number generation for loop function use. Currently
    * *NOT* shared between loop functions and robots.
    */
   void rng_init(const rmath::config::rng_config* config) RCSW_COLD;

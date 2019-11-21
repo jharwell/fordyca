@@ -1,7 +1,7 @@
 /**
- * @file tasking_oracle.cpp
+ * \file tasking_oracle.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -97,7 +97,7 @@ void tasking_oracle::task_finish_cb(const rta::polled_task* task) {
 
 void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
   /*
-   * @todo Updating task exec/interface estimates on abort is a little dicey, as
+   * \todo Updating task exec/interface estimates on abort is a little dicey, as
    * it can cause tasks that just failed to be re-attempted because they have a
    * much lower estimate than successful tasks. This is the current non-oracle
    * behavior, so we duplicate it here; it should be less of an issue, as we

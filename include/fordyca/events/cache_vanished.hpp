@@ -1,7 +1,7 @@
 /**
- * @file cache_vanished.hpp
+ * \file cache_vanished.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,11 +39,11 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
- * @class cache_vanished
- * @ingroup fordyca events detail
+/**
+ * \class cache_vanished
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a robot is serving a cache penalty, but while
+ * \brief Created whenever a robot is serving a cache penalty, but while
  * serving the penalty the cache it is waiting in vanishes due to another
  * robot picking up the last available block.
  */
@@ -96,7 +96,7 @@ class cache_vanished : public rer::client<cache_vanished> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

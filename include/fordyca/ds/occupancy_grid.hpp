@@ -1,7 +1,7 @@
 /**
- * @file occupancy_grid.hpp
+ * \file occupancy_grid.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,16 +44,21 @@ struct perception_config;
 }} // namespace config::perception
 
 NS_START(ds);
+
+/**
+ * \brief The types of layers used by \ref occupancy_grid (i.e. a heterogeneous
+ * 3D grid).
+ */
 using robot_layer_stack = std::tuple<crepr::pheromone_density, cell2D>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class occupancy_grid
- * @ingroup fordyca ds
+ * \class occupancy_grid
+ * \ingroup fordyca ds
  *
- * @brief Multilayered grid of cells and associated information
+ * \brief Multilayered grid of cells and associated information
  * density/relevance on the state of those cells. Used by robots in making
  * decisions in how they execute their tasks.
  */
@@ -61,12 +66,12 @@ class occupancy_grid : public rer::client<occupancy_grid>,
                        public rds::stacked_grid<robot_layer_stack> {
  public:
   /**
-   * @brief The index of the \ref crepr::pheromone_density layer.
+   * \brief The index of the \ref crepr::pheromone_density layer.
    */
   static constexpr uint kPheromone = 0;
 
   /**
-   * @brief The index of the \ref cell2D layer.
+   * \brief The index of the \ref cell2D layer.
    */
   static constexpr uint kCell = 1;
 
@@ -74,12 +79,12 @@ class occupancy_grid : public rer::client<occupancy_grid>,
                  const std::string& robot_id);
 
   /**
-   * @brief Update the density of all cells in the grid.
+   * \brief Update the density of all cells in the grid.
    */
   void update(void);
 
   /**
-   * @brief Reset all the cells in the grid
+   * \brief Reset all the cells in the grid
    */
   void reset(void);
 
@@ -93,14 +98,14 @@ class occupancy_grid : public rer::client<occupancy_grid>,
 
  private:
   /**
-   * @brief Update the state of cell (i,j), which involves decreasing its
+   * \brief Update the state of cell (i,j), which involves decreasing its
    * pheromone density, and possibly reseting the cell to be empty if its
    * density gets very close to 0.
    */
   void cell_state_update(uint i, uint j);
 
   /**
-   * @brief Initialize a cell in the occupancy grid, which sets the rate of
+   * \brief Initialize a cell in the occupancy grid, which sets the rate of
    * pheromone decay for the cell, the cell's own reference to its
    * location. Needed because the underlying boost data structure does not
    * support non zero parameter constructors, and we do *NOT* want to use
@@ -110,7 +115,7 @@ class occupancy_grid : public rer::client<occupancy_grid>,
 
   /* clang-format off */
   /**
-   * @brief The threshold for a cell's pheromone density at which it will
+   * \brief The threshold for a cell's pheromone density at which it will
    * transition into back an UNKNOWN state, from whatever state it is currently
    * in.
    */

@@ -1,7 +1,7 @@
 /**
- * @file tasking_oracle.hpp
+ * \file tasking_oracle.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -57,10 +57,10 @@ NS_START(support, oracle);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class tasking_oracle
- * @ingroup fordyca support oracle
+ * \class tasking_oracle
+ * \ingroup fordyca support oracle
  *
- * @brief Repository of perfect knowledge about swarm level task
+ * \brief Repository of perfect knowledge about swarm level task
  * allocation. Used to provide an upper bound on the performance of different
  * allocation methods.
  */
@@ -72,19 +72,19 @@ class tasking_oracle final : public rer::client<tasking_oracle> {
                  const rta::ds::bi_tdgraph* graph);
 
   /**
-   * @brief Ask the oracle something.
+   * \brief Ask the oracle something.
    *
-   * @param query The question to ask. Currently supports:
+   * \param query The question to ask. Currently supports:
    *
-   * exec_est.<task name>
-   * interface_est.<task name>
+   * exec_est.\<task name\>
+   * interface_est.\<task name\>
    *
-   * @return The answer to the query. Empty answer if query was ill-formed.
+   * \return The answer to the query. Empty answer if query was ill-formed.
    */
   boost::optional<variant_type> ask(const std::string& query) const;
 
   /**
-   * @brief Adds the oracle to the task finish and task abort callback lists for
+   * \brief Adds the oracle to the task finish and task abort callback lists for
    * the specified executive. Should be called once during initialization to
    * attach the oracle to each robot so that it can build a perfect map of task
    * allocation information as the simulation progresses.

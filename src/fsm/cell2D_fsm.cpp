@@ -1,7 +1,7 @@
 /**
- * @file cell2D_fsm.cpp
+ * \file cell2D_fsm.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

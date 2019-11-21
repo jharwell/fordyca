@@ -1,7 +1,7 @@
 /**
- * @file base_cache_creator.hpp
+ * \file base_cache_creator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -54,18 +54,18 @@ NS_START(support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_cache_creator
- * @ingroup fordyca support
+ * \class base_cache_creator
+ * \ingroup fordyca support
  *
- * @brief Base class for creating static/dynamic caches in the arena.
+ * \brief Base class for creating static/dynamic caches in the arena.
  */
 class base_cache_creator : public rer::client<base_cache_creator> {
  public:
   /**
-   * @brief Initialize a new cache creator.
+   * \brief Initialize a new cache creator.
    *
-   * @param grid Reference to arena grid.
-   * @param cache_dim Dimension of the cache (caches are square so can use a
+   * \param grid Reference to arena grid.
+   * \param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
   base_cache_creator(ds::arena_grid* grid, rtypes::spatial_dist cache_dim);
@@ -74,38 +74,39 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   base_cache_creator& operator=(const base_cache_creator& other) = delete;
 
   /**
-   * @brief (Potentially) create new caches.
+   * \brief (Potentially) create new caches.
    *
-   * @param c_alloc_blocks The blocks that have been allocated for cache
-   * creation this timestep for all caches.
+   * \param c_params Cache creation parameters
+   * \param c_alloc_blocks The blocks that have been allocated for cache
+   *                       creation this timestep for all caches.
    *
-   * @return A vector of created caches.
+   * \return A vector of created caches.
    */
   virtual ds::cache_vector create_all(const cache_create_ro_params& c_params,
                                       const ds::block_vector& c_alloc_blocks) = 0;
 
   /**
-   * @brief Update the cells for all newly created caches to reflect the fact
+   * \brief Update the cells for all newly created caches to reflect the fact
    * they now contain caches.
    *
-   * @param caches Vector of newly created caches.
+   * \param caches Vector of newly created caches.
    */
   void update_host_cells(ds::cache_vector& caches);
 
   /**
-   * @brief Basic sanity checks on newly created caches:
+   * \brief Basic sanity checks on newly created caches:
    *
    * - No block contained in one cache is contained in another.
    * - No two newly created caches overlap.
    * - No block that is not currently contained in a cache overlaps any cache.
    * - No cache overlaps a block cluster.
    *
-   * @param caches The created caches.
-   * @param free_blocks Blocks that are not carried by a robot or part of a
-   *                    newly created cache.
-   * @param clusters Current block clusters in the arena.
+   * \param c_caches The created caches.
+   * \param c_free_blocks Blocks that are not carried by a robot or part of a
+   *                     newly created cache.
+   * \param c_clusters Current block clusters in the arena.
    *
-   * @return \c TRUE iff no errors/inconsistencies are found, \c FALSE
+   * \return \c TRUE iff no errors/inconsistencies are found, \c FALSE
    * otherwise.
    */
   bool creation_sanity_checks(
@@ -118,14 +119,14 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   ds::arena_grid* grid(void) { return m_grid; }
 
   /**
-   * @brief Create a single cache in the arena from the specified set of blocks
+   * \brief Create a single cache in the arena from the specified set of blocks
    * at the specified location.
    *
-   * @param center Location of the new cache.
-   * @param blocks Vector of blocks to use to create the cache. Passed by value
+   * \param center Location of the new cache.
+   * \param blocks Vector of blocks to use to create the cache. Passed by value
    *               because they are (possibly) modified by this function in a
    *               way that callers probably do not want.
-   * @param timestep The current timestep.
+   * \param t The current timestep.
    */
   std::unique_ptr<repr::arena_cache> create_single_cache(
       const rmath::vector2d& center,

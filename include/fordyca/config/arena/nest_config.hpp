@@ -1,7 +1,7 @@
 /**
- * @file nest_config.hpp
+ * \file nest_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,8 +37,10 @@ NS_START(fordyca, config);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct nest_config
- * @ingroup fordyca config arena
+ * \struct nest_config
+ * \ingroup fordyca config arena
+ *
+ * \brief Configuration for the nest within the arena.
  */
 struct nest_config final : public rconfig::base_config {
   rmath::vector2d center{};

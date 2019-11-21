@@ -1,7 +1,7 @@
 /**
- * @file acquire_new_cache_fsm.cpp
+ * \file acquire_new_cache_fsm.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

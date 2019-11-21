@@ -1,7 +1,7 @@
 /**
- * @file cache_acq_point_selector.hpp
+ * \file cache_acq_point_selector.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,10 +46,10 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_acq_point_selector
- * @ingroup fordyca fsm
+ * \class cache_acq_point_selector
+ * \ingroup fordyca fsm
  *
- * @brief Once an existing cache has been selected, select a point within the
+ * \brief Once an existing cache has been selected, select a point within the
  * cache to acquire.
  *
  * This helps a LOT with maximimizing caches' potential for traffic/congestion

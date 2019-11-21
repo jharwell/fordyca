@@ -1,7 +1,7 @@
 /**
- * @file depth2/task_executive_builder.hpp
+ * \file depth2/task_executive_builder.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(controller, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class task_executive_builder
- * @ingroup fordyca controller depth2
+ * \class task_executive_builder
+ * \ingroup fordyca controller depth2
  *
- * @brief A helper class to offload initialization of the task tree and
+ * \brief A helper class to offload initialization of the task tree and
  * executive for depth2 foraging.
  */
 class task_executive_builder : public depth1::task_executive_builder,

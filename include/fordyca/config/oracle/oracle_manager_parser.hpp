@@ -1,7 +1,7 @@
 /**
- * @file oracle_manager_parser.hpp
+ * \file oracle_manager_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,17 +41,17 @@ NS_START(fordyca, config, oracle);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class oracle_manager_parser
- * @ingroup fordyca config oracle
+ * \class oracle_manager_parser
+ * \ingroup fordyca config oracle
  *
- * @brief Parses XML parameters used for oracles at the start of simulation.
+ * \brief Parses XML parameters used for oracles at the start of simulation.
  */
 class oracle_manager_parser final : public rconfig::xml::xml_config_parser {
  public:
   using config_type = oracle_manager_config;
 
   /**
-   * @brief The root tag that all cache parameters should lie under in the
+   * \brief The root tag that all cache parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "oracle_manager";

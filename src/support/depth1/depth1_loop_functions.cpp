@@ -1,7 +1,7 @@
 /**
- * @file depth1_loop_functions.cpp
+ * \file depth1_loop_functions.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -88,10 +88,10 @@ struct d1_subtask_status_extractor
 };
 
 /**
- * @struct d1_subtask_status_extractor_adaptor
- * @ingroup fordyca support depth1
+ * \struct d1_subtask_status_extractor_adaptor
+ * \ingroup fordyca support depth1
  *
- * @brief Calculate the \ref collector, \ref harvester task counts for depth1
+ * \brief Calculate the \ref collector, \ref harvester task counts for depth1
  * when a static cache is depleted, for use in determining the static cache
  * respawn probability.
  */
@@ -112,8 +112,8 @@ struct d1_subtask_status_extractor_adaptor
 };
 
 /**
- * @struct functor_maps_initializer
- * @ingroup fordyca support depth1 detail
+ * \struct functor_maps_initializer
+ * \ingroup fordyca support depth1 detail
  *
  * Convenience class containing initialization for all of the typeid ->
  * boost::variant maps for all controller types that are used throughout
@@ -370,14 +370,12 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
 std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   auto cb = [&](const auto* controller) {
-    v.push_back(boost::apply_visitor(
-        robot_task_extractor_adaptor(controller),
-        m_task_extractor_map->at(controller->type_index())));
+    v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
+                                     m_task_extractor_map->at(
+                                         controller->type_index())));
   };
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this,
-                                                            cb,
-                                                            "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
   return v;
 } /* robot_tasks_extract() */
 
@@ -390,10 +388,8 @@ void depth1_loop_functions::PreStep() {
 
   /* Process all robots */
   auto cb = [&](auto* robot) { robot_pre_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity,
-                         swarm_iterator::dynamic_order>(this,
-                                                        cb,
-                                                        "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
+      this, cb, "foot-bot");
   ndc_pop();
 } /* PreStep() */
 
@@ -403,10 +399,8 @@ void depth1_loop_functions::PostStep(void) {
 
   /* Process all robots: interact with environment then collect metrics */
   auto cb = [&](auto* robot) { robot_post_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity,
-                         swarm_iterator::dynamic_order>(this,
-                                                        cb,
-                                                        "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
+      this, cb, "foot-bot");
 
   /*
    * Manage the static cache and handle cache removal as a result of robot
@@ -566,7 +560,7 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    *
    * See #577.
    */
-  if (interactor_status::ekNoEvent != status && nullptr != oracle_manager()) {
+  if (interactor_status::ekNO_EVENT != status && nullptr != oracle_manager()) {
     oracle_manager()->update(arena_map());
   }
 
@@ -602,10 +596,8 @@ void depth1_loop_functions::static_cache_monitor(void) {
     counts.first += is_harvester;
     counts.second += is_collector;
   };
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this,
-                                                            cb,
-                                                            "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
   cache_create_ro_params ccp = {
       .current_caches = arena_map()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),

@@ -1,7 +1,7 @@
 /**
- * @file irv_lf_adaptor.hpp
+ * \file irv_lf_adaptor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(tv);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class irv_lf_adaptor
- * @ingroup fordyca support tv
+ * \class irv_lf_adaptor
+ * \ingroup fordyca support tv
  *
- * @brief Adapts \ref ctv::swarm_irv_manager to work within the ARGoS simulator.
+ * \brief Adapts \ref ctv::swarm_irv_manager to work within the ARGoS simulator.
  */
 class irv_lf_adaptor final : public rer::client<irv_lf_adaptor>,
                              public ctv::swarm_irv_manager {

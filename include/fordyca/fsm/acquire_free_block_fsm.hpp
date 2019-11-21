@@ -1,7 +1,7 @@
 /**
- * @file acquire_free_block_fsm.hpp
+ * \file acquire_free_block_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -54,10 +54,10 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_free_block_fsm
- * @ingroup fordyca fsm
+ * \class acquire_free_block_fsm
+ * \ingroup fordyca fsm
  *
- * @brief The FSM for an acquiring a free (i.e. not in a cache) block in the
+ * \brief The FSM for an acquiring a free (i.e. not in a cache) block in the
  * arena.
  *
  * Each robot executing this FSM will look for a block (either a known block or

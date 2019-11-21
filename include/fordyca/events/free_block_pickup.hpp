@@ -1,7 +1,7 @@
 /**
- * @file free_block_pickup.hpp
+ * \file free_block_pickup.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,10 +44,10 @@ NS_START(fordyca, events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class free_block_pickup
- * @ingroup fordyca events detail
+ * \class free_block_pickup
+ * \ingroup fordyca events detail
  *
- * @brief Fired whenever a robot picks up a free block in the arena (i.e. one
+ * \brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
  */
 class free_block_pickup : public rer::client<free_block_pickup>, public cell_op {
@@ -87,7 +87,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   /* CRW foraging */
 
   /**
-   * @brief Perform actual block pickup in the arena.
+   * \brief Perform actual block pickup in the arena.
    *
    * Takes \ref arena_map grid mutex to protect block re-distribution and block
    * updates. \ref arena_map block mutex assumed to be held when calling this
@@ -137,7 +137,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

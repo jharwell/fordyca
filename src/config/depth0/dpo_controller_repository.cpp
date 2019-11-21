@@ -1,7 +1,7 @@
 /**
- * @file dpo_controller_repository.cpp
+ * \file dpo_controller_repository.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

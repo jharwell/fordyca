@@ -1,7 +1,7 @@
 /**
- * @file localized_search.hpp
+ * \file localized_search.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class localized_search
- * @ingroup fordyca fsm expstrat
+ * \class localized_search
+ * \ingroup fordyca fsm expstrat
  *
- * @brief An exploration behavior in which robots vector to a specific location,
+ * \brief An exploration behavior in which robots vector to a specific location,
  * then begin correlated random walk exploration there via \ref crw. Falls back
  * to vanilla \ref crw if a specific location is not given during at task start.
  */
@@ -74,10 +74,10 @@ class localized_search : public foraging_expstrat,
   /* taskable overrides */
 
   /**
-   * @brief Start the targeted exploration by starting to vector to the starting
+   * \brief Start the targeted exploration by starting to vector to the starting
    * location.
    *
-   * @param c_arg The starting location, or NULL if there is not a
+   * \param c_arg The starting location, or NULL if there is not a
    * location. This can happen if the robot doesn't know of a good starting
    * location (e.g. the location of the last known object of a specific type),
    * in which case we will just fall back to regular CRW.
@@ -96,7 +96,7 @@ class localized_search : public foraging_expstrat,
   }
 
   /**
-   * @brief Since we are exploring for something we don't know about, we will
+   * \brief Since we are exploring for something we don't know about, we will
    * never finish (stopping exploration is handled at a higher level).
    */
   bool task_finished(void) const override final { return false; }

@@ -1,7 +1,7 @@
 /**
- * @file block_selector.hpp
+ * \file block_selector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, controller);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_selector
- * @ingroup fordyca controller depth0
+ * \class block_selector
+ * \ingroup fordyca controller depth0
  *
- * @brief Select the best block that a robot knows about, for use in acquiring a
+ * \brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.
  */
 class block_selector : public rer::client<block_selector> {
@@ -56,11 +56,11 @@ class block_selector : public rer::client<block_selector> {
   block_selector& operator=(const block_selector& other) = delete;
   block_selector(const block_selector& other) = delete;
   /**
-   * @brief Given a list of blocks that a robot knows about (i.e. have not faded
+   * \brief Given a list of blocks that a robot knows about (i.e. have not faded
    * into an unknown state), compute which is the "best", for use in deciding
    * which block to go attempt to pickup.
    *
-   * @return A pointer to the "best" block, along with its utility value, if a
+   * \return A pointer to the "best" block, along with its utility value, if a
    * best block is found, and empty otherwise.
    */
   boost::optional<ds::dp_block_map::value_type> operator()(
@@ -69,7 +69,7 @@ class block_selector : public rer::client<block_selector> {
 
  private:
   /**
-   * @brief Determine if the specified block is excluded from being considered
+   * \brief Determine if the specified block is excluded from being considered
    * for selection because:
    *
    * - The robot is too close to it (within block_dim meters of it). Allowing
@@ -80,7 +80,7 @@ class block_selector : public rer::client<block_selector> {
    *
    * - It is on the exception list.
    *
-   * @return \c TRUE if the cache should be excluded, \c FALSE otherwise.
+   * \return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool block_is_excluded(const rmath::vector2d& position,
                          const repr::base_block* block) const;

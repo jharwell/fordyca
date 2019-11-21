@@ -1,7 +1,7 @@
 /**
- * @file task_visualizer.hpp
+ * \file task_visualizer.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(fordyca, support);
  * Classes
  ******************************************************************************/
 /**
- * @class task_visualizer
- * @ingroup fordyca support
+ * \class task_visualizer
+ * \ingroup fordyca support
  *
- * @brief Renders the task that a robot is currently executing in text above the
+ * \brief Renders the task that a robot is currently executing in text above the
  * robot for visualization/debugging purposes.
  */
 class task_visualizer : public rer::client<task_visualizer> {
@@ -62,11 +62,11 @@ class task_visualizer : public rer::client<task_visualizer> {
   task_visualizer& operator=(const task_visualizer& op) = delete;
 
   /**
-   * @brief Draw visualizations related to task execution:
+   * \brief Draw visualizations related to task execution:
    *
    * - The task name
    *
-   * @param current_task The current task the robot is executing.
+   * \param current_task The current task the robot is executing.
    */
   void draw(const rta::logical_task* current_task);
 

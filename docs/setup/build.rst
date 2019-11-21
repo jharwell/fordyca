@@ -3,20 +3,38 @@
 Building The Code Locally
 =========================
 
+.. IMPORTANT:: If you want to build an optimized version of FORDYCA (necessary
+   for large swarms), you will need to either manually modify the
+   ``bootstrap.sh`` script that you copied, or re-run ``cmake`` and ``make`` as
+   shown in the :ref:`ln-opt-build` section below, as that script is for a debug
+   build by default.
+
 Debug Build
 -----------
 
-Download ``scripts/bootstrap.sh`` BEFORE cloning this repo. The script can be
-downloaded by navigating to the file on github, clicking the ``raw`` button, and
-then right clicking and doing ``Save As``. After downloading, mark the script as
-executable (``chmod +x bootstrap.sh``) and then run it (it can be run from
-anywhere), with the following arguments:
+.. IMPORTANT:: These instructions assume:
+
+   - You are running on a Debian-based linux environment, specifically
+     Ubuntu. If you are running on something else (OSX, WSL, etc) you will have
+     to manually modify the script to work on your target platform and/or
+     probably have to build a **LOT** more stuff from source manually.
+
+   - You have sudo privileges on the machine you want to install the project on.
+
+   If either of these conditions is not met, you will be on your own for getting
+   things setup in your development environment of choice.
+
+Download ``scripts/bootstrap.sh`` BEFORE cloning the FORDYCA repo. The script
+can be downloaded by navigating to the file on github, clicking the ``raw``
+button, and then right clicking and doing ``Save As``. After downloading, mark
+the script as executable (``chmod +x bootstrap.sh``) and then run it (it can be
+run from anywhere), with the following arguments:
 
 - 1st arg: The root directory for the project (all repos will be cloned/built
   in here, and it **must** be an absolute path).
 - 2nd arg: ``YES`` if you want to install ARGoS system wide (you probably do)
   and ``NO`` otherwise.
-- 3rd arg: Location ARGoS should be installed into
+- 3rd arg: Location ARGoS should be installed into.
 - 4th arg: The # of cores to use when building ARGoS/FORDYCA (should be set to
   # cores on your machine).
 
@@ -30,31 +48,18 @@ of running the script so that if there are errors it is easier to track them
 down (the script generates a LOT of output, which usually overflows terminal
 ringbuffers).
 
-The script assumes:
-
-- You have sudo privileges on the machine you want to install the project on. If
-  you do not, you will have to build a **lot** more stuff from source manually.
-
-- You are running on a debian-based linux environment. If you are running on
-  something else (OSX, WSL, etc) you will have to manually modify the script to
-  work on your target platform and/or probably have to build a **LOT** more
-  stuff from source manually.
-
-.. IMPORTANT:: If you want to build an optimized version of FORDYCA (necessary
-   for large swarms), you will need to either manually modify the
-   ``bootstrap.sh`` script that you copied, or re-run ``cmake`` and ``make`` as
-   shown below.
-
 The script is configured such that it will stop if any command fails. So if the
 script makes it all the way through and you see a ``BOOTSTRAP SUCCESS!`` line at
-the end of the ``output.txt``, then you know everything worked. Otherwise look in
-the ``output.txt`` for the error and fix it and try running the script again (the
-script **should** be idempotent).
+the end of the ``output.txt``, then you know everything worked. Otherwise look
+in the ``output.txt`` for the error and fix it and try running the script again
+(the script **should** be idempotent).
+
+ .. _ln-opt-build:
 
 Optimized Build
 ---------------
 
-To build ``FORYDCA`` with optimizations (necessary for using ``sierra`` or
+To build ``FORYDCA`` with optimizations (necessary for using ``SIERRA`` or
 running large scale simulations), will need a different cmake command than the
 one ``bootstrap.sh`` uses for you. Something like the following, run from the
 ``build`` directory prior to building will do the trick::
@@ -65,8 +70,9 @@ one ``bootstrap.sh`` uses for you. Something like the following, run from the
   -DWITH_FOOTBOT_RAB=NO \
   -DWITH_FOOTBOT_LEDS=NO \
   -DCMAKE_BUILD_TYPE=OPT \
-  -DLIBRA_ER=LIBRA_ER_NONE \
+  -DLIBRA_ER=NONE \
   -DLIBRA_OPENMP=YES \
+  -DLIBRA_BUILD_FOR=ARGOS \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over
@@ -86,8 +92,7 @@ Build Notes
 -----------
 
 - If you do a build with the intel compiler toolchain, then Qt graphical
-  displays are disabled (cmake 3.10 does not correctly handle the icpc for
-  C++17).
+  displays are disabled (cmake 3.10 does not correctly handle icpc for C++17).
 
 .. WARNING:: Whatever compiler you use to build FORDYCA should be the same
   compiler that you use to build ARGoS, otherwise ARGoS will be unable to load
@@ -103,16 +108,16 @@ Viewing The Documentation
 After the bootstrap.sh script finishes successfully, you can (*AND SHOULD*) view
 the doxygen documentation in your browser by navigating to the generated
 ``index.html`` file. Simply open your browser, and then put the path to the
-fordyca repo followed by ``/build/docs/html/index.html``. For example, if you
-built fordyca under ``$HOME/research``, then you would do
-``$HOME/research/build/docs/html/index.html`` in the address bar of your
-browser.
+fordyca repo followed by ``/build/docs/fordyca/html/index.html``. For example,
+if you built fordyca under ``$HOME/research``, then you would do
+``$HOME/research/fordyca/build/docs/fordyca/html/index.html`` in the address bar
+of your browser.
 
 Alternatively, if you would like a .pdf of the documentation, you can navigate
 to the ``latex`` directory for doxygen and then build said pdf. Again assuming
 you built fordyca in ``$HOME/research``, do the following::
 
-  cd $HOME/research/fordyca/build/docs/latex
+  cd $HOME/research/fordyca/build/docs/fordyca/latex
   make
 
 A ``refman.pdf`` will (eventually) be built in that directory once the command
@@ -128,11 +133,12 @@ Build Issues
 
 Before reporting a bug, try:
 
-#. Verifying that both FORDYCA *AND* RCPPSW are on the ``devel`` branch.
+#. Verifying that FORDYCA, COSM, RCPPSW are all on the ``devel`` branch.
 
-#. Updating RCPPSW and FORDYCA to the latest ``devel`` branch via ``git pull``.
+#. Updating RCPPSW, COSM, FORDYCA to the latest ``devel`` branch via ``git
+   pull``.
 
-#. Updating the FORDYCA, RCPPSW cmake submodules by running::
+#. Updating the FORDYCA, COSM, RCPPSW cmake submodules by running::
 
      git submodule update --recursive --remote
 

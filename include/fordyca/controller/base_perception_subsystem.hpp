@@ -1,7 +1,7 @@
 /**
- * @file base_perception_subsystem.hpp
+ * \file base_perception_subsystem.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,8 +46,11 @@ class oracular_info_receptor;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_perception_subsystem
- * @ingroup fordyca controller
+ * \class base_perception_subsystem
+ * \ingroup fordyca controller
+ *
+ * \brief Base class for robot perception common to all controllers, which is
+ * just the \ref dpo_store of objects.
  */
 class base_perception_subsystem {
  public:
@@ -58,12 +61,12 @@ class base_perception_subsystem {
   virtual ~base_perception_subsystem(void) = default;
 
   /**
-   * @brief Reset the robot's perception of the environment to an initial state
+   * \brief Reset the robot's perception of the environment to an initial state
    */
   virtual void reset(void) {}
 
   /**
-   * @brief Update the internal data structure/repr of the
+   * \brief Update the internal data structure/repr of the
    * environment/arena, after the LOS has been updated.
    */
   virtual void update(oracular_info_receptor* receptor) = 0;
@@ -72,19 +75,19 @@ class base_perception_subsystem {
   virtual ds::dpo_store* dpo_store(void) = 0;
 
   /**
-   * @brief Set the robots LOS for the next timestep.
+   * \brief Set the robots LOS for the next timestep.
    *
    * This is a hack to make it easy for me to run simulations, as I can computer
    * the line of sight for a robot within the loop functions, and just pass it
    * in here. In real robots this routine would be MUCH messier and harder to
    * work with.
    *
-   * @param los The new los
+   * \param los The new los
    */
   void los(std::unique_ptr<repr::line_of_sight> los) { m_los = std::move(los); }
 
   /**
-   * @brief Get the robot's current line-of-sight (LOS)
+   * \brief Get the robot's current line-of-sight (LOS)
    */
   const repr::line_of_sight* los(void) const { return m_los.get(); }
 

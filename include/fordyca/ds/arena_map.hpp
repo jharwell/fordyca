@@ -1,7 +1,7 @@
 /**
- * @file arena_map.hpp
+ * \file arena_map.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -61,10 +61,10 @@ class cell2D;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class arena_map
- * @ingroup fordyca ds
+ * \class arena_map
+ * \ingroup fordyca ds
  *
- * @brief Combines a 2D grid with sets of objects (blocks, caches, nests, etc.)
+ * \brief Combines a 2D grid with sets of objects (blocks, caches, nests, etc.)
  * that populate the grid and move around as the state of the arena
  * changes. The idea is that the arena map should be as simple as possible,
  * providing accessors and mutators, but not more complex logic, separating the
@@ -79,7 +79,7 @@ class arena_map final : public rer::client<arena_map>,
   explicit arena_map(const config::arena::arena_map_config* config);
 
   /**
-   * @brief Get the list of all the blocks currently present in the arena.
+   * \brief Get the list of all the blocks currently present in the arena.
    *
    * Some blocks may not be visible on the arena_map, as they are being carried
    * by robots.
@@ -88,46 +88,46 @@ class arena_map final : public rer::client<arena_map>,
   const block_vector& blocks(void) const { return m_blocks; }
 
   /**
-   * @brief Get the # of blocks available in the arena.
+   * \brief Get the # of blocks available in the arena.
    */
   size_t n_blocks(void) const { return m_blocks.size(); }
 
   /**
-   * @brief Get the list of all the caches currently present in the arena and
+   * \brief Get the list of all the caches currently present in the arena and
    * active.
    */
   cache_vector& caches(void) { return m_caches; }
   const cache_vector& caches(void) const { return m_caches; }
 
   /**
-   * @brief Get the # of caches currently in the arena.
+   * \brief Get the # of caches currently in the arena.
    */
   size_t n_caches(void) const { return m_caches.size(); }
 
   /**
-   * @brief Add caches that have been created by robots in the arena to the
+   * \brief Add caches that have been created by robots in the arena to the
    * current set of active caches.
    */
   void caches_add(const cache_vector& caches,
                   support::base_loop_functions* loop);
 
   /**
-   * @brief Remove a cache from the list of caches.
+   * \brief Remove a cache from the list of caches.
    *
-   * @param victim The cache to remove.
-   * @param loop The loop functions (to remove light for cache)
+   * \param victim The cache to remove.
+   * \param loop The loop functions (to remove light for cache)
    */
   void cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
                     support::base_loop_functions* loop);
 
   /**
-   * @brief Clear the cells that a cache covers while in the arena that are in
+   * \brief Clear the cells that a cache covers while in the arena that are in
    * CACHE_EXTENT state, resetting them to EMPTY. Called right before deleting
    * the cache from the arena.
    *
-   * @param victim The cache about to be deleted.
+   * \param victim The cache about to be deleted.
    *
-   * @note This operation requires holding the cache and grid mutexes in
+   * \note This operation requires holding the cache and grid mutexes in
    *       multithreaded contexts.
    */
   void cache_extent_clear(const std::shared_ptr<repr::arena_cache>& victim);
@@ -155,24 +155,24 @@ class arena_map final : public rer::client<arena_map>,
   }
 
   /**
-   * @brief Distribute all blocks in the arena. Resets arena state. Should only
+   * \brief Distribute all blocks in the arena. Resets arena state. Should only
    * be called during (re)-initialization.
    *
-   * @note This operation requires holding the block and grid mutexes in
+   * \note This operation requires holding the block and grid mutexes in
    *       multi-threaded contetxts.
    */
   void distribute_all_blocks(void);
 
   /**
-   * @brief Distribute a particular block in the arena, according to whatever
+   * \brief Distribute a particular block in the arena, according to whatever
    * policy was specified in the .argos file.
    *
-   * @param block The block to distribute.
+   * \param block The block to distribute.
    *
-   * @note This operation requires holding the block and grid mutexes in
+   * \note This operation requires holding the block and grid mutexes in
    * multithreaded contexts.
    *
-   * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
+   * \return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
   bool distribute_single_block(std::shared_ptr<repr::base_block>& block);
 
@@ -182,7 +182,7 @@ class arena_map final : public rer::client<arena_map>,
   RCPPSW_DECORATE_FUNC(yrsize, const);
 
   /**
-   * @brief Determine if a robot is currently on top of a block (i.e. if the
+   * \brief Determine if a robot is currently on top of a block (i.e. if the
    * center of the robot has crossed over into the space occupied by the block
    * extent).
    *
@@ -191,15 +191,15 @@ class arena_map final : public rer::client<arena_map>,
    * the final arbiter when deciding whether or not to trigger a given event
    * (such as \ref free_block_pickup) for a particular robot.
    *
-   * @param pos The position of a robot.
+   * \param pos The position of a robot.
    *
-   * @return The ID of the block that the robot is on, or -1 if the robot is not
+   * \return The ID of the block that the robot is on, or -1 if the robot is not
    * actually on a block.
    */
   int robot_on_block(const rmath::vector2d& pos) const RCSW_PURE;
 
   /**
-   * @brief Determine if a robot is currently on top of a cache (i.e. if the
+   * \brief Determine if a robot is currently on top of a cache (i.e. if the
    * center of the robot has crossed over into the space occupied by the block
    * extent).
    *
@@ -208,21 +208,21 @@ class arena_map final : public rer::client<arena_map>,
    * the final arbiter when deciding whether or not to trigger a cache related
    * event for a particular robot (such as \ref cached_block_pickup).
    *
-   * @param pos The position of a robot.
+   * \param pos The position of a robot.
    *
-   * @return The ID of the cache that the robot is on, or -1 if the robot is not
+   * \return The ID of the cache that the robot is on, or -1 if the robot is not
    * actually on a cache.
    */
   int robot_on_cache(const rmath::vector2d& pos) const RCSW_PURE;
 
   /**
-   * @brief Get the subgrid for use in calculating a robot's LOS.
+   * \brief Get the subgrid for use in calculating a robot's LOS.
    *
-   * @param x X coord of the center of the subgrid.
-   * @param y Y coord of the center of the subgrid.
-   * @param radius The radius of the subgrid.
+   * \param x X coord of the center of the subgrid.
+   * \param y Y coord of the center of the subgrid.
+   * \param radius The radius of the subgrid.
    *
-   * @return The subgrid.
+   * \return The subgrid.
    */
   grid_view subgrid(size_t x, size_t y, size_t radius) {
     return decoratee().layer<arena_grid::kCell>()->subcircle(x, y, radius);
@@ -247,7 +247,7 @@ class arena_map final : public rer::client<arena_map>,
   }
 
   /**
-   * @brief The amount of padding to add to the arena map so that LOS
+   * \brief The amount of padding to add to the arena map so that LOS
    * calculations when a robot is VERY close to the upper edge of the arena in x
    * or y, and the conversion to discrete coordinates/rounding would cause an
    * off-by-one out-of-bounds access are avoided.
@@ -255,7 +255,7 @@ class arena_map final : public rer::client<arena_map>,
   double arena_padding(void) const { return 1.0; }
 
   /**
-   * @brief Perform deferred initialization. This is not part the constructor so
+   * \brief Perform deferred initialization. This is not part the constructor so
    * that it can be verified via return code. Currently it initializes:
    *
    * - The block distributor
@@ -264,23 +264,23 @@ class arena_map final : public rer::client<arena_map>,
   bool initialize(support::base_loop_functions* loop, rmath::rng* rng);
 
   /**
-   * @brief Protects simultaneous updates to the underlying grid.
+   * \brief Protects simultaneous updates to the underlying grid.
    */
   std::mutex& grid_mtx(void) { return m_grid_mtx; }
 
   /**
-   * @brief Protects simultaneous updates to the caches vector.
+   * \brief Protects simultaneous updates to the caches vector.
    */
   std::mutex& cache_mtx(void) { return m_cache_mtx; }
   std::mutex& cache_mtx(void) const { return m_cache_mtx; }
 
   /**
-   * @brief Protects simultaneous updates to the blocks vector.
+   * \brief Protects simultaneous updates to the blocks vector.
    */
   std::mutex& block_mtx(void) { return m_block_mtx; }
 
   /**
-   * @brief Clear the list of caches that have been removed this timestep.
+   * \brief Clear the list of caches that have been removed this timestep.
    *
    * Having such a list is necessary in order to be able to correctly gather
    * metrics from caches that have been depleted THIS timestep about block

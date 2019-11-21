@@ -1,7 +1,7 @@
 /**
- * @file depth0/robot_arena_interactor.hpp
+ * \file depth0/robot_arena_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, support, depth0);
  ******************************************************************************/
 
 /**
- * @class robot_arena_interactor
- * @ingroup fordyca support depth0
+ * \class robot_arena_interactor
+ * \ingroup fordyca support depth0
  *
- * @brief Handle's a robot's interactions with the environment on each timestep:
+ * \brief Handle's a robot's interactions with the environment on each timestep:
  *
  * - Picking up a free block (possibly with penalty).
  * - Dropping a carried block in the nest (possibly with a penalty).
@@ -60,10 +60,10 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
         m_nest_drop_interactor(map, metrics_agg, floor, tv_manager) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -72,13 +72,13 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
   robot_arena_interactor& operator=(const robot_arena_interactor& other) = delete;
 
   /**
-   * @brief The actual handling function for the interactions.
+   * \brief The actual handling function for the interactions.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep The current timestep.
+   * \param controller The controller to handle interactions for.
+   * \param t The current timestep.
    */
   template<typename C = T>
-  interactor_status operator()(C& controller, rtypes::timestep t) {
+  interactor_status operator()(C& controller, const rtypes::timestep& t) {
     if (controller.is_carrying_block()) {
       return m_nest_drop_interactor(controller, t);
     } else { /* The foot-bot has no block item */

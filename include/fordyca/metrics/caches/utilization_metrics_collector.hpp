@@ -1,7 +1,7 @@
 /**
- * @file utilization_metrics_collector.hpp
+ * \file utilization_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,18 +39,18 @@ NS_START(fordyca, metrics, caches);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class utilization_metrics_collector
- * @ingroup fordyca metrics caches
+ * \class utilization_metrics_collector
+ * \ingroup fordyca metrics caches
  *
- * @brief Collector for \ref utilization_metrics.
+ * \brief Collector for \ref utilization_metrics.
  *
  * Metrics are output at the specified interval.
  */
 class utilization_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname Output file name.
-   * @param interval Collection interval.
+   * \param ofname Output file name.
+   * \param interval Collection interval.
    */
   utilization_metrics_collector(const std::string& ofname, uint interval);
 
@@ -60,7 +60,7 @@ class utilization_metrics_collector final : public rmetrics::base_metrics_collec
 
  private:
   /**
-   * @brief All stats are cumulative within an interval.
+   * \brief All stats are cumulative within an interval.
    */
   struct stats {
     uint int_blocks{0};

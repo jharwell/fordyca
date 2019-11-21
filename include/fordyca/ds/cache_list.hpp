@@ -1,7 +1,7 @@
 /**
- * @file cache_list.hpp
+ * \file cache_list.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,19 +44,39 @@ using const_cache_list_type = std::shared_ptr<const repr::base_cache>;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
+/**
+ * \class cache_list
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::list with an additional \ref to_str()
+ * method.
+ */
 class cache_list : public std::list<cache_list_type> {
  public:
   using std::list<cache_list_type>::list;
   using value_type = std::list<cache_list_type>::value_type;
 
+  /**
+   * \brief Get a string representation of the list contents.
+   */
   std::string to_str(void) const;
 };
 
+/**
+ * \class const_cache_list
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::list with an additional \ref to_str()
+ * method.
+ */
 class const_cache_list : public std::list<const_cache_list_type> {
  public:
   using std::list<const_cache_list_type>::list;
   using value_type = std::list<const_cache_list_type>::value_type;
 
+  /**
+   * \brief Get a string representation of the list contents.
+   */
   std::string to_str(void) const;
 };
 

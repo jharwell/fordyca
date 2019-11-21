@@ -1,7 +1,7 @@
 /**
- * @file base_metrics_aggregator.cpp
+ * \file base_metrics_aggregator.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

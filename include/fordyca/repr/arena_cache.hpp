@@ -1,7 +1,7 @@
 /**
- * @file arena_cache.hpp
+ * \file arena_cache.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class arena_cache
- * @ingroup fordyca repr
+ * \class arena_cache
+ * \ingroup fordyca repr
  *
- * @brief A repr of an ACTUAL cache within the arena. This differs from \ref
+ * \brief A repr of an ACTUAL cache within the arena. This differs from \ref
  * dpo_entity caches because they:
  *
  * - Handle cache penalties

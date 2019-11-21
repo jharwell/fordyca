@@ -1,7 +1,7 @@
 /**
- * @file oracular_info_receptor.cpp
+ * \file oracular_info_receptor.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/oracular_info_receptor.hpp"
 
+#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/polled_task.hpp"
 #include "rcppsw/ta/time_estimate.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
@@ -43,10 +43,10 @@ NS_START(fordyca, controller);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct dpo_store_updater
- * @ingroup fordyca controller
+ * \struct dpo_store_updater
+ * \ingroup fordyca controller
  *
- * @brief Updates the \ref dpo_store with a single (possibly new) entity from
+ * \brief Updates the \ref dpo_store with a single (possibly new) entity from
  * the list of entities we have been handed by the \ref entities_oracle.
  */
 struct dpo_store_updater {

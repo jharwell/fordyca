@@ -1,7 +1,7 @@
 /**
- * @file redist_governor.hpp
+ * \file redist_governor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class redist_governor
- * @ingroup fordyca support block_dist
+ * \class redist_governor
+ * \ingroup fordyca support block_dist
  *
- * @brief Supervises block distribution by determining the conditions under
+ * \brief Supervises block distribution by determining the conditions under
  * which blocks should continue to be distributed, or if the # of blocks in the
  * arena should become finite. Conditions are one of:
  *
@@ -66,11 +66,11 @@ class redist_governor : public rer::client<redist_governor> {
       const config::arena::block_redist_governor_config* config);
 
   /**
-   * @brief Update the distribution status according to the policy parameters.
+   * \brief Update the distribution status according to the policy parameters.
    *
-   * @param t Current timestep.
-   * @param blocks_collected # blocks collected so far.
-   * @param convergence_status Current swarm convergence status.
+   * \param t Current timestep.
+   * \param blocks_collected # blocks collected so far.
+   * \param convergence_status Current swarm convergence status.
    */
   void update(rtypes::timestep t,
               uint blocks_collected,

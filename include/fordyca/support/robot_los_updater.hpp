@@ -1,7 +1,7 @@
 /**
- * @file robot_los_updater.hpp
+ * \file robot_los_updater.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct robot_los_updater
- * @ingroup fordyca support
+ * \struct robot_los_updater
+ * \ingroup fordyca support
  *
- * @brief Functor to update robot LOS each timestep.
+ * \brief Functor to update robot LOS each timestep.
  */
 template <typename ControllerType>
 class robot_los_updater final
@@ -55,7 +55,7 @@ class robot_los_updater final
       : ER_CLIENT_INIT("fordyca.support.robot_los_updater"), m_map(map) {}
 
   /*
-   * @todo Ideally these would be deleted, but emplace() does not seem to do
+   * \todo Ideally these would be deleted, but emplace() does not seem to do
    * what I think it does (i.e. construct an object in place without a need for
    * a copy constructor), so it is defaulted instead.
    */

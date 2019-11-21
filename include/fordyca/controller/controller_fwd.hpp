@@ -1,7 +1,7 @@
 /**
- * @file controller_fwd.hpp
+ * \file controller_fwd.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -71,6 +71,7 @@
 #define NON_ORACULAR_CONTROLLER_TYPES                                         \
   DEPTH0_NON_ORACULAR_CONTROLLER_TYPES, DEPTH1_NON_ORACULAR_CONTROLLER_TYPES, \
       DEPTH2_NON_ORACULAR_CONTROLLER_TYPES
+
 #define CONTROLLER_TYPES \
   ORACULAR_CONTROLLER_TYPES, NON_ORACULAR_CONTROLLER_TYPES
 

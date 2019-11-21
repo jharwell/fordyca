@@ -1,7 +1,7 @@
 /**
- * @file tv_manager_parser.hpp
+ * \file tv_manager_parser.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,17 +40,17 @@ NS_START(fordyca, config, tv);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class tv_manager_parser
- * @ingroup fordyca config tv
+ * \class tv_manager_parser
+ * \ingroup fordyca config tv
  *
- * @brief Parses XML parameters for \ref tv_manager into \ref tv_manager_config.
+ * \brief Parses XML parameters for \ref tv_manager into \ref tv_manager_config.
  */
 class tv_manager_parser final : public rconfig::xml::xml_config_parser {
  public:
   using config_type = tv_manager_config;
 
   /**
-   * @brief The root tag that all temporal variance parameters should lie under
+   * \brief The root tag that all temporal variance parameters should lie under
    * in the XML tree.
    */
   static constexpr char kXMLRoot[] = "temporal_variance";

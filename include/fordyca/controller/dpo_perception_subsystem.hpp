@@ -1,7 +1,7 @@
 /**
- * @file dpo_perception_subsystem.hpp
+ * \file dpo_perception_subsystem.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -51,10 +51,10 @@ NS_START(controller);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dpo_perception_subsystem
- * @ingroup fordyca controller
+ * \class dpo_perception_subsystem
+ * \ingroup fordyca controller
  *
- * @brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
+ * \brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
  * into a useful internal repr: a \ref dpo_store.
  */
 class dpo_perception_subsystem final
@@ -73,13 +73,13 @@ class dpo_perception_subsystem final
   crepr::pheromone_density avg_cache_density(void) const override;
 
   /**
-   * @brief Update the robot's perception of the environment, passing it its
+   * \brief Update the robot's perception of the environment, passing it its
    * current line of sight.
    */
   void update(oracular_info_receptor* receptor) override;
 
   /**
-   * @brief Reset the robot's perception of the environment to an initial state
+   * \brief Reset the robot's perception of the environment to an initial state
    */
   void reset(void) override;
 
@@ -88,11 +88,11 @@ class dpo_perception_subsystem final
 
  private:
   /*
-   * @brief Update the perceived arena map with the current line-of-sight,
+   * \brief Update the perceived arena map with the current line-of-sight,
    * update the relevance of information (density) within it (blocks and
    * caches).
    *
-   * @param c_los The LOS to process.
+   * \param c_los The LOS to process.
    */
   void process_los(const repr::line_of_sight* c_los,
                    oracular_info_receptor* receptor);

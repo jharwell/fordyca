@@ -1,7 +1,7 @@
 /**
- * @file cache_transferer.hpp
+ * \file cache_transferer.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, tasks, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_transferer
- * @ingroup fordyca tasks depth2
+ * \class cache_transferer
+ * \ingroup fordyca tasks depth2
  *
- * @brief Task in which robots locate an existing cache, pickup a block from it,
+ * \brief Task in which robots locate an existing cache, pickup a block from it,
  * and then transfer the block to a cache with higher utility (presumably one
  * that is closer to the nest). It is abortable, and has two task interfaces:
  * one at each cache it interacts with.

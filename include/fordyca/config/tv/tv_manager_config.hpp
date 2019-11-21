@@ -1,7 +1,7 @@
 /**
- * @file tv_manager_config.hpp
+ * \file tv_manager_config.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,8 +38,10 @@ NS_START(fordyca, config, tv);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct tv_manager_config
- * @ingroup fordyca config tv
+ * \struct tv_manager_config
+ * \ingroup fordyca config tv
+ *
+ * \brief Configuration for the \ref tv_manager.
  */
 struct tv_manager_config final : public rconfig::base_config {
   ctv::config::swarm_irv_manager_config irv{};

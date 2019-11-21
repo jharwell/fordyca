@@ -1,7 +1,7 @@
 /**
- * @file mdpo_perception_metrics_collector.hpp
+ * \file mdpo_perception_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,18 +41,18 @@ NS_START(fordyca, metrics, perception);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class mdpo_perception_metrics_collector
- * @ingroup fordyca metrics blocks
+ * \class mdpo_perception_metrics_collector
+ * \ingroup fordyca metrics blocks
  *
- * @brief Collector for \ref mdpo_perception_metrics.
+ * \brief Collector for \ref mdpo_perception_metrics.
  *
  * Metrics are written out at the specified collection interval.
  */
 class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname The output file name.
-   * @param interval Collection interval.
+   * \param ofname The output file name.
+   * \param interval Collection interval.
    */
   mdpo_perception_metrics_collector(const std::string& ofname, uint interval);
 

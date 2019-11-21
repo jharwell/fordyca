@@ -1,7 +1,7 @@
 /**
- * @file blocks_config.hpp
+ * \file blocks_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,8 +36,8 @@ NS_START(fordyca, config, arena);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct blocks_config
- * @ingroup fordyca config arena
+ * \struct blocks_config
+ * \ingroup fordyca config arena
  */
 struct blocks_config final : public rconfig::base_config {
   struct block_dist_config dist{};

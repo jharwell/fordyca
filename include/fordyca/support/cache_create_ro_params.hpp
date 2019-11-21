@@ -1,7 +1,7 @@
 /**
- * @file cache_create_ro_params.hpp
+ * \file cache_create_ro_params.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,27 +39,27 @@ NS_START(fordyca, support);
  * Struct Definitions
  ******************************************************************************/
 /**
- * @struct cache_create_ro_params
- * @ingroup fordyca support
+ * \struct cache_create_ro_params
+ * \ingroup fordyca support
  *
- * @brief Parameters for cache creation, to reduce # of arguments to
+ * \brief Parameters for cache creation, to reduce # of arguments to
  * functions. Contains all parameters that will *NOT* change during creation.
  */
 struct cache_create_ro_params {
   /**
-   * @brief Currently existing caches in the arena. For use in avoiding
+   * \brief Currently existing caches in the arena. For use in avoiding
    * overlaps during cache creation.
    */
   ds::cache_vector current_caches;
 
   /**
-   * @brief The block clusters in the arena. For use in avoiding overlaps
+   * \brief The block clusters in the arena. For use in avoiding overlaps
    * during cache creation.
    */
   ds::block_cluster_vector clusters;
 
   /**
-   * @brief The current timestep.
+   * \brief The current timestep.
    */
   rtypes::timestep t;
 };

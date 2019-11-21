@@ -1,7 +1,7 @@
 /**
- * @file free_block_to_nest_fsm.hpp
+ * \file free_block_to_nest_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -51,10 +51,10 @@ NS_START(fsm, depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class free_block_to_nest_fsm
- * @ingroup fordyca fsm depth0
+ * \class free_block_to_nest_fsm
+ * \ingroup fordyca fsm depth0
  *
- * @brief FILL ME IN!
+ * \brief FILL ME IN!
  */
 class free_block_to_nest_fsm final : public cfsm::util_hfsm,
                                      public rer::client<free_block_to_nest_fsm>,
@@ -107,7 +107,7 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
     ekST_START,
     ekST_ACQUIRE_BLOCK,     /* superstate for finding a block */
     /**
-     * @brief State robots wait in after acquiring a block for the simulation to
+     * \brief State robots wait in after acquiring a block for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
@@ -142,7 +142,7 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
   HFSM_STATE_DECLARE_ND(free_block_to_nest_fsm, finished);
 
   /**
-   * @brief Defines the state map for the FSM.
+   * \brief Defines the state map for the FSM.
    *
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.

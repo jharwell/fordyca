@@ -1,7 +1,7 @@
 /**
- * @file site_selection_metrics.hpp
+ * \file site_selection_metrics.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, metrics, caches);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class site_selection_metrics
- * @ingroup fordyca metrics caches
+ * \class site_selection_metrics
+ * \ingroup fordyca metrics caches
  *
- * @brief Interface defining cache site selection metrics that can be collected
+ * \brief Interface defining cache site selection metrics that can be collected
  * from robots choosing cache sites.
  */
 class site_selection_metrics : public virtual rmetrics::base_metrics {
@@ -52,13 +52,13 @@ class site_selection_metrics : public virtual rmetrics::base_metrics {
   site_selection_metrics& operator=(const site_selection_metrics&) = default;
 
   /**
-   * @brief Return \c TRUE iff the robot has run the cache site selection
+   * \brief Return \c TRUE iff the robot has run the cache site selection
    * algorithm this timestep.
    */
   virtual bool site_select_exec(void) const = 0;
 
   /**
-   * @brief Return \c TRUE iff the cache site selection algorithm was
+   * \brief Return \c TRUE iff the cache site selection algorithm was
    * successful.
    *
    * The result of this function is undefined if \ref site_select_exec() did
@@ -67,10 +67,10 @@ class site_selection_metrics : public virtual rmetrics::base_metrics {
   virtual bool site_select_success(void) const = 0;
 
   /**
-   * @brief If the robot successfully selected a cache site, return the nlopt
+   * \brief If the robot successfully selected a cache site, return the nlopt
    * code that led to successful selection.
    *
-   * The result of this function is undefined if \ref site_selected() did not
+   * The result of this function is undefined if \ref site_select_exec() did not
    * return \c TRUE.
    */
   virtual nlopt::result nlopt_result(void) const = 0;

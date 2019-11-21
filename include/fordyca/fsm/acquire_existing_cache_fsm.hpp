@@ -1,7 +1,7 @@
 /**
- * @file acquire_existing_cache_fsm.hpp
+ * \file acquire_existing_cache_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -64,10 +64,10 @@ class foraging_expstrat;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_existing_cache_fsm
- * @ingroup fordyca fsm depth1
+ * \class acquire_existing_cache_fsm
+ * \ingroup fordyca fsm depth1
  *
- * @brief Acquire an existing cache within the arena. Once such a cache has been
+ * \brief Acquire an existing cache within the arena. Once such a cache has been
  * acquired (always by vectoring), it signals that it has completed its task.
  */
 class acquire_existing_cache_fsm
@@ -75,7 +75,7 @@ class acquire_existing_cache_fsm
       public cfsm::acquire_goal_fsm {
  public:
   /**
-   * @param for_pickup Are we acquiring a cache for pickup or block drop?
+   * \param for_pickup Are we acquiring a cache for pickup or block drop?
    */
   acquire_existing_cache_fsm(
       const fsm_ro_params* c_params,
@@ -107,7 +107,7 @@ class acquire_existing_cache_fsm
 
   /* clang-format off */
   /**
-   * @brief Needed to ensure the points that robots choose when acquiring the
+   * \brief Needed to ensure the points that robots choose when acquiring the
    * cache are far enough inside the cache extent that all ground sensors are
    * guaranteed to read "in cache". Set to footbot radius + a little padding.
    */

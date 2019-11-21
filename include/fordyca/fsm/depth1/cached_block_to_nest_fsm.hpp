@@ -1,7 +1,7 @@
 /**
- * @file cached_block_to_nest_fsm.hpp
+ * \file cached_block_to_nest_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -57,10 +57,10 @@ NS_START(depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cached_block_to_nest_fsm
- * @ingroup fordyca fsm
+ * \class cached_block_to_nest_fsm
+ * \ingroup fordyca fsm
  *
- * @brief Each robot executing this FSM will locate for a block (either a known
+ * \brief Each robot executing this FSM will locate for a block (either a known
  * block or via exploration), pickup the block and bring it all the way back to
  * the nest.
  *
@@ -94,7 +94,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
   }
 
   /**
-   * @brief Reset the task FSM to a state where it can be started again.
+   * \brief Reset the task FSM to a state where it can be started again.
    */
   void task_reset(void) override { init(); }
   void task_start(const rta::taskable_argument*) override {}
@@ -119,7 +119,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
   foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
   /**
-   * @brief Reset the FSM
+   * \brief Reset the FSM
    */
   void init(void) override;
 
@@ -132,7 +132,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
     ekST_ACQUIRE_BLOCK,
 
     /**
-     * @brief State robots wait in after acquiring a cache for the simulation to
+     * \brief State robots wait in after acquiring a cache for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
@@ -156,7 +156,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
 
  private:
   /**
-   * @brief It is possible that robots can be waiting indefinitely for a block
+   * \brief It is possible that robots can be waiting indefinitely for a block
    * pickup signal that will never come once a block has been acquired if they
    * "detect" a block by sprawling across multiple blocks (i.e. all ground
    * sensors did not detect the same block).
@@ -194,7 +194,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 
   /**
-   * @brief Defines the state map for the FSM.
+   * \brief Defines the state map for the FSM.
    *
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.

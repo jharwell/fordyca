@@ -1,7 +1,7 @@
 /**
- * @file cached_block_pickup_interactor.hpp
+ * \file cached_block_pickup_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -47,10 +47,10 @@ NS_START(fordyca, support);
  * Classes
  ******************************************************************************/
 /**
- * @class cached_block_pickup_interactor
- * @ingroup fordyca support
+ * \class cached_block_pickup_interactor
+ * \ingroup fordyca support
  *
- * @brief Handles a robot's (possible) \ref cached_block_pickup event on a given
+ * \brief Handles a robot's (possible) \ref cached_block_pickup event on a given
  * timestep.
  */
 template <typename T>
@@ -71,10 +71,10 @@ class cached_block_pickup_interactor
         m_loop(loop) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -85,12 +85,12 @@ class cached_block_pickup_interactor
       const cached_block_pickup_interactor& other) = delete;
 
   /**
-   * @brief The actual handling function for interactions.
+   * \brief The actual handling function for interactions.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestepp.
+   * \param controller The controller to handle interactions for.
+   * \param t   The current timestepp.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         return finish_cached_block_pickup(controller, t);
@@ -100,12 +100,12 @@ class cached_block_pickup_interactor
                                       tv::cache_op_src::ekEXISTING_CACHE_PICKUP,
                                       t);
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
   /**
-   * @brief Called after a robot has satisfied the cache usage penalty, and
+   * \brief Called after a robot has satisfied the cache usage penalty, and
    * actually performs the handshaking between the cache, the arena, and the
    * robot for block pickup.
    */
@@ -155,7 +155,7 @@ class cached_block_pickup_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    auto status = interactor_status::ekNoEvent;
+    auto status = interactor_status::ekNO_EVENT;
     if (p.id() != utils::robot_on_cache(controller, *m_map)) {
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
@@ -197,7 +197,7 @@ class cached_block_pickup_interactor
   }
 
   /**
-   * @brief Perform the actual pickup of a block from a cache, once all
+   * \brief Perform the actual pickup of a block from a cache, once all
    * preconditions have been satisfied.
    */
   interactor_status perform_cached_block_pickup(
@@ -232,9 +232,9 @@ class cached_block_pickup_interactor
     pickup_op.visit(controller);
 
     if (m_map->caches().size() < old_n_caches) {
-      return interactor_status::ekCacheDepletion;
+      return interactor_status::ekCACHE_DEPLETION;
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:

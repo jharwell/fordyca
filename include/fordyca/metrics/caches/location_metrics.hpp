@@ -1,7 +1,7 @@
 /**
- * @file location_metrics.hpp
+ * \file location_metrics.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 
 /**
- * @class location_metrics
- * @ingroup fordyca metrics caches
+ * \class location_metrics
+ * \ingroup fordyca metrics caches
  *
- * @brief Defines the metrics to be collected from a cache regarding its
+ * \brief Defines the metrics to be collected from a cache regarding its
  * location in the arena.
  *
  * Metrics are collected every timestep.
@@ -51,7 +51,7 @@ class location_metrics : public virtual rmetrics::base_metrics {
   location_metrics(void) = default;
 
   /**
-   * @brief Should return the discrete location of the cache.
+   * \brief Should return the discrete location of the cache.
    */
   virtual rcppsw::math::vector2u location(void) const = 0;
 };

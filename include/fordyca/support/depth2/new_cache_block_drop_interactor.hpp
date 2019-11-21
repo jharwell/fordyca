@@ -1,7 +1,7 @@
 /**
- * @file new_cache_block_drop_interactor.hpp
+ * \file new_cache_block_drop_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(fordyca, support, depth2);
  * Classes
  ******************************************************************************/
 /**
- * @class new_cache_block_drop_interactor
- * @ingroup fordyca support depth2
+ * \class new_cache_block_drop_interactor
+ * \ingroup fordyca support depth2
  *
- * @brief Handles a robot's (possible) \ref free_block_drop event at a new cache
+ * \brief Handles a robot's (possible) \ref free_block_drop event at a new cache
  * on a given timestep.
  */
 template <typename T>
@@ -64,10 +64,10 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
             tv::block_op_src::ekNEW_CACHE_DROP)) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -78,14 +78,14 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
       const new_cache_block_drop_interactor& other) = delete;
 
   /**
-   * @brief The actual handling function for interactions.
+   * \brief The actual handling function for interactions.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
+   * \param controller The controller to handle interactions for.
+   * \param t   The current timestep.
    *
-   * @return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
+   * \return \c TRUE if a block was dropped in a new cache, \c FALSE otherwise.
    */
-  interactor_status operator()(T& controller, rtypes::timestep t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
       if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         return finish_new_cache_block_drop(controller);
@@ -112,7 +112,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
         cache_proximity_notify(controller, prox_status);
       }
     }
-    return interactor_status::ekNoEvent;
+    return interactor_status::ekNO_EVENT;
   }
 
  private:
@@ -143,7 +143,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
   }
 
   /**
-   * @brief Handles handshaking between cache, robot, and arena if the robot is
+   * \brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache site and is looking to drop an object on it.
    */
   interactor_status finish_new_cache_block_drop(T& controller) {
@@ -188,18 +188,18 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
                 status.entity_id);
       events::cache_proximity_visitor prox_op(*it);
       prox_op.visit(controller);
-      return interactor_status::ekNoEvent;
+      return interactor_status::ekNO_EVENT;
     } else {
       perform_new_cache_block_drop(controller, p);
       m_penalty_handler->penalty_remove(p);
       ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
                 "Multiple instances of same controller serving cache penalty");
-      return interactor_status::ekNewCacheBlockDrop;
+      return interactor_status::ekNEW_CACHE_BLOCK_DROP;
     }
   }
 
   /**
-   * @brief Perform the actual dropping of a block in the cache once all
+   * \brief Perform the actual dropping of a block in the cache once all
    * preconditions have been satisfied.
    */
   void perform_new_cache_block_drop(T& controller,

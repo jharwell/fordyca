@@ -1,7 +1,7 @@
 /**
- * @file block_dist_parser.hpp
+ * \file block_dist_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,10 +44,10 @@ NS_START(fordyca, config, arena);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_dist_parser
- * @ingroup fordyca config arena
+ * \class block_dist_parser
+ * \ingroup fordyca config arena
  *
- * @brief Parses XML parameters related to block distribution
+ * \brief Parses XML parameters related to block distribution
  * into \ref block_dist_config.
  */
 class block_dist_parser : public rconfig::xml::xml_config_parser {
@@ -55,7 +55,7 @@ class block_dist_parser : public rconfig::xml::xml_config_parser {
   using config_type = block_dist_config;
 
   /**
-   * @brief The root tag that all block distribution parameters should lie under
+   * \brief The root tag that all block distribution parameters should lie under
    * in the XML tree.
    */
   static constexpr char kXMLRoot[] = "distribution";

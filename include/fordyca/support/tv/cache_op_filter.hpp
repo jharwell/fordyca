@@ -1,7 +1,7 @@
 /**
- * @file cache_op_filter.hpp
+ * \file cache_op_filter.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 
 /**
- * @class cache_op_filter
- * @ingroup fordyca support tv
+ * \class cache_op_filter
+ * \ingroup fordyca support tv
  *
- * @brief The filter for cache operation for robots (e.g. picking up, dropping
+ * \brief The filter for cache operation for robots (e.g. picking up, dropping
  * in places that involve existing caches.
  */
 template <typename T>
@@ -59,7 +59,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
   cache_op_filter(const cache_op_filter& other) = delete;
 
   /**
-   * @brief Filters out controllers that actually are not eligible to start
+   * \brief Filters out controllers that actually are not eligible to start
    * serving penalties.
    */
   op_filter_status operator()(T& controller, cache_op_src src) {
@@ -80,7 +80,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
 
  private:
   /**
-   * @brief Filter out spurious penalty initializations for existing cache
+   * \brief Filter out spurious penalty initializations for existing cache
    * operations (e.g. pickup/drop) (i.e. controller not ready/not intending to
    * use an existing cache).
    */

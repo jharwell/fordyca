@@ -1,7 +1,7 @@
 /**
- * @file powerlaw_dist_parser.hpp
+ * \file powerlaw_dist_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, config, arena);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class powerlaw_dist_parser
- * @ingroup fordyca config arena
+ * \class powerlaw_dist_parser
+ * \ingroup fordyca config arena
  *
- * @brief Parses XML parameters for related to \ref powerlaw_distributor
+ * \brief Parses XML parameters for related to \ref powerlaw_distributor
  * objects into \ref powerlaw_dist_config.
  */
 class powerlaw_dist_parser final : public rconfig::xml::xml_config_parser {
@@ -51,7 +51,7 @@ class powerlaw_dist_parser final : public rconfig::xml::xml_config_parser {
   using config_type = powerlaw_dist_config;
 
   /**
-   * @brief The root tag that all powerlaw dist parameters should lie
+   * \brief The root tag that all powerlaw dist parameters should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "powerlaw";

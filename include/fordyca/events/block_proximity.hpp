@@ -1,7 +1,7 @@
 /**
- * @file block_proximity.hpp
+ * \file block_proximity.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -50,10 +50,10 @@ NS_START(events, detail);
  ******************************************************************************/
 
 /**
- * @class block_proximity
- * @ingroup fordyca events
+ * \class block_proximity
+ * \ingroup fordyca events
  *
- * @brief Event that is created whenever a block that a robot is not currently
+ * \brief Event that is created whenever a block that a robot is not currently
  * aware of blocks its ability to complete its current task.
  */
 class block_proximity : public rer::client<block_proximity> {
@@ -91,7 +91,7 @@ class block_proximity : public rer::client<block_proximity> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

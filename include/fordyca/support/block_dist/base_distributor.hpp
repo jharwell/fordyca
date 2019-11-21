@@ -1,7 +1,7 @@
 /**
- * @file base_distributor.hpp
+ * \file base_distributor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,15 +42,15 @@ NS_START(fordyca, support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_distributor
- * @ingroup fordyca support block_dist
+ * \class base_distributor
+ * \ingroup fordyca support block_dist
  *
- * @brief Base class for block distributors to enable use of strategy pattern.
+ * \brief Base class for block distributors to enable use of strategy pattern.
  */
 class base_distributor {
  public:
   /**
-   * @brief How many times to attempt to distribute all blocks before giving up,
+   * \brief How many times to attempt to distribute all blocks before giving up,
    * causing an assertion failure on distribution.
    */
   static constexpr uint kMAX_DIST_TRIES = 100;
@@ -63,30 +63,30 @@ class base_distributor {
   base_distributor& operator=(const base_distributor&) = delete;
 
   /**
-   * @brief Distribute a block in the specified area by trying each random
+   * \brief Distribute a block in the specified area by trying each random
    * distributor in turn.
    *
-   * @param block The block to distribute.
-   * @param entities The list of entities that the block should be distributed
+   * \param block The block to distribute.
+   * \param entities The list of entities that the block should be distributed
    * around. If block distribution is successful, then the distributed block is
    * added to the entity list.
    *
-   * @return \c TRUE if the block distribution was successful, \c FALSE
+   * \return \c TRUE if the block distribution was successful, \c FALSE
    * otherwise.
    */
   virtual bool distribute_block(std::shared_ptr<repr::base_block>& block,
                                 ds::const_entity_list& entities) = 0;
 
   /**
-   * @brief Return a read-only list of \ref block_clusters for capacity checking
+   * \brief Return a read-only list of \ref block_clusters for capacity checking
    * by external classes.
    */
   virtual ds::block_cluster_vector block_clusters(void) const = 0;
 
   /**
-   * @brief Calls \ref distribute_block on each block.
+   * \brief Calls \ref distribute_block on each block.
    *
-   * @return \c TRUE iff all block distributions were successful, \c FALSE
+   * \return \c TRUE iff all block distributions were successful, \c FALSE
    * otherwise.
    */
   virtual bool distribute_blocks(ds::block_vector& blocks,

@@ -1,7 +1,7 @@
 /**
- * @file dp_cache_map.cpp
+ * \file dp_cache_map.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

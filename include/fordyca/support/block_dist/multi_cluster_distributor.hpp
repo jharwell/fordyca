@@ -1,7 +1,7 @@
 /**
- * @file multi_cluster_distributor.hpp
+ * \file multi_cluster_distributor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class multi_cluster_distributor
- * @ingroup fordyca support block_dist
+ * \class multi_cluster_distributor
+ * \ingroup fordyca support block_dist
  *
- * @brief Distributes a block or set of blocks within the set of specified
+ * \brief Distributes a block or set of blocks within the set of specified
  * clusters bounds randomly, using \ref random_distributor within
  * each cluster to do the actual distribution.
  */

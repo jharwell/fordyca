@@ -1,7 +1,7 @@
 /**
- * @file static_cache_config.hpp
+ * \file static_cache_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,20 +37,22 @@ NS_START(fordyca, config, caches);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct static_cache_config
- * @ingroup fordyca config caches
+ * \struct static_cache_config
+ * \ingroup fordyca config caches
+ *
+ * \brief Configuration for static caches in the arena for the loop functions.
  */
 struct static_cache_config final : public rconfig::base_config {
   bool                enable{false};
 
   /**
-   * @brief How large should the static cache be, in terms of blocks (if
+   * \brief How large should the static cache be, in terms of blocks (if
    * enabled)?
    */
   uint                size{0};
 
   /**
-   * @brief When depleted, how quickly should the cache be re-created by the
+   * \brief When depleted, how quickly should the cache be re-created by the
    * arena. Very useful to debug a lot of the issues surrounding dynamic cache
    * creation in a more controlled setting.
    */

@@ -1,7 +1,7 @@
 /**
- * @file cache_vector.hpp
+ * \file cache_vector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,11 +43,21 @@ using cache_vector_type = std::shared_ptr<repr::arena_cache>;
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
+/**
+ * \class cache_vector
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::vector with an additional \ref to_str()
+ * method.
+ */
 class cache_vector : public std::vector<cache_vector_type> {
  public:
   using std::vector<cache_vector_type>::vector;
   using value_type = std::vector<cache_vector_type>::value_type;
 
+  /**
+   * \brief Get a string representation of the vector contents.
+   */
   std::string to_str(void) const;
 };
 

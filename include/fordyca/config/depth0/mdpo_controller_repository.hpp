@@ -1,7 +1,7 @@
 /**
- * @file mdpo_controller_repository.hpp
+ * \file mdpo_controller_repository.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -35,10 +35,10 @@ NS_START(fordyca, config, depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class mdpo_controller_repository
- * @ingroup fordyca config depth0
+ * \class mdpo_controller_repository
+ * \ingroup fordyca config depth0
  *
- * @brief Collection of all parameter parsers and parse results needed by
+ * \brief Collection of all parameter parsers and parse results needed by
  * \ref mdpo_controller.
  */
 class mdpo_controller_repository: public dpo_controller_repository {

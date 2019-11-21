@@ -1,7 +1,7 @@
 /**
- * @file crw.hpp
+ * \file crw.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class crw
- * @ingroup fordyca fsm expstrat
+ * \class crw
+ * \ingroup fordyca fsm expstrat
  *
- * @brief Roam around using Correlated Random Walk looking for something until
+ * \brief Roam around using Correlated Random Walk looking for something until
  * you happen to stumble across it.
  */
 class crw final : public foraging_expstrat,
@@ -67,7 +67,7 @@ class crw final : public foraging_expstrat,
   bool task_running(void) const override final { return m_task_running; }
 
   /**
-   * @brief Since we are exploring for something we don't know about, we will
+   * \brief Since we are exploring for something we don't know about, we will
    * never finish (stopping exploration is handled at a higher level).
    */
   bool task_finished(void) const override final { return false; }
@@ -80,19 +80,19 @@ class crw final : public foraging_expstrat,
 
  private:
   /**
-   * @brief Handle all logic for entering collision avoidance; derived classes
+   * \brief Handle all logic for entering collision avoidance; derived classes
    * should only have to call this function whenever they detect an obstacle.
    *
-   * @param timestep The current timestep.
+   * \param timestep The current timestep.
    */
   void ca_enter(rtypes::timestep t);
 
   /**
-   * @brief Handle all logic for exiting collision avoidance; derived classes
+   * \brief Handle all logic for exiting collision avoidance; derived classes
    * should only have to call this function whenever they no longer detect any
    * obstacles.
    *
-   * @param timestep The current timestep.
+   * \param timestep The current timestep.
    */
   void ca_exit(void);
 

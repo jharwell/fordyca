@@ -1,7 +1,7 @@
 /**
- * @file base_block.cpp
+ * \file base_block.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

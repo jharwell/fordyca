@@ -1,7 +1,7 @@
 /**
- * @file base_controller.cpp
+ * \file base_controller.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -53,8 +53,7 @@ namespace fs = std::experimental::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 base_controller::base_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.base"),
-      m_block(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.base"), m_block(nullptr) {}
 
 base_controller::~base_controller(void) = default;
 
@@ -91,7 +90,7 @@ void base_controller::init(ticpp::Element& node) {
 
   /* initialize RNG */
   auto rngp = repo.config_get<rmath::config::rng_config>();
-  base_controller2D::rng_init((nullptr == rngp) ? -1: rngp->seed, "footbot");
+  base_controller2D::rng_init((nullptr == rngp) ? -1 : rngp->seed, "footbot");
 
   /* initialize output */
   auto* outputp = repo.config_get<config::output_config>();
@@ -103,13 +102,11 @@ void base_controller::init(ticpp::Element& node) {
   ndc_pop();
 } /* init() */
 
-void base_controller::reset(void) {
-  m_block.reset();
-} /* Reset() */
+void base_controller::reset(void) { m_block.reset(); } /* Reset() */
 
 void base_controller::output_init(const config::output_config* outputp) {
-  std::string dir = base_controller2D::output_init(outputp->output_root,
-                                                   outputp->output_dir);
+  std::string dir =
+      base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
 #if (LIBRA_ER == LIBRA_ER_ALL)
   /*
@@ -121,14 +118,17 @@ void base_controller::output_init(const config::output_config* outputp) {
   client<base_controller>::set_logfile(log4cxx::Logger::getLogger("rcppsw.ta"),
                                        dir + "/ta.log");
 
-  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.controller"),
-              dir + "/controller.log");
-  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.ds"), dir + "/ds.log");
-  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
-  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.saa"),
-              dir + "/saa.log");
-  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
-                      dir + "/saa.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller"), dir + "/controller.log");
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.ds"),
+                                       dir + "/ds.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller.saa"), dir + "/saa.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+      dir + "/saa.log");
 #endif
 } /* output_init() */
 
@@ -161,7 +161,6 @@ void base_controller::saa_init(
   auto ground = chal::sensors::ground_sensor(
       GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names.ground_sensor),
       &sensing_p->ground);
-
 
   auto diff_drives = chal::sensors::diff_drive_sensor(
       GetSensor<argos::CCI_DifferentialSteeringSensor>(
@@ -200,7 +199,7 @@ void base_controller::saa_init(
 
   auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
 
-    /*
+      /*
      * We put the governed differential drive in the actuator map twice because
      * some of the reusable components use the base class differential drive
      * instead of the governed entry (no robust way to inform that we want to
@@ -241,9 +240,11 @@ std::unique_ptr<repr::base_block> base_controller::block_release(void) {
 }
 
 class crfootbot::footbot_saa_subsystem* base_controller::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_controller2D::saa());
+  return static_cast<crfootbot::footbot_saa_subsystem*>(
+      base_controller2D::saa());
 }
 const class crfootbot::footbot_saa_subsystem* base_controller::saa(void) const {
-  return static_cast<const crfootbot::footbot_saa_subsystem*>(base_controller2D::saa());
+  return static_cast<const crfootbot::footbot_saa_subsystem*>(
+      base_controller2D::saa());
 }
 NS_END(controller, fordyca);

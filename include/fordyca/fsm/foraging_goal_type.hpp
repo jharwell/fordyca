@@ -1,7 +1,7 @@
 /**
- * @file foraging_goal_type.hpp
+ * \file foraging_goal_type.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -48,30 +48,30 @@ struct foraging_acq_goal {
 struct foraging_transport_goal {
   enum type {
     /**
-     * @brief No goal--robot is probably not carrying a block.
+     * \brief No goal--robot is probably not carrying a block.
      */
     ekNONE = -1,
 
     /**
-     * @brief A robot has acquired a block and is currently taking it back to
+     * \brief A robot has acquired a block and is currently taking it back to
      * the nest.
      */
     ekNEST,
 
     /**
-     * @brief A robot is currently transporting an acquired block to its
+     * \brief A robot is currently transporting an acquired block to its
      * existing cache of choice.
      */
     ekEXISTING_CACHE,
 
     /**
-     * @brief A robot is currently transporting an acquired block to its new
+     * \brief A robot is currently transporting an acquired block to its new
      * cache of choice.
      */
     ekNEW_CACHE,
 
     /**
-     * @brief A robot is currently transporting an acquired block to its cache
+     * \brief A robot is currently transporting an acquired block to its cache
      * site of choice.
      */
     ekCACHE_SITE

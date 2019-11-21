@@ -1,7 +1,7 @@
 /**
- * @file block_carry_visualizer.cpp
+ * \file block_carry_visualizer.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

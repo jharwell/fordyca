@@ -1,7 +1,7 @@
 /**
- * @file ledtaxis.hpp
+ * \file ledtaxis.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class ledtaxis
- * @ingroup fordyca fsm expstrat
+ * \class ledtaxis
+ * \ingroup fordyca fsm expstrat
  *
- * @brief Assumes that the target entity type isequipped with an LED entity that
+ * \brief Assumes that the target entity type isequipped with an LED entity that
  * robots can detect with their blob camera. Performs phototaxis towards the
  * source of the signal if one is found, and performs phototaxis to it.
  */
@@ -86,7 +86,7 @@ class ledtaxis : public foraging_expstrat,
 
  private:
   /**
-   * @brief The tolerance within which a robot's location has to be in order to
+   * \brief The tolerance within which a robot's location has to be in order to
    * be considered having arrived at the taxis' source.
    */
   static constexpr double kARRIVAL_TOL = 1.0;

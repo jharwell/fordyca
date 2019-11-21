@@ -1,7 +1,7 @@
 /**
- * @file depth1_loop_functions.hpp
+ * \file depth1_loop_functions.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -59,10 +59,10 @@ using d1_subtask_status_map_type =
  * Classes
  ******************************************************************************/
 /**
- * @class loop_functions
- * @ingroup fordyca support depth1
+ * \class depth1_loop_functions
+ * \ingroup fordyca support depth1
  *
- * @brief The loop functions for depth 1 foraging.
+ * \brief The loop functions for depth 1 foraging.
  *
  * Handles all operations robots perform relating to depth 1 foraging and
  * potential usage of static caches (pickup, drop, etc.), along with the depth0
@@ -82,7 +82,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
 
  protected:
   /**
-   * @brief Initialize depth1 support to be shared with derived classes:
+   * \brief Initialize depth1 support to be shared with derived classes:
    *
    * - All depth0 shared initialization
    * - Depth1 metric collection
@@ -113,16 +113,18 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
     >;
   using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
 
-  /*
-   * These are friend classes because they are basically just pieces of the loop
-   * functions pulled out for increased clarity/modularity, and are not meant to
-   * be used in other contexts. Doing things this way rather than passing 8
-   * parameters to the functors seemed much cleaner.
+  /**
+   * \brief These are friend classes because they are basically just pieces of
+   * the loop functions pulled out for increased clarity/modularity, and are not
+   * meant to be used in other contexts.
+   *
+   * Doing things this way rather than passing 8 parameters to the functors
+   * seemed much cleaner.
    */
   friend detail::functor_maps_initializer;
 
   /**
-   * @brief Initialize depth0 support not shared with derived classes:
+   * \brief Initialize depth0 support not shared with derived classes:
    *
    * - Robot interactions with arena
    * - Various maps mapping controller types to metric collection, controller
@@ -133,13 +135,13 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   void private_init(void) RCSW_COLD;
 
   /**
-   * @brief Initialize static cache handling/management:
+   * \brief Initialize static cache handling/management:
    */
   void cache_handling_init(const config::caches::caches_config *cachep,
                            const config::arena::block_dist_config* distp) RCSW_COLD;
 
   /**
-   * @brief Map the block distribution type to the locations of one or more
+   * \brief Map the block distribution type to the locations of one or more
    * static caches that will be maintained by the simulation during
    * initialization.
    */
@@ -147,26 +149,26 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
       const config::arena::block_dist_config* distp) RCSW_COLD;
 
   /**
-   * @brief Initialize all oracles.
+   * \brief Initialize all oracles.
    */
   void oracle_init(void) RCSW_COLD;
 
   /**
-   * @brief Process a single robot on a timestep, before running its controller:
+   * \brief Process a single robot on a timestep, before running its controller:
    *
    * - Set its new position, time from ARGoS and send it its LOS.
    *
-   * @note These operations are done in parallel for all robots (lock free).
+   * \note These operations are done in parallel for all robots (lock free).
    */
   void robot_pre_step(argos::CFootBotEntity& robot);
 
   /**
-   * @brief Process a single robot on a timestep, after running its controller.
+   * \brief Process a single robot on a timestep, after running its controller.
    *
    * - Have it interact with the environment.
    * - Collect metrics from it.
    *
-   * @note These operations are done in parallel for all robots (with mutual
+   * \note These operations are done in parallel for all robots (with mutual
    *       exclusion as needed).
    */
   void robot_post_step(argos::CFootBotEntity& robot);
@@ -174,15 +176,15 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   /**
-   * @brief Extract the numerical ID of the task each robot is currently
+   * \brief Extract the numerical ID of the task each robot is currently
    * executing for use in convergence calculations.
    *
-   * @param uint Unused.
+   * \param uint Unused.
    */
   std::vector<int> robot_tasks_extract(uint) const;
 
   /**
-   * @brief Monitor the status of the static cache(s), calculating respawn
+   * \brief Monitor the status of the static cache(s), calculating respawn
    * probability and potentially recreating depleted caches as needed.
    */
   void static_cache_monitor(void);

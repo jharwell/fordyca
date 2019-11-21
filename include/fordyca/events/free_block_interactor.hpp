@@ -1,7 +1,7 @@
 /**
- * @file free_block_interactor.hpp
+ * \file free_block_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ class free_block_drop;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class free_block_interactor
- * @ingroup fordyca events
+ * \class free_block_interactor
+ * \ingroup fordyca events
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
+ * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with free blocks in FORDYCA.
  */
 class free_block_interactor

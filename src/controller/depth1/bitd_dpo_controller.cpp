@@ -1,7 +1,7 @@
 /**
- * @file bitd_dpo_controller.cpp
+ * \file bitd_dpo_controller.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -31,13 +31,13 @@
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/config/depth1/controller_repository.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
 
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
@@ -113,7 +113,8 @@ void bitd_dpo_controller::shared_init(
    * have an XML repository with the correct configuration init.
    */
   auto saa_names = config::saa_xml_names();
-  auto sensing_p = config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>();
+  auto sensing_p =
+      config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>();
   auto ground = chal::sensors::ground_sensor(
       GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names.ground_sensor),
       &sensing_p->ground);
@@ -134,12 +135,12 @@ void bitd_dpo_controller::private_init(
 } /* private_init() */
 
 void bitd_dpo_controller::task_abort_cb(const rta::polled_task*) {
-  m_task_status = tasks::task_status::ekAbortPending;
+  m_task_status = tasks::task_status::ekABORT_PENDING;
 } /* task_abort_cb() */
 
 void bitd_dpo_controller::task_start_cb(const rta::polled_task*) {
-  if (tasks::task_status::ekAbortPending != m_task_status) {
-    m_task_status = tasks::task_status::ekRunning;
+  if (tasks::task_status::ekABORT_PENDING != m_task_status) {
+    m_task_status = tasks::task_status::ekRUNNING;
   }
 } /* task_start_cb() */
 

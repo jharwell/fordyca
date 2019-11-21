@@ -1,7 +1,7 @@
 /**
- * @file cell_op.hpp
+ * \file cell_op.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -49,10 +49,10 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell_op
- * @ingroup fordyca events detail
+ * \class cell_op
+ * \ingroup fordyca events detail
  *
- * @brief Non-abstract interface specifying the minimum set of classes that all
+ * \brief Non-abstract interface specifying the minimum set of classes that all
  * events that operate on cells within an occupany grid need to visit.
  *
  * Also provided are the (x, y) coordinates of the cell to which the event is
@@ -80,7 +80,7 @@ class cell_op {
 NS_END(detail);
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

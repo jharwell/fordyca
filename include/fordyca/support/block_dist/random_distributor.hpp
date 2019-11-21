@@ -1,7 +1,7 @@
 /**
- * @file random_distributor.hpp
+ * \file random_distributor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -51,10 +51,10 @@ NS_START(support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class random_distributor
- * @ingroup fordyca support
+ * \class random_distributor
+ * \ingroup fordyca support
  *
- * @brief Distributes a set of blocks randomly within a specified 2D area, such
+ * \brief Distributes a set of blocks randomly within a specified 2D area, such
  * that no blocks overlap with each other or other entities already present in
  * the arena (nest, cache, etc.).
  *
@@ -76,15 +76,15 @@ class random_distributor final : public rer::client<random_distributor>,
                          ds::const_entity_list& entities) override;
 
   /**
-   * @brief Distribution a single block in the arena.
+   * \brief Distribution a single block in the arena.
    *
-   * @param block The block to distribute.
-   * @param entities Entities that need to be avoided during distribution.
+   * \param block The block to distribute.
+   * \param entities Entities that need to be avoided during distribution.
    *
-   * @note Holding \ref arena_map block, grid mutexes necessary to safely call
+   * \note Holding \ref arena_map block, grid mutexes necessary to safely call
    * this function in multithreaded contexts (not handled internally).
    *
-   * @return \c TRUE if the distribution was successful, \c FALSE otherwise.
+   * \return \c TRUE if the distribution was successful, \c FALSE otherwise.
    */
   bool distribute_block(std::shared_ptr<repr::base_block>& block,
                         ds::const_entity_list& entities) override;
@@ -98,16 +98,16 @@ class random_distributor final : public rer::client<random_distributor>,
     rmath::vector2u abs{};
   };
   /**
-   * @brief The maxmimum # of times the distribution will be attempted before
+   * \brief The maxmimum # of times the distribution will be attempted before
    * giving up.
    */
   static constexpr uint kMAX_DIST_TRIES = 1000;
 
   /**
-   * @brief Find coordinates for distribution that are outside the extent of the
+   * \brief Find coordinates for distribution that are outside the extent of the
    * all specified entities, while also accounting for block size.
    *
-   * @param entities The entities to avoid.
+   * \param entities The entities to avoid.
    */
   boost::optional<coord_search_res_t> avail_coord_search(
       const ds::const_entity_list& entities,

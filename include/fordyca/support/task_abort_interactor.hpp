@@ -1,7 +1,7 @@
 /**
- * @file task_abort_interactor.hpp
+ * \file task_abort_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(fordyca, support);
  * Classes
  ******************************************************************************/
 /**
- * @class task_abort_interactor
- * @ingroup fordyca support
+ * \class task_abort_interactor
+ * \ingroup fordyca support
  *
- * @brief Handles a robot's (possible) aborting of its current task on a given
+ * \brief Handles a robot's (possible) aborting of its current task on a given
  * timestep.
  */
 template <typename T>
@@ -63,10 +63,10 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
         m_floor(floor_in) {}
 
   /**
-   * @brief Interactors should generally NOT be copy constructable/assignable,
+   * \brief Interactors should generally NOT be copy constructable/assignable,
    * but is needed to use these classes with boost::variant.
    *
-   * @todo Supposedly in recent versions of boost you can use variants with
+   * \todo Supposedly in recent versions of boost you can use variants with
    * move-constructible-only types (which is what this class SHOULD be), but I
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
@@ -75,19 +75,19 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
   task_abort_interactor& operator=(const task_abort_interactor& other) = delete;
 
   /**
-   * @brief Handle cases in which a robot aborts its current task, and perform
+   * \brief Handle cases in which a robot aborts its current task, and perform
    * any necessary cleanup, such as dropping/distributing a carried block, etc.
    *
-   * @param controller The robot to handle task abort for.
-   * @param penalty_handlers List of all penalty handlers in the arena that the
+   * \param controller The robot to handle task abort for.
+   * \param penalty_handlers List of all penalty handlers in the arena that the
    *                         robot may be serving a penalty with that may need
    *                         to be updated.
    *
-   * @return \c TRUE if the robot aborted is current task, \c FALSE otherwise.
+   * \return \c TRUE if the robot aborted is current task, \c FALSE otherwise.
    */
   bool operator()(T& controller, const penalty_handler_list& penalty_handlers) {
     if (nullptr == controller.current_task() ||
-        tasks::task_status::ekAbortPending != controller.task_status()) {
+        tasks::task_status::ekABORT_PENDING != controller.task_status()) {
       return false;
     }
     RCSW_UNUSED auto polled =

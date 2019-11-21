@@ -1,11 +1,11 @@
 /**
- * @file loop_utils.hpp
- * @ingroup fordyca support utils
+ * \file loop_utils.hpp
+ * \ingroup fordyca support utils
  *
  * Helpers for loop functions that CAN be free functions, as they do not require
  * access to anything in \ref argos::CLoopFunctions.
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -65,11 +65,11 @@ struct placement_status_t {
  * Functions
  ******************************************************************************/
 /**
- * @brief Set the position and orientation of the robot in the arena.
+ * \brief Set the position and orientation of the robot in the arena.
  *
  * This is a hack that makes getting my research up and running easier.
  *
- * @todo This should eventually be replaced by a calculation of robot's
+ * \todo This should eventually be replaced by a calculation of robot's
  * position/orientation by the robot.
  */
 template <typename T>
@@ -96,7 +96,7 @@ void set_robot_pos(argos::CFootBotEntity& robot,
 }
 
 /**
- * @brief Compute the line of sight for a given robot.
+ * \brief Compute the line of sight for a given robot.
  *
  * Needed to eliminate header dependencies in this file.
  */
@@ -106,11 +106,11 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
     const rmath::vector2d& pos);
 
 /**
- * @brief Set the LOS of a robot in the arena.
+ * \brief Set the LOS of a robot in the arena.
  *
  * This is a hack that makes getting my research up and running easier.
  *
- * @todo This should eventually be replaced by a calculation of a robot's LOS by
+ * \todo This should eventually be replaced by a calculation of a robot's LOS by
  * the robot, probably using on-board cameras.
  */
 template <typename T>
@@ -129,7 +129,7 @@ void set_robot_tick(argos::CFootBotEntity& robot, rtypes::timestep t) {
 }
 
 /**
- * @brief Determine if an entity of the specified dimensions, placed at the
+ * \brief Determine if an entity of the specified dimensions, placed at the
  * specified location (or that currently exists at the specified location), will
  * overlap the specified (different) entity (or does overlap it).
  *
@@ -139,13 +139,13 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
                                       const repr::base_entity* entity);
 
 /**
- * @brief Calculate the blocks that are:
+ * \brief Calculate the blocks that are:
  *
  * - Not carried by a robot
  * - Not inside a cache
  *
- * @param all_caches All existing caches in the arena.
- * @param all_blocks All blocks in the arena.
+ * \param all_caches All existing caches in the arena.
+ * \param all_blocks All blocks in the arena.
  */
 ds::block_vector free_blocks_calc(const ds::cache_vector& all_caches,
                                   const ds::block_vector& all_blocks);

@@ -1,7 +1,7 @@
 /**
- * @file block_cluster.hpp
+ * \file block_cluster.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_cluster
- * @ingroup fordyca repr
+ * \class block_cluster
+ * \ingroup fordyca repr
  *
- * @brief Represents a cluster of blocks in the arena as an entity for use
+ * \brief Represents a cluster of blocks in the arena as an entity for use
  * during block distribution and dynamic cache creation. A cluster is defined
  * as:
  *

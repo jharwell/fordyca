@@ -1,7 +1,7 @@
 /**
- * @file block_to_existing_cache_fsm.hpp
+ * \file block_to_existing_cache_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ NS_START(fsm, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_to_existing_cache_fsm
- * @ingroup fordyca fsm depth1
+ * \class block_to_existing_cache_fsm
+ * \ingroup fordyca fsm depth1
  *
- * @brief The FSM for the block-to-existing-cache subtask.
+ * \brief The FSM for the block-to-existing-cache subtask.
  *
  * Each robot executing this FSM will locate a free block (either a known block
  * or via exploration), pickup the block and bring it to the best existing cache

@@ -1,7 +1,7 @@
 /**
- * @file block_sel_matrix.hpp
+ * \file block_sel_matrix.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of RCPPSW.
  *
@@ -43,6 +43,11 @@ struct block_sel_matrix_config;
 }} // namespace config::block_sel
 NS_START(controller);
 
+/**
+ * \brief \ref boost::variant containing all the different object/POD types that
+ * are mapped to within the \ref block_sel_matrix; multiple entries in the
+ * matrix can have the same type.
+ */
 using block_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
@@ -53,18 +58,14 @@ using block_sel_variant =
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_sel_matrix
- * @ingroup fordyca controller
+ * \class block_sel_matrix
+ * \ingroup fordyca controller
  *
- * @brief A dictionary of information needed by robots using various utility
+ * \brief A dictionary of information needed by robots using various utility
  * functions to calculate the best:
  *
  * - block (of whatever type)
- *
- * This class may be separated into those components in the future if it makes
- * sense.
  */
-
 class block_sel_matrix : public std::map<std::string, block_sel_variant> {
  public:
   static constexpr char kNestLoc[] = "nest_loc";
@@ -73,7 +74,7 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
   static constexpr char kSelExceptions[] = "sel_exceptions";
 
   /**
-   * @brief The conditions that must be satisfied before a robot will be
+   * \brief The conditions that must be satisfied before a robot will be
    * able to pickup a block (if applicable).
    */
   static constexpr char kPickupPolicy[] = "pickup_policy";
@@ -84,16 +85,16 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
       const config::block_sel::block_sel_matrix_config* config);
 
   /**
-   * @brief Add a block to the exception list, disqualifying it from being
+   * \brief Add a block to the exception list, disqualifying it from being
    * selected as a block to pick up, regardless of its utility value, the next
    * time the robot runs the block selection algorithm.
    *
-   * @param id The ID of the block to add.
+   * \param id The ID of the block to add.
    */
   void sel_exception_add(int id);
 
   /**
-   * @brief Clear the exceptions list. This happens after a robot has executed
+   * \brief Clear the exceptions list. This happens after a robot has executed
    * the task AFTER the task that dropped a free block somewhere in the arena
    * (i.e. there is a 1 task buffer between when a robot drops block X via a
    * free block drop event as part of a task, and when it is allowed to pick

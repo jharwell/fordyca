@@ -1,7 +1,7 @@
 /**
- * @file metrics_config.hpp
+ * \file metrics_config.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,8 +40,8 @@ NS_START(fordyca, config);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct metrics_config
- * @ingroup fordyca config
+ * \struct metrics_config
+ * \ingroup fordyca config
  *
  * Each member represents the filename to which a specific type of metrics
  * should be logged. Empty filename=no metrics of that type will be collected.

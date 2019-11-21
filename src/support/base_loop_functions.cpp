@@ -1,7 +1,7 @@
 /**
- * @file base_loop_functions.cpp
+ * \file base_loop_functions.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -167,10 +167,8 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
     m_tv_manager->register_controller(c->entity_id());
     c->irv_init(m_tv_manager->irv_adaptor());
   };
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this,
-                                                            cb,
-                                                            "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
 } /* tv_init() */
 
 void base_loop_functions::arena_map_init(
@@ -253,12 +251,12 @@ void base_loop_functions::Reset(void) {
 std::vector<double> base_loop_functions::calc_robot_nn(
     RCSW_UNUSED uint n_threads) const {
   std::vector<rmath::vector2d> v;
-  auto cb =  [&](auto* robot) {
+  auto cb = [&](auto* robot) {
     v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
-            robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
+                 robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
   };
-  swarm_iterator::robots<argos::CFootBotEntity,
-                         swarm_iterator::static_order>(this, cb, "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
 
   /*
    * For each closest pair of robots we find, we add the corresponding distance
@@ -274,7 +272,8 @@ std::vector<double> base_loop_functions::calc_robot_nn(
     auto dist_func = std::bind(&rmath::vector2d::distance,
                                std::placeholders::_1,
                                std::placeholders::_2);
-    auto pts = ralg::closest_pair<rmath::vector2d>()("recursive", v, dist_func);
+    auto pts =
+        ralg::closest_pair2D<rmath::vector2d>()("recursive", v, dist_func);
     size_t old = v.size();
 #pragma omp critical
     {
@@ -301,8 +300,8 @@ std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const
   auto cb = [&](const auto* controller) {
     v.push_back(controller->heading2D().angle());
   };
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                         swarm_iterator::static_order>(this, cb, "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
   return v;
 } /* calc_robot_headings() */
 
@@ -310,9 +309,11 @@ std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
     uint) const {
   std::vector<rmath::vector2d> v;
 
-  auto cb = [&](const auto* controller) { v.push_back(controller->position2D()); };
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this, cb, "foot-bot");
+  auto cb = [&](const auto* controller) {
+    v.push_back(controller->position2D());
+  };
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
   return v;
 } /* calc_robot_positions() */
 

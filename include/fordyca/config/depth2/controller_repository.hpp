@@ -1,7 +1,7 @@
 /**
- * @file depth2/controller_repository.hpp
+ * \file depth2/controller_repository.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -35,10 +35,10 @@ NS_START(fordyca, config, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class controller_repository
- * @ingroup fordyca config depth2
+ * \class controller_repository
+ * \ingroup fordyca config depth2
  *
- * @brief Collection of all parameter parsers and parse results needed
+ * \brief Collection of all parameter parsers and parse results needed
  * by depth2 controllers.
  */
 class controller_repository: public depth1::controller_repository {

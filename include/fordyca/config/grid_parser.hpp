@@ -1,7 +1,7 @@
 /**
- * @file grid_parser.hpp
+ * \file grid_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, config);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class grid_parser
- * @ingroup fordyca config
+ * \class grid_parser
+ * \ingroup fordyca config
  *
- * @brief Parses XML parameters for various 2D grid structures into
+ * \brief Parses XML parameters for various 2D grid structures into
  * \ref grid_config.
  */
 
@@ -53,7 +53,7 @@ class grid_parser : public rconfig::xml::xml_config_parser {
   using config_type = grid_config;
 
   /**
-   * @brief The root tag that all grid parameters should lie under in the
+   * \brief The root tag that all grid parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "grid";

@@ -1,7 +1,7 @@
 /**
- * @file block_carry_visualizer.hpp
+ * \file block_carry_visualizer.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(support);
  * Classes
  ******************************************************************************/
 /**
- * @class block_carry_visualizer
- * @ingroup fordyca support
+ * \class block_carry_visualizer
+ * \ingroup fordyca support
  *
- * @brief Renders a block in 3D that the robot is carrying for
+ * \brief Renders a block in 3D that the robot is carrying for
  * visualization/debugging purposes.
  */
 class block_carry_visualizer : public rer::client<block_carry_visualizer> {
@@ -65,12 +65,13 @@ class block_carry_visualizer : public rer::client<block_carry_visualizer> {
   block_carry_visualizer& operator=(const block_carry_visualizer& op) = delete;
 
   /**
-   * @brief Draw visualizations related to block carries:
+   * \brief Draw visualizations related to block carries:
    *
    * - The block itself
    * - The block ID
    *
-   * @param block The block to draw.
+   * \param block The block to draw.
+   * \param id_len Length of the robot ID string.
    */
   void draw(const repr::base_block* block, uint id_len);
 

@@ -1,7 +1,7 @@
 /**
- * @file dynamic_cache_manager.hpp
+ * \file dynamic_cache_manager.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -53,10 +53,10 @@ NS_START(support, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dynamic_cache_manager
- * @ingroup fordyca support depth2
+ * \class dynamic_cache_manager
+ * \ingroup fordyca support depth2
  *
- * @brief Manager for creation, depletion, and metric gathering for dynamic
+ * \brief Manager for creation, depletion, and metric gathering for dynamic
  * caches in the arena.
  */
 class dynamic_cache_manager final : public base_cache_manager,
@@ -69,16 +69,16 @@ class dynamic_cache_manager final : public base_cache_manager,
   dynamic_cache_manager& operator=(const dynamic_cache_manager&) = delete;
 
   /**
-   * @brief Create caches in the arena as needed according to free block
+   * \brief Create caches in the arena as needed according to free block
    * configurations.
    *
-   * @return The created caches (if any were created).
+   * \return The created caches (if any were created).
    */
   boost::optional<ds::cache_vector> create(const cache_create_ro_params& c_params,
                                            const ds::block_vector&  c_alloc_blocks);
 
   /**
-   * @brief Get the minimum distance that must be maintained between two caches
+   * \brief Get the minimum distance that must be maintained between two caches
    * in order for them to discrete. Equal to the maximum of (twice the cache
    * dimension, minimmum distance between blocks to consider when creating
    * caches);
@@ -90,7 +90,7 @@ class dynamic_cache_manager final : public base_cache_manager,
 
  private:
   /*
-   * @brief Calculate the blocks eligible to be considered for dynamic cache
+   * \brief Calculate the blocks eligible to be considered for dynamic cache
    * creation. Only blocks that are not:
    *
    * - Currently carried by a robot

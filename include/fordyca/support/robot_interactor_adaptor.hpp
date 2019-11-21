@@ -1,7 +1,7 @@
 /**
- * @file robot_interactor_adaptor.hpp
+ * \file robot_interactor_adaptor.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class robot_interactor_adaptor
- * @ingroup fordyca support
+ * \class robot_interactor_adaptor
+ * \ingroup fordyca support
  *
- * @brief Wrapping functor to perform robot-arena interactions each
+ * \brief Wrapping functor to perform robot-arena interactions each
  * timestep. Needed for use with boost::static_visitor.
  */
 template <template <typename ControllerType> class InteractorType,

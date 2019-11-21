@@ -1,7 +1,7 @@
 /**
- * @file dpo_semantic_map.hpp
+ * \file dpo_semantic_map.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -48,10 +48,10 @@ NS_START(ds);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dpo_semantic_map
- * @ingroup fordyca ds
+ * \class dpo_semantic_map
+ * \ingroup fordyca ds
  *
- * @brief Stores a semantic map of the state of the arena, from the perspective
+ * \brief Stores a semantic map of the state of the arena, from the perspective
  * of the robot (i.e. th physical extent of the arena + semantic information
  * about what is in it/its characteristics such as likelihood of
  * collision).
@@ -73,14 +73,14 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_DECORATE_FUNC(pheromone_repeat_deposit, const);
 
   /**
-   * @brief Access a particular element in the discretized grid representing the
+   * \brief Access a particular element in the discretized grid representing the
    * robot's view of the arena. No bounds checking is performed, so if something
    * is out of bounds, boost will fail with a bounds checking assertion.
    *
-   * @param i X coord.
-   * @param j Y coord
+   * \param i X coord.
+   * \param j Y coord
    *
-   * @return The cell.
+   * \return The cell.
    */
   template <size_t Index>
   typename occupancy_grid::layer_value_type<Index>::value_type& access(size_t i,
@@ -105,7 +105,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   }
 
   /**
-   * @brief Update the density of:
+   * \brief Update the density of:
    *
    * - All cells in the arena.
    * - All known objects in the arena.
@@ -113,7 +113,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   void decay_all(void);
 
   /**
-   * @brief Reset all the cells in the percieved arena.
+   * \brief Reset all the cells in the percieved arena.
    */
   RCPPSW_DECORATE_FUNC(reset)
   RCPPSW_DECORATE_FUNC(xdsize, const)

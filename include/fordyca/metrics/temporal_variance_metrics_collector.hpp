@@ -1,7 +1,7 @@
 /**
- * @file temporal_variance_metrics_collector.hpp
+ * \file temporal_variance_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, metrics);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class temporal_variance_metrics_collector
- * @ingroup fordyca metrics blocks
+ * \class temporal_variance_metrics_collector
+ * \ingroup fordyca metrics blocks
  *
- * @brief Collector for \ref temporal_variance_metrics.
+ * \brief Collector for \ref temporal_variance_metrics.
  *
  * Metrics are written out every timestep.
  */
@@ -51,7 +51,7 @@ class temporal_variance_metrics_collector final
     : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname The output file name.
+   * \param ofname The output file name.
    */
   explicit temporal_variance_metrics_collector(const std::string& ofname);
 

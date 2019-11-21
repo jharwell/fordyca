@@ -1,7 +1,7 @@
 /**
- * @file block_drop_base_visit_set.hpp
+ * \file block_drop_base_visit_set.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -47,9 +47,9 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @ingroup fordyca events detail
+ * \ingroup fordyca events detail
  *
- * @brief Interface specifying the core class of classes any action involving
+ * \brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).
  */
 using block_drop_base_visit_typelist =

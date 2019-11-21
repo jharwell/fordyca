@@ -1,7 +1,7 @@
 /**
- * @file block_manifest_processor.hpp
+ * \file block_manifest_processor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,6 +44,14 @@ NS_START(support);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * \class block_manifest_processor
+ * \ingroup support
+ *
+ * \brief Translates the parsed XML configuration for how many/what type of
+ * blocks should be used in simulation into a heterogeneous vector of actual
+ * blocks.
+ */
 class block_manifest_processor
     : public rpfactory::
           sharing_factory<repr::base_block, const rmath::vector2d&, int> {

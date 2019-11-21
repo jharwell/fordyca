@@ -1,7 +1,7 @@
 /**
- * @file depth0_metrics_aggregator.hpp
+ * \file depth0_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,10 +36,10 @@ NS_START(fordyca, support, depth0);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth0_metrics_aggregator
- * @ingroup fordyca support depth0
+ * \class depth0_metrics_aggregator
+ * \ingroup fordyca support depth0
  *
- * @brief Aggregates and metrics metric collection for depth0 foraging. That
+ * \brief Aggregates and metrics metric collection for depth0 foraging. That
  * includes:
  *
  * - FSM distance/block acquisition metrics

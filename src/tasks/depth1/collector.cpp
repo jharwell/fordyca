@@ -1,7 +1,7 @@
 /**
- * @file collector.cpp
+ * \file collector.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

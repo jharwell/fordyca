@@ -1,7 +1,7 @@
 /**
- * @file powerlaw_distributor.hpp
+ * \file powerlaw_distributor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -52,10 +52,10 @@ NS_START(support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class powerlaw_distributor
- * @ingroup fordyca support
+ * \class powerlaw_distributor
+ * \ingroup fordyca support
  *
- * @brief Distributes a block, or set of blocks, within the arena as randomly
+ * \brief Distributes a block, or set of blocks, within the arena as randomly
  * placed clusters with sizes ranging [minsize, maxsize], with a power law based
  * stride of 2^x between.
  *
@@ -66,7 +66,7 @@ class powerlaw_distributor final : public rer::client<powerlaw_distributor>,
                                    public base_distributor {
  public:
   /**
-   * @brief Initialize the distributor.
+   * \brief Initialize the distributor.
    */
   powerlaw_distributor(const config::arena::powerlaw_dist_config* config,
                        rtypes::discretize_ratio resolution,
@@ -81,13 +81,13 @@ class powerlaw_distributor final : public rer::client<powerlaw_distributor>,
   ds::block_cluster_vector block_clusters(void) const override;
 
   /**
-   * @brief Computer cluster locations such that no two clusters overlap, and
+   * \brief Computer cluster locations such that no two clusters overlap, and
    * map locations and compositional block distributors into internal data
    * structures.
    *
-   * @param grid The grid for the ENTIRE arena.
+   * \param grid The grid for the ENTIRE arena.
    *
-   * @return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
+   * \return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
    */
   bool map_clusters(ds::arena_grid* grid);
 
@@ -100,28 +100,28 @@ class powerlaw_distributor final : public rer::client<powerlaw_distributor>,
   using cluster_paramvec = std::vector<cluster_config>;
 
   /**
-   * @brief Assign cluster centers randomly, with the only restriction that the
+   * \brief Assign cluster centers randomly, with the only restriction that the
    * edges of each cluster are within the boundaries of the arena.
    *
-   * @param grid Arena grid.
-   * @param clust_sizes Vector of powers of 2 for the cluster sizes.
+   * \param grid Arena grid.
+   * \param clust_sizes Vector of powers of 2 for the cluster sizes.
    */
   cluster_paramvec guess_cluster_placements(
       ds::arena_grid* grid,
       const std::vector<uint>& clust_sizes);
 
   /**
-   * @brief Verify that no cluster placements cause overlap, after guessing
+   * \brief Verify that no cluster placements cause overlap, after guessing
    * initial locations.
    *
-   * @param list Possible list of cluster placements.
+   * \param list Possible list of cluster placements.
    *
-   * @return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
+   * \return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
    */
   bool check_cluster_placements(const cluster_paramvec& pvec) RCSW_PURE;
 
   /**
-   * @brief Perform a "guess and check" cluster placement until you get a
+   * \brief Perform a "guess and check" cluster placement until you get a
    * distribution without overlap, or \ref kMAX_DIST_TRIES is exceeded,
    * whichever happens first.
    *

@@ -1,7 +1,7 @@
 /**
- * @file ramp_block.hpp
+ * \file ramp_block.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,10 +36,10 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 
 /**
- * @class ramp_block
- * @ingroup fordyca repr
+ * \class ramp_block
+ * \ingroup fordyca repr
  *
- * @brief A representation of a ramp block within the arena. Ramp blocks are 2x1
+ * \brief A representation of a ramp block within the arena. Ramp blocks are 2x1
  * cells in size. Ramped blocks only need X,Y dimensions, because they are only
  * handled concretely in the arena in 2D (3D is only for visualization purposes,
  * and I can cheat a bit there).

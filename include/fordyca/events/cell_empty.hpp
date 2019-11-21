@@ -1,7 +1,7 @@
 /**
- * @file cell_empty.hpp
+ * \file cell_empty.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -46,10 +46,10 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell_empty
- * @ingroup fordyca events detail
+ * \class cell_empty
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a cell needs to go from some other state to being
+ * \brief Created whenever a cell needs to go from some other state to being
  * empty.
  *
  * The most common example of this is when a free block is picked up, and the
@@ -79,7 +79,7 @@ class cell_empty : public cell_op, public rer::client<cell_empty> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

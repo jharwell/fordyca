@@ -1,7 +1,7 @@
 /**
- * @file mdpo_controller.cpp
+ * \file mdpo_controller.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

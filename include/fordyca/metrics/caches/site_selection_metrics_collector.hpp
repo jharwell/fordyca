@@ -1,7 +1,7 @@
 /**
- * @file site_selection_metrics_collector.hpp
+ * \file site_selection_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,18 +39,18 @@ NS_START(fordyca, metrics, caches);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class site_selection_metrics_collector
- * @ingroup fordyca metrics caches
+ * \class site_selection_metrics_collector
+ * \ingroup fordyca metrics caches
  *
- * @brief Collector for \ref site_selection_metrics.
+ * \brief Collector for \ref site_selection_metrics.
  *
  * Metrics are output at the specified interval.
  */
 class site_selection_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname Output file name.
-   * @param interval Collection interval.
+   * \param ofname Output file name.
+   * \param interval Collection interval.
    */
   site_selection_metrics_collector(const std::string& ofname, uint interval);
 

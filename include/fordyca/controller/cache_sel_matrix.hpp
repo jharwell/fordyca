@@ -1,7 +1,7 @@
 /**
- * @file cache_sel_matrix.hpp
+ * \file cache_sel_matrix.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -47,6 +47,11 @@ struct cache_sel_matrix_config;
 }} // namespace config::cache_sel
 NS_START(controller);
 
+/**
+ * \brief \ref boost::variant containing all the different object/POD types that
+ * are mapped to within the \ref cache_sel_matrix; multiple entries in the
+ * matrix can have the same type.
+ */
 using cache_sel_variant =
     boost::variant<rtypes::spatial_dist,
                    rmath::vector2d,
@@ -59,10 +64,10 @@ using cache_sel_variant =
  ******************************************************************************/
 
 /**
- * @class cache_sel_matrix
- * @ingroup fordyca controller
+ * \class cache_sel_matrix
+ * \ingroup fordyca controller
  *
- * @brief A dictionary of information needed by robots using various utility
+ * \brief A dictionary of information needed by robots using various utility
  * functions to calculate the best:
  *
  * - existing cache
@@ -87,7 +92,7 @@ class cache_sel_matrix final
   static constexpr char kDropExceptions[] = "drop_exceptions";
 
   /**
-   * @brief The conditions that must be satisfied before a robot will be
+   * \brief The conditions that must be satisfied before a robot will be
    * able to pickup from *ANY* cache.
    */
   static constexpr char kPickupPolicy[] = "pickup_policy";
@@ -101,7 +106,7 @@ class cache_sel_matrix final
   ~cache_sel_matrix(void) override = default;
 
   /**
-   * @brief Add a cache to the exception list, disqualifying it from being
+   * \brief Add a cache to the exception list, disqualifying it from being
    * selected as a cache to pick up a block from/drop a block in, regardless of
    * its utility value, the next time the robot runs the existing cache
    * selection algorithm to select a cache IF the previous usage of that cache
@@ -112,7 +117,7 @@ class cache_sel_matrix final
   void sel_exception_add(const cache_sel_exception& ex);
 
   /**
-   * @brief Clear the exceptions list. This happens after a robot has executed
+   * \brief Clear the exceptions list. This happens after a robot has executed
    * the task AFTER the task that dropped a block in/picked up a block from an
    * existing cache (i.e. there is a 1 task buffer between usages of the same
    * existing cache).

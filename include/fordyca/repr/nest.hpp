@@ -1,7 +1,7 @@
 /**
- * @file nest.hpp
+ * \file nest.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class nest
- * @ingroup fordyca repr
+ * \class nest
+ * \ingroup fordyca repr
  *
- * @brief Class representing the nest in the arena, which is multi-cellular and
+ * \brief Class representing the nest in the arena, which is multi-cellular and
  * immobile.
  *
  * When initializing lights, they will only be detectable by the footbot's light
@@ -55,7 +55,7 @@ NS_START(fordyca, repr);
 class nest : public unicell_immovable_entity, public colored_entity {
  public:
   /**
-   * @brief We use raw pointers to indicate we (FORDYCA) do not own the
+   * \brief We use raw pointers to indicate we (FORDYCA) do not own the
    * constructed lights. If we own them, then when ARGoS goes to delete them
    * after the experiment has ended the arena has already been deconstructed and
    * the nest lights along with them, and an exception is thrown.
@@ -68,15 +68,15 @@ class nest : public unicell_immovable_entity, public colored_entity {
        const rutils::color& light_color);
 
   /**
-   * @brief Determine if a real-valued point lies within the extent of the
+   * \brief Determine if a real-valued point lies within the extent of the
    * nest for:
    *
    * 1. Visualization purposes.
    * 2. Determining if a robot has entered the nest.
    *
-   * @param point The point to check.
+   * \param point The point to check.
    *
-   * @return \c TRUE if the condition is met, and \c FALSE otherwise.
+   * \return \c TRUE if the condition is met, and \c FALSE otherwise.
    */
   bool contains_point(const rmath::vector2d& point) const {
     return xspan().contains(point.x()) && yspan().contains(point.y());

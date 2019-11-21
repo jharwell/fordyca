@@ -1,7 +1,7 @@
 /**
- * @file bitd_dpo_controller.hpp
+ * \file bitd_dpo_controller.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -61,10 +61,10 @@ NS_START(depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class bitd_dpo_controller
- * @ingroup fordyca controller depth1
+ * \class bitd_dpo_controller
+ * \ingroup fordyca controller depth1
  *
- * @brief A controller defining the task allocation space via BIfurcating Task
+ * \brief A controller defining the task allocation space via BIfurcating Task
  * Decomposition (BITD) and spliting the \ref generalist task into the \ref
  * harvester, and \ref collector tasks, according to dynamic changes in the
  * environment and/or execution/interface times of the tasks.
@@ -102,7 +102,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
                             const final);
 
   /**
-   * @brief Get the current task the controller is executing.
+   * \brief Get the current task the controller is executing.
    */
   tasks::base_foraging_task* current_task(void) RCSW_PURE;
   const tasks::base_foraging_task* current_task(void) const RCSW_PURE;
@@ -110,13 +110,13 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   int task_id(const std::string& task_name) const;
 
   /**
-   * @brief Set whether or not a robot is supposed to display the task it is
+   * \brief Set whether or not a robot is supposed to display the task it is
    * currently working on above itself during simulation.
    */
   void display_task(bool display_task) { m_display_task = display_task; }
 
   /**
-   * @brief If \c TRUE, then the robot should display the task it is currently
+   * \brief If \c TRUE, then the robot should display the task it is currently
    * working on above itself during simulation.
    */
   bool display_task(void) const { return m_display_task; }
@@ -130,7 +130,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   rta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
 
   /**
-   * @brief Get whether or not a task has been aborted this timestep.
+   * \brief Get whether or not a task has been aborted this timestep.
    *
    * This functionality CANNOT use the abort state of the \ref current_task()
    * because as soon as a task is aborted, the executive allocates a new task
@@ -151,7 +151,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
 
  protected:
   /**
-   * @brief Initialization that derived classes may also need to perform, if
+   * \brief Initialization that derived classes may also need to perform, if
    * they want to use any of the following parts of this class's functionality
    * as-is:
    *
@@ -160,7 +160,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    * - Task executive (\ref rta::bi_tdgraph_executive)
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    *
-   * @param config_repo Handle to parameter repository for this controller
+   * \param config_repo Handle to parameter repository for this controller
    *                   (after parsing and validation).
    */
   void shared_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
@@ -174,13 +174,13 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   void executive(std::unique_ptr<rta::bi_tdgraph_executive> executive);
 
   /**
-   * @brief Callback for task abort. Task argument unused for now--only need to
+   * \brief Callback for task abort. Task argument unused for now--only need to
    * know that a task WAS aborted. \see \ref task_aborted().
    */
   void task_abort_cb(const rta::polled_task*);
 
   /**
-   * @brief Callback for task start. Needed to reset the task state of the
+   * \brief Callback for task start. Needed to reset the task state of the
    * controller (not the task, which is handled by the executive) in the case
    * that the previous task was aborted. Not reseting this results in erroneous
    * handling of the newly allocated task as if it was aborted by the loop
@@ -193,7 +193,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
 
   /* clang-format off */
   bool                                       m_display_task{false};
-  tasks::task_status                         m_task_status{tasks::task_status::ekNull};
+  tasks::task_status                         m_task_status{tasks::task_status::ekNULL};
   std::unique_ptr<class cache_sel_matrix>    m_cache_sel_matrix;
   std::unique_ptr<rta::bi_tdgraph_executive> m_executive;
   /* clang-format on */

@@ -1,7 +1,7 @@
 /**
- * @file cube_block.hpp
+ * \file cube_block.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 
 /**
- * @class cube_block
- * @ingroup fordyca repr
+ * \class cube_block
+ * \ingroup fordyca repr
  *
- * @brief A representation of a cube block within the arena. Cube blocks are 1
+ * \brief A representation of a cube block within the arena. Cube blocks are 1
  * cell in size.
  */
 class cube_block final : public base_block {

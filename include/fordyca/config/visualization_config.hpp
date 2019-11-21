@@ -1,7 +1,7 @@
 /**
- * @file visualization_config.hpp
+ * \file visualization_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,8 +37,11 @@ NS_START(fordyca, config);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct visualization_config
- * @ingroup fordyca config
+ * \struct visualization_config
+ * \ingroup fordyca config
+ *
+ * \brief Configuration for the extended ARGoS visualizations possible within
+ * FORDYCA.
  */
 struct visualization_config final : public rconfig::base_config {
   bool robot_id{false};

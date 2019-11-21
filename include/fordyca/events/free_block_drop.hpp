@@ -1,7 +1,7 @@
 /**
- * @file free_block_drop.hpp
+ * \file free_block_drop.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -53,10 +53,10 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class free_block_drop
- * @ingroup fordyca events detail
+ * \class free_block_drop
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a block is dropped somewhere in the arena that is not
+ * \brief Created whenever a block is dropped somewhere in the arena that is not
  * a cache or the nest.
  *
  * This can happen when:
@@ -90,11 +90,11 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   using visit_typelist = visit_typelist_impl::value;
 
   /**
-   * @param block The block to drop, which is already part of the vector owned
+   * \param block The block to drop, which is already part of the vector owned
    *              by the \ref arena_map.
-   * @param coord The discrete coordinates of the cell to drop the block in.
-   * @param resolution The resolution of the arena map.
-   * @param cache_lock Is locking needed around arena map cache accesses, or is
+   * \param coord The discrete coordinates of the cell to drop the block in.
+   * \param resolution The resolution of the arena map.
+   * \param cache_lock Is locking needed around arena map cache accesses, or is
    *                   that handled by the caller?
    */
   free_block_drop(const std::shared_ptr<repr::base_block>& block,
@@ -113,7 +113,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   void visit(fsm::cell2D_fsm& fsm);
 
   /**
-   * @brief Perform actual free block drop in the arena.
+   * \brief Perform actual free block drop in the arena.
    *
    * Assumes caller holds \ref arena_map grid and block mutexes. May lock \ref
    * arena_map cache mutex, depending on configuration. If it does lock \ref
@@ -138,7 +138,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   void visit(ds::dpo_semantic_map& map);
 
   /**
-   * @brief Get the handle on the block that has been dropped.
+   * \brief Get the handle on the block that has been dropped.
    */
   std::shared_ptr<repr::base_block> block(void) const { return m_block; }
 
@@ -155,7 +155,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

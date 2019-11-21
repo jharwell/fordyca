@@ -1,7 +1,7 @@
 /**
- * @file cache_transferer_fsm.hpp
+ * \file cache_transferer_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -47,10 +47,10 @@ NS_START(depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_transferer_fsm
- * @ingroup fordyca fsm depth2
+ * \class cache_transferer_fsm
+ * \ingroup fordyca fsm depth2
  *
- * @brief The FSM for a cache transferer task. Each robot executing this FSM
+ * \brief The FSM for a cache transferer task. Each robot executing this FSM
  * will acquire a cache (either a known cache or via exploration), pickup a
  * block from it and then bring it to ANOTHER cache (either a known cache or one
  * found via exploration) and drop it.

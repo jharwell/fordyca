@@ -1,7 +1,7 @@
 /**
- * @file block_utility.hpp
+ * \file block_utility.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, math);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_utility
- * @ingroup fordyca math
+ * \class block_utility
+ * \ingroup fordyca math
  *
- * @brief Calculates the utility associated with a known block, as part of a
+ * \brief Calculates the utility associated with a known block, as part of a
  * robot's decision on whether or not to go and attempt to pick it up.
  *
  * Depends on:

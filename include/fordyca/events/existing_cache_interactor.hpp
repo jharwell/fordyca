@@ -1,7 +1,7 @@
 /**
- * @file existing_cache_interactor.hpp
+ * \file existing_cache_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -43,10 +43,10 @@ class cache_vanished;
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class existing_cache_interactor
- * @ingroup fordyca tasks depth1
+ * \class existing_cache_interactor
+ * \ingroup fordyca tasks depth1
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
+ * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with existing caches in FORDYCA.
  */
 class existing_cache_interactor

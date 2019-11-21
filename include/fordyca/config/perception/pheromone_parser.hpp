@@ -1,7 +1,7 @@
 /**
- * @file pheromone_parser.hpp
+ * \file pheromone_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -40,10 +40,10 @@ NS_START(fordyca, config, perception);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class pheromone_parser
- * @ingroup fordyca config perception
+ * \class pheromone_parser
+ * \ingroup fordyca config perception
  *
- * @brief Parses XML parameters relating to pheromones into
+ * \brief Parses XML parameters relating to pheromones into
  * \ref pheromone_config.
  */
 class pheromone_parser : public rconfig::xml::xml_config_parser {
@@ -51,7 +51,7 @@ class pheromone_parser : public rconfig::xml::xml_config_parser {
   using config_type = pheromone_config;
 
   /**
-   * @brief The root tag that all pheromone parameters should lie under in the
+   * \brief The root tag that all pheromone parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "pheromone";

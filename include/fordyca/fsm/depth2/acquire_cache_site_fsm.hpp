@@ -1,7 +1,7 @@
 /**
- * @file acquire_cache_site_fsm.hpp
+ * \file acquire_cache_site_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -45,10 +45,10 @@ NS_START(fsm, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_cache_site_fsm
- * @ingroup fordyca fsm depth2
+ * \class acquire_cache_site_fsm
+ * \ingroup fordyca fsm depth2
  *
- * @brief The FSM for acquiring a site to start a new cache at within the
+ * \brief The FSM for acquiring a site to start a new cache at within the
  * arena.
  *
  * Each robot executing this FSM will compute the "best" site to start a new

@@ -1,7 +1,7 @@
 /**
- * @file cache_proximity.hpp
+ * \file cache_proximity.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -44,11 +44,11 @@ NS_START(events, detail);
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
- * @class cache_proximity
- * @ingroup fordyca events detail
+/**
+ * \class cache_proximity
+ * \ingroup fordyca events detail
  *
- * @brief Created whenever a robot is attempting to start a new cache, but an
+ * \brief Created whenever a robot is attempting to start a new cache, but an
  * existing cache unknown to the robot is too close.
  */
 class cache_proximity : public rer::client<cache_proximity> {
@@ -87,7 +87,7 @@ class cache_proximity : public rer::client<cache_proximity> {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

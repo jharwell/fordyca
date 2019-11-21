@@ -1,7 +1,7 @@
 /**
- * @file event_utils.hpp
+ * \file event_utils.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -63,38 +63,38 @@ struct proximity_status_t {
  * Free Functions
  ******************************************************************************/
 /**
- * @brief Check if a robot is on top of a block. If, so return the block index.
+ * \brief Check if a robot is on top of a block. If, so return the block index.
  *
- * @param controller The robot to check.
- * @param map \ref arena_map reference.
+ * \param controller The robot to check.
+ * \param map \ref arena_map reference.
  *
- * @note Holding the arena map block mutex necessary in multi-threaded contexts;
+ * \note Holding the arena map block mutex necessary in multi-threaded contexts;
  *       this is *NOT* handled internally by this function.
  *
- * @return The block index, or -1 if the robot is not on top of a block.
+ * \return The block index, or -1 if the robot is not on top of a block.
  */
 int robot_on_block(const controller::base_controller& controller,
                    const ds::arena_map& map) RCSW_PURE;
 
 /**
- * @brief Check if a robot is on top of a cache. If, so return the cache index.
+ * \brief Check if a robot is on top of a cache. If, so return the cache index.
  *
- * @param robot The robot to check.
- * @param map \ref arena_map reference.
+ * \param controller The robot to check.
+ * \param map \ref arena_map reference.
  *
- * @note Holding the arena map cache mutex necessary in multi-threaded contexts;
+ * \note Holding the arena map cache mutex necessary in multi-threaded contexts;
  *       this is *NOT* handled internally by this function.
  *
- * @return The cache index, or -1 if the robot is not on top of a cache.
+ * \return The cache index, or -1 if the robot is not on top of a cache.
  */
 int robot_on_cache(const controller::base_controller& controller,
                    const ds::arena_map& map) RCSW_PURE;
 
 /**
- * @brief Determine if dropping the specified block at the specified location
+ * \brief Determine if dropping the specified block at the specified location
  * will overlap with the specified cache.
  *
- * @return \c TRUE if so, \c FALSE otherwise.
+ * \return \c TRUE if so, \c FALSE otherwise.
  */
 bool block_drop_overlap_with_cache(
     const repr::base_block* block,
@@ -102,10 +102,10 @@ bool block_drop_overlap_with_cache(
     const rmath::vector2d& drop_loc) RCSW_CONST;
 
 /**
- * @brief Determine if dropping the specified block at the specified location
+ * \brief Determine if dropping the specified block at the specified location
  * will be too close to arena boundaries.
  *
- * @return \c TRUE if so, \c FALSE otherwise.
+ * \return \c TRUE if so, \c FALSE otherwise.
  */
 bool block_drop_near_arena_boundary(
     const ds::arena_map& map,
@@ -113,10 +113,10 @@ bool block_drop_near_arena_boundary(
     const rmath::vector2d& drop_loc) RCSW_PURE;
 
 /**
- * @brief Determine if dropping the specified block at the specified location
+ * \brief Determine if dropping the specified block at the specified location
  * will overlap with the nest.
  *
- * @return \c TRUE if so, \c FALSE otherwise.
+ * \return \c TRUE if so, \c FALSE otherwise.
  */
 bool block_drop_overlap_with_nest(
     const repr::base_block* block,
@@ -124,17 +124,17 @@ bool block_drop_overlap_with_nest(
     const rmath::vector2d& drop_loc) RCSW_PURE;
 
 /**
- * @brief Determine if creating a new cache centered at the robot's current
+ * \brief Determine if creating a new cache centered at the robot's current
  * position will overlap with any other caches in the arena/be too close to
  * them. This is an approximate check, because the weighted centroid of
  * constituent blocks is used rather than the robot's current location when
  * creating a new cache, but this should serve as a good check against invalid
  * cache creation.
  *
- * @note Holding the arena map cache mutex necessary in multi-threaded contexts;
+ * \note Holding the arena map cache mutex necessary in multi-threaded contexts;
  *       this is *NOT* handled internally by this function.
  *
- * @return (cache id of cache that is too close (-1 if none), distance to said
+ * \return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).
  */
 proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,

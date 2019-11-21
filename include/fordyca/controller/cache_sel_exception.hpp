@@ -1,7 +1,7 @@
 /**
- * @file cache_sel_exception.hpp
+ * \file cache_sel_exception.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -35,9 +35,12 @@ NS_START(fordyca, controller);
  * Struct Definitions
 ******************************************************************************/
 /**
- * @class cache_sel_exception
- * @ingroup fordyca controller
+ * \class cache_sel_exception
+ * \ingroup fordyca controller
  *
+ * \brief Once an object has been dropped (picked up) in a cache, this structure
+ * is used to disallow the robot from immediately using that same cache again
+ * (which it may try to do, depending on what task it is doing).
  */
 struct cache_sel_exception {
   enum type { kPickup, kDrop };

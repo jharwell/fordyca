@@ -1,7 +1,7 @@
 /**
- * @file block_utility.cpp
+ * \file block_utility.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

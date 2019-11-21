@@ -1,7 +1,7 @@
 /**
- * @file likelihood_cache_search.hpp
+ * \file likelihood_cache_search.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class likelihood_cache_search
- * @ingroup fordyca fsm expstrat
+ * \class likelihood_cache_search
+ * \ingroup fordyca fsm expstrat
  *
- * @brief Vector to the last known location of a cache, then begin performing
+ * \brief Vector to the last known location of a cache, then begin performing
  * CRW at that location, with the idea being that the likelihood of another
  * cache being nearby is higher, given that you've found one there before.
  */

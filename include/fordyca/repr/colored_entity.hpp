@@ -1,7 +1,7 @@
 /**
- * @file colored_entity.hpp
+ * \file colored_entity.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -37,15 +37,15 @@ NS_START(fordyca, repr);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class colored_entity
- * @ingroup fordyca repr
+ * \class colored_entity
+ * \ingroup fordyca repr
  *
- * @brief A mixin class representing cell entities that have a static color.
+ * \brief A mixin class representing cell entities that have a static color.
  */
 class colored_entity {
  public:
   /**
-   * @brief Initialize an entity with a color.
+   * \brief Initialize an entity with a color.
    */
   explicit colored_entity(const rcppsw::utils::color& color) : m_color(color) {}
 

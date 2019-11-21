@@ -1,7 +1,7 @@
 /**
- * @file exploration_parser.hpp
+ * \file exploration_parser.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -41,10 +41,10 @@ NS_START(fordyca, config);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class exploration_parser
- * @ingroup fordyca config
+ * \class exploration_parser
+ * \ingroup fordyca config
  *
- * @brief Parses XML configuration for how robots should explore for things into
+ * \brief Parses XML configuration for how robots should explore for things into
  * \ref exploration_config.
  */
 class exploration_parser final : public rconfig::xml::xml_config_parser {
@@ -52,7 +52,7 @@ class exploration_parser final : public rconfig::xml::xml_config_parser {
   using config_type = exploration_config;
 
   /**
-   * @brief The root tag that all XML configuration for exploration should lie
+   * \brief The root tag that all XML configuration for exploration should lie
    * under in the XML tree.
    */
   static constexpr char kXMLRoot[] = "exploration";

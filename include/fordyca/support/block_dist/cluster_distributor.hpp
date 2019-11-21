@@ -1,7 +1,7 @@
 /**
- * @file cluster_distributor.hpp
+ * \file cluster_distributor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,10 +39,10 @@ NS_START(fordyca, support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cluster_distributor
- * @ingroup fordyca support block_dist
+ * \class cluster_distributor
+ * \ingroup fordyca support block_dist
  *
- * @brief Distributes a block or set of blocks within the specified cluster
+ * \brief Distributes a block or set of blocks within the specified cluster
  * bounds randomly, using \ref random_distributor.
  */
 class cluster_distributor final : public rer::client<cluster_distributor>,

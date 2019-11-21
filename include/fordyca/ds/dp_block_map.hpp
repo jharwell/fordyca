@@ -1,7 +1,7 @@
 /**
- * @file dp_block_map.hpp
+ * \file dp_block_map.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,9 +42,10 @@ NS_START(ds);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dp_block_mapp
- * @ingroup fordyca ds
- * @brief The block map is a repr of the robot's perception of blocks
+ * \class dp_block_map
+ * \ingroup fordyca ds
+ *
+ * \brief The block map is a repr of the robot's perception of blocks
  * in the arena. It uses integers as keys, because blocks are mobile (i.e. can
  * move between instants of time where the robot sees them), and
  * inserting/removing blocks from the map using location comparison will not
@@ -55,7 +56,7 @@ class dp_block_map : public dpo_map<int, repr::base_block> {
   using dpo_map<int, repr::base_block>::dpo_map;
 
   /**
-   * @brief Build a string from the list of DP blocks that a robot is tracking
+   * \brief Build a string from the list of DP blocks that a robot is tracking
    * for logging.
    */
   std::string to_str(void) const;

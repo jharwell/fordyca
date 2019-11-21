@@ -1,7 +1,7 @@
 /**
- * @file powerlaw_dist_config.hpp
+ * \file powerlaw_dist_config.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -36,22 +36,24 @@ NS_START(fordyca, config, arena);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct powerlaw_dist_config
- * @ingroup fordyca config arena
+ * \struct powerlaw_dist_config
+ * \ingroup fordyca config arena
+ *
+ * \brief Configuration for powerlaw block distribution.
  */
 struct powerlaw_dist_config final : public rconfig::base_config {
   /**
-   * @brief Min power of 2 for distribution.
+   * \brief Min power of 2 for distribution.
    */
   uint pwr_min{0};
 
   /**
-   * @brief Max power of 2 for distribution.
+   * \brief Max power of 2 for distribution.
    */
   uint pwr_max{0};
 
   /**
-   * @brief How many clusters to allocate in the arena.
+   * \brief How many clusters to allocate in the arena.
    */
   uint n_clusters{0};
 };

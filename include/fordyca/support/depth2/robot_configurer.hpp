@@ -1,7 +1,7 @@
 /**
- * @file robot_configurer.hpp
+ * \file depth2/robot_configurer.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -35,10 +35,10 @@ NS_START(fordyca, support, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @struct robot_configurer
- * @ingroup fordyca support depth2
+ * \struct robot_configurer
+ * \ingroup fordyca support depth2
  *
- * @brief Configure a depth2 controller during initialization:
+ * \brief Configure a depth2 controller during initialization:
  *
  * - Displaying task text
  * - Enabled oracles (if applicable)

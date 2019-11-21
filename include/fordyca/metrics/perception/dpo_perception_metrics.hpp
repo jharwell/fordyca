@@ -1,7 +1,7 @@
 /**
- * @file dpo_perception_metrics.hpp
+ * \file dpo_perception_metrics.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, metrics, perception);
  ******************************************************************************/
 
 /**
- * @class dpo_perception_metrics
- * @ingroup fordyca metrics perception
+ * \class dpo_perception_metrics
+ * \ingroup fordyca metrics perception
  *
- * @brief Defines the metrics to be collected from robots about their DPO world
+ * \brief Defines the metrics to be collected from robots about their DPO world
  * model.
  *
  * Metrics are collected every timestep.
@@ -51,23 +51,23 @@ class dpo_perception_metrics : public virtual rmetrics::base_metrics {
   dpo_perception_metrics(void) = default;
 
   /**
-   * @brief Return the # of blocks that a robot currently knows about.
+   * \brief Return the # of blocks that a robot currently knows about.
    */
   virtual uint n_known_blocks(void) const = 0;
 
   /**
-   * @brief Return The # of caches that a robot currently knows about.
+   * \brief Return The # of caches that a robot currently knows about.
    */
   virtual uint n_known_caches(void) const = 0;
 
   /**
-   * @brief Return the average block pheromone density for the blocks the robot
+   * \brief Return the average block pheromone density for the blocks the robot
    * currently knows about.
    */
   virtual crepr::pheromone_density avg_block_density(void) const = 0;
 
   /**
-   * @brief Return the average cache pheromone density for the caches the robot
+   * \brief Return the average cache pheromone density for the caches the robot
    * currently knows about.
    */
   virtual crepr::pheromone_density avg_cache_density(void) const = 0;

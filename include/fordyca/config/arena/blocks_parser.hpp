@@ -1,7 +1,7 @@
 /**
- * @file blocks_parser.hpp
+ * \file blocks_parser.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -42,10 +42,10 @@ NS_START(fordyca, config, arena);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class blocks_parser
- * @ingroup fordyca config arena
+ * \class blocks_parser
+ * \ingroup fordyca config arena
  *
- * @brief Parses XML parameters related to blocks in the arena into \ref
+ * \brief Parses XML parameters related to blocks in the arena into \ref
  * blocks_config.
  */
 class blocks_parser : public rconfig::xml::xml_config_parser {
@@ -53,7 +53,7 @@ class blocks_parser : public rconfig::xml::xml_config_parser {
   using config_type = blocks_config;
 
   /**
-   * @brief The root tag that all block parameters should lie under in the
+   * \brief The root tag that all block parameters should lie under in the
    * XML tree.
    */
   static constexpr char kXMLRoot[] = "blocks";

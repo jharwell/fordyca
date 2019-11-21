@@ -1,7 +1,7 @@
 /**
- * @file ledtaxis_cache_search.hpp
+ * \file ledtaxis_cache_search.hpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -38,10 +38,10 @@ NS_START(fordyca, fsm, expstrat);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class ledtaxis_cache_search
- * @ingroup fordyca fsm expstrat
+ * \class ledtaxis_cache_search
+ * \ingroup fordyca fsm expstrat
  *
- * @brief Vector to the last known location of a cache, then begin performing
+ * \brief Vector to the last known location of a cache, then begin performing
  * CRW at that location, with the idea being that the ledtaxis of another
  * cache being nearby is higher, given that you've found one there before.
  */
@@ -68,13 +68,13 @@ class ledtaxis_cache_search : public foraging_expstrat,
   /* taskable overrides */
 
   /**
-   * @brief Start LED taxis cache search. Crucially, this enables the camera
+   * \brief Start LED taxis cache search. Crucially, this enables the camera
    * sensor for use during exploration. See #593.
    */
   void task_start(const rta::taskable_argument*) override;
 
   /**
-   * @brief Reset LED taxis cache search after a cache is successfully
+   * \brief Reset LED taxis cache search after a cache is successfully
    * discovered. Crucially, this disable the camera sensor for increased
    * computational efficiency. See #593.
    */
@@ -85,7 +85,7 @@ class ledtaxis_cache_search : public foraging_expstrat,
   }
 
   /**
-   * @brief Since we are exploring for something we don't know about, we will
+   * \brief Since we are exploring for something we don't know about, we will
    * never finish (stopping exploration is handled at a higher level).
    */
   bool task_finished(void) const override final { return false; }

@@ -1,7 +1,7 @@
 /**
- * @file dynamic_cache_config.hpp
+ * \file dynamic_cache_config.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,27 +39,30 @@ NS_START(fordyca, config, caches);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @struct dynamic_cache_config
- * @ingroup fordyca config cache
+ * \struct dynamic_cache_config
+ * \ingroup fordyca config cache
+ *
+ * \brief Configuration for dynamic caches within the arena for the loop
+ * functions.
  */
 struct dynamic_cache_config final : public rconfig::base_config {
   bool   enable{false};
 
   /**
-   * @brief How close do blocks have to be to each other to be considered for
+   * \brief How close do blocks have to be to each other to be considered for
    * dynamic cache creation (should be >= whatever the threshold value for the
    * \ref cache_sel_matrix is, or weird behavior will likely result).
    */
   rtypes::spatial_dist min_dist{0.0};
 
   /**
-   * @brief How many blocks within min_dist does it take to trigger dynamic
+   * \brief How many blocks within min_dist does it take to trigger dynamic
    * cache creation?
    */
   uint   min_blocks{0};
 
   /**
-   * @brief If \c TRUE, then dynamic cache creation will only occur when a robot
+   * \brief If \c TRUE, then dynamic cache creation will only occur when a robot
    * drops a block (if the other conditions for dynamic cache creation are also
    * met of course). If \c FALSE, then it will occur ANYTIME the conditions for
    * dynamic cache creation are met (viz, min # blocks and block

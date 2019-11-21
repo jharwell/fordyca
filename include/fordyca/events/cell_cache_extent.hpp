@@ -1,7 +1,7 @@
 /**
- * @file cell_cache_extent.hpp
+ * \file cell_cache_extent.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -48,10 +48,10 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell_cache_extent
- * @ingroup fordyca events
+ * \class cell_cache_extent
+ * \ingroup fordyca events
  *
- * @brief Created whenever a cell needs to go from some other state to being
+ * \brief Created whenever a cell needs to go from some other state to being
  * part of a cache's extent (dub). All the blocks (and the cache itself) live in
  * a single cell, but the cells that the cache covers need to be in a special
  * state in order to avoid corner cases when picking up from/dropping in a cache
@@ -83,7 +83,7 @@ class cell_cache_extent : public cell_op {
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

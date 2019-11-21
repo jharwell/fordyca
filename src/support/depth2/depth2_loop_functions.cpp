@@ -1,7 +1,7 @@
 /**
- * @file depth2_loop_functions.cpp
+ * \file depth2_loop_functions.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -72,8 +72,8 @@ using ds::arena_grid;
 NS_START(detail);
 
 /**
- * @struct functor_maps_initializer
- * @ingroup fordyca support depth2 detail
+ * \struct functor_maps_initializer
+ * \ingroup fordyca support depth2 detail
  *
  * Convenience class containing initialization for all of the typeid ->
  * boost::variant maps for all controller types that are used throughout
@@ -227,14 +227,12 @@ void depth2_loop_functions::cache_handling_init(
 std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   auto cb = [&](auto* controller) {
-    v.push_back(boost::apply_visitor(
-        robot_task_extractor_adaptor(controller),
-        m_task_extractor_map->at(controller->type_index())));
+    v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
+                                     m_task_extractor_map->at(
+                                         controller->type_index())));
   };
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this,
-                                                            cb,
-                                                            "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
   return v;
 } /* robot_tasks_extract() */
 
@@ -247,10 +245,8 @@ void depth2_loop_functions::PreStep() {
 
   /* Process all robots */
   auto cb = [&](auto* robot) { robot_pre_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity,
-                         swarm_iterator::static_order>(this,
-                                                       cb,
-                                                       "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
 
   ndc_pop();
 } /* PreStep() */
@@ -261,14 +257,10 @@ void depth2_loop_functions::PostStep(void) {
   /* Process all robots: environment interactions then metric collection */
   auto cb1 = [&](auto* robot) { robot_post_step1(*robot); };
   auto cb2 = [&](auto* robot) { robot_post_step2(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity,
-                         swarm_iterator::static_order>(this,
-                                                       cb1,
-                                                       "foot-bot");
-  swarm_iterator::robots<argos::CFootBotEntity,
-                         swarm_iterator::dynamic_order>(this,
-                                                        cb2,
-                                                        "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb1, "foot-bot");
+  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
+      this, cb2, "foot-bot");
 
   /* Update block distribution status */
   auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
@@ -385,8 +377,8 @@ void depth2_loop_functions::robot_post_step1(argos::CFootBotEntity& robot) {
   auto status =
       boost::apply_visitor(iadaptor,
                            m_interactor_map->at(controller->type_index()));
-  if (interactor_status::ekNoEvent != status) {
-    if (interactor_status::ekNewCacheBlockDrop & status) {
+  if (interactor_status::ekNO_EVENT != status) {
+    if (interactor_status::ekNEW_CACHE_BLOCK_DROP & status) {
       bool ret = cache_creation_handle(true);
       if (!ret) {
         ER_WARN("Unable to create cache after block drop in new cache");

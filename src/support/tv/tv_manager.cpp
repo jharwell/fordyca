@@ -1,7 +1,7 @@
 /**
- * @file tv_manager.cpp
+ * \file tv_manager.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -76,7 +76,7 @@ class penalty_handler_initializer : public boost::static_visitor<void> {
         m_type_map(type_map) {}
 
   /*
-   * @todo Ideally these would be deleted, but emplace() does not seem to do
+   * \todo Ideally these would be deleted, but emplace() does not seem to do
    * what I think it does (i.e. construct an object in place without a need for
    * a copy constructor), so it is defaulted instead.
    */

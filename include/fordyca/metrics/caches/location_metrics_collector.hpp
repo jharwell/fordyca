@@ -1,7 +1,7 @@
 /**
- * @file location_metrics_collector.hpp
+ * \file location_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -39,18 +39,18 @@ NS_START(fordyca, metrics, caches);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class location_metrics_collector
- * @ingroup fordyca metrics caches
+ * \class location_metrics_collector
+ * \ingroup fordyca metrics caches
  *
- * @brief Collector for \ref location_metrics.
+ * \brief Collector for \ref location_metrics.
  */
 class location_metrics_collector final :
     public rmetrics::spatial::grid2D_avg_metrics_collector {
  public:
   /**
-   * @param ofname The output file name.
-   * @param interval Collection interval.
-   * @param dims Dimensions of the arena.
+   * \param ofname The output file name.
+   * \param interval Collection interval.
+   * \param dims Dimensions of the arena.
    */
   location_metrics_collector(const std::string& ofname,
                              uint interval,

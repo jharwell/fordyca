@@ -1,7 +1,7 @@
 /**
- * @file cache_block_drop.hpp
+ * \file cache_block_drop.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -60,10 +60,10 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_block_drop
- * @ingroup fordyca events
+ * \class cache_block_drop
+ * \ingroup fordyca events
  *
- * @brief Created whenever a robot drops a block in a cache.
+ * \brief Created whenever a robot drops a block in a cache.
  *
  * The cache usuage penalty, if there is one, is not assessed during the event,
  * but at a higher level.
@@ -96,11 +96,11 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   using visit_typelist = visit_typelist_impl::value;
 
   /**
-   * @brief Initialize a cache_block_drop event
+   * \brief Initialize a cache_block_drop event
    *
-   * @param robot_block Block to drop (owned by robot).
-   * @param cache Cache to drop into (owned by arena).
-   * @param resolution Arena resolution.
+   * \param robot_block Block to drop (owned by robot).
+   * \param cache Cache to drop into (owned by arena).
+   * \param resolution Arena resolution.
    *
    * If you use this constructor, any visitation function is valid.
    */
@@ -109,11 +109,11 @@ class cache_block_drop : public rer::client<cache_block_drop>,
                    rtypes::discretize_ratio resolution);
 
   /**
-   * @brief Initialize a cache_block_drop event
+   * \brief Initialize a cache_block_drop event
    *
-   * @param robot_block Block to drop (owned by arena).
-   * @param cache Cache to drop into (owned by arena).
-   * @param resolution Arena resolution.
+   * \param robot_block Block to drop (owned by arena).
+   * \param cache Cache to drop into (owned by arena).
+   * \param resolution Arena resolution.
    *
    * If you use this constructor, only \ref arena_map visitation functions are
    * valid.
@@ -129,7 +129,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
 
   /* depth1 foraging */
   /**
-   * @brief Perform actual cache block drop in the arena.
+   * \brief Perform actual cache block drop in the arena.
    *
    * Assumes \ref arena_map cache mutex held by the caller. Takes \ref arena_map
    * block mutex to perform block updates and releases afterwards.
@@ -168,7 +168,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
 };
 
 /**
- * @brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the picky visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

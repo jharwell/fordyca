@@ -1,7 +1,7 @@
 /**
- * @file irv_lf_adaptor.cpp
+ * \file irv_lf_adaptor.cpp
  *
- * @copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -31,7 +31,6 @@
 #define BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 #include "fordyca/support/tv/irv_lf_adaptor.hpp"
 
-
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
 #include "fordyca/support/base_loop_functions.hpp"
@@ -46,7 +45,7 @@ NS_START(fordyca, support, tv);
  * Constructors/Destructors
  ******************************************************************************/
 irv_lf_adaptor::irv_lf_adaptor(const ctv::config::swarm_irv_manager_config* config,
-                       const support::base_loop_functions* const lf)
+                               const support::base_loop_functions* const lf)
     : ER_CLIENT_INIT("fordyca.support.tv.irv_lf_adaptor"),
       swarm_irv_manager(config),
       mc_lf(lf) {}
@@ -62,7 +61,7 @@ double irv_lf_adaptor::avg_motion_throttle(void) const {
 
   support::swarm_iterator::controllers<argos::CFootBotEntity,
                                        swarm_iterator::static_order>(
-                                           mc_lf, cb, "foot-bot");
+      mc_lf, cb, "foot-bot");
   return accum / mc_lf->GetSpace().GetEntitiesByType("foot-bot").size();
 } /* avg_motion_throttle() */
 
@@ -73,13 +72,13 @@ void irv_lf_adaptor::update(void) {
   rtypes::timestep t(mc_lf->GetSpace().GetSimulationClock());
   auto cb = [&](auto& controller) {
     m_motion_throttling.at(controller->entity_id())
-    .toggle(controller->is_carrying_block());
+        .toggle(controller->is_carrying_block());
     m_motion_throttling.at(controller->entity_id()).update(t);
   };
 
   support::swarm_iterator::controllers<argos::CFootBotEntity,
                                        swarm_iterator::static_order>(
-                                           mc_lf, cb, "foot-bot");
+      mc_lf, cb, "foot-bot");
 } /* update() */
 
 NS_END(tv, support, fordyca);
