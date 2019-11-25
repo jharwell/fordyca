@@ -70,10 +70,12 @@ void transport_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-bool transport_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> transport_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
+  std::string line;
+
   line += std::to_string(m_cum.collected) + separator();
   line += std::to_string(m_cum.ramp_collected) + separator();
   line += std::to_string(m_cum.cube_collected) + separator();
@@ -94,7 +96,7 @@ bool transport_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_interval.initial_wait_time, m_interval.collected);
   line += csv_entry_domavg(m_cum.initial_wait_time, m_cum.collected, true);
 
-  return true;
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void transport_metrics_collector::collect(const rmetrics::base_metrics& metrics) {

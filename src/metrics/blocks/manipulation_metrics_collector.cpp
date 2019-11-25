@@ -65,10 +65,12 @@ void manipulation_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-bool manipulation_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
+  std::string line;
+
   line += std::to_string(m_interval.free_pickup_events) + separator();
   line += std::to_string(m_interval.free_drop_events) + separator();
 
@@ -85,7 +87,8 @@ bool manipulation_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_interval.cache_drop_penalty,
                            m_interval.cache_drop_events,
                            true);
-  return true;
+
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void manipulation_metrics_collector::collect(

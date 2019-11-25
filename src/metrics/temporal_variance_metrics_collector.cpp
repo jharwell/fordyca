@@ -54,11 +54,12 @@ std::list<std::string> temporal_variance_metrics_collector::csv_header_cols(
   return merged;
 } /* csv_header_cols() */
 
-bool temporal_variance_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> temporal_variance_metrics_collector::csv_line_build(void) {
+  std::string line;
   line += std::to_string(m_avg_motion_throttle) + separator();
   line += std::to_string(m_env_block_manip.v()) + separator();
   line += std::to_string(m_env_cache_usage.v());
-  return true;
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void temporal_variance_metrics_collector::collect(

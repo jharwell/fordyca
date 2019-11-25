@@ -72,10 +72,11 @@ void mdpo_perception_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> mdpo_perception_metrics_collector::csv_line_build() {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
+  std::string line;
   line += csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_EMPTY]);
   line +=
       csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_HAS_BLOCK]);
@@ -93,7 +94,7 @@ bool mdpo_perception_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_interval.known_percent,
                            m_interval.unknown_percent,
                            true);
-  return true;
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void mdpo_perception_metrics_collector::collect(

@@ -59,7 +59,7 @@ class temporal_variance_metrics_collector final
 
  private:
   std::list<std::string> csv_header_cols(void) const override;
-  bool csv_line_build(std::string& line) override;
+  boost::optional<std::string> csv_line_build(void) override;
 
   /* clang-format off */
   double           m_avg_motion_throttle{0.0};

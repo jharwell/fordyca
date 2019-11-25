@@ -65,10 +65,12 @@ void lifecycle_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-bool lifecycle_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
+  std::string line;
+
   line += std::to_string(m_stats.int_created) + separator();
   line += std::to_string(m_stats.int_depleted) + separator();
   line += csv_entry_intavg(m_stats.int_created);
@@ -79,7 +81,7 @@ bool lifecycle_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_stats.cum_depletion_sum.v(),
                            m_stats.cum_depleted,
                            true);
-  return true;
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void lifecycle_metrics_collector::collect(const rmetrics::base_metrics& metrics) {

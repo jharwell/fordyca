@@ -76,7 +76,7 @@ class site_selection_metrics_collector final : public rmetrics::base_metrics_col
   };
 
   std::list<std::string> csv_header_cols(void) const override;
-  bool csv_line_build(std::string& line) override;
+  boost::optional<std::string> csv_line_build(void) override;
 
   /* clang-format off */
   struct stats m_stats{};

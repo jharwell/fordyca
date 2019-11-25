@@ -67,10 +67,12 @@ void dpo_perception_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> dpo_perception_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
+  std::string line;
+
   line += csv_entry_domavg(m_interval.known_blocks, m_interval.robot_count);
   line += csv_entry_domavg(m_cum.known_blocks, m_cum.robot_count);
   line += csv_entry_domavg(m_interval.known_caches, m_interval.robot_count);
@@ -80,7 +82,8 @@ bool dpo_perception_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_cum.block_density_sum, m_cum.robot_count);
   line += csv_entry_domavg(m_interval.cache_density_sum, m_interval.robot_count);
   line += csv_entry_domavg(m_cum.cache_density_sum, m_cum.robot_count, true);
-  return true;
+
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void dpo_perception_metrics_collector::collect(

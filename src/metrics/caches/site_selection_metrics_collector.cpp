@@ -69,10 +69,12 @@ void site_selection_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-bool site_selection_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> site_selection_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
+  std::string line;
+
   line += csv_entry_intavg(m_stats.int_n_successes);
   line += csv_entry_intavg(m_stats.int_n_fails);
   line += csv_entry_intavg(m_stats.int_nlopt_stopval);
@@ -87,7 +89,7 @@ bool site_selection_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_tsavg(m_stats.cum_nlopt_xtol);
   line += csv_entry_tsavg(m_stats.cum_nlopt_maxeval, true);
 
-  return true;
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void site_selection_metrics_collector::collect(

@@ -62,7 +62,7 @@ class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_co
 
  private:
   std::list<std::string> csv_header_cols(void) const override;
-  bool csv_line_build(std::string& line) override;
+  boost::optional<std::string> csv_line_build(void) override;
 
   struct stats {
     std::atomic_uint    states[::fordyca::fsm::cell2D_states::ekST_MAX_STATES];

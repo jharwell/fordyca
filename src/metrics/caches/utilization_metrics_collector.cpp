@@ -64,10 +64,12 @@ void utilization_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-bool utilization_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> utilization_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
+  std::string line;
+
   line += csv_entry_domavg(m_stats.int_blocks, m_stats.int_cache_count);
   line += csv_entry_domavg(m_stats.cum_blocks, m_stats.cum_cache_count);
   line += csv_entry_domavg(m_stats.int_pickups, m_stats.int_cache_count);
@@ -76,7 +78,8 @@ bool utilization_metrics_collector::csv_line_build(std::string& line) {
   line += csv_entry_domavg(m_stats.cum_drops, m_stats.cum_cache_count);
   line += csv_entry_intavg(m_stats.int_cache_count);
   line += csv_entry_tsavg(m_stats.cum_cache_count, true);
-  return true;
+
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void utilization_metrics_collector::collect(
