@@ -31,11 +31,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+namespace cosm::repr {
+class base_block2D;
+} // namespace cosm::repr
 
-namespace repr {
-class base_block;
-} // namespace repr
+NS_START(fordyca);
 
 namespace ds {
 class arena_map;
@@ -54,8 +54,10 @@ NS_START(events, detail);
  * \brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).
  */
-using block_pickup_base_visit_typelist = rmpl::
-    typelist<ds::arena_map, ds::dpo_semantic_map, ds::dpo_store, repr::base_block>;
+using block_pickup_base_visit_typelist = rmpl::typelist<ds::arena_map,
+                                                        ds::dpo_semantic_map,
+                                                        ds::dpo_store,
+                                                        crepr::base_block2D>;
 NS_END(detail, events, fordyca);
 
 #endif /* INCLUDE_FORDYCA_EVENTS_BLOCK_PICKUP_BASE_VISIT_SET_HPP_ */

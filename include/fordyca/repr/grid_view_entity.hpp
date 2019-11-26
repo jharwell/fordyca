@@ -31,7 +31,8 @@
 
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/repr/base_entity.hpp"
+
+#include "cosm/repr/entity2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +54,7 @@ NS_START(fordyca, repr);
  * - Has no concept of movability/immovability (again, it is abstract).
  */
 template <class T>
-class grid_view_entity : public base_entity {
+class grid_view_entity : public crepr::entity2D {
  public:
   grid_view_entity(const T& view, rtypes::discretize_ratio resolution)
       : mc_resolution(resolution), m_view(view) {}

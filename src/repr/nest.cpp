@@ -35,7 +35,7 @@ nest::nest(const rmath::vector2d& dim,
            const rmath::vector2d& loc,
            rtypes::discretize_ratio resolution,
            const rutils::color& light_color)
-    : unicell_immovable_entity(dim, loc, resolution),
+    : unicell_immovable_entity2D(dim, loc, resolution),
       colored_entity(rcppsw::utils::color::kGRAY70),
       m_lights(init_lights(light_color)) {}
 

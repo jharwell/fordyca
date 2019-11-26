@@ -46,11 +46,12 @@
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,7 +64,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 free_block_pickup::free_block_pickup(
-    const std::shared_ptr<repr::base_block>& block,
+    const std::shared_ptr<crepr::base_block2D>& block,
     uint robot_index,
     const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
@@ -111,7 +112,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
           cell_op::coord().to_str().c_str());
 } /* visit() */
 
-void free_block_pickup::visit(repr::base_block& block) {
+void free_block_pickup::visit(crepr::base_block2D& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
   block.robot_pickup_event(mc_robot_index);
   block.first_pickup_time(mc_timestep);

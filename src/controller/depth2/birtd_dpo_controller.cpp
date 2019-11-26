@@ -32,9 +32,9 @@
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth2/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************

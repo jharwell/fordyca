@@ -31,11 +31,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+namespace cosm::repr {
+class base_block2D;
+} // namespace cosm::repr
 
-namespace repr {
-class base_block;
-} // namespace repr
+NS_START(fordyca);
 
 namespace ds {
 class arena_map;
@@ -53,7 +53,7 @@ NS_START(events, detail);
  * dropping a block will need to visit (think data structures).
  */
 using block_drop_base_visit_typelist =
-    rmpl::typelist<ds::arena_map, repr::base_block>;
+    rmpl::typelist<ds::arena_map, crepr::base_block2D>;
 
 NS_END(detail, events, fordyca);
 

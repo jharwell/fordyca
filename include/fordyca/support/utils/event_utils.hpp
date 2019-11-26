@@ -33,6 +33,11 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+class entity2D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca);
 
 namespace controller {
@@ -41,9 +46,7 @@ class base_controller;
 namespace repr {
 class arena_cache;
 class nest;
-class base_entity;
 class line_of_sight;
-class base_block;
 }
 namespace ds { class arena_map; }
 
@@ -57,7 +60,6 @@ struct proximity_status_t {
   rmath::vector2d entity_loc{};
   rmath::vector2d distance{};
 };
-
 
 /*******************************************************************************
  * Free Functions
@@ -97,7 +99,7 @@ int robot_on_cache(const controller::base_controller& controller,
  * \return \c TRUE if so, \c FALSE otherwise.
  */
 bool block_drop_overlap_with_cache(
-    const repr::base_block* block,
+    const crepr::base_block2D* block,
     const std::shared_ptr<repr::arena_cache>& cache,
     const rmath::vector2d& drop_loc) RCSW_CONST;
 
@@ -109,7 +111,7 @@ bool block_drop_overlap_with_cache(
  */
 bool block_drop_near_arena_boundary(
     const ds::arena_map& map,
-    const repr::base_block* block,
+    const crepr::base_block2D* block,
     const rmath::vector2d& drop_loc) RCSW_PURE;
 
 /**
@@ -119,7 +121,7 @@ bool block_drop_near_arena_boundary(
  * \return \c TRUE if so, \c FALSE otherwise.
  */
 bool block_drop_overlap_with_nest(
-    const repr::base_block* block,
+    const crepr::base_block2D* block,
     const repr::nest& nest,
     const rmath::vector2d& drop_loc) RCSW_PURE;
 

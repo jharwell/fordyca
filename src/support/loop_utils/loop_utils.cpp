@@ -37,9 +37,9 @@ NS_START(fordyca, support, utils);
  ******************************************************************************/
 placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
                                       const rmath::vector2d& ent1_dims,
-                                      const repr::base_entity* const entity) {
-  auto loc_xspan = repr::base_entity::xspan(ent1_loc, ent1_dims.x());
-  auto loc_yspan = repr::base_entity::yspan(ent1_loc, ent1_dims.y());
+                                      const crepr::entity2D* const entity) {
+  auto loc_xspan = crepr::entity2D::xspan(ent1_loc, ent1_dims.x());
+  auto loc_yspan = crepr::entity2D::yspan(ent1_loc, ent1_dims.y());
   return placement_status_t{entity->xspan().overlaps_with(loc_xspan),
                             entity->yspan().overlaps_with(loc_yspan)};
 } /* placement_conflict() */

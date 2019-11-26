@@ -30,8 +30,8 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
-#include "fordyca/repr/base_block.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************

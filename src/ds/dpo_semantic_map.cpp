@@ -58,7 +58,7 @@ bool dpo_semantic_map::cache_remove(
 } /* cache_remove() */
 
 bool dpo_semantic_map::block_remove(
-    const std::shared_ptr<repr::base_block>& victim) {
+    const std::shared_ptr<crepr::base_block2D>& victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->dloc().to_str().c_str());

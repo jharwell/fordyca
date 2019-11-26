@@ -27,7 +27,8 @@
 
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/ds/dp_block_map.hpp"
-#include "fordyca/repr/base_block.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

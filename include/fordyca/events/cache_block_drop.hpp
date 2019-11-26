@@ -104,7 +104,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
    *
    * If you use this constructor, any visitation function is valid.
    */
-  cache_block_drop(std::unique_ptr<repr::base_block> robot_block,
+  cache_block_drop(std::unique_ptr<crepr::base_block2D> robot_block,
                    const std::shared_ptr<repr::arena_cache>& cache,
                    rtypes::discretize_ratio resolution);
 
@@ -118,7 +118,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
    * If you use this constructor, only \ref arena_map visitation functions are
    * valid.
    */
-  cache_block_drop(const std::shared_ptr<repr::base_block>& robot_block,
+  cache_block_drop(const std::shared_ptr<crepr::base_block2D>& robot_block,
                    const std::shared_ptr<repr::arena_cache>& cache,
                    rtypes::discretize_ratio resolution);
 
@@ -138,7 +138,7 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   void visit(class ds::cell2D& cell);
   void visit(fsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
-  void visit(repr::base_block& block);
+  void visit(crepr::base_block2D& block);
   void visit(repr::arena_cache& cache);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(tasks::depth1::harvester& task);
@@ -161,8 +161,8 @@ class cache_block_drop : public rer::client<cache_block_drop>,
                                     controller::cache_sel_matrix* csel_matrix);
 
   const rtypes::discretize_ratio     mc_resolution;
-  std::unique_ptr<repr::base_block>  m_robot_block;
-  std::shared_ptr<repr::base_block>  m_arena_block;
+  std::unique_ptr<crepr::base_block2D>  m_robot_block;
+  std::shared_ptr<crepr::base_block2D>  m_arena_block;
   std::shared_ptr<repr::arena_cache> m_cache;
   /* clang-format on */
 };

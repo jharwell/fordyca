@@ -97,7 +97,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
    * \param cache_lock Is locking needed around arena map cache accesses, or is
    *                   that handled by the caller?
    */
-  free_block_drop(const std::shared_ptr<repr::base_block>& block,
+  free_block_drop(const std::shared_ptr<crepr::base_block2D>& block,
                   const rmath::vector2u& coord,
                   rtypes::discretize_ratio resolution,
                   bool cache_lock);
@@ -109,7 +109,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
 
   /* depth0 */
   void visit(ds::cell2D& cell);
-  void visit(repr::base_block& block);
+  void visit(crepr::base_block2D& block);
   void visit(fsm::cell2D_fsm& fsm);
 
   /**
@@ -140,7 +140,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   /**
    * \brief Get the handle on the block that has been dropped.
    */
-  std::shared_ptr<repr::base_block> block(void) const { return m_block; }
+  std::shared_ptr<crepr::base_block2D> block(void) const { return m_block; }
 
  private:
   bool dispatch_free_block_interactor(tasks::base_foraging_task* task,
@@ -150,7 +150,7 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   const rtypes::discretize_ratio    mc_resolution;
   const bool                        mc_cache_lock;
 
-  std::shared_ptr<repr::base_block> m_block;
+  std::shared_ptr<crepr::base_block2D> m_block;
   /* clang-format on */
 };
 

@@ -41,11 +41,12 @@
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -57,7 +58,7 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_drop::free_block_drop(const std::shared_ptr<repr::base_block>& block,
+free_block_drop::free_block_drop(const std::shared_ptr<crepr::base_block2D>& block,
                                  const rmath::vector2u& coord,
                                  rtypes::discretize_ratio resolution,
                                  bool cache_lock)
@@ -113,7 +114,7 @@ void free_block_drop::visit(fsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void free_block_drop::visit(repr::base_block& block) {
+void free_block_drop::visit(crepr::base_block2D& block) {
   block.reset_robot_id();
 
   block.rloc(rmath::uvec2dvec(cell_op::coord(), mc_resolution.v()));

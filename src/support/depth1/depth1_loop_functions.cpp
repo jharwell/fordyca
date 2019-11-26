@@ -45,7 +45,6 @@
 #include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/repr/block_cluster.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
@@ -62,6 +61,7 @@
 #include "fordyca/support/swarm_iterator.hpp"
 
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -412,11 +412,11 @@ void depth1_loop_functions::PostStep(void) {
   }
 
   /* Update block distribution status */
-  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+  auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
   arena_map()->redist_governor()->update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
-      collector.cum_collected(),
+      collector.cum_transported(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about existing caches */

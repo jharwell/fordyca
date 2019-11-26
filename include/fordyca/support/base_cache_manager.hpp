@@ -40,7 +40,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace repr {
-class base_block;
+class base_block2D;
 class arena_cache;
 } // namespace repr
 namespace ds {

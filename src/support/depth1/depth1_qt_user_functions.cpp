@@ -26,8 +26,9 @@
 #include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
-#include "fordyca/support/task_visualizer.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
+
+#include "cosm/vis/task_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +54,7 @@ void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
       c_entity.GetControllableEntity().GetController());
 
   if (controller.display_task()) {
-    task_visualizer(this, 0.75)
+    cvis::task_visualizer(this, 0.75)
         .draw(dynamic_cast<rta::logical_task*>(controller.current_task()));
   }
 }

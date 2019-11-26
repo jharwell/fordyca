@@ -24,8 +24,8 @@
 #include "fordyca/controller/block_selector.hpp"
 
 #include "fordyca/math/block_utility.hpp"
-#include "fordyca/repr/base_block.hpp"
-#include "fordyca/repr/cube_block.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -60,7 +60,7 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
      * undoubtedly have to change in the future.
      */
     double priority =
-        (nullptr != dynamic_cast<const repr::cube_block*>(b.ent()))
+        (crepr::block_type::ekCUBE == b.ent()->type())
             ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
             : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =
@@ -95,8 +95,9 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
   }
 } /* operator() */
 
-bool block_selector::block_is_excluded(const rmath::vector2d& position,
-                                       const repr::base_block* const block) const {
+bool block_selector::block_is_excluded(
+    const rmath::vector2d& position,
+    const crepr::base_block2D* const block) const {
   double block_dim = std::min(block->xspan().span(), block->yspan().span());
   if ((position - block->rloc()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",

@@ -32,9 +32,10 @@
 #include "rcppsw/types/spatial_dist.hpp"
 
 #include "fordyca/ds/block_vector.hpp"
-#include "fordyca/repr/base_block.hpp"
-#include "fordyca/repr/colored_entity.hpp"
-#include "fordyca/repr/unicell_immovable_entity.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/colored_entity.hpp"
+#include "cosm/repr/unicell_immovable_entity2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -54,8 +55,8 @@ NS_START(fordyca, repr);
  * world) and discretized locations (where they are mapped to within the arena
  * map).
  */
-class base_cache : public unicell_immovable_entity,
-                   public colored_entity,
+class base_cache : public crepr::unicell_immovable_entity2D,
+                   public crepr::colored_entity,
                    public rpprototype::clonable<base_cache> {
  public:
   /**
@@ -112,10 +113,11 @@ class base_cache : public unicell_immovable_entity,
   /**
    * \brief \c TRUE iff the cache contains the specified block.
    */
-  RCSW_PURE bool contains_block(const std::shared_ptr<base_block>& c_block) const {
+  RCSW_PURE bool contains_block(
+      const std::shared_ptr<crepr::base_block2D>& c_block) const {
     return contains_block(c_block.get());
   }
-  RCSW_PURE bool contains_block(const base_block* const c_block) const {
+  RCSW_PURE bool contains_block(const crepr::base_block2D* const c_block) const {
     return std::find_if(m_blocks.begin(), m_blocks.end(), [&](const auto& b) {
              return b->id() == c_block->id();
            }) != m_blocks.end();
@@ -133,7 +135,7 @@ class base_cache : public unicell_immovable_entity,
    *
    * Does not update the block's location.
    */
-  void block_add(const std::shared_ptr<base_block>& block) {
+  void block_add(const std::shared_ptr<crepr::base_block2D>& block) {
     m_blocks.push_back(block);
   }
 
@@ -142,13 +144,15 @@ class base_cache : public unicell_immovable_entity,
    *
    * Does not update the block's location.
    */
-  void block_remove(const std::shared_ptr<base_block>& block);
+  void block_remove(const std::shared_ptr<crepr::base_block2D>& block);
 
   /**
    * \brief Get the oldest block in the cache (the one that has been in the
    * cache the longest).
    */
-  std::shared_ptr<base_block> oldest_block(void) { return m_blocks.front(); }
+  std::shared_ptr<crepr::base_block2D> oldest_block(void) {
+    return m_blocks.front();
+  }
 
   std::unique_ptr<base_cache> clone(void) const override final;
 

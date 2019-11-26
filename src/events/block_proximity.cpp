@@ -33,8 +33,9 @@
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +45,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_proximity::block_proximity(const std::shared_ptr<repr::base_block>& block)
+block_proximity::block_proximity(const std::shared_ptr<crepr::base_block2D>& block)
     : ER_CLIENT_INIT("fordyca.events.block_proximity"), m_block(block) {}
 
 /*******************************************************************************

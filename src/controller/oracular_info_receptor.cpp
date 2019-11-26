@@ -30,9 +30,10 @@
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -52,7 +53,7 @@ NS_START(fordyca, controller);
 struct dpo_store_updater {
   explicit dpo_store_updater(ds::dpo_store* const s) : store(s) {}
 
-  void operator()(std::shared_ptr<repr::base_block>& block) const {
+  void operator()(std::shared_ptr<crepr::base_block2D>& block) const {
     events::block_found_visitor e(block);
     e.visit(*store);
   }

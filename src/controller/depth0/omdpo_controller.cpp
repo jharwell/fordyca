@@ -26,8 +26,8 @@
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
-#include "fordyca/repr/base_block.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************

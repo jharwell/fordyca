@@ -33,9 +33,9 @@
 #include "fordyca/config/base_controller_repository.hpp"
 #include "fordyca/config/output_config.hpp"
 #include "fordyca/config/saa_xml_names.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
@@ -231,11 +231,11 @@ void base_controller::irv_init(const ctv::swarm_irv_manager* irv_manager) {
   }
 } /* irv_init() */
 
-void base_controller::block(std::unique_ptr<repr::base_block> block) {
+void base_controller::block(std::unique_ptr<crepr::base_block2D> block) {
   m_block = std::move(block);
 }
 
-std::unique_ptr<repr::base_block> base_controller::block_release(void) {
+std::unique_ptr<crepr::base_block2D> base_controller::block_release(void) {
   return std::move(m_block);
 }
 

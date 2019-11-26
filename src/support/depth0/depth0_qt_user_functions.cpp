@@ -34,8 +34,9 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/support/block_carry_visualizer.hpp"
 #include "fordyca/support/los_visualizer.hpp"
+
+#include "cosm/vis/block_carry_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +65,7 @@ void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   }
 
   if (base->is_carrying_block()) {
-    block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
+    cvis::block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
         .draw(base->block(), base->GetId().size());
   }
   if (nullptr != mdpo && mdpo->display_los()) {

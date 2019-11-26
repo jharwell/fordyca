@@ -22,8 +22,11 @@
   <category name="rcppsw.ta.executive" >
     <priority value ="info" />
   </category>
-  <category name="rcppsw.robotics.steer2D.force_calculator" >
+  <category name="cosm.steer2D.force_calculator" >
     <priority value ="info" />
+  </category>
+  <category name="cosm.robots.footbot" >
+    <priority value ="debug" />
   </category>
   <category name="fordyca.controller" >
     <priority value ="info" />

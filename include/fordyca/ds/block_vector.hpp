@@ -32,13 +32,12 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
-class base_block;
+namespace cosm::repr {
+class base_block2D;
 }
-NS_START(ds);
+NS_START(fordyca, ds);
 
-using block_vector_type = std::shared_ptr<repr::base_block>;
+using block_vector_type = std::shared_ptr<crepr::base_block2D>;
 
 /*******************************************************************************
  * Type Definitions

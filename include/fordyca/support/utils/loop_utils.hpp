@@ -39,6 +39,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class entity2D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca);
 namespace controller {
 class base_controller;
@@ -46,9 +50,8 @@ class base_controller;
 namespace repr {
 class arena_cache;
 class nest;
-class base_entity;
 class line_of_sight;
-class base_block;
+class base_block2D;
 }
 namespace ds { class arena_map; }
 NS_START(support, utils);
@@ -136,7 +139,7 @@ void set_robot_tick(argos::CFootBotEntity& robot, rtypes::timestep t) {
  */
 placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
                                       const rmath::vector2d& ent1_dims,
-                                      const repr::base_entity* entity);
+                                      const crepr::entity2D* entity);
 
 /**
  * \brief Calculate the blocks that are:

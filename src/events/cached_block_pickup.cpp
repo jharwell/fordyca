@@ -45,12 +45,13 @@
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -346,7 +347,7 @@ void cached_block_pickup::visit(support::base_cache_manager& manager) {
   }
 } /* visit() */
 
-void cached_block_pickup::visit(repr::base_block& block) {
+void cached_block_pickup::visit(crepr::base_block2D& block) {
   ER_ASSERT(-1 != block.id(), "Unamed block");
   block.robot_pickup_event(mc_robot_index);
   block.first_pickup_time(mc_timestep);

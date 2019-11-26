@@ -116,7 +116,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   void visit(fsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
   void visit(ds::dpo_store& store);
-  void visit(repr::base_block& block);
+  void visit(crepr::base_block2D& block);
   void visit(repr::arena_cache& cache);
   void visit(tasks::depth1::collector& task);
   void visit(fsm::block_to_goal_fsm& fsm);
@@ -156,13 +156,13 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
   /**
    * \brief The block that will be picked up by the robot.
    */
-  std::shared_ptr<repr::base_block>  m_pickup_block{nullptr};
+  std::shared_ptr<crepr::base_block2D>  m_pickup_block{nullptr};
 
   /**
    * \brief The block that is left over when a cache devolves into a single
    * block, that needs to be sent to the cell that the cache used to live on.
    */
-  std::shared_ptr<repr::base_block>  m_orphan_block{nullptr};
+  std::shared_ptr<crepr::base_block2D>  m_orphan_block{nullptr};
   /* clang-format on */
 };
 

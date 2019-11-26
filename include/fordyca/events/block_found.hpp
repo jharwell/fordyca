@@ -34,11 +34,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
+namespace cosm::repr {
+class base_block2D;
+} /* namespace cosm::repr */
 
-namespace repr {
-class base_block;
-}
+NS_START(fordyca);
 
 namespace ds {
 class dpo_semantic_map;
@@ -73,8 +73,8 @@ class block_found : public rer::client<block_found>, public cell_op {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_found(std::unique_ptr<repr::base_block> block);
-  explicit block_found(const std::shared_ptr<repr::base_block>& block);
+  explicit block_found(std::unique_ptr<crepr::base_block2D> block);
+  explicit block_found(const std::shared_ptr<crepr::base_block2D>& block);
   ~block_found(void) override = default;
 
   block_found(const block_found& op) = delete;
@@ -98,7 +98,7 @@ class block_found : public rer::client<block_found>, public cell_op {
   void pheromone_update(ds::dpo_semantic_map& map);
 
   /* clang-format off */
-  std::shared_ptr<repr::base_block> m_block;
+  std::shared_ptr<crepr::base_block2D> m_block;
   /* clang-format on */
 };
 

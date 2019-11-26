@@ -45,7 +45,7 @@ class cell2D;
 }
 
 NS_START(repr);
-class base_block;
+class base_block2D;
 class base_cache;
 
 /*******************************************************************************

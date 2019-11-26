@@ -31,11 +31,11 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/cube_block.hpp"
-#include "fordyca/repr/ramp_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
 #include "fordyca/support/light_type_index.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -123,7 +123,8 @@ int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
   return -1;
 } /* robot_on_cache() */
 
-bool arena_map::distribute_single_block(std::shared_ptr<repr::base_block>& block) {
+bool arena_map::distribute_single_block(
+    std::shared_ptr<crepr::base_block2D>& block) {
   /* return TRUE because the distribution of nothing is ALWAYS successful */
   if (!m_redist_governor.dist_status()) {
     return true;

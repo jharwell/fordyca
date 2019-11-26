@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <birtd_odpo_controller id="ffc"
+    <crw_controller id="ffc"
                          library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -25,7 +25,13 @@
       </actuators>
       <sensors>
         <differential_steering implementation="default" />
-        <footbot_proximity implementation="default" show_rays="true" />
+        <footbot_proximity implementation="default" show_rays="true">
+          <!-- <noise model="guassian" -->
+          <!--        noise_level="0.1" -->
+          <!--        mean="0.0" -->
+          <!--        stddev="0.1" -->
+          <!--        /> -->
+        </footbot_proximity>
         <footbot_light implementation="rot_z_only" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
@@ -184,7 +190,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </birtd_odpo_controller>
+    </crw_controller>
 
   </controllers>
 
@@ -192,7 +198,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth2_loop_functions">
+                  label="depth0_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -350,7 +356,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="64" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

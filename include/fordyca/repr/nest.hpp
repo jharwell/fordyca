@@ -30,8 +30,8 @@
 
 #include "rcppsw/types/discretize_ratio.hpp"
 
-#include "fordyca/repr/colored_entity.hpp"
-#include "fordyca/repr/unicell_immovable_entity.hpp"
+#include "cosm/repr/colored_entity.hpp"
+#include "cosm/repr/unicell_immovable_entity2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +52,8 @@ NS_START(fordyca, repr);
  * sensor, NOT the omnidirectional camera, as that can only detect LED entities
  * that are on the ground (implementation detail).
  */
-class nest : public unicell_immovable_entity, public colored_entity {
+class nest : public crepr::unicell_immovable_entity2D,
+             public crepr::colored_entity {
  public:
   /**
    * \brief We use raw pointers to indicate we (FORDYCA) do not own the

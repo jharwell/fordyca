@@ -33,8 +33,9 @@
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_states.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

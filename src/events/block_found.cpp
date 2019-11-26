@@ -35,9 +35,9 @@
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
 
 /*******************************************************************************
@@ -49,12 +49,12 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(std::unique_ptr<repr::base_block> block)
+block_found::block_found(std::unique_ptr<crepr::base_block2D> block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
       cell_op(block->dloc()),
       m_block(std::move(block)) {}
 
-block_found::block_found(const std::shared_ptr<repr::base_block>& block)
+block_found::block_found(const std::shared_ptr<crepr::base_block2D>& block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
       cell_op(block->dloc()),
       m_block(block) {}

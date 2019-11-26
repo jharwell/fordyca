@@ -36,9 +36,9 @@
 #include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 

@@ -16,8 +16,6 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
 
 set(LIBRA_BUILD_FOR "ARGOS" CACHE STRING "Build for ARGoS.")
 
-set(CMAKE_CXX_STANDARD 17)
-
 ################################################################################
 # External Projects                                                            #
 ################################################################################
@@ -39,30 +37,24 @@ else()
     "Unknown build target '${LIBRA_BUILD_FOR}'. Must be: [MSI,TRAVIS,ARGOS,EV3]")
 endif()
 
-# Qt not reliably available on MSI. Might be able to work with EV3, but would
-# require building Qt from source, and there is no GUI stuff anyway so...
-if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS" OR "${LIBRA_BUILD_FOR}" MATCHES "TRAVIS")
-  set(CMAKE_AUTOMOC ON)
-  find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
-  set(CMAKE_AUTOMOC OFF)
-  set(LOCAL_INSTALL_PREFIX /opt/data/local)
-endif()
-
 # Support libraries
 add_subdirectory(ext/rcppsw)
 add_subdirectory(ext/cosm)
 
+set(FORDYCA_WITH_VIS "${COSM_WITH_VIS}")
+
+if (${FORDYCA_WITH_VIS})
+  set(CMAKE_AUTOMOC ON)
+  find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
+  set(CMAKE_AUTOMOC OFF)
+endif()
+
 ################################################################################
 # Sources                                                                      #
 ################################################################################
-# Qt is only available on Linux when building for ARGoS, and when the compiler
-# is not Intel, because the cmake module for Qt does not play nice with the
-# Intel compiler.
-if (NOT "${LIBRA_BUILD_FOR}" MATCHES "ARGOS" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
+if (NOT ${FORDYCA_WITH_VIS})
     list(REMOVE_ITEM ${target}_ROOT_SRC
-    ${${target}_SRC_PATH}/support/block_carry_visualizer.cpp
     ${${target}_SRC_PATH}/support/los_visualizer.cpp
-    ${${target}_SRC_PATH}/support/task_visualizer.cpp
     ${${target}_SRC_PATH}/support/depth0/depth0_qt_user_functions.cpp
     ${${target}_SRC_PATH}/support/depth1/depth1_qt_user_functions.cpp
     ${${target}_SRC_PATH}/support/depth2/depth2_qt_user_functions.cpp)
@@ -101,13 +93,6 @@ if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS" OR "${LIBRA_BUILD_FOR}" MATCHES "MSI")
     ${${target}_LIBRARIES}
     ${argos3_LIBRARIES}
     )
-  # Qt cmake module does not work with Intel compiler
-  if (NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Intel")
-    set(${target}_LIBRARIES ${${target}_LIBRARIES}
-      Qt5::Widgets
-      Qt5::Core
-      Qt5::Gui)
-  endif()
 
   set(${target}_LIBRARY_DIRS
     ${${target}_LIBRARY_DIRS}
@@ -154,17 +139,11 @@ endif()
 target_include_directories(${target} PUBLIC ${${target}_INCLUDE_DIRS})
 
 target_include_directories(${target} SYSTEM PUBLIC
-  /usr/include/lua5.2 # Not needed for compiling, but for emacs rtags
+  /usr/include/lua5.3 # Not needed for compiling, but for emacs rtags
   /usr/local/include
   ${nlopt_INCLUDE_DIRS}
   ${${target}_SYS_INCLUDE_DIRS}
   )
-
-if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
-  target_include_directories(${target} SYSTEM PUBLIC
-    ${Qt5Widgets_INCLUDE_DIRS}
-    )
-endif()
 
 target_link_libraries(${target} ${${target}_LIBRARIES} cosm nlopt)
 

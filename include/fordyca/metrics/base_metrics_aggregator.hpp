@@ -37,13 +37,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+}
+
 NS_START(fordyca);
 
 namespace support {
 class base_loop_functions;
-}
-namespace repr {
-class base_block;
 }
 namespace ds {
 class arena_map;
@@ -76,7 +77,7 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
   /**
    * \brief Collect metrics from a block right before it is dropped in the nest.
    */
-  void collect_from_block(const repr::base_block* block);
+  void collect_from_block(const crepr::base_block2D* block);
 
   /**
    * \brief Collect metrics from \ref base_controller.

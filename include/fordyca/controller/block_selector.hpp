@@ -83,7 +83,7 @@ class block_selector : public rer::client<block_selector> {
    * \return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool block_is_excluded(const rmath::vector2d& position,
-                         const repr::base_block* block) const;
+                         const crepr::base_block2D* block) const;
 
   /* clang-format off */
   const block_sel_matrix* const mc_matrix;

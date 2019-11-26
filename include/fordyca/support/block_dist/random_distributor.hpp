@@ -86,7 +86,7 @@ class random_distributor final : public rer::client<random_distributor>,
    *
    * \return \c TRUE if the distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_block(std::shared_ptr<repr::base_block>& block,
+  bool distribute_block(std::shared_ptr<crepr::base_block2D>& block,
                         ds::const_entity_list& entities) override;
   ds::block_cluster_vector block_clusters(void) const override {
     return ds::block_cluster_vector();
@@ -112,7 +112,7 @@ class random_distributor final : public rer::client<random_distributor>,
   boost::optional<coord_search_res_t> avail_coord_search(
       const ds::const_entity_list& entities,
       const rmath::vector2d& block_dim);
-  bool verify_block_dist(const repr::base_block* block,
+  bool verify_block_dist(const crepr::base_block2D* block,
                          const ds::const_entity_list& entities,
                          const ds::cell2D* cell) RCSW_PURE;
 

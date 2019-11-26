@@ -75,7 +75,7 @@ class powerlaw_distributor final : public rer::client<powerlaw_distributor>,
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
 
-  bool distribute_block(std::shared_ptr<repr::base_block>& block,
+  bool distribute_block(std::shared_ptr<crepr::base_block2D>& block,
                         ds::const_entity_list& entities) override;
 
   ds::block_cluster_vector block_clusters(void) const override;

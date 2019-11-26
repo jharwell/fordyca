@@ -132,9 +132,9 @@ class nest_block_drop_interactor
                                rtypes::timestep t) {
     /*
      * We have to do this asynchronous to the rest of metric collection, because
-     * the nest block drop event resets block metrics.
+     * the \ref nest_block_drop event resets block metrics.
      */
-    controller.block()->nest_drop_time(t);
+    controller.block()->dest_drop_time(t);
     m_metrics_agg->collect_from_block(controller.block());
 
     /*

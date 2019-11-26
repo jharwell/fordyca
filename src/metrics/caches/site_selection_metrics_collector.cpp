@@ -69,7 +69,8 @@ void site_selection_metrics_collector::reset(void) {
   reset_after_interval();
 } /* reset() */
 
-boost::optional<std::string> site_selection_metrics_collector::csv_line_build(void) {
+boost::optional<std::string> site_selection_metrics_collector::csv_line_build(
+    void) {
   if (!((timestep() + 1) % interval() == 0)) {
     return boost::none;
   }

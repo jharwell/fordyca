@@ -32,14 +32,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
-class base_block;
-}
-NS_START(ds);
+namespace cosm::repr {
+class base_block2D;
+} /* namespace cosm::repr */
 
-using block_list_type = std::shared_ptr<repr::base_block>;
-using const_block_list_type = std::shared_ptr<const repr::base_block>;
+NS_START(fordyca, ds);
+
+using block_list_type = std::shared_ptr<crepr::base_block2D>;
+using const_block_list_type = std::shared_ptr<const crepr::base_block2D>;
 
 /*******************************************************************************
  * Class Definitions

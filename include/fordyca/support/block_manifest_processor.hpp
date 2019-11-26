@@ -37,7 +37,7 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace repr {
-class base_block;
+class base_block2D;
 }
 NS_START(support);
 
@@ -54,7 +54,7 @@ NS_START(support);
  */
 class block_manifest_processor
     : public rpfactory::
-          sharing_factory<repr::base_block, const rmath::vector2d&, int> {
+          sharing_factory<crepr::base_block2D, const rmath::vector2d&, int> {
  public:
   explicit block_manifest_processor(const config::arena::block_manifest* m);
 

@@ -25,7 +25,7 @@
 
 #include <numeric>
 
-#include "fordyca/repr/base_block.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

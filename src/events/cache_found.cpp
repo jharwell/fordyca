@@ -162,7 +162,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<const std::shared_ptr<repr::base_block>*> rms;
+  std::list<const std::shared_ptr<crepr::base_block2D>*> rms;
   for (auto&& b : map.blocks().const_values_range()) {
     if (m_cache->contains_point(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",

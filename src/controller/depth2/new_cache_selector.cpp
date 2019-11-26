@@ -91,7 +91,7 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
 bool new_cache_selector::new_cache_is_excluded(
     const ds::dp_cache_map& existing_caches,
     const ds::dp_block_map& blocks,
-    const repr::base_block* const new_cache) const {
+    const crepr::base_block2D* const new_cache) const {
   auto cache_prox = boost::get<rtypes::spatial_dist>(
       mc_matrix->find(cselm::kCacheProxDist)->second);
   auto cluster_prox = boost::get<rtypes::spatial_dist>(

@@ -34,10 +34,11 @@
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
 #include "fordyca/support/block_dist/redist_governor.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -174,7 +175,7 @@ class arena_map final : public rer::client<arena_map>,
    *
    * \return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_single_block(std::shared_ptr<repr::base_block>& block);
+  bool distribute_single_block(std::shared_ptr<crepr::base_block2D>& block);
 
   RCPPSW_DECORATE_FUNC(xdsize, const);
   RCPPSW_DECORATE_FUNC(ydsize, const);

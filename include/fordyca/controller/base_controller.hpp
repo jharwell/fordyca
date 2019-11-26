@@ -48,6 +48,9 @@ struct force_calculator_config;
 namespace cosm::tv {
 class swarm_irv_manager;
 }
+namespace cosm::repr {
+class base_block2D;
+}
 namespace rcppsw::math::config {
 struct rng_config;
 } // namespace rcppsw::math::config
@@ -55,7 +58,6 @@ struct rng_config;
 NS_START(fordyca);
 
 namespace repr {
-class base_block;
 class line_of_sight;
 } // namespace repr
 namespace config {
@@ -126,20 +128,20 @@ class base_controller : public ccontroller::base_controller2D,
    * \brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  const repr::base_block* block(void) const { return m_block.get(); }
-  repr::base_block* block(void) { return m_block.get(); }
+  const crepr::base_block2D* block(void) const { return m_block.get(); }
+  crepr::base_block2D* block(void) { return m_block.get(); }
 
   /**
    * \brief Release the held block as part of a drop operation.
    */
-  std::unique_ptr<repr::base_block> block_release(void);
+  std::unique_ptr<crepr::base_block2D> block_release(void);
 
   /**
    * \brief Set the block that the robot is carrying. We use a unique_ptr to
    * convey that the robot owns the block it picks up from a C++ point of
    * view. In actuality it gets a clone of the block in the arena map.
    */
-  void block(std::unique_ptr<repr::base_block> block);
+  void block(std::unique_ptr<crepr::base_block2D> block);
 
   /**
    * \brief If \c TRUE, then the robot thinks that it is on top of a block.
@@ -172,7 +174,7 @@ class base_controller : public ccontroller::base_controller2D,
 
   /* clang-format off */
   class block_manip_collator                        m_block_manip{};
-  std::unique_ptr<repr::base_block>                 m_block;
+  std::unique_ptr<crepr::base_block2D>                 m_block;
   /* clang-format on */
 };
 

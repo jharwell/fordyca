@@ -37,13 +37,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace repr {
-class base_block;
+namespace cosm::repr {
+class base_block2D;
 }
 
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
@@ -68,7 +66,7 @@ class block_proximity : public rer::client<block_proximity> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_proximity(const std::shared_ptr<repr::base_block>& block);
+  explicit block_proximity(const std::shared_ptr<crepr::base_block2D>& block);
   ~block_proximity(void) override = default;
 
   block_proximity(const block_proximity& op) = delete;
@@ -86,7 +84,7 @@ class block_proximity : public rer::client<block_proximity> {
   void dispatch_cache_starter(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  std::shared_ptr<repr::base_block> m_block;
+  std::shared_ptr<crepr::base_block2D> m_block;
   /* clang-format on */
 };
 

@@ -45,7 +45,7 @@
 NS_START(fordyca);
 namespace repr {
 class arena_cache;
-class base_block;
+class base_block2D;
 class multicell_entity;
 } // namespace repr
 NS_START(support);

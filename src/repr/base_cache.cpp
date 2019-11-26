@@ -38,23 +38,24 @@ constexpr size_t base_cache::kMinBlocks;
  * Constructors/Destructor
  ******************************************************************************/
 base_cache::base_cache(const params& p)
-    : unicell_immovable_entity(rmath::vector2d(p.dimension.v(), p.dimension.v()),
-                               p.center,
-                               p.resolution),
+    : unicell_immovable_entity2D(rmath::vector2d(p.dimension.v(),
+                                                 p.dimension.v()),
+                                 p.center,
+                                 p.resolution),
       colored_entity(rutils::color::kGRAY40),
       mc_resolution(p.resolution),
       m_blocks(p.blocks) {
   if (-1 == p.id) {
-    base_entity::id(m_next_id++);
+    entity2D::id(m_next_id++);
   } else {
-    base_entity::id(p.id);
+    entity2D::id(p.id);
   }
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void base_cache::block_remove(const std::shared_ptr<base_block>& block) {
+void base_cache::block_remove(const std::shared_ptr<crepr::base_block2D>& block) {
   m_blocks.erase(std::find(m_blocks.begin(), m_blocks.end(), block));
 } /* block_remove() */
 

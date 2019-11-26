@@ -27,8 +27,9 @@
 #include <numeric>
 
 #include "fordyca/config/perception/pheromone_config.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -89,17 +90,17 @@ bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
 } /* cache_remove() */
 
 dpo_store::update_res_t dpo_store::block_update(
-    const dpo_entity<repr::base_block>& block_in) {
+    const dpo_entity<crepr::base_block2D>& block_in) {
   auto range = m_blocks.const_values_range();
 
   auto it1 = std::find_if(range.begin(),
                           range.end(),
-                          [&block_in](const dpo_entity<repr::base_block>& b) {
+                          [&block_in](const dpo_entity<crepr::base_block2D>& b) {
                             return b.ent()->idcmp(*block_in.ent());
                           });
   auto it2 = std::find_if(range.begin(),
                           range.end(),
-                          [&block_in](const dpo_entity<repr::base_block>& b) {
+                          [&block_in](const dpo_entity<crepr::base_block2D>& b) {
                             return b.ent()->dloccmp(*block_in.ent()) &&
                                    !b.ent()->idcmp(*block_in.ent());
                           });
@@ -172,7 +173,7 @@ dpo_store::update_res_t dpo_store::block_update(
   return {false, kNO_CHANGE, rmath::vector2u()};
 } /* block_update() */
 
-bool dpo_store::block_remove(const std::shared_ptr<repr::base_block>& victim) {
+bool dpo_store::block_remove(const std::shared_ptr<crepr::base_block2D>& victim) {
   auto range = m_blocks.const_values_range();
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
     return b.ent()->idcmp(*victim);
@@ -200,7 +201,7 @@ void dpo_store::clear_all(void) {
   m_caches.clear();
 } /* clear_all() */
 
-bool dpo_store::contains(const std::shared_ptr<repr::base_block>& block) const {
+bool dpo_store::contains(const std::shared_ptr<crepr::base_block2D>& block) const {
   return m_blocks.contains(block->id());
 } /* contains() */
 
@@ -209,7 +210,7 @@ bool dpo_store::contains(const std::shared_ptr<repr::base_cache>& cache) const {
 } /* contains() */
 
 const dp_block_map::value_type* dpo_store::find(
-    const std::shared_ptr<repr::base_block>& block) const {
+    const std::shared_ptr<crepr::base_block2D>& block) const {
   return m_blocks.find(block->id());
 } /* find() */
 

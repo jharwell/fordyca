@@ -27,10 +27,11 @@
 
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
-#include "fordyca/repr/unicell_immovable_entity.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/unicell_immovable_entity2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,8 +72,9 @@ bool random_distributor::distribute_blocks(ds::block_vector& blocks,
   });
 } /* distribute_blocks() */
 
-bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& block,
-                                          ds::const_entity_list& entities) {
+bool random_distributor::distribute_block(
+    std::shared_ptr<crepr::base_block2D>& block,
+    ds::const_entity_list& entities) {
   ds::cell2D* cell = nullptr;
   auto coords = avail_coord_search(entities, block->dims());
   if (coords) {
@@ -123,14 +125,14 @@ bool random_distributor::distribute_block(std::shared_ptr<repr::base_block>& blo
 } /* distribute_block() */
 
 bool random_distributor::verify_block_dist(
-    const repr::base_block* const block,
+    const crepr::base_block2D* const block,
     const ds::const_entity_list& entities,
     RCSW_UNUSED const ds::cell2D* const cell) {
   /* blocks should not be out of sight after distribution... */
-  ER_CHECK(repr::base_block::kOutOfSightDLoc != block->dloc(),
+  ER_CHECK(crepr::base_block2D::kOutOfSightDLoc != block->dloc(),
            "Block%d discrete coord still out of sight after distribution",
            block->id());
-  ER_CHECK(repr::base_block::kOutOfSightRLoc != block->rloc(),
+  ER_CHECK(crepr::base_block2D::kOutOfSightRLoc != block->rloc(),
            "Block%d real coord still out of sight after distribution",
            block->id());
 

@@ -26,8 +26,9 @@
 #include <numeric>
 
 #include "fordyca/config/oracle/entities_oracle_config.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/repr/base_cache.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +65,7 @@ std::string entities_oracle::result_to_string(const variant_vector_type& v) {
     if (0 == ent.which()) {
       return a + "b" +
              std::to_string(
-                 boost::get<std::shared_ptr<repr::base_block>>(ent)->id()) +
+                 boost::get<std::shared_ptr<crepr::base_block2D>>(ent)->id()) +
              ",";
     } else if (1 == ent.which()) {
       return a + "c" +

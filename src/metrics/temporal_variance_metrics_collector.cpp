@@ -54,7 +54,8 @@ std::list<std::string> temporal_variance_metrics_collector::csv_header_cols(
   return merged;
 } /* csv_header_cols() */
 
-boost::optional<std::string> temporal_variance_metrics_collector::csv_line_build(void) {
+boost::optional<std::string> temporal_variance_metrics_collector::csv_line_build(
+    void) {
   std::string line;
   line += std::to_string(m_avg_motion_throttle) + separator();
   line += std::to_string(m_env_block_manip.v()) + separator();

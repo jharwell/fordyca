@@ -40,10 +40,11 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +57,7 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
-    std::unique_ptr<repr::base_block> robot_block,
+    std::unique_ptr<crepr::base_block2D> robot_block,
     const std::shared_ptr<repr::arena_cache>& cache,
     rtypes::discretize_ratio resolution)
     : ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
@@ -67,7 +68,7 @@ cache_block_drop::cache_block_drop(
       m_cache(cache) {}
 
 cache_block_drop::cache_block_drop(
-    const std::shared_ptr<repr::base_block>& arena_block,
+    const std::shared_ptr<crepr::base_block2D>& arena_block,
     const std::shared_ptr<repr::arena_cache>& cache,
     rtypes::discretize_ratio resolution)
     : ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
@@ -179,7 +180,7 @@ void cache_block_drop::visit(ds::dpo_semantic_map& map) {
   visit(map.access<occupancy_grid::kCell>(x(), y()));
 } /* visit() */
 
-void cache_block_drop::visit(repr::base_block& block) {
+void cache_block_drop::visit(crepr::base_block2D& block) {
   events::free_block_drop_visitor e(m_arena_block,
                                     rmath::vector2u(cell_op::x(), cell_op::y()),
                                     mc_resolution,

@@ -42,11 +42,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+class entity2D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca);
 namespace repr {
 class arena_cache;
-class base_block;
-class base_entity;
 } // namespace repr
 NS_START(support, depth2);
 
@@ -143,7 +146,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    *               discretized).
    */
   boost::optional<rmath::vector2u> deconflict_loc_entity(
-      const repr::base_entity* ent,
+      const crepr::entity2D* ent,
       const rmath::vector2u& center,
       rmath::rng* rng) const;
 

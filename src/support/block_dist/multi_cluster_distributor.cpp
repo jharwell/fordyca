@@ -24,7 +24,8 @@
 #include "fordyca/support/block_dist/multi_cluster_distributor.hpp"
 
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/repr/base_block.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +51,7 @@ multi_cluster_distributor::multi_cluster_distributor(
  * Member Functions
  ******************************************************************************/
 bool multi_cluster_distributor::distribute_block(
-    std::shared_ptr<repr::base_block>& block,
+    std::shared_ptr<crepr::base_block2D>& block,
     ds::const_entity_list& entities) {
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
     /* -1 because we are working with array indices */

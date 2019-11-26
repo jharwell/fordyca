@@ -44,7 +44,7 @@
 NS_START(fordyca);
 namespace ds { class arena_grid; }
 namespace repr {
-class base_block;
+class base_block2D;
 class arena_cache;
 }
 NS_START(support, depth2);

@@ -35,11 +35,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+class entity2D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca);
 namespace repr {
 class base_cache;
-class base_block;
-class base_entity;
 } // namespace repr
 
 NS_START(ds);
@@ -52,7 +55,7 @@ NS_START(ds);
  * \ingroup fordyca ds
  *
  * \brief Base repr of a cell on a 2D grid. A combination of FSM +
- * handle to whatever \ref repr::base_entity the cell contains, if any.
+ * handle to whatever \ref repr::entity2D the cell contains, if any.
  */
 class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
  public:
@@ -88,10 +91,10 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
   /**
    * \brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<repr::base_entity>& entity) {
+  void entity(const std::shared_ptr<crepr::entity2D>& entity) {
     m_entity = entity;
   }
-  const std::shared_ptr<repr::base_entity>& entity(void) const {
+  const std::shared_ptr<crepr::entity2D>& entity(void) const {
     return m_entity;
   }
 
@@ -104,8 +107,8 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<repr::base_block> block(void) const RCSW_PURE;
-  std::shared_ptr<repr::base_block> block(void) RCSW_PURE;
+  std::shared_ptr<crepr::base_block2D> block(void) const RCSW_PURE;
+  std::shared_ptr<crepr::base_block2D> block(void) RCSW_PURE;
 
   /**
    * \brief Get the cache entity associated with this cell.
@@ -118,9 +121,9 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
 
  private:
   /* clang-format off */
-  std::string                         m_robot_id{};
-  std::shared_ptr<repr::base_entity> m_entity{nullptr};
-  rmath::vector2u                     m_loc{};
+  std::string                           m_robot_id{};
+  std::shared_ptr<crepr::entity2D> m_entity{nullptr};
+  rmath::vector2u                       m_loc{};
   /* clang-format on */
 };
 

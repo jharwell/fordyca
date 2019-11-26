@@ -27,7 +27,6 @@
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
-#include "fordyca/metrics/blocks/transport_metrics.hpp"
 #include "fordyca/tasks/argument.hpp"
 
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"

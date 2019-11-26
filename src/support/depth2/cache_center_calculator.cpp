@@ -198,7 +198,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_boundar
 } /* deconflict_loc_boundaries() */
 
 boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
-    const repr::base_entity* ent,
+    const crepr::entity2D* ent,
     const rmath::vector2u& center,
     rmath::rng* rng) const {
   /*
@@ -209,8 +209,8 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
 
   auto exc_xspan = ent->xspan();
   auto exc_yspan = ent->yspan();
-  auto newc_xspan = repr::base_entity::xspan(center_r, mc_cache_dim.v());
-  auto newc_yspan = repr::base_entity::yspan(center_r, mc_cache_dim.v());
+  auto newc_xspan = crepr::entity2D::xspan(center_r, mc_cache_dim.v());
+  auto newc_yspan = crepr::entity2D::yspan(center_r, mc_cache_dim.v());
 
   ER_TRACE("cache: xspan=%s,center=%s/%s, ent%d: xspan=%s",
            newc_xspan.to_str().c_str(),

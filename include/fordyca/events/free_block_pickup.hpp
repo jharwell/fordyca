@@ -76,7 +76,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  free_block_pickup(const std::shared_ptr<repr::base_block>& block,
+  free_block_pickup(const std::shared_ptr<crepr::base_block2D>& block,
                     uint robot_index,
                     const rtypes::timestep& t);
   ~free_block_pickup(void) override = default;
@@ -94,7 +94,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
    * function.
    */
   void visit(ds::arena_map& map);
-  void visit(repr::base_block& block);
+  void visit(crepr::base_block2D& block);
   void visit(controller::depth0::crw_controller& controller);
   void visit(fsm::depth0::crw_fsm& fsm);
 
@@ -132,7 +132,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   const rtypes::timestep            mc_timestep;
   const uint                        mc_robot_index;
 
-  std::shared_ptr<repr::base_block> m_block;
+  std::shared_ptr<crepr::base_block2D> m_block;
   /* clang-format on */
 };
 

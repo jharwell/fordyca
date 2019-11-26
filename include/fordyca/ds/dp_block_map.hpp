@@ -32,11 +32,11 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
-class base_block;
-}
-NS_START(ds);
+namespace cosm::repr {
+class base_block2D;
+} /* namespace cosm::repr */
+
+NS_START(fordyca, ds);
 
 /*******************************************************************************
  * Class Definitions
@@ -51,9 +51,9 @@ NS_START(ds);
  * inserting/removing blocks from the map using location comparison will not
  * give correct results.
  */
-class dp_block_map : public dpo_map<int, repr::base_block> {
+class dp_block_map : public dpo_map<int, crepr::base_block2D> {
  public:
-  using dpo_map<int, repr::base_block>::dpo_map;
+  using dpo_map<int, crepr::base_block2D>::dpo_map;
 
   /**
    * \brief Build a string from the list of DP blocks that a robot is tracking

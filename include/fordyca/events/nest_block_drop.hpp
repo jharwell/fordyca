@@ -81,7 +81,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
    *                    for the drop.
    * \param t Current timestep.
    */
-  nest_block_drop(std::unique_ptr<repr::base_block> robot_block,
+  nest_block_drop(std::unique_ptr<crepr::base_block2D> robot_block,
                   const rtypes::timestep& t);
   ~nest_block_drop(void) override = default;
 
@@ -98,7 +98,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
    */
   void visit(ds::arena_map& map);
 
-  void visit(repr::base_block& block);
+  void visit(crepr::base_block2D& block);
   void visit(fsm::depth0::crw_fsm& fsm);
   void visit(controller::depth0::crw_controller& controller);
   void visit(fsm::depth0::dpo_fsm& fsm);
@@ -129,8 +129,8 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   /* clang-format off */
   const rtypes::timestep            mc_timestep;
 
-  std::unique_ptr<repr::base_block> m_robot_block;
-  std::shared_ptr<repr::base_block> m_arena_block{};
+  std::unique_ptr<crepr::base_block2D> m_robot_block;
+  std::shared_ptr<crepr::base_block2D> m_arena_block{};
   /* clang-format on */
 };
 

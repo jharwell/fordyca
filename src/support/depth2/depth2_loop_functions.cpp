@@ -44,7 +44,6 @@
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
-#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
@@ -59,6 +58,7 @@
 #include "fordyca/support/swarm_iterator.hpp"
 
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -263,11 +263,11 @@ void depth2_loop_functions::PostStep(void) {
       this, cb2, "foot-bot");
 
   /* Update block distribution status */
-  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+  auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
   arena_map()->redist_governor()->update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
-      collector.cum_collected(),
+      collector.cum_transported(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about caches */

@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/support/block_manifest_processor.hpp"
 
-#include "fordyca/repr/cube_block.hpp"
-#include "fordyca/repr/ramp_block.hpp"
+#include "cosm/repr/cube_block2D.hpp"
+#include "cosm/repr/ramp_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,8 +37,8 @@ NS_START(fordyca, support);
 block_manifest_processor::block_manifest_processor(
     const config::arena::block_manifest* const m)
     : mc_manifest(*m) {
-  register_type<repr::cube_block>("cube");
-  register_type<repr::ramp_block>("ramp");
+  register_type<crepr::cube_block2D>("cube");
+  register_type<crepr::ramp_block2D>("ramp");
 }
 
 /*******************************************************************************

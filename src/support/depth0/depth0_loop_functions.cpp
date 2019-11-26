@@ -43,7 +43,6 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/depth0/robot_arena_interactor.hpp"
@@ -58,6 +57,7 @@
 #include "fordyca/support/swarm_iterator.hpp"
 
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -201,11 +201,11 @@ void depth0_loop_functions::PostStep(void) {
       this, cb, "foot-bot");
 
   /* Update block distribution status */
-  auto& collector = static_cast<metrics::blocks::transport_metrics_collector&>(
+  auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
   arena_map()->redist_governor()->update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
-      collector.cum_collected(),
+      collector.cum_transported(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* collect metrics from loop functions */

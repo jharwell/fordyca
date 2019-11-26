@@ -43,10 +43,10 @@
 #include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
-#include "fordyca/repr/base_block.hpp"
 
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

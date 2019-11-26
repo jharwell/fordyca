@@ -33,11 +33,9 @@
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
-#include "fordyca/metrics/blocks/transport_metrics_collector.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
 #include "fordyca/metrics/temporal_variance_metrics.hpp"
 #include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
@@ -52,10 +50,12 @@
 #include "cosm/fsm/metrics/goal_acq_metrics_collector.hpp"
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics_collector.hpp"
+#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/metrics/convergence_metrics.hpp"
 #include "cosm/metrics/convergence_metrics_collector.hpp"
 #include "cosm/metrics/spatial_dist2D_metrics.hpp"
 #include "cosm/metrics/spatial_dist2D_pos_metrics_collector.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,7 +71,7 @@ using collector_typelist = rmpl::typelist<
     collector_registerer::type_wrap<cfmetrics::goal_acq_locs_metrics_collector>,
     collector_registerer::type_wrap<cfmetrics::current_explore_locs_metrics_collector>,
     collector_registerer::type_wrap<cfmetrics::current_vector_locs_metrics_collector>,
-    collector_registerer::type_wrap<blocks::transport_metrics_collector>,
+    collector_registerer::type_wrap<cmetrics::blocks::transport_metrics_collector>,
     collector_registerer::type_wrap<blocks::manipulation_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::spatial_dist2D_pos_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::convergence_metrics_collector>,
@@ -114,7 +114,7 @@ base_metrics_aggregator::base_metrics_aggregator(
       {typeid(cfmetrics::current_vector_locs_metrics_collector),
        "block_acq_vector_locs",
        "blocks::acq_vector_locs"},
-      {typeid(blocks::transport_metrics_collector),
+      {typeid(cmetrics::blocks::transport_metrics_collector),
        "block_transport",
        "blocks::transport"},
       {typeid(blocks::manipulation_metrics_collector),
@@ -147,7 +147,7 @@ void base_metrics_aggregator::collect_from_loop(
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(
-    const repr::base_block* const block) {
+    const crepr::base_block2D* const block) {
   collect("blocks::transport", *block);
 } /* collect_from_block() */
 

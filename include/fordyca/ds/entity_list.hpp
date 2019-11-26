@@ -31,14 +31,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
-class unicell_entity;
-} // namespace repr
-NS_START(ds);
+namespace cosm::repr {
+class unicell_entity2D;
+} // namespace cosm::repr
 
-using entity_list_type = repr::unicell_entity*;
-using const_entity_list_type = const repr::unicell_entity*;
+NS_START(fordyca, ds);
+
+using entity_list_type = crepr::unicell_entity2D*;
+using const_entity_list_type = const crepr::unicell_entity2D*;
 
 /*******************************************************************************
  * Type Definitions

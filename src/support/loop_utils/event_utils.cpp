@@ -44,17 +44,17 @@ int robot_on_cache(const controller::base_controller& controller,
   return map.robot_on_cache(controller.position2D());
 } /* robot_on_cache() */
 
-bool block_drop_overlap_with_cache(const repr::base_block* const block,
+bool block_drop_overlap_with_cache(const crepr::base_block2D* const block,
                                    const std::shared_ptr<repr::arena_cache>& cache,
                                    const rmath::vector2d& drop_loc) {
-  auto drop_xspan = repr::base_entity::xspan(drop_loc, block->dims().x());
-  auto drop_yspan = repr::base_entity::yspan(drop_loc, block->dims().y());
+  auto drop_xspan = crepr::entity2D::xspan(drop_loc, block->dims().x());
+  auto drop_yspan = crepr::entity2D::yspan(drop_loc, block->dims().y());
   return cache->xspan().overlaps_with(drop_xspan) &&
          cache->yspan().overlaps_with(drop_yspan);
 } /* block_drop_overlap_with_cache() */
 
 bool block_drop_near_arena_boundary(const ds::arena_map& map,
-                                    const repr::base_block* const block,
+                                    const crepr::base_block2D* const block,
                                     const rmath::vector2d& drop_loc) {
   return (drop_loc.x() <= block->xdimr() * 2 ||
           drop_loc.x() >= map.xrsize() - block->xdimr() * 2 ||
@@ -62,11 +62,11 @@ bool block_drop_near_arena_boundary(const ds::arena_map& map,
           drop_loc.y() >= map.yrsize() - block->ydimr() * 2);
 } /* block_drop_overlap_with_nest() */
 
-bool block_drop_overlap_with_nest(const repr::base_block* const block,
+bool block_drop_overlap_with_nest(const crepr::base_block2D* const block,
                                   const repr::nest& nest,
                                   const rmath::vector2d& drop_loc) {
-  auto drop_xspan = repr::base_entity::xspan(drop_loc, block->dims().x());
-  auto drop_yspan = repr::base_entity::yspan(drop_loc, block->dims().y());
+  auto drop_xspan = crepr::entity2D::xspan(drop_loc, block->dims().x());
+  auto drop_yspan = crepr::entity2D::yspan(drop_loc, block->dims().y());
 
   return nest.xspan().overlaps_with(drop_xspan) &&
          nest.yspan().overlaps_with(drop_yspan);

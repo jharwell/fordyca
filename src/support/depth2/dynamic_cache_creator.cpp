@@ -27,9 +27,10 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/base_block.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
