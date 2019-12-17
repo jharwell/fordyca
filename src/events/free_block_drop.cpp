@@ -25,8 +25,6 @@
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/controller/depth0/dpo_controller.hpp"
-#include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
@@ -90,7 +88,7 @@ bool free_block_drop::dispatch_free_block_interactor(
     if (tasks::depth2::foraging_task::task_in_depth2(polled) &&
         !polled->task_aborted()) {
       ER_INFO("Added block%d@%s to exception list,task='%s'",
-              m_block->id(),
+              m_block->id().v(),
               m_block->rloc().to_str().c_str(),
               polled->name().c_str());
       bsel_matrix->sel_exception_add(m_block->id());

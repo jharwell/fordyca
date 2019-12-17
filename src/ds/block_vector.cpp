@@ -40,7 +40,7 @@ std::string block_vector::to_str(void) const {
                          this->end(),
                          std::string(),
                          [&](const std::string& a, const auto& b) {
-                           return a + "b" + std::to_string(b->id()) + ",";
+                           return a + "b" + rcppsw::to_string(b->id()) + ",";
                          });
 } /* to_string() */
 

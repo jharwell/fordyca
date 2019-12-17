@@ -48,7 +48,8 @@ NS_START(fordyca, support, depth0);
 class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
                                   public rer::client<depth0_metrics_aggregator> {
  public:
-  depth0_metrics_aggregator(const config::metrics_config* mconfig,
+  depth0_metrics_aggregator(const cpconfig::metrics_config* mconfig,
+                            const config::grid_config* const gconfig,
                             const std::string& output_root);
 
 

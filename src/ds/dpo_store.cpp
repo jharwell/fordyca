@@ -53,7 +53,7 @@ dpo_store::update_res_t dpo_store::cache_update(
                       .reason = kNO_CHANGE,
                       .old_loc = rmath::vector2u()};
   ER_TRACE("Updating cache%d@%s",
-           cache.ent()->id(),
+           cache.ent()->id().v(),
            cache.ent()->dloc().to_str().c_str());
   /*
    * If we are currently tracking the cache, we unconditionally remove it,
@@ -78,7 +78,7 @@ bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
 
   if (it != range.end()) {
     ER_TRACE("Removing cache%d@%s",
-             it->ent()->id(),
+             it->ent()->id().v(),
              it->ent()->dloc().to_str().c_str());
     if (1 == m_caches.size()) {
       m_last_cache_loc = boost::make_optional(it->ent()->rloc());
@@ -115,15 +115,15 @@ dpo_store::update_res_t dpo_store::block_update(
    */
   if (it2 != range.end()) {
     ER_TRACE("Remove old block%d@%s: new block%d found there",
-             it2->ent()->id(),
+             it2->ent()->id().v(),
              block_in.ent()->dloc().to_str().c_str(),
-             block_in.ent()->id());
+             block_in.ent()->id().v());
     block_remove(it2->ent_obj());
   }
 
   if (range.end() != it1) { /* block is known */
     ER_TRACE("Known incoming block%d@%s",
-             block_in.ent()->id(),
+             block_in.ent()->id().v(),
              block_in.ent()->dloc().to_str().c_str());
     /*
      * Unless a given block's location has changed, there is no need to update
@@ -131,7 +131,7 @@ dpo_store::update_res_t dpo_store::block_update(
      */
     if (block_in.ent()->dloc() != it1->ent()->dloc()) {
       ER_TRACE("Block%d has moved: %s -> %s",
-               block_in.ent()->id(),
+               block_in.ent()->id().v(),
                it1->ent()->dloc().to_str().c_str(),
                block_in.ent()->dloc().to_str().c_str());
       block_remove(it1->ent_obj());
@@ -142,9 +142,9 @@ dpo_store::update_res_t dpo_store::block_update(
        */
       rmath::vector2u old_loc = it1->ent()->dloc();
       m_blocks.obj_add({block_in.ent()->id(), block_in});
-      RCSW_UNUSED int id = block_in.ent()->id();
+      RCSW_UNUSED rtypes::type_uuid id = block_in.ent()->id();
       ER_TRACE("Add block%d@%s (n_blocks=%zu)",
-               id,
+               id.v(),
                block_in.ent()->dloc().to_str().c_str(),
                m_blocks.size());
       return update_res_t{true, kBLOCK_MOVED, old_loc};
@@ -157,15 +157,15 @@ dpo_store::update_res_t dpo_store::block_update(
     if (nullptr != known) {
       known->density(block_in.density());
       ER_TRACE("Update density of known block%d@%s to %f",
-               block_in.ent()->id(),
+               block_in.ent()->id().v(),
                block_in.ent()->dloc().to_str().c_str(),
                block_in.density().v());
     }
   } else { /* block is not known */
-    ER_TRACE("Unknown incoming block%d", block_in.ent()->id());
+    ER_TRACE("Unknown incoming block%d", block_in.ent()->id().v());
     m_blocks.obj_add({block_in.ent()->id(), block_in});
     ER_TRACE("Add block%d@%s (n_blocks=%zu)",
-             block_in.ent()->id(),
+             block_in.ent()->id().v(),
              block_in.ent()->dloc().to_str().c_str(),
              m_blocks.size());
     return {true, kNEW_BLOCK_ADDED, rmath::vector2u()};
@@ -180,7 +180,7 @@ bool dpo_store::block_remove(const std::shared_ptr<crepr::base_block2D>& victim)
   });
   if (it != range.end()) {
     ER_TRACE("Removing block%d@%s",
-             victim->id(),
+             victim->id().v(),
              victim->dloc().to_str().c_str());
     if (1 == m_blocks.size()) {
       m_last_block_loc = boost::make_optional(it->ent()->rloc());

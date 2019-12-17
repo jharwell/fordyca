@@ -29,6 +29,7 @@
 #include <utility>
 
 #include "rcppsw/math/rng.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -91,7 +92,8 @@ class acquire_existing_cache_fsm
       delete;
 
  private:
-  using acq_loc_type = std::pair<int, rmath::vector2d>;
+  using acq_loc_type = std::pair<rtypes::type_uuid, rmath::vector2d>;
+
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
@@ -101,7 +103,7 @@ class acquire_existing_cache_fsm
   boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
   bool candidates_exist(void) const RCSW_PURE;
   boost::optional<acq_loc_type> calc_acq_location(void);
-  bool cache_acq_valid(const rmath::vector2d& loc, uint id);
+  bool cache_acq_valid(const rmath::vector2d& loc, const rtypes::type_uuid& id);
 
   bool cache_acquired_cb(bool explore_result) const;
 

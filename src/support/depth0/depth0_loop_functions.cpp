@@ -36,7 +36,6 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 #include "fordyca/config/arena/arena_map_config.hpp"
-#include "fordyca/config/output_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
@@ -55,6 +54,7 @@
 #include "fordyca/support/robot_metric_extractor.hpp"
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 #include "cosm/convergence/convergence_calculator.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
@@ -90,7 +90,7 @@ struct functor_maps_initializer {
         robot_arena_interactor<T>(lf->arena_map(),
                                   lf->m_metrics_agg.get(),
                                   lf->floor(),
-                                  lf->tv_manager()));
+                                  lf->tv_manager()->environ_dynamics()));
     lf->m_metrics_map->emplace(
         typeid(controller),
         robot_metric_extractor<depth0_metrics_aggregator, T>(
@@ -147,10 +147,10 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
 void depth0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
   auto* arena = config()->config_get<config::arena::arena_map_config>();
-  config::output_config output = *config()->config_get<config::output_config>();
-  output.metrics.arena_grid = arena->grid;
+  auto* output = config()->config_get<cpconfig::output_config>();
 
-  m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output.metrics,
+  m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
+                                                              &arena->grid,
                                                               output_root());
   m_interactor_map = std::make_unique<interactor_map_type>();
   m_metrics_map = std::make_unique<metric_extraction_map_type>();

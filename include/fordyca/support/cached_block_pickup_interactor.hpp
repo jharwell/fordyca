@@ -36,7 +36,7 @@
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -59,14 +59,14 @@ class cached_block_pickup_interactor
  public:
   cached_block_pickup_interactor(ds::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
-                                 tv::tv_manager* tv_manager,
+                                 tv::env_dynamics* envd,
                                  support::base_cache_manager* cache_manager,
                                  support::base_loop_functions* loop)
       : ER_CLIENT_INIT("fordyca.support.cached_block_pickup_interactor"),
         m_floor(floor_in),
         m_map(map_in),
-        m_penalty_handler(tv_manager->penalty_handler<T>(
-            tv::cache_op_src::ekEXISTING_CACHE_PICKUP)),
+        m_penalty_handler(
+            envd->penalty_handler(tv::cache_op_src::ekEXISTING_CACHE_PICKUP)),
         m_cache_manager(cache_manager),
         m_loop(loop) {}
 
@@ -82,7 +82,7 @@ class cached_block_pickup_interactor
   cached_block_pickup_interactor(const cached_block_pickup_interactor& other) =
       default;
   cached_block_pickup_interactor& operator=(
-      const cached_block_pickup_interactor& other) = delete;
+      const cached_block_pickup_interactor&) = delete;
 
   /**
    * \brief The actual handling function for interactions.
@@ -111,7 +111,7 @@ class cached_block_pickup_interactor
    */
   interactor_status finish_cached_block_pickup(T& controller,
                                                rtypes::timestep t) {
-    const tv::temporal_penalty<T>& p = m_penalty_handler->penalty_next();
+    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
@@ -122,7 +122,7 @@ class cached_block_pickup_interactor
               "Controller not waiting for cached block pickup");
     ER_ASSERT(!controller.is_carrying_block(),
               "Controller is already carrying block%d",
-              controller.block()->id());
+              controller.block()->id().v());
     /*
      * We cannot just lock around the critical arena map updates here in order
      * to make this section thread safe, and need to lock around the whole
@@ -159,7 +159,7 @@ class cached_block_pickup_interactor
     if (p.id() != utils::robot_on_cache(controller, *m_map)) {
       ER_WARN("%s cannot pickup from from cache%d: No such cache",
               controller.GetId().c_str(),
-              p.id());
+              p.id().v());
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
@@ -185,7 +185,7 @@ class cached_block_pickup_interactor
       } else {
         ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
                 controller.GetId().c_str(),
-                p.id());
+                p.id().v());
       }
     }
     m_map->cache_mtx().unlock();
@@ -202,7 +202,7 @@ class cached_block_pickup_interactor
    */
   interactor_status perform_cached_block_pickup(
       T& controller,
-      const tv::temporal_penalty<T>& penalty,
+      const tv::temporal_penalty& penalty,
       rtypes::timestep t) {
     auto it =
         std::find_if(m_map->caches().begin(),
@@ -210,7 +210,7 @@ class cached_block_pickup_interactor
                      [&](const auto& c) { return c->id() == penalty.id(); });
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
-              penalty.id());
+              penalty.id().v());
     events::cached_block_pickup_visitor pickup_op(
         m_loop, *it, controller.entity_id(), t);
     (*it)->penalty_served(penalty.penalty());
@@ -239,11 +239,11 @@ class cached_block_pickup_interactor
 
  private:
   /* clang-format off */
-  argos::CFloorEntity* const             m_floor;
-  ds::arena_map* const                   m_map;
-  tv::cache_op_penalty_handler<T>* const m_penalty_handler;
-  base_cache_manager *                   m_cache_manager;
-  base_loop_functions*                   m_loop;
+  argos::CFloorEntity* const          m_floor;
+  ds::arena_map* const                m_map;
+  tv::cache_op_penalty_handler* const m_penalty_handler;
+  base_cache_manager *                m_cache_manager;
+  base_loop_functions*                m_loop;
   /* clang-format on */
 };
 

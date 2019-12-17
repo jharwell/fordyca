@@ -97,30 +97,30 @@ void arena_map::caches_add(const cache_vector& caches,
   ER_INFO("Add %zu created caches, total=%zu", caches.size(), m_caches.size());
 } /* caches_add() */
 
-int arena_map::robot_on_block(const rmath::vector2d& pos) const {
+rtypes::type_uuid arena_map::robot_on_block(const rmath::vector2d& pos) const {
   /*
    * Caches hide blocks, add even though a robot may technically be standing on
    * a block, if it is also standing in a cache, that takes priority.
    */
-  if (-1 != robot_on_cache(pos)) {
-    ER_TRACE("Block hidden by cache%d", robot_on_cache(pos));
-    return -1;
+  if (rtypes::constants::kNoUUID != robot_on_cache(pos)) {
+    ER_TRACE("Block hidden by cache%d", robot_on_cache(pos).v());
+    return rtypes::constants::kNoUUID;
   }
   for (auto& b : m_blocks) {
     if (b->contains_point(pos)) {
       return b->id();
     }
   } /* for(&b..) */
-  return -1;
+  return rtypes::constants::kNoUUID;
 } /* robot_on_block() */
 
-int arena_map::robot_on_cache(const rmath::vector2d& pos) const {
+rtypes::type_uuid arena_map::robot_on_cache(const rmath::vector2d& pos) const {
   for (auto& c : m_caches) {
     if (c->contains_point(pos)) {
       return c->id();
     }
   } /* for(&c..) */
-  return -1;
+  return rtypes::constants::kNoUUID;
 } /* robot_on_cache() */
 
 bool arena_map::distribute_single_block(
@@ -188,10 +188,10 @@ void arena_map::cache_remove(const std::shared_ptr<repr::arena_cache>& victim,
 
   /* Remove cache */
   size_t before = caches().size();
-  RCSW_UNUSED int id = victim->id();
+  RCSW_UNUSED rtypes::type_uuid id = victim->id();
   m_zombie_caches.push_back(victim);
   m_caches.erase(std::remove(m_caches.begin(), m_caches.end(), victim));
-  ER_ASSERT(caches().size() == before - 1, "Cache%d not removed", id);
+  ER_ASSERT(caches().size() == before - 1, "Cache%d not removed", id.v());
 } /* cache_remove() */
 
 void arena_map::cache_extent_clear(
@@ -217,7 +217,7 @@ void arena_map::cache_extent_clear(
         ER_ASSERT(victim->contains_point(
                       rmath::uvec2dvec(c, grid_resolution().v())),
                   "Cache%d does not contain point (%u, %u) within its extent",
-                  victim->id(),
+                  victim->id().v(),
                   i,
                   j);
 

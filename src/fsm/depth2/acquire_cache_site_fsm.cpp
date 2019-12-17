@@ -61,7 +61,8 @@ acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
                                               std::placeholders::_1),
                 .explore_term_cb = std::bind(&acquire_cache_site_fsm::site_exploration_term_cb,
                                              this),
-                .goal_valid_cb = [](const rmath::vector2d&, uint) noexcept { return true;
+                .goal_valid_cb = [](const rmath::vector2d&,
+                                    const rtypes::type_uuid&) noexcept { return true;
 }
 }),
       mc_matrix(c_params->csel_matrix),

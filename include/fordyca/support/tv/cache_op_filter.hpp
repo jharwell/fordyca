@@ -55,8 +55,8 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
       : ER_CLIENT_INIT("fordyca.support.cache_op_filter"), mc_map(map) {}
 
   ~cache_op_filter(void) override = default;
-  cache_op_filter& operator=(const cache_op_filter& other) = delete;
-  cache_op_filter(const cache_op_filter& other) = delete;
+  cache_op_filter& operator=(const cache_op_filter&) = delete;
+  cache_op_filter(const cache_op_filter&) = delete;
 
   /**
    * \brief Filters out controllers that actually are not eligible to start
@@ -85,11 +85,11 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * use an existing cache).
    */
   op_filter_status do_filter(const T& controller) const {
-    int cache_id = utils::robot_on_cache(controller, *mc_map);
+    auto cache_id = utils::robot_on_cache(controller, *mc_map);
     bool ready = (controller.goal_acquired() &&
                   fsm::foraging_acq_goal::ekEXISTING_CACHE ==
                       controller.acquisition_goal() &&
-                  -1 != cache_id);
+                  rtypes::constants::kNoUUID != cache_id);
     if (ready) {
       return op_filter_status::ekSATISFIED;
     }

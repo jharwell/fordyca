@@ -88,7 +88,8 @@ class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
   bool candidates_exist(void) const RCSW_PURE;
   bool block_exploration_term_cb(void) const;
   bool block_acquired_cb(bool explore_result) const;
-  bool block_acq_valid(const rmath::vector2d& loc, uint id) const;
+  bool block_acq_valid(const rmath::vector2d& loc,
+                       const rtypes::type_uuid& id) const;
 
   /* clang-format off */
   const controller::block_sel_matrix* const mc_matrix;

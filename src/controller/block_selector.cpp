@@ -71,7 +71,7 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
                             nest_loc)(position, b.density(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
-             b.ent()->id(),
+             b.ent()->id().v(),
              b.ent()->rloc().to_str().c_str(),
              b.ent()->dloc().to_str().c_str(),
              b.density().v(),
@@ -84,7 +84,7 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
 
   if (nullptr != best.ent()) {
     ER_INFO("Best utility: block%d@%s/%s: %f",
-            best.ent()->id(),
+            best.ent()->id().v(),
             best.ent()->rloc().to_str().c_str(),
             best.ent()->dloc().to_str().c_str(),
             max_utility);
@@ -101,20 +101,20 @@ bool block_selector::block_is_excluded(
   double block_dim = std::min(block->xspan().span(), block->yspan().span());
   if ((position - block->rloc()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
-             block->id(),
+             block->id().v(),
              block->rloc().to_str().c_str(),
              block->dloc().to_str().c_str(),
              (position - block->rloc()).length(),
              block_dim);
     return true;
   }
-  std::vector<int> exceptions = boost::get<std::vector<int>>(
+  auto exceptions = boost::get<std::vector<rtypes::type_uuid>>(
       mc_matrix->find(bselm::kSelExceptions)->second);
-  if (std::any_of(exceptions.begin(), exceptions.end(), [&](int id) {
+  if (std::any_of(exceptions.begin(), exceptions.end(), [&](auto& id) {
         return id == block->id();
       })) {
     ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
-             block->id(),
+             block->id().v(),
              block->rloc().to_str().c_str(),
              block->dloc().to_str().c_str());
     return true;

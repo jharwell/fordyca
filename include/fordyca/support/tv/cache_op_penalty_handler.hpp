@@ -48,46 +48,45 @@ NS_START(fordyca, support, tv);
  * \brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
-template <typename T>
 class cache_op_penalty_handler final
-    : public temporal_penalty_handler<T>,
-      public rer::client<cache_op_penalty_handler<T>> {
+    : public temporal_penalty_handler,
+      public rer::client<cache_op_penalty_handler> {
  public:
-  using temporal_penalty_handler<T>::is_serving_penalty;
-  using temporal_penalty_handler<T>::penalty_finish_uniqueify;
-  using temporal_penalty_handler<T>::penalty_calc;
-  using temporal_penalty_handler<T>::penalty_add;
-
   cache_op_penalty_handler(ds::arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
-      : temporal_penalty_handler<T>(config, name),
+      : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.cache_op_penalty_handler"),
         m_map(map) {}
 
   ~cache_op_penalty_handler(void) override = default;
   cache_op_penalty_handler& operator=(const cache_op_penalty_handler& other) =
       delete;
-  cache_op_penalty_handler(const cache_op_penalty_handler& other) = delete;
+  cache_op_penalty_handler(const cache_op_penalty_handler&) = delete;
 
   /**
    * \brief Check if a robot has acquired a block or is in the nest, and is
    * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
    *
+   * \tparam TControllerType The type of the controller. Must be a template
+   * parameter, rather than \ref controller::base_controller, because of the
+   * goal acquisition determination done by \ref cacheilter.
+
    * \param controller The robot to check.
    * \param src The penalty source (i.e. what event caused this penalty to be
    *            applied).
    * \param t The current timestep.
   */
-  op_filter_status penalty_init(T& controller,
+  template<typename TControllerType>
+  op_filter_status penalty_init(TControllerType& controller,
                                 cache_op_src src,
                                 const rtypes::timestep& t) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do.
      */
-    auto filter = cache_op_filter<T>(m_map)(controller, src);
+    auto filter = cache_op_filter<TControllerType>(m_map)(controller, src);
     if (filter != op_filter_status::ekSATISFIED) {
       return filter;
     }
@@ -98,19 +97,19 @@ class cache_op_penalty_handler final
 
     rtypes::timestep orig_duration = penalty_calc(t);
     rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
-    int id = utils::robot_on_cache(controller, *m_map);
-    ER_ASSERT(-1 != id,
+    auto id = utils::robot_on_cache(controller, *m_map);
+    ER_ASSERT(rtypes::constants::kNoUUID != id,
               "%s not in cache?",
               controller.GetId().c_str());
-    ER_INFO("fb%d: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
-            controller.entity_id(),
-            id,
+    ER_INFO("%s: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
+            controller.GetId().c_str(),
+            id.v(),
             t.v(),
             orig_duration.v(),
             duration.v(),
             static_cast<int>(src));
 
-    penalty_add(temporal_penalty<T>(&controller, id, duration, t));
+    penalty_add(temporal_penalty(&controller, id, duration, t));
     return filter;
   }
 

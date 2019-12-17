@@ -216,14 +216,14 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
            newc_xspan.to_str().c_str(),
            center_r.to_str().c_str(),
            center.to_str().c_str(),
-           ent->id(),
+           ent->id().v(),
            exc_xspan.to_str().c_str());
 
   ER_TRACE("cache: yspan=%s,center=%s/%s, ent%d: yspan=%s",
            newc_yspan.to_str().c_str(),
            center_r.to_str().c_str(),
            center.to_str().c_str(),
-           ent->id(),
+           ent->id().v(),
            exc_yspan.to_str().c_str());
 
   rmath::vector2u new_center = center;

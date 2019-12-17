@@ -26,11 +26,18 @@
  ******************************************************************************/
 #include "fordyca/fordyca.hpp"
 #include "rcppsw/types/timestep.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, tv);
+NS_START(fordyca);
+
+namespace controller {
+class base_controller;
+} /* namespace controller */
+
+NS_START(support, tv);
 
 /*******************************************************************************
  * Class Definitions
@@ -42,7 +49,6 @@ NS_START(fordyca, support, tv);
  * \brief Handles subjecting a robot to a penalty when doing something via a
  * timeout in which the robot will sit still.
  */
-template <typename T>
 class temporal_penalty {
  public:
   /**
@@ -50,23 +56,25 @@ class temporal_penalty {
    *
    * \param controller The controller for the robot being subjected to the
    * penalty.
-   * \param id An optional ID to associate with the penalty.
+   * \param id The ID to associate with the penalty.
    * \param penalty The # of timesteps for the penalty.
    * \param start_time The timestep the penalty will start on.
    */
-  temporal_penalty(const T* const controller,
-                   int id,
-                   rtypes::timestep penalty,
-                   rtypes::timestep start_time)
+  temporal_penalty(const controller::base_controller* const controller,
+                   const rtypes::type_uuid& id,
+                   const rtypes::timestep& penalty,
+                   const rtypes::timestep& start_time)
       : mc_id(id),
         mc_penalty(penalty),
         mc_start_time(start_time),
         mc_controller(controller) {}
 
-  const T* controller(void) const { return mc_controller; }
-  rtypes::timestep start_time(void) const { return mc_start_time; }
-  rtypes::timestep penalty(void) const { return mc_penalty; }
-  int id(void) const { return mc_id; }
+  const controller::base_controller* controller(void) const {
+    return mc_controller;
+  }
+  const rtypes::timestep& start_time(void) const { return mc_start_time; }
+  const rtypes::timestep& penalty(void) const { return mc_penalty; }
+  const rtypes::type_uuid& id(void) const { return mc_id; }
 
   bool operator==(const temporal_penalty& other) {
     return this->controller() == other.controller();
@@ -82,10 +90,10 @@ class temporal_penalty {
 
  private:
   /* clang-format off */
-  const int              mc_id;
-  const rtypes::timestep mc_penalty;
-  const rtypes::timestep mc_start_time;
-  const T*const          mc_controller;
+  const rtypes::type_uuid          mc_id;
+  const rtypes::timestep             mc_penalty;
+  const rtypes::timestep             mc_start_time;
+  const controller::base_controller* mc_controller;
   /* clang-format on */
 };
 

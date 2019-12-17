@@ -25,8 +25,9 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/config/base_config.hpp"
-#include "rcppsw/control/config/waveform_config.hpp"
-#include "cosm/tv/config/swarm_irv_manager_config.hpp"
+#include "cosm/tv/config/population_dynamics_config.hpp"
+#include "fordyca/config/tv/env_dynamics_config.hpp"
+
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -44,9 +45,8 @@ NS_START(fordyca, config, tv);
  * \brief Configuration for the \ref tv_manager.
  */
 struct tv_manager_config final : public rconfig::base_config {
-  ctv::config::swarm_irv_manager_config irv{};
-  rct::config::waveform_config block_manipulation_penalty{};
-  rct::config::waveform_config cache_usage_penalty{};
+  config::tv::env_dynamics_config env_dynamics{};
+  ctv::config::population_dynamics_config population_dynamics{};
 };
 
 NS_END(tv, config, fordyca);

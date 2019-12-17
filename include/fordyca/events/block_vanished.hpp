@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
@@ -71,7 +72,7 @@ class block_vanished : public rer::client<block_vanished> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_vanished(uint block_id);
+  explicit block_vanished(const rtypes::type_uuid& block_id);
   ~block_vanished(void) override = default;
 
   block_vanished(const block_vanished& op) = delete;
@@ -108,7 +109,7 @@ class block_vanished : public rer::client<block_vanished> {
   void dispatch_free_block_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  int m_block_id;
+  const rtypes::type_uuid mc_block_id;
   /* clang-format on */
 };
 

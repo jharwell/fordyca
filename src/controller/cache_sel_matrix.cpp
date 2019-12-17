@@ -44,8 +44,10 @@ cache_sel_matrix::cache_sel_matrix(
   this->insert(std::make_pair(kClusterProxDist, config->nest_prox_dist));
   this->insert(std::make_pair(kSiteXRange, config->site_xrange));
   this->insert(std::make_pair(kSiteYRange, config->site_yrange));
-  this->insert(std::make_pair(kPickupExceptions, std::vector<int>()));
-  this->insert(std::make_pair(kDropExceptions, std::vector<int>()));
+  this->insert(
+      std::make_pair(kPickupExceptions, std::vector<rtypes::type_uuid>()));
+  this->insert(
+      std::make_pair(kDropExceptions, std::vector<rtypes::type_uuid>()));
   this->insert(std::make_pair(kPickupPolicy, config->pickup_policy));
 }
 
@@ -55,13 +57,13 @@ cache_sel_matrix::cache_sel_matrix(
 void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
   switch (ex.type) {
     case cache_sel_exception::kPickup: {
-      auto& vec =
-          boost::get<std::vector<int>>(this->find(kPickupExceptions)->second);
+      auto& vec = boost::get<std::vector<rtypes::type_uuid>>(
+          this->find(kPickupExceptions)->second);
       vec.push_back(ex.id);
     } break;
     case cache_sel_exception::kDrop: {
-      auto& vec =
-          boost::get<std::vector<int>>(this->find(kDropExceptions)->second);
+      auto& vec = boost::get<std::vector<rtypes::type_uuid>>(
+          this->find(kDropExceptions)->second);
       vec.push_back(ex.id);
     } break;
     default:
@@ -70,8 +72,8 @@ void cache_sel_matrix::sel_exception_add(const cache_sel_exception& ex) {
 } /* sel_exception_add() */
 
 void cache_sel_matrix::sel_exceptions_clear(void) {
-  boost::get<std::vector<int>>(this->at(kPickupExceptions)).clear();
-  boost::get<std::vector<int>>(this->at(kDropExceptions)).clear();
+  boost::get<std::vector<rtypes::type_uuid>>(this->at(kPickupExceptions)).clear();
+  boost::get<std::vector<rtypes::type_uuid>>(this->at(kDropExceptions)).clear();
 } /* sel_exceptions_clear() */
 
 NS_END(controller, fordyca);

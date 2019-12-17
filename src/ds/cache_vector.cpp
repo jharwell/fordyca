@@ -40,7 +40,7 @@ std::string cache_vector::to_str(void) const {
                          this->end(),
                          std::string(),
                          [&](const std::string& a, const auto& b) {
-                           return a + "c" + std::to_string(b->id()) + "@" +
+                           return a + "c" + rcppsw::to_string(b->id()) + "@" +
                                   b->dloc().to_str() + ",";
                          });
 } /* to_string() */

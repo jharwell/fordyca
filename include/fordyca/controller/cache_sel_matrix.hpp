@@ -56,13 +56,12 @@ using cache_sel_variant =
     boost::variant<rtypes::spatial_dist,
                    rmath::vector2d,
                    rmath::rangeu,
-                   std::vector<int>,
+                   std::vector<rtypes::type_uuid>,
                    config::cache_sel::cache_pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
  * \class cache_sel_matrix
  * \ingroup fordyca controller

@@ -52,7 +52,7 @@ existing_cache_selector::existing_cache_selector(
 boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator()(
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position,
-    rtypes::timestep t) {
+    const rtypes::timestep& t) {
   ds::dp_cache_map::value_type best(nullptr, {});
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
@@ -71,7 +71,7 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
     double utility = u.calc(position, c.density(), c.ent()->n_blocks());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for existing_cache%d@%s/%s, density=%f: %f",
-             c.ent()->id(),
+             c.ent()->id().v(),
              c.ent()->rloc().to_str().c_str(),
              c.ent()->dloc().to_str().c_str(),
              c.density().v(),
@@ -85,7 +85,7 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
 
   if (nullptr != best.ent()) {
     ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
-            best.ent()->id(),
+            best.ent()->id().v(),
             best.ent()->rloc().to_str().c_str(),
             best.ent()->dloc().to_str().c_str(),
             best.ent()->n_blocks(),
@@ -111,27 +111,27 @@ bool existing_cache_selector::cache_is_excluded(
    */
   if (cache->contains_point(position)) {
     ER_DEBUG("Ignoring cache%d@%s/%s: robot@%s inside it",
-             cache->id(),
+             cache->id().v(),
              cache->rloc().to_str().c_str(),
              cache->dloc().to_str().c_str(),
              position.to_str().c_str());
     return true;
   }
 
-  std::vector<int> exceptions;
+  std::vector<rtypes::type_uuid> exceptions;
   if (mc_is_pickup) {
-    exceptions = boost::get<std::vector<int>>(
+    exceptions = boost::get<std::vector<rtypes::type_uuid>>(
         mc_matrix->find(cselm::kPickupExceptions)->second);
   } else {
-    exceptions = boost::get<std::vector<int>>(
+    exceptions = boost::get<std::vector<rtypes::type_uuid>>(
         mc_matrix->find(cselm::kDropExceptions)->second);
   }
 
-  if (std::any_of(exceptions.begin(), exceptions.end(), [&](int id) {
+  if (std::any_of(exceptions.begin(), exceptions.end(), [&](auto& id) {
         return id == cache->id();
       })) {
     ER_DEBUG("Ignoring cache%d@%s/%s: On exception list",
-             cache->id(),
+             cache->id().v(),
              cache->rloc().to_str().c_str(),
              cache->dloc().to_str().c_str());
     return true;

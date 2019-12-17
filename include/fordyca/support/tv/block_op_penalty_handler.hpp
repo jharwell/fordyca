@@ -26,6 +26,8 @@
  ******************************************************************************/
 #include <string>
 
+#include "rcppsw/types/type_uuid.hpp"
+
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/block_op_filter.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
@@ -47,32 +49,29 @@ NS_START(fordyca, support, tv);
  * \brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
-template <typename T>
-class block_op_penalty_handler final
-    : public temporal_penalty_handler<T>,
-      public rer::client<block_op_penalty_handler<T>> {
+class block_op_penalty_handler final : public temporal_penalty_handler,
+                                       public rer::client<block_op_penalty_handler> {
  public:
-  using temporal_penalty_handler<T>::is_serving_penalty;
-  using temporal_penalty_handler<T>::penalty_finish_uniqueify;
-  using temporal_penalty_handler<T>::penalty_calc;
-  using temporal_penalty_handler<T>::penalty_add;
-
   block_op_penalty_handler(ds::arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
-      : temporal_penalty_handler<T>(config, name),
+      : temporal_penalty_handler(config, name),
         ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
         mc_map(map) {}
 
   ~block_op_penalty_handler(void) override = default;
   block_op_penalty_handler& operator=(const block_op_penalty_handler& other) =
       delete;
-  block_op_penalty_handler(const block_op_penalty_handler& other) = delete;
+  block_op_penalty_handler(const block_op_penalty_handler&) = delete;
 
   /**
    * \brief Check if a robot has acquired a block or is in the nest, and is
    * trying to drop/pickup a block. If so, create a \ref temporal_penalty object
    * and associate it with the robot.
+   *
+   * \tparam TControllerType The type of the controller. Must be a template
+   * parameter, rather than \ref controller::base_controller, because of the
+   * goal acquisition determination done by \ref block_op_filter.
    *
    * \param controller The robot to check.
    * \param src The penalty source (i.e. what event caused this penalty to be
@@ -81,11 +80,12 @@ class block_op_penalty_handler final
    * \param prox_dist The minimum distance that the cache site needs to be from
    *                  all caches in the arena.
    */
-  op_filter_status penalty_init(T& controller,
+  template<typename TControllerType>
+  op_filter_status penalty_init(TControllerType& controller,
                                 block_op_src src,
                                 const rtypes::timestep& t,
                                 rtypes::spatial_dist cache_prox = rtypes::spatial_dist(-1)) {
-    auto filter = block_op_filter<T>(
+    auto filter = block_op_filter<TControllerType>(
         mc_map)(controller, src, cache_prox);
     if (filter != op_filter_status::ekSATISFIED) {
       return filter;
@@ -94,53 +94,54 @@ class block_op_penalty_handler final
               "%s already serving block penalty?",
               controller.GetId().c_str());
 
-    int id = penalty_id_calc(controller, src, cache_prox);
+    rtypes::type_uuid id = penalty_id_calc(controller, src, cache_prox);
     rtypes::timestep orig_duration = penalty_calc(t);
     rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
     ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
-            id,
+            id.v(),
             t.v(),
             orig_duration.v(),
             duration.v(),
             static_cast<int>(src));
 
-    penalty_add(temporal_penalty<T>(&controller, id, duration, t));
+    penalty_add(temporal_penalty(&controller, id, duration, t));
     return filter;
   }
 
  private:
-  int penalty_id_calc(const T& controller,
+  template<typename TControllerType>
+  rtypes::type_uuid penalty_id_calc(const TControllerType& controller,
                       block_op_src src,
                       rtypes::spatial_dist cache_prox) const {
-    int id = -1;
+    rtypes::type_uuid id(-1);
     switch (src) {
       case block_op_src::ekFREE_PICKUP:
         id = utils::robot_on_block(controller, *mc_map);
-        ER_ASSERT(-1 != id, "Robot not on block?");
+        ER_ASSERT(rtypes::constants::kNoUUID != id, "Robot not on block?");
         break;
       case block_op_src::ekNEST_DROP:
         ER_ASSERT(nullptr != controller.block() &&
-                      -1 != controller.block()->id(),
+                  rtypes::constants::kNoUUID != controller.block()->id(),
                   "Robot not carrying block?");
         id = controller.block()->id();
         break;
       case block_op_src::ekCACHE_SITE_DROP:
         ER_ASSERT(nullptr != controller.block() &&
-                      -1 != controller.block()->id(),
+                      rtypes::constants::kNoUUID != controller.block()->id(),
                   "Robot not carrying block?");
         id = controller.block()->id();
         break;
       case block_op_src::ekNEW_CACHE_DROP:
         ER_ASSERT(nullptr != controller.block() &&
-                      -1 != controller.block()->id(),
+                      rtypes::constants::kNoUUID != controller.block()->id(),
                   "Robot not carrying block?");
         ER_ASSERT(cache_prox > 0.0,
                   "Cache proximity distance not specified for new cache drop");
         id = controller.block()->id();
         break;
       default:
-        id = -1;
+        break;
     }
     return id;
   } /* penalty_id_calc() */

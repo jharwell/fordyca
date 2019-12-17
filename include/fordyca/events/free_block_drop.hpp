@@ -69,8 +69,11 @@ class free_block_drop : public rer::client<free_block_drop>, public cell_op {
   struct visit_typelist_impl {
     using inherited = boost::mpl::joint_view<block_drop_base_visit_typelist,
                                              cell_op::visit_typelist>;
-    using controllers = boost::mpl::joint_view<controller::depth1::typelist,
-                                               controller::depth2::typelist>;
+    using controllers = boost::mpl::joint_view<
+        boost::mpl::joint_view<controller::depth0::typelist,
+                               controller::depth1::typelist>,
+        controller::depth2::typelist>;
+
     using others = rmpl::typelist<
         /* depth0 */
         fsm::block_to_goal_fsm,

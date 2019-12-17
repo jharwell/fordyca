@@ -71,16 +71,16 @@ boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void
   }
   std::string line;
 
-  line += std::to_string(m_interval.free_pickup_events) + separator();
-  line += std::to_string(m_interval.free_drop_events) + separator();
+  line += rcppsw::to_string(m_interval.free_pickup_events) + separator();
+  line += rcppsw::to_string(m_interval.free_drop_events) + separator();
 
   line += csv_entry_domavg(m_interval.free_pickup_penalty,
                            m_interval.free_pickup_events);
   line += csv_entry_domavg(m_interval.free_drop_penalty,
                            m_interval.free_drop_events);
 
-  line += std::to_string(m_interval.cache_pickup_events) + separator();
-  line += std::to_string(m_interval.cache_drop_events) + separator();
+  line += rcppsw::to_string(m_interval.cache_pickup_events) + separator();
+  line += rcppsw::to_string(m_interval.cache_drop_events) + separator();
 
   line += csv_entry_domavg(m_interval.cache_pickup_penalty,
                            m_interval.cache_pickup_events);

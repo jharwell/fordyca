@@ -32,8 +32,7 @@
 #include "rcppsw/ta/polled_task.hpp"
 
 #include "fordyca/ds/arena_map.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/task_status.hpp"
 
 /*******************************************************************************
@@ -54,13 +53,13 @@ NS_START(fordyca, support);
 template <typename T>
 class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
  public:
-  using penalty_handler_list = std::list<tv::temporal_penalty_handler<T>*>;
-
-  task_abort_interactor(ds::arena_map* const map_in,
-                        argos::CFloorEntity* const floor_in)
+  task_abort_interactor(ds::arena_map* const map,
+                        tv::env_dynamics* envd,
+                        argos::CFloorEntity* const floor)
       : ER_CLIENT_INIT("fordyca.support.task_abort_interactor"),
-        m_map(map_in),
-        m_floor(floor_in) {}
+        m_map(map),
+        m_envd(envd),
+        m_floor(floor) {}
 
   /**
    * \brief Interactors should generally NOT be copy constructable/assignable,
@@ -72,7 +71,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
    * I think, and is not being interpreted as such).
    */
   task_abort_interactor(const task_abort_interactor& other) = default;
-  task_abort_interactor& operator=(const task_abort_interactor& other) = delete;
+  task_abort_interactor& operator=(const task_abort_interactor&) = delete;
 
   /**
    * \brief Handle cases in which a robot aborts its current task, and perform
@@ -85,7 +84,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
    *
    * \return \c TRUE if the robot aborted is current task, \c FALSE otherwise.
    */
-  bool operator()(T& controller, const penalty_handler_list& penalty_handlers) {
+  bool operator()(T& controller) {
     if (nullptr == controller.current_task() ||
         tasks::task_status::ekABORT_PENDING != controller.task_status()) {
       return false;
@@ -101,68 +100,20 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
       ER_INFO("%s aborted task '%s' while carrying block%d",
               controller.GetId().c_str(),
               polled->name().c_str(),
-              controller.block()->id());
+              controller.block()->id().v());
       task_abort_with_block(controller);
     } else {
       ER_INFO("%s aborted task '%s' (no block)",
               controller.GetId().c_str(),
               polled->name().c_str());
     }
-    bool aborted = false;
-    for (auto& h : penalty_handlers) {
-      if (h->is_serving_penalty(controller)) {
-        ER_ASSERT(!aborted,
-                  "Controller serving penalties from more than one source");
-        h->penalty_abort(controller);
-        aborted = true;
-        ER_INFO("%s aborted task '%s' while serving '%s' penalty",
-                controller.GetId().c_str(),
-                polled->name().c_str(),
-                h->name().c_str());
-      }
-    } /* for(&h..) */
+
+    m_envd->penalties_flush(controller);
     return true;
   }
 
  private:
   void task_abort_with_block(T& controller) {
-    /*
-     * If the robot is currently right on the edge of a cache, we can't just
-     * drop the block here, as it will overlap with the cache, and robots
-     * will think that is accessible, but will not be able to vector to it
-     * (not all 4 wheel sensors will report the color of a block). See #233.
-     */
-    bool conflict = false;
-    m_map->cache_mtx().lock();
-    for (auto& cache : m_map->caches()) {
-      if (utils::block_drop_overlap_with_cache(
-              controller.block(), cache, controller.position2D())) {
-        conflict = true;
-      }
-    } /* for(cache..) */
-    m_map->cache_mtx().unlock();
-
-    /*
-     * If the robot is currently right on the edge of the nest, we can't just
-     * drop the block in the nest, as it will not be processed as a normal
-     * \ref block_nest_drop, and will be discoverable by a robot via LOS but
-     * not able to be acquired, as its color is hidden by that of the nest.
-     *
-     * If the robot is really close to a wall, then dropping a block may make
-     * it inaccessible to future robots trying to reach it, due to obstacle
-     * avoidance kicking in. This can result in an endless loop if said block
-     * is the only one a robot knows about (see #242).
-     */
-    if (utils::block_drop_overlap_with_nest(
-            controller.block(), m_map->nest(), controller.position2D()) ||
-        utils::block_drop_near_arena_boundary(
-            *m_map, controller.block(), controller.position2D())) {
-      conflict = true;
-    }
-    perform_block_drop(controller, conflict);
-  }
-
-  void perform_block_drop(T& controller, bool drop_conflict) {
     /*
      * The robot owns a unique copy of a block originally from the arena, so we
      * need to look it up rather than implicitly converting its unique_ptr to a
@@ -177,8 +128,9 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
                              return controller.block()->id() == b->id();
                            });
     ER_ASSERT(m_map->blocks().end() != it,
-              "Robot block%d not found in arena map blocks",
-              controller.block()->id());
+              "Block%d carried by %s not found in arena map blocks",
+              controller.block()->id().v(),
+              controller.GetId().c_str());
 
     events::free_block_drop_visitor drop_op(
         *it,
@@ -186,16 +138,10 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
         m_map->grid_resolution(),
         true);
 
-    m_map->block_mtx().lock();
-    m_map->grid_mtx().lock();
-
-    if (!drop_conflict) {
-      drop_op.visit(*m_map);
-    } else {
-      m_map->distribute_single_block(*it);
-    }
-    m_map->grid_mtx().unlock();
-    m_map->block_mtx().unlock();
+    bool conflict = utils::free_block_drop_conflict(*m_map,
+                                                    it->get(),
+                                                    controller.position2D());
+    utils::handle_arena_free_block_drop(drop_op, *m_map, conflict);
 
     drop_op.visit(controller);
     m_floor->SetChanged();
@@ -203,6 +149,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
 
   /* clang-format off */
   ds::arena_map* const       m_map;
+  tv::env_dynamics* const    m_envd;
   argos::CFloorEntity* const m_floor;
   /* clang-format on */
 };

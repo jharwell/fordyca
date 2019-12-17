@@ -1,7 +1,7 @@
 /**
- * \file metrics_config.hpp
+ * \file env_dynamics_config.hpp
  *
- * \copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,44 +18,37 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_METRICS_CONFIG_HPP_
-#define INCLUDE_FORDYCA_CONFIG_METRICS_CONFIG_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_TV_ENV_DYNAMICS_CONFIG_HPP_
+#define INCLUDE_FORDYCA_CONFIG_TV_ENV_DYNAMICS_CONFIG_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <map>
-#include <string>
-
 #include "rcppsw/config/base_config.hpp"
-
-#include "fordyca/config/grid_config.hpp"
+#include "cosm/tv/config/robot_dynamics_applicator_config.hpp"
+#include "cosm/tv/config/population_dynamics_config.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, config, tv);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * \struct metrics_config
- * \ingroup fordyca config
+ * \struct env_dynamics_config
+ * \ingroup fordyca config tv
  *
- * Each member represents the filename to which a specific type of metrics
- * should be logged. Empty filename=no metrics of that type will be collected.
+ * \brief Configuration for the \ref env_dynamics.
  */
-struct metrics_config final : public rconfig::base_config {
-  using enabled_map_type = std::map<std::string, std::string>;
-
-  std::string output_dir{};
-  grid_config arena_grid{};
-  uint output_interval{0};
-
-  enabled_map_type enabled{};
+struct env_dynamics_config final : public rconfig::base_config {
+  ctv::config::robot_dynamics_applicator_config rda{};
+  rct::config::waveform_config block_manip_penalty{};
+  rct::config::waveform_config cache_usage_penalty{};
 };
 
-NS_END(config, fordyca);
+NS_END(tv, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_METRICS_CONFIG_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_TV_ENV_DYNAMICS_CONFIG_HPP_ */

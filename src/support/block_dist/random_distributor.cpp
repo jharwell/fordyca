@@ -92,11 +92,11 @@ bool random_distributor::distribute_block(
     ER_ASSERT(!cell->state_has_block(),
               "Destination cell@%s already contains block%d",
               coords->abs.to_str().c_str(),
-              cell->block()->id());
+              cell->block()->id().v());
     ER_ASSERT(!cell->state_has_cache(),
               "Destination cell@%s already contains cache%d",
               coords->abs.to_str().c_str(),
-              cell->cache()->id());
+              cell->cache()->id().v());
     ER_ASSERT(!cell->state_in_cache_extent(),
               "Destination cell part of cache extent");
 
@@ -104,7 +104,7 @@ bool random_distributor::distribute_block(
     op.visit(*cell);
     if (verify_block_dist(block.get(), entities, cell)) {
       ER_DEBUG("Block%d,ptr=%p distributed@%s/%s",
-               block->id(),
+               block->id().v(),
                block.get(),
                block->rloc().to_str().c_str(),
                block->dloc().to_str().c_str());
@@ -116,10 +116,11 @@ bool random_distributor::distribute_block(
       return true;
     }
     ER_WARN("Failed to distribute block%d after finding distribution coord",
-            block->id());
+            block->id().v());
     return false;
   } else {
-    ER_WARN("Unable to find distribution coordinates for block%d", block->id());
+    ER_WARN("Unable to find distribution coordinates for block%d",
+            block->id().v());
     return false;
   }
 } /* distribute_block() */
@@ -131,15 +132,15 @@ bool random_distributor::verify_block_dist(
   /* blocks should not be out of sight after distribution... */
   ER_CHECK(crepr::base_block2D::kOutOfSightDLoc != block->dloc(),
            "Block%d discrete coord still out of sight after distribution",
-           block->id());
+           block->id().v());
   ER_CHECK(crepr::base_block2D::kOutOfSightRLoc != block->rloc(),
            "Block%d real coord still out of sight after distribution",
-           block->id());
+           block->id().v());
 
   /* The cell it was distributed to should refer to it */
   ER_CHECK(block == cell->block().get(),
            "Block%d@%s not referenced by containing cell@%s",
-           block->id(),
+           block->id().v(),
            block->rloc().to_str().c_str(),
            cell->loc().to_str().c_str());
 
@@ -151,7 +152,7 @@ bool random_distributor::verify_block_dist(
     auto status = utils::placement_conflict(block->rloc(), block->dims(), e);
     ER_ASSERT(!(status.x_conflict && status.y_conflict),
               "Entity contains block%d@%s/%s after distribution",
-              block->id(),
+              block->id().v(),
               block->rloc().to_str().c_str(),
               block->rloc().to_str().c_str());
   } /* for(&e..) */

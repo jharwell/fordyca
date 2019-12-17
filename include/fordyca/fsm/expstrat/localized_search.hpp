@@ -61,7 +61,7 @@ class localized_search : public foraging_expstrat,
         m_crw(saa, rng) {}
 
   ~localized_search(void) override = default;
-  localized_search(const localized_search& other) = delete;
+  localized_search(const localized_search&) = delete;
   localized_search& operator=(const localized_search&) = delete;
 
   /* collision metrics */

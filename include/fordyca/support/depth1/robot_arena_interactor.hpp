@@ -56,6 +56,7 @@ NS_START(depth1);
  * - Picking up a free block.
  * - Dropping a carried block in the nest.
  * - Free block drop due to task abort.
+ * - Task abort.
  */
 template <typename T>
 class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
@@ -65,22 +66,23 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
     ds::arena_map* const map;
     depth0::depth0_metrics_aggregator *const metrics_agg;
     argos::CFloorEntity* const floor;
-    tv::tv_manager* const tv_manager;
+    tv::env_dynamics* const envd;
     base_cache_manager* cache_manager;
     base_loop_functions* loop;
   };
   explicit robot_arena_interactor(const params& p)
       : ER_CLIENT_INIT("fordyca.support.depth1.robot_arena_interactor"),
-        m_tv_manager(p.tv_manager),
-        m_free_pickup_interactor(p.map, p.floor, p.tv_manager),
-        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.tv_manager),
-        m_task_abort_interactor(p.map, p.floor),
+        m_free_pickup_interactor(p.map, p.floor, p.envd),
+        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.envd),
+        m_task_abort_interactor(p.map,
+                                p.envd,
+                                p.floor),
         m_cached_pickup_interactor(p.map,
                                    p.floor,
-                                   p.tv_manager,
+                                   p.envd,
                                    p.cache_manager, p.
                                    loop),
-        m_existing_cache_drop_interactor(p.map, p.tv_manager) {}
+        m_existing_cache_drop_interactor(p.map, p.envd) {}
 
   /**
    * \brief Interactors should generally NOT be copy constructable/assignable,
@@ -91,19 +93,17 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
    */
-  robot_arena_interactor(const robot_arena_interactor& other) = default;
-  robot_arena_interactor& operator=(
-      const robot_arena_interactor& other) = delete;
+  robot_arena_interactor(const robot_arena_interactor&) = default;
+  robot_arena_interactor& operator=(const robot_arena_interactor&) = delete;
 
   /**
    * \brief The actual handling function for interactions.
    *
    * \param controller The controller to handle interactions for.
-   * \param t   The current timestep.
+   * \param t The current timestep.
    */
   interactor_status operator()(T& controller, const rtypes::timestep& t) {
-    if (m_task_abort_interactor(controller,
-                                m_tv_manager->template all_penalty_handlers<T>())) {
+    if (m_task_abort_interactor(controller)) {
       /*
        * This needs to be here, rather than in each robot's control step
        * function, in order to avoid triggering erroneous handling of an aborted
@@ -132,7 +132,6 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
  private:
   /* clang-format off */
-  tv::tv_manager* const                m_tv_manager;
   free_block_pickup_interactor<T>         m_free_pickup_interactor;
   nest_block_drop_interactor<T>           m_nest_drop_interactor;
   task_abort_interactor<T>                m_task_abort_interactor;

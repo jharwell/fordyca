@@ -63,7 +63,7 @@ void oracle_manager::update(ds::arena_map* const map) {
                  std::back_inserter(v),
                  [&](const auto& b) {
                    /* don't include blocks robot's are carrying */
-                   return -1 == b->robot_id() &&
+                   return rtypes::constants::kNoUUID == b->robot_id() &&
                           /*
                         * Don't include blocks that are currently in a cache
                         * (harmless, but causes repeated "removed block hidden

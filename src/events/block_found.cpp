@@ -90,7 +90,7 @@ void block_found::visit(ds::dpo_store& store) {
      */
     if (!known->ent()->dloccmp(*m_block)) {
       ER_INFO("Removing block%d@%s: Moved to %s",
-              known->ent()->id(),
+              known->ent()->id().v(),
               known->ent()->dloc().to_str().c_str(),
               m_block->dloc().to_str().c_str());
       store.block_remove(known->ent_obj());
@@ -178,8 +178,8 @@ void block_found::visit(ds::dpo_semantic_map& map) {
   ER_ASSERT(cell.block()->id() == m_block->id(),
             "Block for cell@%s ID mismatch: %d/%d",
             cell.loc().to_str().c_str(),
-            m_block->id(),
-            cell.block()->id());
+            m_block->id().v(),
+            cell.block()->id().v());
 } /* visit() */
 
 void block_found::pheromone_update(ds::dpo_semantic_map& map) {
@@ -210,7 +210,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
     if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
                res.old_loc.to_str().c_str(),
-               m_block->id(),
+               m_block->id().v(),
                res.old_loc.to_str().c_str(),
                m_block->dloc().to_str().c_str());
       events::cell_empty_visitor op(res.old_loc);

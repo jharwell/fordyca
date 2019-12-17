@@ -32,7 +32,7 @@
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/interactor_status.hpp"
 
@@ -56,13 +56,13 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
  public:
   cache_site_block_drop_interactor(ds::arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
-                                   tv::tv_manager* tv_manager,
+                                   tv::env_dynamics* envd,
                                    dynamic_cache_manager* const cache_manager)
       : ER_CLIENT_INIT("fordyca.support.depth2.cache_site_block_drop_interactor"),
         m_floor(floor_in),
         m_map(map_in),
         m_cache_manager(cache_manager),
-        m_penalty_handler(tv_manager->template penalty_handler<T>(
+        m_penalty_handler(envd->penalty_handler(
             tv::block_op_src::ekCACHE_SITE_DROP)) {}
 
   /**
@@ -77,13 +77,13 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
   cache_site_block_drop_interactor(
       const cache_site_block_drop_interactor& other) = default;
   cache_site_block_drop_interactor& operator=(
-      const cache_site_block_drop_interactor& other) = delete;
+      const cache_site_block_drop_interactor&) = delete;
 
   /**
    * \brief The actual handling function for interactions.
    *
    * \param controller The controller to handle interactions for.
-   * \param  t  The current timestep.
+   * \param t The current timestep.
    */
   interactor_status operator()(T& controller, const rtypes::timestep& t) {
     /*
@@ -115,7 +115,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
       auto prox_status = utils::new_cache_cache_proximity(controller,
                                                           *m_map,
                                                           m_cache_manager->cache_proximity_dist());
-      ER_ASSERT(-1 != prox_status.entity_id,
+      ER_ASSERT(rtypes::constants::kNoUUID != prox_status.entity_id,
                 "No cache too close with CacheProximity return status");
       cache_proximity_notify(controller, prox_status);
     }
@@ -128,7 +128,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
             controller.GetId().c_str(),
             controller.position2D().to_str().c_str(),
-            status.entity_id,
+            status.entity_id.v(),
             status.entity_loc.to_str().c_str(),
             status.distance.length(),
             m_cache_manager->cache_proximity_dist().v());
@@ -150,7 +150,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    * has acquired a cache site and is looking to drop an object on it.
    */
   void finish_cache_site_block_drop(T& controller) {
-    const tv::temporal_penalty<T>& p = m_penalty_handler->penalty_next();
+    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
@@ -169,8 +169,8 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    * preconditions have been satisfied.
    */
   void perform_cache_site_block_drop(T& controller,
-                                     const tv::temporal_penalty<T>& penalty) {
-    events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id()],
+                                     const tv::temporal_penalty& penalty) {
+    events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id().v()],
                                     rmath::dvec2uvec(controller.position2D(),
                                                      m_map->grid_resolution().v()),
                                             m_map->grid_resolution(),
@@ -183,10 +183,10 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
   }
 
   /* clang-format off */
-  argos::CFloorEntity*  const           m_floor;
-  ds::arena_map* const                  m_map;
-  dynamic_cache_manager*const           m_cache_manager;
-  tv::block_op_penalty_handler<T>*const m_penalty_handler;
+  argos::CFloorEntity*  const        m_floor;
+  ds::arena_map* const               m_map;
+  dynamic_cache_manager*const        m_cache_manager;
+  tv::block_op_penalty_handler*const m_penalty_handler;
   /* clang-format on */
 };
 

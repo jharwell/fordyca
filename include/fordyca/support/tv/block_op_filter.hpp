@@ -56,8 +56,8 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
       : ER_CLIENT_INIT("fordyca.support.block_op_filter"), mc_map(map) {}
 
   ~block_op_filter(void) override = default;
-  block_op_filter& operator=(const block_op_filter& other) = delete;
-  block_op_filter(const block_op_filter& other) = delete;
+  block_op_filter& operator=(const block_op_filter&) = delete;
+  block_op_filter(const block_op_filter&) = delete;
 
   /**
    * \brief Filters out controllers that actually are not eligible to start
@@ -97,11 +97,11 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    *
    */
   op_filter_status free_pickup_filter(const T& controller) const {
-    int block_id = utils::robot_on_block(controller, *mc_map);
+    auto block_id = utils::robot_on_block(controller, *mc_map);
     if (!(controller.goal_acquired() &&
           fsm::foraging_acq_goal::ekBLOCK == controller.acquisition_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
-    } else if (-1 == block_id) {
+    } else if (rtypes::constants::kNoUUID == block_id) {
       return op_filter_status::ekROBOT_NOT_ON_BLOCK;
     }
     return op_filter_status::ekSATISFIED;
@@ -132,11 +132,11 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
 
-    int cache_id = utils::new_cache_cache_proximity(controller,
+    auto cache_id = utils::new_cache_cache_proximity(controller,
                                                     *mc_map,
                                                     cache_prox)
                    .entity_id;
-    if (-1 != cache_id) {
+    if (rtypes::constants::kNoUUID != cache_id) {
       return op_filter_status::ekCACHE_PROXIMITY;
     }
     return op_filter_status::ekSATISFIED;
@@ -154,11 +154,11 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
           fsm::foraging_transport_goal::ekNEW_CACHE == controller.block_transport_goal())) {
       return op_filter_status::ekROBOT_INTERNAL_UNREADY;
     }
-    int cache_id = utils::new_cache_cache_proximity(controller,
+    auto cache_id = utils::new_cache_cache_proximity(controller,
                                                     *mc_map,
                                                     cache_prox)
                    .entity_id;
-    if (-1 != cache_id) {
+    if (rtypes::constants::kNoUUID != cache_id) {
       return op_filter_status::ekCACHE_PROXIMITY;
     }
     return op_filter_status::ekSATISFIED;

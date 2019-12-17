@@ -65,7 +65,7 @@ ds::cache_list line_of_sight::caches(void) const {
             cell.loc().to_str().c_str());
         ER_ASSERT(cache->n_blocks() >= base_cache::kMinBlocks,
                   "Cache%d@%s has too few blocks (%zu < %zu)",
-                  cache->id(),
+                  cache->id().v(),
                   cache->dloc().to_str().c_str(),
                   cache->n_blocks(),
                   base_cache::kMinBlocks);

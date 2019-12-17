@@ -107,7 +107,7 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
                            saa()->sensing()->position(),
                            saa()->sensing()->tick())) {
     ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
-            best->ent()->id(),
+            best->ent()->id().v(),
             best->ent()->rloc().to_str().c_str(),
             best->ent()->dloc().to_str().c_str(),
             best->density().v());
@@ -153,7 +153,7 @@ bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
 } /* cache_acquired_cb() */
 
 bool acquire_existing_cache_fsm::cache_acq_valid(const rmath::vector2d& loc,
-                                                 uint id) {
+                                                 const rtypes::type_uuid& id) {
   return cache_acq_validator(&mc_store->caches(),
                              mc_matrix,
                              mc_for_pickup)(loc, id, saa()->sensing()->tick());

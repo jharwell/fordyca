@@ -81,8 +81,8 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
   cache_center_calculator(ds::arena_grid* grid,
                           rtypes::spatial_dist cache_dim);
 
-  cache_center_calculator(const cache_center_calculator& other) = delete;
-  cache_center_calculator& operator=(const cache_center_calculator& other) = delete;
+  cache_center_calculator(const cache_center_calculator&) = delete;
+  cache_center_calculator& operator=(const cache_center_calculator&) = delete;
 
   /**
    * \brief Calculate the center of the new cache that will be constructed from

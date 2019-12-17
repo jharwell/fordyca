@@ -55,14 +55,14 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_vanished::block_vanished(uint block_id)
-    : ER_CLIENT_INIT("fordyca.events.block_vanished"), m_block_id(block_id) {}
+block_vanished::block_vanished(const rtypes::type_uuid& block_id)
+    : ER_CLIENT_INIT("fordyca.events.block_vanished"), mc_block_id(block_id) {}
 
 void block_vanished::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
   ER_INFO("Abort pickup executing task %s: block%d vanished",
           dynamic_cast<rta::logical_task*>(task)->name().c_str(),
-          m_block_id);
+          mc_block_id.v());
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non-free block interactor task %s triggered block vanished event",
@@ -76,7 +76,7 @@ void block_vanished::dispatch_free_block_interactor(
 void block_vanished::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
 
   controller.ndc_pop();
@@ -85,7 +85,7 @@ void block_vanished::visit(controller::depth0::crw_controller& controller) {
 void block_vanished::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
 
   controller.ndc_pop();
@@ -94,7 +94,7 @@ void block_vanished::visit(controller::depth0::dpo_controller& controller) {
 void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
 
   controller.ndc_pop();
@@ -103,7 +103,7 @@ void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
 void block_vanished::visit(controller::depth0::odpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
 
   controller.ndc_pop();
@@ -112,7 +112,7 @@ void block_vanished::visit(controller::depth0::odpo_controller& controller) {
 void block_vanished::visit(controller::depth0::omdpo_controller& controller) {
   controller.ndc_push();
 
-  ER_INFO("Abort pickup: block%d vanished", m_block_id);
+  ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
 
   controller.ndc_pop();

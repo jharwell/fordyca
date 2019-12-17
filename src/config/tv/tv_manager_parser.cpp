@@ -40,40 +40,22 @@ void tv_manager_parser::parse(const ticpp::Element& node) {
   ticpp::Element tvnode = node_get(node, kXMLRoot);
   m_config = std::make_unique<config_type>();
 
-  /* block temporal variance configured */
-  if (nullptr != tvnode.FirstChild("blocks", false)) {
-    ticpp::Element bnode = node_get(tvnode, "blocks");
+  m_envd.parse(tvnode);
+  m_popd.parse(tvnode);
 
-    if (nullptr != bnode.FirstChild("manipulation_penalty", false)) {
-      m_block_manip.parse(node_get(bnode, "manipulation_penalty"));
-      m_config->block_manipulation_penalty =
-          *m_block_manip
-               .config_get<rct::config::xml::waveform_parser::config_type>();
-    }
-    if (nullptr != bnode.FirstChild("carry_throttle", false)) {
-      m_block_carry.parse(node_get(bnode, "carry_throttle"));
-      auto config =
-          m_block_carry
-              .config_get<rct::config::xml::waveform_parser::config_type>();
-      m_config->irv.motion_throttle = *config;
-    }
+  if (m_envd.is_parsed()) {
+    m_config->env_dynamics =
+        *m_envd.config_get<env_dynamics_parser::config_type>();
   }
 
-  /* cache temporal variance configured */
-  if (nullptr != tvnode.FirstChild("caches", false)) {
-    ticpp::Element cnode = node_get(tvnode, "caches");
-    if (nullptr != cnode.FirstChild("usage_penalty", false)) {
-      m_cache_usage.parse(node_get(cnode, "usage_penalty"));
-      m_config->cache_usage_penalty =
-          *m_cache_usage
-               .config_get<rct::config::xml::waveform_parser::config_type>();
-    }
+  if (m_popd.is_parsed()) {
+    m_config->population_dynamics = *m_popd.config_get<
+        ctv::config::xml::population_dynamics_parser::config_type>();
   }
 } /* parse() */
 
 bool tv_manager_parser::validate(void) const {
-  return m_block_manip.validate() && m_block_carry.validate() &&
-         m_cache_usage.validate();
+  return m_envd.validate() && m_popd.validate();
 } /* validate() */
 
 NS_END(tv, config, fordyca);

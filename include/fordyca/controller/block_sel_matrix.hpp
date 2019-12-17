@@ -30,6 +30,7 @@
 #include <vector>
 
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/config/block_sel/block_pickup_policy_config.hpp"
 #include "fordyca/fordyca.hpp"
@@ -51,7 +52,7 @@ NS_START(controller);
 using block_sel_variant =
     boost::variant<double,
                    rmath::vector2d,
-                   std::vector<int>,
+                   std::vector<rtypes::type_uuid>,
                    config::block_sel::block_pickup_policy_config>;
 
 /*******************************************************************************
@@ -91,7 +92,7 @@ class block_sel_matrix : public std::map<std::string, block_sel_variant> {
    *
    * \param id The ID of the block to add.
    */
-  void sel_exception_add(int id);
+  void sel_exception_add(const rtypes::type_uuid& id);
 
   /**
    * \brief Clear the exceptions list. This happens after a robot has executed

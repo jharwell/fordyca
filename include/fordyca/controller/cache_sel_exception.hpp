@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "rcppsw/types/type_uuid.hpp"
+
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
@@ -45,7 +47,7 @@ NS_START(fordyca, controller);
 struct cache_sel_exception {
   enum type { kPickup, kDrop };
 
-  int id;
+  rtypes::type_uuid id;
   enum type type;
 };
 

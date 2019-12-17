@@ -28,12 +28,10 @@
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
 #include "rcppsw/algorithm/closest_pair2D.hpp"
-#include "rcppsw/math/rngm.hpp"
 #include "rcppsw/math/vector2.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
-#include "fordyca/config/output_config.hpp"
 #include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
@@ -42,10 +40,13 @@
 #include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
+#include "fordyca/support/tv/argos_pd_adaptor.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 #include "cosm/convergence/config/convergence_config.hpp"
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/pal/config/output_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,8 +68,9 @@ base_loop_functions::~base_loop_functions(void) = default;
 /*******************************************************************************
  * Initialization Functions
  ******************************************************************************/
-void base_loop_functions::Init(ticpp::Element& node) {
+void base_loop_functions::init(ticpp::Element& node) {
   ndc_push();
+
   /* parse simulation input file */
   m_config.parse_all(node);
 
@@ -78,10 +80,10 @@ void base_loop_functions::Init(ticpp::Element& node) {
   }
 
   /* initialize RNG */
-  rng_init(m_config.config_get<rmath::config::rng_config>());
+  rng_init(config()->config_get<rmath::config::rng_config>());
 
   /* initialize output and metrics collection */
-  output_init(m_config.config_get<config::output_config>());
+  output_init(m_config.config_get<cpconfig::output_config>());
 
   /* initialize arena map and distribute blocks */
   arena_map_init(config());
@@ -96,37 +98,8 @@ void base_loop_functions::Init(ticpp::Element& node) {
   /* initialize oracle, if configured */
   oracle_init(config()->config_get<config::oracle::oracle_manager_config>());
 
-  m_floor = &GetSpace().GetFloorEntity();
-  std::srand(std::time(nullptr));
   ndc_pop();
-} /* Init() */
-
-void base_loop_functions::output_init(const config::output_config* const output) {
-  if ("__current_date__" == output->output_dir) {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    m_output_root = output->output_root + "/" +
-                    std::to_string(now.date().year()) + "-" +
-                    std::to_string(now.date().month()) + "-" +
-                    std::to_string(now.date().day()) + ":" +
-                    std::to_string(now.time_of_day().hours()) + "-" +
-                    std::to_string(now.time_of_day().minutes());
-  } else {
-    m_output_root = output->output_root + "/" + output->output_dir;
-  }
-
-#if (LIBRA_ER == LIBRA_ER_ALL)
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
-                      m_output_root + "/events.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
-                      m_output_root + "/support.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
-                      m_output_root + "/sim.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
-                      m_output_root + "/sim.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
-                      m_output_root + "/metrics.log");
-#endif
-} /* output_init() */
+} /* init() */
 
 void base_loop_functions::convergence_init(
     const cconvergence::config::convergence_config* const config) {
@@ -145,27 +118,28 @@ void base_loop_functions::convergence_init(
 } /* convergence_init() */
 
 void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
-  /*
-   * Even if temporal variance is not requested in teh input file, we still
-   * need to create the manager in order to deconflict pickups/drops/etc
-   */
-  if (nullptr == tvp) {
-    m_tv_manager = std::make_unique<tv::tv_manager>(
-        std::make_unique<config::tv::tv_manager_config>().get(),
-        this,
-        arena_map());
-  } else {
-    ER_INFO("Creating temporal variance manager");
-    m_tv_manager = std::make_unique<tv::tv_manager>(tvp, this, arena_map());
-  }
+  ER_INFO("Creating temporal variance manager");
+  auto envd =
+      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics, this, arena_map());
+  auto popd =
+      std::make_unique<tv::argos_pd_adaptor>(&tvp->population_dynamics,
+                                             this,
+                                             arena_map(),
+                                             tv_manager()->environ_dynamics(),
+                                             "fb",
+                                             "ffc",
+                                             rng());
 
+  m_tv_manager =
+      std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
   /*
-   * Register all controllers with temporal variance manager in order to be
-   * able to apply sensing/actuation variances if configured.
+   * Register all controllers with temporal variance manager in order to be able
+   * to apply environmental variances if configured. Note that we MUST use
+   * static ordering, because we use robot ID to create the mapping.
    */
   auto cb = [&](auto* c) {
-    m_tv_manager->register_controller(c->entity_id());
-    c->irv_init(m_tv_manager->irv_adaptor());
+    m_tv_manager->environ_dynamics()->register_controller(*c);
+    c->irv_init(m_tv_manager->environ_dynamics()->rda_adaptor());
   };
   swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
       this, cb, "foot-bot");
@@ -202,36 +176,24 @@ void base_loop_functions::oracle_init(
   }
 } /* oracle_init() */
 
-void base_loop_functions::rng_init(const rmath::config::rng_config* config) {
-  rmath::rngm::instance().register_type<rmath::rng>("loop");
-  if (nullptr == config || (nullptr != config && -1 == config->seed)) {
-    ER_INFO("Using time seeded RNG");
-    m_rng = rmath::rngm::instance().create(
-        "loop", std::chrono::system_clock::now().time_since_epoch().count());
-  } else {
-    ER_INFO("Using user seeded RNG");
-    m_rng = rmath::rngm::instance().create("loop", config->seed);
-  }
-} /* rng_init() */
-
 /*******************************************************************************
  * ARGoS Hooks
  ******************************************************************************/
-void base_loop_functions::PreStep(void) {
+void base_loop_functions::pre_step(void) {
   /*
    * Needs to be before robot controllers are run, so they run with the correct
    * throttling/are subjected to the correct penalties, etc.
    */
   if (nullptr != m_tv_manager) {
-    m_tv_manager->update();
+    m_tv_manager->update(rtypes::timestep(GetSpace().GetSimulationClock()));
   }
 
   if (nullptr != m_oracle_manager) {
     m_oracle_manager->update(arena_map());
   }
-} /* PreStep() */
+} /* pre_step() */
 
-void base_loop_functions::PostStep(void) {
+void base_loop_functions::post_step(void) {
   /*
    * Needs to be after robot controllers are run, because compute convergence
    * before that gives you the convergence status for the LAST timestep.
@@ -239,11 +201,11 @@ void base_loop_functions::PostStep(void) {
   if (nullptr != m_conv_calc) {
     m_conv_calc->update();
   }
-} /* PostStep() */
+} /* post_step() */
 
-void base_loop_functions::Reset(void) {
+void base_loop_functions::reset(void) {
   m_arena_map->distribute_all_blocks();
-} /* Reset() */
+} /* reset() */
 
 /*******************************************************************************
  * Metrics

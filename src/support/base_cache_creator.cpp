@@ -86,7 +86,7 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
        * helps to ensure fairness/better statistics for the simulations.
        */
       ER_DEBUG("Add block%d in from cache host cell@%s to block vector",
-               cell.block()->id(),
+               cell.block()->id().v(),
                cell.loc().to_str().c_str());
       blocks.insert(blocks.begin(), cell.block());
     }
@@ -108,12 +108,15 @@ std::unique_ptr<repr::arena_cache> base_cache_creator::create_single_cache(
 
   ds::block_vector block_vec(blocks.begin(), blocks.end());
   auto ret = std::make_unique<repr::arena_cache>(
-      repr::arena_cache::params{
-          mc_cache_dim, m_grid->resolution(), center, block_vec, -1},
+      repr::arena_cache::params{mc_cache_dim,
+                                m_grid->resolution(),
+                                center,
+                                block_vec,
+                                rtypes::constants::kNoUUID},
       light_type_index()[light_type_index::kCache]);
   ret->creation_ts(t);
   ER_INFO("Create cache%d@%s/%s, xspan=%s/%s,yspan=%s/%s with %zu blocks [%s]",
-          ret->id(),
+          ret->id().v(),
           ret->rloc().to_str().c_str(),
           ret->dloc().to_str().c_str(),
           ret->xspan().to_str().c_str(),
@@ -157,7 +160,7 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
           ER_ASSERT(cache->contains_point(
                         rmath::uvec2dvec(c, m_grid->resolution().v())),
                     "Cache%d does not contain point (%u, %u) within its extent",
-                    cache->id(),
+                    cache->id().v(),
                     i,
                     j);
           auto& cell = m_grid->access<arena_grid::kCell>(i, j);
@@ -202,10 +205,10 @@ bool base_cache_creator::creation_sanity_checks(
                  c1_yspan.overlaps_with(c2_yspan)),
                "Cache%d xspan=%s, yspan=%s overlaps cache%d "
                "xspan=%s,yspan=%s",
-               c1->id(),
+               c1->id().v(),
                c1_xspan.to_str().c_str(),
                c1_yspan.to_str().c_str(),
-               c2->id(),
+               c2->id().v(),
                c2_xspan.to_str().c_str(),
                c2_yspan.to_str().c_str());
     } /* for(&c2..) */
@@ -219,13 +222,13 @@ bool base_cache_creator::creation_sanity_checks(
         ER_CHECK(c1->blocks().end() == std::adjacent_find(c1->blocks().begin(),
                                                           c1->blocks().end()),
                  "Multiple blocks with the same ID in cache%d",
-                 c1->id());
+                 c1->id().v());
 
         ER_CHECK(!c2->contains_block(b),
                  "Block%d contained in both cache%d and cache%d",
-                 b->id(),
-                 c1->id(),
-                 c2->id());
+                 b->id().v(),
+                 c1->id().v(),
+                 c2->id().v());
       } /* for(&b..) */
     }   /* for(&c2..) */
 
@@ -235,10 +238,10 @@ bool base_cache_creator::creation_sanity_checks(
                  c1_yspan.overlaps_with(b->yspan())),
                "Cache%d xspan=%s, yspan=%s overlaps block%d "
                "xspan=%s,yspan=%s",
-               c1->id(),
+               c1->id().v(),
                c1_xspan.to_str().c_str(),
                c1_yspan.to_str().c_str(),
-               b->id(),
+               b->id().v(),
                b->xspan().to_str().c_str(),
                b->yspan().to_str().c_str());
     } /* for(&b..) */
@@ -251,7 +254,7 @@ bool base_cache_creator::creation_sanity_checks(
           !(cache->xspan().overlaps_with(cluster->xspan()) &&
             cache->yspan().overlaps_with(cluster->yspan())),
           "Cache%d xspan=%s, yspan=%s overlaps cluster w/xspan=%s,yspan=%s",
-          cache->id(),
+          cache->id().v(),
           cache->xspan().to_str().c_str(),
           cache->yspan().to_str().c_str(),
           cluster->xspan().to_str().c_str(),

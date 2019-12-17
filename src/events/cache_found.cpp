@@ -70,8 +70,8 @@ void cache_found::visit(ds::dpo_store& store) {
   for (auto&& b : store.blocks().const_values_range()) {
     if (m_cache->contains_point(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
-               b.ent()->id(),
-               m_cache->id());
+               b.ent()->id().v(),
+               m_cache->id().v());
       store.block_remove(b.ent_obj());
     }
   } /* while(it..) */
@@ -166,8 +166,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   for (auto&& b : map.blocks().const_values_range()) {
     if (m_cache->contains_point(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
-               b.ent()->id(),
-               m_cache->id());
+               b.ent()->id().v(),
+               m_cache->id().v());
       rms.push_back(&b.ent_obj());
     }
   } /* for(&&b..) */

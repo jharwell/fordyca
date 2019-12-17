@@ -63,7 +63,7 @@ struct swarm_iterator {
    * \tparam TOrdering \ref static_order or \ref dynamic_order.
    * \tparam TFunction Type of the lambda callback to use (inferred).
    *
-   * \param lf Handle to the \ref base_loop_functions.
+   * \param sm Handle to the \ref cpal::swarm_manager.
    * \param cb Function to run on each robot in the swarm.
    * \param entity_name Name associated with the robot type within ARGoS.
    */
@@ -72,10 +72,10 @@ struct swarm_iterator {
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             static_order::type>::value)>
-  static void controllers(const base_loop_functions* const lf,
+  static void controllers(const cpal::swarm_manager* const sm,
                           const TFunction& cb,
                           const std::string& entity_name) {
-    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType(entity_name)) {
+    for (auto& [name, robotp] : sm->GetSpace().GetEntitiesByType(entity_name)) {
       auto* robot = ::argos::any_cast<TRobotType*>(robotp);
       auto* controller = dynamic_cast<controller::base_controller*>(
           &robot->GetControllableEntity().GetController());
@@ -92,7 +92,7 @@ struct swarm_iterator {
    * \tparam TOrdering \ref static_order or \ref dynamic_order.
    * \tparam TFunction Type of the lambda callback (inferred).
    *
-   * \param lf Handle to the \ref base_loop_functions.
+   * \param sm Handle to the \ref cpal::swarm_manager.
    * \param cb Function to run on each robot in the swarm.
    * \param entity_name Name associated with the robot type within ARGoS.
    */
@@ -101,10 +101,10 @@ struct swarm_iterator {
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             dynamic_order::type>::value)>
-  static void controllers(const base_loop_functions* const lf,
+  static void controllers(const cpal::swarm_manager* const sm,
                           const TFunction& cb,
                           const std::string& entity_name) {
-    auto& ents = lf->GetSpace().GetEntitiesByType(entity_name);
+    auto& ents = sm->GetSpace().GetEntitiesByType(entity_name);
     std::vector<::argos::CAny> robots;
     robots.reserve(ents.size());
     for (auto& [name, robotp] : ents) {
@@ -128,7 +128,7 @@ struct swarm_iterator {
    * \tparam TOrdering \ref static_order or \ref dynamic_order.
    * \tparam TFunction Type of the lambda callback (inferred).
    *
-   * \param lf Handle to the \ref base_loop_functions.
+   * \param sm Handle to the \ref cpal::swarm_manager.
    * \param cb Function to run on each robot in the swarm.
    * \param entity_name Name associated with the robot type within ARGoS.
    */
@@ -137,10 +137,10 @@ struct swarm_iterator {
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             static_order::type>::value)>
-  static void robots(const base_loop_functions* const lf,
+  static void robots(const cpal::swarm_manager* const sm,
                      const TFunction& cb,
                      const std::string& entity_name) {
-    for (auto& [name, robotp] : lf->GetSpace().GetEntitiesByType(entity_name)) {
+    for (auto& [name, robotp] : sm->GetSpace().GetEntitiesByType(entity_name)) {
       auto* robot = ::argos::any_cast<TRobotType*>(robotp);
       cb(robot);
     } /* for(...) */
@@ -155,7 +155,7 @@ struct swarm_iterator {
    * \tparam TOrdering \ref static_order or \ref dynamic_order.
    * \tparam TFunction Type of the lambda callback (inferred).
    *
-   * \param lf Handle to the \ref base_loop_functions.
+   * \param sm Handle to the \ref cpal::swarm_manager.
    * \param cb Function to run on each robot in the swarm.
    * \param entity_name Name associated with the robot type within ARGoS.
    */
@@ -164,10 +164,10 @@ struct swarm_iterator {
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             dynamic_order::type>::value)>
-  static void robots(const base_loop_functions* const lf,
+  static void robots(const cpal::swarm_manager* const sm,
                      const TFunction& cb,
                      const std::string& entity_name) {
-    auto& ents = lf->GetSpace().GetEntitiesByType(entity_name);
+    auto& ents = sm->GetSpace().GetEntitiesByType(entity_name);
     std::vector<::argos::CAny> robots;
     robots.reserve(ents.size());
     for (auto& [name, robotp] : ents) {

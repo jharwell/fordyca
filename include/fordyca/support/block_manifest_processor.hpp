@@ -24,10 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <vector>
 
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/factory/factory.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/config/arena/block_manifest.hpp"
 #include "fordyca/ds/block_vector.hpp"
@@ -35,11 +37,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
-class base_block2D;
-}
-NS_START(support);
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Class Definitions
@@ -53,8 +51,10 @@ NS_START(support);
  * blocks.
  */
 class block_manifest_processor
-    : public rpfactory::
-          sharing_factory<crepr::base_block2D, const rmath::vector2d&, int> {
+    : public rpfactory::sharing_factory<crepr::base_block2D,
+                                        std::string, /* key type */
+                                        const rmath::vector2d&,
+                                        const rtypes::type_uuid&> {
  public:
   explicit block_manifest_processor(const config::arena::block_manifest* m);
 

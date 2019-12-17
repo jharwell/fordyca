@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -61,7 +62,8 @@ class block_acq_validator : public rer::client<block_acq_validator> {
   block_acq_validator(const block_acq_validator& v) = delete;
   block_acq_validator& operator=(const block_acq_validator& v) = delete;
 
-  bool operator()(const rmath::vector2d& loc, int id) const RCSW_PURE;
+  bool operator()(const rmath::vector2d& loc,
+                  const rtypes::type_uuid& id) const RCSW_PURE;
 
  private:
   /* clang-format off */

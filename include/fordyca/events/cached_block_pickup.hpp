@@ -28,6 +28,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/timestep.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
@@ -96,7 +97,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
 
   cached_block_pickup(support::base_loop_functions* loop,
                       const std::shared_ptr<repr::arena_cache>& cache,
-                      uint robot_index,
+                      const rtypes::type_uuid& robot_id,
                       const rtypes::timestep& t);
   ~cached_block_pickup(void) override = default;
 
@@ -147,7 +148,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
                                     controller::cache_sel_matrix* csel_matrix);
 
   /* clang-format off */
-  const uint                         mc_robot_index;
+  const rtypes::type_uuid          mc_robot_id;
   const rtypes::timestep             mc_timestep;
 
   support::base_loop_functions       *m_loop;

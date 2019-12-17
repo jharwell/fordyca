@@ -59,8 +59,8 @@ class arena_cache final : public base_cache,
   arena_cache(const base_cache::params& p, const rutils::color& light_color);
   ~arena_cache(void) override = default;
 
-  arena_cache(const arena_cache& other) = delete;
-  arena_cache& operator=(const arena_cache& other) = delete;
+  arena_cache(const arena_cache&) = delete;
+  arena_cache& operator=(const arena_cache&) = delete;
 
   /* metrics */
   size_t n_blocks(void) const override { return base_cache::n_blocks(); }

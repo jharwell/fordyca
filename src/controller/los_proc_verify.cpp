@@ -53,7 +53,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
       if (!cache.ent()->contains_point(block->rloc())) {
         ER_ASSERT(c_dpo->contains(block),
                   "Store does not contain block%d@%s",
-                  block->id(),
+                  block->id().v(),
                   block->dloc().to_str().c_str());
       }
     } /* for(&block..) */
@@ -70,21 +70,21 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
     auto exists = c_dpo->find(c1);
     ER_ASSERT(nullptr != exists,
               "LOS Cache%d@%s does not exist in DPO store",
-              c1->id(),
+              c1->id().v(),
               c1->dloc().to_str().c_str());
     ER_ASSERT(c1->dloc() == exists->ent()->dloc(),
               "LOS/DPO store disagree on cache%d location: %s/%s",
-              c1->id(),
+              c1->id().v(),
               c1->dloc().to_str().c_str(),
               exists->ent()->dloc().to_str().c_str());
     ER_ASSERT(c1->id() == exists->ent()->id(),
               "DPO store/LOS disagree on cache ID @%s: %d/%d",
               c1->dloc().to_str().c_str(),
-              exists->ent()->id(),
-              c1->id());
+              exists->ent()->id().v(),
+              c1->id().v());
     ER_ASSERT(c1->n_blocks() == exists->ent()->n_blocks(),
               "LOS/DPO store disagree on # of blocks in cache%d@%s: %zu/%zu",
-              c1->id(),
+              c1->id().v(),
               c1->dloc().to_str().c_str(),
               c1->n_blocks(),
               exists->ent()->n_blocks());
@@ -107,8 +107,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
     ER_ASSERT(cell.block()->id() == block->id(),
               "Cell@%s has wrong block ID (%d vs %d)",
               block->dloc().to_str().c_str(),
-              block->id(),
-              cell.block()->id());
+              block->id().v(),
+              cell.block()->id().v());
   } /* for(&block..) */
 
   /*
@@ -131,8 +131,8 @@ bool los_proc_verify::operator()(const ds::dpo_semantic_map* const c_map) const 
           ER_ASSERT(cell1.block()->id() == cell2.block()->id(),
                     "LOS/DPO map disagree on block id in cell@%s: %d/%d",
                     d.to_str().c_str(),
-                    cell1.block()->id(),
-                    cell2.block()->id());
+                    cell1.block()->id().v(),
+                    cell2.block()->id().v());
         }
       }
     } /* for(j..) */

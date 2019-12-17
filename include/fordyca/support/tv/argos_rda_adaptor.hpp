@@ -1,7 +1,7 @@
 /**
- * \file temporal_variance_metrics_collector.hpp
+ * \file argos_rda_adaptor.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,56 +18,52 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_TEMPORAL_VARIANCE_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_TEMPORAL_VARIANCE_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_SUPPORT_TV_ARGOS_RDA_ADAPTOR_HPP_
+#define INCLUDE_FORDYCA_SUPPORT_TV_ARGOS_RDA_ADAPTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
-#include <string>
+#include "rcppsw/er/client.hpp"
 
-#include "rcppsw/metrics/base_metrics_collector.hpp"
-
-#include "fordyca/fordyca.hpp"
+#include "cosm/tv/switchable_tv_generator.hpp"
+#include "cosm/tv/robot_dynamics_applicator.hpp"
+#include "cosm/cosm.hpp"
+#include "cosm/pal/swarm_manager.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, support, tv);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class temporal_variance_metrics_collector
- * \ingroup fordyca metrics blocks
+ * \class argos_rda_adaptor
+ * \ingroup fordyca support tv
  *
- * \brief Collector for \ref temporal_variance_metrics.
- *
- * Metrics are written out every timestep.
+ * \brief Adapts \ref ctv::robot_dynamics_applicator to work within the ARGoS
+ * simulator.
  */
-class temporal_variance_metrics_collector final
-    : public rmetrics::base_metrics_collector {
+class argos_rda_adaptor final : public rer::client<argos_rda_adaptor>,
+                                public ctv::robot_dynamics_applicator {
  public:
-  /**
-   * \param ofname The output file name.
-   */
-  explicit temporal_variance_metrics_collector(const std::string& ofname);
+  argos_rda_adaptor(const ctv::config::robot_dynamics_applicator_config* config,
+                 const cpal::swarm_manager* sm);
 
-  void collect(const rmetrics::base_metrics& metrics) override;
+  argos_rda_adaptor(const argos_rda_adaptor&) = delete;
+  const argos_rda_adaptor& operator=(const argos_rda_adaptor&) = delete;
+
+  void update(void) override;
+  double avg_motion_throttle(void) const override;
 
  private:
-  std::list<std::string> csv_header_cols(void) const override;
-  boost::optional<std::string> csv_line_build(void) override;
-
   /* clang-format off */
-  double           m_avg_motion_throttle{0.0};
-  rtypes::timestep m_env_block_manip{0};
-  rtypes::timestep m_env_cache_usage{0};
+  const cpal::swarm_manager* const mc_sm;
   /* clang-format on */
 };
 
-NS_END(metrics, fordyca);
+NS_END(tv, support, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_TEMPORAL_VARIANCE_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_SUPPORT_TV_ARGOS_RDA_ADAPTOR_HPP_ */

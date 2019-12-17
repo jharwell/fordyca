@@ -50,8 +50,8 @@ cache_acq_validator::cache_acq_validator(
  * Member Functions
  ******************************************************************************/
 bool cache_acq_validator::operator()(const rmath::vector2d& loc,
-                                     int id,
-                                     rtypes::timestep t) const {
+                                     const rtypes::type_uuid& id,
+                                     const rtypes::timestep& t) const {
   /*
    * We can't just lookup the cache by the location key we are passed directly,
    * as it is for a point somewhere *inside* the cache, and thus probably not at
@@ -65,12 +65,12 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
 
   if (range.end() == it) {
     ER_WARN("Cache%d near %s invalid for acquisition: no such cache",
-            id,
+            id.v(),
             loc.to_str().c_str());
     return false;
   } else if (!it->ent()->contains_point(loc)) {
     ER_WARN("Cache%d@%s invalid for acquisition: does not contain %s",
-            id,
+            id.v(),
             it->ent()->dloc().to_str().c_str(),
             loc.to_str().c_str());
     return false;
@@ -91,7 +91,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
     ER_WARN("Cache%d invalid for acquisition: policy=%s, %u < %u",
-            id,
+            id.v(),
             config.policy.c_str(),
             t.v(),
             config.timestep.v());
@@ -99,7 +99,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {
     ER_WARN("Cache%d invalid for acquisition: policy=%s, %zu < %u",
-            id,
+            id.v(),
             config.policy.c_str(),
             cache->n_blocks(),
             config.cache_size);

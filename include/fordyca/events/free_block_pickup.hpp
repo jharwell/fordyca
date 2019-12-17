@@ -28,6 +28,7 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/timestep.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
@@ -77,7 +78,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   using visit_typelist = visit_typelist_impl::value;
 
   free_block_pickup(const std::shared_ptr<crepr::base_block2D>& block,
-                    uint robot_index,
+                    const rtypes::type_uuid& robot_id,
                     const rtypes::timestep& t);
   ~free_block_pickup(void) override = default;
 
@@ -129,8 +130,8 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
   void dispatch_free_block_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  const rtypes::timestep            mc_timestep;
-  const uint                        mc_robot_index;
+  const rtypes::timestep               mc_timestep;
+  const rtypes::type_uuid            mc_robot_id;
 
   std::shared_ptr<crepr::base_block2D> m_block;
   /* clang-format on */

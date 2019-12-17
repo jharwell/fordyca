@@ -33,7 +33,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/interactor_status.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,13 +58,13 @@ class nest_block_drop_interactor
   nest_block_drop_interactor(ds::arena_map* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
                              argos::CFloorEntity* const floor,
-                             tv::tv_manager* tv_manager)
+                             tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.nest_block_drop_interactor"),
         m_floor(floor),
         m_metrics_agg(metrics_agg),
         m_map(map),
-        m_penalty_handler(
-            tv_manager->penalty_handler<T>(tv::block_op_src::ekNEST_DROP)) {}
+        m_penalty_handler(envd->penalty_handler(tv::block_op_src::ekNEST_DROP)) {
+  }
 
   /**
    * \brief Interactors should generally NOT be copy constructable/assignable,
@@ -76,8 +76,8 @@ class nest_block_drop_interactor
    * I think, and is not being interpreted as such).
    */
   nest_block_drop_interactor(const nest_block_drop_interactor& other) = default;
-  nest_block_drop_interactor& operator=(
-      const nest_block_drop_interactor& other) = delete;
+  nest_block_drop_interactor& operator=(const nest_block_drop_interactor&) =
+      delete;
 
   /**
    * \brief The actual handling function for the robot-arena nest block drop
@@ -128,7 +128,7 @@ class nest_block_drop_interactor
    * preconditions have been satisfied.
    */
   void perform_nest_block_drop(T& controller,
-                               const tv::temporal_penalty<T>& penalty,
+                               const tv::temporal_penalty& penalty,
                                rtypes::timestep t) {
     /*
      * We have to do this asynchronous to the rest of metric collection, because
@@ -168,7 +168,7 @@ class nest_block_drop_interactor
   argos::CFloorEntity* const               m_floor;
   depth0::depth0_metrics_aggregator* const m_metrics_agg;
   ds::arena_map* const                     m_map;
-  tv::block_op_penalty_handler<T>* const   m_penalty_handler;
+  tv::block_op_penalty_handler* const      m_penalty_handler;
   /* clang-format on */
 };
 

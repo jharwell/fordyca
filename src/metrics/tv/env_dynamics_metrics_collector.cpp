@@ -1,5 +1,5 @@
 /**
- * \file temporal_variance_metrics_collector.cpp
+ * \file env_dynamics_metrics_collector.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,54 +21,53 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
 
-#include "fordyca/metrics/temporal_variance_metrics.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, metrics);
+NS_START(fordyca, metrics, tv);
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-temporal_variance_metrics_collector::temporal_variance_metrics_collector(
+env_dynamics_metrics_collector::env_dynamics_metrics_collector(
     const std::string& ofname)
     : base_metrics_collector(ofname, 1) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::list<std::string> temporal_variance_metrics_collector::csv_header_cols(
+std::list<std::string> env_dynamics_metrics_collector::csv_header_cols(
     void) const {
   auto merged = dflt_csv_header_cols();
   auto cols = std::list<std::string>{
       /* clang-format off */
       "swarm_motion_throttle",
-      "env_block_manip",
-      "env_cache_usage"
+      "block_manip_penalty",
+      "cache_usage_penalty"
       /* clang-format on */
   };
   merged.splice(merged.end(), cols);
   return merged;
 } /* csv_header_cols() */
 
-boost::optional<std::string> temporal_variance_metrics_collector::csv_line_build(
-    void) {
+boost::optional<std::string> env_dynamics_metrics_collector::csv_line_build(void) {
   std::string line;
-  line += std::to_string(m_avg_motion_throttle) + separator();
-  line += std::to_string(m_env_block_manip.v()) + separator();
-  line += std::to_string(m_env_cache_usage.v());
+  line += rcppsw::to_string(m_avg_motion_throttle) + separator();
+  line += rcppsw::to_string(m_block_manip_penalty) + separator();
+  line += rcppsw::to_string(m_cache_usage_penalty);
   return boost::make_optional(line);
 } /* csv_line_build() */
 
-void temporal_variance_metrics_collector::collect(
+void env_dynamics_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
-  auto& m = dynamic_cast<const temporal_variance_metrics&>(metrics);
+  auto& m = dynamic_cast<const env_dynamics_metrics&>(metrics);
   m_avg_motion_throttle = m.avg_motion_throttle();
-  m_env_block_manip = m.env_block_manipulation();
-  m_env_cache_usage = m.env_cache_usage();
+  m_block_manip_penalty = m.block_manip_penalty();
+  m_cache_usage_penalty = m.cache_usage_penalty();
 } /* collect() */
 
-NS_END(metrics, fordyca);
+NS_END(tv, metrics, fordyca);

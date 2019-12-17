@@ -197,7 +197,7 @@ class arena_map final : public rer::client<arena_map>,
    * \return The ID of the block that the robot is on, or -1 if the robot is not
    * actually on a block.
    */
-  int robot_on_block(const rmath::vector2d& pos) const RCSW_PURE;
+  rtypes::type_uuid robot_on_block(const rmath::vector2d& pos) const RCSW_PURE;
 
   /**
    * \brief Determine if a robot is currently on top of a cache (i.e. if the
@@ -214,7 +214,7 @@ class arena_map final : public rer::client<arena_map>,
    * \return The ID of the cache that the robot is on, or -1 if the robot is not
    * actually on a cache.
    */
-  int robot_on_cache(const rmath::vector2d& pos) const RCSW_PURE;
+  rtypes::type_uuid robot_on_cache(const rmath::vector2d& pos) const RCSW_PURE;
 
   /**
    * \brief Get the subgrid for use in calculating a robot's LOS.

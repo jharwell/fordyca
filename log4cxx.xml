@@ -26,7 +26,7 @@
     <priority value ="info" />
   </category>
   <category name="cosm.robots.footbot" >
-    <priority value ="debug" />
+    <priority value ="info" />
   </category>
   <category name="fordyca.controller" >
     <priority value ="info" />

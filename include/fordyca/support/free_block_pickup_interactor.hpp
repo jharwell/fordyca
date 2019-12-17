@@ -33,7 +33,7 @@
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/support/interactor_status.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
@@ -58,12 +58,12 @@ class free_block_pickup_interactor
  public:
   free_block_pickup_interactor(ds::arena_map* const map,
                                argos::CFloorEntity* const floor,
-                               tv::tv_manager* tv_manager)
+                               tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
         m_floor(floor),
         m_map(map),
         m_penalty_handler(
-            tv_manager->penalty_handler<T>(tv::block_op_src::ekFREE_PICKUP)) {}
+            envd->penalty_handler(tv::block_op_src::ekFREE_PICKUP)) {}
 
   /**
    * \brief Interactors should generally NOT be copy constructable/assignable,
@@ -76,8 +76,8 @@ class free_block_pickup_interactor
    */
   free_block_pickup_interactor(const free_block_pickup_interactor& other) =
       default;
-  free_block_pickup_interactor& operator=(
-      const free_block_pickup_interactor& other) = delete;
+  free_block_pickup_interactor& operator=(const free_block_pickup_interactor&) =
+      delete;
 
   /**
    * \brief The actual handlipng function for the free block pickup arena-robot
@@ -114,7 +114,7 @@ class free_block_pickup_interactor
               "Controller not serving pickup penalty");
     ER_ASSERT(!controller.is_carrying_block(),
               "Controller is already carrying block%d",
-              controller.block()->id());
+              controller.block()->id().v());
     /*
      * More than 1 robot can pick up a block in a timestep, so we have to
      * search for this robot's controller.
@@ -150,7 +150,7 @@ class free_block_pickup_interactor
     if (p.id() != utils::robot_on_block(controller, *m_map)) {
       ER_WARN("%s cannot pickup block%d: No such block",
               controller.GetId().c_str(),
-              m_penalty_handler->penalty_find(controller)->id());
+              m_penalty_handler->penalty_find(controller)->id().v());
       events::block_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
@@ -170,7 +170,7 @@ class free_block_pickup_interactor
    * preconditions have been satisfied.
    */
   void perform_free_block_pickup(T& controller,
-                                 const tv::temporal_penalty<T>& penalty,
+                                 const tv::temporal_penalty& penalty,
                                  rtypes::timestep t) {
     /* Holding block mutex not necessary here, but does not hurt */
     auto it =
@@ -179,10 +179,10 @@ class free_block_pickup_interactor
                      [&](const auto& b) { return b->id() == penalty.id(); });
     ER_ASSERT(it != m_map->blocks().end(),
               "Block%d from penalty does not exist",
-              penalty.id());
+              penalty.id().v());
     ER_ASSERT(!(*it)->is_out_of_sight(),
               "Attempt to pick up out of sight block%d",
-              (*it)->id());
+              (*it)->id().v());
     /*
      * Penalty served needs to be set here rather than in the free block pickup
      * event, because the penalty is generic, and the event handles concrete
@@ -207,9 +207,9 @@ class free_block_pickup_interactor
   }
 
   /* clang-format off */
-  argos::CFloorEntity*const              m_floor;
-  ds::arena_map* const                   m_map;
-  tv::block_op_penalty_handler<T>* const m_penalty_handler;
+  argos::CFloorEntity*const           m_floor;
+  ds::arena_map* const                m_map;
+  tv::block_op_penalty_handler* const m_penalty_handler;
   /* clang-format on */
 };
 

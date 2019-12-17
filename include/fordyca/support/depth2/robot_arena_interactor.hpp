@@ -26,12 +26,13 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/cache_site_block_drop_interactor.hpp"
 #include "fordyca/support/depth2/new_cache_block_drop_interactor.hpp"
-#include "fordyca/support/task_abort_interactor.hpp"
 #include "fordyca/support/cached_block_pickup_interactor.hpp"
 #include "fordyca/support/existing_cache_block_drop_interactor.hpp"
 #include "fordyca/support/free_block_pickup_interactor.hpp"
 #include "fordyca/support/nest_block_drop_interactor.hpp"
 #include "fordyca/support/interactor_status.hpp"
+#include "fordyca/tasks/task_status.hpp"
+#include "fordyca/support/task_abort_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,6 +57,7 @@ class dynamic_cache_manager;
  * - Dropping a carried block in the nest.
  * - Free block drop due to task abort.
  * - Creating a new cache.
+ * - Task abort.
  */
 template <typename T>
 class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
@@ -66,29 +68,28 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
     ds::arena_map* const map;
     depth0::depth0_metrics_aggregator *const metrics_agg;
     argos::CFloorEntity* const floor;
-    tv::tv_manager* const tv_manager;
+    tv::env_dynamics* const envd;
     dynamic_cache_manager* cache_manager;
     base_loop_functions* loop;
   };
   explicit robot_arena_interactor(const params& p)
       : ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
-        m_tv_manager(p.tv_manager),
-        m_free_pickup_interactor(p.map, p.floor, p.tv_manager),
-        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.tv_manager),
-        m_task_abort_interactor(p.map, p.floor),
+        m_free_pickup_interactor(p.map, p.floor, p.envd),
+        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.envd),
+        m_task_abort_interactor(p.map, p.envd, p.floor),
         m_cached_pickup_interactor(p.map,
                                    p.floor,
-                                   p.tv_manager,
+                                   p.envd,
                                    p.cache_manager,
                                    p.loop),
-        m_existing_cache_drop_interactor(p.map, p.tv_manager),
+        m_existing_cache_drop_interactor(p.map, p.envd),
         m_cache_site_drop_interactor(p.map,
                                      p.floor,
-                                     p.tv_manager,
+                                     p.envd,
                                      p.cache_manager),
         m_new_cache_drop_interactor(p.map,
                                     p.floor,
-                                    p.tv_manager,
+                                    p.envd,
                                     p.cache_manager) {}
 
   /**
@@ -102,7 +103,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    */
   robot_arena_interactor(const robot_arena_interactor& other) = default;
   robot_arena_interactor& operator=(
-      const robot_arena_interactor& other) = delete;
+      const robot_arena_interactor&) = delete;
 
 
   /**
@@ -112,8 +113,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * \param t The current timestep.
    */
   interactor_status operator()(T& controller, const rtypes::timestep& t) {
-    if (m_task_abort_interactor(controller,
-                                m_tv_manager->template all_penalty_handlers<T>())) {
+    if (m_task_abort_interactor(controller)) {
       /*
        * This needs to be here, rather than in each robot's control step
        * function, in order to avoid triggering erroneous handling of an aborted
@@ -140,8 +140,6 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
 
  private:
   /* clang-format off */
-  tv::tv_manager* const                   m_tv_manager;
-
   free_block_pickup_interactor<T>         m_free_pickup_interactor;
   nest_block_drop_interactor<T>           m_nest_drop_interactor;
   task_abort_interactor<T>                m_task_abort_interactor;

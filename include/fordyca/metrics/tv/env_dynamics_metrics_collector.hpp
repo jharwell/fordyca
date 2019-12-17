@@ -1,7 +1,7 @@
 /**
- * \file irv_lf_adaptor.hpp
+ * \file env_dynamics_metrics_collector.hpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,54 +18,56 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TV_IRV_LF_ADAPTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TV_IRV_LF_ADAPTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/er/client.hpp"
+#include <list>
+#include <string>
 
-#include "cosm/tv/switchable_tv_generator.hpp"
-#include "cosm/tv/swarm_irv_manager.hpp"
-#include "cosm/cosm.hpp"
+#include "rcppsw/metrics/base_metrics_collector.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
- * Namespaces/Decls
+ * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support);
-
-class base_loop_functions;
-
-NS_START(tv);
+NS_START(fordyca, metrics, tv);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class irv_lf_adaptor
- * \ingroup fordyca support tv
+ * \class env_dynamics_metrics_collector
+ * \ingroup metrics blocks
  *
- * \brief Adapts \ref ctv::swarm_irv_manager to work within the ARGoS simulator.
+ * \brief Collector for \ref env_dynamics_metrics.
+ *
+ * Metrics are written out every timestep.
  */
-class irv_lf_adaptor final : public rer::client<irv_lf_adaptor>,
-                             public ctv::swarm_irv_manager {
+class env_dynamics_metrics_collector final
+    : public rmetrics::base_metrics_collector {
  public:
-  irv_lf_adaptor(const ctv::config::swarm_irv_manager_config* config,
-                const support::base_loop_functions* lf);
+  /**
+   * \param ofname The output file name.
+   */
+  explicit env_dynamics_metrics_collector(const std::string& ofname);
 
-  irv_lf_adaptor(const irv_lf_adaptor& other) = delete;
-  const irv_lf_adaptor& operator=(const irv_lf_adaptor& other) = delete;
-
-  void update(void) override;
-  double avg_motion_throttle(void) const override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
+  std::list<std::string> csv_header_cols(void) const override;
+  boost::optional<std::string> csv_line_build(void) override;
+
   /* clang-format off */
-  const support::base_loop_functions* const mc_lf;
+  double           m_avg_motion_throttle{0.0};
+  rtypes::timestep m_block_manip_penalty{0};
+  rtypes::timestep m_cache_usage_penalty{0};
   /* clang-format on */
 };
 
-NS_END(tv, support, fordyca);
+NS_END(tv, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_TV_IRV_LF_ADAPTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_TV_ENV_DYNAMICS_METRICS_COLLECTOR_HPP_ */

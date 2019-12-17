@@ -28,8 +28,9 @@
 #include <memory>
 
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "rcppsw/control/config/xml/waveform_parser.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
+#include "cosm/tv/config/xml/population_dynamics_parser.hpp"
+#include "fordyca/config/tv/env_dynamics_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,10 +67,9 @@ class tv_manager_parser final : public rconfig::xml::xml_config_parser {
   }
 
   /* clang-format off */
-  std::unique_ptr<config_type>      m_config{nullptr};
-  rct::config::xml::waveform_parser m_block_manip{};
-  rct::config::xml::waveform_parser m_block_carry{};
-  rct::config::xml::waveform_parser m_cache_usage{};
+  std::unique_ptr<config_type>                 m_config{nullptr};
+  ctv::config::xml::population_dynamics_parser m_popd{};
+  env_dynamics_parser                          m_envd{};
   /* clang-format on */
 };
 

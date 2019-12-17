@@ -103,7 +103,7 @@ bool cache_block_drop::dispatch_d2_cache_interactor(
 
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
     ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
-            m_cache->id(),
+            m_cache->id().v(),
             m_cache->rloc().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
@@ -134,10 +134,10 @@ void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_block_drop::visit(ds::arena_map& map) {
-  ER_ASSERT(-1 != m_robot_block->robot_id(),
+  ER_ASSERT(rtypes::constants::kNoUUID != m_robot_block->robot_id(),
             "Undefined robot index for block%d",
-            m_robot_block->id());
-  RCSW_UNUSED int index = m_robot_block->robot_id();
+            m_robot_block->id().v());
+  RCSW_UNUSED rtypes::type_uuid robot_id = m_robot_block->robot_id();
 
   map.block_mtx().lock();
   /*
@@ -151,7 +151,7 @@ void cache_block_drop::visit(ds::arena_map& map) {
       });
   ER_ASSERT(map.blocks().end() != it,
             "Robot block%d not found in arena map blocks",
-            m_robot_block->id());
+            m_robot_block->id().v());
   m_arena_block = *it;
   visit(*m_arena_block);
   map.block_mtx().unlock();
@@ -169,9 +169,9 @@ void cache_block_drop::visit(ds::arena_map& map) {
   visit(map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()));
 
   ER_INFO("arena_map: fb%d dropped block%d in cache%d,total=[%s] (%zu)",
-          index,
-          m_arena_block->id(),
-          m_cache->id(),
+          robot_id.v(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           rcppsw::to_string(m_cache->blocks()).c_str(),
           m_cache->n_blocks());
 } /* visit() */
@@ -201,8 +201,8 @@ void cache_block_drop::visit(controller::depth1::bitd_dpo_controller& controller
   controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
@@ -220,8 +220,8 @@ void cache_block_drop::visit(
   controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
@@ -238,8 +238,8 @@ void cache_block_drop::visit(
   controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
@@ -257,8 +257,8 @@ void cache_block_drop::visit(
   controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
@@ -289,8 +289,8 @@ void cache_block_drop::visit(
   controller.block_manip_collator()->cache_drop_event(true);
   controller.block(nullptr);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
@@ -310,8 +310,8 @@ void cache_block_drop::visit(
   controller.block_manip_collator()->cache_drop_event(true);
   controller.block(nullptr);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
@@ -330,8 +330,8 @@ void cache_block_drop::visit(
   controller.block_manip_collator()->cache_drop_event(true);
   controller.block(nullptr);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
@@ -351,8 +351,8 @@ void cache_block_drop::visit(
   controller.block_manip_collator()->cache_drop_event(true);
   controller.block(nullptr);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_arena_block->id(),
-          m_cache->id(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
           dynamic_cast<rta::logical_task*>(controller.current_task())
               ->name()
               .c_str());

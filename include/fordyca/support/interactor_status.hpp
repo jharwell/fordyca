@@ -81,7 +81,7 @@ enum class interactor_status {
    * \brief The robot purposefully dropped a block somewhere in the arena to
    * finish a new cache, from \ref new_cache_block_drop_interactor.
    */
-  ekFREE_BLOCK_DROP = 1 << 6
+  ekFREE_BLOCK_DROP = 1 << 6,
 };
 
 NS_END(support, fordyca);

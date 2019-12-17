@@ -90,7 +90,7 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
                   std::get<0>(m_constraints)[0].cache_prox,
               "Cache site@%s too close to cache%d (%f <= %f)",
               site.to_str().c_str(),
-              c.ent()->id(),
+              c.ent()->id().v(),
               (c.ent()->rloc() - site).length(),
               std::get<0>(m_constraints)[0].cache_prox.v());
   } /* for(&c..) */
@@ -100,7 +100,7 @@ bool cache_site_selector::verify_site(const rmath::vector2d& site,
                   std::get<1>(m_constraints)[0].block_prox,
               "Cache site@%s too close to block%d (%f <= %f)",
               site.to_str().c_str(),
-              b.ent()->id(),
+              b.ent()->id().v(),
               (b.ent()->rloc() - site).length(),
               std::get<1>(m_constraints)[0].block_prox.v());
   } /* for(&b..) */

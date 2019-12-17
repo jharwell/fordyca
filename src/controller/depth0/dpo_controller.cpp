@@ -79,10 +79,11 @@ double dpo_controller::los_dim(void) const {
 
 void dpo_controller::control_step(void) {
   ndc_pusht();
-  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+  ER_ASSERT(!(nullptr != block() &&
+              rtypes::constants::kNoUUID == block()->robot_id()),
             "Carried block%d has robot id=%d",
-            block()->id(),
-            block()->robot_id());
+            block()->id().v(),
+            block()->robot_id().v());
 
   m_perception->update(nullptr);
   m_fsm->run();

@@ -71,10 +71,11 @@ void crw_controller::reset(void) {
 
 void crw_controller::control_step(void) {
   ndc_pusht();
-  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+  ER_ASSERT(!(nullptr != block() &&
+              rtypes::constants::kNoUUID == block()->robot_id()),
             "Carried block%d has robot id=%d",
-            block()->id(),
-            block()->robot_id());
+            block()->id().v(),
+            block()->robot_id().v());
   m_fsm->run();
   saa()->steer_force2D_apply();
   ndc_pop();

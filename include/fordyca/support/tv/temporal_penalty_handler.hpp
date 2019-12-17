@@ -55,11 +55,9 @@ NS_START(fordyca, support, tv);
  * Does not do much more than provide the penalty list, and functions for
  * manipulating it to derived classes.
  */
-template <typename T>
-class temporal_penalty_handler
-    : public rer::client<temporal_penalty_handler<T>> {
+class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
  public:
-  using const_iterator_type = typename std::list<temporal_penalty<T>>::const_iterator;
+  using const_iterator_type = typename std::list<temporal_penalty>::const_iterator;
 
   /**
    * \brief Initialize the penalty handler.
@@ -81,17 +79,17 @@ class temporal_penalty_handler
                                      delete;
 
 
+#if(LIBRA_ER == LIBRA_ER_ALL)
   /**
    * \brief Get the name of the penalty handler (for debugging)
    */
-#if(LIBRA_ER == LIBRA_ER_ALL)
   const std::string& name(void) const { return mc_name; }
 #endif
 
   /**
-   * \brief Get the next robot that will satisfy its penalty from the list.
+   * \brief Get the next penalty which will be satisfied from the list.
    */
-  temporal_penalty<T> penalty_next(void) const {
+  temporal_penalty penalty_next(void) const {
     std::scoped_lock lock(m_list_mtx);
     return m_penalty_list.front();
   }
@@ -105,8 +103,7 @@ class temporal_penalty_handler
    *             Should *ALWAYS* be \c TRUE if the function is called external
    *             to this class.
    */
-  void penalty_remove(const temporal_penalty<T>& victim,
-                      bool lock = true) {
+  void penalty_remove(const temporal_penalty& victim, bool lock = true) {
     maybe_lock(lock);
     m_penalty_list.remove(victim);
     maybe_unlock(lock);
@@ -120,16 +117,7 @@ class temporal_penalty_handler
    *
    * \param controller The robot to abort the penalty for.
    */
-  void penalty_abort(const T& controller) {
-    std::scoped_lock lock(m_list_mtx);
-    auto it = penalty_find(controller, false);
-    if (m_penalty_list.end() != it) {
-      penalty_remove(*it, false);
-    }
-    ER_INFO("fb%d", controller.entity_id());
-    ER_ASSERT(!is_serving_penalty(controller, false),
-              "Robot still serving penalty after abort?!");
-  }
+  void penalty_abort(const controller::base_controller& controller);
 
   /**
    * \brief Find the penalty object currently associated with the given
@@ -142,12 +130,12 @@ class temporal_penalty_handler
    *
    * \return Iterator pointing to the penalty, or end() if none was found.
    */
-  const_iterator_type penalty_find(const T& controller,
+  const_iterator_type penalty_find(const controller::base_controller& controller,
                                    bool lock = true) const {
     maybe_lock(lock);
     auto it = std::find_if(m_penalty_list.begin(),
                            m_penalty_list.end(),
-                           [&](const temporal_penalty<T>& p) {
+                           [&](const temporal_penalty& p) {
                              return p.controller() == &controller;
                            });
     maybe_unlock(lock);
@@ -162,7 +150,7 @@ class temporal_penalty_handler
    *             Should *ALWAYS* be \c TRUE if the function is called external
    *             to this class.
    */
-  RCSW_PURE bool is_serving_penalty(const T& controller,
+  RCSW_PURE bool is_serving_penalty(const controller::base_controller& controller,
                                     bool lock = true) const {
     maybe_lock(lock);
     auto it = penalty_find(controller, false);
@@ -183,7 +171,7 @@ class temporal_penalty_handler
    * \return \c TRUE If the robot is currently waiting AND it has satisfied its
    * penalty.
    */
-  RCSW_PURE bool is_penalty_satisfied(const T& controller,
+  RCSW_PURE bool is_penalty_satisfied(const controller::base_controller& controller,
                                       const rtypes::timestep& t) const {
     std::scoped_lock lock(m_list_mtx);
     auto it = penalty_find(controller, false);
@@ -193,11 +181,6 @@ class temporal_penalty_handler
     return false;
   }
 
- protected:
-  void penalty_add(const temporal_penalty<T>& penalty) {
-    std::scoped_lock lock(m_list_mtx);
-    m_penalty_list.push_back(penalty);
-  }
   /**
    * \brief Calculate the penalty for a robot to serve for the operation, given
    * the current timestep and the configured penalty waveform.
@@ -219,6 +202,12 @@ class temporal_penalty_handler
       penalty.set(static_cast<uint>(m_waveform->value(t.v())));
     }
     return penalty += (penalty == 0);
+  }
+
+ protected:
+  void penalty_add(const temporal_penalty& penalty) {
+    std::scoped_lock lock(m_list_mtx);
+    m_penalty_list.push_back(penalty);
   }
 
   /*
@@ -275,11 +264,12 @@ class temporal_penalty_handler
   /* clang-format off */
   const std::string              mc_name;
 
-  std::list<temporal_penalty<T>> m_penalty_list{};
+  std::list<temporal_penalty>    m_penalty_list{};
   mutable std::mutex             m_list_mtx{};
   std::unique_ptr<rct::waveform> m_waveform;
   /* clang-format on */
 };
+
 NS_END(tv, support, fordyca);
 
 #endif /* INCLUDE_FORDYCA_SUPPORT_TV_TEMPORAL_PENALTY_HANDLER_HPP_ */

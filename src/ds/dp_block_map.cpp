@@ -41,7 +41,8 @@ std::string dp_block_map::to_str(void) const {
                          range.end(),
                          std::string(),
                          [&](const std::string& a, const auto& b) {
-                           return a + "b" + std::to_string(b.ent()->id()) + ",";
+                           return a + "b" + rcppsw::to_string(b.ent()->id()) +
+                                  ",";
                          });
 } /* to_str() */
 

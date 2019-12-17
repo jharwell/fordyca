@@ -67,11 +67,11 @@ using repr::base_cache;
 cached_block_pickup::cached_block_pickup(
     support::base_loop_functions* loop,
     const std::shared_ptr<repr::arena_cache>& cache,
-    uint robot_index,
+    const rtypes::type_uuid& robot_id,
     const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
       cell_op(cache->dloc()),
-      mc_robot_index(robot_index),
+      mc_robot_id(robot_id),
       mc_timestep(t),
       m_loop(loop),
       m_real_cache(cache) {
@@ -95,8 +95,8 @@ void cached_block_pickup::dispatch_d1_cache_interactor(
       task_name.c_str());
   interactor->accept(*this);
   ER_INFO("Picked up block%d from cache%d,task='%s'",
-          m_pickup_block->id(),
-          m_real_cache->id(),
+          m_pickup_block->id().v(),
+          m_real_cache->id().v(),
           task_name.c_str());
 } /* dispatch_d1_cache_interactor() */
 
@@ -113,7 +113,7 @@ bool cached_block_pickup::dispatch_d2_cache_interactor(
 
   if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
     ER_INFO("Added cache%d@%s to drop exception list,task='%s'",
-            m_real_cache->id(),
+            m_real_cache->id().v(),
             m_real_cache->rloc().to_str().c_str(),
             polled->name().c_str());
     csel_matrix->sel_exception_add(
@@ -122,8 +122,8 @@ bool cached_block_pickup::dispatch_d2_cache_interactor(
   }
   interactor->accept(*this);
   ER_INFO("Picked up block%d from cache%d,task='%s'",
-          m_pickup_block->id(),
-          m_real_cache->id(),
+          m_pickup_block->id().v(),
+          m_real_cache->id().v(),
           polled->name().c_str());
   return ret;
 } /* dispatch_d2_cache_interactor() */
@@ -143,7 +143,7 @@ void cached_block_pickup::visit(ds::cell2D& cell) {
     cell.entity(m_orphan_block);
     ER_DEBUG("Cell@%s gets orphan block%d after cache depletion",
              cell.loc().to_str().c_str(),
-             m_orphan_block->id());
+             m_orphan_block->id().v());
   }
   visit(cell.fsm());
 } /* visit() */
@@ -157,20 +157,21 @@ void cached_block_pickup::visit(ds::arena_map& map) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
             "< %zu blocks in cache",
             base_cache::kMinBlocks);
-  int cache_id = m_real_cache->id();
-  ER_ASSERT(-1 != cache_id, "Cache ID undefined on block pickup");
+  rtypes::type_uuid cache_id = m_real_cache->id();
+  ER_ASSERT(rtypes::constants::kNoUUID != cache_id,
+            "Cache ID undefined on block pickup");
 
   rmath::vector2u cache_coord = m_real_cache->dloc();
   ER_ASSERT(cache_coord == cell_op::coord(),
             "Coordinates for cache%d%s/cell@%s do not agree",
-            cache_id,
+            cache_id.v(),
             cache_coord.to_str().c_str(),
             cell_op::coord().to_str().c_str());
 
   ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
             "Cache%d/cell@%s disagree on # of blocks: cache=%zu/cell=%zu",
-            m_real_cache->id(),
+            m_real_cache->id().v(),
             cell.loc().to_str().c_str(),
             m_real_cache->n_blocks(),
             cell.block_count());
@@ -202,9 +203,9 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
     ER_INFO(
         "arena_map: fb%u: block%d from cache%d@(%u, %u),remaining=[%s] (%zu)",
-        mc_robot_index,
-        m_pickup_block->id(),
-        cache_id,
+        mc_robot_id.v(),
+        m_pickup_block->id().v(),
+        cache_id.v(),
         cell_op::x(),
         cell_op::y(),
         rcppsw::to_string(m_real_cache->blocks()).c_str(),
@@ -238,9 +239,9 @@ void cached_block_pickup::visit(ds::arena_map& map) {
     map.cache_remove(m_real_cache, m_loop);
 
     ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [depleted]",
-            mc_robot_index,
-            m_pickup_block->id(),
-            cache_id,
+            mc_robot_id.v(),
+            m_pickup_block->id().v(),
+            cache_id.v(),
             cell_op::x(),
             cell_op::y());
   }
@@ -251,7 +252,7 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 void cached_block_pickup::visit(ds::dpo_store& store) {
   ER_ASSERT(store.contains(m_real_cache),
             "Cache%d@%s not in DPO store",
-            m_real_cache->id(),
+            m_real_cache->id().v(),
             m_real_cache->dloc().to_str().c_str());
 
   auto pcache = store.find(m_real_cache);
@@ -267,31 +268,31 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
    */
   if (!pcache->ent()->contains_block(m_pickup_block)) {
     ER_INFO("DPO cache%d@%s/%s does not contain pickup block%d",
-            pcache->ent()->id(),
+            pcache->ent()->id().v(),
             pcache->ent()->rloc().to_str().c_str(),
             pcache->ent()->dloc().to_str().c_str(),
-            m_pickup_block->id());
+            m_pickup_block->id().v());
     return;
   }
 
   if (pcache->ent()->n_blocks() > base_cache::kMinBlocks) {
     pcache->ent_obj()->block_remove(m_pickup_block);
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
-            mc_robot_index,
-            m_pickup_block->id(),
-            pcache->ent()->id(),
+            mc_robot_id.v(),
+            m_pickup_block->id().v(),
+            pcache->ent()->id().v(),
             cell_op::coord().to_str().c_str(),
             rcppsw::to_string(pcache->ent()->blocks()).c_str(),
             pcache->ent()->n_blocks());
 
   } else {
-    RCSW_UNUSED int id = pcache->ent()->id();
+    RCSW_UNUSED rtypes::type_uuid id = pcache->ent()->id();
     pcache->ent_obj()->block_remove(m_pickup_block);
     store.cache_remove(pcache->ent_obj());
     ER_INFO("DPO Store: fb%u: block%d from cache%d@%s [depleted]",
-            mc_robot_index,
-            m_pickup_block->id(),
-            id,
+            mc_robot_id.v(),
+            m_pickup_block->id().v(),
+            id.v(),
             cell_op::coord().to_str().c_str());
   }
 } /* visit() */
@@ -307,10 +308,10 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
 
   ER_ASSERT(cell.cache()->contains_block(m_pickup_block),
             "Perceived cache%d@%s/%s does not contain pickup block%d",
-            cell.cache()->id(),
+            cell.cache()->id().v(),
             cell.cache()->rloc().to_str().c_str(),
             cell.cache()->dloc().to_str().c_str(),
-            m_pickup_block->id());
+            m_pickup_block->id().v());
 
   if (cell.cache()->n_blocks() > base_cache::kMinBlocks) {
     cell.cache()->block_remove(m_pickup_block);
@@ -320,22 +321,22 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
               cell_op::coord().to_str().c_str());
 
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
-            mc_robot_index,
-            m_pickup_block->id(),
-            cell.cache()->id(),
+            mc_robot_id.v(),
+            m_pickup_block->id().v(),
+            cell.cache()->id().v(),
             cell_op::coord().to_str().c_str(),
             rcppsw::to_string(cell.cache()->blocks()).c_str(),
             cell.cache()->n_blocks());
 
   } else {
-    RCSW_UNUSED int id = cell.cache()->id();
+    RCSW_UNUSED rtypes::type_uuid id = cell.cache()->id();
     cell.cache()->block_remove(m_pickup_block);
 
     map.cache_remove(cell.cache());
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s [depleted]",
-            mc_robot_index,
-            m_pickup_block->id(),
-            id,
+            mc_robot_id.v(),
+            m_pickup_block->id().v(),
+            id.v(),
             cell_op::coord().to_str().c_str());
   }
 } /* visit() */
@@ -348,11 +349,11 @@ void cached_block_pickup::visit(support::base_cache_manager& manager) {
 } /* visit() */
 
 void cached_block_pickup::visit(crepr::base_block2D& block) {
-  ER_ASSERT(-1 != block.id(), "Unamed block");
-  block.robot_pickup_event(mc_robot_index);
+  ER_ASSERT(rtypes::constants::kNoUUID != block.id(), "Unamed block");
+  block.robot_pickup_event(mc_robot_id);
   block.first_pickup_time(mc_timestep);
 
-  ER_INFO("Block%d is now carried by fb%u", block.id(), mc_robot_index);
+  ER_INFO("Block%d is now carried by fb%u", block.id().v(), mc_robot_id.v());
 } /* visit() */
 
 void cached_block_pickup::visit(
@@ -362,7 +363,7 @@ void cached_block_pickup::visit(
   visit(*controller.dpo_perception()->dpo_store());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);
@@ -378,7 +379,7 @@ void cached_block_pickup::visit(
   visit(*controller.mdpo_perception()->map());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);
@@ -394,7 +395,7 @@ void cached_block_pickup::visit(
   visit(*controller.dpo_perception()->dpo_store());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);
@@ -410,7 +411,7 @@ void cached_block_pickup::visit(
   visit(*controller.mdpo_perception()->map());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);
@@ -443,7 +444,7 @@ void cached_block_pickup::visit(
   visit(*controller.dpo_perception()->dpo_store());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);
@@ -463,7 +464,7 @@ void cached_block_pickup::visit(
   visit(*controller.mdpo_perception()->map());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);
@@ -481,7 +482,7 @@ void cached_block_pickup::visit(
   visit(*controller.dpo_perception()->dpo_store());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);
@@ -501,7 +502,7 @@ void cached_block_pickup::visit(
   visit(*controller.mdpo_perception()->map());
 
   auto robot_block = m_pickup_block->clone();
-  robot_block->robot_id(mc_robot_index);
+  robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->cache_pickup_event(true);

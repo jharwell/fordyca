@@ -32,8 +32,9 @@
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
 
-#include "cosm/controller/base_controller2D.hpp"
 #include "cosm/controller/irv_recipient_controller.hpp"
+#include "cosm/pal/argos_controller2D_adaptor.hpp"
+#include "cosm/pal/config/output_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,11 +47,12 @@ namespace cosm::steer2D::config {
 struct force_calculator_config;
 }
 namespace cosm::tv {
-class swarm_irv_manager;
+class robot_dynamics_applicator;
 }
 namespace cosm::repr {
 class base_block2D;
 }
+
 namespace rcppsw::math::config {
 struct rng_config;
 } // namespace rcppsw::math::config
@@ -60,9 +62,6 @@ NS_START(fordyca);
 namespace repr {
 class line_of_sight;
 } // namespace repr
-namespace config {
-struct output_config;
-} // namespace config
 
 NS_START(controller);
 class base_perception_subsystem;
@@ -80,24 +79,24 @@ class base_perception_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_controller : public ccontroller::base_controller2D,
+class base_controller : public cpal::argos_controller2D_adaptor,
                         public ccontroller::irv_recipient_controller,
                         rer::client<base_controller> {
  public:
   base_controller(void) RCSW_COLD;
   ~base_controller(void) override RCSW_COLD;
 
-  base_controller(const base_controller& other) = delete;
-  base_controller& operator=(const base_controller& other) = delete;
+  base_controller(const base_controller&) = delete;
+  base_controller& operator=(const base_controller&) = delete;
 
   /* base_controller2D overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void reset(void) override RCSW_COLD;
-  int entity_id(void) const override final;
+  rtypes::type_uuid entity_id(void) const override final;
 
-  /* irv_recipient_controller overrides */
+  /* rda_recipient_controller overrides */
   double applied_movement_throttle(void) const override final;
-  void irv_init(const ctv::swarm_irv_manager* irv_manager) override final;
+  void irv_init(const ctv::robot_dynamics_applicator* rda) override final;
 
   /**
    * \brief By default controllers have no perception subsystem, and are
@@ -170,11 +169,11 @@ class base_controller : public ccontroller::base_controller2D,
   void saa_init(
       const csubsystem::config::actuation_subsystem2D_config* actuation_p,
       const csubsystem::config::sensing_subsystem2D_config* sensing_p);
-  void output_init(const config::output_config* outputp);
+  void output_init(const cpconfig::output_config* outputp);
 
   /* clang-format off */
-  class block_manip_collator                        m_block_manip{};
-  std::unique_ptr<crepr::base_block2D>                 m_block;
+  class block_manip_collator           m_block_manip{};
+  std::unique_ptr<crepr::base_block2D> m_block;
   /* clang-format on */
 };
 

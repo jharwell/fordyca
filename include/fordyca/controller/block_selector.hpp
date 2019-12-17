@@ -53,8 +53,8 @@ class block_selector : public rer::client<block_selector> {
 
   ~block_selector(void) override = default;
 
-  block_selector& operator=(const block_selector& other) = delete;
-  block_selector(const block_selector& other) = delete;
+  block_selector& operator=(const block_selector&) = delete;
+  block_selector(const block_selector&) = delete;
   /**
    * \brief Given a list of blocks that a robot knows about (i.e. have not faded
    * into an unknown state), compute which is the "best", for use in deciding

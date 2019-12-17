@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
+
 #include "rcppsw/patterns/factory/factory.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
@@ -44,6 +46,7 @@ NS_START(fordyca, fsm, expstrat);
  */
 class cache_factory :
     public rpfactory::releasing_factory<foraging_expstrat,
+                                        std::string, /* key type */
                                         const foraging_expstrat::params*,
                                         rmath::rng*> {
  public:

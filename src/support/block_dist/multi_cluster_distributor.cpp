@@ -62,12 +62,12 @@ bool multi_cluster_distributor::distribute_block(
     auto* clust = dist.block_clusters().front();
     if (clust->capacity() == clust->block_count()) {
       ER_DEBUG("Block%d to cluster%u failed: capacity (%u) reached",
-               block->id(),
+               block->id().v(),
                idx,
                clust->capacity());
     } else {
       ER_DEBUG("Block%d to cluster%u: capacity=%u,size=%zu",
-               block->id(),
+               block->id().v(),
                idx,
                clust->capacity(),
                clust->block_count());

@@ -123,7 +123,7 @@ void mdpo_perception_subsystem::process_los_blocks(
           m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
         auto block = m_map->access<occupancy_grid::kCell>(d).block();
         ER_DEBUG("Correct block%d %s/%s discrepency",
-                 block->id(),
+                 block->id().v(),
                  block->rloc().to_str().c_str(),
                  block->dloc().to_str().c_str());
         m_map->block_remove(block);
@@ -139,23 +139,23 @@ void mdpo_perception_subsystem::process_los_blocks(
   for (auto& block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d out of sight in LOS?",
-              block->id());
+              block->id().v());
     auto& cell = m_map->access<occupancy_grid::kCell>(block->dloc());
     if (!cell.state_has_block()) {
       ER_INFO("Discovered block%d@%s/%s",
-              block->id(),
+              block->id().v(),
               block->rloc().to_str().c_str(),
               block->dloc().to_str().c_str());
     } else if (cell.state_has_block()) {
       ER_DEBUG("Block%d@%s/%s already known",
-               block->id(),
+               block->id().v(),
                block->rloc().to_str().c_str(),
                block->dloc().to_str().c_str());
       auto range = m_map->blocks().const_values_range();
       auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
         return b.ent()->id() == cell.block()->id();
       });
-      ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id());
+      ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }
     events::block_found_visitor op(block->clone());
     op.visit(*m_map);
@@ -189,7 +189,7 @@ void mdpo_perception_subsystem::process_los_caches(
           map()->access<occupancy_grid::kCell>(d).state_has_cache()) {
         auto cache = map()->access<occupancy_grid::kCell>(d).cache();
         ER_DEBUG("Correct cache%d@%s/%s discrepency",
-                 cache->id(),
+                 cache->id().v(),
                  cache->rloc().to_str().c_str(),
                  cache->dloc().to_str().c_str());
         map()->cache_remove(cache);
@@ -204,7 +204,7 @@ void mdpo_perception_subsystem::process_los_caches(
      * caches in the LOS, even if you already know about them.
      */
     ER_DEBUG("LOS: Cache%d@%s/%s: %zu blocks",
-             cache->id(),
+             cache->id().v(),
              cache->rloc().to_str().c_str(),
              cache->dloc().to_str().c_str(),
              cache->n_blocks());
@@ -212,14 +212,14 @@ void mdpo_perception_subsystem::process_los_caches(
 
     if (!cell.state_has_cache()) {
       ER_INFO("Discovered cache%d@%s/%s: %zu blocks",
-              cache->id(),
+              cache->id().v(),
               cache->rloc().to_str().c_str(),
               cache->dloc().to_str().c_str(),
               cache->n_blocks());
     } else if (cell.state_has_cache() &&
                cell.cache()->n_blocks() != cache->n_blocks()) {
       ER_INFO("Fixed cache%d@%s/%s block count: %zu -> %zu",
-              cache->id(),
+              cache->id().v(),
               cache->rloc().to_str().c_str(),
               cache->dloc().to_str().c_str(),
               cache->n_blocks(),

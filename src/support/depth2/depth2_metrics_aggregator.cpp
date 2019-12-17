@@ -33,7 +33,6 @@
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/ds/bi_tab.hpp"
 
-#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
@@ -64,9 +63,10 @@ using task2 = tasks::depth2::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth2_metrics_aggregator::depth2_metrics_aggregator(
-    const config::metrics_config* const mconfig,
+    const cpconfig::metrics_config* const mconfig,
+    const config::grid_config* const gconfig,
     const std::string& output_root)
-    : depth1_metrics_aggregator(mconfig, output_root),
+    : depth1_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
   metrics::collector_registerer::creatable_set creatable_set = {
       {typeid(rmetrics::tasks::bi_tab_metrics_collector),
@@ -97,7 +97,8 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
   /* Overwrite depth1; we have a deeper decomposition now */
   collector_remove("tasks::distribution");
 
-  metrics::collector_registerer registerer(mconfig, creatable_set, this, 2);
+  metrics::collector_registerer registerer(
+      mconfig, gconfig, creatable_set, this, 2);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
 
   reset_all();

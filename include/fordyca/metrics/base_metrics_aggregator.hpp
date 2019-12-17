@@ -31,8 +31,9 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
 
-#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/fordyca.hpp"
+
+#include "cosm/pal/config/metrics_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,6 +53,10 @@ class arena_map;
 namespace controller {
 class base_controller;
 } /* namespace controller */
+namespace config {
+struct grid_config;
+} /* namespace config */
+
 NS_START(metrics);
 
 /*******************************************************************************
@@ -68,7 +73,8 @@ NS_START(metrics);
 class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
                                 public rmetrics::collector_group {
  public:
-  base_metrics_aggregator(const config::metrics_config* mconfig,
+  base_metrics_aggregator(const cpconfig::metrics_config* mconfig,
+                          const config::grid_config* const gconfig,
                           const std::string& output_root);
   ~base_metrics_aggregator(void) override = default;
 

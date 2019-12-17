@@ -64,12 +64,12 @@ std::string entities_oracle::result_to_string(const variant_vector_type& v) {
   auto lambda = [&](const std::string& a, const auto& ent) {
     if (0 == ent.which()) {
       return a + "b" +
-             std::to_string(
+             rcppsw::to_string(
                  boost::get<std::shared_ptr<crepr::base_block2D>>(ent)->id()) +
              ",";
     } else if (1 == ent.which()) {
       return a + "c" +
-             std::to_string(
+             rcppsw::to_string(
                  boost::get<std::shared_ptr<repr::base_cache>>(ent)->id()) +
              ",";
     } else {

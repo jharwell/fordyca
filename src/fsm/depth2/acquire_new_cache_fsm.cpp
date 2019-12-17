@@ -62,11 +62,11 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
                   std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
                             this,
                             std::placeholders::_1),
-              .explore_term_cb = std::bind([](void) noexcept {
-                return false;
-              }), /* new caches never acquired via exploration */
+
+              /* new caches never acquired via exploration */
+              .explore_term_cb = std::bind([](void) noexcept { return false; }),
               .goal_valid_cb = [](const rmath::vector2d&,
-                                  uint) { return true; }}),
+                                  const rtypes::type_uuid&) { return true; }}),
       mc_matrix(c_params->csel_matrix),
       mc_store(c_params->store) {}
 
@@ -85,7 +85,7 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
   if (auto best = selector(
           mc_store->blocks(), mc_store->caches(), sensing()->position())) {
     ER_INFO("Select new cache%d@%s/%s,density=%f for acquisition",
-            best->ent()->id(),
+            best->ent()->id().v(),
             best->ent()->rloc().to_str().c_str(),
             best->ent()->dloc().to_str().c_str(),
             best->density().v());

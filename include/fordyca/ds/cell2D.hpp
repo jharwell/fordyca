@@ -62,7 +62,7 @@ class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
   cell2D(void);
 
   cell2D(const cell2D& other) = default;
-  cell2D& operator=(const cell2D& other) = delete;
+  cell2D& operator=(const cell2D&) = delete;
 
   bool operator==(const cell2D& other) const { return other.loc() == m_loc; }
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }

@@ -26,13 +26,9 @@
       <sensors>
         <differential_steering implementation="default" />
         <footbot_proximity implementation="default" show_rays="true">
-          <!-- <noise model="guassian" -->
-          <!--        noise_level="0.1" -->
-          <!--        mean="0.0" -->
-          <!--        stddev="0.1" -->
-          <!--        /> -->
         </footbot_proximity>
-        <footbot_light implementation="rot_z_only" show_rays="false" />
+        <footbot_light implementation="rot_z_only" show_rays="false">
+        </footbot_light>
         <footbot_motor_ground implementation="rot_z_only" />
         <range_and_bearing implementation="medium" medium="rab" />
         <colored_blob_omnidirectional_camera implementation="rot_z_only"
@@ -258,37 +254,44 @@
       <entities_oracle
           blocks="true"
           caches="true"/>
-      </oracle_manager>
-    <!-- <temporal_variance> -->
-    <!-- <blocks> -->
-    <!--   <manipulation_penalty> -->
-    <!--     <waveform -->
-    <!--         type="Null" -->
-    <!--         frequency="0.01" -->
-    <!--         amplitude="50" -->
-    <!--         offset="50" -->
-    <!--         phase="0"/> -->
-    <!--   </manipulation_penalty> -->
-    <!--   <carry_throttle> -->
-    <!--     <waveform -->
-    <!--         type="Sine" -->
-    <!--         frequency="0.004" -->
-    <!--         amplitude="0.4" -->
-    <!--         offset="0.4" -->
-    <!--         phase="0"/> -->
-    <!--   </carry_throttle> -->
-    <!-- </blocks> -->
-    <!-- <caches> -->
-    <!--   <usage_penalty> -->
-    <!--     <waveform -->
-    <!--         type="Null" -->
-    <!--         frequency="100" -->
-    <!--         amplitude="500" -->
-    <!--         offset="10" -->
-    <!--         phase="0"/> -->
-    <!--   </usage_penalty> -->
-    <!-- </caches> -->
-    <!-- </temporal_variance> -->
+    </oracle_manager>
+    <temporal_variance>
+      <env_dynamics>
+        <blocks>
+          <manipulation_penalty>
+            <waveform
+                type="Null"
+                frequency="0.01"
+                amplitude="50"
+                offset="50"
+                phase="0"/>
+          </manipulation_penalty>
+          <carry_throttle>
+            <waveform
+                type="Sine"
+                frequency="0.004"
+                amplitude="0.4"
+                offset="0.4"
+                phase="0"/>
+          </carry_throttle>
+        </blocks>
+        <caches>
+          <usage_penalty>
+            <waveform
+                type="Null"
+                frequency="100"
+                amplitude="500"
+                offset="10"
+                phase="0"/>
+          </usage_penalty>
+        </caches>
+      </env_dynamics>
+      <population_dynamics
+          birth_lambda="1.0"
+          death_lambda="1.0"
+          malfunction_lambda="1.0"
+          repair_mu="1.0"/>
+    </temporal_variance>
 
     <arena_map>
       <grid resolution="0.2"

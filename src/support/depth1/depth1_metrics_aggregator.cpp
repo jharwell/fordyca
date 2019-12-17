@@ -35,7 +35,6 @@
 #include "rcppsw/ta/bi_tdgraph_executive.hpp"
 #include "rcppsw/ta/ds/bi_tab.hpp"
 
-#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
 #include "fordyca/metrics/caches/location_metrics.hpp"
@@ -89,9 +88,10 @@ using task1 = tasks::depth1::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
-    const config::metrics_config* const mconfig,
+    const cpconfig::metrics_config* const mconfig,
+    const config::grid_config* const gconfig,
     const std::string& output_root)
-    : depth0_metrics_aggregator(mconfig, output_root),
+    : depth0_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   metrics::collector_registerer::creatable_set creatable_set = {
       {typeid(cfmetrics::goal_acq_metrics_collector),
@@ -130,7 +130,8 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       {typeid(metrics::caches::location_metrics_collector),
        "cache_locations",
        "caches::locations"}};
-  metrics::collector_registerer registerer(mconfig, creatable_set, this, 1);
+  metrics::collector_registerer registerer(
+      mconfig, gconfig, creatable_set, this, 1);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
 
   reset_all();

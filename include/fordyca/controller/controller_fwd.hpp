@@ -78,8 +78,7 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-namespace controller {
+NS_START(fordyca, controller);
 class base_controller;
 namespace depth0 {
 class crw_controller;
@@ -119,8 +118,19 @@ using d1d2_typelist = rmpl::typelist<DEPTH1_ORACULAR_CONTROLLER_TYPES,
                                      DEPTH1_NON_ORACULAR_CONTROLLER_TYPES,
                                      DEPTH2_ORACULAR_CONTROLLER_TYPES,
                                      DEPTH2_NON_ORACULAR_CONTROLLER_TYPES>;
-} // namespace controller
 
-NS_END(fordyca);
+template <typename T>
+using is_depth0 =
+    typename boost::mpl::contains<controller::depth0::typelist, T>::type;
+
+template <typename T>
+using is_depth1 =
+    typename boost::mpl::contains<controller::depth1::typelist, T>::type;
+
+template <typename T>
+using is_depth2 =
+    typename boost::mpl::contains<controller::depth2::typelist, T>::type;
+
+NS_END(controller, fordyca);
 
 #endif /* INCLUDE_FORDYCA_CONTROLLER_CONTROLLER_FWD_HPP_ */

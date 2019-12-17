@@ -25,13 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include <memory>
 #include <string>
 
-#include "rcppsw/config/xml/xml_config_parser.hpp"
-
-#include "fordyca/config/metrics_config.hpp"
-#include "fordyca/fordyca.hpp"
+#include "cosm/cosm.hpp"
+#include "cosm/pal/config/xml/metrics_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -45,39 +42,53 @@ NS_START(fordyca, config);
  * \class metrics_parser
  * \ingroup fordyca config
  *
- * \brief Parses XML parameters related to metric collection into
- * \ref metrics_config.
+ * \brief Parses XML parameters related to metric collection into \ref
+ * metrics_config (actually the parent class does this, this cass just fulfills
+ * a small interface).
  */
-class metrics_parser final : public rconfig::xml::xml_config_parser {
+class metrics_parser final : public cpconfig::xml::metrics_parser {
  public:
-  using config_type = metrics_config;
+  using config_type = metrics_parser::config_type;
 
   /**
    * \brief The XML attributes specifying supported metric collectors.
    */
-  static const std::list<std::string> xml_attr;
+  std::list<std::string> xml_attr(void) const override {
+    auto base = cpconfig::xml::metrics_parser::xml_attr();
+    std::list<std::string> ret = {
+        "cache_acq_counts",
+        "cache_acq_locs",
+        "cache_acq_explore_locs",
+        "cache_acq_vector_locs",
+        "cache_utilization",
+        "cache_lifecycle",
+        "cache_locations",
+        "cache_site_selection",
 
-  ~metrics_parser(void) override = default;
+        "task_execution_generalist",
+        "task_execution_collector",
+        "task_execution_harvester",
+        "task_execution_cache_starter",
+        "task_execution_cache_finisher",
+        "task_execution_cache_transferer",
+        "task_execution_cache_collector",
 
-  /**
-   * \brief The root tag that all loop functions relating to metrics parameters
-   * should lie under in the XML tree.
-   */
-  static constexpr char kXMLRoot[] = "metrics";
+        "task_tab_generalist",
+        "task_tab_harvester",
+        "task_tab_collector",
 
-  bool validate(void) const override RCSW_ATTR(pure, cold);
-  void parse(const ticpp::Element& node) override;
+        "task_distribution",
 
-  std::string xml_root(void) const override { return kXMLRoot; }
+        "perception_mdpo",
+        "perception_dpo",
 
- private:
-  const rconfig::base_config* config_get_impl(void) const override {
-    return m_config.get();
-  }
-
-  /* clang-format off */
-  std::unique_ptr<config_type> m_config{nullptr};
-  /* clang-format on */
+        "tv_environment",
+    };
+    std::for_each(base.begin(), base.end(), [&](const auto& s) {
+      ret.push_back(s);
+    });
+    return ret;
+  };
 };
 
 NS_END(config, fordyca);

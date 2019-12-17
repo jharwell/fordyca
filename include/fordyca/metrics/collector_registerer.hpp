@@ -31,6 +31,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
+#include "fordyca/config/grid_config.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
 
@@ -144,14 +145,15 @@ class collector_registerer : public rer::client<collector_registerer> {
    * mapping collectors to run-time categories, so that this class is general
    * purpose and not tied to a specific input format.
    */
-  collector_registerer(const config::metrics_config* const config,
+  collector_registerer(const cpconfig::metrics_config* const config,
+                       const config::grid_config* const grid_config,
                        const creatable_set& create_set,
                        base_metrics_aggregator* const agg,
                        int decomposition_depth = -1)
       : ER_CLIENT_INIT("fordyca.metrics.collector_registerer"),
         mc_decomp_depth(decomposition_depth),
-        mc_arena_dim(rmath::dvec2uvec(config->arena_grid.upper,
-                                      config->arena_grid.resolution.v())),
+        mc_arena_dim(
+            rmath::dvec2uvec(grid_config->upper, grid_config->resolution.v())),
         mc_config(config),
         mc_create_set(create_set),
         m_agg(agg) {}
@@ -233,7 +235,7 @@ class collector_registerer : public rer::client<collector_registerer> {
    * if it is enabled, and "" otherwise.
    */
   std::string collector_fpath_create(
-      const config::metrics_config::enabled_map_type& enabled,
+      const cpconfig::metrics_config::enabled_map_type& enabled,
       const std::string& collector_name) const {
     auto it = enabled.find(collector_name);
     return (it == enabled.end()) ? std::string()
@@ -241,12 +243,12 @@ class collector_registerer : public rer::client<collector_registerer> {
   }
 
   /* clang-format off */
-  const int                           mc_decomp_depth;
-  const rmath::vector2u               mc_arena_dim;
-  const config::metrics_config* const mc_config;
-  const creatable_set                 mc_create_set;
+  const int                             mc_decomp_depth;
+  const rmath::vector2u                 mc_arena_dim;
+  const cpconfig::metrics_config* const mc_config;
+  const creatable_set                   mc_create_set;
 
-  base_metrics_aggregator* const      m_agg;
+  base_metrics_aggregator* const        m_agg;
   /* clang-format on */
 };
 

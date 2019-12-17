@@ -61,7 +61,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
   ~existing_cache_selector(void) override = default;
   existing_cache_selector& operator=(const existing_cache_selector& other) =
       delete;
-  existing_cache_selector(const existing_cache_selector& other) = delete;
+  existing_cache_selector(const existing_cache_selector&) = delete;
 
   /**
    * \brief Given a list of existing caches that a robot knows about (i.e. have
@@ -73,7 +73,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
   boost::optional<ds::dp_cache_map::value_type> operator()(
       const ds::dp_cache_map& existing_caches,
       const rmath::vector2d& position,
-      rtypes::timestep t);
+      const rtypes::timestep& t);
 
  private:
   /**

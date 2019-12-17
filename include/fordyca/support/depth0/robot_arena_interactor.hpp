@@ -41,10 +41,12 @@ NS_START(fordyca, support, depth0);
  * \class robot_arena_interactor
  * \ingroup fordyca support depth0
  *
- * \brief Handle's a robot's interactions with the environment on each timestep:
+ * \brief Handle's a robot's interactions with the environment on each timestep.
  *
- * - Picking up a free block (possibly with penalty).
- * - Dropping a carried block in the nest (possibly with a penalty).
+ * Including:
+ *
+ * - Picking up a free block.
+ * - Dropping a carried block in the nest.
  */
 template <typename T>
 class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
@@ -54,10 +56,10 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
   robot_arena_interactor(ds::arena_map* const map,
                          depth0_metrics_aggregator *const metrics_agg,
                          argos::CFloorEntity* const floor,
-                         tv::tv_manager* const tv_manager)
+                         tv::env_dynamics* const envd)
       : ER_CLIENT_INIT("fordyca.support.depth0.robot_arena_interactor"),
-        m_free_pickup_interactor(map, floor, tv_manager),
-        m_nest_drop_interactor(map, metrics_agg, floor, tv_manager) {}
+        m_free_pickup_interactor(map, floor, envd),
+        m_nest_drop_interactor(map, metrics_agg, floor, envd) {}
 
   /**
    * \brief Interactors should generally NOT be copy constructable/assignable,
@@ -68,8 +70,8 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * cannot get this to work (the default move constructor needs to be noexcept
    * I think, and is not being interpreted as such).
    */
-  robot_arena_interactor(const robot_arena_interactor& other) = default;
-  robot_arena_interactor& operator=(const robot_arena_interactor& other) = delete;
+  robot_arena_interactor(const robot_arena_interactor&) = default;
+  robot_arena_interactor& operator=(const robot_arena_interactor&) = delete;
 
   /**
    * \brief The actual handling function for the interactions.
@@ -77,8 +79,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
    * \param controller The controller to handle interactions for.
    * \param t The current timestep.
    */
-  template<typename C = T>
-  interactor_status operator()(C& controller, const rtypes::timestep& t) {
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
     if (controller.is_carrying_block()) {
       return m_nest_drop_interactor(controller, t);
     } else { /* The foot-bot has no block item */

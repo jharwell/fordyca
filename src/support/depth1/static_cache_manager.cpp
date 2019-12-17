@@ -148,7 +148,7 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
         /* don't have enough blocks yet */
         return (cache_i_blocks.size() < n_blocks) &&
                /* not carried by robot */
-               -1 == b->robot_id() &&
+               rtypes::constants::kNoUUID == b->robot_id() &&
                /* not already allocated for a different cache */
                allocated_blocks.end() == std::find(allocated_blocks.begin(),
                                                    allocated_blocks.end(),
@@ -187,17 +187,18 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
     std::for_each(cache_i_blocks.begin(),
                   cache_i_blocks.end(),
                   [&](const auto& b) {
-                    accum += "b" + std::to_string(b->id()) + "->fb" +
-                             std::to_string(b->robot_id()) + ",";
+                    accum += "b" + rcppsw::to_string(b->id()) + "->fb" +
+                             rcppsw::to_string(b->robot_id()) + ",";
                   });
     ER_TRACE("Cache i alloc_blocks carry statuses: [%s]", accum.c_str());
 
     accum = "";
-    std::for_each(
-        cache_i_blocks.begin(), cache_i_blocks.end(), [&](const auto& b) {
-          accum +=
-              "b" + std::to_string(b->id()) + "->" + b->dloc().to_str() + ",";
-        });
+    std::for_each(cache_i_blocks.begin(),
+                  cache_i_blocks.end(),
+                  [&](const auto& b) {
+                    accum += "b" + rcppsw::to_string(b->id()) + "->" +
+                             b->dloc().to_str() + ",";
+                  });
     ER_TRACE("Cache i alloc_blocks locs: [%s]", accum.c_str());
 
     ER_ASSERT(cache_i_blocks.size() - count < repr::base_cache::kMinBlocks,
@@ -239,7 +240,7 @@ void static_cache_manager::post_creation_blocks_absorb(
             true);
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);
-        ER_INFO("Hidden block%d added to cache%d", b->id(), c->id());
+        ER_INFO("Hidden block%d added to cache%d", b->id().v(), c->id().v());
       }
     } /* for(&c..) */
   }   /* for(&b..) */

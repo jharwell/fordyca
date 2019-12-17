@@ -45,10 +45,10 @@ base_cache::base_cache(const params& p)
       colored_entity(rutils::color::kGRAY40),
       mc_resolution(p.resolution),
       m_blocks(p.blocks) {
-  if (-1 == p.id) {
-    entity2D::id(m_next_id++);
+  if (rtypes::constants::kNoUUID == p.id) {
+    entity2D::id(rtypes::type_uuid(m_next_id++));
   } else {
-    entity2D::id(p.id);
+    entity2D::id(rtypes::type_uuid(p.id));
   }
 }
 

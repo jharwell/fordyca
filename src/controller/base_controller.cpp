@@ -31,17 +31,16 @@
 #include "rcppsw/math/rngm.hpp"
 
 #include "fordyca/config/base_controller_repository.hpp"
-#include "fordyca/config/output_config.hpp"
 #include "fordyca/config/saa_xml_names.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
 
+#include "cosm/pal/config/output_config.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
-#include "cosm/tv/swarm_irv_manager.hpp"
+#include "cosm/tv/robot_dynamics_applicator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -93,7 +92,7 @@ void base_controller::init(ticpp::Element& node) {
   base_controller2D::rng_init((nullptr == rngp) ? -1 : rngp->seed, "footbot");
 
   /* initialize output */
-  auto* outputp = repo.config_get<config::output_config>();
+  auto* outputp = repo.config_get<cpconfig::output_config>();
   base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
   /* initialize sensing and actuation (SAA) subsystem */
@@ -104,7 +103,7 @@ void base_controller::init(ticpp::Element& node) {
 
 void base_controller::reset(void) { m_block.reset(); } /* Reset() */
 
-void base_controller::output_init(const config::output_config* outputp) {
+void base_controller::output_init(const cpconfig::output_config* outputp) {
   std::string dir =
       base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
@@ -216,18 +215,18 @@ void base_controller::saa_init(
       sensors, actuators, &actuation_p->steering));
 } /* saa_init() */
 
-int base_controller::entity_id(void) const {
-  return std::atoi(GetId().c_str() + 2);
+rtypes::type_uuid base_controller::entity_id(void) const {
+  return rtypes::type_uuid(std::atoi(GetId().c_str() + 2));
 } /* entity_id() */
 
 double base_controller::applied_movement_throttle(void) const {
   return saa()->actuation()->governed_diff_drive()->applied_throttle();
 } /* applied_movement_throttle() */
 
-void base_controller::irv_init(const ctv::swarm_irv_manager* irv_manager) {
-  if (irv_manager->motion_throttling_enabled()) {
+void base_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
+  if (rda->motion_throttling_enabled()) {
     saa()->actuation()->governed_diff_drive()->tv_generator(
-        irv_manager->motion_throttling_handler(entity_id()));
+        rda->motion_throttler(entity_id()));
   }
 } /* irv_init() */
 

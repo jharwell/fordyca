@@ -66,8 +66,8 @@ class base_cache_manager : public metrics::caches::lifecycle_metrics,
       : ER_CLIENT_INIT("fordyca.support.cache_manager"), m_grid(arena_grid) {}
   ~base_cache_manager(void) override = default;
 
-  base_cache_manager(const base_cache_manager& other) = delete;
-  base_cache_manager& operator=(const base_cache_manager& other) = delete;
+  base_cache_manager(const base_cache_manager&) = delete;
+  base_cache_manager& operator=(const base_cache_manager&) = delete;
 
   /* cache lifecycle metrics */
   uint caches_created(void) const override final { return m_caches_created; }

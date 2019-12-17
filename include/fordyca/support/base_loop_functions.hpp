@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include <argos3/core/simulator/entity/floor_entity.h>
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 
@@ -41,6 +40,8 @@
 
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/fordyca.hpp"
+
+#include "cosm/pal/swarm_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +56,7 @@ struct convergence_config;
 NS_START(fordyca);
 
 namespace config {
-struct output_config;
+class loop_function_repository;
 namespace tv {
 struct tv_manager_config;
 }
@@ -90,7 +91,7 @@ class oracle_manager;
  * could not just be free functions because they require access to members in
  * the \ref argos::CLoopFunctions class.
  */
-class base_loop_functions : public argos::CLoopFunctions,
+class base_loop_functions : public cpal::swarm_manager,
                             public rer::client<base_loop_functions> {
  public:
   base_loop_functions(void) RCSW_COLD;
@@ -99,32 +100,25 @@ class base_loop_functions : public argos::CLoopFunctions,
   base_loop_functions(const base_loop_functions& s) = delete;
   base_loop_functions& operator=(const base_loop_functions& s) = delete;
 
-  /* CLoopFunctions overrides */
-  void Init(ticpp::Element&) override RCSW_COLD;
-  void Reset(void) override RCSW_COLD;
-  void PreStep(void) override;
-  void PostStep(void) override;
+  /* swarm manager noverrides */
+  void init(ticpp::Element&) override RCSW_COLD;
+  void reset(void) override RCSW_COLD;
+  void pre_step(void) override;
+  void post_step(void) override;
 
-  void ndc_push(void) {
-    ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
-  }
-  void ndc_pop(void) { ER_NDC_POP(); }
   const tv::tv_manager* tv_manager(void) const { return m_tv_manager.get(); }
   const cconvergence::convergence_calculator* conv_calculator(void) const {
     return m_conv_calc.get();
   }
+  const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
 
  protected:
-  argos::CFloorEntity* floor(void) const { return m_floor; }
-  const std::string& output_root(void) const { return m_output_root; }
+  tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
+  ds::arena_map* arena_map(void) { return m_arena_map.get(); }
   const config::loop_function_repository* config(void) const {
     return &m_config;
   }
-  tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
-
   config::loop_function_repository* config(void) { return &m_config; }
-  const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
-  ds::arena_map* arena_map(void) { return m_arena_map.get(); }
   cconvergence::convergence_calculator* conv_calculator(void) {
     return m_conv_calc.get();
   }
@@ -135,8 +129,6 @@ class base_loop_functions : public argos::CLoopFunctions,
     return m_oracle_manager.get();
   }
 
-  rmath::rng* rng(void) { return m_rng; }
-
  private:
   /**
    * \brief Initialize convergence calculations.
@@ -145,13 +137,6 @@ class base_loop_functions : public argos::CLoopFunctions,
    */
   void convergence_init(
       const cconvergence::config::convergence_config* config) RCSW_COLD;
-
-  /**
-   * \brief Initialize logging for all support/loop function code.
-   *
-   * \param output Parsed output parameters.
-   */
-  void output_init(const config::output_config* output) RCSW_COLD;
 
   /**
    * \brief Initialize the arena contents.
@@ -174,21 +159,12 @@ class base_loop_functions : public argos::CLoopFunctions,
    */
   void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
 
-  /**
-   * \brief Initialize random number generation for loop function use. Currently
-   * *NOT* shared between loop functions and robots.
-   */
-  void rng_init(const rmath::config::rng_config* config) RCSW_COLD;
-
   std::vector<double> calc_robot_nn(uint n_threads) const;
   std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;
   std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
 
   /* clang-format off */
-  argos::CFloorEntity*                                  m_floor{nullptr};
-  std::string                                           m_output_root{};
   config::loop_function_repository                      m_config{};
-  rmath::rng*                                           m_rng{nullptr};
   std::unique_ptr<ds::arena_map>                        m_arena_map;
   std::unique_ptr<tv::tv_manager>                       m_tv_manager;
   std::unique_ptr<cconvergence::convergence_calculator> m_conv_calc;

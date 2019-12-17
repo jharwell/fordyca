@@ -101,7 +101,7 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
                                 std::find(cblocks.begin(), cblocks.end(), b);
                        }) &&
            /* blocks cannot be carried by a robot */
-           -1 == b->robot_id();
+           rtypes::constants::kNoUUID == b->robot_id();
   };
   std::copy_if(blocks.begin(), blocks.end(), std::back_inserter(to_use), filter);
 
@@ -122,14 +122,15 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
 
     std::string accum;
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      accum += "b" + std::to_string(b->id()) + "->fb" +
-               std::to_string(b->robot_id()) + ",";
+      accum += "b" + rcppsw::to_string(b->id()) + "->fb" +
+               rcppsw::to_string(b->robot_id()) + ",";
     });
     ER_DEBUG("Block carry statuses: [%s]", accum.c_str());
 
     accum = "";
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
-      accum += "b" + std::to_string(b->id()) + "->" + b->dloc().to_str() + ",";
+      accum +=
+          "b" + rcppsw::to_string(b->id()) + "->" + b->dloc().to_str() + ",";
     });
     ER_DEBUG("Block locations: [%s]", accum.c_str());
 

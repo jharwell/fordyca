@@ -28,14 +28,13 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/config/metrics_parser.hpp"
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
-#include "fordyca/metrics/temporal_variance_metrics.hpp"
-#include "fordyca/metrics/temporal_variance_metrics_collector.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
@@ -75,7 +74,7 @@ using collector_typelist = rmpl::typelist<
     collector_registerer::type_wrap<blocks::manipulation_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::spatial_dist2D_pos_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::convergence_metrics_collector>,
-    collector_registerer::type_wrap<temporal_variance_metrics_collector> >;
+    collector_registerer::type_wrap<tv::env_dynamics_metrics_collector> >;
 
 NS_END(detail);
 
@@ -83,7 +82,8 @@ NS_END(detail);
  * Constructors/Destructors
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
-    const config::metrics_config* const mconfig,
+    const cpconfig::metrics_config* const mconfig,
+    const config::grid_config* const gconfig,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
       m_metrics_path(output_root + "/" + mconfig->output_dir) {
@@ -126,11 +126,11 @@ base_metrics_aggregator::base_metrics_aggregator(
       {typeid(cmetrics::convergence_metrics_collector),
        "swarm_convergence",
        "swarm::convergence"},
-      {typeid(temporal_variance_metrics_collector),
-       "loop_temporal_variance",
-       "loop::temporal_variance"}};
+      {typeid(tv::env_dynamics_metrics_collector),
+       "tv_environment",
+       "tv::environment"}};
 
-  collector_registerer registerer(mconfig, creatable_set, this);
+  collector_registerer registerer(mconfig, gconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
   reset_all();
 }
@@ -143,7 +143,7 @@ void base_metrics_aggregator::collect_from_loop(
   if (nullptr != loop->conv_calculator()) {
     collect("swarm::convergence", *loop->conv_calculator());
   }
-  collect("loop::temporal_variance", *loop->tv_manager());
+  collect("tv::environment", *loop->tv_manager()->environ_dynamics());
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(

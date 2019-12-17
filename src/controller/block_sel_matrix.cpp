@@ -38,19 +38,21 @@ block_sel_matrix::block_sel_matrix(
   this->insert(std::make_pair(kNestLoc, config->nest));
   this->insert(std::make_pair(kCubePriority, config->priorities.cube));
   this->insert(std::make_pair(kRampPriority, config->priorities.ramp));
-  this->insert(std::make_pair(kSelExceptions, std::vector<int>()));
+  this->insert(std::make_pair(kSelExceptions, std::vector<rtypes::type_uuid>()));
   this->insert(std::make_pair(kPickupPolicy, config->pickup_policy));
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void block_sel_matrix::sel_exception_add(int id) {
-  boost::get<std::vector<int>>(this->find(kSelExceptions)->second).push_back(id);
+void block_sel_matrix::sel_exception_add(const rtypes::type_uuid& id) {
+  boost::get<std::vector<rtypes::type_uuid>>(this->find(kSelExceptions)->second)
+      .push_back(id);
 } /* sel_exception_add() */
 
 void block_sel_matrix::sel_exceptions_clear(void) {
-  boost::get<std::vector<int>>(this->operator[](kSelExceptions)).clear();
+  boost::get<std::vector<rtypes::type_uuid>>(this->operator[](kSelExceptions))
+      .clear();
 } /* sel_exceptions_clear() */
 
 NS_END(controller, fordyca);

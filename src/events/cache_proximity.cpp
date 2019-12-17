@@ -68,7 +68,7 @@ void cache_proximity::dispatch_cache_interactor(
 void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
+  ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
   found.visit(*c.dpo_perception()->dpo_store());
@@ -81,7 +81,7 @@ void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
 void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
+  ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
   found.visit(*c.mdpo_perception()->map());
@@ -94,7 +94,7 @@ void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
 void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
+  ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
   found.visit(*c.dpo_perception()->dpo_store());
@@ -107,7 +107,7 @@ void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
 void cache_proximity::visit(controller::depth2::birtd_omdpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: cache%d proximity", m_cache->id());
+  ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
   events::cache_found_visitor found(m_cache);
   found.visit(*c.mdpo_perception()->map());

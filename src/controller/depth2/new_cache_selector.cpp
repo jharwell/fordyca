@@ -63,7 +63,7 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
     double utility = u.calc(position, c.density());
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
-             c.ent()->id(),
+             c.ent()->id().v(),
              best.ent()->rloc().to_str().c_str(),
              best.ent()->dloc().to_str().c_str(),
              c.density().v(),
@@ -77,7 +77,7 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
 
   if (nullptr != best.ent()) {
     ER_INFO("Best utility: new cache%d@%s/%s: %f",
-            best.ent()->id(),
+            best.ent()->id().v(),
             best.ent()->rloc().to_str().c_str(),
             best.ent()->dloc().to_str().c_str(),
             max_utility);
@@ -102,10 +102,10 @@ bool new_cache_selector::new_cache_is_excluded(
     if (cache_prox >= dist) {
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to cache%d@%s/%s (%f <= %f)",
-          new_cache->id(),
+          new_cache->id().v(),
           new_cache->rloc().to_str().c_str(),
           new_cache->dloc().to_str().c_str(),
-          ec.ent()->id(),
+          ec.ent()->id().v(),
           ec.ent()->rloc().to_str().c_str(),
           ec.ent()->dloc().to_str().c_str(),
           dist,
@@ -134,7 +134,7 @@ bool new_cache_selector::new_cache_is_excluded(
       ER_DEBUG(
           "Ignoring new cache%d@%s/%s: Too close to potential block "
           "cluster@%s/%s (%f <= %f)",
-          new_cache->id(),
+          new_cache->id().v(),
           new_cache->rloc().to_str().c_str(),
           new_cache->dloc().to_str().c_str(),
           b.ent()->rloc().to_str().c_str(),

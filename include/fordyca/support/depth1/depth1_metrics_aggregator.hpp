@@ -73,7 +73,8 @@ NS_START(support, depth1);
 class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
-  depth1_metrics_aggregator(const config::metrics_config* mconfig,
+  depth1_metrics_aggregator(const cpconfig::metrics_config* mconfig,
+                            const config::grid_config* const gconfig,
                             const std::string& output_root);
 
   /**

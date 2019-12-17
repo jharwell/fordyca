@@ -71,8 +71,8 @@ boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
   }
   std::string line;
 
-  line += std::to_string(m_stats.int_created) + separator();
-  line += std::to_string(m_stats.int_depleted) + separator();
+  line += rcppsw::to_string(m_stats.int_created) + separator();
+  line += rcppsw::to_string(m_stats.int_depleted) + separator();
   line += csv_entry_intavg(m_stats.int_created);
   line += csv_entry_intavg(m_stats.int_depleted);
   line += csv_entry_tsavg(m_stats.cum_created);

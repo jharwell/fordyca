@@ -76,7 +76,7 @@ class base_cache : public crepr::unicell_immovable_entity2D,
     rtypes::discretize_ratio resolution;
     rmath::vector2d          center;
     const ds::block_vector&  blocks;
-    int                      id;
+    rtypes::type_uuid      id;
     /* clang-format on */
   };
   /**

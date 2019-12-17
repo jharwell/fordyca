@@ -67,7 +67,7 @@ bool powerlaw_distributor::distribute_block(
     for (auto& dist : l.second) {
       ER_INFO(
           "Attempting distribution: block%d -> cluster [capacity=%u,count=%zu]",
-          block->id(),
+          block->id().v(),
           l.first,
           dist.block_clusters().front()->block_count());
 

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/type_uuid.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/cell_op.hpp"
@@ -65,7 +66,7 @@ class cache_vanished : public rer::client<cache_vanished> {
 
  public:
   using visit_typelist = visit_typelist_impl::value;
-  explicit cache_vanished(uint cache_id);
+  explicit cache_vanished(const rtypes::type_uuid& cache_id);
   ~cache_vanished(void) override = default;
 
   cache_vanished(const cache_vanished& op) = delete;
@@ -91,7 +92,8 @@ class cache_vanished : public rer::client<cache_vanished> {
  private:
   /* clang-format off */
   void dispatch_cache_interactor(tasks::base_foraging_task* task);
-  int m_cache_id;
+
+  const rtypes::type_uuid mc_cache_id;
   /* clang-format on */
 };
 

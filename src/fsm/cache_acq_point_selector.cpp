@@ -55,7 +55,7 @@ rmath::vector2d cache_acq_point_selector::operator()(
 
   ER_ASSERT(cache->contains_point(loc),
             "Cache%d@%s/%s with xspan=%s,yspan=%s does not contain %s",
-            cache->id(),
+            cache->id().v(),
             cache->rloc().to_str().c_str(),
             cache->dloc().to_str().c_str(),
             cache->xspan().to_str().c_str(),
@@ -63,7 +63,7 @@ rmath::vector2d cache_acq_point_selector::operator()(
             loc.to_str().c_str());
   ER_INFO("Point=%s in cache%d: robot_loc=%s,xrange=%s,yrange=%s",
           loc.to_str().c_str(),
-          cache->id(),
+          cache->id().v(),
           robot_loc.to_str().c_str(),
           xrange.to_str().c_str(),
           yrange.to_str().c_str());

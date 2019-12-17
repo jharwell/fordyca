@@ -31,7 +31,7 @@
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
@@ -54,11 +54,11 @@ class existing_cache_block_drop_interactor
     : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
   existing_cache_block_drop_interactor(ds::arena_map* const map_in,
-                                       tv::tv_manager* tv_manager)
+                                       tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
-        m_penalty_handler(tv_manager->penalty_handler<T>(
-            tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
+        m_penalty_handler(
+            envd->penalty_handler(tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
 
   /**
    * \brief Interactors should generally NOT be copy constructable/assignable,
@@ -72,7 +72,7 @@ class existing_cache_block_drop_interactor
   existing_cache_block_drop_interactor(
       const existing_cache_block_drop_interactor& other) = default;
   existing_cache_block_drop_interactor& operator=(
-      const existing_cache_block_drop_interactor& other) = delete;
+      const existing_cache_block_drop_interactor&) = delete;
 
   /**
    * \brief The actual handling function for interactions.
@@ -98,7 +98,7 @@ class existing_cache_block_drop_interactor
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    const tv::temporal_penalty<T>& p = m_penalty_handler->penalty_next();
+    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
@@ -140,12 +140,12 @@ class existing_cache_block_drop_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    int cache_id = utils::robot_on_cache(controller, *m_map);
+    auto cache_id = utils::robot_on_cache(controller, *m_map);
 
     if (p.id() != cache_id) {
       ER_WARN("%s cannot drop in cache%d: No such cache",
               controller.GetId().c_str(),
-              p.id());
+              p.id().v());
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
@@ -163,14 +163,14 @@ class existing_cache_block_drop_interactor
    * preconditions have been satisfied.
    */
   void perform_cache_block_drop(T& controller,
-                                const tv::temporal_penalty<T>& penalty) {
+                                const tv::temporal_penalty& penalty) {
     auto cache_it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == penalty.id(); });
     ER_ASSERT(cache_it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
-              penalty.id());
+              penalty.id().v());
 
     events::cache_block_drop_visitor drop_op(controller.block_release(),
                                              *cache_it,
@@ -190,8 +190,8 @@ class existing_cache_block_drop_interactor
   }
 
   /* clang-format off */
-  ds::arena_map* const                  m_map;
-  tv::cache_op_penalty_handler<T>*const m_penalty_handler;
+  ds::arena_map* const               m_map;
+  tv::cache_op_penalty_handler*const m_penalty_handler;
   /* clang-format on */
 };
 

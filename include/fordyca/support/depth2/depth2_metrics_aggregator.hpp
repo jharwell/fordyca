@@ -51,7 +51,8 @@ NS_START(fordyca, support, depth2);
 class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator,
                                   public rer::client<depth2_metrics_aggregator> {
  public:
-  depth2_metrics_aggregator(const config::metrics_config* mconfig,
+  depth2_metrics_aggregator(const cpconfig::metrics_config* mconfig,
+                            const config::grid_config* const gconfig,
                             const std::string& output_root);
 
   void task_start_cb(const rta::polled_task* task,

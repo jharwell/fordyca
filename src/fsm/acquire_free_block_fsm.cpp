@@ -124,7 +124,7 @@ bool acquire_free_block_fsm::candidates_exist(void) const {
 } /* candidates_exist() */
 
 bool acquire_free_block_fsm::block_acq_valid(const rmath::vector2d& loc,
-                                             uint id) const {
+                                             const rtypes::type_uuid& id) const {
   return block_acq_validator(&mc_store->blocks(), mc_matrix)(loc, id);
 } /* block_acq_valid() */
 

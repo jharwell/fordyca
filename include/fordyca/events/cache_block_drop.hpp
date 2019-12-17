@@ -160,10 +160,11 @@ class cache_block_drop : public rer::client<cache_block_drop>,
   bool dispatch_d2_cache_interactor(tasks::base_foraging_task* task,
                                     controller::cache_sel_matrix* csel_matrix);
 
-  const rtypes::discretize_ratio     mc_resolution;
-  std::unique_ptr<crepr::base_block2D>  m_robot_block;
-  std::shared_ptr<crepr::base_block2D>  m_arena_block;
-  std::shared_ptr<repr::arena_cache> m_cache;
+  const rtypes::discretize_ratio       mc_resolution;
+
+  std::unique_ptr<crepr::base_block2D> m_robot_block;
+  std::shared_ptr<crepr::base_block2D> m_arena_block;
+  std::shared_ptr<repr::arena_cache>   m_cache;
   /* clang-format on */
 };
 

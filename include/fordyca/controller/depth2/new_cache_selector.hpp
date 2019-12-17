@@ -55,8 +55,8 @@ class new_cache_selector: public rer::client<new_cache_selector> {
   explicit new_cache_selector(const controller::cache_sel_matrix* csel_matrix);
 
   ~new_cache_selector(void) override = default;
-  new_cache_selector& operator=(const new_cache_selector& other) = delete;
-  new_cache_selector(const new_cache_selector& other) = delete;
+  new_cache_selector& operator=(const new_cache_selector&) = delete;
+  new_cache_selector(const new_cache_selector&) = delete;
 
   /**
    * \brief Given a list of new caches that a robot knows about, compute which

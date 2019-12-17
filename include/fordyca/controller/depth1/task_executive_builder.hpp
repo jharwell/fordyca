@@ -78,8 +78,8 @@ class task_executive_builder : public rer::client<task_executive_builder> {
                       base_perception_subsystem* perception) RCSW_COLD;
 
   ~task_executive_builder(void) override RCSW_COLD;
-  task_executive_builder& operator=(const task_executive_builder& other) = delete;
-  task_executive_builder(const task_executive_builder& other) = delete;
+  task_executive_builder& operator=(const task_executive_builder&) = delete;
+  task_executive_builder(const task_executive_builder&) = delete;
 
   std::unique_ptr<rta::bi_tdgraph_executive>
   operator()(const config::depth1::controller_repository& config_repo,

@@ -46,15 +46,15 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_vanished::cache_vanished(uint cache_id)
-    : ER_CLIENT_INIT("fordyca.events.cache_vanished"), m_cache_id(cache_id) {}
+cache_vanished::cache_vanished(const rtypes::type_uuid& cache_id)
+    : ER_CLIENT_INIT("fordyca.events.cache_vanished"), mc_cache_id(cache_id) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 void cache_vanished::dispatch_cache_interactor(
     tasks::base_foraging_task* const task) {
-  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", m_cache_id);
+  ER_INFO("Abort pickup/drop from/in cache: cache%d vanished", mc_cache_id.v());
 
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
   ER_ASSERT(

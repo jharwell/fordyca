@@ -82,7 +82,7 @@ void dpo_semantic_map::decay_all(void) {
                   std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP block%d density disagree: %f vs %f",
               loc.to_str().c_str(),
-              b.ent()->id(),
+              b.ent()->id().v(),
               map_density.v(),
               b.density().v());
   } /* for(&b..) */
@@ -96,7 +96,7 @@ void dpo_semantic_map::decay_all(void) {
                   std::numeric_limits<double>::epsilon(),
               "FATAL: Map density@%s and DP cache%d density disagree: %f vs %f",
               loc.to_str().c_str(),
-              c.ent()->id(),
+              c.ent()->id().v(),
               map_density.v(),
               c.density().v());
   } /* for(&c..) */

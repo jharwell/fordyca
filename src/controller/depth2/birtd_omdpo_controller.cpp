@@ -50,10 +50,11 @@ birtd_omdpo_controller::~birtd_omdpo_controller(void) = default;
  ******************************************************************************/
 void birtd_omdpo_controller::control_step(void) {
   ndc_pusht();
-  ER_ASSERT(!(nullptr != block() && -1 == block()->robot_id()),
+  ER_ASSERT(!(nullptr != block() &&
+              rtypes::constants::kNoUUID == block()->robot_id()),
             "Carried block%d has robot id=%d",
-            block()->id(),
-            block()->robot_id());
+            block()->id().v(),
+            block()->robot_id().v());
   mdpo_perception()->update(m_receptor.get());
   saa()->steer_force2D_apply();
   executive()->run();

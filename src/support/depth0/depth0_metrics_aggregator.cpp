@@ -27,7 +27,6 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "fordyca/config/metrics_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -79,9 +78,10 @@ template void depth0_metrics_aggregator::collect_from_controller(
  * Constructors/Destructors
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
-    const config::metrics_config* const mconfig,
+    const cpconfig::metrics_config* const mconfig,
+    const config::grid_config* const gconfig,
     const std::string& output_root)
-    : base_metrics_aggregator(mconfig, output_root),
+    : base_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
   metrics::collector_registerer::creatable_set creatable_set = {
       {typeid(metrics::perception::mdpo_perception_metrics_collector),
@@ -91,7 +91,7 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
        "perception_dpo",
        "perception::dpo"}};
 
-  metrics::collector_registerer registerer(mconfig, creatable_set, this);
+  metrics::collector_registerer registerer(mconfig, gconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
 
   reset_all();

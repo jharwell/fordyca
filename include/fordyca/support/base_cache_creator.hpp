@@ -70,8 +70,8 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    */
   base_cache_creator(ds::arena_grid* grid, rtypes::spatial_dist cache_dim);
 
-  base_cache_creator(const base_cache_creator& other) = delete;
-  base_cache_creator& operator=(const base_cache_creator& other) = delete;
+  base_cache_creator(const base_cache_creator&) = delete;
+  base_cache_creator& operator=(const base_cache_creator&) = delete;
 
   /**
    * \brief (Potentially) create new caches.

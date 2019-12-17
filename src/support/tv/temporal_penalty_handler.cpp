@@ -1,7 +1,7 @@
 /**
- * \file output_config.hpp
+ * \file temporal_penalty_handler.cpp
  *
- * \copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,38 +18,31 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_OUTPUT_CONFIG_HPP_
-#define INCLUDE_FORDYCA_CONFIG_OUTPUT_CONFIG_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
+#include "fordyca/support/tv/temporal_penalty_handler.hpp"
 
-#include "rcppsw/config/base_config.hpp"
-
-#include "fordyca/config/metrics_config.hpp"
+#include "fordyca/controller/base_controller.hpp"
 
 /*******************************************************************************
- * Namespaces
+ * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, support, tv);
 
 /*******************************************************************************
- * Structure Definitions
+ * Member Functions
  ******************************************************************************/
-/**
- * \struct output_config
- * \ingroup fordyca config
- *
- * \brief Configuration for robot/loop function logging/metrics.
- */
-struct output_config final : public rconfig::base_config {
-  std::string output_root{};
-  std::string output_dir{};
-  struct metrics_config metrics {};
-};
+void temporal_penalty_handler::penalty_abort(
+    const controller::base_controller& controller) {
+  std::scoped_lock lock(m_list_mtx);
+  auto it = penalty_find(controller, false);
+  if (m_penalty_list.end() != it) {
+    penalty_remove(*it, false);
+  }
+  ER_INFO("%s", controller.GetId().c_str());
+  ER_ASSERT(!is_serving_penalty(controller, false),
+            "Robot still serving penalty after abort?!");
+} /* penalty_abort() */
 
-NS_END(config, fordyca);
-
-#endif /* INCLUDE_FORDYCA_CONFIG_OUTPUT_CONFIG_HPP_ */
+NS_END(tv, support, fordyca);

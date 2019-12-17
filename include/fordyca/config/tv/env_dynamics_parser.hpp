@@ -1,7 +1,7 @@
 /**
- * \file output_parser.hpp
+ * \file env_dynamics_parser.hpp
  *
- * \copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2019 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,64 +18,62 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_OUTPUT_PARSER_HPP_
-#define INCLUDE_FORDYCA_CONFIG_OUTPUT_PARSER_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_TV_ENV_DYNAMICS_PARSER_HPP_
+#define INCLUDE_FORDYCA_CONFIG_TV_ENV_DYNAMICS_PARSER_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
 #include <string>
+#include <memory>
 
+#include "fordyca/config/tv/env_dynamics_config.hpp"
+#include "rcppsw/control/config/xml/waveform_parser.hpp"
 #include "rcppsw/config/xml/xml_config_parser.hpp"
-
-#include "fordyca/config/metrics_parser.hpp"
-#include "fordyca/config/output_config.hpp"
-#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, config);
+NS_START(fordyca, config, tv);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class output_parser
- * \ingroup fordyca config
+ * \class env_dynamics_parser
+ * \ingroup fordyca config tv
  *
- * \brief Parses XML parameters relating to simulation output into
- * \ref output_config. This parser is used by both loop functions and robots,
- * and so its logic is slighly more complex in order to handle the needs of
- * both.
+ * \brief Parses XML parameters for \ref env_dynamics into \ref
+ * env_dynamics_config.
  */
-class output_parser final : public rconfig::xml::xml_config_parser {
+class env_dynamics_parser final : public rconfig::xml::xml_config_parser {
  public:
-  using config_type = output_config;
+  using config_type = env_dynamics_config;
 
   /**
-   * \brief The root tag that all output loop functions parameters should lie
-   * under in the XML tree.
+   * \brief The root tag that all temporal variance parameters should lie under
+   * in the XML tree.
    */
-  static constexpr char kXMLRoot[] = "output";
+  static constexpr char kXMLRoot[] = "env_dynamics";
 
-  bool validate(void) const override RCSW_ATTR(pure, cold);
-  void parse(const ticpp::Element& node) override RCSW_COLD;
+  void parse(const ticpp::Element& node) override;
+  bool validate(void) const override RCSW_CONST;
 
-  RCSW_COLD std::string xml_root(void) const override { return kXMLRoot; }
+  std::string xml_root(void) const override { return kXMLRoot; }
 
  private:
-  RCSW_COLD const rconfig::base_config* config_get_impl(void) const override {
+  const rconfig::base_config* config_get_impl(void) const override {
     return m_config.get();
   }
 
   /* clang-format off */
-  std::unique_ptr<output_config> m_config{nullptr};
-  metrics_parser                 m_metrics_parser{};
+  std::unique_ptr<config_type>      m_config{nullptr};
+  rct::config::xml::waveform_parser m_block_manip{};
+  rct::config::xml::waveform_parser m_block_carry{};
+  rct::config::xml::waveform_parser m_cache_usage{};
   /* clang-format on */
 };
 
-NS_END(config, fordyca);
+NS_END(tv, config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_OUTPUT_PARSER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_TV_ENV_DYNAMICS_PARSER_HPP_ */

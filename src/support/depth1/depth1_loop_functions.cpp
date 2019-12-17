@@ -38,7 +38,6 @@
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
-#include "fordyca/config/output_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
@@ -59,6 +58,7 @@
 #include "fordyca/support/robot_task_extractor.hpp"
 #include "fordyca/support/robot_task_extractor_adaptor.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 #include "cosm/convergence/convergence_calculator.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
@@ -126,12 +126,13 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       : lf(lf_in), config_map(cmap) {}
   template <typename T>
   RCSW_COLD void operator()(const T& controller) const {
-    typename robot_arena_interactor<T>::params p{lf->arena_map(),
-                                                 lf->m_metrics_agg.get(),
-                                                 lf->floor(),
-                                                 lf->tv_manager(),
-                                                 lf->m_cache_manager.get(),
-                                                 lf};
+    typename robot_arena_interactor<T>::params p{
+        lf->arena_map(),
+        lf->m_metrics_agg.get(),
+        lf->floor(),
+        lf->tv_manager()->environ_dynamics(),
+        lf->m_cache_manager.get(),
+        lf};
     lf->m_interactor_map->emplace(typeid(controller),
                                   robot_arena_interactor<T>(p));
     lf->m_metric_extractor_map->emplace(
@@ -207,11 +208,10 @@ void depth1_loop_functions::shared_init(ticpp::Element& node) {
 
 void depth1_loop_functions::private_init(void) {
   /* initialize stat collecting */
-  auto* arenap = config()->config_get<config::arena::arena_map_config>();
-  config::output_config output =
-      *config()->config_get<const config::output_config>();
-  output.metrics.arena_grid = arenap->grid;
-  m_metrics_agg = std::make_unique<depth1_metrics_aggregator>(&output.metrics,
+  auto* arena = config()->config_get<config::arena::arena_map_config>();
+  auto* output = config()->config_get<cpconfig::output_config>();
+  m_metrics_agg = std::make_unique<depth1_metrics_aggregator>(&output->metrics,
+                                                              &arena->grid,
                                                               output_root());
 
   /* initialize cache handling and create initial cache */

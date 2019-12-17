@@ -66,7 +66,7 @@ void block_proximity::dispatch_cache_starter(
 void block_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
   found_op.visit(*c.dpo_perception()->dpo_store());
   dispatch_cache_starter(c.current_task());
@@ -77,7 +77,7 @@ void block_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
 void block_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
   found_op.visit(*c.mdpo_perception()->map());
   dispatch_cache_starter(c.current_task());
@@ -88,7 +88,7 @@ void block_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
 void block_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
   found_op.visit(*c.dpo_perception()->dpo_store());
   dispatch_cache_starter(c.current_task());
@@ -99,7 +99,7 @@ void block_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
 void block_proximity::visit(controller::depth2::birtd_omdpo_controller& c) {
   c.ndc_push();
 
-  ER_INFO("Abort block drop: block%d proximity", m_block->id());
+  ER_INFO("Abort block drop: block%d proximity", m_block->id().v());
   events::block_found_visitor found_op(m_block);
   found_op.visit(*c.mdpo_perception()->map());
   dispatch_cache_starter(c.current_task());
