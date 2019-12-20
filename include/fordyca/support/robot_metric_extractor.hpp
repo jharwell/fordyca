@@ -37,7 +37,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \struct robot_metric_extractor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Functor to perform metric extraction from a controller on each
  * timestep.

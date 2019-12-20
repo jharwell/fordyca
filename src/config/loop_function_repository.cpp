@@ -25,15 +25,15 @@
 
 #include "rcppsw/control/config/xml/waveform_parser.hpp"
 
+#include "cosm/convergence/config/xml/convergence_parser.hpp"
+#include "cosm/metrics/config/xml/output_parser.hpp"
+#include "cosm/tv/config/xml/population_dynamics_parser.hpp"
+
 #include "fordyca/config/arena/arena_map_parser.hpp"
 #include "fordyca/config/caches/caches_parser.hpp"
 #include "fordyca/config/oracle/oracle_manager_parser.hpp"
 #include "fordyca/config/tv/tv_manager_parser.hpp"
 #include "fordyca/config/visualization_parser.hpp"
-
-#include "cosm/convergence/config/xml/convergence_parser.hpp"
-#include "cosm/pal/config/xml/output_parser.hpp"
-#include "cosm/tv/config/xml/population_dynamics_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,8 +44,8 @@ NS_START(fordyca, config);
  * Constructors/Destructor
  ******************************************************************************/
 loop_function_repository::loop_function_repository(void) noexcept {
-  parser_register<cpconfig::xml::output_parser, cpconfig::output_config>(
-      cpconfig::xml::output_parser::kXMLRoot);
+  parser_register<cmconfig::xml::output_parser, cmconfig::output_config>(
+      cmconfig::xml::output_parser::kXMLRoot);
   parser_register<arena::arena_map_parser, arena::arena_map_config>(
       arena::arena_map_parser::kXMLRoot);
   parser_register<tv::tv_manager_parser, tv::tv_manager_config>(

@@ -27,9 +27,9 @@
 #include "rcppsw/math/expression.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/fordyca.hpp"
-
 #include "cosm/repr/pheromone_density.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -41,7 +41,7 @@ NS_START(fordyca, math);
  ******************************************************************************/
 /**
  * \class existing_cache_utility
- * \ingroup fordyca math
+ * \ingroup math
  *
  * \brief Calculates the utility associated with an existing cache that the
  * robot knows about.

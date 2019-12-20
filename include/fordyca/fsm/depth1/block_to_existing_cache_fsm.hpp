@@ -44,7 +44,7 @@ NS_START(fsm, depth1);
  ******************************************************************************/
 /**
  * \class block_to_existing_cache_fsm
- * \ingroup fordyca fsm depth1
+ * \ingroup fsm depth1
  *
  * \brief The FSM for the block-to-existing-cache subtask.
  *

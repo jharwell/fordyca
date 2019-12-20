@@ -40,7 +40,7 @@ NS_START(fordyca, config, cache_sel);
  ******************************************************************************/
 /**
  * \class cache_pickup_policy_parser
- * \ingroup fordyca config
+ * \ingroup config
  *
  * \brief Parses XML parameters for \ref cache_pickup_policy_config at the
  * start of simulation.

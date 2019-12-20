@@ -25,10 +25,10 @@
 
 #include <numeric>
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/config/oracle/entities_oracle_config.hpp"
 #include "fordyca/repr/base_cache.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -55,7 +55,7 @@ NS_START(support);
  ******************************************************************************/
 /**
  * \class base_cache_creator
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Base class for creating static/dynamic caches in the arena.
  */

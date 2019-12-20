@@ -60,7 +60,7 @@ using d1_subtask_status_map_type =
  ******************************************************************************/
 /**
  * \class depth1_loop_functions
- * \ingroup fordyca support depth1
+ * \ingroup support depth1
  *
  * \brief The loop functions for depth 1 foraging.
  *

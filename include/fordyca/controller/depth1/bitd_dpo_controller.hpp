@@ -28,16 +28,16 @@
 #include <memory>
 
 #include "fordyca/controller/depth0/dpo_controller.hpp"
-#include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
+#include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 #include "fordyca/tasks/task_status.hpp"
 
-#include "rcppsw/ta/logical_task.hpp"
+#include "cosm/ta/logical_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw::ta {
+namespace cosm::ta {
 class bi_tdgraph_executive;
 class executable_task;
 class polled_task;
@@ -62,7 +62,7 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * \class bitd_dpo_controller
- * \ingroup fordyca controller depth1
+ * \ingroup controller depth1
  *
  * \brief A controller defining the task allocation space via BIfurcating Task
  * Decomposition (BITD) and spliting the \ref generalist task into the \ref
@@ -73,7 +73,7 @@ NS_START(depth1);
  */
 class bitd_dpo_controller : public depth0::dpo_controller,
                             public rer::client<bitd_dpo_controller>,
-                            public rmetrics::tasks::bi_tdgraph_metrics {
+                            public ctametrics::bi_tdgraph_metrics {
  public:
   using dpo_controller::perception;
 
@@ -121,13 +121,13 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    */
   bool display_task(void) const { return m_display_task; }
 
-  const rta::ds::bi_tab* active_tab(void) const RCSW_PURE;
+  const cta::ds::bi_tab* active_tab(void) const RCSW_PURE;
 
   /*
    * Public to setup metric collection from tasks.
    */
-  const rta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
-  rta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
+  const cta::bi_tdgraph_executive* executive(void) const { return m_executive.get(); }
+  cta::bi_tdgraph_executive* executive(void) { return m_executive.get(); }
 
   /**
    * \brief Get whether or not a task has been aborted this timestep.
@@ -157,7 +157,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    *
    * - Block selection matrix (\ref block_sel_matrix)
    * - Cache selection matrix (\ref cache_sel_matrix)
-   * - Task executive (\ref rta::bi_tdgraph_executive)
+   * - Task executive (\ref cta::bi_tdgraph_executive)
    * - DPO perception subsystem (\ref dpo_perception_subsystem)
    *
    * \param config_repo Handle to parameter repository for this controller
@@ -171,13 +171,13 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    * to reduce the amount of function overriding that would have to be performed
    * otherwise if derived controllers each had private executives.
    */
-  void executive(std::unique_ptr<rta::bi_tdgraph_executive> executive);
+  void executive(std::unique_ptr<cta::bi_tdgraph_executive> executive);
 
   /**
    * \brief Callback for task abort. Task argument unused for now--only need to
    * know that a task WAS aborted. \see \ref task_aborted().
    */
-  void task_abort_cb(const rta::polled_task*);
+  void task_abort_cb(const cta::polled_task*);
 
   /**
    * \brief Callback for task start. Needed to reset the task state of the
@@ -186,7 +186,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    * handling of the newly allocated task as if it was aborted by the loop
    * functions, resulting in inconsistent state with the robot's executive.
    */
-  void task_start_cb(const rta::polled_task*);
+  void task_start_cb(const cta::polled_task*);
 
  private:
   void private_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
@@ -195,7 +195,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   bool                                       m_display_task{false};
   tasks::task_status                         m_task_status{tasks::task_status::ekNULL};
   std::unique_ptr<class cache_sel_matrix>    m_cache_sel_matrix;
-  std::unique_ptr<rta::bi_tdgraph_executive> m_executive;
+  std::unique_ptr<cta::bi_tdgraph_executive> m_executive;
   /* clang-format on */
 };
 

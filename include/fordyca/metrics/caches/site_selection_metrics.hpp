@@ -39,7 +39,7 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 /**
  * \class site_selection_metrics
- * \ingroup fordyca metrics caches
+ * \ingroup metrics caches
  *
  * \brief Interface defining cache site selection metrics that can be collected
  * from robots choosing cache sites.

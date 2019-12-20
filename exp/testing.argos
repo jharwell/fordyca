@@ -229,7 +229,8 @@
           perception_mdpo="perception-mdpo.csv"
           swarm_dist_pos2D="swarm-dist-pos2D.csv"
           swarm_convergence="swarm-convergence.csv"
-          loop_temporal_variance="temporal-variance.csv"
+          tv_population="tv-population.csv"
+          tv_environment="tv-environment.csv"
           output_interval="1000">
       </metrics>
     </output>
@@ -246,15 +247,15 @@
     <!--   <!-\- <angular_order enable="false"/> -\-> -->
     <!-- </convergence> -->
 
-    <oracle_manager>
-      <tasking_oracle
-          task_exec_ests="true"
-          task_interface_ests="true"
-          />
-      <entities_oracle
-          blocks="true"
-          caches="true"/>
-    </oracle_manager>
+    <!-- <oracle_manager> -->
+    <!--   <tasking_oracle -->
+    <!--       task_exec_ests="true" -->
+    <!--       task_interface_ests="true" -->
+    <!--       /> -->
+    <!--   <entities_oracle -->
+    <!--       blocks="true" -->
+    <!--       caches="true"/> -->
+    <!-- </oracle_manager> -->
     <temporal_variance>
       <env_dynamics>
         <blocks>
@@ -288,9 +289,10 @@
       </env_dynamics>
       <population_dynamics
           birth_lambda="1.0"
-          death_lambda="1.0"
-          malfunction_lambda="1.0"
-          repair_mu="1.0"/>
+          death_lambda="0.0"
+          malfunction_lambda="0.0"
+          max_size="16"
+          repair_mu="0.0"/>
     </temporal_variance>
 
     <arena_map>
@@ -359,7 +361,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="16" max_trials="1000">
+      <entity quantity="1" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

@@ -38,7 +38,7 @@ NS_START(fordyca, config, perception);
  ******************************************************************************/
 /**
  * \struct perception_config
- * \ingroup fordyca config perception
+ * \ingroup config perception
  *
  * \brief Configuration for robot perception.
  */

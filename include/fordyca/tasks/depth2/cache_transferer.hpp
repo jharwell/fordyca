@@ -40,7 +40,7 @@ NS_START(fordyca, tasks, depth2);
  ******************************************************************************/
 /**
  * \class cache_transferer
- * \ingroup fordyca tasks depth2
+ * \ingroup tasks depth2
  *
  * \brief Task in which robots locate an existing cache, pickup a block from it,
  * and then transfer the block to a cache with higher utility (presumably one
@@ -51,8 +51,8 @@ class cache_transferer final : public foraging_task,
                                public events::existing_cache_interactor,
                                public rer::client<cache_transferer> {
  public:
-  cache_transferer(const struct rta::config::task_alloc_config* config,
-                   std::unique_ptr<rta::taskable> mechanism);
+  cache_transferer(const struct cta::config::task_alloc_config* config,
+                   std::unique_ptr<cta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -84,7 +84,7 @@ class cache_transferer final : public foraging_task,
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const rta::taskable_argument*) override;
+  void task_start(const cta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
   rtypes::timestep interface_time_calc(uint interface,
                                        const rtypes::timestep& start_time) override RCSW_PURE;

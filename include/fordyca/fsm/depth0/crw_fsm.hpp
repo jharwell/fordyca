@@ -46,12 +46,12 @@ class foraging_expstrat;
 NS_START(depth0);
 
 /*******************************************************************************
-ppp * Class Definitions
+ * Class Definitions
  ******************************************************************************/
 
 /**
  * \class crw_fsm
- * \ingroup fordyca fsm depth0
+ * \ingroup fsm depth0
  *
  * \brief The FSM for the most basic foraging definition: each robot executing
  * this FSM roams around randomly until it finds a block, and then brings the
@@ -66,8 +66,8 @@ class crw_fsm final : public cfsm::util_hfsm,
           std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
           rmath::rng* rng);
 
-  crw_fsm(const crw_fsm& fsm) = delete;
-  crw_fsm& operator=(const crw_fsm& fsm) = delete;
+  crw_fsm(const crw_fsm&) = delete;
+  crw_fsm& operator=(const crw_fsm&) = delete;
 
   /* collision metrics */
   bool in_collision_avoidance(void) const override RCSW_PURE;
@@ -141,11 +141,11 @@ class crw_fsm final : public cfsm::util_hfsm,
   return (&mc_state_map[index]);
   }
 
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+
   /* clang-format off */
   cfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
-
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, controller, fordyca);

@@ -43,7 +43,7 @@ NS_START(fordyca, config, caches);
  ******************************************************************************/
 /**
  * \class caches_parser
- * \ingroup fordyca config caches
+ * \ingroup config caches
  *
  * \brief Parses XML parameters for relating to cache into \ref caches_config.
  */

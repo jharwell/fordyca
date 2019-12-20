@@ -23,13 +23,13 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth1/collector.hpp"
 
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
-
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,22 +39,22 @@ NS_START(fordyca, tasks, depth1);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-collector::collector(const rta::config::task_alloc_config* const config,
-                     std::unique_ptr<rta::taskable> mechanism)
+collector::collector(const cta::config::task_alloc_config* const config,
+                     std::unique_ptr<cta::taskable> mechanism)
     : collector(config, kCollectorName, std::move(mechanism)) {}
 
-collector::collector(const rta::config::task_alloc_config* const config,
+collector::collector(const cta::config::task_alloc_config* const config,
                      const std::string& name,
-                     std::unique_ptr<rta::taskable> mechanism)
+                     std::unique_ptr<cta::taskable> mechanism)
     : foraging_task(name, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.collector") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void collector::task_start(const rta::taskable_argument* const) {
+void collector::task_start(const cta::taskable_argument* const) {
   foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_CACHED_BLOCK);
-  rta::polled_task::mechanism()->task_start(&a);
+  cta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
 double collector::abort_prob_calc(void) {
@@ -65,7 +65,7 @@ double collector::abort_prob_calc(void) {
    * tasks.
    */
   if (-1 == active_interface()) {
-    return rta::abort_probability::kMIN_ABORT_PROB;
+    return cta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }

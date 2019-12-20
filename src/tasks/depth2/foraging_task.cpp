@@ -23,12 +23,11 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
-#include "rcppsw/ta/config/task_alloc_config.hpp"
-
-#include "fordyca/fordyca.hpp"
-
 #include "cosm/fsm/util_hfsm.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/ta/config/task_alloc_config.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,8 +38,8 @@ NS_START(fordyca, tasks, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const rta::config::task_alloc_config* config,
-                             std::unique_ptr<rta::taskable> mechanism)
+                             const cta::config::task_alloc_config* config,
+                             std::unique_ptr<cta::taskable> mechanism)
     : polled_task(name,
                   &config->abort,
                   &config->exec_est.ema,
@@ -55,7 +54,7 @@ rtypes::timestep foraging_task::current_time(void) const {
       ->tick();
 } /* current_time() */
 
-bool foraging_task::task_in_depth2(const rta::polled_task* const task) {
+bool foraging_task::task_in_depth2(const cta::polled_task* const task) {
   return task->name() == kCacheStarterName ||
          task->name() == kCacheFinisherName ||
          task->name() == kCacheTransfererName ||

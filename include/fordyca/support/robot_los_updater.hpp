@@ -42,7 +42,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \struct robot_los_updater
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Functor to update robot LOS each timestep.
  */

@@ -23,12 +23,12 @@
  ******************************************************************************/
 #include "fordyca/controller/los_proc_verify.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/repr/base_cache.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls

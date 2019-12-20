@@ -25,13 +25,13 @@
 
 #include <algorithm>
 
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/unicell_immovable_entity2D.hpp"
+
 #include "fordyca/ds/cell2D.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/base_cache.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
-#include "cosm/repr/unicell_immovable_entity2D.hpp"
 
 /*******************************************************************************
  * Namespaces

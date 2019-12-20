@@ -38,7 +38,7 @@ NS_START(fordyca, support, depth2);
  ******************************************************************************/
 /**
  * \class dynamic_cache_creator
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief Handles creation of dynamic caches during simulation, given a set of
  * candidate blocks, and constraints on proximity, minimum # for a cache, etc.

@@ -53,7 +53,7 @@ NS_START(events, detail);
 
 /**
  * \class block_found
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Event that is created whenever a block (possibly known, possibly
  * unknown) appears in a robot's LOS.

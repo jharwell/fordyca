@@ -38,22 +38,22 @@ NS_START(fordyca, tasks, depth2);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_finisher::cache_finisher(const struct rta::config::task_alloc_config* config,
-                               std::unique_ptr<rta::taskable> mechanism)
+cache_finisher::cache_finisher(const struct cta::config::task_alloc_config* config,
+                               std::unique_ptr<cta::taskable> mechanism)
     : foraging_task(kCacheFinisherName, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth1.cache_finisher") {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void cache_finisher::task_start(const rta::taskable_argument* const) {
+void cache_finisher::task_start(const cta::taskable_argument* const) {
   foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_FREE_BLOCK);
-  rta::polled_task::mechanism()->task_start(&a);
+  cta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
 double cache_finisher::abort_prob_calc(void) {
   if (-1 == active_interface()) {
-    return rta::abort_probability::kMIN_ABORT_PROB;
+    return cta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }

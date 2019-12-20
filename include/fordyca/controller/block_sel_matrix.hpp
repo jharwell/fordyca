@@ -60,7 +60,7 @@ using block_sel_variant =
  ******************************************************************************/
 /**
  * \class block_sel_matrix
- * \ingroup fordyca controller
+ * \ingroup controller
  *
  * \brief A dictionary of information needed by robots using various utility
  * functions to calculate the best:

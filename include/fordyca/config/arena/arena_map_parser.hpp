@@ -45,7 +45,7 @@ NS_START(fordyca, config, arena);
  ******************************************************************************/
 /**
  * \class arena_map_parser
- * \ingroup fordyca config arena
+ * \ingroup config arena
  *
  * \brief Parses XML parameters for \ref arena_map into \ref arena_map_config.
  */

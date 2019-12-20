@@ -42,7 +42,7 @@ NS_START(fordyca, events, detail);
  ******************************************************************************/
 /**
  * \class block_vanished
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Created whenever a robot is serving a block pickup penalty, but while
  * serving the penalty the block it is waiting for vanishes due to another

@@ -37,7 +37,7 @@ NS_START(fordyca, config, oracle);
  ******************************************************************************/
 /**
  * \struct tasking_oracle_config
- * \ingroup fordyca config oracle
+ * \ingroup config oracle
  *
  * \brief Parameters for all-seeing task allocation oracle.
  */

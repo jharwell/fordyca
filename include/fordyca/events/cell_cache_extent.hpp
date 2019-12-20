@@ -49,7 +49,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class cell_cache_extent
- * \ingroup fordyca events
+ * \ingroup events
  *
  * \brief Created whenever a cell needs to go from some other state to being
  * part of a cache's extent (dub). All the blocks (and the cache itself) live in

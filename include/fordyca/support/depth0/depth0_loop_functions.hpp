@@ -55,7 +55,7 @@ class robot_arena_interactor;
  ******************************************************************************/
 /**
  * \class depth0_loop_functions
- * \ingroup fordyca support depth0
+ * \ingroup support depth0
  *
  * \brief Contains the simulation support functions for depth0 foraging, such
  * as:

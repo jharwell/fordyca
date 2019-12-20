@@ -32,10 +32,10 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace rcppsw { namespace ta {
+namespace cosm::ta {
 class polled_task;
 class bi_tdgraph_executive;
-}} // namespace rcppsw::ta
+} // namespace cosm::ta
 
 NS_START(fordyca);
 namespace support { namespace oracle {
@@ -52,7 +52,7 @@ NS_START(controller);
  ******************************************************************************/
 /**
  * \class oracular_info_receptor
- * \ingroup fordyca controller
+ * \ingroup controller
  *
  * \brief Plugin/hook for controllers to receive information from the loop
  * functions about the following:
@@ -86,23 +86,23 @@ class oracular_info_receptor final : public rer::client<oracular_info_receptor> 
   bool entities_caches_enabled(void) const RCSW_PURE;
   bool tasking_enabled(void) const RCSW_PURE;
 
-  void tasking_hooks_register(rta::bi_tdgraph_executive* executive);
+  void tasking_hooks_register(cta::bi_tdgraph_executive* executive);
 
  private:
   /**
    * \brief Uses the \ref support::tasking_oracle to update the execution time
    * estimate for the task that was just aborted.
    */
-  void task_abort_cb(rta::polled_task* task);
+  void task_abort_cb(cta::polled_task* task);
 
   /**
    * \brief Uses the \ref support::tasking_oracle to update the execution time
    * estimate for the task that was just finished.
    */
-  void task_finish_cb(rta::polled_task* task);
+  void task_finish_cb(cta::polled_task* task);
 
-  void exec_est_update(rta::polled_task* task);
-  void int_est_update(rta::polled_task* task);
+  void exec_est_update(cta::polled_task* task);
+  void int_est_update(cta::polled_task* task);
 
   /* clang-format off */
   support::oracle::tasking_oracle*  m_tasking_oracle;

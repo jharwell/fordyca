@@ -41,7 +41,7 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 /**
  * \class argos_rda_adaptor
- * \ingroup fordyca support tv
+ * \ingroup support tv
  *
  * \brief Adapts \ref ctv::robot_dynamics_applicator to work within the ARGoS
  * simulator.

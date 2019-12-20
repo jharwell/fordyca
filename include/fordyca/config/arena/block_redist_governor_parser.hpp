@@ -42,7 +42,7 @@ NS_START(fordyca, config, arena);
  ******************************************************************************/
 /**
  * \class block_redist_governor_parser
- * \ingroup fordyca config arena
+ * \ingroup config arena
  *
  * \brief Parses XML parameters related to block redistribution by the \ref
  * redist_governor.

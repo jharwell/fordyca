@@ -41,7 +41,7 @@ NS_START(fordyca, config, cache_sel);
  ******************************************************************************/
 /**
  * \class cache_sel_matrix_parser
- * \ingroup fordyca config cache_sel
+ * \ingroup config cache_sel
  *
  * \brief Parses XML parameters for the \ref cache_sel_matrix at the start
  * of simulation.

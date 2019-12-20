@@ -25,8 +25,9 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/ta/taskable.hpp"
-#include "rcppsw/ta/taskable_argument.hpp"
+
+#include "cosm/ta/taskable.hpp"
+#include "cosm/ta/taskable_argument.hpp"
 
 #include "fordyca/fsm/foraging_signal.hpp"
 
@@ -40,13 +41,13 @@ NS_START(fordyca, tasks);
  ******************************************************************************/
 /**
  * \class vector_argument
- * \ingroup fordyca tasks
+ * \ingroup tasks
  *
  * \brief An argument that can be passed to a \ref
- * rta::taskable function which contains a vector, mostly
+ * cta::taskable function which contains a vector, mostly
  * likely representing an arena location.
  */
-class vector_argument : public rta::taskable_argument {
+class vector_argument : public cta::taskable_argument {
  public:
   vector_argument(double tolerance, const rmath::vector2d& v)
       : m_tolerance(tolerance), m_vector(v) {}
@@ -62,14 +63,14 @@ class vector_argument : public rta::taskable_argument {
 
 /**
  * \class foraging_signal_argument
- * \ingroup fordyca tasks
+ * \ingroup tasks
  *
  * \brief An argument that can be passed to a \ref
- * rta::taskable::task_start() function which contains a
+ * cta::taskable::task_start() function which contains a
  * foraging signal, for use in specifying initial conditions/commands for
  * certain state machines.
  */
-class foraging_signal_argument : public rta::taskable_argument {
+class foraging_signal_argument : public cta::taskable_argument {
  public:
   explicit foraging_signal_argument(fsm::foraging_signal::type s)
       : m_signal(s) {}

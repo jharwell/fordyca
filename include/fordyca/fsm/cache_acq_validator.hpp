@@ -50,7 +50,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * \class cache_acq_validator
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Determine if the acquisition of a cache at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and

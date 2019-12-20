@@ -45,7 +45,7 @@ class dynamic_cache_manager;
  ******************************************************************************/
 /**
  * \class robot_arena_interactor
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief Handles a robot's interactions with the environment on each timestep.
  *

@@ -54,7 +54,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class free_block_drop
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Created whenever a block is dropped somewhere in the arena that is not
  * a cache or the nest.

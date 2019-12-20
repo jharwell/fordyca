@@ -38,7 +38,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 /**
  * \class block_transporter
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Interface defining what classes directly involved in transporting
  * blocks need to implement in order to successfully interact with the loop

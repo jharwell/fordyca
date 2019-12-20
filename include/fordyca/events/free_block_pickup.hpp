@@ -46,7 +46,7 @@ NS_START(fordyca, events, detail);
  ******************************************************************************/
 /**
  * \class free_block_pickup
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).

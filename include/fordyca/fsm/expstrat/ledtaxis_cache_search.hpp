@@ -39,7 +39,7 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 /**
  * \class ledtaxis_cache_search
- * \ingroup fordyca fsm expstrat
+ * \ingroup fsm expstrat
  *
  * \brief Vector to the last known location of a cache, then begin performing
  * CRW at that location, with the idea being that the ledtaxis of another
@@ -71,7 +71,7 @@ class ledtaxis_cache_search : public foraging_expstrat,
    * \brief Start LED taxis cache search. Crucially, this enables the camera
    * sensor for use during exploration. See #593.
    */
-  void task_start(const rta::taskable_argument*) override;
+  void task_start(const cta::taskable_argument*) override;
 
   /**
    * \brief Reset LED taxis cache search after a cache is successfully

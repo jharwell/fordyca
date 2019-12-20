@@ -25,14 +25,14 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/ta/taskable.hpp"
+
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/util_hfsm.hpp"
+#include "cosm/ta/taskable.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
-
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/util_hfsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,7 +50,7 @@ class acquire_free_block_fsm;
  ******************************************************************************/
 /**
  * \class block_to_goal_fsm
- * \ingroup fordyca fsm depth1
+ * \ingroup fsm depth1
  *
  * \brief Base FSM for acquiring, picking up a block, and then bringing it
  * somewhere and dropping it.
@@ -61,7 +61,7 @@ class acquire_free_block_fsm;
  */
 class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
                           public cfsm::util_hfsm,
-                          public rta::taskable,
+                          public cta::taskable,
                           public cfmetrics::goal_acq_metrics,
                           public fsm::block_transporter {
  public:
@@ -76,7 +76,7 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
 
   /* taskable overrides */
   void task_execute(void) override;
-  void task_start(const rta::taskable_argument* arg) override;
+  void task_start(const cta::taskable_argument* arg) override;
   bool task_finished(void) const override {
     return ekST_FINISHED == current_state();
   }
@@ -162,12 +162,12 @@ class block_to_goal_fsm : public rer::client<block_to_goal_fsm>,
     return &mc_state_map[index];
   }
 
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+
   /* clang-format off */
   cfsm::acquire_goal_fsm* const  m_goal_fsm;
   cfsm::acquire_goal_fsm * const m_block_fsm;
   /* clang-format on */
-
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(fsm, fordyca);

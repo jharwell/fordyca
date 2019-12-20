@@ -32,8 +32,8 @@
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
+#include "cosm/ta/polled_task.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/base_controller.hpp"
 
@@ -41,7 +41,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw::ta {
+namespace cosm::ta {
 namespace ds {
 class bi_tab;
 } /* namespace ds */
@@ -58,7 +58,7 @@ NS_START(support, depth1);
  ******************************************************************************/
 /**
  * \class depth1_metrics_aggregator
- * \ingroup fordyca support depth1
+ * \ingroup support depth1
  *
  * \brief Aggregates and metrics collection for depth1 foraging. That
  * includes everything from \ref depth0_metrics_aggregator, and also:
@@ -73,7 +73,7 @@ NS_START(support, depth1);
 class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
-  depth1_metrics_aggregator(const cpconfig::metrics_config* mconfig,
+  depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                             const config::grid_config* const gconfig,
                             const std::string& output_root);
 
@@ -90,9 +90,9 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    * Solution: hook into the executive callback queue in order to correctly
    * capture statistics.
    */
-  void task_finish_or_abort_cb(const rta::polled_task* task);
+  void task_finish_or_abort_cb(const cta::polled_task* task);
 
-  void task_start_cb(const rta::polled_task*, const rta::ds::bi_tab* tab);
+  void task_start_cb(const cta::polled_task*, const cta::ds::bi_tab* tab);
 
     /**
    * \brief Collect metrics from the depth1 controller.
@@ -137,7 +137,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     collect("fsm::movement", *controller);
     collect("blocks::manipulation", *controller->block_manip_collator());
 
-    auto task = dynamic_cast<const rta::polled_task*>(controller->current_task());
+    auto task = dynamic_cast<const cta::polled_task*>(controller->current_task());
     if (nullptr == task) {
       return;
     }

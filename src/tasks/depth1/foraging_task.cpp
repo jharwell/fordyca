@@ -23,10 +23,9 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
-#include "rcppsw/ta/config/task_alloc_config.hpp"
-
 #include "cosm/fsm/util_hfsm.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/ta/config/task_alloc_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,8 +36,8 @@ NS_START(fordyca, tasks, depth1);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const struct rta::config::task_alloc_config* config,
-                             std::unique_ptr<rta::taskable> mechanism)
+                             const struct cta::config::task_alloc_config* config,
+                             std::unique_ptr<cta::taskable> mechanism)
     : polled_task(name,
                   &config->abort,
                   &config->exec_est.ema,

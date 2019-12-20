@@ -48,7 +48,7 @@ NS_START(depth0);
  ******************************************************************************/
 /**
  * \class dpo_controller
- * \ingroup fordyca controller depth0
+ * \ingroup controller depth0
  *
  * \brief A foraging controller that remembers what it has seen for a period of
  * time (knowledge is modeled by pheromone density and decays as such).

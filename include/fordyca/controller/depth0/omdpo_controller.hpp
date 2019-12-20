@@ -39,7 +39,7 @@ NS_START(depth0);
  ******************************************************************************/
 /**
  * \class omdpo_controller
- * \ingroup fordyca controller depth0
+ * \ingroup controller depth0
  *
  * \brief A foraging controller that has the same properties as \ref
  * mdpo_controller, but that also:

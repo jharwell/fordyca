@@ -25,13 +25,13 @@
 
 #include <boost/mpl/for_each.hpp>
 
-#include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
-#include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/ds/bi_tab.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/ds/bi_tab.hpp"
+#include "cosm/ta/metrics/bi_tab_metrics.hpp"
+#include "cosm/ta/metrics/bi_tab_metrics_collector.hpp"
+#include "cosm/ta/metrics/bi_tdgraph_metrics_collector.hpp"
+#include "cosm/ta/metrics/execution_metrics.hpp"
+#include "cosm/ta/metrics/execution_metrics_collector.hpp"
 
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
@@ -44,15 +44,12 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2, detail);
-using collector_typelist =
-    rmpl::typelist<metrics::collector_registerer::type_wrap<
-                       rmetrics::tasks::bi_tab_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       rmetrics::tasks::execution_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       rmetrics::tasks::bi_tdgraph_metrics_collector>,
-                   metrics::collector_registerer::type_wrap<
-                       metrics::caches::site_selection_metrics_collector> >;
+using collector_typelist = rmpl::typelist<
+    metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
+    metrics::collector_registerer::type_wrap<ctametrics::execution_metrics_collector>,
+    metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
+    metrics::collector_registerer::type_wrap<
+        metrics::caches::site_selection_metrics_collector> >;
 NS_END(detail);
 
 using task0 = tasks::depth0::foraging_task;
@@ -63,31 +60,31 @@ using task2 = tasks::depth2::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth2_metrics_aggregator::depth2_metrics_aggregator(
-    const cpconfig::metrics_config* const mconfig,
+    const cmconfig::metrics_config* const mconfig,
     const config::grid_config* const gconfig,
     const std::string& output_root)
     : depth1_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
   metrics::collector_registerer::creatable_set creatable_set = {
-      {typeid(rmetrics::tasks::bi_tab_metrics_collector),
+      {typeid(ctametrics::bi_tab_metrics_collector),
        "task_tab_harvester",
        "tasks::tab::harvester"},
-      {typeid(rmetrics::tasks::bi_tab_metrics_collector),
+      {typeid(ctametrics::bi_tab_metrics_collector),
        "task_tab_collector",
        "tasks::tab::collector"},
-      {typeid(rmetrics::tasks::execution_metrics_collector),
+      {typeid(ctametrics::execution_metrics_collector),
        "task_execution_cache_starter",
        "tasks::execution::" + std::string(task2::kCacheStarterName)},
-      {typeid(rmetrics::tasks::execution_metrics_collector),
+      {typeid(ctametrics::execution_metrics_collector),
        "task_execution_cache_finisher",
        "tasks::execution::" + std::string(task2::kCacheFinisherName)},
-      {typeid(rmetrics::tasks::execution_metrics_collector),
+      {typeid(ctametrics::execution_metrics_collector),
        "task_execution_cache_transferer",
        "tasks::execution::" + std::string(task2::kCacheTransfererName)},
-      {typeid(rmetrics::tasks::execution_metrics_collector),
+      {typeid(ctametrics::execution_metrics_collector),
        "task_execution_cache_collector",
        "tasks::execution::" + std::string(task2::kCacheCollectorName)},
-      {typeid(rmetrics::tasks::bi_tdgraph_metrics_collector),
+      {typeid(ctametrics::bi_tdgraph_metrics_collector),
        "task_distribution",
        "tasks::distribution"},
       {typeid(metrics::caches::site_selection_metrics_collector),
@@ -108,8 +105,8 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void depth2_metrics_aggregator::task_start_cb(
-    RCSW_UNUSED const rta::polled_task* const task,
-    const rta::ds::bi_tab* const tab) {
+    RCSW_UNUSED const cta::polled_task* const task,
+    const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
   if (nullptr == tab) {
     return;
@@ -126,9 +123,9 @@ void depth2_metrics_aggregator::task_start_cb(
 } /* task_start_cb() */
 
 void depth2_metrics_aggregator::task_finish_or_abort_cb(
-    const rta::polled_task* const task) {
+    const cta::polled_task* const task) {
   collect("tasks::execution::" + task->name(),
-          dynamic_cast<const rmetrics::tasks::execution_metrics&>(*task));
+          dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
 NS_END(depth2, support, fordyca);

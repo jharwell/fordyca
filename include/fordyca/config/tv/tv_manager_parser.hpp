@@ -42,7 +42,7 @@ NS_START(fordyca, config, tv);
  ******************************************************************************/
 /**
  * \class tv_manager_parser
- * \ingroup fordyca config tv
+ * \ingroup config tv
  *
  * \brief Parses XML parameters for \ref tv_manager into \ref tv_manager_config.
  */

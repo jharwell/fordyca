@@ -38,7 +38,7 @@ NS_START(fordyca, config);
  ******************************************************************************/
 /**
  * \struct block_priority_config
- * \ingroup fordyca config block_sel
+ * \ingroup config block_sel
  *
  * \brief Configuration for setting the block priorities of different block
  * types.

@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/block_proximity.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
@@ -34,8 +36,6 @@
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,7 @@ void block_proximity::dispatch_cache_starter(
   auto* starter = dynamic_cast<tasks::depth2::cache_starter*>(task);
   ER_ASSERT(nullptr != starter,
             "Non cache starter task %s received block proximity event",
-            dynamic_cast<rta::logical_task*>(task)->name().c_str());
+            dynamic_cast<cta::logical_task*>(task)->name().c_str());
   starter->accept(*this);
 } /* dispatch_cache_starter() */
 

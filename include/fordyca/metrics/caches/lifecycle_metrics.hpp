@@ -40,7 +40,7 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 /**
  * \class lifecycle_metrics
- * \ingroup fordyca metrics caches
+ * \ingroup metrics caches
  *
  * \brief Interface defining lifecycle metrics that can be collected on
  * static/dynamic caches in the arena during their lifetime.

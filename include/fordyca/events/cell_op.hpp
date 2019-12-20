@@ -50,7 +50,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class cell_op
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Non-abstract interface specifying the minimum set of classes that all
  * events that operate on cells within an occupany grid need to visit.

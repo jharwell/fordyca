@@ -39,7 +39,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \struct robot_metric_extractor_adaptor
- * \ingroup fordyca support depth0
+ * \ingroup support depth0
  *
  * \brief Wrapping functor to perform metric extractor which provides the
  * indirection in mapping from templated controller type in operator() to the

@@ -40,7 +40,7 @@ NS_START(fordyca, config);
 ******************************************************************************/
 /**
   * \struct exploration_config
-  * \ingroup fordyca config
+  * \ingroup config
   *
   * \brief Configuration for exploration strategies that can be employed by
   * robots.

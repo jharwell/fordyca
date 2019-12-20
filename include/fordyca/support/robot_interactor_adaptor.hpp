@@ -39,7 +39,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \class robot_interactor_adaptor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Wrapping functor to perform robot-arena interactions each
  * timestep. Needed for use with boost::static_visitor.

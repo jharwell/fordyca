@@ -46,7 +46,7 @@ using arena_layer_stack = std::tuple<cell2D>;
  ******************************************************************************/
 /**
  * \class arena_grid
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief 2D grid of \ref cell2D objects containing the state of the geometrical
  * extent of the arena floor.

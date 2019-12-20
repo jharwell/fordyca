@@ -38,7 +38,7 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * \class birtd_mdpo_controller
- * \ingroup fordyca controller depth2
+ * \ingroup controller depth2
  *
  * \brief A controller defining the task allocation space via BIfurcating
  * Recursive Task Decomposition (BIRTD) and spliting the \ref generalist task

@@ -43,7 +43,7 @@ NS_START(controller, depth2);
  ******************************************************************************/
 /**
  * \class birtd_dpo_controller
- * \ingroup fordyca controller depth2
+ * \ingroup controller depth2
  *
  * \brief A controller defining the task allocation space via BIfurcating
  * Recursive Task Decomposition (BIRTD) and spliting the \ref generalist task
@@ -68,8 +68,8 @@ class birtd_dpo_controller : public depth1::bitd_dpo_controller,
   void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
  private:
-  void task_start_cb(const rta::polled_task* task,
-                     const rta::ds::bi_tab*);
+  void task_start_cb(const cta::polled_task* task,
+                     const cta::ds::bi_tab*);
   void private_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 
 

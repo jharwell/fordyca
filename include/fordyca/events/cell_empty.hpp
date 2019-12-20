@@ -47,7 +47,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class cell_empty
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Created whenever a cell needs to go from some other state to being
  * empty.

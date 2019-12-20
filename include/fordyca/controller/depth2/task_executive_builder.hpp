@@ -44,7 +44,7 @@ NS_START(controller, depth2);
  ******************************************************************************/
 /**
  * \class task_executive_builder
- * \ingroup fordyca controller depth2
+ * \ingroup controller depth2
  *
  * \brief A helper class to offload initialization of the task tree and
  * executive for depth2 foraging.
@@ -58,7 +58,7 @@ class task_executive_builder : public depth1::task_executive_builder,
                       base_perception_subsystem* perception) RCSW_COLD;
   ~task_executive_builder(void) override RCSW_COLD;
 
-  std::unique_ptr<rta::bi_tdgraph_executive>
+  std::unique_ptr<cta::bi_tdgraph_executive>
   operator()(const config::depth2::controller_repository& config_repo,
              rmath::rng* rng) RCSW_COLD;
 
@@ -67,12 +67,12 @@ class task_executive_builder : public depth1::task_executive_builder,
  protected:
   tasking_map depth2_tasks_create(
       const config::depth2::controller_repository& config_repo,
-      rta::ds::bi_tdgraph* graph,
+      cta::ds::bi_tdgraph* graph,
       rmath::rng* rng) RCSW_COLD;
 
   void depth2_exec_est_init(const config::depth2::controller_repository& config_repo,
                             const tasking_map& map,
-                            rta::ds::bi_tdgraph* graph,
+                            cta::ds::bi_tdgraph* graph,
                             rmath::rng* rng) RCSW_COLD;
 };
 

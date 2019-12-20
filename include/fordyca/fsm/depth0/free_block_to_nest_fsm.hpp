@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <memory>
 
-#include "rcppsw/ta/taskable.hpp"
+#include "cosm/ta/taskable.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
@@ -52,7 +52,7 @@ NS_START(fsm, depth0);
  ******************************************************************************/
 /**
  * \class free_block_to_nest_fsm
- * \ingroup fordyca fsm depth0
+ * \ingroup fsm depth0
  *
  * \brief FILL ME IN!
  */
@@ -60,7 +60,7 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
                                      public rer::client<free_block_to_nest_fsm>,
                                      public cfmetrics::goal_acq_metrics,
                                      public block_transporter,
-                                     public rta::taskable {
+                                     public cta::taskable {
  public:
   free_block_to_nest_fsm(
       const fsm_ro_params* c_params,
@@ -68,10 +68,13 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
       std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
       rmath::rng* rng);
 
+  free_block_to_nest_fsm(const free_block_to_nest_fsm&) = delete;
+  free_block_to_nest_fsm& operator=(const free_block_to_nest_fsm&) = delete;
+
   /* taskable overrides */
   void task_execute(void) override;
   void task_reset(void) override { init(); }
-  void task_start(const rta::taskable_argument*) override {}
+  void task_start(const cta::taskable_argument*) override {}
 
   bool task_finished(void) const override {
     return ekST_FINISHED == current_state();
@@ -151,11 +154,11 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
   return &mc_state_map[index];
   }
 
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+
   /* clang-format off */
   acquire_free_block_fsm m_block_fsm;
   /* clang-format on */
-
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, fsm, fordyca);

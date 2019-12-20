@@ -38,10 +38,10 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/utils/color.hpp"
 
+#include "cosm/pal/swarm_manager.hpp"
+
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/fordyca.hpp"
-
-#include "cosm/pal/swarm_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,6 +52,10 @@ namespace config {
 struct convergence_config;
 } /* namespace config */
 } /* namespace cosm::convergence */
+
+namespace cosm::metrics::config {
+struct output_config;
+} /* namespace cosm::metrics::config */
 
 NS_START(fordyca);
 
@@ -81,7 +85,7 @@ class oracle_manager;
  ******************************************************************************/
 /**
  * \class base_loop_functions
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief The base loop functions in FORDYCA that all other loop functions
  * inherit from.
@@ -158,6 +162,13 @@ class base_loop_functions : public cpal::swarm_manager,
    * \param oraclep Parsed \ref oracle_manager parameters.
    */
   void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
+
+  /**
+   * \brief Initialize logging for all support/loop function code.
+   *
+   * \param output Parsed output parameters.
+   */
+  void output_init(const cmconfig::output_config* output) RCSW_COLD;
 
   std::vector<double> calc_robot_nn(uint n_threads) const;
   std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;

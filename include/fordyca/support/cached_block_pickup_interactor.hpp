@@ -48,7 +48,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \class cached_block_pickup_interactor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Handles a robot's (possible) \ref cached_block_pickup event on a given
  * timestep.

@@ -47,7 +47,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * \class cache_acq_point_selector
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Once an existing cache has been selected, select a point within the
  * cache to acquire.

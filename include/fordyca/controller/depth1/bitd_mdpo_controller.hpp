@@ -38,7 +38,7 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * \class bitd_mdpo_controller
- * \ingroup fordyca controller depth1
+ * \ingroup controller depth1
  *
  * \brief A controller defining the task allocation space via BIfurcating Task
  * Decomposition (BITD) and spliting the \ref generalist task into the \ref
@@ -75,7 +75,7 @@ class bitd_mdpo_controller : public depth1::bitd_dpo_controller,
    *
    * - Block selection matrix (\ref block_sel_matrix)
    * - Cache selection matrix (\ref cache_sel_matrix)
-   * - Task executive (\ref rta::bi_tdgraph_executive)
+   * - Task executive (\ref cta::bi_tdgraph_executive)
    * - MDPO perception subsystem (\ref mdpo_perception_subsystem)
    *
    * \param config_repo Handle to parameter repository for this controller

@@ -35,6 +35,9 @@
 
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
+#include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
+
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -56,9 +59,6 @@
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
-#include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
@@ -72,7 +72,7 @@ NS_START(detail);
 
 /**
  * \struct functor_maps_initializer
- * \ingroup fordyca support depth0 detail
+ * \ingroup support depth0 detail
  *
  * Convenience class containing initialization for all of the typeid ->
  * boost::variant maps for all controller types that are used throughout
@@ -147,7 +147,7 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
 void depth0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
   auto* arena = config()->config_get<config::arena::arena_map_config>();
-  auto* output = config()->config_get<cpconfig::output_config>();
+  auto* output = config()->config_get<cmconfig::output_config>();
 
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,

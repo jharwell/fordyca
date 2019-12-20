@@ -50,7 +50,7 @@ NS_START(support);
  ******************************************************************************/
 /**
  * \class los_visualizer
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Renders the LOS for a given robot for visualization/debugging
  * purposes.

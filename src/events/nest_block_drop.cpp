@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/nest_block_drop.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
@@ -46,8 +48,6 @@
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -67,7 +67,7 @@ nest_block_drop::nest_block_drop(std::unique_ptr<crepr::base_block2D> robot_bloc
  ******************************************************************************/
 void nest_block_drop::dispatch_nest_interactor(
     tasks::base_foraging_task* const task) {
-  RCSW_UNUSED auto* polled = dynamic_cast<rta::polled_task*>(task);
+  RCSW_UNUSED auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto interactor = dynamic_cast<events::nest_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non nest-interactor task %s causing nest block drop",

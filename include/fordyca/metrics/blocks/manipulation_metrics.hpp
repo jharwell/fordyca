@@ -39,7 +39,7 @@ NS_START(fordyca, metrics, blocks);
 
 /**
  * \class manipulation_metrics
- * \ingroup fordyca metrics blocks
+ * \ingroup metrics blocks
  *
  * \brief Defines the metrics to be collected from blocks about the process of
  * manipulation (pickup, drop, etc.)

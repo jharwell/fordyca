@@ -46,7 +46,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * \class existing_cache_selector
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Selects from among known caches (which are presumed to still exist at
  * this point, although that may not be true as a robot's knowledge of the arena

@@ -39,7 +39,7 @@ NS_START(fordyca, metrics, caches);
 
 /**
  * \class location_metrics
- * \ingroup fordyca metrics caches
+ * \ingroup metrics caches
  *
  * \brief Defines the metrics to be collected from a cache regarding its
  * location in the arena.

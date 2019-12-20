@@ -38,7 +38,7 @@ NS_START(fordyca, support, depth1);
  ******************************************************************************/
 /**
  * \class static_cache_creator
- * \ingroup fordyca support depth1
+ * \ingroup support depth1
  *
  * \brief Creates static cache(s) in the arena by taking \ref
  * base_cache::kMinBlocks from the allocated blocks and grouping them together

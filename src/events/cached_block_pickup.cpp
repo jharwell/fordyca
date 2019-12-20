@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/cached_block_pickup.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
@@ -50,8 +52,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/cache_collector.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -88,7 +88,7 @@ cached_block_pickup::cached_block_pickup(
 void cached_block_pickup::dispatch_d1_cache_interactor(
     tasks::base_foraging_task* const task) {
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
-  std::string task_name = dynamic_cast<rta::logical_task*>(task)->name();
+  std::string task_name = dynamic_cast<cta::logical_task*>(task)->name();
   ER_ASSERT(
       nullptr != task,
       "Non existing cache interactor task '%s' causing cached block pickup",
@@ -103,7 +103,7 @@ void cached_block_pickup::dispatch_d1_cache_interactor(
 bool cached_block_pickup::dispatch_d2_cache_interactor(
     tasks::base_foraging_task* task,
     controller::cache_sel_matrix* csel_matrix) {
-  auto* polled = dynamic_cast<rta::polled_task*>(task);
+  auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
   bool ret = false;
 

@@ -28,13 +28,13 @@
 #include <string>
 #include <typeindex>
 
+#include "cosm/controller/irv_recipient_controller.hpp"
+#include "cosm/pal/argos_controller2D_adaptor.hpp"
+#include "cosm/metrics/config/output_config.hpp"
+
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
-
-#include "cosm/controller/irv_recipient_controller.hpp"
-#include "cosm/pal/argos_controller2D_adaptor.hpp"
-#include "cosm/pal/config/output_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -71,7 +71,7 @@ class base_perception_subsystem;
  ******************************************************************************/
 /**
  * \class base_controller
- * \ingroup fordyca controller
+ * \ingroup controller
  *
  * \brief The base controller foraging class that all FORDYCA controllers derive
  * from. It holds all functionality common to all controllers, as well that some
@@ -169,7 +169,7 @@ class base_controller : public cpal::argos_controller2D_adaptor,
   void saa_init(
       const csubsystem::config::actuation_subsystem2D_config* actuation_p,
       const csubsystem::config::sensing_subsystem2D_config* sensing_p);
-  void output_init(const cpconfig::output_config* outputp);
+  void output_init(const cmconfig::output_config* outputp);
 
   /* clang-format off */
   class block_manip_collator           m_block_manip{};

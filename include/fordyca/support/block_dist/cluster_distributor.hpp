@@ -40,7 +40,7 @@ NS_START(fordyca, support, block_dist);
  ******************************************************************************/
 /**
  * \class cluster_distributor
- * \ingroup fordyca support block_dist
+ * \ingroup support block_dist
  *
  * \brief Distributes a block or set of blocks within the specified cluster
  * bounds randomly, using \ref random_distributor.

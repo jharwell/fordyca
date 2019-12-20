@@ -31,10 +31,10 @@
 #include "rcppsw/math/rng.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
+#include "cosm/fsm/acquire_goal_fsm.hpp"
+
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
-
-#include "cosm/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +66,7 @@ class foraging_expstrat;
  ******************************************************************************/
 /**
  * \class acquire_existing_cache_fsm
- * \ingroup fordyca fsm depth1
+ * \ingroup fsm depth1
  *
  * \brief Acquire an existing cache within the arena. Once such a cache has been
  * acquired (always by vectoring), it signals that it has completed its task.

@@ -46,7 +46,7 @@ NS_START(fordyca, support, depth2);
  ******************************************************************************/
 /**
  * \class cache_site_block_drop_interactor
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief Handles a robot's (possible) \ref free_block_drop event at a cache
  * site on a given timestep.

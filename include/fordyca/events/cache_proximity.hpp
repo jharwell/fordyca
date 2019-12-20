@@ -46,7 +46,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class cache_proximity
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Created whenever a robot is attempting to start a new cache, but an
  * existing cache unknown to the robot is too close.

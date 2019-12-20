@@ -38,7 +38,7 @@ NS_START(fordyca, config);
  ******************************************************************************/
 /**
  * \struct nest_config
- * \ingroup fordyca config arena
+ * \ingroup config arena
  *
  * \brief Configuration for the nest within the arena.
  */

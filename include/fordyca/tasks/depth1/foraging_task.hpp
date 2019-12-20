@@ -28,12 +28,13 @@
 #include <memory>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta { namespace config { struct task_alloc_config; }}}
+namespace cosm::ta::config { struct task_alloc_config; }
+
 NS_START(fordyca, tasks, depth1);
 
 /*******************************************************************************
@@ -41,7 +42,7 @@ NS_START(fordyca, tasks, depth1);
  ******************************************************************************/
 /**
  * \class foraging_task
- * \ingroup fordyca tasks depth1
+ * \ingroup tasks depth1
  *
  * \brief Interface specifying the visit set for all depth1 foraging tasks
  * in FORDYCA.
@@ -51,14 +52,14 @@ NS_START(fordyca, tasks, depth1);
  * this way.
  */
 class foraging_task : public base_foraging_task,
-                      public rta::polled_task {
+                      public cta::polled_task {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kHarvesterName[] = "Harvester";
 
   foraging_task(const std::string& name,
-                const struct rta::config::task_alloc_config *config,
-                std::unique_ptr<rta::taskable> mechanism);
+                const struct cta::config::task_alloc_config *config,
+                std::unique_ptr<cta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
   static bool task_in_depth1(const polled_task* task) RCSW_PURE;

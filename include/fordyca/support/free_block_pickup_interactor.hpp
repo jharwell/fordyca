@@ -47,7 +47,7 @@ NS_START(fordyca, support);
 
 /**
  * \class free_block_pickup_interactor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Handle's a robot's (possible) \ref free_block_pickup event on a given
  * timestep.

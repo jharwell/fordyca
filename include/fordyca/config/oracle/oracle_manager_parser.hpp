@@ -42,7 +42,7 @@ NS_START(fordyca, config, oracle);
  ******************************************************************************/
 /**
  * \class oracle_manager_parser
- * \ingroup fordyca config oracle
+ * \ingroup config oracle
  *
  * \brief Parses XML parameters used for oracles at the start of simulation.
  */

@@ -54,7 +54,7 @@ NS_START(tv);
  ******************************************************************************/
 /**
  * \class env_dynamics
- * \ingroup fordyca support tv
+ * \ingroup support tv
  *
  * \brief Orchestrates all application of temporal variance in environmental
  * conditions to the swarm.

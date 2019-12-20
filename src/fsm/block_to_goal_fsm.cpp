@@ -23,13 +23,13 @@
  ******************************************************************************/
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
-#include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/tasks/argument.hpp"
-
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
+#include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/tasks/argument.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,20 +51,21 @@ block_to_goal_fsm::block_to_goal_fsm(cfsm::acquire_goal_fsm* const goal_fsm,
       HFSM_CONSTRUCT_STATE(transport_to_goal, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(finished, hfsm::top_state()),
+      HFSM_DEFINE_STATE_MAP(mc_state_map,
+                            HFSM_STATE_MAP_ENTRY_EX(&start),
+                            HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
+                                                        nullptr,
+                                                        &entry_wait_for_signal,
+                                                        nullptr),
+                            HFSM_STATE_MAP_ENTRY_EX(&transport_to_goal),
+                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                                                        nullptr,
+                                                        &entry_wait_for_signal,
+                                                        nullptr),
+                            HFSM_STATE_MAP_ENTRY_EX(&finished)),
       m_goal_fsm(goal_fsm),
-      m_block_fsm(block_fsm),
-      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-                   HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
-                                               nullptr,
-                                               &entry_wait_for_signal,
-                                               nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&transport_to_goal),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
-                                               nullptr,
-                                               &entry_wait_for_signal,
-                                               nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX(&finished)} {}
+      m_block_fsm(block_fsm) {}
 
 HFSM_STATE_DEFINE(block_to_goal_fsm, start, rpfsm::event_data* data) {
   if (rpfsm::event_type::ekNORMAL == data->type()) {
@@ -252,7 +253,7 @@ void block_to_goal_fsm::init(void) {
   m_block_fsm->task_reset();
 } /* init() */
 
-void block_to_goal_fsm::task_start(const rta::taskable_argument* const arg) {
+void block_to_goal_fsm::task_start(const cta::taskable_argument* const arg) {
   auto* a = dynamic_cast<const tasks::foraging_signal_argument*>(arg);
   ER_ASSERT(nullptr != a, "Bad argument passed");
   inject_event(a->signal(), rpfsm::event_type::ekNORMAL);

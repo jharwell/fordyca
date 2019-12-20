@@ -25,9 +25,9 @@
 
 #include <algorithm>
 
-#include "fordyca/ds/cell2D.hpp"
-
 #include "cosm/repr/base_block2D.hpp"
+
+#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces

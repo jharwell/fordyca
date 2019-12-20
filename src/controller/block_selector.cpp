@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/block_selector.hpp"
 
-#include "fordyca/math/block_utility.hpp"
-
 #include "cosm/repr/base_block2D.hpp"
+
+#include "fordyca/math/block_utility.hpp"
 
 /*******************************************************************************
  * Namespaces

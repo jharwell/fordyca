@@ -60,7 +60,7 @@ void cache_vanished::dispatch_cache_interactor(
   ER_ASSERT(
       nullptr != interactor,
       "Non existing cache interactor task %s received cache vanished event",
-      dynamic_cast<rta::logical_task*>(task)->name().c_str());
+      dynamic_cast<cta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_cache_interactor() */
 

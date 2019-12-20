@@ -37,7 +37,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \class robot_los_updater_adaptor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Wrapping functor to update robot LOS each timestep. Needed for use
  * with boost::static_visitor.

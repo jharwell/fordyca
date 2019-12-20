@@ -41,7 +41,7 @@ NS_START(fordyca, config, block_sel);
  ******************************************************************************/
 /**
  * \struct block_sel_matrix_config
- * \ingroup fordyca config block_sel
+ * \ingroup config block_sel
  *
  * \brief XML parameters for the \ref block_sel_matrix
  */

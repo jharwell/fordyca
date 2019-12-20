@@ -33,8 +33,10 @@
 
 #include <boost/mpl/for_each.hpp>
 
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/ds/bi_tdgraph.hpp"
+#include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
@@ -60,9 +62,6 @@
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
-#include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
@@ -80,7 +79,7 @@ struct d1_subtask_status_extractor
   using controller_type = ControllerType;
 
   std::pair<bool, bool> operator()(const ControllerType* const c) const {
-    auto task = dynamic_cast<const rta::polled_task*>(c->current_task());
+    auto task = dynamic_cast<const cta::polled_task*>(c->current_task());
     return std::make_pair(
         task->name() == tasks::depth1::foraging_task::kHarvesterName,
         task->name() == tasks::depth1::foraging_task::kCollectorName);
@@ -89,7 +88,7 @@ struct d1_subtask_status_extractor
 
 /**
  * \struct d1_subtask_status_extractor_adaptor
- * \ingroup fordyca support depth1
+ * \ingroup support depth1
  *
  * \brief Calculate the \ref collector, \ref harvester task counts for depth1
  * when a static cache is depleted, for use in determining the static cache
@@ -113,7 +112,7 @@ struct d1_subtask_status_extractor_adaptor
 
 /**
  * \struct functor_maps_initializer
- * \ingroup fordyca support depth1 detail
+ * \ingroup support depth1 detail
  *
  * Convenience class containing initialization for all of the typeid ->
  * boost::variant maps for all controller types that are used throughout
@@ -209,7 +208,7 @@ void depth1_loop_functions::shared_init(ticpp::Element& node) {
 void depth1_loop_functions::private_init(void) {
   /* initialize stat collecting */
   auto* arena = config()->config_get<config::arena::arena_map_config>();
-  auto* output = config()->config_get<cpconfig::output_config>();
+  auto* output = config()->config_get<cmconfig::output_config>();
   m_metrics_agg = std::make_unique<depth1_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
                                                               output_root());
@@ -272,7 +271,7 @@ void depth1_loop_functions::oracle_init(void) {
     const auto& controller0 =
         dynamic_cast<controller::depth1::bitd_dpo_controller&>(
             robot0.GetControllableEntity().GetController());
-    auto* bigraph = dynamic_cast<const rta::ds::bi_tdgraph*>(
+    auto* bigraph = dynamic_cast<const cta::ds::bi_tdgraph*>(
         controller0.executive()->graph());
     oracle_manager()->tasking_oracle(
         std::make_unique<support::oracle::tasking_oracle>(&oraclep->tasking,

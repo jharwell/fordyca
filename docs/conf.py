@@ -105,6 +105,11 @@ exhale_args = {
     "exhaleDoxygenStdin":    "INPUT = ../include"
 }
 
+xref_links = {
+    "COSM": ("COSM", "https://cosm.readthedocs.io"),
+    "SILICON": ("SILICON", "https://silicon.readthedocs.io")
+}
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

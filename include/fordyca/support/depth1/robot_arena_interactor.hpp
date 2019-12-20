@@ -45,7 +45,7 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * \class robot_arena_interactor
- * \ingroup fordyca support depth1
+ * \ingroup support depth1
  *
  * \brief Handles a robot's interactions with the environment on each timestep.
  *

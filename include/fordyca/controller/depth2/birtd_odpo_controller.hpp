@@ -39,7 +39,7 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * \class birtd_odpo_controller
- * \ingroup fordyca controller depth2
+ * \ingroup controller depth2
  *
  * \brief A foraging controller built on \ref birtd_dpo_controller that has
  * perfect information about one or more of the following, depending on

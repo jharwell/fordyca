@@ -61,12 +61,12 @@ block_vanished::block_vanished(const rtypes::type_uuid& block_id)
 void block_vanished::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
   ER_INFO("Abort pickup executing task %s: block%d vanished",
-          dynamic_cast<rta::logical_task*>(task)->name().c_str(),
+          dynamic_cast<cta::logical_task*>(task)->name().c_str(),
           mc_block_id.v());
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non-free block interactor task %s triggered block vanished event",
-            dynamic_cast<rta::logical_task*>(task)->name().c_str());
+            dynamic_cast<cta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_free_block_interactor() */
 

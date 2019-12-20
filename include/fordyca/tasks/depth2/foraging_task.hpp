@@ -29,12 +29,13 @@
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw::ta::config { struct task_alloc_config; }
+namespace cosm::ta::config { struct task_alloc_config; }
+
 NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
@@ -42,7 +43,7 @@ NS_START(fordyca, tasks, depth2);
  ******************************************************************************/
 /**
  * \class foraging_task
- * \ingroup fordyca tasks depth2
+ * \ingroup tasks depth2
  *
  * \brief Interface specifying the visit set for all depth2 foraging tasks
  * in FORDYCA.
@@ -53,12 +54,12 @@ NS_START(fordyca, tasks, depth2);
  */
 class foraging_task
     : public base_foraging_task,
-      public rta::polled_task {
+      public cta::polled_task {
 
  public:
   foraging_task(const std::string& name,
-                const rta::config::task_alloc_config *config,
-                std::unique_ptr<rta::taskable> mechanism);
+                const cta::config::task_alloc_config *config,
+                std::unique_ptr<cta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
   static constexpr char kCacheStarterName[] = "Cache Starter";

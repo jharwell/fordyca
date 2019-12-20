@@ -37,7 +37,7 @@ NS_START(fordyca, config, oracle);
  ******************************************************************************/
 /**
  * \struct entities_oracle_config
- * \ingroup fordyca config oracle
+ * \ingroup config oracle
  *
  * \brief Parameters for all-seeing oracle of entity location/size/etc.
  */

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/config/depth2/controller_repository.hpp"
 
-#include "rcppsw/ta/config/xml/task_alloc_parser.hpp"
+#include "cosm/ta/config/xml/task_alloc_parser.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -36,17 +36,17 @@ NS_START(fordyca, config, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 controller_repository::controller_repository(void) {
-  parser_find<rta::config::xml::task_alloc_parser>(
-      rta::config::xml::task_alloc_parser::kXMLRoot)
+  parser_find<cta::config::xml::task_alloc_parser>(
+      cta::config::xml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("cache_starter");
-  parser_find<rta::config::xml::task_alloc_parser>(
-      rta::config::xml::task_alloc_parser::kXMLRoot)
+  parser_find<cta::config::xml::task_alloc_parser>(
+      cta::config::xml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("cache_finisher");
-  parser_find<rta::config::xml::task_alloc_parser>(
-      rta::config::xml::task_alloc_parser::kXMLRoot)
+  parser_find<cta::config::xml::task_alloc_parser>(
+      cta::config::xml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("cache_transferer");
-  parser_find<rta::config::xml::task_alloc_parser>(
-      rta::config::xml::task_alloc_parser::kXMLRoot)
+  parser_find<cta::config::xml::task_alloc_parser>(
+      cta::config::xml::task_alloc_parser::kXMLRoot)
       ->exec_est_task_add("cache_collector");
 }
 

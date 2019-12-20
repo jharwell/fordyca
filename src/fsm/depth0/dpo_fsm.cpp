@@ -43,13 +43,14 @@ dpo_fsm::dpo_fsm(const fsm_ro_params* params,
       HFSM_CONSTRUCT_STATE(leaving_nest, &start),
       HFSM_CONSTRUCT_STATE(start, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(block_to_nest, hfsm::top_state()),
-      m_block_fsm(params, saa, std::move(exp_behavior), rng),
-      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-                   HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
-                                               nullptr,
-                                               &entry_leaving_nest,
-                                               nullptr)} {
+      HFSM_DEFINE_STATE_MAP(mc_state_map,
+                            HFSM_STATE_MAP_ENTRY_EX(&start),
+                            HFSM_STATE_MAP_ENTRY_EX(&block_to_nest),
+                            HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+                                                        nullptr,
+                                                        &entry_leaving_nest,
+                                                        nullptr)),
+      m_block_fsm(params, saa, std::move(exp_behavior), rng) {
   hfsm::change_parent(ekST_LEAVING_NEST, &start);
 }
 

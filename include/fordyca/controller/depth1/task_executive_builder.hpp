@@ -36,7 +36,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw::ta {
+namespace cosm::ta {
 class polled_task;
 class bi_tdgraph_executive;
 namespace ds {
@@ -65,7 +65,7 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * \class task_executive_builder
- * \ingroup fordyca controller depth1
+ * \ingroup controller depth1
  *
  * \brief A helper class to offload initialization of the task tree and
  * executive for depth1 foraging.
@@ -81,12 +81,12 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   task_executive_builder& operator=(const task_executive_builder&) = delete;
   task_executive_builder(const task_executive_builder&) = delete;
 
-  std::unique_ptr<rta::bi_tdgraph_executive>
+  std::unique_ptr<cta::bi_tdgraph_executive>
   operator()(const config::depth1::controller_repository& config_repo,
              rmath::rng* rng) RCSW_COLD;
 
  protected:
-  using tasking_map = std::map<std::string, rta::polled_task*>;
+  using tasking_map = std::map<std::string, cta::polled_task*>;
 
   RCSW_COLD const base_perception_subsystem* perception(void) const { return m_perception; }
   RCSW_COLD base_perception_subsystem* perception(void) { return m_perception; }
@@ -105,13 +105,13 @@ class task_executive_builder : public rer::client<task_executive_builder> {
 
   RCSW_COLD tasking_map depth1_tasks_create(
       const config::depth1::controller_repository& config_repo,
-      rta::ds::bi_tdgraph* graph,
+      cta::ds::bi_tdgraph* graph,
       rmath::rng* rng);
 
   RCSW_COLD void depth1_exec_est_init(
       const config::depth1::controller_repository& config_repo,
       const tasking_map& map,
-      rta::ds::bi_tdgraph* graph,
+      cta::ds::bi_tdgraph* graph,
       rmath::rng* rng);
 
  private:

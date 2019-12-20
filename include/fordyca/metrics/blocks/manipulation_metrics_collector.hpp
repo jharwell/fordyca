@@ -41,7 +41,7 @@ NS_START(fordyca, metrics, blocks);
  ******************************************************************************/
 /**
  * \class manipulation_metrics_collector
- * \ingroup fordyca metrics blocks
+ * \ingroup metrics blocks
  *
  * \brief Collector for \ref manipulation_metrics.
  *

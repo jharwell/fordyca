@@ -61,7 +61,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class cache_block_drop
- * \ingroup fordyca events
+ * \ingroup events
  *
  * \brief Created whenever a robot drops a block in a cache.
  *

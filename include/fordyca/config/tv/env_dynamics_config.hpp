@@ -39,7 +39,7 @@ NS_START(fordyca, config, tv);
  ******************************************************************************/
 /**
  * \struct env_dynamics_config
- * \ingroup fordyca config tv
+ * \ingroup config tv
  *
  * \brief Configuration for the \ref env_dynamics.
  */

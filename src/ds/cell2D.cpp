@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/ds/cell2D.hpp"
 
-#include "fordyca/repr/base_cache.hpp"
-
 #include "cosm/repr/base_block2D.hpp"
+
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -47,7 +47,7 @@ NS_START(fordyca, support, tv);
 
 /**
  * \class temporal_penalty_handler
- * \ingroup fordyca support tv
+ * \ingroup support tv
  *
  * \brief The penalty handler for penalties for robots (e.g. how long they have
  * to wait when they pickup/drop a block).

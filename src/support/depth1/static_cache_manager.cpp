@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
@@ -29,8 +31,6 @@
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

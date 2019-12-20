@@ -39,7 +39,7 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 /**
  * \class ledtaxis
- * \ingroup fordyca fsm expstrat
+ * \ingroup fsm expstrat
  *
  * \brief Assumes that the target entity type isequipped with an LED entity that
  * robots can detect with their blob camera. Performs phototaxis towards the
@@ -62,7 +62,7 @@ class ledtaxis : public foraging_expstrat,
   ledtaxis& operator=(const ledtaxis&) = delete;
 
   /* taskable overrides */
-  void task_start(const rta::taskable_argument*) override final {
+  void task_start(const cta::taskable_argument*) override final {
     m_task_running = true;
   }
 

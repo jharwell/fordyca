@@ -25,8 +25,11 @@
 
 #include <fstream>
 
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/ds/bi_tdgraph.hpp"
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
@@ -37,10 +40,6 @@
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -135,17 +134,17 @@ void bitd_dpo_controller::private_init(
       &bitd_dpo_controller::task_start_cb, this, std::placeholders::_1));
 } /* private_init() */
 
-void bitd_dpo_controller::task_abort_cb(const rta::polled_task*) {
+void bitd_dpo_controller::task_abort_cb(const cta::polled_task*) {
   m_task_status = tasks::task_status::ekABORT_PENDING;
 } /* task_abort_cb() */
 
-void bitd_dpo_controller::task_start_cb(const rta::polled_task*) {
+void bitd_dpo_controller::task_start_cb(const cta::polled_task*) {
   if (tasks::task_status::ekABORT_PENDING != m_task_status) {
     m_task_status = tasks::task_status::ekRUNNING;
   }
 } /* task_start_cb() */
 
-const rta::ds::bi_tab* bitd_dpo_controller::active_tab(void) const {
+const cta::ds::bi_tab* bitd_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
 
@@ -159,7 +158,7 @@ const tasks::base_foraging_task* bitd_dpo_controller::current_task(void) const {
 } /* current_task() */
 
 void bitd_dpo_controller::executive(
-    std::unique_ptr<rta::bi_tdgraph_executive> executive) {
+    std::unique_ptr<cta::bi_tdgraph_executive> executive) {
   m_executive = std::move(executive);
 }
 
@@ -193,11 +192,11 @@ RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
  ******************************************************************************/
 int bitd_dpo_controller::current_task_depth(void) const {
   return executive()->graph()->vertex_depth(
-      dynamic_cast<const rta::polled_task*>(current_task()));
+      dynamic_cast<const cta::polled_task*>(current_task()));
 } /* current_task_depth() */
 
 int bitd_dpo_controller::current_task_id(void) const {
-  auto task = dynamic_cast<const rta::polled_task*>(current_task());
+  auto task = dynamic_cast<const cta::polled_task*>(current_task());
   if (nullptr != task) {
     return executive()->graph()->vertex_id(task);
   }
@@ -210,7 +209,7 @@ int bitd_dpo_controller::task_id(const std::string& task_name) const {
 } /* task_id() */
 
 int bitd_dpo_controller::current_task_tab(void) const {
-  return dynamic_cast<const rta::ds::bi_tdgraph*>(executive()->graph())
+  return dynamic_cast<const cta::ds::bi_tdgraph*>(executive()->graph())
       ->active_tab_id();
 } /* current_task_tab() */
 

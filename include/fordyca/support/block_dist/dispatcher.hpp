@@ -58,7 +58,7 @@ class base_distributor;
  ******************************************************************************/
 /**
  * \class dispatcher
- * \ingroup fordyca block_dist support
+ * \ingroup block_dist support
  *
  * \brief Dispatches call to distribute blocks (or a single block), as
  * configured in simulation input file.

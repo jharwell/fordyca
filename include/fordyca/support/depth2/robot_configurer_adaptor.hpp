@@ -47,7 +47,7 @@ using configurer_map_type = rds::type_map<
  ******************************************************************************/
 /**
  * \class robot_configurer_adaptor
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief Wrapping functor to perform robot controller configuration during
  * initialization.

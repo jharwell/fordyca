@@ -23,6 +23,9 @@
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/cache_acq_point_selector.hpp"
@@ -31,9 +34,6 @@
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/repr/base_cache.hpp"
-
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

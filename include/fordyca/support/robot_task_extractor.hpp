@@ -36,7 +36,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \struct robot_task_extractor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Given a robot controller of type T, extract the ID of its current
  * task. This is used in computing task distribution entropy in depth1, depth2

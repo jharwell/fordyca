@@ -40,7 +40,7 @@ NS_START(fordyca, config, arena);
  ******************************************************************************/
 /**
  * \struct block_dist_config
- * \ingroup fordyca config arena
+ * \ingroup config arena
  *
  * \brief Configuration for block distribution in the arena by the loop
  * functions.

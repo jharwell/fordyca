@@ -25,6 +25,8 @@
 
 #include <algorithm>
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/ds/cell2D.hpp"
@@ -34,8 +36,6 @@
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/cell2D_states.hpp"
 #include "fordyca/repr/base_cache.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

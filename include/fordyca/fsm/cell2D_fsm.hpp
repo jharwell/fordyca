@@ -43,7 +43,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 /**
  * \class cell2D_fsm
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Per-cell FSM containing the current state of the cell (empty, has a
  * block, has a cache, or unknown, etc.).
@@ -53,10 +53,29 @@ class cell2D_fsm final : public rpfsm::simple_fsm,
                          public rer::client<cell2D_fsm> {
  public:
   using states = cell2D_states;
-  cell2D_fsm(void);
-  ~cell2D_fsm(void) override = default;
-  cell2D_fsm(const cell2D_fsm& other) = default;
 
+  cell2D_fsm(void);
+
+  ~cell2D_fsm(void) override = default;
+  cell2D_fsm& operator=(const cell2D_fsm&) = delete;
+
+  /**
+   * \brief Initialize a COPY of a class instance via copy construction.
+   *
+   * This function is necessary to use this class with \ref
+   * rcppsw::ds::stacked_grid, because the boost::multi_array it is built on
+   * only calls the constructor for the cell object type ONCE, and then uses the
+   * copy constructor to initialize the rest of the cells.
+   *
+   * My FSM paradigm uses *MEMBER* function pointers, so you need to initialize
+   * the state map cleanly WITHOUT copy construction (even though this is the
+   * copy constructor), otherwise all copies of the object will use the \p other
+   * object's state map (default behavior in default copy constructor). If \p
+   * other is destructed, then you will get a segfault due to dangling pointers.
+   */
+  cell2D_fsm(const cell2D_fsm& other);
+
+  /* simple_fsm overrides */
   void init(void) override;
 
   bool state_is_known(void) const {
@@ -102,20 +121,10 @@ class cell2D_fsm final : public rpfsm::simple_fsm,
   FSM_STATE_DECLARE_ND(cell2D_fsm, state_cache_extent);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
-    FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP){
-        FSM_STATE_MAP_ENTRY(&state_unknown),
-        FSM_STATE_MAP_ENTRY(&state_empty),
-        FSM_STATE_MAP_ENTRY(&state_block),
-        FSM_STATE_MAP_ENTRY(&state_cache),
-        FSM_STATE_MAP_ENTRY(&state_cache_extent),
-    };
-    FSM_VERIFY_STATE_MAP(state_map,
-                         kSTATE_MAP,
-                         std::underlying_type<states>::type(
-                             states::ekST_MAX_STATES));
-    return &kSTATE_MAP[index];
+    return &mc_state_map[index];
   }
 
+  FSM_DECLARE_STATE_MAP(state_map, mc_state_map, states::ekST_MAX_STATES);
   /* clang-format off */
   uint m_block_count{0};
   /* clang-format on */

@@ -26,14 +26,22 @@
 #include <boost/mpl/for_each.hpp>
 #include <vector>
 
-#include "rcppsw/metrics/tasks/bi_tab_metrics.hpp"
-#include "rcppsw/metrics/tasks/bi_tab_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/bi_tdgraph_metrics_collector.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics.hpp"
-#include "rcppsw/metrics/tasks/execution_metrics_collector.hpp"
 #include "rcppsw/mpl/typelist.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/ds/bi_tab.hpp"
+
+#include "cosm/fsm/metrics/collision_metrics.hpp"
+#include "cosm/fsm/metrics/current_explore_locs_metrics_collector.hpp"
+#include "cosm/fsm/metrics/current_vector_locs_metrics_collector.hpp"
+#include "cosm/fsm/metrics/goal_acq_locs_metrics_collector.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics_collector.hpp"
+#include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/ds/bi_tab.hpp"
+#include "cosm/ta/metrics/bi_tab_metrics.hpp"
+#include "cosm/ta/metrics/bi_tab_metrics_collector.hpp"
+#include "cosm/ta/metrics/bi_tdgraph_metrics_collector.hpp"
+#include "cosm/ta/metrics/execution_metrics.hpp"
+#include "cosm/ta/metrics/execution_metrics_collector.hpp"
 
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
@@ -45,14 +53,6 @@
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-
-#include "cosm/fsm/metrics/collision_metrics.hpp"
-#include "cosm/fsm/metrics/current_explore_locs_metrics_collector.hpp"
-#include "cosm/fsm/metrics/current_vector_locs_metrics_collector.hpp"
-#include "cosm/fsm/metrics/goal_acq_locs_metrics_collector.hpp"
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/metrics/goal_acq_metrics_collector.hpp"
-#include "cosm/fsm/metrics/movement_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -67,12 +67,9 @@ using collector_typelist = rmpl::typelist<
         cfmetrics::current_explore_locs_metrics_collector>,
     metrics::collector_registerer::type_wrap<
         cfmetrics::current_vector_locs_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        rmetrics::tasks::execution_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        rmetrics::tasks::bi_tab_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        rmetrics::tasks::bi_tdgraph_metrics_collector>,
+    metrics::collector_registerer::type_wrap<ctametrics::execution_metrics_collector>,
+    metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
+    metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
     metrics::collector_registerer::type_wrap<
         metrics::caches::utilization_metrics_collector>,
     metrics::collector_registerer::type_wrap<
@@ -88,7 +85,7 @@ using task1 = tasks::depth1::foraging_task;
  * Constructors/Destructors
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
-    const cpconfig::metrics_config* const mconfig,
+    const cmconfig::metrics_config* const mconfig,
     const config::grid_config* const gconfig,
     const std::string& output_root)
     : depth0_metrics_aggregator(mconfig, gconfig, output_root),
@@ -106,19 +103,19 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       {typeid(cfmetrics::current_vector_locs_metrics_collector),
        "cache_acq_vector_locs",
        "caches::acq_vector_locs"},
-      {typeid(rmetrics::tasks::execution_metrics_collector),
+      {typeid(ctametrics::execution_metrics_collector),
        "task_execution_collector",
        "tasks::execution::" + std::string(task1::kCollectorName)},
-      {typeid(rmetrics::tasks::execution_metrics_collector),
+      {typeid(ctametrics::execution_metrics_collector),
        "task_execution_harvester",
        "tasks::execution::" + std::string(task1::kHarvesterName)},
-      {typeid(rmetrics::tasks::execution_metrics_collector),
+      {typeid(ctametrics::execution_metrics_collector),
        "task_execution_generalist",
        "tasks::execution::" + std::string(task0::kGeneralistName)},
-      {typeid(rmetrics::tasks::bi_tab_metrics_collector),
+      {typeid(ctametrics::bi_tab_metrics_collector),
        "task_tab_generalist",
        "tasks::tab::generalist"},
-      {typeid(rmetrics::tasks::bi_tdgraph_metrics_collector),
+      {typeid(ctametrics::bi_tdgraph_metrics_collector),
        "task_distribution",
        "tasks::distribution"},
       {typeid(metrics::caches::utilization_metrics_collector),
@@ -154,7 +151,7 @@ void depth1_metrics_aggregator::collect_from_cache_manager(
 } /* collect_from_cache() */
 
 void depth1_metrics_aggregator::task_finish_or_abort_cb(
-    const rta::polled_task* const task) {
+    const cta::polled_task* const task) {
   /*
    * Both depth1 and depth2 metrics aggregators are registered on the same
    * callback, so this function will be called for the depth2 task abort/finish
@@ -164,11 +161,11 @@ void depth1_metrics_aggregator::task_finish_or_abort_cb(
     return;
   }
   collect("tasks::execution::" + task->name(),
-          dynamic_cast<const rmetrics::tasks::execution_metrics&>(*task));
+          dynamic_cast<const ctametrics::execution_metrics&>(*task));
 } /* task_finish_or_abort_cb() */
 
-void depth1_metrics_aggregator::task_start_cb(const rta::polled_task* const,
-                                              const rta::ds::bi_tab* const tab) {
+void depth1_metrics_aggregator::task_start_cb(const cta::polled_task* const,
+                                              const cta::ds::bi_tab* const tab) {
   /* Not using stochastic nbhd policy */
   if (nullptr == tab) {
     return;

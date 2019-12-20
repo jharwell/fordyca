@@ -40,7 +40,7 @@ NS_START(fordyca, support, depth0);
  ******************************************************************************/
 /**
  * \struct robot_configurer
- * \ingroup fordyca support depth0
+ * \ingroup support depth0
  *
  * \brief Functor to perform controller configuration during initialization.
  */

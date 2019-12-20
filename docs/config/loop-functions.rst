@@ -14,7 +14,7 @@ The following root XML tags are defined under ``<loop_functions>``:
 +------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
 | ``oracle_manager``     | None                       | Parameters for the oracle, which allows swarms to make decisions based on perfect information (performance upper bound).     |
 +------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
-| ``temporal_variance``  | None                       | Parameters for the various types of temporal waveforms that can be applied to swarm/environmental state during simulation.   |
+| ``temporal_variance``  | None                       | Parameters for the various types of temporal that can be applied to swarm/environmental state during simulation.             |
 +------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
 | ``caches``             | Depth1, depth2 controllers | Parameters for the use of caches in the arena.                                                                               |
 +------------------------+----------------------------+------------------------------------------------------------------------------------------------------------------------------+
@@ -154,7 +154,9 @@ type.
 +------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
 | ``swarm_convergence``                          | Results of swarm convergence calculations.                                    | Requires convergence calculations to be enabled. |
 +------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
-| ``loop_temporal_variance``                     | Waveforms of the penalties applied to the swarm.                              | Output every timestep.                           |
+| ``tv_environment``                             | Waveforms of the penalties applied to the swarm.                              | Output every timestep.                           |
++------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
+| ``tv_population``                              | Poisson processes for governing population dynamics.                          |                                                  |
 +------------------------------------------------+-------------------------------------------------------------------------------+--------------------------------------------------+
 
 ``convergence``
@@ -393,20 +395,30 @@ XML configuration:
 - Required child attributes if present: none.
 - Required child tags if present: none.
 - Optional child attributes: none.
-- Optional child tags: [ ``blocks``, ``caches`` ].
+- Optional child tags: [ ``env_dynamics``, ``population_dynamics`` ].
 
 XML configuration:
 
 .. code-block:: XML
 
    <temporal_variance>
-       <blocks>
+       <env_dynamics>
        ...
-       </blocks>
-       <caches>
+       </env_dynamics>
+       <population_dynamics>
        ...
-       </caches>
+       </population_dynamics>
    </temporal_variance>
+
+
+``temporal_variance/env_dynamics``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: none.
+- Optional child tags: [ ``manipulation_penalty``, ``carry_throttle`` ].
 
 Subsections in this section make use of the ``waveform`` XML configuration block:
 
@@ -424,21 +436,11 @@ Subsections in this section make use of the ``waveform`` XML configuration block
 
 Other parameters are self explanatory. ``phase`` is specified in radians.
 
-``temporal_variance/blocks``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Required by: none.
-- Required child attributes if present: none.
-- Required child tags if present: none.
-- Optional child attributes: none.
-- Optional child tags: [ ``manipulation_penalty``, ``carry_throttle`` ].
-
 XML configuration:
 
 .. code-block:: XML
 
-   <temporal_variance>
-       ...
+   <env_dynamics>
        <blocks>
            <manipulation_penalty>
            ...
@@ -447,11 +449,10 @@ XML configuration:
            ...
            </carry_throttle>
            </blocks>
-       ...
-   </temporal_variance>
+   </env_dynamics>
 
-``temporal_variance/blocks/manipulation_penalty``
-"""""""""""""""""""""""""""""""""""""""""""""""""
+``temporal_variance/env_dynamics/blocks/manipulation_penalty``
+##############################################################
 
 - Required by: none.
 - Required child attributes if present: none.
@@ -476,8 +477,8 @@ XML configuration:
 - ``waveform`` - Parameters defining the waveform of block manipulation penalty
   (picking up/dropping that does not involve caches).
 
-``temporal_variance/blocks/carry_throttle``
-"""""""""""""""""""""""""""""""""""""""""""
+``temporal_variance/env_dynamics/blocks/carry_throttle``
+########################################################
 
 - Required by: none.
 - Required child attributes if present: none.
@@ -502,8 +503,8 @@ XML configuration:
 - ``waveform`` - Parameters defining the waveform of block carry penalty (how
   much slower robots move when carrying a block).
 
-``temporal_variance/caches``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``temporal_variance/env_dynamics/caches``
+#########################################
 
 - Required by: none.
 - Required child attributes if present: none.
@@ -549,8 +550,52 @@ XML configuration:
    </caches>
 
 
-- ``waveform`` - Parameters defining the waveform of cache usage penalty (picking
-  up/dropping).
+- ``waveform`` - Parameters defining the waveform of cache usage penalty
+  (picking up/dropping).
+
+``temporal_variance/population_dynamics``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Required by: none.
+- Required child attributes if present: none.
+- Required child tags if present: none.
+- Optional child attributes: [ ``birth_mu``, ``death_lambda`` ,
+  ``repair_lambda``, ``repair_mu`` ]. 
+- Optional child tags: none.
+
+XML configuration:
+
+.. code-block:: XML
+
+   <temporal_variance>
+       ...
+       <population_dynamics
+           birth_mu="0.0"
+           death_lambda="0.0"
+           repair_lambda="0.0"
+           repair_mu="0.0"
+           max_size="0"/>
+       ...
+   </temporal_variance>
+
+All parameters have the default values shown above if omitted.
+
+- ``birth_mu`` - Parameter for pure birth Poisson process describing the rate at
+  which new robots will be introduced into the simulation, up to ``max_size``
+  robots.
+
+- ``death_lambda`` - Parameter for pure death Poisson process describing the
+  rate at which existing robots will be permanently removed from simulation.
+
+- ``repair_lambda`` - Parameter for general birth-death Poisson process
+  describing the rate at which robots will be temporarily removed from
+  simulation in order to simulate being repaired (i.e. added to repair queue).
+
+- ``repair_mu`` - Parameter for general birth-death Poisson process
+  describing the rate at which robots which have been temporarily removed from
+  the simulation will be restored (i.e. removed from repair queue).
+
+- ``max_size`` - The maximum swarm size achievable using the pure birth process.
 
 ``arena_map``
 -------------

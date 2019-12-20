@@ -50,7 +50,7 @@ struct functor_maps_initializer;
  ******************************************************************************/
 /**
  * \class depth2_loop_functions
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief The loop functions for depth 2 foraging.
  *

@@ -28,16 +28,6 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "fordyca/config/metrics_parser.hpp"
-#include "fordyca/controller/base_controller.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
-#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
-#include "fordyca/metrics/collector_registerer.hpp"
-#include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
-#include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
-#include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
-
 #include "cosm/convergence/convergence_calculator.hpp"
 #include "cosm/fsm/metrics/collision_locs_metrics_collector.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
@@ -55,6 +45,17 @@
 #include "cosm/metrics/spatial_dist2D_metrics.hpp"
 #include "cosm/metrics/spatial_dist2D_pos_metrics_collector.hpp"
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/tv/metrics/population_dynamics_metrics.hpp"
+#include "cosm/tv/metrics/population_dynamics_metrics_collector.hpp"
+
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics.hpp"
+#include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+#include "fordyca/metrics/collector_registerer.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics.hpp"
+#include "fordyca/metrics/tv/env_dynamics_metrics_collector.hpp"
+#include "fordyca/support/base_loop_functions.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -74,7 +75,8 @@ using collector_typelist = rmpl::typelist<
     collector_registerer::type_wrap<blocks::manipulation_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::spatial_dist2D_pos_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::convergence_metrics_collector>,
-    collector_registerer::type_wrap<tv::env_dynamics_metrics_collector> >;
+    collector_registerer::type_wrap<tv::env_dynamics_metrics_collector>,
+    collector_registerer::type_wrap<ctvmetrics::population_dynamics_metrics_collector> >;
 
 NS_END(detail);
 
@@ -82,7 +84,7 @@ NS_END(detail);
  * Constructors/Destructors
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
-    const cpconfig::metrics_config* const mconfig,
+    const cmconfig::metrics_config* const mconfig,
     const config::grid_config* const gconfig,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
@@ -128,7 +130,10 @@ base_metrics_aggregator::base_metrics_aggregator(
        "swarm::convergence"},
       {typeid(tv::env_dynamics_metrics_collector),
        "tv_environment",
-       "tv::environment"}};
+       "tv::environment"},
+      {typeid(ctvmetrics::population_dynamics_metrics_collector),
+       "tv_population",
+       "tv::population"}};
 
   collector_registerer registerer(mconfig, gconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
@@ -143,7 +148,12 @@ void base_metrics_aggregator::collect_from_loop(
   if (nullptr != loop->conv_calculator()) {
     collect("swarm::convergence", *loop->conv_calculator());
   }
+
   collect("tv::environment", *loop->tv_manager()->environ_dynamics());
+
+  if (loop->tv_manager()->population_dynamics()) {
+    collect("tv::population", *loop->tv_manager()->population_dynamics());
+  }
 } /* collect_from_loop() */
 
 void base_metrics_aggregator::collect_from_block(

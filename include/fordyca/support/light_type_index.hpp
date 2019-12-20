@@ -41,7 +41,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \class light_type_index
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Index mapping an entity type to the color of the light that should be
  * associated with it, so that what things should have lights of what color is

@@ -40,7 +40,7 @@ class nest_block_drop;
  ******************************************************************************/
 /**
  * \class nest_interactor
- * \ingroup fordyca events
+ * \ingroup events
  *
  * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with the nest in FORDYCA.

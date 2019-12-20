@@ -47,7 +47,7 @@ NS_START(ds);
  ******************************************************************************/
 /**
  * \class dpo_store
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief Stores sets of caches and blocks the robot encounters in the arena,
  * along with the pheromone-based relevance for each. Also contains the logic

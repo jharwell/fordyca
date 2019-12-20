@@ -25,11 +25,11 @@
 
 #include "rcppsw/math/config/xml/rng_parser.hpp"
 
-#include "fordyca/config/exploration_parser.hpp"
-
-#include "cosm/pal/config/xml/output_parser.hpp"
+#include "cosm/metrics/config/xml/output_parser.hpp"
 #include "cosm/subsystem/config/xml/actuation_subsystem2D_parser.hpp"
 #include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
+
+#include "fordyca/config/exploration_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,8 +42,8 @@ namespace cscxml = csconfig::xml;
  * Constructors/Destructor
  ******************************************************************************/
 base_controller_repository::base_controller_repository(void) {
-  parser_register<cpconfig::xml::output_parser, cpconfig::output_config>(
-      cpconfig::xml::output_parser::kXMLRoot);
+  parser_register<cmconfig::xml::output_parser, cmconfig::output_config>(
+      cmconfig::xml::output_parser::kXMLRoot);
   parser_register<cscxml::actuation_subsystem2D_parser,
                   csconfig::actuation_subsystem2D_config>(
       cscxml::actuation_subsystem2D_parser::kXMLRoot);

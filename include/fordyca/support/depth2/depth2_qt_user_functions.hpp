@@ -35,7 +35,7 @@ NS_START(fordyca, support, depth2);
  ******************************************************************************/
 /**
  * \class depth2_qt_user_functions
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief Contains hooks for Qt to draw the visualizations related to depth 2
  * task decomposition:

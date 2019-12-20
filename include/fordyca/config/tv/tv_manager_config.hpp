@@ -40,7 +40,7 @@ NS_START(fordyca, config, tv);
  ******************************************************************************/
 /**
  * \struct tv_manager_config
- * \ingroup fordyca config tv
+ * \ingroup config tv
  *
  * \brief Configuration for the \ref tv_manager.
  */

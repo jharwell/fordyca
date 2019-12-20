@@ -31,9 +31,9 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
 
-#include "fordyca/fordyca.hpp"
+#include "cosm/metrics/config/metrics_config.hpp"
 
-#include "cosm/pal/config/metrics_config.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -64,7 +64,7 @@ NS_START(metrics);
  ******************************************************************************/
 /**
  * \class base_metrics_aggregator
- * \ingroup fordyca metrics
+ * \ingroup metrics
  *
  * \brief Base class for aggregating collection of metrics for various
  * sources. Extends \ref rmetrics::collector_group to include
@@ -73,7 +73,7 @@ NS_START(metrics);
 class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
                                 public rmetrics::collector_group {
  public:
-  base_metrics_aggregator(const cpconfig::metrics_config* mconfig,
+  base_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                           const config::grid_config* const gconfig,
                           const std::string& output_root);
   ~base_metrics_aggregator(void) override = default;

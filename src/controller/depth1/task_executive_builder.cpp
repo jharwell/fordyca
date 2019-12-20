@@ -25,11 +25,13 @@
 
 #include <vector>
 
-#include "rcppsw/ta/bi_tdgraph_allocator.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/config/task_alloc_config.hpp"
-#include "rcppsw/ta/config/task_executive_config.hpp"
-#include "rcppsw/ta/ds/bi_tdgraph.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/ta/bi_tdgraph_allocator.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/config/task_alloc_config.hpp"
+#include "cosm/ta/config/task_executive_config.hpp"
+#include "cosm/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -45,9 +47,6 @@
 #include "fordyca/tasks/depth0/generalist.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
-
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -75,9 +74,9 @@ task_executive_builder::~task_executive_builder(void) = default;
  ******************************************************************************/
 task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
     const config::depth1::controller_repository& config_repo,
-    rta::ds::bi_tdgraph* const graph,
+    cta::ds::bi_tdgraph* const graph,
     rmath::rng* rng) {
-  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
+  auto* task_config = config_repo.config_get<cta::config::task_alloc_config>();
   auto* exp_config = config_repo.config_get<config::exploration_config>();
   fsm::expstrat::block_factory block_factory;
   fsm::expstrat::cache_factory cache_factory;
@@ -122,7 +121,7 @@ task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
   generalist->set_atomic(false);
 
   graph->set_root(std::move(generalist));
-  rta::ds::bi_tdgraph::vertex_vector children;
+  cta::ds::bi_tdgraph::vertex_vector children;
   children.push_back(std::move(harvester));
   children.push_back(std::move(collector));
   graph->install_tab(tasks::depth0::foraging_task::kGeneralistName,
@@ -140,9 +139,9 @@ task_executive_builder::tasking_map task_executive_builder::depth1_tasks_create(
 void task_executive_builder::depth1_exec_est_init(
     const config::depth1::controller_repository& config_repo,
     const tasking_map& map,
-    rta::ds::bi_tdgraph* const graph,
+    cta::ds::bi_tdgraph* const graph,
     rmath::rng* rng) {
-  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
+  auto* task_config = config_repo.config_get<cta::config::task_alloc_config>();
   if (!task_config->exec_est.seed_enabled) {
     return;
   }
@@ -179,33 +178,33 @@ void task_executive_builder::depth1_exec_est_init(
   collector->exec_estimate_init(c_bounds, rng);
 } /* depth1_exec_est_init() */
 
-std::unique_ptr<rta::bi_tdgraph_executive> task_executive_builder::operator()(
+std::unique_ptr<cta::bi_tdgraph_executive> task_executive_builder::operator()(
     const config::depth1::controller_repository& config_repo,
     rmath::rng* rng) {
-  auto* task_config = config_repo.config_get<rta::config::task_alloc_config>();
+  auto* task_config = config_repo.config_get<cta::config::task_alloc_config>();
   auto variant =
-      std::make_unique<rta::ds::ds_variant>(rta::ds::bi_tdgraph(task_config));
-  auto graph = boost::get<rta::ds::bi_tdgraph>(variant.get());
+      std::make_unique<cta::ds::ds_variant>(cta::ds::bi_tdgraph(task_config));
+  auto graph = boost::get<cta::ds::bi_tdgraph>(variant.get());
   auto map = depth1_tasks_create(config_repo, graph, rng);
   const auto* execp =
-      config_repo.config_get<rta::config::task_executive_config>();
-  const auto* allocp = config_repo.config_get<rta::config::task_alloc_config>();
+      config_repo.config_get<cta::config::task_executive_config>();
+  const auto* allocp = config_repo.config_get<cta::config::task_alloc_config>();
 
   /* can be omitted if the user wants the default values */
   if (nullptr == execp) {
-    execp = std::make_unique<rta::config::task_executive_config>().get();
+    execp = std::make_unique<cta::config::task_executive_config>().get();
   }
 
   /*
    * Only necessary if we are using the stochastic neighborhood policy; causes
    * segfaults due to asserts otherwise.
    */
-  if (rta::bi_tdgraph_allocator::kPolicyStochNBHD1 == allocp->policy) {
+  if (cta::bi_tdgraph_allocator::kPolicyStochNBHD1 == allocp->policy) {
     graph->active_tab_init(allocp->stoch_nbhd1.tab_init_policy, rng);
   }
   depth1_exec_est_init(config_repo, map, graph, rng);
 
-  return std::make_unique<rta::bi_tdgraph_executive>(
+  return std::make_unique<cta::bi_tdgraph_executive>(
       execp, allocp, std::move(variant), rng);
 } /* initialize() */
 

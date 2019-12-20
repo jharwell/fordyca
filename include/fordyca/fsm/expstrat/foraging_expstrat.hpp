@@ -51,7 +51,7 @@ NS_START(fsm, expstrat);
  ******************************************************************************/
 /**
  * \class foraging_expstrat
- * \ingroup fordyca fsm expstrat
+ * \ingroup fsm expstrat
  *
  * \brief Base class for different exploration behaviors that controller can
  * exhibit when looking for stuff.

@@ -43,7 +43,7 @@ NS_START(fsm, expstrat);
  ******************************************************************************/
 /**
  * \class utility_cache_search
- * \ingroup fordyca fsm expstrat
+ * \ingroup fsm expstrat
  *
  * \brief Using \ref cache_site_selector and the average location of all known
  * blocks (or the robot's current location if there are not any known blocks),
@@ -71,7 +71,7 @@ class utility_cache_search : public localized_search {
   utility_cache_search& operator=(const utility_cache_search&) = delete;
 
   /* taskable overrides */
-  void task_start(const rta::taskable_argument*) override;
+  void task_start(const cta::taskable_argument*) override;
 
   /* prototype overrides */
   std::unique_ptr<foraging_expstrat> clone(void) const override {

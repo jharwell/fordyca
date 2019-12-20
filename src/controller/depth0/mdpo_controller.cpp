@@ -23,6 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
@@ -30,9 +33,6 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

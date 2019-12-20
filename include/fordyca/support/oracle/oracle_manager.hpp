@@ -50,7 +50,7 @@ class tasking_oracle;
  ******************************************************************************/
 /**
  * \class oracle_manager
- * \ingroup fordyca support oracle
+ * \ingroup support oracle
  *
  * \brief Thin wrapper around the following oracles:
  *

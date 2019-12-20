@@ -38,7 +38,7 @@ NS_START(fordyca, config, caches);
  ******************************************************************************/
 /**
  * \struct static_cache_config
- * \ingroup fordyca config caches
+ * \ingroup config caches
  *
  * \brief Configuration for static caches in the arena for the loop functions.
  */

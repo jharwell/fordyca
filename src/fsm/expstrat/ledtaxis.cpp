@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
 
-#include "fordyca/support/light_type_index.hpp"
-
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
+#include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
  * Namespaces

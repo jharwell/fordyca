@@ -42,7 +42,7 @@ NS_START(fordyca, metrics, perception);
  ******************************************************************************/
 /**
  * \class dpo_perception_metrics_collector
- * \ingroup fordyca metrics blocks
+ * \ingroup metrics blocks
  *
  * \brief Collector for \ref dpo_perception_metrics.
  *

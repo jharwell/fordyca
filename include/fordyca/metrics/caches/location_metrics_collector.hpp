@@ -40,7 +40,7 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 /**
  * \class location_metrics_collector
- * \ingroup fordyca metrics caches
+ * \ingroup metrics caches
  *
  * \brief Collector for \ref location_metrics.
  */

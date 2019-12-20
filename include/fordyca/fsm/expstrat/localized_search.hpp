@@ -41,7 +41,7 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 /**
  * \class localized_search
- * \ingroup fordyca fsm expstrat
+ * \ingroup fsm expstrat
  *
  * \brief An exploration behavior in which robots vector to a specific location,
  * then begin correlated random walk exploration there via \ref crw. Falls back
@@ -82,7 +82,7 @@ class localized_search : public foraging_expstrat,
    * location (e.g. the location of the last known object of a specific type),
    * in which case we will just fall back to regular CRW.
    */
-  void task_start(const rta::taskable_argument* c_arg) override {
+  void task_start(const cta::taskable_argument* c_arg) override {
     if (nullptr != c_arg) {
       m_vfsm.task_start(c_arg);
     }

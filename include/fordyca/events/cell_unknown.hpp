@@ -49,7 +49,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class cell_unknown
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Created whenever a cell within an occupancy grid needs to go into an
  * unknown state.

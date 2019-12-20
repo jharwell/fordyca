@@ -48,7 +48,7 @@ NS_START(depth2);
  ******************************************************************************/
 /**
  * \class cache_transferer_fsm
- * \ingroup fordyca fsm depth2
+ * \ingroup fsm depth2
  *
  * \brief The FSM for a cache transferer task. Each robot executing this FSM
  * will acquire a cache (either a known cache or via exploration), pickup a

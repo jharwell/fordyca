@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/support/block_dist/multi_cluster_distributor.hpp"
 
-#include "fordyca/ds/cell2D.hpp"
-
 #include "cosm/repr/base_block2D.hpp"
+
+#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces

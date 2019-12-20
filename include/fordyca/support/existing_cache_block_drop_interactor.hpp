@@ -44,7 +44,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \class existing_cache_block_drop_interactor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Handles a robot's (possible) \ref cache_block_drop event for existing
  * caches on a given timestep.

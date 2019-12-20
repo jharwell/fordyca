@@ -27,8 +27,8 @@
 #include <string>
 #include <memory>
 
-#include "rcppsw/ta/abort_probability.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/abort_probability.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
@@ -45,7 +45,7 @@ NS_START(fordyca, tasks, depth1);
  ******************************************************************************/
 /**
  * \class collector
- * \ingroup fordyca tasks depth1
+ * \ingroup tasks depth1
  *
  * \brief Task in which robots locate a cache and bring a block from it to the
  * nest. It is abortable, and has one task interface.
@@ -55,11 +55,11 @@ class collector : public foraging_task,
                   public events::nest_interactor,
                   public rer::client<collector> {
  public:
-  collector(const struct rta::config::task_alloc_config* config,
+  collector(const struct cta::config::task_alloc_config* config,
             const std::string& name,
-            std::unique_ptr<rta::taskable> mechanism);
-  collector(const struct rta::config::task_alloc_config* config,
-            std::unique_ptr<rta::taskable> mechanism);
+            std::unique_ptr<cta::taskable> mechanism);
+  collector(const struct cta::config::task_alloc_config* config,
+            std::unique_ptr<cta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -93,7 +93,7 @@ class collector : public foraging_task,
   bool task_at_interface(void) const override RCSW_PURE;
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const rta::taskable_argument*) override;
+  void task_start(const cta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
   rtypes::timestep interface_time_calc(uint interface,
                                        const rtypes::timestep& start_time) override;

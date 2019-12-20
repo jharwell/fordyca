@@ -32,12 +32,12 @@
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "fordyca/events/nest_interactor.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace ta { namespace config { struct task_alloc_config; }}}
+namespace cosm::ta::config { struct task_alloc_config; }
 
 NS_START(fordyca, tasks, depth0);
 class generalist;
@@ -47,7 +47,7 @@ class generalist;
  ******************************************************************************/
 /**
  * \class foraging_task
- * \ingroup fordyca tasks depth0
+ * \ingroup tasks depth0
  *
  * \brief Interface specifying the visit set for all depth0 foraging tasks in
  * FORDYCA.
@@ -60,19 +60,19 @@ class foraging_task
     : public base_foraging_task,
       public events::nest_interactor,
       public events::free_block_interactor,
-      public rta::polled_task {
+      public cta::polled_task {
  public:
   using variant_type = boost::variant<generalist*>;
 
   static constexpr char kGeneralistName[] = "Generalist";
 
   foraging_task(const std::string& name,
-                const rta::config::task_alloc_config* config,
-                std::unique_ptr<rta::taskable> mechanism);
+                const cta::config::task_alloc_config* config,
+                std::unique_ptr<cta::taskable> mechanism);
 
   ~foraging_task(void) override = default;
 
-  static bool task_in_depth0(const rta::polled_task* task) RCSW_PURE;
+  static bool task_in_depth0(const cta::polled_task* task) RCSW_PURE;
 };
 
 NS_END(depth0, tasks, fordyca);

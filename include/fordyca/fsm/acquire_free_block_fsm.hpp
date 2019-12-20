@@ -26,14 +26,13 @@
  ******************************************************************************/
 #include <memory>
 
-#include "rcppsw/ta/taskable.hpp"
+#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/ta/taskable.hpp"
 
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
-
-#include "cosm/fsm/acquire_goal_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +54,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * \class acquire_free_block_fsm
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief The FSM for an acquiring a free (i.e. not in a cache) block in the
  * arena.

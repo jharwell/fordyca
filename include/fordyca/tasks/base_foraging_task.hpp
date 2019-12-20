@@ -25,13 +25,13 @@
  * Includes
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "rcppsw/ta/abort_probability.hpp"
-#include "rcppsw/ta/logical_task.hpp"
+
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/ta/abort_probability.hpp"
+#include "cosm/ta/logical_task.hpp"
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -43,7 +43,7 @@ NS_START(fordyca, tasks);
  ******************************************************************************/
 /**
  * \class base_foraging_task
- * \ingroup fordyca tasks
+ * \ingroup tasks
  *
  * \brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.

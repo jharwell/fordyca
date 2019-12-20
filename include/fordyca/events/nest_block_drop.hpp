@@ -45,7 +45,7 @@ NS_START(fordyca, events, detail);
  ******************************************************************************/
 /**
  * \class nest_block_drop
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Fired whenever a robot drops a block in the nest.
  */

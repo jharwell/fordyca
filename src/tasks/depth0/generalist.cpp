@@ -23,12 +23,12 @@ v * \file generalist.cpp
  ******************************************************************************/
 #include "fordyca/tasks/depth0/generalist.hpp"
 
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/depth0/free_block_to_nest_fsm.hpp"
-
-#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,8 +38,8 @@ NS_START(fordyca, tasks, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-generalist::generalist(const rta::config::task_alloc_config* const config,
-                       std::unique_ptr<rta::taskable> mechanism)
+generalist::generalist(const cta::config::task_alloc_config* const config,
+                       std::unique_ptr<cta::taskable> mechanism)
     : foraging_task(kGeneralistName, config, std::move(mechanism)) {}
 
 /*******************************************************************************

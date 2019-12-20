@@ -59,7 +59,7 @@ NS_START(events, detail);
  ******************************************************************************/
 /**
  * \class cached_block_pickup
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Created whenever a robpot picks up a block from a cache.
  *

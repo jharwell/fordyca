@@ -53,7 +53,7 @@ NS_START(controller);
  ******************************************************************************/
 /**
  * \class mdpo_perception_subsystem
- * \ingroup fordyca controller
+ * \ingroup controller
  *
  * \brief Translates the sensor readings of the robot (i.e. \ref line_of_sight),
  * into a useful internal repr: a \ref dpo_semantic_map.

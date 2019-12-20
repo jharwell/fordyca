@@ -39,7 +39,7 @@ NS_START(fordyca, config, arena);
  ******************************************************************************/
 /**
  * \struct arena_map_config
- * \ingroup fordyca config arena
+ * \ingroup config arena
  */
 struct arena_map_config final : public rconfig::base_config {
   struct grid_config grid {};

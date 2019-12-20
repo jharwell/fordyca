@@ -41,7 +41,7 @@ NS_START(fordyca, config, tv);
  ******************************************************************************/
 /**
  * \class env_dynamics_parser
- * \ingroup fordyca config tv
+ * \ingroup config tv
  *
  * \brief Parses XML parameters for \ref env_dynamics into \ref
  * env_dynamics_config.

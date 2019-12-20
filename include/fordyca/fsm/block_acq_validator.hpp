@@ -48,7 +48,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * \class block_acq_validator
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Determine if the acquisition of a block at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and

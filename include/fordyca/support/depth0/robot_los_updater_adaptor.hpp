@@ -45,7 +45,7 @@ using los_updater_map_type = rds::type_map<
  ******************************************************************************/
 /**
  * \class robot_los_updater_adaptor
- * \ingroup fordyca support depth0
+ * \ingroup support depth0
  *
  * \brief Wrapping functor to update robot LOS each timestep. Needed for use
  * with boost::static_visitor.

@@ -36,7 +36,7 @@ NS_START(fordyca, support, depth2);
  ******************************************************************************/
 /**
  * \struct robot_configurer
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief Configure a depth2 controller during initialization:
  *

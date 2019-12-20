@@ -38,7 +38,7 @@ NS_START(fordyca, tasks, depth0);
  ******************************************************************************/
 /**
  * \class generalist
- * \ingroup fordyca tasks
+ * \ingroup tasks
  *
  * \brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
@@ -51,8 +51,8 @@ NS_START(fordyca, tasks, depth0);
  */
 class generalist final : public foraging_task {
  public:
-  generalist(const rta::config::task_alloc_config* config,
-             std::unique_ptr<rta::taskable> mechanism);
+  generalist(const cta::config::task_alloc_config* config,
+             std::unique_ptr<cta::taskable> mechanism);
 
   /* event handling */
   void accept(events::detail::free_block_pickup& visitor) override;
@@ -80,7 +80,7 @@ class generalist final : public foraging_task {
   bool task_at_interface(void) const override { return false; }
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const rta::taskable_argument* const) override {}
+  void task_start(const cta::taskable_argument* const) override {}
 
   rtypes::timestep current_time(void) const override RCSW_PURE;
   rtypes::timestep interface_time_calc(uint, const rtypes::timestep&) override {

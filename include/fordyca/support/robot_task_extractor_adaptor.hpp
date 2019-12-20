@@ -39,7 +39,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \struct robot_task_extractor_adaptor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Map a controller instance to the task extraction action run during
  * convergence calculations.

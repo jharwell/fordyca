@@ -23,12 +23,12 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 
-#include "fordyca/fsm/expstrat/crw.hpp"
-#include "fordyca/fsm/foraging_signal.hpp"
-
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
+#include "fordyca/fsm/expstrat/crw.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,28 +49,29 @@ crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
       HFSM_CONSTRUCT_STATE(acquire_block, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_pickup, hfsm::top_state()),
       HFSM_CONSTRUCT_STATE(wait_for_block_drop, hfsm::top_state()),
+      HFSM_DEFINE_STATE_MAP(mc_state_map,
+                            HFSM_STATE_MAP_ENTRY_EX(&start),
+                            HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
+                            HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
+                                                        nullptr,
+                                                        &entry_transport_to_nest,
+                                                        &exit_transport_to_nest),
+                            HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
+                                                        nullptr,
+                                                        &entry_leaving_nest,
+                                                        nullptr),
+                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
+                                                        nullptr,
+                                                        &entry_wait_for_signal,
+                                                        nullptr),
+                            HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
+                                                        nullptr,
+                                                        &entry_wait_for_signal,
+                                                        nullptr)),
       m_explore_fsm(saa,
                     std::move(exp_behavior),
                     rng,
-                    std::bind(&crw_fsm::block_detected, this)),
-      mc_state_map{HFSM_STATE_MAP_ENTRY_EX(&start),
-                   HFSM_STATE_MAP_ENTRY_EX(&acquire_block),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&transport_to_nest,
-                                               nullptr,
-                                               &entry_transport_to_nest,
-                                               &exit_transport_to_nest),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&leaving_nest,
-                                               nullptr,
-                                               &entry_leaving_nest,
-                                               nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_pickup,
-                                               nullptr,
-                                               &entry_wait_for_signal,
-                                               nullptr),
-                   HFSM_STATE_MAP_ENTRY_EX_ALL(&wait_for_block_drop,
-                                               nullptr,
-                                               &entry_wait_for_signal,
-                                               nullptr)} {}
+                    std::bind(&crw_fsm::block_detected, this)) {}
 
 /*******************************************************************************
  * States

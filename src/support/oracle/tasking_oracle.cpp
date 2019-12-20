@@ -25,9 +25,9 @@
 
 #include <functional>
 
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/ds/bi_tdgraph.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 #include "fordyca/config/oracle/tasking_oracle_config.hpp"
 
@@ -41,11 +41,11 @@ NS_START(fordyca, support, oracle);
  ******************************************************************************/
 tasking_oracle::tasking_oracle(
     const config::oracle::tasking_oracle_config* const config,
-    const rta::ds::bi_tdgraph* const graph)
+    const cta::ds::bi_tdgraph* const graph)
     : ER_CLIENT_INIT("fordyca.support.tasking_oracle"),
       mc_exec_ests(config->task_exec_ests),
       mc_int_ests(config->task_interface_ests) {
-  auto cb = [&](const rta::polled_task* task) {
+  auto cb = [&](const cta::polled_task* task) {
     m_map.insert({"exec_est." + task->name(), task->task_exec_estimate()});
     m_map.insert(
         {"interface_est." + task->name(), task->task_interface_estimate(0)});
@@ -64,15 +64,15 @@ boost::optional<tasking_oracle::variant_type> tasking_oracle::ask(
                              : boost::optional<variant_type>();
 } /* ask() */
 
-void tasking_oracle::listener_add(rta::bi_tdgraph_executive* const executive) {
+void tasking_oracle::listener_add(cta::bi_tdgraph_executive* const executive) {
   executive->task_abort_notify(
       std::bind(&tasking_oracle::task_abort_cb, this, std::placeholders::_1));
   executive->task_finish_notify(
       std::bind(&tasking_oracle::task_finish_cb, this, std::placeholders::_1));
 } /* listener_add() */
 
-void tasking_oracle::task_finish_cb(const rta::polled_task* task) {
-  auto& exec_est = boost::get<rta::time_estimate>(
+void tasking_oracle::task_finish_cb(const cta::polled_task* task) {
+  auto& exec_est = boost::get<cta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
   RCSW_UNUSED int exec_old = exec_est.v();
   exec_est.calc(task->task_exec_estimate());
@@ -82,7 +82,7 @@ void tasking_oracle::task_finish_cb(const rta::polled_task* task) {
            exec_old,
            exec_est.v());
 
-  auto& int_est = boost::get<rta::time_estimate>(
+  auto& int_est = boost::get<cta::time_estimate>(
       m_map.find("interface_est." + task->name())->second);
   RCSW_UNUSED int int_old = int_est.v();
 
@@ -95,7 +95,7 @@ void tasking_oracle::task_finish_cb(const rta::polled_task* task) {
            int_est.v());
 } /* task_finish_cb() */
 
-void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
+void tasking_oracle::task_abort_cb(const cta::polled_task* task) {
   /*
    * \todo Updating task exec/interface estimates on abort is a little dicey, as
    * it can cause tasks that just failed to be re-attempted because they have a
@@ -106,7 +106,7 @@ void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
    * Whether updating estimates on abort actually matters is tracked by #416,
    * and will be eventually be implemented.
    */
-  auto& exec_est = boost::get<rta::time_estimate>(
+  auto& exec_est = boost::get<cta::time_estimate>(
       m_map.find("exec_est." + task->name())->second);
   RCSW_UNUSED int exec_old = exec_est.v();
   exec_est.calc(task->task_exec_estimate());
@@ -116,7 +116,7 @@ void tasking_oracle::task_abort_cb(const rta::polled_task* task) {
            exec_old,
            exec_est.v());
 
-  auto& int_est = boost::get<rta::time_estimate>(
+  auto& int_est = boost::get<cta::time_estimate>(
       m_map.find("interface_est." + task->name())->second);
   RCSW_UNUSED int int_old = int_est.v();
 

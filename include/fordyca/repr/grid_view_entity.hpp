@@ -29,10 +29,10 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
 
+#include "cosm/repr/entity2D.hpp"
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/fordyca.hpp"
-
-#include "cosm/repr/entity2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -44,7 +44,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * \class grid_view_entity
- * \ingroup fordyca repr
+ * \ingroup repr
  *
  * \brief Representation of an entity in the arena that:
  *

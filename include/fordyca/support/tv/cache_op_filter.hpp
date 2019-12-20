@@ -43,7 +43,7 @@ NS_START(fordyca, support, tv);
 
 /**
  * \class cache_op_filter
- * \ingroup fordyca support tv
+ * \ingroup support tv
  *
  * \brief The filter for cache operation for robots (e.g. picking up, dropping
  * in places that involve existing caches.

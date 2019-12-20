@@ -49,7 +49,7 @@ NS_START(ds);
  ******************************************************************************/
 /**
  * \class dpo_semantic_map
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief Stores a semantic map of the state of the arena, from the perspective
  * of the robot (i.e. th physical extent of the arena + semantic information

@@ -40,7 +40,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \struct cache_create_ro_params
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Parameters for cache creation, to reduce # of arguments to
  * functions. Contains all parameters that will *NOT* change during creation.

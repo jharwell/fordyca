@@ -31,12 +31,12 @@
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
 
+#include "cosm/vis/block_carry_visualizer.hpp"
+
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/support/los_visualizer.hpp"
-
-#include "cosm/vis/block_carry_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces

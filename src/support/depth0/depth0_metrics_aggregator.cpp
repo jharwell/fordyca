@@ -27,6 +27,10 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/base_controller.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -42,10 +46,6 @@
 #include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
-
-#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "cosm/fsm/metrics/movement_metrics.hpp"
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -78,7 +78,7 @@ template void depth0_metrics_aggregator::collect_from_controller(
  * Constructors/Destructors
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
-    const cpconfig::metrics_config* const mconfig,
+    const cmconfig::metrics_config* const mconfig,
     const config::grid_config* const gconfig,
     const std::string& output_root)
     : base_metrics_aggregator(mconfig, gconfig, output_root),

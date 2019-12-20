@@ -23,14 +23,14 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/repr/base_cache.hpp"
-
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces

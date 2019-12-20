@@ -23,14 +23,14 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/block_list.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -175,7 +175,7 @@ ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
    * anyway.
    */
   ER_TRACE("Add anchor block%d@%s to src list",
-           c_alloc_blocks[index]->id(),
+           c_alloc_blocks[index]->id().v(),
            c_alloc_blocks[index]->rloc().to_str().c_str());
   src_blocks.push_back(c_alloc_blocks[index]);
   for (size_t i = index + 1; i < c_alloc_blocks.size(); ++i) {
@@ -189,12 +189,12 @@ ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
                           src_blocks.end(),
                           c_alloc_blocks[i]) == src_blocks.end(),
                 "Block%d already on src list",
-                c_alloc_blocks[i]->id());
+                c_alloc_blocks[i]->id().v());
       if (std::find(c_used_blocks.begin(),
                     c_used_blocks.end(),
                     c_alloc_blocks[i]) == c_used_blocks.end()) {
         ER_TRACE("Add block %d@%s to src list",
-                 c_alloc_blocks[i]->id(),
+                 c_alloc_blocks[i]->id().v(),
                  c_alloc_blocks[i]->rloc().to_str().c_str());
         src_blocks.push_back(c_alloc_blocks[i]);
       }

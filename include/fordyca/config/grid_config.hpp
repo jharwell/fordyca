@@ -40,7 +40,7 @@ NS_START(fordyca, config);
  ******************************************************************************/
 /**
  * \struct grid_config
- * \ingroup fordyca config perception
+ * \ingroup config perception
  *
  * \brief Configuration for the 2D grid used to represent the arena by both loop
  * functions and robots.

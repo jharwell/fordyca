@@ -45,7 +45,7 @@ NS_START(fordyca, ds);
  ******************************************************************************/
 /**
  * \class dp_block_map
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief The block map is a repr of the robot's perception of blocks
  * in the arena. It uses integers as keys, because blocks are mobile (i.e. can

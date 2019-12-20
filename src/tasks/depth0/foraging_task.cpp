@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 
-#include "rcppsw/ta/config/task_alloc_config.hpp"
+#include "cosm/ta/config/task_alloc_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,8 +34,8 @@ NS_START(fordyca, tasks, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const rta::config::task_alloc_config* const config,
-                             std::unique_ptr<rta::taskable> mechanism)
+                             const cta::config::task_alloc_config* const config,
+                             std::unique_ptr<cta::taskable> mechanism)
     : polled_task(name,
                   &config->abort,
                   &config->exec_est.ema,
@@ -44,7 +44,7 @@ foraging_task::foraging_task(const std::string& name,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool foraging_task::task_in_depth0(const rta::polled_task* const task) {
+bool foraging_task::task_in_depth0(const cta::polled_task* const task) {
   return task->name() == kGeneralistName;
 } /* task_in_depth0() */
 

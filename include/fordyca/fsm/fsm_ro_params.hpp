@@ -52,7 +52,7 @@ NS_START(fsm);
  ******************************************************************************/
 /**
  * \struct fsm_ro_params
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Contains all parameters for FSM initialization that will be read-only
  * by the FSM at run-time; not all FSMs need all members.

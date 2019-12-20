@@ -28,8 +28,8 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "rcppsw/ta/logical_task.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/logical_task.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
@@ -45,7 +45,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \class task_abort_interactor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Handles a robot's (possible) aborting of its current task on a given
  * timestep.
@@ -90,7 +90,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
       return false;
     }
     RCSW_UNUSED auto polled =
-        dynamic_cast<const rta::polled_task*>(controller.current_task());
+        dynamic_cast<const cta::polled_task*>(controller.current_task());
     /*
      * If a robot aborted its task and was carrying a block, it needs to (1)
      * drop it so that the block is not left dangling and unusable for the rest

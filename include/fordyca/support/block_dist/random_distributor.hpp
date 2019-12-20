@@ -52,7 +52,7 @@ NS_START(support, block_dist);
  ******************************************************************************/
 /**
  * \class random_distributor
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Distributes a set of blocks randomly within a specified 2D area, such
  * that no blocks overlap with each other or other entities already present in

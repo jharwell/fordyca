@@ -36,7 +36,7 @@ NS_START(fordyca, config, depth1);
  ******************************************************************************/
 /**
  * \class controller_repository
- * \ingroup fordyca config depth1
+ * \ingroup config depth1
  *
  * \brief Collection of all parameter parsers and parse results needed
  * by depth1 controllers.

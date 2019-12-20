@@ -54,19 +54,19 @@ class env_dynamics;
  ******************************************************************************/
 /**
  * \class argos_pd_adaptor
- * \ingroup fordyca support tv
+ * \ingroup support tv
  *
  * \brief Adapts \ref ctv::population_dynamics to work within the ARGoS
  * simulator.
  */
 class argos_pd_adaptor final : public rer::client<argos_pd_adaptor>,
-                            public ctv::population_dynamics {
+                               public ctv::population_dynamics {
  public:
   /**
-   * @brief When adding a new robot, try this many times to find a conflict-free
-   * place in the arena to put it.
+   * @brief When adding/removing a robot, try this many times to complete the
+   * operation.
    */
-  static constexpr size_t kMaxDistributeAttempts = 1000;
+  static constexpr size_t kMaxOperationAttempts = 1000;
 
   argos_pd_adaptor(const ctv::config::population_dynamics_config* config,
                 support::base_loop_functions* lf,

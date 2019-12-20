@@ -39,7 +39,7 @@ NS_START(fordyca, support, block_dist);
  ******************************************************************************/
 /**
  * \class redist_governor
- * \ingroup fordyca support block_dist
+ * \ingroup support block_dist
  *
  * \brief Supervises block distribution by determining the conditions under
  * which blocks should continue to be distributed, or if the # of blocks in the

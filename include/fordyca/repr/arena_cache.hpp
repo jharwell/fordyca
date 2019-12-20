@@ -43,7 +43,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * \class arena_cache
- * \ingroup fordyca repr
+ * \ingroup repr
  *
  * \brief A repr of an ACTUAL cache within the arena. This differs from \ref
  * dpo_entity caches because they:

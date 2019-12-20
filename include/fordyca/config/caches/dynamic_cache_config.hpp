@@ -40,7 +40,7 @@ NS_START(fordyca, config, caches);
  ******************************************************************************/
 /**
  * \struct dynamic_cache_config
- * \ingroup fordyca config cache
+ * \ingroup config cache
  *
  * \brief Configuration for dynamic caches within the arena for the loop
  * functions.

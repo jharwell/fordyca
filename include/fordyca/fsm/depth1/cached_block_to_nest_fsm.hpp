@@ -29,7 +29,7 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
-#include "rcppsw/ta/taskable.hpp"
+#include "cosm/ta/taskable.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
@@ -58,7 +58,7 @@ NS_START(depth1);
  ******************************************************************************/
 /**
  * \class cached_block_to_nest_fsm
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Each robot executing this FSM will locate for a block (either a known
  * block or via exploration), pickup the block and bring it all the way back to
@@ -71,7 +71,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
                                        public rer::client<cached_block_to_nest_fsm>,
                                        public cfmetrics::goal_acq_metrics,
                                        public block_transporter,
-                                       public rta::taskable {
+                                       public cta::taskable {
  public:
   cached_block_to_nest_fsm(
       const fsm_ro_params* c_params,
@@ -80,8 +80,8 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
       rmath::rng *rng);
   ~cached_block_to_nest_fsm(void) override = default;
 
-  cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
-  cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;
+  cached_block_to_nest_fsm(const cached_block_to_nest_fsm&) = delete;
+  cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm&) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
@@ -97,7 +97,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
    * \brief Reset the task FSM to a state where it can be started again.
    */
   void task_reset(void) override { init(); }
-  void task_start(const rta::taskable_argument*) override {}
+  void task_start(const cta::taskable_argument*) override {}
 
   /* collision metrics */
   bool in_collision_avoidance(void) const override RCSW_PURE;
@@ -203,10 +203,11 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
     return &mc_state_map[index];
   }
 
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+
   /* clang-format off */
   acquire_existing_cache_fsm m_cache_fsm;
   /* clang-format on */
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth1, fsm, fordyca);

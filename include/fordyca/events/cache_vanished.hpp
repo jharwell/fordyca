@@ -42,7 +42,7 @@ NS_START(fordyca, events, detail);
  ******************************************************************************/
 /**
  * \class cache_vanished
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Created whenever a robot is serving a cache penalty, but while
  * serving the penalty the cache it is waiting in vanishes due to another

@@ -30,10 +30,7 @@
 #include "rcppsw/math/config/rng_config.hpp"
 #include "rcppsw/math/rngm.hpp"
 
-#include "fordyca/config/base_controller_repository.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
-
-#include "cosm/pal/config/output_config.hpp"
+#include "cosm/metrics/config/output_config.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
@@ -41,6 +38,9 @@
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
+
+#include "fordyca/config/base_controller_repository.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -92,7 +92,7 @@ void base_controller::init(ticpp::Element& node) {
   base_controller2D::rng_init((nullptr == rngp) ? -1 : rngp->seed, "footbot");
 
   /* initialize output */
-  auto* outputp = repo.config_get<cpconfig::output_config>();
+  auto* outputp = repo.config_get<cmconfig::output_config>();
   base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
   /* initialize sensing and actuation (SAA) subsystem */
@@ -103,7 +103,7 @@ void base_controller::init(ticpp::Element& node) {
 
 void base_controller::reset(void) { m_block.reset(); } /* Reset() */
 
-void base_controller::output_init(const cpconfig::output_config* outputp) {
+void base_controller::output_init(const cmconfig::output_config* outputp) {
   std::string dir =
       base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
@@ -136,8 +136,9 @@ void base_controller::saa_init(
     const csubsystem::config::sensing_subsystem2D_config* sensing_p) {
   auto saa_names = config::saa_xml_names();
 #ifdef FORDYCA_WITH_ROBOT_RAB
-  auto rabs = chal::sensors::wifi_sensor(
-      GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names.rab_saa));
+  /* auto rabs = chal::sensors::wifi_sensor( */
+  /*     GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names.rab_saa)); */
+  auto rabs = nullptr;
 #else
   auto rabs = chal::sensors::wifi_sensor(nullptr);
 #endif /* FORDYCA_WITH_ROBOT_RAB */
@@ -197,16 +198,15 @@ void base_controller::saa_init(
 #endif /* FORDYCA_WITH_ROBOT_RABS */
 
   auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
-
       /*
      * We put the governed differential drive in the actuator map twice because
      * some of the reusable components use the base class differential drive
-     * instead of the governed entry (no robust way to inform that we want to
+     * instead of the governed version (no robust way to inform that we want to
      * use the governed version).
      */
       csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
-      {typeid(chal::actuators::diff_drive_actuator),
-       csubsystem::actuation_subsystem2D::variant_type(diff_drivea)},
+      /* {typeid(chal::actuators::diff_drive_actuator), */
+      /*  csubsystem::actuation_subsystem2D::variant_type(diff_drivea)}, */
 
       csubsystem::actuation_subsystem2D::map_entry_create(leds),
       csubsystem::actuation_subsystem2D::map_entry_create(raba)};

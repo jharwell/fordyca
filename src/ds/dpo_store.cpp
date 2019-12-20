@@ -26,10 +26,10 @@
 #include <boost/range/adaptor/map.hpp>
 #include <numeric>
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/config/perception/pheromone_config.hpp"
 #include "fordyca/repr/base_cache.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

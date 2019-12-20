@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <memory>
 
-#include "fordyca/fordyca.hpp"
-
 #include "cosm/repr/pheromone_density.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,7 +40,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * \class dpo_entity
- * \ingroup fordyca repr
+ * \ingroup repr
  *
  * \brief A repr of a Decaying Pheromone (DP) entity in the arena,
  * which has a pheromone density/relevance associated with it.

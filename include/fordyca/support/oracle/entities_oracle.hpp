@@ -58,7 +58,7 @@ NS_START(support, oracle);
  ******************************************************************************/
 /**
  * \class entities_oracle
- * \ingroup fordyca support oracle
+ * \ingroup support oracle
  *
  * \brief Repository of perfect knowledge about entities in the arena (blocks,
  * caches, etc). Used to provide an upper bound on the performance of different

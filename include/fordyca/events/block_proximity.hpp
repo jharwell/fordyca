@@ -49,7 +49,7 @@ NS_START(fordyca, events, detail);
 
 /**
  * \class block_proximity
- * \ingroup fordyca events
+ * \ingroup events
  *
  * \brief Event that is created whenever a block that a robot is not currently
  * aware of blocks its ability to complete its current task.

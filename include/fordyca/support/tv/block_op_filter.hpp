@@ -44,7 +44,7 @@ NS_START(fordyca, support, tv);
 
 /**
  * \class block_op_filter
- * \ingroup fordyca support tv
+ * \ingroup support tv
  *
  * \brief The filter for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.

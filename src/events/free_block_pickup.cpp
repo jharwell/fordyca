@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
@@ -51,8 +53,6 @@
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
-
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -78,7 +78,7 @@ free_block_pickup::free_block_pickup(
  ******************************************************************************/
 void free_block_pickup::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task) {
-  RCSW_UNUSED auto* polled = dynamic_cast<rta::polled_task*>(task);
+  RCSW_UNUSED auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non free block interactor task %s causing free block pickup",

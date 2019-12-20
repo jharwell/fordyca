@@ -37,7 +37,7 @@ NS_START(fordyca, support, depth0);
  ******************************************************************************/
 /**
  * \class depth0_qt_user_functions
- * \ingroup fordyca support depth0
+ * \ingroup support depth0
  *
  * \brief Contains hooks for Qt to draw the robot's LOS if so configured.
  */

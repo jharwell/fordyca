@@ -24,9 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fordyca.hpp"
-
 #include "cosm/fsm/util_signal.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,7 +38,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 /**
  * \class foraging_signal
- * \ingroup fordyca fsm
+ * \ingroup fsm
  *
  * \brief Signals that FSMs can use to communicate between sub/super states, and
  * that can be used to direct them in some way.

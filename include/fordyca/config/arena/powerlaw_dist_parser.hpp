@@ -41,7 +41,7 @@ NS_START(fordyca, config, arena);
  ******************************************************************************/
 /**
  * \class powerlaw_dist_parser
- * \ingroup fordyca config arena
+ * \ingroup config arena
  *
  * \brief Parses XML parameters for related to \ref powerlaw_distributor
  * objects into \ref powerlaw_dist_config.

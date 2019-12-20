@@ -40,7 +40,7 @@ NS_START(fordyca, ds);
  ******************************************************************************/
 /**
  * \class dpo_map
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief The Decaying Pheromone Object (DPO) map stores objects in the arena
  * SEPARATELY from the \ref arena_map where they actually live (clone not

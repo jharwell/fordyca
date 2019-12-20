@@ -40,7 +40,7 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 /**
  * \class lifecycle_metrics_collector
- * \ingroup fordyca metrics caches
+ * \ingroup metrics caches
  *
  * \brief Collector for \ref lifecycle_metrics.
  *

@@ -30,9 +30,9 @@
 #include "rcppsw/ds/stacked_grid.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/ds/cell2D.hpp"
-
 #include "cosm/repr/pheromone_density.hpp"
+
+#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,7 +56,7 @@ using robot_layer_stack = std::tuple<crepr::pheromone_density, cell2D>;
  ******************************************************************************/
 /**
  * \class occupancy_grid
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief Multilayered grid of cells and associated information
  * density/relevance on the state of those cells. Used by robots in making

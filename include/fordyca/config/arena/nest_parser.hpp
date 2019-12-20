@@ -41,7 +41,7 @@ NS_START(fordyca, config, arena);
  ******************************************************************************/
 /**
  * \class nest_parser
- * \ingroup fordyca config arena
+ * \ingroup config arena
  *
  * \brief Parses XML parameters for related to \ref nest objects into
  * \ref nest_config.

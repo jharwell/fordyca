@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_drop.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
@@ -43,8 +45,6 @@
 #include "fordyca/tasks/depth2/cache_finisher.hpp"
 #include "fordyca/tasks/depth2/cache_starter.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -72,7 +72,7 @@ free_block_drop::free_block_drop(const std::shared_ptr<crepr::base_block2D>& blo
 bool free_block_drop::dispatch_free_block_interactor(
     tasks::base_foraging_task* const task,
     controller::block_sel_matrix* const bsel_matrix) {
-  auto* polled = dynamic_cast<rta::polled_task*>(task);
+  auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   bool ret = false;
 

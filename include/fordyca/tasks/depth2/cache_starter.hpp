@@ -42,7 +42,7 @@ NS_START(fordyca, tasks, depth2);
  ******************************************************************************/
 /**
  * \class cache_starter
- * \ingroup fordyca tasks depth2
+ * \ingroup tasks depth2
  *
  * \brief Task in which robots locate a free block and drop it somewhere to
  * start a new cache. It is abortable, and has one task interface.
@@ -53,8 +53,8 @@ class cache_starter final : public foraging_task,
                             public events::dynamic_cache_interactor,
                             public metrics::caches::site_selection_metrics {
  public:
-  cache_starter(const struct rta::config::task_alloc_config* config,
-                std::unique_ptr<rta::taskable> mechanism);
+  cache_starter(const struct cta::config::task_alloc_config* config,
+                std::unique_ptr<cta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -93,7 +93,7 @@ class cache_starter final : public foraging_task,
   /* task metrics */
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const rta::taskable_argument*) override;
+  void task_start(const cta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
   rtypes::timestep interface_time_calc(uint interface,
                                        const rtypes::timestep& start_time) override RCSW_PURE;

@@ -58,7 +58,7 @@ NS_START(support, depth2);
  ******************************************************************************/
 /**
  * \class cache_center_calculator
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Calculate the center for a cache to create in the arena:
  *

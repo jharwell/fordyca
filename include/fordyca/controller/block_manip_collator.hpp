@@ -41,7 +41,7 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 /**
  * \class block_manip_collator
- * \ingroup fordyca controller
+ * \ingroup controller
  *
  * \brief Collates block manipulation metrics.
  */

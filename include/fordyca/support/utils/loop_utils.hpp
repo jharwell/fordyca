@@ -1,6 +1,6 @@
 /**
  * \file loop_utils.hpp
- * \ingroup fordyca support utils
+ * \ingroup support utils
  *
  * Helpers for loop functions that CAN be free functions, as they do not require
  * access to anything in \ref argos::CLoopFunctions.

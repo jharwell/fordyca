@@ -44,7 +44,7 @@ class free_block_drop;
  ******************************************************************************/
 /**
  * \class free_block_interactor
- * \ingroup fordyca events
+ * \ingroup events
  *
  * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with free blocks in FORDYCA.

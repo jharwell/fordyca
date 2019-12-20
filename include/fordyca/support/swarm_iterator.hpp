@@ -42,7 +42,7 @@ NS_START(fordyca, support);
  ******************************************************************************/
 /**
  * \struct swarm_iterator
- * \ingroup fordyca support
+ * \ingroup support
  *
  * \brief Iterate over the swarm (robots or controllers), and perform an action
  * within the ARGoS simulator.

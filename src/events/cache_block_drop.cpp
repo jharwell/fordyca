@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
@@ -43,8 +45,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -87,14 +87,14 @@ void cache_block_drop::dispatch_d1_cache_interactor(
 
   ER_ASSERT(nullptr != interactor,
             "Non existing cache interactor task %s causing cached block drop",
-            dynamic_cast<rta::logical_task*>(task)->name().c_str());
+            dynamic_cast<cta::logical_task*>(task)->name().c_str());
   interactor->accept(*this);
 } /* dispatch_d1_cache_interactor() */
 
 bool cache_block_drop::dispatch_d2_cache_interactor(
     tasks::base_foraging_task* task,
     controller::cache_sel_matrix* csel_matrix) {
-  auto* polled = dynamic_cast<rta::polled_task*>(task);
+  auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
   bool ret = false;
   ER_ASSERT(nullptr != interactor,
@@ -203,7 +203,7 @@ void cache_block_drop::visit(controller::depth1::bitd_dpo_controller& controller
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 
@@ -222,7 +222,7 @@ void cache_block_drop::visit(
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 
@@ -240,7 +240,7 @@ void cache_block_drop::visit(
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 
@@ -259,7 +259,7 @@ void cache_block_drop::visit(
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 
@@ -291,7 +291,7 @@ void cache_block_drop::visit(
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 
@@ -312,7 +312,7 @@ void cache_block_drop::visit(
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 
@@ -332,7 +332,7 @@ void cache_block_drop::visit(
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 
@@ -353,7 +353,7 @@ void cache_block_drop::visit(
   ER_INFO("Dropped block%d in cache%d,task='%s'",
           m_arena_block->id().v(),
           m_cache->id().v(),
-          dynamic_cast<rta::logical_task*>(controller.current_task())
+          dynamic_cast<cta::logical_task*>(controller.current_task())
               ->name()
               .c_str());
 

@@ -52,7 +52,7 @@ NS_START(ds);
  ******************************************************************************/
 /**
  * \class cell2D
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief Base repr of a cell on a 2D grid. A combination of FSM +
  * handle to whatever \ref repr::entity2D the cell contains, if any.

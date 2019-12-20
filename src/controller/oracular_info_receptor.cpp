@@ -23,17 +23,16 @@
  ******************************************************************************/
 #include "fordyca/controller/oracular_info_receptor.hpp"
 
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/polled_task.hpp"
-#include "rcppsw/ta/time_estimate.hpp"
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/polled_task.hpp"
+#include "cosm/ta/time_estimate.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -45,7 +44,7 @@ NS_START(fordyca, controller);
  ******************************************************************************/
 /**
  * \struct dpo_store_updater
- * \ingroup fordyca controller
+ * \ingroup controller
  *
  * \brief Updates the \ref dpo_store with a single (possibly new) entity from
  * the list of entities we have been handed by the \ref entities_oracle.
@@ -106,14 +105,14 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
 } /* dpo_store_update() */
 
 void oracular_info_receptor::tasking_hooks_register(
-    rta::bi_tdgraph_executive* const executive) {
+    cta::bi_tdgraph_executive* const executive) {
   executive->task_abort_notify(std::bind(
       &oracular_info_receptor::task_abort_cb, this, std::placeholders::_1));
   executive->task_finish_notify(std::bind(
       &oracular_info_receptor::task_finish_cb, this, std::placeholders::_1));
 } /* tasking_hooks_register() */
 
-void oracular_info_receptor::task_abort_cb(rta::polled_task* const task) {
+void oracular_info_receptor::task_abort_cb(cta::polled_task* const task) {
   if (m_tasking_oracle->update_exec_ests()) {
     exec_est_update(task);
   }
@@ -122,7 +121,7 @@ void oracular_info_receptor::task_abort_cb(rta::polled_task* const task) {
   }
 } /* task_abort_cb() */
 
-void oracular_info_receptor::task_finish_cb(rta::polled_task* const task) {
+void oracular_info_receptor::task_finish_cb(cta::polled_task* const task) {
   if (m_tasking_oracle->update_exec_ests()) {
     exec_est_update(task);
   }
@@ -131,12 +130,12 @@ void oracular_info_receptor::task_finish_cb(rta::polled_task* const task) {
   }
 } /* task_finish_cb() */
 
-void oracular_info_receptor::exec_est_update(rta::polled_task* const task) {
+void oracular_info_receptor::exec_est_update(cta::polled_task* const task) {
   auto exec_result = m_tasking_oracle->ask("exec_est." + task->name());
   ER_ASSERT(exec_result,
             "Bad oracle query 'exec_est.%s': no such task",
             task->name().c_str());
-  auto oracle_exec_est = boost::get<rta::time_estimate>(exec_result.get());
+  auto oracle_exec_est = boost::get<cta::time_estimate>(exec_result.get());
   RCSW_UNUSED int exec_old = task->task_exec_estimate().v();
   task->exec_estimate_update(rtypes::timestep(oracle_exec_est.v()));
   ER_INFO("Update 'exec_est.%s' with oracular estimate %d: %d -> %d",
@@ -146,12 +145,12 @@ void oracular_info_receptor::exec_est_update(rta::polled_task* const task) {
           task->task_exec_estimate().v());
 } /* exec_est_update() */
 
-void oracular_info_receptor::int_est_update(rta::polled_task* const task) {
+void oracular_info_receptor::int_est_update(cta::polled_task* const task) {
   auto int_result = m_tasking_oracle->ask("interface_est." + task->name());
   ER_ASSERT(int_result,
             "Bad oracle query 'interface_est.%s': no such task",
             task->name().c_str());
-  auto oracle_int_est = boost::get<rta::time_estimate>(int_result.get());
+  auto oracle_int_est = boost::get<cta::time_estimate>(int_result.get());
   RCSW_UNUSED int int_old = task->task_interface_estimate(0).v();
   task->interface_estimate_update(0, rtypes::timestep(oracle_int_est.v()));
   ER_INFO("Update 'interface_est.%s' with oracular estimate %d: %d -> %d",

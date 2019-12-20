@@ -25,12 +25,12 @@
 
 #include <numeric>
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/depth2/cache_site_selector.hpp"
 #include "fordyca/tasks/argument.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -40,7 +40,7 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void utility_cache_search::task_start(const rta::taskable_argument*) {
+void utility_cache_search::task_start(const cta::taskable_argument*) {
   auto range = mc_store->blocks().const_values_range();
   rmath::vector2d position;
   if (!range.empty()) {

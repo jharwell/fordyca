@@ -39,7 +39,7 @@ NS_START(fordyca, support, depth2);
  ******************************************************************************/
 /**
  * \class depth2_metrics_aggregator
- * \ingroup fordyca support depth2
+ * \ingroup support depth2
  *
  * \brief Aggregates and metrics collection for depth2 foraging. That
  * includes everything from \ref depth1_metrics_aggregator, and also:
@@ -51,13 +51,13 @@ NS_START(fordyca, support, depth2);
 class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator,
                                   public rer::client<depth2_metrics_aggregator> {
  public:
-  depth2_metrics_aggregator(const cpconfig::metrics_config* mconfig,
+  depth2_metrics_aggregator(const cmconfig::metrics_config* mconfig,
                             const config::grid_config* const gconfig,
                             const std::string& output_root);
 
-  void task_start_cb(const rta::polled_task* task,
-                     const rta::ds::bi_tab* tab);
-  void task_finish_or_abort_cb(const rta::polled_task* task);
+  void task_start_cb(const cta::polled_task* task,
+                     const cta::ds::bi_tab* tab);
+  void task_finish_or_abort_cb(const cta::polled_task* task);
 
   /**
    * \brief Collect metrics from the depth2 controller.
@@ -66,7 +66,7 @@ class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator
   void collect_from_controller(const ControllerType* c) {
     depth1::depth1_metrics_aggregator::collect_from_controller(c);
 
-    auto task = dynamic_cast<const rta::polled_task*>(c->current_task());
+    auto task = dynamic_cast<const cta::polled_task*>(c->current_task());
 
     /* only Cache Starter implements these metrics */
     if (nullptr != task &&

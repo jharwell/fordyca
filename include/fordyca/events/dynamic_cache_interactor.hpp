@@ -42,7 +42,7 @@ class cache_proximity;
  ******************************************************************************/
 /**
  * \class dynamic_cache_interactor
- * \ingroup fordyca events
+ * \ingroup events
  *
  * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with dynamic caches in FORDYCA.

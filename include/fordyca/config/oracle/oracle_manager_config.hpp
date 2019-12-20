@@ -39,7 +39,7 @@ NS_START(fordyca, config, oracle);
  ******************************************************************************/
 /**
  * \struct oracle_manager_config
- * \ingroup fordyca config oracle
+ * \ingroup config oracle
  *
  * \brief Parameters for the various oracles that can be employed during
  * simulation.

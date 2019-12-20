@@ -32,7 +32,24 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 cell2D_fsm::cell2D_fsm(void)
     : rpfsm::simple_fsm(states::ekST_MAX_STATES, states::ekST_UNKNOWN),
-      ER_CLIENT_INIT("fordyca.fsm.cell2D_fsm") {}
+      ER_CLIENT_INIT("fordyca.fsm.cell2D"),
+      FSM_DEFINE_STATE_MAP(mc_state_map,
+                           FSM_STATE_MAP_ENTRY(&state_unknown),
+                           FSM_STATE_MAP_ENTRY(&state_empty),
+                           FSM_STATE_MAP_ENTRY(&state_block),
+                           FSM_STATE_MAP_ENTRY(&state_cache),
+                           FSM_STATE_MAP_ENTRY(&state_cache_extent)) {}
+
+cell2D_fsm::cell2D_fsm(const cell2D_fsm& other)
+    : rpfsm::simple_fsm(states::ekST_MAX_STATES, states::ekST_UNKNOWN),
+      ER_CLIENT_INIT("fordyca.fsm.cell2D"),
+      FSM_DEFINE_STATE_MAP(mc_state_map,
+                           FSM_STATE_MAP_ENTRY(&state_unknown),
+                           FSM_STATE_MAP_ENTRY(&state_empty),
+                           FSM_STATE_MAP_ENTRY(&state_block),
+                           FSM_STATE_MAP_ENTRY(&state_cache),
+                           FSM_STATE_MAP_ENTRY(&state_cache_extent)),
+      m_block_count(other.m_block_count) {}
 
 /*******************************************************************************
  * Event Functions
@@ -92,9 +109,9 @@ void cell2D_fsm::event_cache_extent(void) {
       states::ekST_CACHE_EXTENT, /* unknown */
       states::ekST_CACHE_EXTENT, /* empty */
       /*
-         * This is technically bad, but the arena map fixes it right after
-         * creating a new cache, so we can let it slide here.
-         */
+       * This is technically bad, but the arena map fixes it right after
+       * creating a new cache, so we can let it slide here.
+       */
       states::ekST_CACHE_EXTENT,    /* has block */
       rpfsm::event_signal::ekFATAL, /* has cache */
       rpfsm::event_signal::ekFATAL, /* cache extent */

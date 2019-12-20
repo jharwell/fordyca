@@ -43,7 +43,7 @@ NS_START(fsm, expstrat);
  ******************************************************************************/
 /**
  * \class likelihood_cache_search
- * \ingroup fordyca fsm expstrat
+ * \ingroup fsm expstrat
  *
  * \brief Vector to the last known location of a cache, then begin performing
  * CRW at that location, with the idea being that the likelihood of another
@@ -65,7 +65,7 @@ class likelihood_cache_search : public localized_search {
   likelihood_cache_search& operator=(const likelihood_cache_search&) = delete;
 
   /* taskable overrides */
-  void task_start(const rta::taskable_argument*) override;
+  void task_start(const cta::taskable_argument*) override;
 
   /* prototype overrides */
   std::unique_ptr<foraging_expstrat> clone(void) const override {

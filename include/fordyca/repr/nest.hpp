@@ -43,7 +43,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * \class nest
- * \ingroup fordyca repr
+ * \ingroup repr
  *
  * \brief Class representing the nest in the arena, which is multi-cellular and
  * immobile.

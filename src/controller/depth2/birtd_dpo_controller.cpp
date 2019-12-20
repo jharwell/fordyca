@@ -25,7 +25,9 @@
 
 #include <fstream>
 
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"
@@ -33,9 +35,6 @@
 #include "fordyca/controller/depth2/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -106,8 +105,8 @@ void birtd_dpo_controller::private_init(
       &birtd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
 } /* private_init() */
 
-void birtd_dpo_controller::task_start_cb(const rta::polled_task* const task,
-                                         const rta::ds::bi_tab* const) {
+void birtd_dpo_controller::task_start_cb(const cta::polled_task* const task,
+                                         const cta::ds::bi_tab* const) {
   /**
    * \brief Callback for task alloc. Needed to reset the task state of the
    * controller (not the task, which is handled by the executive) in the case

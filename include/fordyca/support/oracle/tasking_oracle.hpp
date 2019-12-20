@@ -32,18 +32,18 @@
 
 #include "fordyca/fordyca.hpp"
 #include "rcppsw/er/client.hpp"
-#include "rcppsw/ta/time_estimate.hpp"
+#include "cosm/ta/time_estimate.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw::ta {
+namespace cosm::ta {
 class bi_tdgraph_executive;
 class polled_task;
 namespace ds {
 class bi_tdgraph;
 } /* namespace ds */
-} // namespace rcppsw::ta
+} // namespace cosm::ta
 
 NS_START(fordyca);
 namespace config {
@@ -58,7 +58,7 @@ NS_START(support, oracle);
  ******************************************************************************/
 /**
  * \class tasking_oracle
- * \ingroup fordyca support oracle
+ * \ingroup support oracle
  *
  * \brief Repository of perfect knowledge about swarm level task
  * allocation. Used to provide an upper bound on the performance of different
@@ -66,10 +66,10 @@ NS_START(support, oracle);
  */
 class tasking_oracle final : public rer::client<tasking_oracle> {
  public:
-  using variant_type = boost::variant<rta::time_estimate>;
+  using variant_type = boost::variant<cta::time_estimate>;
 
   tasking_oracle(const config::oracle::tasking_oracle_config* config,
-                 const rta::ds::bi_tdgraph* graph);
+                 const cta::ds::bi_tdgraph* graph);
 
   /**
    * \brief Ask the oracle something.
@@ -92,13 +92,13 @@ class tasking_oracle final : public rer::client<tasking_oracle> {
    * This results in asynchronous/irregular updates to the oracle's map of task
    * allocation information as robots finish/abort tasks.
    */
-  void listener_add(rta::bi_tdgraph_executive* executive);
+  void listener_add(cta::bi_tdgraph_executive* executive);
 
   bool update_exec_ests(void) const { return mc_exec_ests; }
   bool update_int_ests(void) const { return mc_int_ests; }
 
-  void task_abort_cb(const rta::polled_task* task);
-  void task_finish_cb(const rta::polled_task* task);
+  void task_abort_cb(const cta::polled_task* task);
+  void task_finish_cb(const cta::polled_task* task);
 
  private:
   /* clang-format off */

@@ -31,11 +31,11 @@
 #include "rcppsw/patterns/prototype/clonable.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 
-#include "fordyca/ds/block_vector.hpp"
-
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/repr/colored_entity.hpp"
 #include "cosm/repr/unicell_immovable_entity2D.hpp"
+
+#include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,7 +47,7 @@ NS_START(fordyca, repr);
  ******************************************************************************/
 /**
  * \class base_cache
- * \ingroup fordyca repr
+ * \ingroup repr
  *
  * \brief Base class for representating a cache within the arena. Caches do not
  * have state, and if/when a cache becomes empty, it needs to be deleted by an

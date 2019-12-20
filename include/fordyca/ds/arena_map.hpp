@@ -30,6 +30,8 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/arena_grid.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
@@ -37,8 +39,6 @@
 #include "fordyca/repr/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
 #include "fordyca/support/block_dist/redist_governor.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -63,7 +63,7 @@ class cell2D;
  ******************************************************************************/
 /**
  * \class arena_map
- * \ingroup fordyca ds
+ * \ingroup ds
  *
  * \brief Combines a 2D grid with sets of objects (blocks, caches, nests, etc.)
  * that populate the grid and move around as the state of the arena

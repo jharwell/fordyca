@@ -42,7 +42,7 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 /**
  * \class crw
- * \ingroup fordyca fsm expstrat
+ * \ingroup fsm expstrat
  *
  * \brief Roam around using Correlated Random Walk looking for something until
  * you happen to stumble across it.
@@ -60,7 +60,7 @@ class crw final : public foraging_expstrat,
   crw& operator=(const crw&) = delete;
 
   /* taskable overrides */
-  void task_start(const rta::taskable_argument*) override final {
+  void task_start(const cta::taskable_argument*) override final {
     m_task_running = true;
   }
   void task_reset(void) override final { m_task_running = false; }

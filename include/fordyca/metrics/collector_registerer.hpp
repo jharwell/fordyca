@@ -45,7 +45,7 @@ NS_START(fordyca, metrics);
  ******************************************************************************/
 /**
  * \class collector_registerer
- * \ingroup fordyca metrics
+ * \ingroup metrics
  *
  * \brief Register all enabled collectors with an aggregator.
  */
@@ -145,7 +145,7 @@ class collector_registerer : public rer::client<collector_registerer> {
    * mapping collectors to run-time categories, so that this class is general
    * purpose and not tied to a specific input format.
    */
-  collector_registerer(const cpconfig::metrics_config* const config,
+  collector_registerer(const cmconfig::metrics_config* const config,
                        const config::grid_config* const grid_config,
                        const creatable_set& create_set,
                        base_metrics_aggregator* const agg,
@@ -185,7 +185,7 @@ class collector_registerer : public rer::client<collector_registerer> {
           ER_WARN("Collector with scoped_name='%s' already exists!",
                   std::get<2>(*it).c_str());
         } else {
-          ER_INFO("Metrics enabled: input_name='%s',scoped_name='%s'",
+          ER_INFO("Metrics enabled: xml_name='%s',scoped_name='%s'",
                   std::get<1>(*it).c_str(),
                   std::get<2>(*it).c_str());
         }
@@ -231,11 +231,11 @@ class collector_registerer : public rer::client<collector_registerer> {
   }
 
   /**
-   * \brief Return the output filename that should be associated with a collect
-   * if it is enabled, and "" otherwise.
+   * \brief Return the output filename that should be associated with a
+   * collector if it is enabled, and "" otherwise.
    */
   std::string collector_fpath_create(
-      const cpconfig::metrics_config::enabled_map_type& enabled,
+      const cmconfig::metrics_config::enabled_map_type& enabled,
       const std::string& collector_name) const {
     auto it = enabled.find(collector_name);
     return (it == enabled.end()) ? std::string()
@@ -245,7 +245,7 @@ class collector_registerer : public rer::client<collector_registerer> {
   /* clang-format off */
   const int                             mc_decomp_depth;
   const rmath::vector2u                 mc_arena_dim;
-  const cpconfig::metrics_config* const mc_config;
+  const cmconfig::metrics_config* const mc_config;
   const creatable_set                   mc_create_set;
 
   base_metrics_aggregator* const        m_agg;

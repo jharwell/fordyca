@@ -42,7 +42,7 @@ NS_START(fordyca, config);
  ******************************************************************************/
 /**
  * \class exploration_parser
- * \ingroup fordyca config
+ * \ingroup config
  *
  * \brief Parses XML configuration for how robots should explore for things into
  * \ref exploration_config.

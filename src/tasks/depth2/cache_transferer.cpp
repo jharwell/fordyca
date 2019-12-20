@@ -40,8 +40,8 @@ NS_START(fordyca, tasks, depth2);
  * Constructors/Destructor
  ******************************************************************************/
 cache_transferer::cache_transferer(
-    const struct rta::config::task_alloc_config* config,
-    std::unique_ptr<rta::taskable> mechanism)
+    const struct cta::config::task_alloc_config* config,
+    std::unique_ptr<cta::taskable> mechanism)
     : foraging_task(kCacheTransfererName, config, std::move(mechanism)),
       ER_CLIENT_INIT("fordyca.tasks.depth2.cache_transferer") {}
 
@@ -49,14 +49,14 @@ cache_transferer::cache_transferer(
  * Member Functions
  ******************************************************************************/
 
-void cache_transferer::task_start(const rta::taskable_argument* const) {
+void cache_transferer::task_start(const cta::taskable_argument* const) {
   foraging_signal_argument a(fsm::foraging_signal::ekACQUIRE_CACHED_BLOCK);
-  rta::polled_task::mechanism()->task_start(&a);
+  cta::polled_task::mechanism()->task_start(&a);
 } /* task_start() */
 
 double cache_transferer::abort_prob_calc(void) {
   if (-1 == active_interface()) {
-    return rta::abort_probability::kMIN_ABORT_PROB;
+    return cta::abort_probability::kMIN_ABORT_PROB;
   } else {
     return executable_task::abort_prob();
   }

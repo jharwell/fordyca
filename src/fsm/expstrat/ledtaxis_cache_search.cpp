@@ -63,7 +63,7 @@ void ledtaxis_cache_search::task_execute(void) {
   m_crw.task_execute();
 } /* task_execute() */
 
-void ledtaxis_cache_search::task_start(const rta::taskable_argument*) {
+void ledtaxis_cache_search::task_start(const cta::taskable_argument*) {
   saa()->sensing()->blobs()->enable();
   m_taxis.task_start(nullptr);
 } /* task_start() */

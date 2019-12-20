@@ -49,7 +49,7 @@ NS_START(events, detail);
  * Class Definitions
  ******************************************************************************/
 /**
- * \ingroup fordyca events detail
+ * \ingroup events detail
  *
  * \brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).

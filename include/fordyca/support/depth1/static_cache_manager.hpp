@@ -53,7 +53,7 @@ NS_START(support, depth1);
  ******************************************************************************/
 /**
  * \class static_cache_manager
- * \ingroup fordyca support depth1
+ * \ingroup support depth1
  *
  * \brief Manager for creation, depletion, and metric gathering for the static
  * cache(s) in the arena.

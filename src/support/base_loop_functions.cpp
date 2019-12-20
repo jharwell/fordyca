@@ -30,6 +30,9 @@
 #include "rcppsw/algorithm/closest_pair2D.hpp"
 #include "rcppsw/math/vector2.hpp"
 
+#include "cosm/convergence/config/convergence_config.hpp"
+#include "cosm/convergence/convergence_calculator.hpp"
+
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
 #include "fordyca/config/tv/tv_manager_config.hpp"
@@ -43,10 +46,6 @@
 #include "fordyca/support/tv/argos_pd_adaptor.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
-
-#include "cosm/convergence/config/convergence_config.hpp"
-#include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/pal/config/output_config.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -83,7 +82,7 @@ void base_loop_functions::init(ticpp::Element& node) {
   rng_init(config()->config_get<rmath::config::rng_config>());
 
   /* initialize output and metrics collection */
-  output_init(m_config.config_get<cpconfig::output_config>());
+  output_init(m_config.config_get<cmconfig::output_config>());
 
   /* initialize arena map and distribute blocks */
   arena_map_init(config());
@@ -119,19 +118,33 @@ void base_loop_functions::convergence_init(
 
 void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
   ER_INFO("Creating temporal variance manager");
-  auto envd =
-      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics, this, arena_map());
-  auto popd =
-      std::make_unique<tv::argos_pd_adaptor>(&tvp->population_dynamics,
-                                             this,
-                                             arena_map(),
-                                             tv_manager()->environ_dynamics(),
-                                             "fb",
-                                             "ffc",
-                                             rng());
+
+  const config::tv::env_dynamics_config* envp;
+  /*
+   * Need environmental dynamics even if they are omitted from input file in
+   * order to correctly calculate 1 timestep penalties for things.
+   */
+  if (nullptr == tvp) {
+    envp = std::make_unique<config::tv::env_dynamics_config>().get();
+  } else {
+    envp = &tvp->env_dynamics;
+  }
+  auto envd = std::make_unique<tv::env_dynamics>(envp, this, arena_map());
+
+  std::unique_ptr<tv::argos_pd_adaptor> popd = nullptr;
+  if (nullptr != tvp) {
+    popd = std::make_unique<tv::argos_pd_adaptor>(&tvp->population_dynamics,
+                                                  this,
+                                                  arena_map(),
+                                                  envd.get(),
+                                                  "fb",
+                                                  "ffc",
+                                                  rng());
+  }
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
+
   /*
    * Register all controllers with temporal variance manager in order to be able
    * to apply environmental variances if configured. Note that we MUST use
@@ -175,6 +188,23 @@ void base_loop_functions::oracle_init(
     m_oracle_manager = std::make_unique<oracle::oracle_manager>(oraclep);
   }
 } /* oracle_init() */
+
+void base_loop_functions::output_init(const cmconfig::output_config* output) {
+  swarm_manager::output_init(output->output_root, output->output_dir);
+
+#if (LIBRA_ER == LIBRA_ER_ALL)
+  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
+                      output_root() + "/events.log");
+  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
+                      output_root() + "/support.log");
+  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
+                      output_root() + "/sim.log");
+  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
+                      output_root() + "/sim.log");
+  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
+                      output_root() + "/metrics.log");
+#endif
+} /* output_init() */
 
 /*******************************************************************************
  * ARGoS Hooks

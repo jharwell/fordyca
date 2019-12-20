@@ -25,10 +25,10 @@
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
+#include "cosm/vis/task_visualizer.hpp"
+
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
-
-#include "cosm/vis/task_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +55,7 @@ void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
 
   if (controller.display_task()) {
     cvis::task_visualizer(this, 0.75)
-        .draw(dynamic_cast<rta::logical_task*>(controller.current_task()));
+        .draw(dynamic_cast<cta::logical_task*>(controller.current_task()));
   }
 }
 

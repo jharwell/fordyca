@@ -45,7 +45,7 @@ NS_START(fsm, depth0);
  ******************************************************************************/
 /**
  * \class dpo_fsm
- * \ingroup fordyca fsm depth0
+ * \ingroup fsm depth0
  *
  * \brief The FSM for an unpartitioned foraging task. Each robot executing this
  * FSM will locate for a block (either a known block or via exploration), pickup
@@ -65,6 +65,8 @@ class dpo_fsm final : public cfsm::util_hfsm,
           std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
+  dpo_fsm(const dpo_fsm&) = delete;
+  dpo_fsm& operator=(const dpo_fsm&) = delete;
 
   /* collision metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, in_collision_avoidance, const);
@@ -124,11 +126,12 @@ class dpo_fsm final : public cfsm::util_hfsm,
   return &mc_state_map[index];
   }
 
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+
   /* clang-format off */
   free_block_to_nest_fsm m_block_fsm;
   /* clang-format on */
 
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 };
 
 NS_END(depth0, fsm, fordyca);

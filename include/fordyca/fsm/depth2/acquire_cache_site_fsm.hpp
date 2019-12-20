@@ -46,7 +46,7 @@ NS_START(fsm, depth2);
  ******************************************************************************/
 /**
  * \class acquire_cache_site_fsm
- * \ingroup fordyca fsm depth2
+ * \ingroup fsm depth2
  *
  * \brief The FSM for acquiring a site to start a new cache at within the
  * arena.

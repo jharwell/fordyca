@@ -40,15 +40,15 @@ NS_START(fordyca, tasks, depth2);
  ******************************************************************************/
 /**
  * \class cache_collector
- * \ingroup fordyca tasks depth2
+ * \ingroup tasks depth2
  *
  * \brief Task in which robots locate a cache and bring a block from it to the
  * nest. It is abortable, and has one task interface.
  */
 class cache_collector final : public depth1::collector {
  public:
-  cache_collector(const rta::config::task_alloc_config* config,
-                  std::unique_ptr<rta::taskable> mechanism) :
+  cache_collector(const cta::config::task_alloc_config* config,
+                  std::unique_ptr<cta::taskable> mechanism) :
       collector(config,
                 depth2::foraging_task::kCacheCollectorName,
                 std::move(mechanism)) {}

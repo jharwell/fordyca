@@ -26,10 +26,10 @@
 #include <algorithm>
 #include <cmath>
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/arena_grid.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

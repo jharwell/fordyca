@@ -40,7 +40,7 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 /**
  * \class tv_manager
- * \ingroup fordyca support tv
+ * \ingroup support tv
  *
  * \brief Orchestrates all application of temporal variance to robot interations
  * with the environment/robotic mechanical functioning.
@@ -65,8 +65,12 @@ class tv_manager {
    * timestep.
    */
   void update(const rtypes::timestep& t) {
-    m_envd->update(t);
-    m_popd->update(t);
+    if (m_envd) {
+      m_envd->update(t);
+    }
+    if (m_popd) {
+      m_popd->update(t);
+    }
   }
 
  private:

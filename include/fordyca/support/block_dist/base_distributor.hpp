@@ -43,7 +43,7 @@ NS_START(fordyca, support, block_dist);
  ******************************************************************************/
 /**
  * \class base_distributor
- * \ingroup fordyca support block_dist
+ * \ingroup support block_dist
  *
  * \brief Base class for block distributors to enable use of strategy pattern.
  */

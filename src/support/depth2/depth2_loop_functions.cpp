@@ -34,8 +34,11 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "rcppsw/ds/type_map.hpp"
-#include "rcppsw/ta/bi_tdgraph_executive.hpp"
-#include "rcppsw/ta/ds/bi_tdgraph.hpp"
+
+#include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
+#include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/ta/ds/bi_tdgraph.hpp"
 
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
@@ -57,9 +60,6 @@
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
-#include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
@@ -73,7 +73,7 @@ NS_START(detail);
 
 /**
  * \struct functor_maps_initializer
- * \ingroup fordyca support depth2 detail
+ * \ingroup support depth2 detail
  *
  * Convenience class containing initialization for all of the typeid ->
  * boost::variant maps for all controller types that are used throughout
@@ -164,7 +164,7 @@ void depth2_loop_functions::shared_init(ticpp::Element& node) {
 void depth2_loop_functions::private_init(void) {
   /* initialize stat collecting */
   auto* arena = config()->config_get<config::arena::arena_map_config>();
-  auto* output = config()->config_get<cpconfig::output_config>();
+  auto* output = config()->config_get<cmconfig::output_config>();
   m_metrics_agg = std::make_unique<depth2_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
                                                               output_root());

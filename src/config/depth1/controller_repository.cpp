@@ -23,13 +23,12 @@
  ******************************************************************************/
 #include "fordyca/config/depth1/controller_repository.hpp"
 
-#include "rcppsw/ta/config/xml/task_alloc_parser.hpp"
-#include "rcppsw/ta/config/xml/task_executive_parser.hpp"
+#include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
+#include "cosm/ta/config/xml/task_alloc_parser.hpp"
+#include "cosm/ta/config/xml/task_executive_parser.hpp"
 
 #include "fordyca/config/cache_sel/cache_sel_matrix_parser.hpp"
 #include "fordyca/fordyca.hpp"
-
-#include "cosm/subsystem/config/xml/sensing_subsystem2D_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,8 +36,8 @@
 NS_START(fordyca, config, depth1);
 namespace csconfig = csubsystem::config;
 namespace cscxml = csconfig::xml;
-namespace rtconfig = rta::config;
-namespace rtcxml = rta::config::xml;
+namespace rtconfig = cta::config;
+namespace rtcxml = cta::config::xml;
 
 /*******************************************************************************
  * Constructors/Destructor

@@ -249,7 +249,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
     ER_TRACE("cache: xspan=%s,center=%s overlap ent%d: xspan=%s, x_delta=%f",
              newc_xspan.to_str().c_str(),
              center.to_str().c_str(),
-             ent->id(),
+             ent->id().v(),
              exc_xspan.to_str().c_str(),
              x_delta);
     new_center.x(static_cast<uint>(new_center.x() + x_delta));
@@ -258,7 +258,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc_entity(
     ER_TRACE("cache: yspan=%s,center=%s overlap ent%d: yspan=%s, y_delta=%f",
              newc_yspan.to_str().c_str(),
              center.to_str().c_str(),
-             ent->id(),
+             ent->id().v(),
              exc_yspan.to_str().c_str(),
              y_delta);
     new_center.y(static_cast<uint>(new_center.y() + y_delta));

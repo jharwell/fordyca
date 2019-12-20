@@ -23,6 +23,9 @@
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/repr/pheromone_density.hpp"
+
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
@@ -36,9 +39,6 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/repr/base_cache.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
-#include "cosm/repr/pheromone_density.hpp"
 
 /*******************************************************************************
  * Namespaces

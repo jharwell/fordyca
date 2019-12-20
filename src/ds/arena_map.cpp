@@ -24,6 +24,8 @@
 
 #include <argos3/plugins/simulator/media/led_medium.h>
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/ds/cell2D.hpp"
@@ -34,8 +36,6 @@
 #include "fordyca/support/base_loop_functions.hpp"
 #include "fordyca/support/block_manifest_processor.hpp"
 #include "fordyca/support/light_type_index.hpp"
-
-#include "cosm/repr/base_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces

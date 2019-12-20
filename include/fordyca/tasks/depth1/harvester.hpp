@@ -30,8 +30,8 @@
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
 
-#include "rcppsw/ta/abort_probability.hpp"
-#include "rcppsw/ta/polled_task.hpp"
+#include "cosm/ta/abort_probability.hpp"
+#include "cosm/ta/polled_task.hpp"
 #include "rcppsw/er/client.hpp"
 
 /*******************************************************************************
@@ -44,7 +44,7 @@ NS_START(fordyca, tasks, depth1);
  ******************************************************************************/
 /**
  * \class harvester
- * \ingroup fordyca tasks depth1
+ * \ingroup tasks depth1
  *
  * \brief Task in which robots locate a free block and bring it to a known
  * cache. It is abortable, and has one task interface.
@@ -54,8 +54,8 @@ class harvester final : public foraging_task,
                   public events::free_block_interactor,
                   public rer::client<harvester> {
  public:
-  harvester(const struct rta::config::task_alloc_config* config,
-            std::unique_ptr<rta::taskable> mechanism);
+  harvester(const struct cta::config::task_alloc_config* config,
+            std::unique_ptr<cta::taskable> mechanism);
   ~harvester(void) override = default;
 
   /*
@@ -93,7 +93,7 @@ class harvester final : public foraging_task,
   bool task_at_interface(void) const override RCSW_PURE;
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const rta::taskable_argument*) override;
+  void task_start(const cta::taskable_argument*) override;
   double abort_prob_calc(void) override RCSW_PURE;
   rtypes::timestep interface_time_calc(uint interface,
                                        const rtypes::timestep& start_time) override RCSW_PURE;
