@@ -1,7 +1,7 @@
 /**
- * @file depth2_qt_user_functions.hpp
+ * \file depth2_qt_user_functions.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -34,10 +34,10 @@ NS_START(fordyca, support, depth2);
  * Classes
  ******************************************************************************/
 /**
- * @class depth2_qt_user_functions
- * @ingroup support depth2
+ * \class depth2_qt_user_functions
+ * \ingroup support depth2
  *
- * @brief Contains hooks for Qt to draw the visualizations related to depth 2
+ * \brief Contains hooks for Qt to draw the visualizations related to depth 2
  * task decomposition:
  *
  */

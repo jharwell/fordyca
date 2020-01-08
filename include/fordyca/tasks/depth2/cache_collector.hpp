@@ -1,7 +1,7 @@
 /**
- * @file cache_collector.hpp
+ * \file cache_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,6 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <utility>
+#include <memory>
+
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
 
@@ -36,17 +39,17 @@ NS_START(fordyca, tasks, depth2);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class cache_collector
- * @ingroup tasks depth2
+ * \class cache_collector
+ * \ingroup tasks depth2
  *
- * @brief Task in which robots locate a cache and bring a block from it to the
+ * \brief Task in which robots locate a cache and bring a block from it to the
  * nest. It is abortable, and has one task interface.
  */
-class cache_collector : public depth1::collector {
+class cache_collector final : public depth1::collector {
  public:
-  cache_collector(const struct ta::task_allocation_params* params,
-                  std::unique_ptr<ta::taskable> mechanism) :
-      collector(params,
+  cache_collector(const cta::config::task_alloc_config* config,
+                  std::unique_ptr<cta::taskable> mechanism) :
+      collector(config,
                 depth2::foraging_task::kCacheCollectorName,
                 std::move(mechanism)) {}
 };

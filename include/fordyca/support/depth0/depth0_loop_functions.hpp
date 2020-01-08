@@ -1,7 +1,7 @@
 /**
- * @file depth0_loop_functions.hpp
+ * \file depth0_loop_functions.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,70 +24,136 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
 #include "fordyca/support/base_loop_functions.hpp"
-#include "fordyca/support/depth0/robot_arena_interactor.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
+#include "rcppsw/ds/type_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace controller { namespace depth0 { class depth0_controller; }}
-NS_START(support, depth0);
+NS_START(fordyca, support);
 
+template<typename ControllerType>
+class robot_los_updater;
+template<typename AggregatorType, typename ControllerType>
+class robot_metric_extractor;
+
+NS_START(depth0);
+namespace detail {
+struct functor_maps_initializer;
+} /* namespace detail */
 class depth0_metrics_aggregator;
+
+template<typename ControllerType>
+class robot_arena_interactor;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class depth0_loop_functions
- * @ingroup support depth0
+ * \class depth0_loop_functions
+ * \ingroup support depth0
  *
- * @brief Contains the simulation support functions for depth0 foraging, such
+ * \brief Contains the simulation support functions for depth0 foraging, such
  * as:
  *
- * - Sending robots their LOS each timestep
- * - Sending robots their position each timestep.
- * - Sending robot the current simulation tick each timestep.
+ * - Metric collection from robots
+ * - Robot arena interactions
  */
 class depth0_loop_functions : public base_loop_functions,
-                                public er::client<depth0_loop_functions> {
+                              public rer::client<depth0_loop_functions> {
  public:
-  depth0_loop_functions(void);
-  ~depth0_loop_functions(void) override;
+  depth0_loop_functions(void) RCSW_COLD;
+  ~depth0_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void PreStep(void) override;
-  void Reset(void) override;
-  void Destroy(void) override;
+  void PostStep(void) override;
+  void Reset(void) override RCSW_COLD;
+  void Destroy(void) override RCSW_COLD;
 
  protected:
-  virtual void pre_step_final(void);
-  template<typename T>
-  void set_robot_tick(argos::CFootBotEntity& robot) {
-    auto& controller = dynamic_cast<T&>(robot.GetControllableEntity().GetController());
-    controller.tick(GetSpace().GetSimulationClock());
-  }
+  /**
+   * \brief Initialize depth0 support to be shared with derived classes:
+   *
+   * - Depth0 metric collection
+   */
+  void shared_init(ticpp::Element& node) RCSW_COLD;
 
  private:
-  /*
-   * We use a unique interactor type for each controller in this depth, rather
-   * than trying to get everything to fit together with a single abstract base
-   * class controller (i.e. \ref depth0_controller). Waaaayyyyy cleaner.
+  using interactor_map_type = rds::type_map<
+    rmpl::typelist_wrap_apply<controller::depth0::typelist,
+                                robot_arena_interactor>::type
+    >;
+  using los_updater_map_type = rds::type_map<
+    rmpl::typelist_wrap_apply<controller::depth0::typelist,
+                              robot_los_updater>::type>;
+
+  using metric_extraction_typelist = rmpl::typelist<
+    robot_metric_extractor<depth0_metrics_aggregator,
+                           controller::depth0::crw_controller>,
+    robot_metric_extractor<depth0_metrics_aggregator,
+                           controller::depth0::dpo_controller>,
+    robot_metric_extractor<depth0_metrics_aggregator,
+                           controller::depth0::odpo_controller>,
+    robot_metric_extractor<depth0_metrics_aggregator,
+                           controller::depth0::mdpo_controller>,
+    robot_metric_extractor<depth0_metrics_aggregator,
+                           controller::depth0::omdpo_controller>
+    >;
+
+  using metric_extraction_map_type = rds::type_map<metric_extraction_typelist>;
+
+  /**
+   * \brief These are friend classes because they are basically just pieces of
+   * the loop functions pulled out for increased clarity/modularity, and are not
+   * meant to be used in other contexts.
+   *
+   * Doing things this way rather than passing 8 parameters to the functors
+   * seemed much cleaner.
    */
-  using crw_interactor_type = robot_arena_interactor<controller::depth0::crw_controller>;
-  using stateful_interactor_type = robot_arena_interactor<controller::depth0::stateful_controller>;
+  friend detail::functor_maps_initializer;
 
-  void pre_step_iter(argos::CFootBotEntity& robot);
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  template<class T>
-  void controller_configure(controller::base_controller* c);
+  /**
+   * \brief Initialize depth0 support not shared with derived classes:
+   *
+   * - Robot interactions with arena
+   * - Various maps mapping controller types to metric collection, controller
+   *   initialization, and arena interaction maps (reflection basically).
+   */
+  void private_init(void) RCSW_COLD;
 
-  // clang-format off
-  std::unique_ptr<depth0_metrics_aggregator> m_metrics_agg;
-  std::unique_ptr<crw_interactor_type>       m_crw_interactor{nullptr};
-  std::unique_ptr<stateful_interactor_type>  m_stateful_interactor{nullptr};
-  // clang-format on
+  /**
+   * \brief Process a single robot on a timestep, before running its controller:
+   *
+   * - Set its new position, time from ARGoS and send it its LOS.
+   *
+   * \note These operations are done in parallel for all robots (lock free).
+   */
+  void robot_pre_step(argos::CFootBotEntity& robot);
+
+  /**
+   * \brief Process a single robot on a timestep, after running its controller.
+   *
+   * - Have it interact with the environment.
+   * - Collect metrics from it.
+   *
+   * \note These operations are done in parallel for all robots (with mutual
+   *       exclusion as needed).
+   */
+  void robot_post_step(argos::CFootBotEntity& robot);
+
+  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override RCSW_PURE;
+
+  /* clang-format off */
+  std::unique_ptr<depth0_metrics_aggregator>  m_metrics_agg;
+  std::unique_ptr<interactor_map_type>        m_interactor_map;
+  std::unique_ptr<metric_extraction_map_type> m_metrics_map;
+  std::unique_ptr<los_updater_map_type>       m_los_update_map;
+  /* clang-format on */
 };
 
 NS_END(depth0, support, fordyca);

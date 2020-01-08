@@ -1,7 +1,7 @@
 /**
- * @file los_visualizer.hpp
+ * \file los_visualizer.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,8 +24,11 @@
  * Includes
  ******************************************************************************/
 #include <string>
-#include "rcppsw/common/common.hpp"
+
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,7 +39,7 @@ class CQTOpenGLUserFunctions;
 
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class line_of_sight;
 }
 
@@ -46,13 +49,13 @@ NS_START(support);
  * Classes
  ******************************************************************************/
 /**
- * @class los_visualizer
- * @ingroup support
+ * \class los_visualizer
+ * \ingroup support
  *
- * @brief Renders the LOS for a given robot for visualization/debugging
+ * \brief Renders the LOS for a given robot for visualization/debugging
  * purposes.
  */
-class los_visualizer : public rcppsw::er::client<los_visualizer> {
+class los_visualizer : public rer::client<los_visualizer> {
  public:
   explicit los_visualizer(argos::CQTOpenGLUserFunctions* qt)
       : ER_CLIENT_INIT("fordyca.support.los_visualizer"), m_qt(qt) {}
@@ -61,17 +64,16 @@ class los_visualizer : public rcppsw::er::client<los_visualizer> {
   los_visualizer& operator=(const los_visualizer& op) = delete;
 
   /**
-   * @brief Draw visualizations related to block LOS:
+   * \brief Draw visualizations related to block LOS:
    *
-   * @param block The LOS to visualize.
-   * @param grid_resolution The grid resolution for the arena.
+   * \param los The LOS to visualize.
+   * \param resolution The grid resolution for the arena.
    */
-  void draw(const representation::line_of_sight* const los,
-            double grid_resolution);
+  void draw(const repr::line_of_sight* los, rtypes::discretize_ratio resolution);
 
-  // clang-format off
+  /* clang-format off */
   argos::CQTOpenGLUserFunctions* const m_qt{nullptr};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fordyca, support);

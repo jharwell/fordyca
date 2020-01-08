@@ -1,7 +1,7 @@
 /**
- * @file depth2_loop_functions.hpp
+ * \file depth2_loop_functions.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,10 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
+#include <vector>
+#include <memory>
+
 #include "fordyca/support/depth1/depth1_loop_functions.hpp"
-#include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/support/depth2/robot_arena_interactor.hpp"
+#include "fordyca/support/robot_los_updater.hpp"
+#include "fordyca/support/robot_metric_extractor.hpp"
+#include "fordyca/support/robot_task_extractor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,55 +38,146 @@
 NS_START(fordyca, support, depth2);
 class depth2_metrics_aggregator;
 class dynamic_cache_manager;
+template<typename T>
+class robot_arena_interactor;
+
+namespace detail {
+struct functor_maps_initializer;
+} /* namespace detail */
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class loop_functions
- * @ingroup support depth2
+ * \class depth2_loop_functions
+ * \ingroup support depth2
  *
- * @brief The loop functions for depth 2 foraging.
+ * \brief The loop functions for depth 2 foraging.
  *
  * Handles all operations robots perform relating to dynamic caches: pickup,
  * drop, creation, depletion, etc.
  */
 class depth2_loop_functions : public depth1::depth1_loop_functions,
-                              public er::client<depth2_loop_functions> {
+                              public rer::client<depth2_loop_functions> {
  public:
-  depth2_loop_functions(void);
-  ~depth2_loop_functions(void) override;
+  depth2_loop_functions(void) RCSW_COLD;
+  ~depth2_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override;
+  void Init(ticpp::Element& node) override RCSW_COLD;
   void PreStep() override;
-  void Reset(void) override;
-
- private:
-  using interactor = robot_arena_interactor<controller::depth2::greedy_recpart_controller>;
+  void PostStep() override;
+  void Reset(void) override RCSW_COLD;
+  void Destroy(void) override RCSW_COLD;
 
   /**
-   * @brief Handle creation of dynamic caches during initialization, reset, or
-   * when triggered by events during simulation.
+   * \brief Initialize depth2 support to be shared with derived classes
    *
-   * @param on_drop \c TRUE if caches are to be (potentially) created as a
+   * - All depth1 shared initialization
+   * - Depth2 metric collection
+   */
+  void shared_init(ticpp::Element& node) RCSW_COLD;
+
+ private:
+  using interactor_map_type = rds::type_map<
+   rmpl::typelist_wrap_apply<controller::depth2::typelist,
+                               robot_arena_interactor>::type>;
+  using los_updater_map_type = rds::type_map<
+    rmpl::typelist_wrap_apply<controller::depth2::typelist,
+                                robot_los_updater>::type>;
+  using task_extractor_map_type = rds::type_map<
+    rmpl::typelist_wrap_apply<controller::depth2::typelist,
+                                robot_task_extractor>::type>;
+
+  using metric_extractor_typelist = rmpl::typelist<
+    robot_metric_extractor<depth2_metrics_aggregator,
+                           controller::depth2::birtd_dpo_controller>,
+    robot_metric_extractor<depth2_metrics_aggregator,
+                           controller::depth2::birtd_odpo_controller>,
+    robot_metric_extractor<depth2_metrics_aggregator,
+                           controller::depth2::birtd_mdpo_controller>,
+    robot_metric_extractor<depth2_metrics_aggregator,
+                           controller::depth2::birtd_omdpo_controller>
+    >;
+  using metric_extractor_map_type = rds::type_map<metric_extractor_typelist>;
+
+  /**
+   * \brief These are friend classes because they are basically just pieces of
+   * the loop functions pulled out for increased clarity/modularity, and are not
+   * meant to be used in other contexts.
+   *
+   * Doing things this way rather than passing 8 parameters to the functors
+   * seemed much cleaner.
+   */
+  friend detail::functor_maps_initializer;
+
+  void private_init(void) RCSW_COLD;
+
+  void cache_handling_init(const config::caches::caches_config* cachep) RCSW_COLD;
+
+  /**
+   * \brief Handle creation of dynamic caches during initialization, reset, or
+   * when triggered by events during simulation.
+   *3a
+   * \param on_drop \c TRUE if caches are to be (potentially) created as a
    * result of a robot block drop. If \c FALSE, then consider dynamic cache
    * creation in other situations.
    *
-   * @return \c TRUE if one or more caches were creation, \c FALSE otherwise.
+   * \return \c TRUE if one or more caches were created, \c FALSE otherwise.
    */
   bool cache_creation_handle(bool on_drop);
 
-  void pre_step_final(void) override;
-  void pre_step_iter(argos::CFootBotEntity& robot);
-  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
-  void controller_configure(controller::base_controller& c);
-  void cache_handling_init(const struct params::caches::caches_params* cachep);
+  /**
+   * \brief Extract the numerical ID of the task each robot is currently
+   * executing for use in convergence calculations.
+   *
+   * Cannot use depth1 version as the binary layout of the controllers is not
+   * guaranteed to be the same, AND the task mappers will throw key errors if
+   * you try it.
+   *
+   * \param uint Unused.
+   */
+  std::vector<int> robot_tasks_extract(uint) const;
 
-  // clang-format off
-  std::unique_ptr<interactor>                m_interactor{};
-  std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg{};
-  std::unique_ptr<dynamic_cache_manager>     m_cache_manager{};
-  // clang-format on
+    /**
+   * \brief Process a single robot on a timestep, before running its controller:
+   *
+   * - Set its new position, time, LOS from ARGoS.
+   * - Have it interact with the environment.
+   */
+  void robot_pre_step(argos::CFootBotEntity& robot);
+
+  /**
+   * \brief Process a single robot on a timestep, after running its controller,
+   * step1: have it interact with the environment.
+   *
+   * This is done serially for all robots.
+   *
+   * \todo This is separate from step 2 until robot-arena interactions can be
+   * made thread safe and then they can be recombined.
+   */
+  void robot_post_step1(argos::CFootBotEntity& robot);
+
+  /**
+   * \brief Process a single robot on a timestep, after running its controller,
+   * step 2: collect metrics from it.
+   *
+   * This is done in parallel for all robots.
+   *
+   * \todo This is separate from step 1 until robot-arena interactions can be
+   * made thread safe and then they can be recombined.
+   */
+  void robot_post_step2(argos::CFootBotEntity& robot);
+
+  argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
+
+  /* clang-format off */
+  std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg;
+  std::unique_ptr<dynamic_cache_manager>     m_cache_manager;
+  std::unique_ptr<interactor_map_type>       m_interactor_map;
+  std::unique_ptr<metric_extractor_map_type> m_metric_extractor_map;
+  std::unique_ptr<los_updater_map_type>      m_los_update_map;
+  std::unique_ptr<task_extractor_map_type>   m_task_extractor_map;
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

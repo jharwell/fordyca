@@ -1,7 +1,7 @@
 /**
- * @file cache_block_drop.cpp
+ * \file cache_block_drop.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,27 +22,34 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cache_block_drop.hpp"
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/controller/depth2/greedy_recpart_controller.hpp"
-#include "fordyca/controller/foraging_signal.hpp"
-#include "fordyca/dbg/dbg.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
+
+#include "fordyca/controller/cache_sel_matrix.hpp"
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
+#include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
+#include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/representation/arena_cache.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-#include "fordyca/controller/cache_sel_matrix.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::arena_grid;
 using ds::occupancy_grid;
 
@@ -50,14 +57,62 @@ using ds::occupancy_grid;
  * Constructors/Destructor
  ******************************************************************************/
 cache_block_drop::cache_block_drop(
-    const std::shared_ptr<representation::base_block>& block,
-    const std::shared_ptr<representation::arena_cache>& cache,
-    double resolution)
-    : cell_op(cache->discrete_loc()),
-      ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
-      m_resolution(resolution),
-      m_block(block),
+    std::unique_ptr<crepr::base_block2D> robot_block,
+    const std::shared_ptr<repr::arena_cache>& cache,
+    rtypes::discretize_ratio resolution)
+    : ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
+      cell_op(cache->dloc()),
+      mc_resolution(resolution),
+      m_robot_block(std::move(robot_block)),
+      m_arena_block(nullptr),
       m_cache(cache) {}
+
+cache_block_drop::cache_block_drop(
+    const std::shared_ptr<crepr::base_block2D>& arena_block,
+    const std::shared_ptr<repr::arena_cache>& cache,
+    rtypes::discretize_ratio resolution)
+    : ER_CLIENT_INIT("fordyca.events.cache_block_drop"),
+      cell_op(cache->dloc()),
+      mc_resolution(resolution),
+      m_robot_block(nullptr),
+      m_arena_block(arena_block),
+      m_cache(cache) {}
+
+/*******************************************************************************
+ * Member Functions
+ ******************************************************************************/
+void cache_block_drop::dispatch_d1_cache_interactor(
+    tasks::base_foraging_task* const task) {
+  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
+
+  ER_ASSERT(nullptr != interactor,
+            "Non existing cache interactor task %s causing cached block drop",
+            dynamic_cast<cta::logical_task*>(task)->name().c_str());
+  interactor->accept(*this);
+} /* dispatch_d1_cache_interactor() */
+
+bool cache_block_drop::dispatch_d2_cache_interactor(
+    tasks::base_foraging_task* task,
+    controller::cache_sel_matrix* csel_matrix) {
+  auto* polled = dynamic_cast<cta::polled_task*>(task);
+  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(task);
+  bool ret = false;
+  ER_ASSERT(nullptr != interactor,
+            "Non existing cache interactor task %s causing cached block drop",
+            polled->name().c_str());
+
+  if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
+    ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
+            m_cache->id().v(),
+            m_cache->rloc().to_str().c_str(),
+            polled->name().c_str());
+    csel_matrix->sel_exception_add(
+        {m_cache->id(), controller::cache_sel_exception::kPickup});
+    ret = true;
+  }
+  interactor->accept(*this);
+  return ret;
+} /* dispatch_d2_cache_interactor() */
 
 /*******************************************************************************
  * Depth1 Foraging
@@ -66,7 +121,7 @@ void cache_block_drop::visit(ds::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().x() && 0 != cell.loc().y(),
             "Cell does not have coordinates");
 
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
   ER_ASSERT(m_cache->n_blocks() == cell.block_count(),
             "Cache/cell disagree on # of blocks: cache=%zu/cell=%zu",
             m_cache->n_blocks(),
@@ -79,101 +134,234 @@ void cache_block_drop::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_block_drop::visit(ds::arena_map& map) {
-  ER_ASSERT(-1 != m_block->robot_id(),
+  ER_ASSERT(rtypes::constants::kNoUUID != m_robot_block->robot_id(),
             "Undefined robot index for block%d",
-            m_block->id());
-  __rcsw_unused int index = m_block->robot_id();
-  m_block->accept(*this);
-  m_cache->accept(*this);
-  map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()).accept(*this);
+            m_robot_block->id().v());
+  RCSW_UNUSED rtypes::type_uuid robot_id = m_robot_block->robot_id();
+
+  map.block_mtx().lock();
+  /*
+   * The robot owns a unique copy of a block originally from the arena, so we
+   * need to look it up rather than implicitly converting its unique_ptr to a
+   * shared_ptr and distributing it--this will cause lots of problems later.
+   */
+  auto it =
+      std::find_if(map.blocks().begin(), map.blocks().end(), [&](const auto& b) {
+        return m_robot_block->id() == b->id();
+      });
+  ER_ASSERT(map.blocks().end() != it,
+            "Robot block%d not found in arena map blocks",
+            m_robot_block->id().v());
+  m_arena_block = *it;
+  visit(*m_arena_block);
+  map.block_mtx().unlock();
+
+  /* Already holding cache mutex from calling context */
+  visit(*m_cache);
+
+  /*
+   * Do not need to hold grid mutex because we know we are the only robot
+   * picking up from the cache right now (though others can do it later) this
+   * timestep, and caches by definition have a unique location, AND if another
+   * robot has just caused a block re-distribution, that operation avoids
+   * caches.
+   */
+  visit(map.access<arena_grid::kCell>(cell_op::x(), cell_op::y()));
+
   ER_INFO("arena_map: fb%d dropped block%d in cache%d,total=[%s] (%zu)",
-          index,
-          m_block->id(),
-          m_cache->id(),
-          dbg::blocks_list(m_cache->blocks()).c_str(),
+          robot_id.v(),
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          rcppsw::to_string(m_cache->blocks()).c_str(),
           m_cache->n_blocks());
 } /* visit() */
 
-void cache_block_drop::visit(ds::perceived_arena_map& map) {
-  map.access<occupancy_grid::kCell>(x(), y()).accept(*this);
+void cache_block_drop::visit(ds::dpo_semantic_map& map) {
+  visit(map.access<occupancy_grid::kCell>(x(), y()));
 } /* visit() */
 
-void cache_block_drop::visit(representation::base_block& block) {
-  events::free_block_drop e(m_block, /* OK because we only have 1 block */
-                            rmath::vector2u(cell_op::x(), cell_op::y()),
-                            m_resolution);
-  block.accept(e);
+void cache_block_drop::visit(crepr::base_block2D& block) {
+  events::free_block_drop_visitor e(m_arena_block,
+                                    rmath::vector2u(cell_op::x(), cell_op::y()),
+                                    mc_resolution,
+                                    false);
+  e.visit(block);
 } /* visit() */
 
-void cache_block_drop::visit(representation::arena_cache& cache) {
-  cache.block_add(m_block);
+void cache_block_drop::visit(repr::arena_cache& cache) {
+  cache.block_add(m_arena_block);
   cache.has_block_drop();
 } /* visit() */
 
-void cache_block_drop::visit(
-    controller::depth1::greedy_partitioning_controller& controller) {
+void cache_block_drop::visit(controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_push();
+
+  dispatch_d1_cache_interactor(controller.current_task());
   controller.block(nullptr);
-  controller.perception()->map()->accept(*this);
-
-  auto* task = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-  std::string task_name = dynamic_cast<ta::logical_task*>(task)->name();
-
-  ER_ASSERT(nullptr != task,
-            "Non existing cache interactor task %s causing cached block drop",
-            task_name.c_str());
-  task->accept(*this);
+  controller.block_manip_collator()->cache_drop_event(true);
 
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id(),
-          m_cache->id(),
-          task_name.c_str());
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(
+    controller::depth1::bitd_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  dispatch_d1_cache_interactor(controller.current_task());
+  controller.block(nullptr);
+  controller.block_manip_collator()->cache_drop_event(true);
+
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(
+    controller::depth1::bitd_odpo_controller& controller) {
+  controller.ndc_push();
+
+  dispatch_d1_cache_interactor(controller.current_task());
+  controller.block(nullptr);
+  controller.block_manip_collator()->cache_drop_event(true);
+
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(
+    controller::depth1::bitd_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  visit(*controller.mdpo_perception()->map());
+  dispatch_d1_cache_interactor(controller.current_task());
+  controller.block(nullptr);
+  controller.block_manip_collator()->cache_drop_event(true);
+
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
   controller.ndc_pop();
 } /* visit() */
 
 void cache_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
-  fsm.inject_event(controller::foraging_signal::BLOCK_DROP,
-                   state_machine::event_type::NORMAL);
+  fsm.inject_event(fsm::foraging_signal::ekBLOCK_DROP,
+                   rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
 void cache_block_drop::visit(tasks::depth1::harvester& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
 /*******************************************************************************
  * Depth2 Foraging
  ******************************************************************************/
 void cache_block_drop::visit(
-    controller::depth2::greedy_recpart_controller& controller) {
+    controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_push();
-  auto* polled = dynamic_cast<ta::polled_task*>(controller.current_task());
-  auto* interactor = dynamic_cast<events::existing_cache_interactor*>(
-      controller.current_task());
-  ER_ASSERT(nullptr != interactor,
-            "Non existing cache interactor task %s causing cached block drop",
-            polled->name().c_str());
 
-  if (tasks::depth2::foraging_task::kCacheTransfererName == polled->name()) {
-    ER_INFO("Added cache%d@%s to pickup exception list,task='%s'",
-            m_block->id(),
-            m_block->real_loc().to_str().c_str(),
-            polled->name().c_str());
-    controller.cache_sel_matrix()->sel_exception_add(
-        {m_cache->id(), controller::cache_sel_exception::kPickup});
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
     controller.csel_exception_added(true);
   }
+  controller.block_manip_collator()->cache_drop_event(true);
   controller.block(nullptr);
-  interactor->accept(*this);
   ER_INFO("Dropped block%d in cache%d,task='%s'",
-          m_block->id(),
-          m_cache->id(),
-          polled->name().c_str());
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(
+    controller::depth2::birtd_mdpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+  visit(*controller.mdpo_perception()->map());
+  controller.block_manip_collator()->cache_drop_event(true);
+  controller.block(nullptr);
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(
+    controller::depth2::birtd_odpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+  controller.block_manip_collator()->cache_drop_event(true);
+  controller.block(nullptr);
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
+  controller.ndc_pop();
+} /* visit() */
+
+void cache_block_drop::visit(
+    controller::depth2::birtd_omdpo_controller& controller) {
+  controller.ndc_push();
+
+  if (dispatch_d2_cache_interactor(controller.current_task(),
+                                   controller.cache_sel_matrix())) {
+    controller.csel_exception_added(true);
+  }
+  visit(*controller.mdpo_perception()->map());
+  controller.block_manip_collator()->cache_drop_event(true);
+  controller.block(nullptr);
+  ER_INFO("Dropped block%d in cache%d,task='%s'",
+          m_arena_block->id().v(),
+          m_cache->id().v(),
+          dynamic_cast<cta::logical_task*>(controller.current_task())
+              ->name()
+              .c_str());
+
   controller.ndc_pop();
 } /* visit() */
 
 void cache_block_drop::visit(tasks::depth2::cache_transferer& task) {
-  static_cast<fsm::block_to_goal_fsm*>(task.mechanism())->accept(*this);
+  visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file acquire_free_block_fsm.hpp
+ * \file acquire_free_block_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,22 +24,28 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
+#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "cosm/ta/taskable.hpp"
+
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
-#include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
+namespace fsm::expstrat {
+class foraging_expstrat;
+} /* namespace fsm::expstrat */
+
 namespace ds {
-class perceived_arena_map;
+class dpo_store;
 }
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-namespace ta = rcppsw::task_allocation;
 
 NS_START(fsm);
 
@@ -47,22 +53,24 @@ NS_START(fsm);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_free_block_fsm
- * @ingroup fsm
+ * \class acquire_free_block_fsm
+ * \ingroup fsm
  *
- * @brief The FSM for an acquiring a free (i.e. not in a cache) block in the
+ * \brief The FSM for an acquiring a free (i.e. not in a cache) block in the
  * arena.
  *
  * Each robot executing this FSM will look for a block (either a known block or
  * via stateless exploration). Once an existing block has been acquired, it
  * signals that it has completed its task.
  */
-class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
-                               public acquire_goal_fsm {
+class acquire_free_block_fsm : public rer::client<acquire_free_block_fsm>,
+                               public cfsm::acquire_goal_fsm {
  public:
-  acquire_free_block_fsm(const controller::block_sel_matrix* matrix,
-                         controller::saa_subsystem* saa,
-                         ds::perceived_arena_map* map);
+  acquire_free_block_fsm(
+      const fsm_ro_params* c_params,
+      crfootbot::footbot_saa_subsystem* saa,
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      rmath::rng* rng);
 
   ~acquire_free_block_fsm(void) override = default;
 
@@ -73,16 +81,19 @@ class acquire_free_block_fsm : public er::client<acquire_free_block_fsm>,
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type block_select(void) const;
-  bool candidates_exist(void) const;
+  static cfmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
+      RCSW_CONST;
+  boost::optional<acquire_goal_fsm::candidate_type> block_select(void) const;
+  bool candidates_exist(void) const RCSW_PURE;
   bool block_exploration_term_cb(void) const;
   bool block_acquired_cb(bool explore_result) const;
+  bool block_acq_valid(const rmath::vector2d& loc,
+                       const rtypes::type_uuid& id) const;
 
-  // clang-format off
+  /* clang-format off */
   const controller::block_sel_matrix* const mc_matrix;
-  const ds::perceived_arena_map*      const mc_map;
-  // clang-format on
+  const ds::dpo_store*      const           mc_store;
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

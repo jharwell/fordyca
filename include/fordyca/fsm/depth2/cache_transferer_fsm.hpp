@@ -1,7 +1,7 @@
 /**
- * @file cache_transferer_fsm.hpp
+ * \file cache_transferer_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 
@@ -32,47 +33,53 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace ds { class perceived_arena_map; }
+namespace ds { class dpo_store; }
 
-NS_START(fsm, depth2);
-using transport_goal_type = fsm::block_transporter::goal_type;
+NS_START(fsm);
+
+namespace expstrat {
+class foraging_expstrat;
+} /* namespace expstrat */
+
+NS_START(depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_transferer_fsm
- * @ingroup fsm depth2
+ * \class cache_transferer_fsm
+ * \ingroup fsm depth2
  *
- * @brief The FSM for a cache transferer task. Each robot executing this FSM
- * will acquire a cache (either a known cache or via random exploration), pickup
- * a block from it and then bring it to ANOTHER cache (either a known cache or
- * one found via random exploration) and drop it.
+ * \brief The FSM for a cache transferer task. Each robot executing this FSM
+ * will acquire a cache (either a known cache or via exploration), pickup a
+ * block from it and then bring it to ANOTHER cache (either a known cache or one
+ * found via exploration) and drop it.
  */
-class cache_transferer_fsm : public block_to_goal_fsm {
+class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
-  cache_transferer_fsm(const controller::cache_sel_matrix* matrix,
-                       controller::saa_subsystem* saa,
-                       ds::perceived_arena_map* map);
+  cache_transferer_fsm(const fsm_ro_params* c_params,
+                       crfootbot::footbot_saa_subsystem* saa,
+                       std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+                       rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;
 
-  cache_transferer_fsm(const cache_transferer_fsm& fsm) = delete;
-  cache_transferer_fsm& operator=(const cache_transferer_fsm& fsm) = delete;
+  cache_transferer_fsm(const cache_transferer_fsm&) = delete;
+  cache_transferer_fsm& operator=(const cache_transferer_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
+  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
-  bool is_acquiring_dest_cache(void) const;
-  bool is_acquiring_src_cache(void) const;
+  bool is_acquiring_dest_cache(void) const RCSW_PURE;
+  bool is_acquiring_src_cache(void) const RCSW_PURE;
 
  private:
-  // clang-format off
+  /* clang-format off */
   acquire_existing_cache_fsm m_src_cache_fsm;
   acquire_existing_cache_fsm m_dest_cache_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth2, fsm, fordyca);

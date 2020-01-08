@@ -1,7 +1,7 @@
 /**
- * @file cluster_distributor.hpp
+ * \file cluster_distributor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,9 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/support/block_dist/random_distributor.hpp"
 #include "fordyca/support/block_dist/base_distributor.hpp"
-#include "fordyca/representation/block_cluster.hpp"
+#include "fordyca/repr/block_cluster.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,34 +39,35 @@ NS_START(fordyca, support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cluster_distributor
- * @ingroup support block_dist
+ * \class cluster_distributor
+ * \ingroup support block_dist
  *
- * @brief Distributes a block or set of blocks within the specified cluster
- * bounds randomly, using \ref random_block_distributor.
+ * \brief Distributes a block or set of blocks within the specified cluster
+ * bounds randomly, using \ref random_distributor.
  */
-class cluster_distributor : public base_distributor,
-                            public er::client<cluster_distributor> {
+class cluster_distributor final : public rer::client<cluster_distributor>,
+                                  public base_distributor {
  public:
   cluster_distributor(const ds::arena_grid::view& view,
-                      double arena_resolution,
-                      uint capacity);
+                      rtypes::discretize_ratio resolution,
+                      uint capacity,
+                      rmath::rng* rng);
   ~cluster_distributor(void) override = default;
 
   cluster_distributor& operator=(const cluster_distributor& s) = delete;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<crepr::base_block2D>& block,
                         ds::const_entity_list& entities) override;
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities) override;
 
-  ds::const_block_cluster_list block_clusters(void) const override;
+  ds::block_cluster_vector block_clusters(void) const override;
 
  private:
-  // clang-format off
-  representation::block_cluster m_clust;
-  random_distributor            m_dist;
-  // clang-format on
+  /* clang-format off */
+  repr::block_cluster m_clust;
+  random_distributor  m_impl;
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

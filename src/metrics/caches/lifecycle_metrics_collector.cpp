@@ -1,7 +1,7 @@
 /**
- * @file lifecycle_metrics_collector.cpp
+ * \file lifecycle_metrics_collector.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,6 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
+
+#include <numeric>
+
 #include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 
 /*******************************************************************************
@@ -34,44 +37,71 @@ NS_START(fordyca, metrics, caches);
  ******************************************************************************/
 lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofname,
                                                          uint interval)
-    : base_metrics_collector(ofname, interval), m_stats() {}
+    : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string lifecycle_metrics_collector::csv_header_build(
-    const std::string& header) {
-  // clang-format off
-  return base_metrics_collector::csv_header_build(header) +
-      "int_created" + separator() +
-      "int_depleted" + separator();
-  // clang-format on
-} /* csv_header_build() */
+std::list<std::string> lifecycle_metrics_collector::csv_header_cols(void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+      /* clang-format off */
+    "int_created",
+    "int_depleted",
+    "int_avg_created",
+    "int_avg_depleted",
+    "cum_avg_created",
+    "cum_avg_depleted",
+    "int_avg_depletion_age",
+    "cum_avg_depletion_age"
+      /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void lifecycle_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-bool lifecycle_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> lifecycle_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
-  line += std::to_string(m_stats.n_created) + separator();
-  line += std::to_string(m_stats.n_depleted) + separator();
-  return true;
+  std::string line;
+
+  line += rcppsw::to_string(m_stats.int_created) + separator();
+  line += rcppsw::to_string(m_stats.int_depleted) + separator();
+  line += csv_entry_intavg(m_stats.int_created);
+  line += csv_entry_intavg(m_stats.int_depleted);
+  line += csv_entry_tsavg(m_stats.cum_created);
+  line += csv_entry_tsavg(m_stats.cum_depleted);
+  line += csv_entry_domavg(m_stats.int_depletion_sum.v(), m_stats.int_depleted);
+  line += csv_entry_domavg(m_stats.cum_depletion_sum.v(),
+                           m_stats.cum_depleted,
+                           true);
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
-void lifecycle_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+void lifecycle_metrics_collector::collect(const rmetrics::base_metrics& metrics) {
   auto& m = static_cast<const lifecycle_metrics&>(metrics);
-  m_stats.n_created += m.caches_created();
-  m_stats.n_depleted += m.caches_depleted();
+  auto ages = m.cache_depletion_ages();
+  auto sum = std::accumulate(ages.begin(), ages.end(), rtypes::timestep(0));
+
+  m_stats.int_created += m.caches_created();
+  m_stats.int_depleted += m.caches_depleted();
+  m_stats.int_depletion_sum += sum;
+
+  m_stats.cum_created += m.caches_created();
+  m_stats.cum_depleted += m.caches_depleted();
+  m_stats.cum_depletion_sum += sum;
 } /* collect() */
 
 void lifecycle_metrics_collector::reset_after_interval(void) {
-  m_stats.n_created = 0;
-  m_stats.n_depleted = 0;
+  m_stats.int_created = 0;
+  m_stats.int_depleted = 0;
+  m_stats.int_depletion_sum = rtypes::timestep(0);
 } /* reset_after_interval() */
 
 NS_END(caches, metrics, fordyca);

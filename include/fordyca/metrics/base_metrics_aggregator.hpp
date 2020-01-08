@@ -1,7 +1,7 @@
 /**
- * @file base_metrics_aggregator.hpp
+ * \file base_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,65 +24,78 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <list>
 #include <string>
+#include <typeindex>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
 
+#include "cosm/metrics/config/metrics_config.hpp"
+
+#include "fordyca/fordyca.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace params {
-struct metrics_params;
+namespace cosm::repr {
+class base_block2D;
 }
+
+NS_START(fordyca);
 
 namespace support {
 class base_loop_functions;
 }
-namespace representation { class base_block; }
-namespace ds { class arena_map; }
+namespace ds {
+class arena_map;
+}
+namespace controller {
+class base_controller;
+} /* namespace controller */
+namespace config {
+struct grid_config;
+} /* namespace config */
+
 NS_START(metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_metrics_aggregator
- * @ingroup metrics
+ * \class base_metrics_aggregator
+ * \ingroup metrics
  *
- * @brief Base class for aggregating collection of metrics for various
- * sources. Extends \ref rcppsw::metrics::collector_group to include
+ * \brief Base class for aggregating collection of metrics for various
+ * sources. Extends \ref rmetrics::collector_group to include
  * initialization bits to make loop functions simpler/clearer.
  */
-class base_metrics_aggregator
-    : public rcppsw::er::client<base_metrics_aggregator>,
-      public rcppsw::metrics::collector_group {
+class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
+                                public rmetrics::collector_group {
  public:
-  base_metrics_aggregator(const struct params::metrics_params* params,
+  base_metrics_aggregator(const cmconfig::metrics_config* mconfig,
+                          const config::grid_config* const gconfig,
                           const std::string& output_root);
-  virtual ~base_metrics_aggregator(void) = default;
+  ~base_metrics_aggregator(void) override = default;
 
-  void collect_from_loop(const support::base_loop_functions* const loop);
-
-  /**
-   * @brief Collect metrics from a block right before it is dropped in the nest.
-   */
-  void collect_from_block(const representation::base_block* block);
+  void collect_from_loop(const support::base_loop_functions* loop);
 
   /**
-   * @brief Collect metrics from the arena each timestep.
+   * \brief Collect metrics from a block right before it is dropped in the nest.
    */
-  void collect_from_arena(const ds::arena_map* arena);
+  void collect_from_block(const crepr::base_block2D* block);
 
- protected:
+  /**
+   * \brief Collect metrics from \ref base_controller.
+   */
+  void collect_from_controller(const controller::base_controller* controller);
+
   const std::string& metrics_path(void) const { return m_metrics_path; }
 
  private:
-  // clang-format off
-  std::string m_metrics_path{""};
-  // clang-format on
+  /* clang-format off */
+  std::string m_metrics_path;
+  /* clang-format on */
 };
 
 NS_END(metrics, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file cache_vanished.hpp
+ * \file cache_vanished.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,84 +24,93 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/block_pickup_event.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/types/type_uuid.hpp"
+
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/events/cell_op.hpp"
+#include "fordyca/fsm/fsm_fwd.hpp"
+#include "fordyca/tasks/tasks_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace visitor = rcppsw::patterns::visitor;
-namespace controller {
-namespace depth1 {
-class greedy_partitioning_controller;
-}
-namespace depth2 {
-class greedy_recpart_controller;
-}
-} // namespace controller
-
-namespace fsm {
-namespace depth1 {
-class cached_block_to_nest_fsm;
-}
-class block_to_goal_fsm;
-} // namespace fsm
-namespace tasks {
-namespace depth1 {
-class collector;
-class harvester;
-} // namespace depth1
-namespace depth2 {
-class cache_transferer;
-}
-} // namespace tasks
-
-NS_START(events);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
- * @class cache_vanished
- * @ingroup events
+/**
+ * \class cache_vanished
+ * \ingroup events detail
  *
- * @brief Created whenever a robot is serving a cache penalty, but while
+ * \brief Created whenever a robot is serving a cache penalty, but while
  * serving the penalty the cache it is waiting in vanishes due to another
  * robot picking up the last available block.
  */
-class cache_vanished
-    : public rcppsw::er::client<cache_vanished>,
-      public visitor::visit_set<controller::depth1::greedy_partitioning_controller,
-                                controller::depth2::greedy_recpart_controller,
-                                tasks::depth1::collector,
-                                tasks::depth1::harvester,
-                                tasks::depth2::cache_transferer,
-                                fsm::block_to_goal_fsm,
-                                fsm::depth1::cached_block_to_nest_fsm> {
+class cache_vanished : public rer::client<cache_vanished> {
+ private:
+  struct visit_typelist_impl {
+    using controllers =
+        boost::mpl::joint_view<controller::depth1::typelist::type,
+                               controller::depth2::typelist::type>;
+    using tasks = rmpl::typelist<tasks::depth1::collector,
+                                 tasks::depth1::harvester,
+                                 tasks::depth2::cache_transferer>;
+    using fsms = rmpl::typelist<fsm::block_to_goal_fsm,
+                                fsm::depth1::cached_block_to_nest_fsm>;
+    using value =
+        boost::mpl::joint_view<boost::mpl::joint_view<tasks::type, fsms::type>,
+                               controllers::type>;
+  };
+
  public:
-  explicit cache_vanished(uint cache_id);
+  using visit_typelist = visit_typelist_impl::value;
+  explicit cache_vanished(const rtypes::type_uuid& cache_id);
   ~cache_vanished(void) override = default;
 
   cache_vanished(const cache_vanished& op) = delete;
   cache_vanished& operator=(const cache_vanished& op) = delete;
 
   /* depth1 foraging */
-  void visit(fsm::block_to_goal_fsm& fsm) override;
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm) override;
-  void visit(tasks::depth1::collector& task) override;
-  void visit(tasks::depth1::harvester& task) override;
-  void visit(
-      controller::depth1::greedy_partitioning_controller& controller) override;
+  void visit(fsm::block_to_goal_fsm& fsm);
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
+  void visit(tasks::depth1::collector& task);
+  void visit(tasks::depth1::harvester& task);
+  void visit(controller::depth1::bitd_dpo_controller& controller);
+  void visit(controller::depth1::bitd_mdpo_controller& controller);
+  void visit(controller::depth1::bitd_odpo_controller& controller);
+  void visit(controller::depth1::bitd_omdpo_controller& controller);
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
-  void visit(tasks::depth2::cache_transferer& controller) override;
+  void visit(controller::depth2::birtd_dpo_controller& controller);
+  void visit(controller::depth2::birtd_mdpo_controller& controller);
+  void visit(controller::depth2::birtd_odpo_controller& controller);
+  void visit(controller::depth2::birtd_omdpo_controller& controller);
+  void visit(tasks::depth2::cache_transferer& task);
 
  private:
-  uint m_cache_id;
+  /* clang-format off */
+  void dispatch_cache_interactor(tasks::base_foraging_task* task);
+
+  const rtypes::type_uuid mc_cache_id;
+  /* clang-format on */
+};
+
+/**
+ * \brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cache_vanished_visitor_impl =
+    rpvisitor::precise_visitor<detail::cache_vanished,
+                               detail::cache_vanished::visit_typelist>;
+
+NS_END(detail);
+
+class cache_vanished_visitor : public detail::cache_vanished_visitor_impl {
+  using detail::cache_vanished_visitor_impl::cache_vanished_visitor_impl;
 };
 
 NS_END(events, fordyca);

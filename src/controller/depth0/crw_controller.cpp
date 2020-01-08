@@ -1,7 +1,7 @@
 /**
- * @file crw_controller.cpp
+ * \file crw_controller.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,12 +22,14 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/depth0/crw_controller.hpp"
+
 #include <fstream>
-#include "fordyca/controller/actuation_subsystem.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
+#include "fordyca/fsm/expstrat/block_factory.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -38,94 +40,67 @@ NS_START(fordyca, controller, depth0);
  * Constructors/Destructor
  ******************************************************************************/
 crw_controller::crw_controller(void)
-    : depth0_controller(),
-      ER_CLIENT_INIT("fordyca.controller.depth0.crw"),
-      m_fsm() {}
+    : ER_CLIENT_INIT("fordyca.controller.depth0.crw"), m_fsm() {}
 
 crw_controller::~crw_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void crw_controller::Init(ticpp::Element& node) {
-  base_controller::Init(node);
+void crw_controller::init(ticpp::Element& node) {
+  base_controller::init(node);
   ndc_push();
   ER_INFO("Initializing...");
-  m_fsm = rcppsw::make_unique<fsm::depth0::crw_fsm>(
-      base_controller::saa_subsystem());
+
+  fsm::expstrat::foraging_expstrat::params p(saa(), nullptr, nullptr, nullptr);
+  m_fsm = std::make_unique<fsm::depth0::crw_fsm>(
+      saa(),
+      fsm::expstrat::block_factory().create(
+          fsm::expstrat::block_factory::kCRW, &p, rng()),
+      rng());
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
-void crw_controller::Reset(void) {
-  base_controller::Reset();
+void crw_controller::reset(void) {
+  base_controller::reset();
   if (nullptr != m_fsm) {
     m_fsm->init();
   }
-} /* Reset() */
+} /* reset() */
 
-void crw_controller::ControlStep(void) {
+void crw_controller::control_step(void) {
   ndc_pusht();
-  if (nullptr != block()) {
-    ER_ASSERT(-1 != block()->robot_id(),
-              "Carried block%d has robot id=%d",
-              block()->id(),
-              block()->robot_id());
-  }
-
-  saa_subsystem()->actuation()->block_carry_throttle(is_carrying_block());
-  saa_subsystem()->actuation()->throttling_update(
-      saa_subsystem()->sensing()->tick());
+  ER_ASSERT(!(nullptr != block() &&
+              rtypes::constants::kNoUUID == block()->robot_id()),
+            "Carried block%d has robot id=%d",
+            block()->id().v(),
+            block()->robot_id().v());
   m_fsm->run();
+  saa()->steer_force2D_apply();
   ndc_pop();
-} /* ControlStep() */
+} /* control_step() */
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-FSM_WRAPPER_DEFINEC_PTR(bool, crw_controller, goal_acquired, m_fsm);
-
-FSM_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
-                        crw_controller,
-                        acquisition_goal,
-                        m_fsm);
-
-FSM_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                        crw_controller,
-                        block_transport_goal,
-                        m_fsm);
-
-/*******************************************************************************
- * Distance Metrics
- ******************************************************************************/
-__rcsw_pure double crw_controller::distance(void) const {
-  /*
-   * If you allow distance gathering at timesteps < 1, you get a big jump
-   * because of the prev/current location not being set up properly yet.
-   */
-  if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->sensing()->heading().length();
-  }
-  return 0;
-} /* distance() */
-
-rmath::vector2d crw_controller::velocity(void) const {
-  /*
-   * If you allow distance gathering at timesteps < 1, you get a big jump
-   * because of the prev/current location not being set up properly yet.
-   */
-  if (saa_subsystem()->sensing()->tick() > 1) {
-    return saa_subsystem()->linear_velocity();
-  }
-  return rmath::vector2d(0, 0);
-} /* velocity() */
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_vector_loc, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, current_explore_loc, *m_fsm, const);
 
 using namespace argos; // NOLINT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-#pragma clang diagnostic ignored "-Wmissing-prototypes"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
+
+RCPPSW_WARNING_DISABLE_PUSH()
+RCPPSW_WARNING_DISABLE_MISSING_VAR_DECL()
+RCPPSW_WARNING_DISABLE_MISSING_PROTOTYPE()
+RCPPSW_WARNING_DISABLE_GLOBAL_CTOR()
+
 REGISTER_CONTROLLER(crw_controller, "crw_controller");
-#pragma clang diagnostic pop
+
+RCPPSW_WARNING_DISABLE_POP()
 
 NS_END(depth0, controller, fordyca);

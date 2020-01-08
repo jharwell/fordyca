@@ -1,7 +1,7 @@
 /**
- * @file block_selector.hpp
+ * \file block_selector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,49 +26,50 @@
  ******************************************************************************/
 #include <list>
 
-#include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/representation/perceived_block.hpp"
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/controller/block_sel_matrix.hpp"
+#include "fordyca/ds/dp_block_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, controller);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_selector
- * @ingroup controller depth0
+ * \class block_selector
+ * \ingroup controller depth0
  *
- * @brief Select the best block that a robot knows about, for use in acquiring a
+ * \brief Select the best block that a robot knows about, for use in acquiring a
  * block as part of a higher level FSM.
  */
-class block_selector : public rcppsw::er::client<block_selector> {
+class block_selector : public rer::client<block_selector> {
  public:
   explicit block_selector(const block_sel_matrix* sel_matrix);
 
   ~block_selector(void) override = default;
 
-  block_selector& operator=(const block_selector& other) = delete;
-  block_selector(const block_selector& other) = delete;
+  block_selector& operator=(const block_selector&) = delete;
+  block_selector(const block_selector&) = delete;
   /**
-   * @brief Given a list of blocks that a robot knows about (i.e. have not faded
+   * \brief Given a list of blocks that a robot knows about (i.e. have not faded
    * into an unknown state), compute which is the "best", for use in deciding
    * which block to go attempt to pickup.
    *
-   * @return A pointer to the "best" block, along with its utility value.
+   * \return A pointer to the "best" block, along with its utility value, if a
+   * best block is found, and empty otherwise.
    */
-  representation::perceived_block calc_best(const ds::perceived_block_list& blocks,
-                                            const rmath::vector2d& position);
+  boost::optional<ds::dp_block_map::value_type> operator()(
+      const ds::dp_block_map& blocks,
+      const rmath::vector2d& position);
 
  private:
   /**
-   * @brief Determine if the specified block is excluded from being considered
+   * \brief Determine if the specified block is excluded from being considered
    * for selection because:
    *
    * - The robot is too close to it (within block_dim meters of it). Allowing
@@ -79,14 +80,14 @@ class block_selector : public rcppsw::er::client<block_selector> {
    *
    * - It is on the exception list.
    *
-   * @return \c TRUE if the cache should be excluded, \c FALSE otherwise.
+   * \return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool block_is_excluded(const rmath::vector2d& position,
-                         const representation::base_block* block) const;
+                         const crepr::base_block2D* block) const;
 
-  // clang-format off
+  /* clang-format off */
   const block_sel_matrix* const mc_matrix;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fordyca, controller);

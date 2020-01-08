@@ -1,7 +1,7 @@
 /**
- * @file cache_vector.hpp
+ * \file cache_vector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,24 +24,42 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <vector>
-#include "rcppsw/common/common.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class arena_cache;
 }
 NS_START(ds);
 
-using cache_vector_type = std::shared_ptr<representation::arena_cache>;
+using cache_vector_type = std::shared_ptr<repr::arena_cache>;
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using cache_vector = std::vector<cache_vector_type>;
+/**
+ * \class cache_vector
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::vector with an additional \ref to_str()
+ * method.
+ */
+class cache_vector : public std::vector<cache_vector_type> {
+ public:
+  using std::vector<cache_vector_type>::vector;
+  using value_type = std::vector<cache_vector_type>::value_type;
+
+  /**
+   * \brief Get a string representation of the vector contents.
+   */
+  std::string to_str(void) const;
+};
 
 NS_END(ds, fordyca);
 

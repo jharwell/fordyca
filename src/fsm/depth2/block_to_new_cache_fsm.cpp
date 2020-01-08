@@ -1,7 +1,7 @@
 /**
- * @file acquire_new_cache_fsm.cpp
+ * \file acquire_new_cache_fsm.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,7 +22,8 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
-#include "fordyca/controller/saa_subsystem.hpp"
+
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -33,34 +34,38 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 block_to_new_cache_fsm::block_to_new_cache_fsm(
-    const controller::block_sel_matrix* bsel_matrix,
-    const controller::cache_sel_matrix* csel_matrix,
-    controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
-    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa),
-      m_cache_fsm(csel_matrix, saa, map),
-      m_block_fsm(bsel_matrix, saa, map) {}
+    const fsm_ro_params* c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng)
+    : block_to_goal_fsm(&m_cache_fsm, &m_block_fsm, saa, rng),
+      m_cache_fsm(c_params, saa, exp_behavior->clone(), rng),
+      m_block_fsm(c_params, saa, exp_behavior->clone(), rng) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acquisition_goal_type block_to_new_cache_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return acquisition_goal_type::kBlock;
-  } else if (ST_TRANSPORT_TO_GOAL == current_state() ||
-             ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return acquisition_goal_type::kNewCache;
+cfmetrics::goal_acq_metrics::goal_type block_to_new_cache_fsm::acquisition_goal(
+    void) const {
+  if (ekST_ACQUIRE_BLOCK == current_state() ||
+      ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekBLOCK);
+  } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+             ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekNEW_CACHE);
   }
-  return acquisition_goal_type::kNone;
+  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
-transport_goal_type block_to_new_cache_fsm::block_transport_goal(void) const {
-  if (ST_TRANSPORT_TO_GOAL == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::kNewCache;
+foraging_transport_goal::type block_to_new_cache_fsm::block_transport_goal(
+    void) const {
+  if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return foraging_transport_goal::type::ekNEW_CACHE;
   }
-  return transport_goal_type::kNone;
+  return foraging_transport_goal::type::ekNONE;
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

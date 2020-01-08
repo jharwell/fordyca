@@ -1,7 +1,7 @@
 /**
- * @file block_found.hpp
+ * \file block_found.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,55 +24,98 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/perceived_cell_op.hpp"
+#include <memory>
+
 #include "rcppsw/er/client.hpp"
+
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca);
 
-namespace representation {
-class base_block;
-}
+namespace ds {
+class dpo_semantic_map;
+class dpo_store;
+} // namespace ds
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+
 /**
- * @class block_found
- * @ingroup events
+ * \class block_found
+ * \ingroup events detail
  *
- * @brief Event that is created whenever a NEW block (i.e. one that is not
- * currently known to the robot, but that has possibly been seen before and had
- * its relevance expire) is found via appearing in a robot's LOS. These events
- * are not processed by the \ref arena_map, and exist only in a robot's
- * perception.
+ * \brief Event that is created whenever a block (possibly known, possibly
+ * unknown) appears in a robot's LOS.
  */
-class block_found : public perceived_cell_op,
-                    public rcppsw::er::client<block_found> {
+class block_found : public rer::client<block_found>, public cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using controllers = controller::depth2::typelist;
+    using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
+
+    using value = boost::mpl::joint_view<
+        boost::mpl::joint_view<inherited::type, controllers::type>::type,
+        others::type>;
+  };
+
  public:
-  explicit block_found(std::unique_ptr<representation::base_block> block);
-  explicit block_found(const std::shared_ptr<representation::base_block>& block);
+  using visit_typelist = visit_typelist_impl::value;
+
+  explicit block_found(std::unique_ptr<crepr::base_block2D> block);
+  explicit block_found(const std::shared_ptr<crepr::base_block2D>& block);
   ~block_found(void) override = default;
 
   block_found(const block_found& op) = delete;
   block_found& operator=(const block_found& op) = delete;
 
-  /* stateful foraging */
-  void visit(ds::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::perceived_arena_map& map) override;
+  /* DPO foraging */
+  void visit(ds::dpo_store& store);
+
+  /* MDPO foraging */
+  void visit(ds::cell2D& cell);
+  void visit(fsm::cell2D_fsm& fsm);
+  void visit(ds::dpo_semantic_map& map);
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::birtd_dpo_controller& c);
+  void visit(controller::depth2::birtd_mdpo_controller& c);
+  void visit(controller::depth2::birtd_odpo_controller& c);
+  void visit(controller::depth2::birtd_omdpo_controller& c);
 
  private:
-  // clang-format off
-  std::shared_ptr<representation::base_block> m_block;
-  // clang-format on
+  void pheromone_update(ds::dpo_semantic_map& map);
+
+  /* clang-format off */
+  std::shared_ptr<crepr::base_block2D> m_block;
+  /* clang-format on */
+};
+
+/**
+ * \brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using block_found_visitor_impl =
+    rpvisitor::precise_visitor<detail::block_found,
+                               detail::block_found::visit_typelist>;
+
+NS_END(detail);
+
+class block_found_visitor : public detail::block_found_visitor_impl {
+  using detail::block_found_visitor_impl::block_found_visitor_impl;
 };
 
 NS_END(events, fordyca);

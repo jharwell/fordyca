@@ -1,7 +1,7 @@
 /**
- * @file generalist.cpp
+v * \file generalist.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -23,7 +23,8 @@
  ******************************************************************************/
 #include "fordyca/tasks/depth0/generalist.hpp"
 
-#include "fordyca/controller/sensing_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/events/nest_block_drop.hpp"
@@ -37,67 +38,85 @@ NS_START(fordyca, tasks, depth0);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-generalist::generalist(const ta::task_allocation_params* const params,
-                       std::unique_ptr<ta::taskable> mechanism)
-    : foraging_task(kGeneralistName, params, std::move(mechanism)) {}
+generalist::generalist(const cta::config::task_alloc_config* const config,
+                       std::unique_ptr<cta::taskable> mechanism)
+    : foraging_task(kGeneralistName, config, std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure double generalist::abort_prob_calc(void) {
+double generalist::abort_prob_calc(void) {
   return executable_task::abort_prob();
 } /* abort_prob_calc() */
 
-__rcsw_pure double generalist::current_time(void) const {
+rtypes::timestep generalist::current_time(void) const {
   return dynamic_cast<fsm::depth0::free_block_to_nest_fsm*>(
              polled_task::mechanism())
-      ->sensors()
+      ->sensing()
       ->tick();
 } /* current_time() */
 
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void generalist::accept(events::nest_block_drop& visitor) {
+void generalist::accept(events::detail::nest_block_drop& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::free_block_pickup& visitor) {
+void generalist::accept(events::detail::free_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void generalist::accept(events::block_vanished& visitor) {
+void generalist::accept(events::detail::block_vanished& visitor) {
   visitor.visit(*this);
 }
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         generalist,
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                          is_exploring_for_goal,
-                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         generalist,
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                          is_vectoring_to_goal,
-                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINEC_PTR(bool,
-                         generalist,
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                          goal_acquired,
-                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINEC_PTR(acquisition_goal_type,
-                         generalist,
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                          acquisition_goal,
-                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
-TASK_WRAPPER_DEFINEC_PTR(transport_goal_type,
-                         generalist,
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                          block_transport_goal,
-                         static_cast<fsm::depth0::free_block_to_nest_fsm*>(
-                             polled_task::mechanism()));
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
+                         acquisition_loc,
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
+                         current_explore_loc,
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
+                         current_vector_loc,
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
 NS_END(depth0, tasks, fordyca);

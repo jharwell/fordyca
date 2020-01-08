@@ -1,7 +1,7 @@
 /**
- * @file static_cache_creator.hpp
+ * \file static_cache_creator.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,7 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <vector>
 #include "fordyca/support/base_cache_creator.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,28 +37,33 @@ NS_START(fordyca, support, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class static_cache_creator
- * @ingroup support depth1
+ * \class static_cache_creator
+ * \ingroup support depth1
  *
- * @brief Creates a static cache in the arena by taking a specified number of
- * free blocks and grouping them together into a cache at the specified
- * location.
+ * \brief Creates static cache(s) in the arena by taking \ref
+ * base_cache::kMinBlocks from the allocated blocks and grouping them together
+ * at each of the specified cache locations where a cache does not currently
+ * exist in order to create a new static cache.
  */
 class static_cache_creator : public base_cache_creator,
-                             public er::client<static_cache_creator> {
+                             public rer::client<static_cache_creator> {
  public:
   static_cache_creator(ds::arena_grid* grid,
-                       const rmath::vector2d& center,
-                       double cache_dim);
+                       const std::vector<rmath::vector2d>& cache_locs,
+                       rtypes::spatial_dist cache_dim);
 
-  ds::cache_vector create_all(const ds::cache_vector& existing_caches,
-                              ds::block_vector& blocks,
-                              double) override;
+  /**
+   * \brief Re-create all static caches. Ignores block cluster locations because
+   * the locations of the static caches do not change and are known to be
+   * conflict free.
+   */
+  ds::cache_vector create_all(const cache_create_ro_params& c_params,
+                              const ds::block_vector&  c_alloc_blocks) override;
 
  private:
-  // clang-format off
-  rmath::vector2d m_center;
-  // clang-format on
+  /* clang-format off */
+  const std::vector<rmath::vector2d> mc_centers;
+  /* clang-format on */
 };
 
 NS_END(depth1, support, fordyca);

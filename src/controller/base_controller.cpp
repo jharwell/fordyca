@@ -1,7 +1,7 @@
 /**
- * @file base_controller.cpp
+ * \file base_controller.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,24 +22,25 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/base_controller.hpp"
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_light_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_motor_ground_sensor.h>
-#include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_battery_sensor.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_leds_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
-#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <experimental/filesystem>
 #include <fstream>
 
-#include "fordyca/controller/saa_subsystem.hpp"
-#include "fordyca/params/actuation_params.hpp"
-#include "fordyca/params/base_controller_repository.hpp"
-#include "fordyca/params/output_params.hpp"
-#include "fordyca/params/sensing_params.hpp"
+#include "rcppsw/math/config/rng_config.hpp"
+#include "rcppsw/math/rngm.hpp"
+
+#include "cosm/metrics/config/output_config.hpp"
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/steer2D/config/force_calculator_config.hpp"
+#include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
+#include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
+#include "cosm/subsystem/saa_subsystem2D.hpp"
+#include "cosm/tv/robot_dynamics_applicator.hpp"
+
+#include "fordyca/config/base_controller_repository.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,29 +52,24 @@ namespace fs = std::experimental::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 base_controller::base_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.base"), m_saa(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.base"), m_block(nullptr) {}
+
+base_controller::~base_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 bool base_controller::in_nest(void) const {
-  return m_saa->sensing()->in_nest();
+  return saa()->sensing()->ground()->detect(
+      chal::sensors::ground_sensor::kNestTarget);
 } /* in_nest() */
 
 bool base_controller::block_detected(void) const {
-  return m_saa->sensing()->block_detected();
+  return saa()->sensing()->ground()->detect("block");
 } /* block_detected() */
 
-void base_controller::position(const rmath::vector2d& loc) {
-  m_saa->sensing()->position(loc);
-}
-
-__rcsw_pure rmath::vector2d base_controller::position(void) const {
-  return m_saa->sensing()->position();
-}
-
-void base_controller::Init(ticpp::Element& node) {
-#ifndef ER_NREPORT
+void base_controller::init(ticpp::Element& node) {
+#if (LIBRA_ER == LIBRA_ER_ALL)
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     client<std::remove_reference<decltype(*this)>::type>::init_logging(env_p);
   } else {
@@ -82,110 +78,172 @@ void base_controller::Init(ticpp::Element& node) {
   }
 #endif
 
-  params::base_controller_repository param_repo;
-  param_repo.parse_all(node);
+  config::base_controller_repository repo;
+  repo.parse_all(node);
 
   ndc_push();
-  if (!param_repo.validate_all()) {
+  if (!repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);
   }
 
+  /* initialize RNG */
+  auto rngp = repo.config_get<rmath::config::rng_config>();
+  base_controller2D::rng_init((nullptr == rngp) ? -1 : rngp->seed, "footbot");
+
   /* initialize output */
-  auto* params = param_repo.parse_results<struct params::output_params>();
-  output_init(params);
+  auto* outputp = repo.config_get<cmconfig::output_config>();
+  base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
   /* initialize sensing and actuation (SAA) subsystem */
-  struct actuation_subsystem::actuator_list alist = {
-      .wheels = hal::actuators::differential_drive_actuator(
-          GetActuator<argos::CCI_DifferentialSteeringActuator>(
-              "differential_steering")),
-      .leds = hal::actuators::led_actuator(
-          GetActuator<argos::CCI_LEDsActuator>("leds")),
-      .wifi = hal::actuators::wifi_actuator(
-          GetActuator<argos::CCI_RangeAndBearingActuator>(
-              "range_and_bearing"))};
-  struct sensing_subsystem::sensor_list slist = {
-      .rabs = hal::sensors::rab_wifi_sensor(
-          GetSensor<argos::CCI_RangeAndBearingSensor>("range_and_bearing")),
-      .proximity = hal::sensors::proximity_sensor(
-          GetSensor<argos::CCI_FootBotProximitySensor>("footbot_proximity")),
-      .light = hal::sensors::light_sensor(
-          GetSensor<argos::CCI_FootBotLightSensor>("footbot_light")),
-      .ground = hal::sensors::ground_sensor(
-          GetSensor<argos::CCI_FootBotMotorGroundSensor>(
-              "footbot_motor_ground")),
-      .battery = hal::sensors::battery_sensor(
-          GetSensor<argos::CCI_BatterySensor>("battery"))};
-  m_saa = rcppsw::make_unique<controller::saa_subsystem>(
-      param_repo.parse_results<struct params::actuation_params>(),
-      param_repo.parse_results<struct params::sensing_params>(),
-      &alist,
-      &slist);
+  saa_init(repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
+           repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
   ndc_pop();
-} /* Init() */
+} /* init() */
 
-void base_controller::Reset(void) {
-  CCI_Controller::Reset();
-  m_block.reset();
-} /* Reset() */
+void base_controller::reset(void) { m_block.reset(); } /* Reset() */
 
-void base_controller::output_init(
-    const struct params::output_params* const params) {
-  std::string output_root;
-  if ("__current_date__" == params->output_dir) {
-    boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
-    output_root = params->output_root + "/" + std::to_string(now.date().year()) +
-                  "-" + std::to_string(now.date().month()) + "-" +
-                  std::to_string(now.date().day()) + ":" +
-                  std::to_string(now.time_of_day().hours()) + "-" +
-                  std::to_string(now.time_of_day().minutes());
-  } else {
-    output_root = params->output_root + "/" + params->output_dir;
-  }
+void base_controller::output_init(const cmconfig::output_config* outputp) {
+  std::string dir =
+      base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
-  if (!fs::exists(output_root)) {
-    fs::create_directories(output_root);
-  }
-
-#ifndef ER_NREPORT
+#if (LIBRA_ER == LIBRA_ER_ALL)
   /*
-   * Each file appender is attached to a root category in the FORDYCA
+   * Each file appender is attached to a root category in the COSM
    * namespace. If you give different file appenders the same file, then the
    * lines within it are not always ordered, which is not overly helpful for
    * debugging.
    */
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.controller"),
-                      output_root + "/controller.log");
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.ds"),
-                      output_root + "/ds.log");
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("rcppsw.ta"),
+                                       dir + "/ta.log");
 
-  client::set_logfile(log4cxx::Logger::getLogger("rcppsw.ta"),
-                      output_root + "/ta.log");
-
-  client::set_logfile(log4cxx::Logger::getLogger("fordyca.fsm"),
-                      output_root + "/fsm.log");
-
-  client::set_logfile(log4cxx::Logger::getLogger(
-                          "fordyca.controller.saa_subsystem"),
-                      output_root + "/saa.log");
-  client::set_logfile(log4cxx::Logger::getLogger(
-                          "fordyca.controller.explore_behavior"),
-                      output_root + "/saa.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller"), dir + "/controller.log");
+  client<base_controller>::set_logfile(log4cxx::Logger::getLogger("fordyca.ds"),
+                                       dir + "/ds.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller.saa"), dir + "/saa.log");
+  client<base_controller>::set_logfile(
+      log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+      dir + "/saa.log");
 #endif
 } /* output_init() */
 
-void base_controller::tick(uint tick) {
-  m_saa->sensing()->tick(tick);
-} /* tick() */
+void base_controller::saa_init(
+    const csubsystem::config::actuation_subsystem2D_config* actuation_p,
+    const csubsystem::config::sensing_subsystem2D_config* sensing_p) {
+  auto saa_names = config::saa_xml_names();
+#ifdef FORDYCA_WITH_ROBOT_RAB
+  /* auto rabs = chal::sensors::wifi_sensor( */
+  /*     GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names.rab_saa)); */
+  auto rabs = nullptr;
+#else
+  auto rabs = chal::sensors::wifi_sensor(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_RAB */
 
-int base_controller::entity_id(void) const {
-  return std::atoi(GetId().c_str() + 2);
+#ifdef FORDYCA_WITH_ROBOT_BATTERY
+  auto battery = chal::sensors::battery_sensor(
+      GetSensor<argos::CCI_BatterySensor>(saa_names.battery_sensor));
+#else
+  auto battery = chal::sensors::battery_sensor(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_BATTERY */
+
+  auto proximity = chal::sensors::proximity_sensor(
+      GetSensor<argos::CCI_FootBotProximitySensor>(saa_names.prox_sensor),
+      &sensing_p->proximity);
+  auto blobs = chal::sensors::colored_blob_camera_sensor(
+      GetSensor<argos::CCI_ColoredBlobOmnidirectionalCameraSensor>(
+          saa_names.camera_sensor));
+  auto light = chal::sensors::light_sensor(
+      GetSensor<argos::CCI_FootBotLightSensor>(saa_names.light_sensor));
+  auto ground = chal::sensors::ground_sensor(
+      GetSensor<argos::CCI_FootBotMotorGroundSensor>(saa_names.ground_sensor),
+      &sensing_p->ground);
+
+  auto diff_drives = chal::sensors::diff_drive_sensor(
+      GetSensor<argos::CCI_DifferentialSteeringSensor>(
+          saa_names.diff_steering_saa));
+
+  auto sensors = csubsystem::sensing_subsystem2D::sensor_map{
+      csubsystem::sensing_subsystem2D::map_entry_create(rabs),
+      csubsystem::sensing_subsystem2D::map_entry_create(battery),
+      csubsystem::sensing_subsystem2D::map_entry_create(proximity),
+      csubsystem::sensing_subsystem2D::map_entry_create(blobs),
+      csubsystem::sensing_subsystem2D::map_entry_create(light),
+      csubsystem::sensing_subsystem2D::map_entry_create(ground),
+      csubsystem::sensing_subsystem2D::map_entry_create(diff_drives)};
+
+  auto diff_drivea = ckin2D::governed_diff_drive(
+      &actuation_p->diff_drive,
+      chal::actuators::diff_drive_actuator(
+          GetActuator<argos::CCI_DifferentialSteeringActuator>(
+              saa_names.diff_steering_saa)),
+      ckin2D::governed_diff_drive::drive_type::kFSMDrive);
+
+#ifdef FORDYCA_WITH_ROBOT_LEDS
+  auto leds = chal::actuators::led_actuator(
+      GetActuator<argos::CCI_LEDsActuator>(saa_names.leds_saa));
+#else
+  auto leds = chal::actuators::led_actuator(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_LEDS */
+
+#ifdef FORDYCA_WITH_ROBOT_RAB
+  auto raba = chal::actuators::wifi_actuator(
+      GetActuator<argos::CCI_RangeAndBearingActuator>(saa_names.rab_saa));
+
+#else
+  auto raba = chal::actuators::wifi_actuator(nullptr);
+#endif /* FORDYCA_WITH_ROBOT_RABS */
+
+  auto actuators = csubsystem::actuation_subsystem2D::actuator_map{
+      /*
+     * We put the governed differential drive in the actuator map twice because
+     * some of the reusable components use the base class differential drive
+     * instead of the governed version (no robust way to inform that we want to
+     * use the governed version).
+     */
+      csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
+      /* {typeid(chal::actuators::diff_drive_actuator), */
+      /*  csubsystem::actuation_subsystem2D::variant_type(diff_drivea)}, */
+
+      csubsystem::actuation_subsystem2D::map_entry_create(leds),
+      csubsystem::actuation_subsystem2D::map_entry_create(raba)};
+
+  base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
+      sensors, actuators, &actuation_p->steering));
+} /* saa_init() */
+
+rtypes::type_uuid base_controller::entity_id(void) const {
+  return rtypes::type_uuid(std::atoi(GetId().c_str() + 2));
 } /* entity_id() */
 
-void base_controller::ndc_pusht(void) {
-  ER_NDC_PUSH("[t=" + std::to_string(m_saa->sensing()->tick()) + "] [" +
-              GetId() + "]");
+double base_controller::applied_movement_throttle(void) const {
+  return saa()->actuation()->governed_diff_drive()->applied_throttle();
+} /* applied_movement_throttle() */
+
+void base_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
+  if (rda->motion_throttling_enabled()) {
+    saa()->actuation()->governed_diff_drive()->tv_generator(
+        rda->motion_throttler(entity_id()));
+  }
+} /* irv_init() */
+
+void base_controller::block(std::unique_ptr<crepr::base_block2D> block) {
+  m_block = std::move(block);
 }
 
+std::unique_ptr<crepr::base_block2D> base_controller::block_release(void) {
+  return std::move(m_block);
+}
+
+class crfootbot::footbot_saa_subsystem* base_controller::saa(void) {
+  return static_cast<crfootbot::footbot_saa_subsystem*>(
+      base_controller2D::saa());
+}
+const class crfootbot::footbot_saa_subsystem* base_controller::saa(void) const {
+  return static_cast<const crfootbot::footbot_saa_subsystem*>(
+      base_controller2D::saa());
+}
 NS_END(controller, fordyca);

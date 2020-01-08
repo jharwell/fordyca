@@ -1,7 +1,7 @@
 /**
- * @file acquire_existing_cache_fsm.hpp
+ * \file acquire_existing_cache_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,68 +24,101 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <random>
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
+#include <boost/optional.hpp>
+#include <memory>
+#include <utility>
+
+#include "rcppsw/math/rng.hpp"
+#include "rcppsw/types/type_uuid.hpp"
+
+#include "cosm/fsm/acquire_goal_fsm.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::robots::footbot {
+class footbot_saa_subsystem;
+} /* namespace cosm::robots::footbot */
+
 NS_START(fordyca);
 
 namespace controller {
 class cache_sel_matrix;
 }
-namespace representation {
+namespace repr {
 class cache;
 }
 namespace ds {
-class perceived_arena_map;
+class dpo_store;
 }
 
 NS_START(fsm);
+
+namespace expstrat {
+class foraging_expstrat;
+} /* namespace expstrat */
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_existing_cache_fsm
- * @ingroup fsm depth1
+ * \class acquire_existing_cache_fsm
+ * \ingroup fsm depth1
  *
- * @brief Acquire an existing cache within the arena. Once such a cache has been
+ * \brief Acquire an existing cache within the arena. Once such a cache has been
  * acquired (always by vectoring), it signals that it has completed its task.
  */
 class acquire_existing_cache_fsm
-    : public er::client<acquire_existing_cache_fsm>,
-      public acquire_goal_fsm {
+    : public rer::client<acquire_existing_cache_fsm>,
+      public cfsm::acquire_goal_fsm {
  public:
-  acquire_existing_cache_fsm(const controller::cache_sel_matrix* matrix,
-                             bool is_pickup,
-                             controller::saa_subsystem* saa,
-                             ds::perceived_arena_map* map);
+  /**
+   * \param for_pickup Are we acquiring a cache for pickup or block drop?
+   */
+  acquire_existing_cache_fsm(
+      const fsm_ro_params* c_params,
+      crfootbot::footbot_saa_subsystem* saa,
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      rmath::rng* rng,
+      bool for_pickup);
+
   ~acquire_existing_cache_fsm(void) override = default;
 
-  acquire_existing_cache_fsm(const acquire_existing_cache_fsm& fsm) = delete;
-  acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm& fsm) =
+  acquire_existing_cache_fsm(const acquire_existing_cache_fsm&) = delete;
+  acquire_existing_cache_fsm& operator=(const acquire_existing_cache_fsm&) =
       delete;
 
  private:
+  using acq_loc_type = std::pair<rtypes::type_uuid, rmath::vector2d>;
+
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type existing_cache_select(void);
-  bool candidates_exist(void) const;
-  bool calc_acquisition_location(rmath::vector2d* loc);
+  static cfmetrics::goal_acq_metrics::goal_type acq_goal_internal(void)
+      RCSW_CONST;
+
+  boost::optional<acquire_goal_fsm::candidate_type> existing_cache_select(void);
+  bool candidates_exist(void) const RCSW_PURE;
+  boost::optional<acq_loc_type> calc_acq_location(void);
+  bool cache_acq_valid(const rmath::vector2d& loc, const rtypes::type_uuid& id);
 
   bool cache_acquired_cb(bool explore_result) const;
-  bool cache_exploration_term_cb(void) const;
 
-  // clang-format off
-  const bool                                mc_is_pickup;
+  /* clang-format off */
+  /**
+   * \brief Needed to ensure the points that robots choose when acquiring the
+   * cache are far enough inside the cache extent that all ground sensors are
+   * guaranteed to read "in cache". Set to footbot radius + a little padding.
+   */
+  static constexpr double kFOOTBOT_CACHE_ACQ_FACTOR = 0.2;
+
+  const bool                                mc_for_pickup;
   const controller::cache_sel_matrix* const mc_matrix;
-  const ds::perceived_arena_map*      const mc_map;
-  std::default_random_engine                m_rd{};
-  // clang-format on
+  const ds::dpo_store*                const mc_store;
+  /* clang-format on */
 };
 
 NS_END(fsm, fordyca);

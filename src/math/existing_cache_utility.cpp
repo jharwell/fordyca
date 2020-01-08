@@ -1,7 +1,7 @@
 /**
- * @file existing_cache_utility.cpp
+ * \file existing_cache_utility.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/math/existing_cache_utility.hpp"
+
 #include <cmath>
 
 /*******************************************************************************
@@ -40,10 +41,10 @@ existing_cache_utility::existing_cache_utility(const rmath::vector2d& cache_loc,
  * Member Functions
  ******************************************************************************/
 double existing_cache_utility::calc(const rmath::vector2d& rloc,
-                                    double density,
+                                    const crepr::pheromone_density& density,
                                     size_t n_blocks) {
-  return set_result(
-      (std::exp(density) * n_blocks) /
+  return eval(
+      (std::exp(density.v()) * n_blocks) /
       ((mc_cache_loc - rloc).length() * (mc_cache_loc - mc_nest_loc).length()));
 } /* calc() */
 

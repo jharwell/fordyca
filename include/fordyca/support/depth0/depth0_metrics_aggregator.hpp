@@ -1,7 +1,7 @@
 /**
- * @file depth0_metrics_aggregator.hpp
+ * \file depth0_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,37 +24,35 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/metrics/base_metrics_aggregator.hpp"
 #include <string>
+#include "fordyca/metrics/base_metrics_aggregator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth0_metrics_aggregator
- * @ingroup support depth0
+ * \class depth0_metrics_aggregator
+ * \ingroup support depth0
  *
- * @brief Aggregates and metrics metric collection for depth0 foraging. That
+ * \brief Aggregates and metrics metric collection for depth0 foraging. That
  * includes:
  *
  * - FSM distance/block acquisition metrics
  */
 
 class depth0_metrics_aggregator : public metrics::base_metrics_aggregator,
-                                  public er::client<depth0_metrics_aggregator> {
+                                  public rer::client<depth0_metrics_aggregator> {
  public:
-  depth0_metrics_aggregator(const struct params::metrics_params* params,
+  depth0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
+                            const config::grid_config* const gconfig,
                             const std::string& output_root);
 
-  /*
-   * Collect metrics from a depth 0 controller.
-   */
+
   template<class T>
   void collect_from_controller(const T* controller);
 };

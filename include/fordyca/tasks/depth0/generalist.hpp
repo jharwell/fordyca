@@ -1,7 +1,7 @@
 /**
- * @file generalist.hpp
+ * \file generalist.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,6 +24,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 
 /*******************************************************************************
@@ -35,48 +37,57 @@ NS_START(fordyca, tasks, depth0);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class generalist
- * @ingroup tasks
+ * \class generalist
+ * \ingroup tasks
  *
- * @brief Class representing depth 0 task allocation: Perform the whole foraging
+ * \brief Class representing depth 0 task allocation: Perform the whole foraging
  * task: (1) Find a free block, and (2) bring it to the nest.
  *
  * It is decomposable into two subtasks that result in the same net change to
  * the arena state when run in sequence (possibly by two different robots):
- * \ref collector and \ref forager. It is not abortable at task interfaces,
+ * \ref collector and \ref harvester. It is not abortable at task interfaces,
  * because it does not have any, but it IS still abortable if its current
  * execution time takes too long (as configured by parameters).
  */
-class generalist : public foraging_task {
+class generalist final : public foraging_task {
  public:
-  generalist(const ta::task_allocation_params* params,
-             std::unique_ptr<ta::taskable> mechanism);
+  generalist(const cta::config::task_alloc_config* config,
+             std::unique_ptr<cta::taskable> mechanism);
 
   /* event handling */
-  void accept(events::free_block_pickup& visitor) override;
-  void accept(events::free_block_drop&) override {}
-  void accept(events::nest_block_drop& visitor) override;
-  void accept(events::block_vanished& visitor) override;
+  void accept(events::detail::free_block_pickup& visitor) override;
+  void accept(events::detail::free_block_drop&) override {}
+  void accept(events::detail::nest_block_drop& visitor) override;
+  void accept(events::detail::block_vanished& visitor) override;
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+                            acquisition_goal,
+                            const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+                            block_transport_goal,
+                            const);
 
   /* task metrics */
   bool task_at_interface(void) const override { return false; }
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const ta::taskable_argument* const) override {}
+  void task_start(const cta::taskable_argument* const) override {}
 
-  double current_time(void) const override;
-  double interface_time_calc(uint, double) override { return 0.0; }
+  rtypes::timestep current_time(void) const override RCSW_PURE;
+  rtypes::timestep interface_time_calc(uint, const rtypes::timestep&) override {
+    return rtypes::timestep(0);
+  }
   void active_interface_update(int) override {}
-  double abort_prob_calc(void) override;
+  double abort_prob_calc(void) override RCSW_PURE;
 };
 
 NS_END(depth0, tasks, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file foraging_task.hpp
+ * \file depth1/foraging_task.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,50 +25,47 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
-NS_START(fordyca);
+namespace cosm::ta::config { struct task_alloc_config; }
 
-namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks, depth1);
+NS_START(fordyca, tasks, depth1);
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class foraging_task
- * @ingroup tasks depth1
+ * \class foraging_task
+ * \ingroup tasks depth1
  *
- * @brief Interface specifying the visit set for all depth1 foraging tasks
+ * \brief Interface specifying the visit set for all depth1 foraging tasks
  * in FORDYCA.
  *
  * Not all tasks need all events, but it is convenient both from a design point
  * of view as well as not having to fight with the compiler as much if you do it
  * this way.
  */
-class foraging_task
-    : public base_foraging_task,
-      public ta::polled_task {
+class foraging_task : public base_foraging_task,
+                      public cta::polled_task {
  public:
   static constexpr char kCollectorName[] = "Collector";
   static constexpr char kHarvesterName[] = "Harvester";
 
   foraging_task(const std::string& name,
-                const struct ta::task_allocation_params *params,
-                std::unique_ptr<ta::taskable> mechanism);
+                const struct cta::config::task_alloc_config *config,
+                std::unique_ptr<cta::taskable> mechanism);
   ~foraging_task(void) override = default;
 
-  static bool task_in_depth1(const polled_task* const task);
+  static bool task_in_depth1(const polled_task* task) RCSW_PURE;
 
     /* task overrides */
-  double current_time(void) const override;
+  rtypes::timestep current_time(void) const override RCSW_PURE;
 };
 
 NS_END(depth1, tasks, fordyca);

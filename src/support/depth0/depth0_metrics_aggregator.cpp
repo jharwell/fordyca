@@ -1,7 +1,7 @@
 /**
- * @file depth0_metrics_aggregator.cpp
+ * \file depth0_metrics_aggregator.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,22 +22,43 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/world_model_metrics_collector.hpp"
-#include "fordyca/params/metrics_params.hpp"
 
-#include "fordyca/controller/depth0/stateful_controller.hpp"
+#include <boost/mpl/for_each.hpp>
+
+#include "rcppsw/mpl/typelist.hpp"
+
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/repr/base_block2D.hpp"
+
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
+#include "fordyca/controller/depth0/dpo_controller.hpp"
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/depth0/odpo_controller.hpp"
+#include "fordyca/controller/depth0/omdpo_controller.hpp"
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/fsm/depth0/stateful_fsm.hpp"
+#include "fordyca/fsm/depth0/dpo_fsm.hpp"
+#include "fordyca/metrics/collector_registerer.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics_collector.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics_collector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca, support, depth0, detail);
+
+using collector_typelist =
+    rmpl::typelist<metrics::collector_registerer::type_wrap<
+                       metrics::perception::mdpo_perception_metrics_collector>,
+                   metrics::collector_registerer::type_wrap<
+                       metrics::perception::dpo_perception_metrics_collector> >;
+
+NS_END(detail);
 
 /*******************************************************************************
  * Template Instantiations
@@ -45,55 +66,102 @@ NS_START(fordyca, support, depth0);
 template void depth0_metrics_aggregator::collect_from_controller(
     const controller::depth0::crw_controller* const c);
 template void depth0_metrics_aggregator::collect_from_controller(
-    const controller::depth0::stateful_controller* const c);
+    const controller::depth0::dpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::mdpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::odpo_controller* const c);
+template void depth0_metrics_aggregator::collect_from_controller(
+    const controller::depth0::omdpo_controller* const c);
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
-    const struct params::metrics_params* params,
+    const cmconfig::metrics_config* const mconfig,
+    const config::grid_config* const gconfig,
     const std::string& output_root)
-    : base_metrics_aggregator(params, output_root),
+    : base_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {
-  register_collector<metrics::world_model_metrics_collector>(
-      "perception::world_model",
-      metrics_path() + "/" + params->perception_world_model_fname,
-      params->collect_interval);
+  metrics::collector_registerer::creatable_set creatable_set = {
+      {typeid(metrics::perception::mdpo_perception_metrics_collector),
+       "perception_mdpo",
+       "perception::mdpo"},
+      {typeid(metrics::perception::dpo_perception_metrics_collector),
+       "perception_dpo",
+       "perception::dpo"}};
+
+  metrics::collector_registerer registerer(mconfig, gconfig, creatable_set, this);
+  boost::mpl::for_each<detail::collector_typelist>(registerer);
+
   reset_all();
 }
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-template<class T>
-void depth0_metrics_aggregator::collect_from_controller(const T* const controller) {
+template <class T>
+void depth0_metrics_aggregator::collect_from_controller(
+    const T* const controller) {
+  base_metrics_aggregator::collect_from_controller(controller);
+
   /*
-   * Both CRW and stateful controllers provide these.
+   * All depth0 controllers provide these.
    */
-  auto collision_m =
-      dynamic_cast<const metrics::fsm::collision_metrics*>(controller->fsm());
-  auto mov_m = dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
-  auto block_acq_m = dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-      controller);
-  auto manip_m = dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
+  collect("fsm::movement", *controller);
+  collect("fsm::collision_counts", *controller->fsm());
+  collect("blocks::acq_counts", *controller);
+  collect("blocks::manipulation", *controller->block_manip_collator());
 
-  ER_ASSERT(mov_m, "FSM does not provide movement metrics");
-  ER_ASSERT(block_acq_m,
-            "FSM does not provide block acquisition metrics");
-  ER_ASSERT(collision_m, "FSM does not provide collision metrics");
-  ER_ASSERT(manip_m, "FSM does not provide block manipulation metrics");
+  collect_if("fsm::collision_locs",
+             *controller->fsm(),
+             [&](const rmetrics::base_metrics&) {
+               return controller->fsm()->ca_tracker()->in_collision_avoidance();
+             });
 
-  collect("fsm::movement", *mov_m);
-  collect("fsm::collision", *collision_m);
-  collect("blocks::acquisition", *block_acq_m);
-  collect("blocks::manipulation", *manip_m);
+  collect_if("blocks::acq_locs",
+             *controller,
+             [&](const rmetrics::base_metrics& metrics) {
+               auto& m =
+                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
+               return fsm::foraging_acq_goal::type::ekBLOCK ==
+                          m.acquisition_goal() &&
+                      m.goal_acquired();
+             });
 
-/*
- * Only stateful provides these.
- */
-  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
-  if (nullptr != worldm_m) {
-    collect("perception::world_model", *worldm_m);
+  /*
+   * We count "false" explorations as part of gathering metrics on where robots
+   * explore.
+   */
+  collect_if("blocks::acq_explore_locs",
+             *controller,
+             [&](const rmetrics::base_metrics& metrics) {
+               auto& m =
+                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
+               return m.is_exploring_for_goal().first;
+             });
+  collect_if("blocks::acq_vector_locs",
+             *controller,
+             [&](const rmetrics::base_metrics& metrics) {
+               auto& m =
+                   dynamic_cast<const cfmetrics::goal_acq_metrics&>(metrics);
+               return m.is_vectoring_to_goal();
+             });
+  /*
+   * Only controllers with MDPO perception provide these.
+   */
+  auto mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+      controller->perception());
+  if (nullptr != mdpo) {
+    collect("perception::mdpo", *mdpo);
+  }
+  /*
+   * Only controllers with DPO perception provide these.
+   */
+  auto dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+      controller->perception());
+  if (nullptr != dpo) {
+    collect("perception::dpo", *dpo);
   }
 } /* collect_from_controller() */
 

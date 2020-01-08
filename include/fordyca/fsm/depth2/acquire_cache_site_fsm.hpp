@@ -1,7 +1,7 @@
 /**
- * @file acquire_cache_site_fsm.hpp
+ * \file acquire_cache_site_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,7 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/acquire_goal_fsm.hpp"
+#include "cosm/fsm/acquire_goal_fsm.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics.hpp"
+#include <nlopt.hpp>
 
 /*******************************************************************************
  * Namespaces
@@ -32,7 +37,7 @@
 NS_START(fordyca);
 
 namespace controller { class cache_sel_matrix; }
-namespace ds { class perceived_arena_map; }
+namespace ds { class dpo_store; }
 
 NS_START(fsm, depth2);
 
@@ -40,45 +45,54 @@ NS_START(fsm, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class acquire_cache_site_fsm
- * @ingroup fsm depth2
+ * \class acquire_cache_site_fsm
+ * \ingroup fsm depth2
  *
- * @brief The FSM for acquiring a site to start a new cache at within the
+ * \brief The FSM for acquiring a site to start a new cache at within the
  * arena.
  *
  * Each robot executing this FSM will compute the "best" site to start a new
  * cache at, and then acquire that location within the arena. Once this has been
  * done, it signals that it has completed its task.
- *
- * @bug There is not currently any handling for what needs to happen if the
- * robot arrives at its chosen site and there is already a cache there or there
- * is one very close by.
  */
-class acquire_cache_site_fsm : public er::client<acquire_cache_site_fsm>,
-                               public acquire_goal_fsm {
+class acquire_cache_site_fsm : public rer::client<acquire_cache_site_fsm>,
+                               public cfsm::acquire_goal_fsm,
+                               public metrics::caches::site_selection_metrics {
  public:
-  acquire_cache_site_fsm(const controller::cache_sel_matrix* matrix,
-                         controller::saa_subsystem* saa,
-                         ds::perceived_arena_map* map);
+  acquire_cache_site_fsm(const fsm_ro_params* c_params,
+                         crfootbot::footbot_saa_subsystem* saa,
+                         rmath::rng* rng);
   ~acquire_cache_site_fsm(void) override = default;
 
   acquire_cache_site_fsm(const acquire_cache_site_fsm& fsm) = delete;
   acquire_cache_site_fsm& operator=(const acquire_cache_site_fsm& fsm) = delete;
 
+  /* site selection metrics overrides */
+  bool site_select_exec(void) const override { return m_sel_exec; }
+  bool site_select_success(void) const override { return m_sel_success; }
+  nlopt::result nlopt_result(void) const override { return m_nlopt_res; }
+  void reset_metrics(void) override {
+    m_sel_success = false;
+    m_sel_exec = false;
+  }
+
  private:
   /*
    * See \ref acquire_goal_fsm for the purpose of these callbacks.
    */
-  acquisition_goal_type acquisition_goal_internal(void) const;
-  acquire_goal_fsm::candidate_type site_select(void) const;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal_internal(void) const RCSW_CONST;
+  boost::optional<acquire_goal_fsm::candidate_type> site_select(void);
   bool candidates_exist(void) const { return true; }
-  bool site_exploration_term_cb(void) const;
-  bool site_acquired_cb(bool explore_result) const;
+  bool site_exploration_term_cb(void) const RCSW_CONST;
+  bool site_acquired_cb(bool explore_result) const RCSW_CONST;
 
-  // clang-format off
+  /* clang-format off */
+  bool                                      m_sel_success{false};
+  bool                                      m_sel_exec{false};
+  nlopt::result                             m_nlopt_res{};
   const controller::cache_sel_matrix* const mc_matrix;
-  const ds::perceived_arena_map*      const mc_map;
-  // clang-format on
+  const ds::dpo_store*      const           mc_store;
+  /* clang-format on */
 };
 
 NS_END(depth2, fsm, fordyca);

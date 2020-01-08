@@ -1,7 +1,7 @@
 /**
- * @file block_to_cache_site_fsm.hpp
+ * \file block_to_cache_site_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,9 +24,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
+#include "fordyca/metrics/caches/site_selection_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,39 +40,46 @@ NS_START(fordyca, fsm, depth2);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_to_cache_site_fsm
- * @ingroup fsm depth2
+ * \class block_to_cache_site_fsm
+ * \ingroup fsm depth2
  *
- * @brief The FSM for the block-to-cache-site subtask.
+ * \brief The FSM for the block-to-cache-site subtask.
  *
  * Each robot executing this FSM will locate a free block (either a known block
- * or via random exploration), pickup the block and bring it to the location in
- * the arena that it has computed as being the best place to start a new cache,
- * and then drop the block there. Once it has done that it will signal that its
- * task is complete.
+ * or via exploration), pickup the block and bring it to the location in the
+ * arena that it has computed as being the best place to start a new cache, and
+ * then drop the block there. Once it has done that it will signal that its task
+ * is complete.
  */
-class block_to_cache_site_fsm : public block_to_goal_fsm {
+class block_to_cache_site_fsm final : public block_to_goal_fsm,
+                                      public virtual metrics::caches::site_selection_metrics {
  public:
-  block_to_cache_site_fsm(const controller::block_sel_matrix* bsel_matrix,
-                          const controller::cache_sel_matrix* csel_matrix,
-                          controller::saa_subsystem* saa,
-                          ds::perceived_arena_map* map);
-  ~block_to_cache_site_fsm(void) override = default;
+  block_to_cache_site_fsm(const fsm_ro_params* c_params,
+                          crfootbot::footbot_saa_subsystem* saa,
+                          std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+                          rmath::rng* rng);
 
-  block_to_cache_site_fsm(const block_to_cache_site_fsm& fsm) = delete;
-  block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm& fsm) = delete;
+  ~block_to_cache_site_fsm(void) override = default;
+  block_to_cache_site_fsm(const block_to_cache_site_fsm&) = delete;
+  block_to_cache_site_fsm& operator=(const block_to_cache_site_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
+  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
  private:
-  // clang-format off
+  /* clang-format off */
   acquire_cache_site_fsm m_cache_fsm;
   acquire_free_block_fsm m_block_fsm;
-  // clang-format on
+  /* clang-format on */
+
+ public:
+  /* cache site selection overrides */
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(site_select_exec, m_cache_fsm, const);
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(site_select_success, m_cache_fsm, const);
+  RCPPSW_DECLDEF_OVERRIDE_WRAP(nlopt_result, m_cache_fsm, const);
 };
 
 NS_END(depth2, fsm, fordyca);

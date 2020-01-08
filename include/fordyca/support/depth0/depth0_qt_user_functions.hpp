@@ -1,7 +1,7 @@
 /**
- * @file depth0_qt_user_functions.hpp
+ * \file depth0_qt_user_functions.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "rcppsw/common/common.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,21 +36,21 @@ NS_START(fordyca, support, depth0);
  * Classes
  ******************************************************************************/
 /**
- * @class depth0_qt_user_functions
- * @ingroup support depth0
+ * \class depth0_qt_user_functions
+ * \ingroup support depth0
  *
- * @brief Contains hooks for Qt to draw the robot's LOS if so configured.
+ * \brief Contains hooks for Qt to draw the robot's LOS if so configured.
  */
 class depth0_qt_user_functions : public argos::CQTOpenGLUserFunctions {
  public:
   /**
-   * @brief How far above the center of the robot to draw the carried block (if
+   * \brief How far above the center of the robot to draw the carried block (if
    * the robot is carrying a block)
    */
   static constexpr double kBLOCK_VIS_OFFSET = 0.3;
 
   /**
-   * @brief How far above the center of the robot to draw text (robot id, task,
+   * \brief How far above the center of the robot to draw text (robot id, task,
    * etc.)
    */
   static constexpr double kTEXT_VIS_OFFSET = 0.5;

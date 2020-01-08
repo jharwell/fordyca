@@ -1,7 +1,7 @@
 /**
- * @file nest_interactor.hpp
+ * \file nest_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,26 +26,27 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
+#include "fordyca/fordyca.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
-
+namespace detail {
 class nest_block_drop;
-namespace visitor = rcppsw::patterns::visitor;
-
+}
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class nest_interactor
- * @ingroup events
+ * \class nest_interactor
+ * \ingroup events
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
+ * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with the nest in FORDYCA.
  */
 class nest_interactor
-    : public visitor::polymorphic_accept_set<nest_block_drop> {};
+    : public rpvisitor::polymorphic_accept_set<detail::nest_block_drop> {};
 
 NS_END(tasks, fordyca);
 

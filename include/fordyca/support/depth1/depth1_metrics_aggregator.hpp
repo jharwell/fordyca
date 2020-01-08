@@ -1,7 +1,7 @@
 /**
- * @file depth1_metrics_aggregator.hpp
+ * \file depth1_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,39 +26,42 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
+#include "fordyca/metrics/perception/dpo_perception_metrics.hpp"
+#include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
-#include "fordyca/metrics/fsm/movement_metrics.hpp"
-#include "fordyca/metrics/fsm/collision_metrics.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/metrics/tasks/bi_tdgraph_metrics.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "cosm/fsm/metrics/movement_metrics.hpp"
+#include "cosm/fsm/metrics/collision_metrics.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
+#include "cosm/ta/polled_task.hpp"
+#include "fordyca/controller/base_perception_subsystem.hpp"
+#include "fordyca/controller/base_controller.hpp"
+
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation {
+namespace cosm::ta {
+namespace ds {
 class bi_tab;
-}}
-namespace ta = rcppsw::task_allocation;
+} /* namespace ds */
+}
 NS_START(fordyca);
 
-namespace controller { namespace depth1 { class greedy_partitioning_controller; }}
-namespace representation { class arena_cache; }
+namespace controller { namespace depth1 { class bitd_mdpo_controller; }}
+namespace repr { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth1_metrics_aggregator
- * @ingroup support depth1
+ * \class depth1_metrics_aggregator
+ * \ingroup support depth1
  *
- * @brief Aggregates and metrics collection for depth1 foraging. That
- * includes everything from \ref stateful_metrics_aggregator, and also:
+ * \brief Aggregates and metrics collection for depth1 foraging. That
+ * includes everything from \ref depth0_metrics_aggregator, and also:
  *
  * - FSM cache acquisition metrics
  * - Cache utilization metrics
@@ -68,15 +71,14 @@ namespace er = rcppsw::er;
  * - TAB metrics (rooted at generalist)
  */
 class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
-                                  public er::client<depth1_metrics_aggregator> {
+                                  public rer::client<depth1_metrics_aggregator> {
  public:
-  using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-
-  depth1_metrics_aggregator(const struct params::metrics_params* params,
+  depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
+                            const config::grid_config* const gconfig,
                             const std::string& output_root);
 
   /**
-   * @brief Collect metrics from a finished or aborted task.
+   * \brief Collect metrics from a finished or aborted task.
    *
    * This cannot be collected synchronously per-timestep with the rest of the
    * metrics from the controller, because by the time metric collecting occurs,
@@ -88,82 +90,147 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    * Solution: hook into the executive callback queue in order to correctly
    * capture statistics.
    */
-  void task_finish_or_abort_cb(const ta::polled_task* task);
+  void task_finish_or_abort_cb(const cta::polled_task* task);
 
-  void task_alloc_cb(const ta::polled_task*, const ta::bi_tab* tab);
+  void task_start_cb(const cta::polled_task*, const cta::ds::bi_tab* tab);
 
-  /**
-   * @brief Collect metrics from the depth1 controller.
+    /**
+   * \brief Collect metrics from the depth1 controller.
    */
-  template<class ControllerType>
-  void collect_from_controller(const ControllerType* const controller) {
-  auto worldm_m = dynamic_cast<const metrics::world_model_metrics*>(controller);
-  auto manip_m =
-      dynamic_cast<const metrics::blocks::manipulation_metrics*>(controller);
-  auto movement_m =
-      dynamic_cast<const metrics::fsm::movement_metrics*>(controller);
-
-  ER_ASSERT(movement_m, "Controller does not provide FSM movement metrics");
-  ER_ASSERT(worldm_m, "Controller does not provide world model metrics");
-  ER_ASSERT(manip_m, "Controller does not provide block manipulation metrics");
-
-  collect("fsm::movement", *movement_m);
-  collect("blocks::manipulation", *manip_m);
-  collect("perception::world_model", *worldm_m);
-
-  if (nullptr != controller->current_task()) {
-    auto collision_m = dynamic_cast<const metrics::fsm::collision_metrics*>(
-        dynamic_cast<const ta::polled_task*>(controller->current_task())
-        ->mechanism());
-    auto block_acq_m =
-        dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-            dynamic_cast<const ta::polled_task*>(controller->current_task())
-                ->mechanism());
-    auto dist_m = dynamic_cast<const rcppsw::metrics::tasks::bi_tdgraph_metrics*>(
-        controller);
-
-
-    ER_ASSERT(block_acq_m,
-              "Task does not provide FSM block acquisition metrics");
-    ER_ASSERT(collision_m, "FSM does not provide collision metrics");
-    ER_ASSERT(dist_m, "Controller does not provide task distribution metrics");
-
-    collect("fsm::collision", *collision_m);
-    collect_if(
-        "blocks::acquisition",
-        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-            controller->current_task()),
-        [&](const rcppsw::metrics::base_metrics& metrics) {
-          return acquisition_goal_type::kBlock ==
-                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                     metrics)
-                     .acquisition_goal();
-        });
-    collect_if(
-        "caches::acquisition",
-        *dynamic_cast<const metrics::fsm::goal_acquisition_metrics*>(
-            controller->current_task()),
-        [&](const rcppsw::metrics::base_metrics& metrics) {
-          return acquisition_goal_type::kExistingCache ==
-                 dynamic_cast<const metrics::fsm::goal_acquisition_metrics&>(
-                     metrics)
-                     .acquisition_goal();
-        });
-    collect("tasks::distribution", *dist_m);
-  }
-}
+    template<class ControllerType>
+    void collect_from_controller(const ControllerType* const controller) {
+      base_metrics_aggregator::collect_from_controller(controller);
+      collect_controller_common(controller);
+      /*
+       * Only controllers with MDPO perception provide these.
+       */
+      auto mdpo = dynamic_cast<const metrics::perception::mdpo_perception_metrics*>(
+          controller->perception());
+      if (nullptr != mdpo) {
+        collect("perception::mdpo", *mdpo);
+      }
+      /*
+       * Only controllers with DPO perception provide these.
+       */
+      auto dpo = dynamic_cast<const metrics::perception::dpo_perception_metrics*>(
+          controller->perception());
+      if (nullptr != dpo) {
+        collect("perception::dpo", *dpo);
+      }
+    }
 
   /**
-   * @brief Collect utilization metrics from a cache in the arena.
+   * \brief Collect utilization metrics from a cache in the arena.
    */
   void collect_from_cache(
-      const representation::arena_cache* cache);
+      const repr::arena_cache* cache);
 
   /**
-   * @brief Collect lifecycle metrics across all caches in the arena.
+   * \brief Collect lifecycle metrics across all caches in the arena.
    */
   void collect_from_cache_manager(
       const support::base_cache_manager* manager);
+
+ private:
+  template<typename ControllerType>
+  void collect_controller_common(const ControllerType* const controller) {
+    collect("fsm::movement", *controller);
+    collect("blocks::manipulation", *controller->block_manip_collator());
+
+    auto task = dynamic_cast<const cta::polled_task*>(controller->current_task());
+    if (nullptr == task) {
+      return;
+    }
+    collect("fsm::collision_counts", *task->mechanism());
+    collect_if("fsm::collision_locs",
+               *task->mechanism(),
+               [&](const rmetrics::base_metrics& metrics) {
+                 auto& m = dynamic_cast<const cfmetrics::collision_metrics&>(metrics);
+                 return m.in_collision_avoidance();
+               });
+    collect_if(
+        "blocks::acq_counts",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal();
+        });
+    collect_if(
+        "blocks::acq_locs",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+              m.goal_acquired();
+        });
+
+    /*
+     * We count "false" explorations as part of gathering metrics on where
+     * robots explore.
+     */
+    collect_if(
+        "blocks::acq_explore_locs",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+              m.is_exploring_for_goal().first;
+        });
+    collect_if(
+        "blocks::acq_vector_locs",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+              m.is_vectoring_to_goal();
+        });
+
+    collect_if(
+        "caches::acq_counts",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal();
+        });
+    collect_if(
+        "caches::acq_locs",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+              m.goal_acquired();
+        });
+
+    /*
+     * We count "false" explorations as part of gathering metrics on where
+     * robots explore.
+     */
+    collect_if(
+        "caches::acq_explore_locs",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+              m.is_exploring_for_goal().first;
+        });
+    collect_if(
+        "caches::acq_vector_locs",
+        *task->mechanism(),
+        [&](const rmetrics::base_metrics& metrics) {
+          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+              metrics);
+          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+              m.is_vectoring_to_goal();
+        });
+    collect("tasks::distribution", *controller);
+  } /* collect_controller_common() */
 };
 
 NS_END(depth1, support, fordyca);

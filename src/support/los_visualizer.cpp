@@ -1,7 +1,7 @@
 /**
- * @file los_visualizer.cpp
+ * \file los_visualizer.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -27,7 +27,8 @@
 #include <argos3/core/utility/math/quaternion.h>
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-#include "fordyca/representation/line_of_sight.hpp"
+
+#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -37,21 +38,21 @@ NS_START(fordyca, support);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void los_visualizer::draw(const representation::line_of_sight* const los,
-                          double grid_resolution) {
+void los_visualizer::draw(const repr::line_of_sight* const los,
+                          rtypes::discretize_ratio grid_resolution) {
   /* has not been populated yet on first timestep */
   if (nullptr == los) {
     return;
   }
   std::vector<argos::CVector2> points;
-  points.emplace_back(-grid_resolution * los->xsize() / 2,
-                      -grid_resolution * los->ysize() / 2);
-  points.emplace_back(-grid_resolution * los->xsize() / 2,
-                      grid_resolution * los->ysize() / 2);
-  points.emplace_back(grid_resolution * los->xsize() / 2,
-                      grid_resolution * los->ysize() / 2);
-  points.emplace_back(grid_resolution * los->xsize() / 2,
-                      -grid_resolution * los->ysize() / 2);
+  points.emplace_back(-grid_resolution.v() * los->xsize() / 2,
+                      -grid_resolution.v() * los->ysize() / 2);
+  points.emplace_back(-grid_resolution.v() * los->xsize() / 2,
+                      grid_resolution.v() * los->ysize() / 2);
+  points.emplace_back(grid_resolution.v() * los->xsize() / 2,
+                      grid_resolution.v() * los->ysize() / 2);
+  points.emplace_back(grid_resolution.v() * los->xsize() / 2,
+                      -grid_resolution.v() * los->ysize() / 2);
 
   /* draw LOS slightly above the ground so that it renders better */
   m_qt->DrawPolygon(argos::CVector3(0, 0, 0.05),

@@ -1,7 +1,7 @@
 /**
- * @file lifecycle_metrics_collector.hpp
+ * \file lifecycle_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,59 +24,61 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <set>
 #include <string>
+#include <list>
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
 
-namespace visitor = rcppsw::patterns::visitor;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class lifecycle_metrics_collector
- * @ingroup metrics caches
+ * \class lifecycle_metrics_collector
+ * \ingroup metrics caches
  *
- * @brief Collector for \ref lifecycle_metrics.
+ * \brief Collector for \ref lifecycle_metrics.
  *
  * Metrics are output at the specified interval.
  */
-class lifecycle_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<lifecycle_metrics_collector> {
+class lifecycle_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * @param ofname Output file name.
-   * @param interval Collection interval.
+   * \param ofname Output file name.
+   * \param interval Collection interval.
    */
   lifecycle_metrics_collector(const std::string& ofname, uint interval);
 
   void reset(void) override;
   void reset_after_interval(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
+  void collect(const rmetrics::base_metrics& metrics) override;
 
  private:
   /**
-   * @brief All stats are cumulative within an interval.
+   * \brief All stats are cumulative within an interval.
    */
   struct stats {
-    uint n_created;
-    uint n_depleted;
+    uint int_created{0};
+    uint int_depleted{0};
+    rtypes::timestep int_depletion_sum{0};
+
+    uint cum_created{0};
+    uint cum_depleted{0};
+    rtypes::timestep cum_depletion_sum{0};
   };
 
-  std::string csv_header_build(const std::string& header) override;
-  bool csv_line_build(std::string& line) override;
 
-  // clang-format off
-  struct stats   m_stats;
-  // clang-format on
+  std::list<std::string> csv_header_cols(void) const override;
+  boost::optional<std::string> csv_line_build(void) override;
+
+  /* clang-format off */
+  struct stats   m_stats{};
+  /* clang-format on */
 };
 
 NS_END(caches, metrics, fordyca);

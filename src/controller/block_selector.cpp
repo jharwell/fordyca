@@ -1,7 +1,7 @@
 /**
- * @file block_selector.cpp
+ * \file block_selector.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,9 +22,10 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/controller/block_selector.hpp"
+
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/math/block_utility.hpp"
-#include "fordyca/representation/base_block.hpp"
-#include "fordyca/representation/cube_block.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -42,15 +43,15 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-representation::perceived_block block_selector::calc_best(
-    const ds::perceived_block_list& blocks,
+boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
+    const ds::dp_block_map& blocks,
     const rmath::vector2d& position) {
   double max_utility = 0.0;
-  representation::perceived_block best{nullptr, {}};
+  ds::dp_block_map::value_type best{nullptr, {}};
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
-  for (auto& b : blocks) {
-    if (block_is_excluded(position, b.ent.get())) {
+  for (const auto& b : blocks.const_values_range()) {
+    if (block_is_excluded(position, b.ent())) {
       continue;
     }
 
@@ -59,20 +60,21 @@ representation::perceived_block block_selector::calc_best(
      * undoubtedly have to change in the future.
      */
     double priority =
-        (dynamic_cast<representation::cube_block*>(b.ent.get()))
+        (crepr::block_type::ekCUBE == b.ent()->type())
             ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
             : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =
         boost::get<rmath::vector2d>(mc_matrix->find(bselm::kNestLoc)->second);
 
-    double utility = math::block_utility(b.ent->real_loc(), nest_loc)(
-        position, b.density.last_result(), priority);
+    double utility =
+        math::block_utility(b.ent()->rloc(),
+                            nest_loc)(position, b.density(), priority);
 
     ER_DEBUG("Utility for block%d@%s/%s, density=%f: %f",
-             b.ent->id(),
-             b.ent->real_loc().to_str().c_str(),
-             b.ent->discrete_loc().to_str().c_str(),
-             b.density.last_result(),
+             b.ent()->id().v(),
+             b.ent()->rloc().to_str().c_str(),
+             b.ent()->dloc().to_str().c_str(),
+             b.density().v(),
              utility);
     if (utility > max_utility) {
       best = b;
@@ -80,42 +82,41 @@ representation::perceived_block block_selector::calc_best(
     }
   } /* for(block..) */
 
-  if (nullptr != best.ent) {
+  if (nullptr != best.ent()) {
     ER_INFO("Best utility: block%d@%s/%s: %f",
-            best.ent->id(),
-            best.ent->real_loc().to_str().c_str(),
-            best.ent->real_loc().to_str().c_str(),
+            best.ent()->id().v(),
+            best.ent()->rloc().to_str().c_str(),
+            best.ent()->dloc().to_str().c_str(),
             max_utility);
+    return boost::make_optional(best);
   } else {
-    ER_WARN(
-        "No best block found: all known blocks excluded!");
+    ER_WARN("No best block found: all known blocks excluded!");
+    return boost::optional<ds::dp_block_map::value_type>();
   }
-  return best;
-} /* calc_best() */
+} /* operator() */
 
 bool block_selector::block_is_excluded(
     const rmath::vector2d& position,
-    const representation::base_block* const block) const {
-  double block_dim = std::min(block->xspan(block->real_loc()).span(),
-                              block->yspan(block->real_loc()).span());
-  if ((position - block->real_loc()).length() <= block_dim) {
+    const crepr::base_block2D* const block) const {
+  double block_dim = std::min(block->xspan().span(), block->yspan().span());
+  if ((position - block->rloc()).length() <= block_dim) {
     ER_DEBUG("Ignoring block%d@%s/%s: Too close (%f <= %f)",
-            block->id(),
-            block->real_loc().to_str().c_str(),
-            block->discrete_loc().to_str().c_str(),
-            (position - block->real_loc()).length(),
-            block_dim);
+             block->id().v(),
+             block->rloc().to_str().c_str(),
+             block->dloc().to_str().c_str(),
+             (position - block->rloc()).length(),
+             block_dim);
     return true;
   }
-  std::vector<int> exceptions = boost::get<std::vector<int>>(
+  auto exceptions = boost::get<std::vector<rtypes::type_uuid>>(
       mc_matrix->find(bselm::kSelExceptions)->second);
-  if (std::any_of(exceptions.begin(), exceptions.end(), [&](int id) {
+  if (std::any_of(exceptions.begin(), exceptions.end(), [&](auto& id) {
         return id == block->id();
       })) {
     ER_DEBUG("Ignoring block%d@%s/%s: On exception list",
-            block->id(),
-            block->real_loc().to_str().c_str(),
-            block->discrete_loc().to_str().c_str());
+             block->id().v(),
+             block->rloc().to_str().c_str(),
+             block->dloc().to_str().c_str());
     return true;
   }
   return false;

@@ -1,7 +1,7 @@
 /**
- * @file depth0_qt_user_functions.cpp
+ * \file depth0_qt_user_functions.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,7 +22,7 @@
  * Includes
  ******************************************************************************/
 /*
- * @todo Figure out how to remove this warning properly.
+ * \todo Figure out how to remove this warning properly.
  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
@@ -30,10 +30,13 @@
 #pragma GCC diagnostic pop
 
 #include <argos3/core/simulator/entity/controllable_entity.h>
-#include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/depth0/stateful_controller.hpp"
+
+#include "cosm/vis/block_carry_visualizer.hpp"
+
+#include "fordyca/controller/depth0/mdpo_controller.hpp"
+#include "fordyca/controller/mdpo_perception_subsystem.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/support/los_visualizer.hpp"
-#include "fordyca/support/block_carry_visualizer.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,26 +55,26 @@ depth0_qt_user_functions::depth0_qt_user_functions(void) {
  * Member Functions
  ******************************************************************************/
 void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
-  auto* stateful = dynamic_cast<const controller::depth0::stateful_controller*>(
+  auto* mdpo = dynamic_cast<const controller::depth0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
-  auto* crw = dynamic_cast<const controller::depth0::crw_controller*>(
+  auto* base = dynamic_cast<const controller::base_controller*>(
       &c_entity.GetControllableEntity().GetController());
 
-  if (crw->display_id()) {
+  if (base->display_id()) {
     DrawText(argos::CVector3(0.0, 0.0, 0.5), c_entity.GetId());
   }
 
-  if (crw->is_carrying_block()) {
-    block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
-        .draw(crw->block().get(), crw->GetId().size());
+  if (base->is_carrying_block()) {
+    cvis::block_carry_visualizer(this, kBLOCK_VIS_OFFSET, kTEXT_VIS_OFFSET)
+        .draw(base->block(), base->GetId().size());
   }
-  if (nullptr != stateful && stateful->display_los()) {
-    los_visualizer(this).draw(stateful->los(),
-                              stateful->perception()->map()->grid_resolution());
+  if (nullptr != mdpo && mdpo->display_los()) {
+    los_visualizer(this).draw(mdpo->los(),
+                              mdpo->mdpo_perception()->map()->resolution());
   }
 }
 
-using namespace argos;
+using namespace argos; // NOLINT
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"

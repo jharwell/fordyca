@@ -1,7 +1,7 @@
 /**
- * @file arena_grid.hpp
+ * \file arena_grid.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,58 +26,62 @@
  ******************************************************************************/
 #include <tuple>
 
-#include "fordyca/ds/cell2D.hpp"
 #include "rcppsw/ds/stacked_grid.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
+
+#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, ds);
-using arena_layer_stack = std::tuple<cell2D, bool>;
+
+/**
+ * \brief The types of layers used by \ref arena_grid.
+ */
+using arena_layer_stack = std::tuple<cell2D>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class arena_grid
- * @ingroup ds
+ * \class arena_grid
+ * \ingroup ds
  *
- * @brief 2D grid of \ref cell2D objects containing the state of the geometrical
+ * \brief 2D grid of \ref cell2D objects containing the state of the geometrical
  * extent of the arena floor.
  */
-class arena_grid : public rcppsw::ds::stacked_grid<arena_layer_stack> {
+class arena_grid : public rds::stacked_grid<arena_layer_stack> {
  public:
-  using view = rcppsw::ds::grid_view<ds::cell2D>;
-  using const_view = rcppsw::ds::const_grid_view<ds::cell2D>;
+  using view = rds::base_grid2D<ds::cell2D>::grid_view;
+  using const_view = rds::base_grid2D<ds::cell2D>::const_grid_view;
 
-  constexpr static uint kCell = 0;
-  constexpr static uint kRobotOccupancy = 1;
+  static constexpr size_t kCell = 0;
 
   /**
-   *
-   * @param resolution The arena resolution (i.e. what is the size of 1 cell in
+   * \param resolution The arena resolution (i.e. what is the size of 1 cell in
    *                   the 2D grid).
-   * @param x_max      Size in X of 2D grid.
-   * @param y_max      Size in Y of 2D grid.
+   * \param x_max      Size in X of 2D grid.
+   * \param y_max      Size in Y of 2D grid.
    *
    * The origin of the grid is in the lower left corner at (0,0).
    */
-  arena_grid(double resolution, size_t x_max, size_t y_max)
+  arena_grid(rtypes::discretize_ratio resolution, size_t x_max, size_t y_max)
       : stacked_grid(resolution, x_max, y_max) {
-    for (uint i = 0; i < xdsize(); ++i) {
-      for (uint j = 0; j < ydsize(); ++j) {
+    for (size_t i = 0; i < xdsize(); ++i) {
+      for (size_t j = 0; j < ydsize(); ++j) {
         access<kCell>(i, j).loc(rmath::vector2u(i, j));
       } /* for(j..) */
     }   /* for(i..) */
   }
 
   /**
-    * @brief Reset all the cells within the grid, removing all references to old
-    * blocks as well as setting all cells back to an empty state.
-    */
+   * \brief Reset all the cells within the grid, removing all references to old
+   * blocks as well as setting all cells back to an empty state.
+   */
   void reset(void) {
-    for (uint i = 0; i < xdsize(); ++i) {
-      for (uint j = 0; j < ydsize(); ++j) {
+    for (size_t i = 0; i < xdsize(); ++i) {
+      for (size_t j = 0; j < ydsize(); ++j) {
         access<kCell>(i, j).reset();
       } /* for(j..) */
     }   /* for(i..) */

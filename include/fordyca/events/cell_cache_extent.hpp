@@ -1,7 +1,7 @@
 /**
- * @file cell_cache_extent.hpp
+ * \file cell_cache_extent.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,53 +24,78 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/cell_op.hpp"
+#include <memory>
+
 #include "rcppsw/math/vector2.hpp"
+
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace rmath = rcppsw::math;
-namespace representation {
-class arena_map;
+namespace repr {
 class base_cache;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class arena_map;
 } // namespace ds
 
-NS_START(events);
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell_cache_extent
- * @ingroup events
+ * \class cell_cache_extent
+ * \ingroup events
  *
- * @brief Created whenever a cell needs to go from some other state to being
+ * \brief Created whenever a cell needs to go from some other state to being
  * part of a cache's extent (dub). All the blocks (and the cache itself) live in
  * a single cell, but the cells that the cache covers need to be in a special
  * state in order to avoid corner cases when picking up from/dropping in a cache
  * (See #432).
  */
-class cell_cache_extent : public cell_op,
-                          public visitor::can_visit<ds::arena_map> {
+class cell_cache_extent : public cell_op {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using others = rmpl::typelist<ds::arena_map>;
+    using value = boost::mpl::joint_view<inherited::type, others::type>;
+  };
+
  public:
+  using visit_typelist = visit_typelist_impl::value;
+
   cell_cache_extent(const rmath::vector2u& coord,
-                    const std::shared_ptr<representation::base_cache> cache);
+                    const std::shared_ptr<repr::base_cache>& cache);
 
   /* depth1 foraging */
-  void visit(ds::cell2D& cell) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
-  void visit(ds::arena_map& map) override;
+  void visit(ds::cell2D& cell);
+  void visit(fsm::cell2D_fsm& fsm);
+  void visit(ds::arena_map& map);
 
  private:
-  // clang-format off
-  std::shared_ptr<representation::base_cache> m_cache;
-  // clang-format on
+  /* clang-format off */
+  std::shared_ptr<repr::base_cache> m_cache;
+  /* clang-format on */
+};
+
+/**
+ * \brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cell_cache_extent_visitor_impl =
+    rpvisitor::precise_visitor<detail::cell_cache_extent,
+                               detail::cell_cache_extent::visit_typelist>;
+
+NS_END(detail);
+
+class cell_cache_extent_visitor : public detail::cell_cache_extent_visitor_impl {
+  using detail::cell_cache_extent_visitor_impl::cell_cache_extent_visitor_impl;
 };
 
 NS_END(events, fordyca);

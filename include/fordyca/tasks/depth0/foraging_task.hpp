@@ -1,7 +1,7 @@
 /**
- * @file foraging_task.hpp
+ * \file depth0/foraging_task.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,31 +25,31 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
+#include <boost/variant.hpp>
 
 #include "fordyca/tasks/base_foraging_task.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 #include "fordyca/events/nest_interactor.hpp"
 #include "fordyca/events/free_block_interactor.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace rcppsw { namespace task_allocation { struct task_allocation_params; }}
+namespace cosm::ta::config { struct task_alloc_config; }
 
-NS_START(fordyca);
-namespace visitor = rcppsw::patterns::visitor;
-
-NS_START(tasks, depth0);
+NS_START(fordyca, tasks, depth0);
+class generalist;
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class foraging_task
- * @ingroup tasks depth0
+ * \class foraging_task
+ * \ingroup tasks depth0
  *
- * @brief Interface specifying the visit set for all depth0 foraging tasks in
+ * \brief Interface specifying the visit set for all depth0 foraging tasks in
  * FORDYCA.
  *
  * Not all tasks need all events, but it is convenient both from a design point
@@ -60,17 +60,19 @@ class foraging_task
     : public base_foraging_task,
       public events::nest_interactor,
       public events::free_block_interactor,
-      public ta::polled_task {
+      public cta::polled_task {
  public:
+  using variant_type = boost::variant<generalist*>;
+
   static constexpr char kGeneralistName[] = "Generalist";
 
   foraging_task(const std::string& name,
-                const ta::task_allocation_params* const params,
-                std::unique_ptr<ta::taskable> mechanism);
+                const cta::config::task_alloc_config* config,
+                std::unique_ptr<cta::taskable> mechanism);
 
   ~foraging_task(void) override = default;
 
-  static bool task_in_depth0(const ta::polled_task* const task);
+  static bool task_in_depth0(const cta::polled_task* task) RCSW_PURE;
 };
 
 NS_END(depth0, tasks, fordyca);

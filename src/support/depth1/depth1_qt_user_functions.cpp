@@ -1,7 +1,7 @@
 /**
- * @file depth1_qt_user_functions.cpp
+ * \file depth1_qt_user_functions.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,8 +25,9 @@
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "fordyca/support/depth1/depth1_qt_user_functions.hpp"
 #pragma GCC diagnostic pop
-#include "fordyca/controller/depth1/greedy_partitioning_controller.hpp"
-#include "fordyca/support/task_visualizer.hpp"
+#include "cosm/vis/task_visualizer.hpp"
+
+#include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
@@ -49,12 +50,12 @@ depth1_qt_user_functions::depth1_qt_user_functions(void) {
 void depth1_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   depth0_qt_user_functions::Draw(c_entity);
 
-  auto& controller = dynamic_cast<controller::greedy_partitioning_controller&>(
+  auto& controller = dynamic_cast<controller::bitd_dpo_controller&>(
       c_entity.GetControllableEntity().GetController());
 
   if (controller.display_task()) {
-    task_visualizer(this, 0.75)
-        .draw(dynamic_cast<ta::logical_task*>(controller.current_task()));
+    cvis::task_visualizer(this, 0.75)
+        .draw(dynamic_cast<cta::logical_task*>(controller.current_task()));
   }
 }
 

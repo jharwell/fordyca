@@ -1,7 +1,7 @@
 /**
- * @file dynamic_cache_manager.hpp
+ * \file dynamic_cache_manager.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,15 +24,17 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <vector>
-#include <utility>
 #include <algorithm>
+#include <boost/optional.hpp>
 
-#include "fordyca/params/caches/caches_params.hpp"
+#include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/ds/block_cluster_list.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
+#include "fordyca/support/cache_create_ro_params.hpp"
+
+#include "rcppsw/math/rng.hpp"
 
 #include "rcppsw/er/client.hpp"
 
@@ -41,70 +43,54 @@
  ******************************************************************************/
 NS_START(fordyca);
 namespace ds { class arena_grid; }
-namespace representation {
-class base_block;
+namespace repr {
+class base_block2D;
 class arena_cache;
 }
 NS_START(support, depth2);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dynamic_cache_manager
- * @ingroup support depth2
+ * \class dynamic_cache_manager
+ * \ingroup support depth2
  *
- * @brief Manager for creation, depletion, and metric gathering for dynamic
- * caches in the arena, whenever they are enabled.
+ * \brief Manager for creation, depletion, and metric gathering for dynamic
+ * caches in the arena.
  */
-class dynamic_cache_manager : public base_cache_manager,
-                              public er::client<dynamic_cache_manager> {
+class dynamic_cache_manager final : public base_cache_manager,
+                              public rer::client<dynamic_cache_manager> {
  public:
-  dynamic_cache_manager(const struct params::caches::caches_params* params,
-                        ds::arena_grid* const arena_grid);
+  dynamic_cache_manager(const config::caches::caches_config* config,
+                        ds::arena_grid* arena_grid,
+                        rmath::rng* rng);
+  dynamic_cache_manager(const dynamic_cache_manager&) = delete;
+  dynamic_cache_manager& operator=(const dynamic_cache_manager&) = delete;
 
   /**
-   * @brief Create caches in the arena as needed according to free block
+   * \brief Create caches in the arena as needed according to free block
    * configurations.
    *
-   * @param existing_caches The list of current caches in the arena.
-   * @param blocks The total block vector for the arena.
-   * @param clusters The total block clusters in the arena, for use in
-   * (possibly) disallowing cache creation within their boundaries, depending on
-   * configuration.
-   *
-   * @return \c TRUE iff at least 1 dynamic cache was actually
-   * created. Non-fatal failures to create dynamic caches can occur if, for
-   * example, all blocks are currently being carried by robots.
+   * \return The created caches (if any were created).
    */
-  creation_res_t create(const ds::cache_vector& existing_caches,
-                         const ds::const_block_cluster_list& clusters,
-                         ds::block_vector& blocks);
+  boost::optional<ds::cache_vector> create(const cache_create_ro_params& c_params,
+                                           const ds::block_vector&  c_alloc_blocks);
 
   /**
-   * @brief Get the minimum distance that must be maintained between two caches
+   * \brief Get the minimum distance that must be maintained between two caches
    * in order for them to discrete. Equal to the maximum of (twice the cache
    * dimension, minimmum distance between blocks to consider when creating
    * caches);
    */
-  double cache_proximity_dist(void) const {
-    return std::max(2 * mc_cache_params.dimension,
-                    mc_cache_params.dynamic.min_dist);
-  }
-
-  /**
-   * @brief Get the minimum distance that must be maintained between two blocks
-   * in order for them not to be consolidated into a cache. Equal to the minimum
-   * cache distance.
-   */
-  double block_proximity_dist(void) const {
-    return mc_cache_params.dynamic.min_dist;
+  rtypes::spatial_dist cache_proximity_dist(void) const {
+    return std::max(mc_cache_config.dimension * 2,
+                    mc_cache_config.dynamic.min_dist);
   }
 
  private:
   /*
-   * @brief Calculate the blocks eligible to be considered for dynamic cache
+   * \brief Calculate the blocks eligible to be considered for dynamic cache
    * creation. Only blocks that are not:
    *
    * - Currently carried by a robot
@@ -112,14 +98,15 @@ class dynamic_cache_manager : public base_cache_manager,
    *
    * are eligible.
    */
-  block_calc_res_t calc_blocks_for_creation(
+  boost::optional<ds::block_vector> calc_blocks_for_creation(
       const ds::cache_vector& existing_caches,
-      const ds::const_block_cluster_list& clusters,
+      const ds::block_cluster_vector& clusters,
       const ds::block_vector& blocks);
 
-  // clang-format off
-  const params::caches::caches_params mc_cache_params;
-  // clang-format on
+  /* clang-format off */
+  const config::caches::caches_config mc_cache_config;
+  rmath::rng*                         m_rng;
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

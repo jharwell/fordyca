@@ -1,7 +1,7 @@
 /**
- * @file existing_cache_block_drop_interactor.hpp
+ * \file existing_cache_block_drop_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,80 +26,101 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
+#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/events/cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/support/cache_op_penalty_handler.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/support/tv/cache_op_src.hpp"
+#include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support);
-namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class existing_cache_block_drop_interactor
- * @ingroup support
+ * \class existing_cache_block_drop_interactor
+ * \ingroup support
  *
- * @brief Handles a robot's (possible) \ref cached_block_drop event for existing
+ * \brief Handles a robot's (possible) \ref cache_block_drop event for existing
  * caches on a given timestep.
  */
 template <typename T>
 class existing_cache_block_drop_interactor
-    : public er::client<existing_cache_block_drop_interactor<T>> {
+    : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
-  existing_cache_block_drop_interactor(
-      ds::arena_map* const map_in,
-      argos::CFloorEntity* const floor_in,
-      cache_op_penalty_handler<T>* penalty_handler)
+  existing_cache_block_drop_interactor(ds::arena_map* const map_in,
+                                       tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
-        m_floor(floor_in),
         m_map(map_in),
-        m_penalty_handler(penalty_handler) {}
-
-  existing_cache_block_drop_interactor& operator=(
-      const existing_cache_block_drop_interactor& other) = delete;
-  existing_cache_block_drop_interactor(
-      const existing_cache_block_drop_interactor& other) = delete;
+        m_penalty_handler(
+            envd->penalty_handler(tv::cache_op_src::ekEXISTING_CACHE_DROP)) {}
 
   /**
-   * @brief The actual handling function for interactions.
+   * \brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
+   * \todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
    */
-  void operator()(T& controller, uint timestep) {
+  existing_cache_block_drop_interactor(
+      const existing_cache_block_drop_interactor& other) = default;
+  existing_cache_block_drop_interactor& operator=(
+      const existing_cache_block_drop_interactor&) = delete;
+
+  /**
+   * \brief The actual handling function for interactions.
+   *
+   * \param controller The controller to handle interactions for.
+   * \param t   The current timestep.
+   */
+  void operator()(T& controller, rtypes::timestep t) {
     if (m_penalty_handler->is_serving_penalty(controller)) {
-      if (m_penalty_handler->penalty_satisfied(controller, timestep)) {
+      if (m_penalty_handler->is_penalty_satisfied(controller, t)) {
         finish_cache_block_drop(controller);
       }
     } else {
       m_penalty_handler->penalty_init(controller,
-                                      cache_op_src::kSrcExistingCacheDrop,
-                                      timestep);
+                                      tv::cache_op_src::ekEXISTING_CACHE_DROP,
+                                      t);
     }
   }
 
  private:
   /**
-   * @brief Handles handshaking between cache, robot, and arena if the robot is
+   * \brief Handles handshaking between cache, robot, and arena if the robot is
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    const temporal_penalty<T>& p = m_penalty_handler->next();
+    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  acquisition_goal_type::kExistingCache ==
+                  fsm::foraging_acq_goal::type::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
+    /*
+     * We cannot just lock around the critical arena map updates here in order
+     * to make this section thread safe, and need to lock around the whole
+     * section below. If two threads updating two robots both having finished
+     * serving their penalty this timestep manage to pass the check to actually
+     * perform the cache pickup before one of them actually finishes picking up
+     * a block, then the second one will not get the necessary \ref
+     * cache_vanished event. See #594.
+     *
+     * Grid and block mutexes are also required, but only within the actual \ref
+     * cached_block_pickup event visit to the arena map.
+     */
+    m_map->cache_mtx().lock();
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -119,51 +140,59 @@ class existing_cache_block_drop_interactor
      * serving our penalty is the same as the one the penalty was originally
      * initialized with (not just checking if it is not -1).
      */
-    int cache_id = loop_utils::robot_on_cache(controller, *m_map);
+    auto cache_id = utils::robot_on_cache(controller, *m_map);
 
     if (p.id() != cache_id) {
       ER_WARN("%s cannot drop in cache%d: No such cache",
               controller.GetId().c_str(),
-              p.id());
-      events::cache_vanished vanished(p.id());
-
-      controller.visitor::template visitable_any<T>::accept(vanished);
+              p.id().v());
+      events::cache_vanished_visitor vanished_op(p.id());
+      vanished_op.visit(controller);
     } else {
       perform_cache_block_drop(controller, p);
     }
-    m_penalty_handler->remove(p);
+    m_map->cache_mtx().unlock();
+
+    m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
               "Multiple instances of same controller serving cache penalty");
   }
 
   /**
-   * @brief Perform the actual dropping of a block in the cache once all
+   * \brief Perform the actual dropping of a block in the cache once all
    * preconditions have been satisfied.
    */
   void perform_cache_block_drop(T& controller,
-                                const temporal_penalty<T>& penalty) {
-    auto it =
+                                const tv::temporal_penalty& penalty) {
+    auto cache_it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == penalty.id(); });
-    ER_ASSERT(it != m_map->caches().end(),
+    ER_ASSERT(cache_it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
-              penalty.id());
-    events::cache_block_drop drop_op(controller.block(),
-                                     *it,
-                                     m_map->grid_resolution());
-    (*it)->penalty_served(penalty.penalty());
+              penalty.id().v());
 
-    /* Update arena map state due to a cache drop */
-    m_map->accept(drop_op);
-    controller.visitor::template visitable_any<T>::accept(drop_op);
+    events::cache_block_drop_visitor drop_op(controller.block_release(),
+                                             *cache_it,
+                                             m_map->grid_resolution());
+    (*cache_it)->penalty_served(penalty.penalty());
+
+    /*
+     * Order of visitation must be:
+     *
+     * 1. Arena map
+     * 2. Controller
+     *
+     * In order for proper \ref events::cache_block_drop processing.
+     */
+    drop_op.visit(*m_map);
+    drop_op.visit(controller);
   }
 
-  // clang-format off
-  argos::CFloorEntity*             const m_floor;
-  ds::arena_map* const                   m_map;
-  cache_op_penalty_handler<T>* const     m_penalty_handler;
-  // clang-format on
+  /* clang-format off */
+  ds::arena_map* const               m_map;
+  tv::cache_op_penalty_handler*const m_penalty_handler;
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

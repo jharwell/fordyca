@@ -1,7 +1,7 @@
 /**
- * @file occupancy_grid.cpp
+ * \file occupancy_grid.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,8 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/ds/occupancy_grid.hpp"
+
+#include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell_unknown.hpp"
-#include "fordyca/params/occupancy_grid_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,24 +35,24 @@ NS_START(fordyca, ds);
  * Constructors/Destructor
  ******************************************************************************/
 occupancy_grid::occupancy_grid(
-    const struct params::occupancy_grid_params* c_params,
+    const config::perception::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
-      stacked_grid(c_params->grid.resolution,
-                   c_params->grid.upper.x(),
-                   c_params->grid.upper.y()),
-      m_pheromone_repeat_deposit(c_params->pheromone.repeat_deposit),
+      stacked_grid(c_config->occupancy_grid.resolution,
+                   c_config->occupancy_grid.upper.x(),
+                   c_config->occupancy_grid.upper.y()),
+      m_pheromone_repeat_deposit(c_config->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
-  ER_INFO("real=(%fx%f), discrete=(%ux%u), resolution=%f",
+  ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",
           xrsize(),
           yrsize(),
           xdsize(),
           ydsize(),
-          resolution());
+          resolution().v());
 
   for (uint i = 0; i < xdsize(); ++i) {
     for (uint j = 0; j < ydsize(); ++j) {
-      cell_init(i, j, c_params->pheromone.rho);
+      cell_init(i, j, c_config->pheromone.rho);
     } /* for(j..) */
   }   /* for(i..) */
 }
@@ -65,7 +66,7 @@ void occupancy_grid::update(void) {
 
   for (uint i = 0; i < xmax; ++i) {
     for (uint j = 0; j < ymax; ++j) {
-      access<kPheromone>(i, j).calc();
+      access<kPheromone>(i, j).update();
     } /* for(j..) */
   }   /* for(i..) */
 
@@ -94,16 +95,16 @@ void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {
 } /* cell_init() */
 
 void occupancy_grid::cell_state_update(uint i, uint j) {
-  rcppsw::swarm::pheromone_density& density = access<kPheromone>(i, j);
+  crepr::pheromone_density& density = access<kPheromone>(i, j);
   cell2D& cell = access<kCell>(i, j);
 
   if (!m_pheromone_repeat_deposit) {
-    ER_ASSERT(density.last_result() <= 1.0,
+    ER_ASSERT(density.v() <= 1.0,
               "Repeat pheromone deposit detected for cell@(%u, %u) (%f > "
               "1.0, state=%d)",
               i,
               j,
-              density.last_result(),
+              density.v(),
               cell.fsm().current_state());
   }
 
@@ -113,15 +114,15 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
    * also check if the cell state is known, but that is slower than checking if
    * the density has already been reset.
    */
-  if (density.last_result() < kEPSILON &&
-      density.last_result() > std::numeric_limits<double>::min()) {
+  if (density.v() < kEPSILON &&
+      density.v() > std::numeric_limits<double>::min()) {
     ER_TRACE("Relevance of cell(%u, %u) is within %f of 0 for %s",
              i,
              j,
              kEPSILON,
              m_robot_id.c_str());
-    events::cell_unknown op(cell.loc());
-    this->accept(op);
+    events::cell_unknown_visitor op(cell.loc());
+    op.visit(*this);
     density.reset();
   }
 } /* cell_state_update() */

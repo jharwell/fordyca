@@ -1,7 +1,7 @@
 /**
- * @file base_foraging_task.hpp
+ * \file base_foraging_task.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,33 +24,32 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
-#include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/logical_task.hpp"
+
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/ta/abort_probability.hpp"
+#include "cosm/ta/logical_task.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-namespace visitor = rcppsw::patterns::visitor;
-namespace ta = rcppsw::task_allocation;
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-using transport_goal_type = fsm::block_transporter::goal_type;
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class base_foraging_task
- * @ingroup tasks
+ * \class base_foraging_task
+ * \ingroup tasks
  *
- * @brief Interface specifying the visit set common to all base_foraging tasks
+ * \brief Interface specifying the visit set common to all base_foraging tasks
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
 class base_foraging_task : public fsm::block_transporter,
-                           public metrics::fsm::goal_acquisition_metrics {
+                           public cfmetrics::goal_acq_metrics {
  public:
   base_foraging_task(void) = default;
   ~base_foraging_task(void) override = default;

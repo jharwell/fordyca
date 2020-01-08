@@ -1,7 +1,7 @@
 /**
- * @file collector.hpp
+ * \file collector.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,9 +25,10 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <memory>
 
-#include "rcppsw/task_allocation/abort_probability.hpp"
-#include "rcppsw/task_allocation/polled_task.hpp"
+#include "cosm/ta/abort_probability.hpp"
+#include "cosm/ta/polled_task.hpp"
 
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
@@ -43,22 +44,22 @@ NS_START(fordyca, tasks, depth1);
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class collector
- * @ingroup tasks depth1
+ * \class collector
+ * \ingroup tasks depth1
  *
- * @brief Task in which robots locate a cache and bring a block from it to the
+ * \brief Task in which robots locate a cache and bring a block from it to the
  * nest. It is abortable, and has one task interface.
  */
 class collector : public foraging_task,
                   public events::existing_cache_interactor,
                   public events::nest_interactor,
-                  public rcppsw::er::client<collector> {
+                  public rer::client<collector> {
  public:
-  collector(const struct ta::task_allocation_params* params,
+  collector(const struct cta::config::task_alloc_config* config,
             const std::string& name,
-            std::unique_ptr<ta::taskable> mechanism);
-  collector(const struct ta::task_allocation_params* params,
-            std::unique_ptr<ta::taskable> mechanism);
+            std::unique_ptr<cta::taskable> mechanism);
+  collector(const struct cta::config::task_alloc_config* config,
+            std::unique_ptr<cta::taskable> mechanism);
 
   /*
    * Event handling. This CANNOT be done using the regular visitor pattern,
@@ -67,28 +68,35 @@ class collector : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::cached_block_pickup& visitor) override;
-  void accept(events::nest_block_drop& visitor) override;
-  void accept(events::cache_vanished& visitor) override;
-  void accept(events::cache_block_drop&) override {}
+  void accept(events::detail::cached_block_pickup& visitor) override;
+  void accept(events::detail::nest_block_drop& visitor) override;
+  void accept(events::detail::cache_vanished& visitor) override;
+  void accept(events::detail::cache_block_drop&) override {}
 
   /* goal acquisition metrics */
-  TASK_WRAPPER_DECLAREC(bool, goal_acquired);
-  TASK_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  TASK_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  TASK_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+                            acquisition_goal,
+                            const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  TASK_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+                            block_transport_goal,
+                            const);
 
   /* task metrics */
-  bool task_at_interface(void) const override;
+  bool task_at_interface(void) const override RCSW_PURE;
   bool task_completed(void) const override { return task_finished(); }
 
-  void task_start(const ta::taskable_argument*) override;
-  double abort_prob_calc(void) override;
-  double interface_time_calc(uint interface,
-                             double start_time) override;
+  void task_start(const cta::taskable_argument*) override;
+  double abort_prob_calc(void) override RCSW_PURE;
+  rtypes::timestep interface_time_calc(uint interface,
+                                       const rtypes::timestep& start_time) override;
   void active_interface_update(int) override;
 };
 

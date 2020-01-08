@@ -1,7 +1,7 @@
 /**
- * @file cache_sel_matrix.hpp
+ * \file cache_sel_matrix.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -29,37 +29,44 @@
 #include <string>
 #include <vector>
 
-
-#include "rcppsw/common/common.hpp"
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/math/range.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/spatial_dist.hpp"
+
+#include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_exception.hpp"
-#include "rcppsw/er/client.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace params {
-struct cache_sel_matrix_params;
-}
+namespace config { namespace cache_sel {
+struct cache_sel_matrix_config;
+}} // namespace config::cache_sel
 NS_START(controller);
-namespace rmath = rcppsw::math;
-namespace er = rcppsw::er;
-using cache_sel_variant = boost::variant<double,
-                                         rmath::vector2d,
-                                         rmath::rangeu,
-                                         std::vector<int>>;
+
+/**
+ * \brief \ref boost::variant containing all the different object/POD types that
+ * are mapped to within the \ref cache_sel_matrix; multiple entries in the
+ * matrix can have the same type.
+ */
+using cache_sel_variant =
+    boost::variant<rtypes::spatial_dist,
+                   rmath::vector2d,
+                   rmath::rangeu,
+                   std::vector<rtypes::type_uuid>,
+                   config::cache_sel::cache_pickup_policy_config>;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-
 /**
- * @class cache_sel_matrix
- * @ingroup controller
+ * \class cache_sel_matrix
+ * \ingroup controller
  *
- * @brief A dictionary of information needed by robots using various utility
+ * \brief A dictionary of information needed by robots using various utility
  * functions to calculate the best:
  *
  * - existing cache
@@ -69,26 +76,36 @@ using cache_sel_variant = boost::variant<double,
  * This class may be separated into those components in the future if it makes
  * sense. For now, it is cleaner to have all three uses be in the same class.
  */
-class cache_sel_matrix : public er::client<cache_sel_matrix>,
-                         private std::map<std::string, cache_sel_variant> {
+class cache_sel_matrix final
+    : public rer::client<cache_sel_matrix>,
+      private std::map<std::string, cache_sel_variant> {
  public:
   static constexpr char kNestLoc[] = "nest_loc";
   static constexpr char kCacheProxDist[] = "cache_prox_dist";
-  static constexpr char kBlockProxDist[] = "block_prox_dist";
   static constexpr char kClusterProxDist[] = "cluster_prox_dist";
+  static constexpr char kBlockProxDist[] = "block_prox_dist";
   static constexpr char kNestProxDist[] = "nest_prox_dist";
   static constexpr char kSiteXRange[] = "site_xrange";
   static constexpr char kSiteYRange[] = "site_yrange";
   static constexpr char kPickupExceptions[] = "pickup_exceptions";
   static constexpr char kDropExceptions[] = "drop_exceptions";
 
+  /**
+   * \brief The conditions that must be satisfied before a robot will be
+   * able to pickup from *ANY* cache.
+   */
+  static constexpr char kPickupPolicy[] = "pickup_policy";
+  static constexpr char kPickupPolicyNull[] = "";
+  static constexpr char kPickupPolicyTime[] = "time";
+  static constexpr char kPickupPolicyCacheSize[] = "cache_size";
+
   using std::map<std::string, cache_sel_variant>::find;
-  cache_sel_matrix(const struct params::cache_sel_matrix_params* params,
+  cache_sel_matrix(const config::cache_sel::cache_sel_matrix_config* config,
                    const rmath::vector2d& nest_loc);
   ~cache_sel_matrix(void) override = default;
 
   /**
-   * @brief Add a cache to the exception list, disqualifying it from being
+   * \brief Add a cache to the exception list, disqualifying it from being
    * selected as a cache to pick up a block from/drop a block in, regardless of
    * its utility value, the next time the robot runs the existing cache
    * selection algorithm to select a cache IF the previous usage of that cache
@@ -99,7 +116,7 @@ class cache_sel_matrix : public er::client<cache_sel_matrix>,
   void sel_exception_add(const cache_sel_exception& ex);
 
   /**
-   * @brief Clear the exceptions list. This happens after a robot has executed
+   * \brief Clear the exceptions list. This happens after a robot has executed
    * the task AFTER the task that dropped a block in/picked up a block from an
    * existing cache (i.e. there is a 1 task buffer between usages of the same
    * existing cache).

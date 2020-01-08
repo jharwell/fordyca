@@ -1,7 +1,7 @@
 /**
- * @file foraging_task.cpp
+ * \file foraging_task.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,9 +22,12 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/tasks/depth2/foraging_task.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/fsm/base_foraging_fsm.hpp"
-#include "rcppsw/task_allocation/task_allocation_params.hpp"
+
+#include "cosm/fsm/util_hfsm.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+#include "cosm/ta/config/task_alloc_config.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -32,34 +35,26 @@
 NS_START(fordyca, tasks, depth2);
 
 /*******************************************************************************
- * Constant Definitions
- ******************************************************************************/
-constexpr char foraging_task::kCacheStarterName[];
-constexpr char foraging_task::kCacheFinisherName[];
-constexpr char foraging_task::kCacheTransfererName[];
-constexpr char foraging_task::kCacheCollectorName[];
-
-/*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 foraging_task::foraging_task(const std::string& name,
-                             const ta::task_allocation_params* params,
-                             std::unique_ptr<ta::taskable> mechanism)
+                             const cta::config::task_alloc_config* config,
+                             std::unique_ptr<cta::taskable> mechanism)
     : polled_task(name,
-                  &params->abort,
-                  &params->exec_est.ema,
+                  &config->abort,
+                  &config->exec_est.ema,
                   std::move(mechanism)) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-__rcsw_pure double foraging_task::current_time(void) const {
-  return dynamic_cast<fsm::base_foraging_fsm*>(polled_task::mechanism())
-      ->sensors()
+rtypes::timestep foraging_task::current_time(void) const {
+  return dynamic_cast<cfsm::util_hfsm*>(polled_task::mechanism())
+      ->sensing()
       ->tick();
 } /* current_time() */
 
-bool foraging_task::task_in_depth2(const polled_task* const task) {
+bool foraging_task::task_in_depth2(const cta::polled_task* const task) {
   return task->name() == kCacheStarterName ||
          task->name() == kCacheFinisherName ||
          task->name() == kCacheTransfererName ||

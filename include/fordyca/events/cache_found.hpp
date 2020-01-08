@@ -1,7 +1,7 @@
 /**
- * @file cache_found.hpp
+ * \file cache_found.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,53 +24,93 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/perceived_cell_op.hpp"
+#include <memory>
+
 #include "rcppsw/er/client.hpp"
+
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class base_cache;
 }
 
-NS_START(events);
+namespace ds {
+class dpo_store;
+class dpo_semantic_map;
+} // namespace ds
+
+NS_START(events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
-/*
- * @class cache_found
- * @ingroup events
+/**
+ * \class cache_found
+ * \ingroup events detail
  *
- * @brief Created whenever a NEW cache (i.e. one that is not currently known to
+ * \brief Created whenever a NEW cache (i.e. one that is not currently known to
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public perceived_cell_op,
-                    public rcppsw::er::client<cache_found> {
+class cache_found : public cell_op, public rer::client<cache_found> {
+ private:
+  struct visit_typelist_impl {
+    using inherited = cell_op::visit_typelist;
+    using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
+    using controllers = controller::depth2::typelist;
+    using value = boost::mpl::joint_view<
+        boost::mpl::joint_view<controllers::type, others::type>,
+        inherited::type>;
+  };
+
  public:
-  explicit cache_found(std::unique_ptr<representation::base_cache> cache);
-  explicit cache_found(const std::shared_ptr<representation::base_cache>& cache);
+  using visit_typelist = visit_typelist_impl::value;
+
+  explicit cache_found(std::unique_ptr<repr::base_cache> cache);
+  explicit cache_found(const std::shared_ptr<repr::base_cache>& cache);
   ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
   cache_found& operator=(const cache_found& op) = delete;
 
-  /* stateful foraging */
-  void visit(ds::cell2D& cell) override;
+  /* DPO foraging */
+  void visit(ds::dpo_store& store);
 
-  /* depth1 foraging */
-  void visit(ds::perceived_arena_map& map) override;
-  void visit(fsm::cell2D_fsm& fsm) override;
+  /* MDPO foraging */
+  void visit(ds::cell2D& cell);
+  void visit(ds::dpo_semantic_map& map);
+  void visit(fsm::cell2D_fsm& fsm);
 
   /* depth2 foraging */
-  void visit(controller::depth2::greedy_recpart_controller& controller) override;
+  void visit(controller::depth2::birtd_dpo_controller& controller);
+  void visit(controller::depth2::birtd_mdpo_controller& c);
+  void visit(controller::depth2::birtd_odpo_controller& controller);
+  void visit(controller::depth2::birtd_omdpo_controller& c);
 
  private:
-  std::shared_ptr<representation::base_cache> m_cache;
+  std::shared_ptr<repr::base_cache> m_cache;
+};
+
+/**
+ * \brief We use the picky visitor in order to force compile errors if a call to
+ * a visitor is made that involves a visitee that is not in our visit set
+ * (i.e. remove the possibility of implicit upcasting performed by the
+ * compiler).
+ */
+using cache_found_visitor_impl =
+    rpvisitor::precise_visitor<detail::cache_found,
+                               detail::cache_found::visit_typelist>;
+
+NS_END(detail);
+
+class cache_found_visitor : public detail::cache_found_visitor_impl {
+  using detail::cache_found_visitor_impl::cache_found_visitor_impl;
 };
 
 NS_END(events, fordyca);

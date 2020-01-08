@@ -1,7 +1,7 @@
 /**
- * @file base_loop_functions.hpp
+ * \file base_loop_functions.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,35 +24,70 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/simulator/entity/floor_entity.h>
-#include <argos3/core/simulator/loop_functions.h>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "fordyca/metrics/robot_interaction_metrics.hpp"
-#include "fordyca/params/loop_function_repository.hpp"
+#include <argos3/core/simulator/loop_functions.h>
+#include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
+
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/math/config/rng_config.hpp"
+#include "rcppsw/math/radians.hpp"
+#include "rcppsw/math/rng.hpp"
+#include "rcppsw/math/vector2.hpp"
+#include "rcppsw/utils/color.hpp"
+
+#include "cosm/pal/swarm_manager.hpp"
+
+#include "fordyca/config/loop_function_repository.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::convergence {
+class convergence_calculator;
+namespace config {
+struct convergence_config;
+} /* namespace config */
+} /* namespace cosm::convergence */
+
+namespace cosm::metrics::config {
+struct output_config;
+} /* namespace cosm::metrics::config */
+
 NS_START(fordyca);
 
-namespace params {
-struct output_params;
+namespace config {
+class loop_function_repository;
+namespace tv {
+struct tv_manager_config;
 }
-namespace ds { class arena_map; }
-
+namespace oracle {
+struct oracle_manager_config;
+} /* namespace oracle */
+} // namespace config
+namespace ds {
+class arena_map;
+}
 NS_START(support);
+
+namespace tv {
+class tv_manager;
+}
+namespace oracle {
+class oracle_manager;
+} /* namespace oracle */
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class base_loop_functions
- * @ingroup support
+ * \class base_loop_functions
+ * \ingroup support
  *
- * @brief The base loop functions in FORDYCA that all other loop functions
+ * \brief The base loop functions in FORDYCA that all other loop functions
  * inherit from.
  *
  * This class is not a functional set of loop functions, but it provides
@@ -60,52 +95,92 @@ NS_START(support);
  * could not just be free functions because they require access to members in
  * the \ref argos::CLoopFunctions class.
  */
-class base_loop_functions : public argos::CLoopFunctions,
-                            public metrics::robot_interaction_metrics,
-                            public rcppsw::er::client<base_loop_functions> {
+class base_loop_functions : public cpal::swarm_manager,
+                            public rer::client<base_loop_functions> {
  public:
-  base_loop_functions(void);
+  base_loop_functions(void) RCSW_COLD;
+  ~base_loop_functions(void) override RCSW_COLD;
+
   base_loop_functions(const base_loop_functions& s) = delete;
   base_loop_functions& operator=(const base_loop_functions& s) = delete;
 
-  /* CLoopFunctions overrides */
-  void Init(ticpp::Element&) override;
-  void PreStep(void) override;
-  void Reset(void) override;
+  /* swarm manager noverrides */
+  void init(ticpp::Element&) override RCSW_COLD;
+  void reset(void) override RCSW_COLD;
+  void pre_step(void) override;
+  void post_step(void) override;
 
-  /* loop metrics */
-  std::vector<double> nearest_neighbors(void) const override;
-
-  void ndc_push(void) {
-    ER_NDC_PUSH("[t=" + std::to_string(GetSpace().GetSimulationClock()) + "]");
+  const tv::tv_manager* tv_manager(void) const { return m_tv_manager.get(); }
+  const cconvergence::convergence_calculator* conv_calculator(void) const {
+    return m_conv_calc.get();
   }
-  void ndc_pop(void) { ER_NDC_POP(); }
+  const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
 
  protected:
-  argos::CFloorEntity* floor(void) const { return m_floor; }
-  const std::string& output_root(void) const { return m_output_root; }
-  const params::loop_function_repository* params(void) const {
-    return &m_params;
-  }
-  params::loop_function_repository* params(void) { return &m_params; }
-  const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
+  tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
   ds::arena_map* arena_map(void) { return m_arena_map.get(); }
+  const config::loop_function_repository* config(void) const {
+    return &m_config;
+  }
+  config::loop_function_repository* config(void) { return &m_config; }
+  cconvergence::convergence_calculator* conv_calculator(void) {
+    return m_conv_calc.get();
+  }
+  const oracle::oracle_manager* oracle_manager(void) const {
+    return m_oracle_manager.get();
+  }
+  oracle::oracle_manager* oracle_manager(void) {
+    return m_oracle_manager.get();
+  }
 
  private:
   /**
-   * @brief Initialize logging for all support/loop function code.
+   * \brief Initialize convergence calculations.
    *
-   * @param output Parsed output parameters.
+   * \param config Parsed convergence parameters.
    */
-  void output_init(const struct params::output_params* const output);
-  void arena_map_init(const params::loop_function_repository* repo);
+  void convergence_init(
+      const cconvergence::config::convergence_config* config) RCSW_COLD;
 
-  // clang-format off
-  argos::CFloorEntity*             m_floor{nullptr};
-  std::string                      m_output_root{""};
-  params::loop_function_repository m_params{};
-  std::unique_ptr<ds::arena_map>   m_arena_map;
-  // clang-format on
+  /**
+   * \brief Initialize the arena contents.
+   *
+   * \param repo Repository of parsed parameters.
+   */
+  void arena_map_init(const config::loop_function_repository* repo) RCSW_COLD;
+
+  /**
+   * \brief Initialize temporal variance handling.
+   *
+   * \param tvp Parsed TV parameters.
+   */
+  void tv_init(const config::tv::tv_manager_config* tvp) RCSW_COLD;
+
+  /**
+   * \brief Initialize oracular information injection.
+   *
+   * \param oraclep Parsed \ref oracle_manager parameters.
+   */
+  void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
+
+  /**
+   * \brief Initialize logging for all support/loop function code.
+   *
+   * \param output Parsed output parameters.
+   */
+  void output_init(const cmconfig::output_config* output) RCSW_COLD;
+
+  std::vector<double> calc_robot_nn(uint n_threads) const;
+  std::vector<rmath::radians> calc_robot_headings(uint n_threads) const;
+  std::vector<rmath::vector2d> calc_robot_positions(uint n_threads) const;
+
+  /* clang-format off */
+  config::loop_function_repository                      m_config{};
+  std::unique_ptr<ds::arena_map>                        m_arena_map;
+  std::unique_ptr<tv::tv_manager>                       m_tv_manager;
+  std::unique_ptr<cconvergence::convergence_calculator> m_conv_calc;
+  std::unique_ptr<oracle::oracle_manager>               m_oracle_manager;
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

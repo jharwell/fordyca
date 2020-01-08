@@ -1,7 +1,7 @@
 /**
- * @file argument.hpp
+ * \file argument.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,30 +24,30 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/foraging_signal.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
-#include "rcppsw/task_allocation/taskable_argument.hpp"
+
+#include "cosm/ta/taskable.hpp"
+#include "cosm/ta/taskable_argument.hpp"
+
+#include "fordyca/fsm/foraging_signal.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, tasks);
-namespace rmath = rcppsw::math;
-namespace ta = rcppsw::task_allocation;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class vector_argument
- * @ingroup tasks
+ * \class vector_argument
+ * \ingroup tasks
  *
- * @brief An argument that can be passed to a
- * \ref rcppsw.task_allocation.taskable function which contains a vector, mostly
+ * \brief An argument that can be passed to a \ref
+ * cta::taskable function which contains a vector, mostly
  * likely representing an arena location.
  */
-class vector_argument : public ta::taskable_argument {
+class vector_argument : public cta::taskable_argument {
  public:
   vector_argument(double tolerance, const rmath::vector2d& v)
       : m_tolerance(tolerance), m_vector(v) {}
@@ -62,23 +62,23 @@ class vector_argument : public ta::taskable_argument {
 };
 
 /**
- * @class foraging_signal_argument
- * @ingroup tasks
+ * \class foraging_signal_argument
+ * \ingroup tasks
  *
- * @brief An argument that can be passed to a
- * \ref rcppsw::task_allocation::taskable::task_start() function which contains
- * a foraging signal,
- * for use in specifying initial conditions/commands for certain state machines.
+ * \brief An argument that can be passed to a \ref
+ * cta::taskable::task_start() function which contains a
+ * foraging signal, for use in specifying initial conditions/commands for
+ * certain state machines.
  */
-class foraging_signal_argument : public ta::taskable_argument {
+class foraging_signal_argument : public cta::taskable_argument {
  public:
-  explicit foraging_signal_argument(controller::foraging_signal::type s)
+  explicit foraging_signal_argument(fsm::foraging_signal::type s)
       : m_signal(s) {}
 
-  controller::foraging_signal::type signal(void) const { return m_signal; }
+  fsm::foraging_signal::type signal(void) const { return m_signal; }
 
  private:
-  controller::foraging_signal::type m_signal;
+  fsm::foraging_signal::type m_signal;
 };
 
 NS_END(tasks, fordyca);

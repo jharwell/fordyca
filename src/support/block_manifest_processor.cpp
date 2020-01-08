@@ -1,7 +1,7 @@
 /**
- * @file block_manifest_processor.cpp
+ * \file block_manifest_processor.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,8 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_manifest_processor.hpp"
-#include "fordyca/representation/cube_block.hpp"
-#include "fordyca/representation/ramp_block.hpp"
+
+#include "cosm/repr/cube_block2D.hpp"
+#include "cosm/repr/ramp_block2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -34,10 +35,10 @@ NS_START(fordyca, support);
  * Constructors/Destructor
  ******************************************************************************/
 block_manifest_processor::block_manifest_processor(
-    const params::arena::block_manifest* const m)
+    const config::arena::block_manifest* const m)
     : mc_manifest(*m) {
-  register_type<representation::cube_block>("cube");
-  register_type<representation::ramp_block>("ramp");
+  register_type<crepr::cube_block2D>("cube");
+  register_type<crepr::ramp_block2D>("ramp");
 }
 
 /*******************************************************************************
@@ -47,15 +48,17 @@ ds::block_vector block_manifest_processor::create_blocks(void) {
   ds::block_vector v;
   uint i;
   for (i = 0; i < mc_manifest.n_cube; ++i) {
-    v.push_back(create(
-        "cube", rmath::vector2d(mc_manifest.unit_dim, mc_manifest.unit_dim), i));
+    v.push_back(
+        create("cube",
+               rmath::vector2d(mc_manifest.unit_dim, mc_manifest.unit_dim),
+               rtypes::type_uuid(i)));
   } /* for(i..) */
   for (i = mc_manifest.n_cube; i < mc_manifest.n_cube + mc_manifest.n_ramp;
        ++i) {
     v.push_back(
         create("ramp",
                rmath::vector2d(mc_manifest.unit_dim * 2, mc_manifest.unit_dim),
-               i));
+               rtypes::type_uuid(i)));
   } /* for(i..) */
   return v;
 } /* create_blocks() */

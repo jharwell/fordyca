@@ -1,7 +1,7 @@
 /**
- * @file cache_site_utility.cpp
+ * \file cache_site_utility.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/math/cache_site_utility.hpp"
+
 #include <cmath>
 #include <limits>
 
@@ -67,9 +68,9 @@ double cache_site_utility::calc(const rmath::vector2d& site_loc) {
   ER_TRACE("Utility: %f",
            (1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
   if (deviation_from_ideal <= std::numeric_limits<double>::epsilon()) {
-    return set_result(std::numeric_limits<double>::min());
+    return eval(std::numeric_limits<double>::min());
   }
-  return set_result((1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
+  return eval((1.0 / (dist_to_robot * dist_to_nest)) * deviation_scaling);
 } /* calc() */
 
 NS_END(expressions, fordyca);

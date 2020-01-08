@@ -1,7 +1,7 @@
 /**
- * @file cache_respawn_probability.hpp
+ * \file cache_respawn_probability.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,8 +24,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
 #include "rcppsw/math/expression.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -36,27 +37,27 @@ NS_START(fordyca, math);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_respawn_probability
- * @ingroup math
+ * \class cache_respawn_probability
+ * \ingroup math
  *
- * @brief Calculate the probability that loop functions should respawn a static
+ * \brief Calculate the probability that loop functions should respawn a static
  * cache after it has been emptied (turned into a single block that is).
  *
  * Depends on:
  *
  * - A scaling factor > 0 that influences the probability distribution shape.
  */
-class cache_respawn_probability : public rcppsw::math::expression<double> {
+class cache_respawn_probability : public rmath::expression<double> {
  public:
   explicit cache_respawn_probability(double scale_factor);
 
   /**
-   * @brief Calculate the probability of respawn
+   * \brief Calculate the probability of respawn
    *
-   * @param n_foragers # robots currently executing Forager task.
-   * @param n_collectors # robots currently executing Collector task.
+   * \param n_harvesters # robots currently executing Harvester task.
+   * \param n_collectors # robots currently executing Collector task.
    */
-  double calc(size_t n_foragers, size_t n_collectors);
+  double calc(uint n_harvesters, uint n_collectors);
 
  private:
   const double mc_scale_factor;

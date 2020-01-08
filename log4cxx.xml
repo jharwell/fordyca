@@ -22,30 +22,60 @@
   <category name="rcppsw.ta.executive" >
     <priority value ="info" />
   </category>
-    <category name="fordyca.support.tasking_oracle" >
-    <priority value ="debug" />
+  <category name="cosm.steer2D.force_calculator" >
+    <priority value ="info" />
+  </category>
+  <category name="cosm.robots.footbot" >
+    <priority value ="info" />
   </category>
   <category name="fordyca.controller" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.fsm.depth0" >
+  <category name="fordyca.fsm.cache_acquisition_validator" >
     <priority value ="all" />
   </category>
-  <category name="fordyca.loop.support.block_dist" >
+  <category name="fordyca.fsm.acquire_goal_fsm" >
+    <priority value ="trace" />
+  </category>
+  <category name="fordyca.fsm.expstrat.crw" >
     <priority value ="info" />
   </category>
-  <category name="fordyca.ds.occupancy_grid" >
+  <category name="fordyca.support.block_dist" >
     <priority value ="info" />
   </category>
   <category name="fordyca.support.depth2.dynamic_cache_creator" >
+    <priority value ="debug" />
+  </category>
+  <category name="fordyca.support.depth1.static_cache_creator" >
+    <priority value ="debug" />
+  </category>
+  <category name="fordyca.support.depth1.static_cache_manager" >
+    <priority value ="trace" />
+  </category>
+    <category name="fordyca.tasks.depth2.cache_starter" >
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.support.depth2.cache_center_calculator" >
     <priority value ="trace" />
   </category>
   <category name="fordyca.support.base_cache_creator" >
     <priority value ="trace" />
   </category>
+  <category name="fordyca.fsm.depth0.free_block_to_nest" >
+    <priority value ="trace" />
+  </category>
 
-  <category name="fordyca.controller.perception" >
+  <category name="fordyca.controller.dpo_perception" >
     <priority value ="info" />
+  </category>
+  <category name="fordyca.controller.metrics.collector_registerer" >
+    <priority value ="trace" />
+  </category>
+  <category name="fordyca.controller.oracular_info_receptor" >
+    <priority value ="info" />
+  </category>
+  <category name="fordyca.support.tasking_oracle" >
+    <priority value ="trace" />
   </category>
 
   <category name="fordyca.ds.arena_map" >

@@ -1,7 +1,7 @@
 /**
- * @file cache_transferer_fsm.cpp
+ * \file cache_transferer_fsm.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"
 
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
@@ -32,41 +34,44 @@ NS_START(fordyca, fsm, depth2);
  * Constructors/Destructors
  ******************************************************************************/
 cache_transferer_fsm::cache_transferer_fsm(
-    const controller::cache_sel_matrix* const matrix,
-    controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
-    : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa),
-      m_src_cache_fsm(matrix, true, saa, map),
-      m_dest_cache_fsm(matrix, false, saa, map) {}
+    const fsm_ro_params* c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng)
+    : block_to_goal_fsm(&m_dest_cache_fsm, &m_src_cache_fsm, saa, rng),
+      m_src_cache_fsm(c_params, saa, exp_behavior->clone(), rng, true),
+      m_dest_cache_fsm(c_params, saa, exp_behavior->clone(), rng, false) {}
 
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-acquisition_goal_type cache_transferer_fsm::acquisition_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return acquisition_goal_type::kExistingCache;
+cfmetrics::goal_acq_metrics::goal_type cache_transferer_fsm::acquisition_goal(
+    void) const {
+  if (ekST_START != current_state() && ekST_FINISHED != current_state()) {
+    return cfmetrics::goal_acq_metrics::goal_type(
+        foraging_acq_goal::type::ekEXISTING_CACHE);
   }
-  return acquisition_goal_type::kNone;
+  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
-transport_goal_type cache_transferer_fsm::block_transport_goal(void) const {
-  if (ST_ACQUIRE_BLOCK == current_state() ||
-      ST_WAIT_FOR_BLOCK_PICKUP == current_state() ||
-      ST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return transport_goal_type::kExistingCache;
+foraging_transport_goal::type cache_transferer_fsm::block_transport_goal(
+    void) const {
+  if (ekST_TRANSPORT_TO_GOAL == current_state() ||
+      ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
+    return foraging_transport_goal::type::ekEXISTING_CACHE;
   }
-  return transport_goal_type::kNone;
+  return foraging_transport_goal::type::ekNONE;
 } /* block_transport_goal() */
 
 bool cache_transferer_fsm::is_acquiring_dest_cache(void) const {
-  return transport_goal_type::kCacheSite == block_transport_goal() &&
+  return foraging_transport_goal::type::ekEXISTING_CACHE ==
+             block_transport_goal() &&
          m_dest_cache_fsm.task_running();
 } /* is_acquiring_dest_cache() */
 
 bool cache_transferer_fsm::is_acquiring_src_cache(void) const {
-  return transport_goal_type::kCacheSite == block_transport_goal() &&
+  return foraging_transport_goal::type::ekEXISTING_CACHE ==
+             block_transport_goal() &&
          m_src_cache_fsm.task_running();
 } /* is_acquiring_src_cache() */
 

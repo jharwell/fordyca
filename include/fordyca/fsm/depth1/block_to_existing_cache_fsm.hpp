@@ -1,7 +1,7 @@
 /**
- * @file block_to_existing_cache_fsm.hpp
+ * \file block_to_existing_cache_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,9 +24,13 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/acquire_free_block_fsm.hpp"
+#include "fordyca/config/exploration_config.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -39,39 +43,45 @@ NS_START(fsm, depth1);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class block_to_existing_cache_fsm
- * @ingroup fsm depth1
+ * \class block_to_existing_cache_fsm
+ * \ingroup fsm depth1
  *
- * @brief The FSM for the block-to-existing-cache subtask.
+ * \brief The FSM for the block-to-existing-cache subtask.
  *
  * Each robot executing this FSM will locate a free block (either a known block
- * or via random exploration), pickup the block and bring it to the best
- * existing cache it knows about. Once it has done that it will signal that its
- * task is complete.
+ * or via exploration), pickup the block and bring it to the best existing cache
+ * it knows about. Once it has done that it will signal that its task is
+ * complete.
+ *
+ * This FSM takes \ref config::exploration_config as an argument because it
+ * needs to be able to use the \ref expstrat::factory to create exploration
+ * strategies for BOTH blocks and caches, and so you can't cleanly pass the
+ * result of factory creation at a higher level into the constructor, like you
+ * can with other FSMs.
  */
-class block_to_existing_cache_fsm : public block_to_goal_fsm {
+class block_to_existing_cache_fsm final : public block_to_goal_fsm {
  public:
-  block_to_existing_cache_fsm(const controller::block_sel_matrix* bsel_matrix,
-                              const controller::cache_sel_matrix* csel_matrix,
-                              controller::saa_subsystem* saa,
-                              ds::perceived_arena_map* map);
+   block_to_existing_cache_fsm(const fsm_ro_params* c_params,
+                               crfootbot::footbot_saa_subsystem* saa,
+                               rmath::rng* rng);
+
   ~block_to_existing_cache_fsm(void) override = default;
 
-  block_to_existing_cache_fsm(const block_to_existing_cache_fsm& fsm) = delete;
-  block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm& fsm) = delete;
+  block_to_existing_cache_fsm(const block_to_existing_cache_fsm&) = delete;
+  block_to_existing_cache_fsm& operator=(const block_to_existing_cache_fsm&) = delete;
 
   /* goal acquisition metrics */
-  acquisition_goal_type acquisition_goal(void) const override;
-  bool goal_acquired(void) const override;
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  bool goal_acquired(void) const override RCSW_PURE;
 
   /* block transportation */
-  transport_goal_type block_transport_goal(void) const override;
+  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
  private:
-  // clang-format off
+  /* clang-format off */
   acquire_existing_cache_fsm m_cache_fsm;
   acquire_free_block_fsm     m_block_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth1, fsm, fordyca);

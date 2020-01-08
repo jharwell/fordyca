@@ -1,7 +1,7 @@
 /**
- * @file cell2D.hpp
+ * \file cell2D.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,46 +24,45 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
 #include <string>
 
-#include "fordyca/fsm/cell2D_fsm.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/decorator/decorator.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
+
+#include "fordyca/fsm/cell2D_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+class entity2D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca);
-namespace representation {
+namespace repr {
 class base_cache;
-class base_block;
-class base_cell_entity;
-} // namespace representation
+} // namespace repr
 
 NS_START(ds);
-
-namespace visitor = rcppsw::patterns::visitor;
-namespace decorator = rcppsw::patterns::decorator;
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell2D
- * @ingroup ds
+ * \class cell2D
+ * \ingroup ds
  *
- * @brief Base representation of a cell on a 2D grid. A combination of FSM +
- * handle to whatever \ref cell_entity the cell contains, if any.
+ * \brief Base repr of a cell on a 2D grid. A combination of FSM +
+ * handle to whatever \ref repr::entity2D the cell contains, if any.
  */
-class cell2D : public visitor::visitable_any<cell2D>,
-               public decorator::decorator<fsm::cell2D_fsm> {
+class cell2D final : public rpdecorator::decorator<fsm::cell2D_fsm> {
  public:
   cell2D(void);
 
   cell2D(const cell2D& other) = default;
-  cell2D& operator=(const cell2D& other) = delete;
+  cell2D& operator=(const cell2D&) = delete;
 
   bool operator==(const cell2D& other) const { return other.loc() == m_loc; }
   void robot_id(const std::string& robot_id) { m_robot_id = robot_id; }
@@ -73,59 +72,59 @@ class cell2D : public visitor::visitable_any<cell2D>,
   const fsm::cell2D_fsm& fsm(void) const { return decoratee(); }
 
   /* state inquiry */
-  DECORATE_FUNC(state_is_known, const);
-  DECORATE_FUNC(state_has_block, const);
-  DECORATE_FUNC(state_has_cache, const);
-  DECORATE_FUNC(state_in_cache_extent, const);
-  DECORATE_FUNC(state_is_empty, const);
+  RCPPSW_DECORATE_FUNC(state_is_known, const)
+  RCPPSW_DECORATE_FUNC(state_has_block, const)
+  RCPPSW_DECORATE_FUNC(state_has_cache, const)
+  RCPPSW_DECORATE_FUNC(state_in_cache_extent, const)
+  RCPPSW_DECORATE_FUNC(state_is_empty, const)
 
   /**
-   * @brief Reset the cell to its UNKNOWN state.
+   * \brief Reset the cell to its UNKNOWN state.
    */
   void reset(void) {
     decoratee().init();
     m_entity.reset();
   }
 
-  DECORATE_FUNC(block_count, const);
+  RCPPSW_DECORATE_FUNC(block_count, const);
 
   /**
-   * @brief Set the entity associated with this cell.
+   * \brief Set the entity associated with this cell.
    */
-  void entity(const std::shared_ptr<representation::base_cell_entity>& entity) {
+  void entity(const std::shared_ptr<crepr::entity2D>& entity) {
     m_entity = entity;
   }
-  const std::shared_ptr<representation::base_cell_entity>& entity(void) const {
+  const std::shared_ptr<crepr::entity2D>& entity(void) const {
     return m_entity;
   }
 
   void loc(rmath::vector2u loc) { m_loc = loc; }
-  rmath::vector2u loc(void) const { return m_loc; }
+  const rmath::vector2u& loc(void) const { return m_loc; }
 
   /**
-   * @brief Get the block entity associated with this cell.
+   * \brief Get the block entity associated with this cell.
    *
    * Will be NULL unless it contains a block, so check the cell's state before
    * calling this function.
    */
-  std::shared_ptr<const representation::base_block> block(void) const;
-  std::shared_ptr<representation::base_block> block(void);
+  std::shared_ptr<crepr::base_block2D> block(void) const RCSW_PURE;
+  std::shared_ptr<crepr::base_block2D> block(void) RCSW_PURE;
 
   /**
-   * @brief Get the cache entity associated with this cell.
+   * \brief Get the cache entity associated with this cell.
    *
    * Will be NULL unless it contains a cache, so check the cell's state before
    * calling this function.
    */
-  const std::shared_ptr<representation::base_cache> cache(void) const;
-  std::shared_ptr<representation::base_cache> cache(void);
+  std::shared_ptr<repr::base_cache> cache(void) const RCSW_PURE;
+  std::shared_ptr<repr::base_cache> cache(void) RCSW_PURE;
 
  private:
-  // clang-format off
-  std::string                                       m_robot_id{""};
-  std::shared_ptr<representation::base_cell_entity> m_entity{nullptr};
-  rmath::vector2u                             m_loc;
-  // clang-format on
+  /* clang-format off */
+  std::string                           m_robot_id{};
+  std::shared_ptr<crepr::entity2D> m_entity{nullptr};
+  rmath::vector2u                       m_loc{};
+  /* clang-format on */
 };
 
 NS_END(ds, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file location_metrics_collector.hpp
+ * \file location_metrics_collector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,68 +18,49 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_
-#define INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include <vector>
+#include <list>
 
-#include "rcppsw/ds/grid2D.hpp"
-#include "rcppsw/metrics/base_metrics_collector.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
+#include "rcppsw/metrics/spatial/grid2D_avg_metrics_collector.hpp"
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, metrics, caches);
-namespace rmath = rcppsw::math;
-namespace visitor = rcppsw::patterns::visitor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class location_metrics_collector
- * @ingroup metrics caches
+ * \class location_metrics_collector
+ * \ingroup metrics caches
  *
- * @brief Collector for \ref location_metrics.
- *
- * Location metrics are somewhat unusual, because they output a large 2D array
- * into a .csv each time they are written out. As such, at the specified
- * collection interval they are written out, capturing the state of the
- * arena in terms of an accumulated desired quantity (i.e. metrics are always
- * written out as cumulative averages) representing proportions of which cells
- * in the arena contain/have contained a cache in the past.
+ * \brief Collector for \ref location_metrics.
  */
-class location_metrics_collector
-    : public rcppsw::metrics::base_metrics_collector,
-      public visitor::visitable_any<location_metrics_collector> {
+class location_metrics_collector final :
+    public rmetrics::spatial::grid2D_avg_metrics_collector {
  public:
   /**
-   * @param ofname The output file name.
-   * @param interval Collection interval.
-   * @param dims Dimensions of the arena.
+   * \param ofname The output file name.
+   * \param interval Collection interval.
+   * \param dims Dimensions of the arena.
    */
   location_metrics_collector(const std::string& ofname,
                              uint interval,
-                             const rmath::vector2u& dims);
+                             const rmath::vector2u& dims) :
+      grid2D_avg_metrics_collector(ofname, interval, dims) {}
 
-  void reset(void) override;
-  void collect(const rcppsw::metrics::base_metrics& metrics) override;
 
- private:
-  std::string csv_header_build(const std::string&) override;
-  bool csv_line_build(std::string& line) override;
-
-  // clang-format off
-  rcppsw::ds::grid2D<uint> m_stats;
-  uint                     m_total{0};  // Total count of all caches across all timesteps
-  // clang-format on
+  void collect(const rmetrics::base_metrics& metrics) override;
 };
 
 NS_END(caches, metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_METRICS_LOCATION_METRICS_COLLECTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_CACHES_LOCATION_METRICS_COLLECTOR_HPP_ */

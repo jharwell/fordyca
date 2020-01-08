@@ -51,6 +51,8 @@ build
 docs/html
 docs/latex
 ext/rcppsw
+ext/cosm
+node_modules
 
 # Runtime
 *.txt
@@ -63,3 +65,7 @@ frames/*.png
 # Tags
 .tag*
 tags
+
+# Sphinx
+docs/_build/
+docs/api

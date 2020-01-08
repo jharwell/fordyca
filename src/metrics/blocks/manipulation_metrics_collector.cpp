@@ -1,7 +1,7 @@
 /**
- * @file manipulation_metrics_collector.cpp
+ * \file manipulation_metrics_collector.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
+
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 
 /*******************************************************************************
@@ -40,80 +41,84 @@ manipulation_metrics_collector::manipulation_metrics_collector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::string manipulation_metrics_collector::csv_header_build(
-    const std::string& header) {
-  // clang-format off
-  return base_metrics_collector::csv_header_build(header) +
-      "int_avg_free_pickup_events" + separator() +
-      "int_avg_free_drop_events" + separator() +
-      "int_avg_free_pickup_penalty" + separator() +
-      "int_avg_free_drop_penalty" + separator() +
-      "int_avg_cache_pickup_events" + separator() +
-      "int_avg_cache_drop_events" + separator() +
-      "int_avg_cache_pickup_penalty" + separator() +
-      "int_avg_cache_drop_penalty" + separator();
-  // clang-format on
-} /* csv_header_build() */
+std::list<std::string> manipulation_metrics_collector::csv_header_cols(
+    void) const {
+  auto merged = dflt_csv_header_cols();
+  auto cols = std::list<std::string>{
+      /* clang-format off */
+    "int_avg_free_pickup_events",
+    "int_avg_free_drop_events",
+    "int_avg_free_pickup_penalty",
+    "int_avg_free_drop_penalty",
+    "int_avg_cache_pickup_events",
+    "int_avg_cache_drop_events",
+    "int_avg_cache_pickup_penalty",
+    "int_avg_cache_drop_penalty"
+      /* clang-format on */
+  };
+  merged.splice(merged.end(), cols);
+  return merged;
+} /* csv_header_cols() */
 
 void manipulation_metrics_collector::reset(void) {
   base_metrics_collector::reset();
   reset_after_interval();
 } /* reset() */
 
-bool manipulation_metrics_collector::csv_line_build(std::string& line) {
+boost::optional<std::string> manipulation_metrics_collector::csv_line_build(void) {
   if (!((timestep() + 1) % interval() == 0)) {
-    return false;
+    return boost::none;
   }
-  line += std::to_string(m_stats.free_pickup_events) + separator();
-  line += std::to_string(m_stats.free_drop_events) + separator();
+  std::string line;
 
-  line += (m_stats.free_pickup_events > 0)
-              ? std::to_string(m_stats.cum_free_pickup_penalty /
-                               static_cast<double>(m_stats.free_pickup_events))
-              : "0";
-  line += separator();
-  line += (m_stats.free_drop_events > 0)
-              ? std::to_string(m_stats.cum_free_drop_penalty /
-                               static_cast<double>(m_stats.free_drop_events))
-              : "0";
-  line += separator();
+  line += rcppsw::to_string(m_interval.free_pickup_events) + separator();
+  line += rcppsw::to_string(m_interval.free_drop_events) + separator();
 
-  line += std::to_string(m_stats.cache_pickup_events) + separator();
-  line += std::to_string(m_stats.cache_drop_events) + separator();
+  line += csv_entry_domavg(m_interval.free_pickup_penalty,
+                           m_interval.free_pickup_events);
+  line += csv_entry_domavg(m_interval.free_drop_penalty,
+                           m_interval.free_drop_events);
 
-  line += (m_stats.cache_pickup_events > 0)
-              ? std::to_string(m_stats.cum_cache_pickup_penalty /
-                               static_cast<double>(m_stats.cache_pickup_events))
-              : "0";
-  line += separator();
-  line += (m_stats.cache_drop_events > 0)
-              ? std::to_string(m_stats.cum_cache_drop_penalty /
-                               static_cast<double>(m_stats.cache_drop_events))
-              : "0";
-  line += separator();
-  return true;
+  line += rcppsw::to_string(m_interval.cache_pickup_events) + separator();
+  line += rcppsw::to_string(m_interval.cache_drop_events) + separator();
+
+  line += csv_entry_domavg(m_interval.cache_pickup_penalty,
+                           m_interval.cache_pickup_events);
+  line += csv_entry_domavg(m_interval.cache_drop_penalty,
+                           m_interval.cache_drop_events,
+                           true);
+
+  return boost::make_optional(line);
 } /* csv_line_build() */
 
 void manipulation_metrics_collector::collect(
-    const rcppsw::metrics::base_metrics& metrics) {
+    const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const manipulation_metrics&>(metrics);
   if (m.free_pickup_event()) {
-    ++m_stats.free_pickup_events;
-    m_stats.cum_free_pickup_penalty += m.penalty_served();
+    ++m_interval.free_pickup_events;
+    m_interval.free_pickup_penalty += m.penalty_served().v();
   } else if (m.free_drop_event()) {
-    ++m_stats.free_drop_events;
-    m_stats.cum_free_drop_penalty += m.penalty_served();
+    ++m_interval.free_drop_events;
+    m_interval.free_drop_penalty += m.penalty_served().v();
   } else if (m.cache_pickup_event()) {
-    ++m_stats.cache_pickup_events;
-    m_stats.cum_cache_pickup_penalty += m.penalty_served();
+    ++m_interval.cache_pickup_events;
+    m_interval.cache_pickup_penalty += m.penalty_served().v();
   } else if (m.cache_drop_event()) {
-    ++m_stats.cache_drop_events;
-    m_stats.cum_cache_drop_penalty += m.penalty_served();
+    ++m_interval.cache_drop_events;
+    m_interval.cache_drop_penalty += m.penalty_served().v();
   }
 } /* collect() */
 
 void manipulation_metrics_collector::reset_after_interval(void) {
-  m_stats = {0, 0, 0, 0, 0, 0, 0, 0};
+  m_interval.free_pickup_events = 0;
+  m_interval.free_drop_events = 0;
+  m_interval.free_pickup_penalty = 0;
+  m_interval.free_drop_penalty = 0;
+
+  m_interval.cache_pickup_events = 0;
+  m_interval.cache_drop_events = 0;
+  m_interval.cache_pickup_penalty = 0;
+  m_interval.cache_drop_penalty = 0;
 } /* reset_after_interval() */
 
 NS_END(blocks, metrics, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file robot_arena_interactor.hpp
+ * \file depth2/robot_arena_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,25 +24,30 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth2/cache_site_block_drop_interactor.hpp"
 #include "fordyca/support/depth2/new_cache_block_drop_interactor.hpp"
+#include "fordyca/support/cached_block_pickup_interactor.hpp"
+#include "fordyca/support/existing_cache_block_drop_interactor.hpp"
+#include "fordyca/support/free_block_pickup_interactor.hpp"
+#include "fordyca/support/nest_block_drop_interactor.hpp"
+#include "fordyca/support/interactor_status.hpp"
+#include "fordyca/tasks/task_status.hpp"
+#include "fordyca/support/task_abort_interactor.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-namespace ta = rcppsw::task_allocation;
 class dynamic_cache_manager;
 
 /*******************************************************************************
  * Classes
  ******************************************************************************/
 /**
- * @class robot_arena_interactor
- * @ingroup support depth2
+ * \class robot_arena_interactor
+ * \ingroup support depth2
  *
- * @brief Handles a robot's interactions with the environment on each timestep.
+ * \brief Handles a robot's interactions with the environment on each timestep.
  *
  * Including:
  *
@@ -52,80 +57,97 @@ class dynamic_cache_manager;
  * - Dropping a carried block in the nest.
  * - Free block drop due to task abort.
  * - Creating a new cache.
+ * - Task abort.
  */
 template <typename T>
-class robot_arena_interactor : public depth1::robot_arena_interactor<T>,
-                               public er::client<robot_arena_interactor<T>> {
+class robot_arena_interactor final : public rer::client<robot_arena_interactor<T>> {
  public:
-  robot_arena_interactor(ds::arena_map* const map_in,
-                         depth0::depth0_metrics_aggregator *const metrics_agg,
-                         argos::CFloorEntity* const floor_in,
-                         const ct::waveform_params* const block_manip_penalty,
-                         const ct::waveform_params* const cache_usage_penalty,
-                         dynamic_cache_manager* const cache_manager)
-      : depth1::robot_arena_interactor<T>(map_in,
-                                          metrics_agg,
-                                          floor_in,
-                                          block_manip_penalty,
-                                          cache_usage_penalty),
-    ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
-    m_cache_site_drop_interactor(map_in,
-                                 floor_in,
-                                 block_manip_penalty,
-                                 cache_manager),
-    m_new_cache_drop_interactor(map_in,
-                                floor_in,
-                                block_manip_penalty,
-                                cache_manager) {}
+  using controller_type = T;
 
-  robot_arena_interactor& operator=(
-      const robot_arena_interactor& other) = delete;
-  robot_arena_interactor(const robot_arena_interactor& other) = delete;
+  struct params {
+    ds::arena_map* const map;
+    depth0::depth0_metrics_aggregator *const metrics_agg;
+    argos::CFloorEntity* const floor;
+    tv::env_dynamics* const envd;
+    dynamic_cache_manager* cache_manager;
+    base_loop_functions* loop;
+  };
+  explicit robot_arena_interactor(const params& p)
+      : ER_CLIENT_INIT("fordyca.support.depth2.robot_arena_interactor"),
+        m_free_pickup_interactor(p.map, p.floor, p.envd),
+        m_nest_drop_interactor(p.map, p.metrics_agg, p.floor, p.envd),
+        m_task_abort_interactor(p.map, p.envd, p.floor),
+        m_cached_pickup_interactor(p.map,
+                                   p.floor,
+                                   p.envd,
+                                   p.cache_manager,
+                                   p.loop),
+        m_existing_cache_drop_interactor(p.map, p.envd),
+        m_cache_site_drop_interactor(p.map,
+                                     p.floor,
+                                     p.envd,
+                                     p.cache_manager),
+        m_new_cache_drop_interactor(p.map,
+                                    p.floor,
+                                    p.envd,
+                                    p.cache_manager) {}
 
   /**
-   * @brief The actual handling function for interactions.
+   * \brief Interactors should generally NOT be copy constructable/assignable,
+   * but is needed to use these classes with boost::variant.
    *
-   * @param controller The controller to handle interactions for.
-   * @param timestep   The current timestep.
-   *
-   * @return \c TRUE if a block was dropped to create a new cache, \c FALSE
-   * otherwise.
+   * \todo Supposedly in recent versions of boost you can use variants with
+   * move-constructible-only types (which is what this class SHOULD be), but I
+   * cannot get this to work (the default move constructor needs to be noexcept
+   * I think, and is not being interpreted as such).
    */
-  bool operator()(T& controller, uint timestep) {
-    std::list<temporal_penalty_handler<T>*> penalty_handlers =  {
-      nest_drop_interactor().penalty_handler(),
-      free_pickup_interactor().penalty_handler(),
-      &cache_penalty_handler()
-    };
-    if (task_abort_interactor()(controller, penalty_handlers)) {
-      return false;
+  robot_arena_interactor(const robot_arena_interactor& other) = default;
+  robot_arena_interactor& operator=(
+      const robot_arena_interactor&) = delete;
+
+
+  /**
+   * \brief The actual handling function for interactions.
+   *
+   * \param controller The controller to handle interactions for.
+   * \param t The current timestep.
+   */
+  interactor_status operator()(T& controller, const rtypes::timestep& t) {
+    if (m_task_abort_interactor(controller)) {
+      /*
+       * This needs to be here, rather than in each robot's control step
+       * function, in order to avoid triggering erroneous handling of an aborted
+       * task in the loop functions when the executive has not aborted the newly
+       * allocated task *after* the previous task was aborted. See #532,#587.
+       */
+      controller.task_status_update(tasks::task_status::ekRUNNING);
+      return interactor_status::ekTASK_ABORT;
     }
 
+    auto status = interactor_status::ekNO_EVENT;
     if (controller.is_carrying_block()) {
-      nest_drop_interactor()(controller, timestep);
-      existing_cache_drop_interactor()(controller, timestep);
-      m_cache_site_drop_interactor(controller, timestep);
-      return m_new_cache_drop_interactor(controller, timestep);
+      status |= m_nest_drop_interactor(controller, t);
+      m_existing_cache_drop_interactor(controller, t);
+      status |= m_cache_site_drop_interactor(controller, t);
+      status |= m_new_cache_drop_interactor(controller, t);
     } else { /* The foot-bot has no block item */
-      free_pickup_interactor()(controller, timestep);
-      cached_pickup_interactor()(controller, timestep);
-      return false;
+      status |= m_free_pickup_interactor(controller, t);
+      status |= m_cached_pickup_interactor(controller, t);
     }
+    return status;
   }
 
 
  private:
-  using depth1::robot_arena_interactor<T>::nest_drop_interactor;
-  using depth1::robot_arena_interactor<T>::free_pickup_interactor;
-  using depth1::robot_arena_interactor<T>::task_abort_interactor;
-  using depth1::robot_arena_interactor<T>::cached_pickup_interactor;
-  using depth1::robot_arena_interactor<T>::existing_cache_drop_interactor;
-  using depth1::robot_arena_interactor<T>::cache_penalty_handler;
-
-  // clang-format off
-  cache_site_block_drop_interactor<T> m_cache_site_drop_interactor;
-  new_cache_block_drop_interactor<T>  m_new_cache_drop_interactor;
-  // clang-format on
+  /* clang-format off */
+  free_block_pickup_interactor<T>         m_free_pickup_interactor;
+  nest_block_drop_interactor<T>           m_nest_drop_interactor;
+  task_abort_interactor<T>                m_task_abort_interactor;
+  cached_block_pickup_interactor<T>       m_cached_pickup_interactor;
+  existing_cache_block_drop_interactor<T> m_existing_cache_drop_interactor;
+  cache_site_block_drop_interactor<T>     m_cache_site_drop_interactor;
+  new_cache_block_drop_interactor<T>      m_new_cache_drop_interactor;
+  /* clang-format on */
 };
 
 NS_END(depth2, support, fordyca);

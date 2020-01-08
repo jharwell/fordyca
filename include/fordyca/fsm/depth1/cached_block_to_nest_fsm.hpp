@@ -1,7 +1,7 @@
 /**
- * @file cached_block_to_nest_fsm.hpp
+ * \file cached_block_to_nest_fsm.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,138 +24,139 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/fsm/base_foraging_fsm.hpp"
+#include <memory>
+#include "cosm/fsm/util_hfsm.hpp"
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/metrics/fsm/goal_acquisition_metrics.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "rcppsw/task_allocation/taskable.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+#include "cosm/ta/taskable.hpp"
+#include "fordyca/fsm/fsm_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace controller {
-namespace depth1 {
-class sensing_subsystem;
-}
-class actuation_subsystem;
-} // namespace controller
-namespace representation {
+namespace repr {
 class block;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
-class perceived_arena_map;
+class dpo_store;
 } // namespace ds
 
-namespace task_allocation = rcppsw::task_allocation;
-namespace visitor = rcppsw::patterns::visitor;
+NS_START(fsm);
 
-NS_START(fsm, depth1);
+namespace expstrat {
+class foraging_expstrat;
+} /* namespace expstrat */
 
-using transport_goal_type = block_transporter::goal_type;
+NS_START(depth1);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cached_block_to_nest_fsm
- * @ingroup fsm
+ * \class cached_block_to_nest_fsm
+ * \ingroup fsm
  *
- * @brief Each robot executing this FSM will locate for a block (either a known
- * block or via random exploration), pickup the block and bring it all the way
- * back to the nest.
+ * \brief Each robot executing this FSM will locate for a block (either a known
+ * block or via exploration), pickup the block and bring it all the way back to
+ * the nest.
  *
  * It can be directed to acquire a block either from a cache or to find a free
  * one.
  */
-class cached_block_to_nest_fsm : public base_foraging_fsm,
-                                 er::client<cached_block_to_nest_fsm>,
-                                 public metrics::fsm::goal_acquisition_metrics,
-                                 public block_transporter,
-                                 public task_allocation::taskable,
-                                 public visitor::visitable_any<cached_block_to_nest_fsm> {
+class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
+                                       public rer::client<cached_block_to_nest_fsm>,
+                                       public cfmetrics::goal_acq_metrics,
+                                       public block_transporter,
+                                       public cta::taskable {
  public:
-  cached_block_to_nest_fsm(const controller::cache_sel_matrix* sel_matrix,
-                           controller::saa_subsystem* saa,
-                           ds::perceived_arena_map* map);
+  cached_block_to_nest_fsm(
+      const fsm_ro_params* c_params,
+      crfootbot::footbot_saa_subsystem* saa,
+      std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+      rmath::rng *rng);
   ~cached_block_to_nest_fsm(void) override = default;
 
-  cached_block_to_nest_fsm(const cached_block_to_nest_fsm& fsm) = delete;
-  cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm& fsm) = delete;
+  cached_block_to_nest_fsm(const cached_block_to_nest_fsm&) = delete;
+  cached_block_to_nest_fsm& operator=(const cached_block_to_nest_fsm&) = delete;
 
   /* taskable overrides */
   void task_execute(void) override;
   bool task_finished(void) const override {
-    return ST_FINISHED == current_state();
+    return ekST_FINISHED == current_state();
   }
 
   bool task_running(void) const override {
-    return !(ST_FINISHED == current_state() || ST_START == current_state());
+    return !(ekST_FINISHED == current_state() || ekST_START == current_state());
   }
 
   /**
-   * @brief Reset the task FSM to a state where it can be started again.
+   * \brief Reset the task FSM to a state where it can be started again.
    */
   void task_reset(void) override { init(); }
-  void task_start(const task_allocation::taskable_argument*) override {}
+  void task_start(const cta::taskable_argument*) override {}
 
   /* collision metrics */
-  bool in_collision_avoidance(void) const override;
-  bool entered_collision_avoidance(void) const override;
-  bool exited_collision_avoidance(void) const override;
-  uint collision_avoidance_duration(void) const override;
+  bool in_collision_avoidance(void) const override RCSW_PURE;
+  bool entered_collision_avoidance(void) const override RCSW_PURE;
+  bool exited_collision_avoidance(void) const override RCSW_PURE;
+  rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, avoidance_loc, const);
 
   /* goal acquisition metrics */
-  bool goal_acquired(void) const override;
-  FSM_WRAPPER_DECLAREC(bool, is_exploring_for_goal);
-  FSM_WRAPPER_DECLAREC(bool, is_vectoring_to_goal);
-  acquisition_goal_type acquisition_goal(void) const override;
+  bool goal_acquired(void) const override RCSW_PURE;
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
 
   /**
-   * @brief Reset the FSM
+   * \brief Reset the FSM
    */
   void init(void) override;
 
  protected:
   enum fsm_states {
-    ST_START,
+    ekST_START,
     /**
      * Superstate for finding a cached block.
      */
-    ST_ACQUIRE_BLOCK,
+    ekST_ACQUIRE_BLOCK,
 
     /**
-     * @brief State robots wait in after acquiring a cache for the simulation to
+     * \brief State robots wait in after acquiring a cache for the simulation to
      * send them the block pickup signal. Having this extra state solves a lot
      * of handshaking/off by one issues regarding the timing of doing so.
      */
-    ST_WAIT_FOR_PICKUP,
+    ekST_WAIT_FOR_PICKUP,
 
-    ST_WAIT_FOR_DROP,
+    ekST_WAIT_FOR_DROP,
 
     /**
      * Block found--bring it back to the nest.
      */
-    ST_TRANSPORT_TO_NEST,
+    ekST_TRANSPORT_TO_NEST,
 
-    ST_LEAVING_NEST,
+    ekST_LEAVING_NEST,
 
     /**
      * Block has been brought to the nest successfully.
      */
-    ST_FINISHED,
-    ST_MAX_STATES,
+    ekST_FINISHED,
+    ekST_MAX_STATES,
   };
 
  private:
   /**
-   * @brief It is possible that robots can be waiting indefinitely for a block
+   * \brief It is possible that robots can be waiting indefinitely for a block
    * pickup signal that will never come once a block has been acquired if they
    * "detect" a block by sprawling across multiple blocks (i.e. all ground
    * sensors did not detect the same block).
@@ -165,33 +166,35 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
    * pick a different block than the one that got it into this predicament, and
    * the system will be able to continue profitably.
    */
-  constexpr static uint kPICKUP_TIMEOUT = 100;
+  static constexpr uint kPICKUP_TIMEOUT = 100;
 
   /* inherited states */
-  HFSM_STATE_INHERIT(base_foraging_fsm,
+  HFSM_STATE_INHERIT(cfsm::util_hfsm,
                      transport_to_nest,
-                     state_machine::event_data);
-  HFSM_STATE_INHERIT(base_foraging_fsm,
+                     rpfsm::event_data);
+  HFSM_STATE_INHERIT(cfsm::util_hfsm,
                      leaving_nest,
-                     state_machine::event_data);
+                     rpfsm::event_data);
 
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_transport_to_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_leaving_nest);
-  HFSM_ENTRY_INHERIT_ND(base_foraging_fsm, entry_wait_for_signal);
+  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_transport_to_nest);
+  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_leaving_nest);
+  HFSM_ENTRY_INHERIT_ND(cfsm::util_hfsm, entry_wait_for_signal);
+
+  HFSM_EXIT_INHERIT(cfsm::util_hfsm, exit_transport_to_nest);
 
   /* foraging states */
-  HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, state_machine::event_data);
+  HFSM_STATE_DECLARE(cached_block_to_nest_fsm, start, rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, acquire_block);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_pickup,
-                     state_machine::event_data);
+                     rpfsm::event_data);
   HFSM_STATE_DECLARE(cached_block_to_nest_fsm,
                      wait_for_drop,
-                     state_machine::event_data);
+                     rpfsm::event_data);
   HFSM_STATE_DECLARE_ND(cached_block_to_nest_fsm, finished);
 
   /**
-   * @brief Defines the state map for the FSM.
+   * \brief Defines the state map for the FSM.
    *
    * Note that the order of the states in the map MUST match the order of the
    * states in \enum fsm_states, or things will not work correctly.
@@ -200,10 +203,11 @@ class cached_block_to_nest_fsm : public base_foraging_fsm,
     return &mc_state_map[index];
   }
 
-  // clang-format off
+  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
+
+  /* clang-format off */
   acquire_existing_cache_fsm m_cache_fsm;
-  // clang-format on
-  HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ST_MAX_STATES);
+  /* clang-format on */
 };
 
 NS_END(depth1, fsm, fordyca);

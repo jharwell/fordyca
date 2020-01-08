@@ -1,7 +1,7 @@
 /**
- * @file powerlaw_distributor.hpp
+ * \file powerlaw_distributor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,11 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <random>
 #include <vector>
 #include <map>
 #include <utility>
 #include <list>
+#include <memory>
 
 #include "rcppsw/er/client.hpp"
 #include "fordyca/support/block_dist/cluster_distributor.hpp"
@@ -40,11 +40,11 @@
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
+namespace repr {
 class block;
-} // namespace representation
+} // namespace repr
 
-namespace params { namespace arena { struct block_dist_params; }}
+namespace config { namespace arena { struct powerlaw_dist_config; }}
 
 NS_START(support, block_dist);
 
@@ -52,89 +52,91 @@ NS_START(support, block_dist);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class powerlaw_distributor
- * @ingroup support
+ * \class powerlaw_distributor
+ * \ingroup support
  *
- * @brief Distributes a block, or set of blocks, within the arena as randomly
+ * \brief Distributes a block, or set of blocks, within the arena as randomly
  * placed clusters with sizes ranging [minsize, maxsize], with a power law based
  * stride of 2^x between.
  *
  * - Blocks are assumed to be the same size as arena resolution (this is not
  *   checked).
  */
-class powerlaw_distributor : public base_distributor,
-                             public er::client<powerlaw_distributor> {
+class powerlaw_distributor final : public rer::client<powerlaw_distributor>,
+                                   public base_distributor {
  public:
   /**
-   * @brief Initialize the distributor.
+   * \brief Initialize the distributor.
    */
-  explicit powerlaw_distributor(const struct params::arena::block_dist_params* params);
+  powerlaw_distributor(const config::arena::powerlaw_dist_config* config,
+                       rtypes::discretize_ratio resolution,
+                       rmath::rng* rng);
 
   powerlaw_distributor(const powerlaw_distributor& s) = delete;
   powerlaw_distributor& operator=(const powerlaw_distributor& s) = delete;
 
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<crepr::base_block2D>& block,
                         ds::const_entity_list& entities) override;
 
-  ds::const_block_cluster_list block_clusters(void) const override;
+  ds::block_cluster_vector block_clusters(void) const override;
 
   /**
-   * @brief Computer cluster locations such that no two clusters overlap, and
+   * \brief Computer cluster locations such that no two clusters overlap, and
    * map locations and compositional block distributors into internal data
    * structures.
    *
-   * @param grid The grid for the ENTIRE arena.
+   * \param grid The grid for the ENTIRE arena.
    *
-   * @return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
+   * \return \c TRUE iff clusters were mapped successfull, \c FALSE otherwise.
    */
-  bool map_clusters(ds::arena_grid& grid);
+  bool map_clusters(ds::arena_grid* grid);
 
  private:
-  struct cluster_params {
+  struct cluster_config {
     ds::arena_grid::view view;
     uint                 capacity;
   };
 
-  using cluster_paramvec = std::vector<cluster_params>;
+  using cluster_paramvec = std::vector<cluster_config>;
 
   /**
-   * @brief Assign cluster centers randomly, with the only restriction that the
+   * \brief Assign cluster centers randomly, with the only restriction that the
    * edges of each cluster are within the boundaries of the arena.
    *
-   * @param grid Arena grid.
-   * @param clust_sizes Vector of powers of 2 for the cluster sizes.
+   * \param grid Arena grid.
+   * \param clust_sizes Vector of powers of 2 for the cluster sizes.
    */
   cluster_paramvec guess_cluster_placements(
-      ds::arena_grid& grid,
+      ds::arena_grid* grid,
       const std::vector<uint>& clust_sizes);
 
   /**
-   * @brief Verify that no cluster placements cause overlap, after guessing
+   * \brief Verify that no cluster placements cause overlap, after guessing
    * initial locations.
    *
-   * @param list Possible list of cluster placements.
+   * \param list Possible list of cluster placements.
    *
-   * @return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
+   * \return \c TRUE if the cluster distribute is valid, \c FALSE otherwise.
    */
-  bool check_cluster_placements(const cluster_paramvec& pvec);
+  bool check_cluster_placements(const cluster_paramvec& pvec) RCSW_PURE;
 
   /**
-   * @brief Perform a "guess and check" cluster placement until you get a
+   * \brief Perform a "guess and check" cluster placement until you get a
    * distribution without overlap, or \ref kMAX_DIST_TRIES is exceeded,
    * whichever happens first.
    *
    * Cluster sizes are drawn from the internally stored power law distribution.
    */
-  cluster_paramvec compute_cluster_placements(ds::arena_grid& grid,
+  cluster_paramvec compute_cluster_placements(ds::arena_grid* grid,
                                              uint n_clusters);
 
-  // clang-format off
-  double                                         m_arena_resolution{0.0};
+  /* clang-format off */
+  const     rtypes::discretize_ratio              mc_resolution;
+
   uint                                           m_n_clusters{0};
   std::map<uint, std::list<cluster_distributor>> m_dist_map{};
-  std::default_random_engine                     m_rng {std::random_device {}()};
   rcppsw::math::binned_powerlaw_distribution     m_pwrdist;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file cache_respawn_probability.cpp
+ * \file cache_respawn_probability.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,6 +22,7 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/math/cache_respawn_probability.hpp"
+
 #include <cmath>
 
 /*******************************************************************************
@@ -38,14 +39,14 @@ cache_respawn_probability::cache_respawn_probability(double scale_factor)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-double cache_respawn_probability::calc(size_t n_foragers, size_t n_collectors) {
+double cache_respawn_probability::calc(uint n_harvesters, uint n_collectors) {
   double tmp;
   if (0 == n_collectors) {
-    tmp = mc_scale_factor * n_foragers;
+    tmp = mc_scale_factor * n_harvesters;
   } else {
-    tmp = mc_scale_factor * n_foragers / n_collectors;
+    tmp = mc_scale_factor * n_harvesters / n_collectors;
   }
-  return set_result(1 - std::exp(-tmp));
+  return eval(1 - std::exp(-tmp));
 } /* calc() */
 
 NS_END(expressions, fordyca);

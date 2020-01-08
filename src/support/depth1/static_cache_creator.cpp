@@ -1,7 +1,7 @@
 /**
- * @file static_cache_creator.cpp
+ * \file static_cache_creator.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,51 +22,71 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_creator.hpp"
+
 #include "fordyca/events/cell_empty.hpp"
 #include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/representation/arena_cache.hpp"
+#include "fordyca/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using representation::base_cache;
+using repr::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-static_cache_creator::static_cache_creator(ds::arena_grid* const grid,
-                                           const rmath::vector2d& center,
-                                           double cache_size)
-    : base_cache_creator(grid, cache_size),
+static_cache_creator::static_cache_creator(
+    ds::arena_grid* const grid,
+    const std::vector<rmath::vector2d>& centers,
+    rtypes::spatial_dist cache_dim)
+    : base_cache_creator(grid, cache_dim),
       ER_CLIENT_INIT("fordyca.support.depth1.static_cache_creator"),
-      m_center(center) {}
+      mc_centers(centers) {}
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
 ds::cache_vector static_cache_creator::create_all(
-    const ds::cache_vector& existing_caches,
-    ds::block_vector& blocks,
-    double) {
-  ER_ASSERT(existing_caches.empty(), "Static cache already exists in arena!");
-  std::vector<std::shared_ptr<representation::arena_cache>> caches;
+    const cache_create_ro_params& c_params,
+    const ds::block_vector& c_alloc_blocks) {
+  ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
+           rcppsw::to_string(c_alloc_blocks).c_str(),
+           c_alloc_blocks.size());
 
-  ER_ASSERT(blocks.size() >= base_cache::kMinBlocks,
-            "Cannot create static cache from < %zu blocks",
-            base_cache::kMinBlocks);
-  ER_INFO("Creating static cache@%s from %zu free blocks",
-          m_center.to_str().c_str(),
-          blocks.size());
-  ds::block_list starter_blocks;
-  for (auto& b : blocks) {
-    starter_blocks.push_back(b);
-  } /* for(i..) */
+  ds::cache_vector created;
+  auto it = c_alloc_blocks.begin();
+  for (auto& center : mc_centers) {
+    auto filter = [&](const auto& c) {
+      return rmath::dvec2uvec(center, grid()->resolution().v()) == c->dloc();
+    };
+    /* static cache already exists */
+    if (c_params.current_caches.end() !=
+        std::find_if(c_params.current_caches.begin(),
+                     c_params.current_caches.end(),
+                     filter)) {
+      continue;
+    }
 
-  auto cache = create_single_cache(starter_blocks, m_center);
-  auto cache_p = std::shared_ptr<representation::arena_cache>(std::move(cache));
-  caches.push_back(cache_p);
-  return caches;
-} /* create() */
+    if (static_cast<uint>(std::distance(it, c_alloc_blocks.end())) <
+        base_cache::kMinBlocks) {
+      ER_WARN("Not enough blocks provided to construct cache@%s: %u < %zu",
+              center.to_str().c_str(),
+              static_cast<uint>(std::distance(it, c_alloc_blocks.end())),
+              base_cache::kMinBlocks);
+      continue;
+    }
+    auto it2 = it;
+    std::advance(it, base_cache::kMinBlocks);
+    ds::block_vector cache_i_blocks(it2, it);
+
+    ER_INFO("Creating static cache@%s: blocks=[%s] (%zu)",
+            center.to_str().c_str(),
+            rcppsw::to_string(cache_i_blocks).c_str(),
+            cache_i_blocks.size());
+    created.push_back(create_single_cache(center, cache_i_blocks, c_params.t));
+  } /* for(&center..) */
+  return created;
+} /* create_all() */
 
 NS_END(depth1, support, fordyca);

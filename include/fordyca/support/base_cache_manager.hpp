@@ -1,7 +1,7 @@
 /**
- * @file base_cache_manager.hpp
+ * \file base_cache_manager.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,20 +24,25 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <mutex>
 #include <vector>
-#include "fordyca/metrics/caches/lifecycle_metrics.hpp"
-#include "rcppsw/common/common.hpp"
-#include "fordyca/ds/cache_vector.hpp"
+
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/types/timestep.hpp"
+
 #include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/cache_vector.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/metrics/caches/lifecycle_metrics.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
-namespace representation {
-class base_block;
+namespace repr {
+class base_block2D;
 class arena_cache;
-} // namespace representation
+} // namespace repr
 namespace ds {
 class arena_grid;
 }
@@ -48,54 +53,50 @@ NS_START(support);
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_cache_manager
- * @ingroup support depth2
+ * \class base_cache_manager
+ * \ingroup support depth2
  *
- * @brief Manager for creation, depletion, and metric gathering for base
+ * \brief Manager for creation, depletion, and metric gathering for base
  * caches in the arena, whenever they are enabled.
  */
-class base_cache_manager : public metrics::caches::lifecycle_metrics {
+class base_cache_manager : public metrics::caches::lifecycle_metrics,
+                           public rer::client<base_cache_manager> {
  public:
-  struct creation_res_t {
-    bool status;
-    ds::cache_vector caches;
-  };
-
-  struct block_calc_res_t {
-    bool status;
-    ds::block_vector blocks;
-  };
-
   explicit base_cache_manager(ds::arena_grid* const arena_grid)
-      : m_grid(arena_grid) {}
-  virtual ~base_cache_manager(void) = default;
+      : ER_CLIENT_INIT("fordyca.support.cache_manager"), m_grid(arena_grid) {}
+  ~base_cache_manager(void) override = default;
 
-  base_cache_manager(const base_cache_manager& other) = delete;
-  base_cache_manager& operator=(const base_cache_manager& other) = delete;
+  base_cache_manager(const base_cache_manager&) = delete;
+  base_cache_manager& operator=(const base_cache_manager&) = delete;
 
   /* cache lifecycle metrics */
-  uint caches_created(void) const override { return m_cache_created; }
-  uint caches_depleted(void) const override { return m_cache_depleted; }
-  void caches_created(uint c) { m_cache_created += c; }
-  void caches_depleted(uint c) { m_cache_depleted += c; }
-  void reset_metrics(void) override {
-    m_cache_created = 0;
-    m_cache_depleted = 0;
+  uint caches_created(void) const override final { return m_caches_created; }
+  uint caches_depleted(void) const override final {
+    return m_depletion_ages.size();
+  }
+  std::vector<rtypes::timestep> cache_depletion_ages(void) const override {
+    return m_depletion_ages;
   }
 
-  void cache_created(void) { ++m_cache_created; }
-  void cache_depleted(void) { ++m_cache_depleted; }
+  void cache_depleted(rtypes::timestep age) { m_depletion_ages.push_back(age); }
+  void reset_metrics(void) override final {
+    m_caches_created = 0;
+    m_depletion_ages.clear();
+  }
+  std::mutex& mtx(void) { return m_mutex; }
 
  protected:
+  void caches_created(uint c) { m_caches_created += c; }
   const ds::arena_grid* arena_grid(void) const { return m_grid; }
   ds::arena_grid* arena_grid(void) { return m_grid; }
 
  private:
-  // clang-format off
-  uint                   m_cache_created{0};
-  uint                   m_cache_depleted{0};
-  ds::arena_grid * const m_grid;
-  // clang-format on
+  /* clang-format off */
+  uint                          m_caches_created{0};
+  std::vector<rtypes::timestep> m_depletion_ages{};
+  ds::arena_grid * const        m_grid;
+  std::mutex                    m_mutex{};
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

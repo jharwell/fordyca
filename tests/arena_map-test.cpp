@@ -70,9 +70,9 @@ void map_resolution_check(arena_map& map) {
    * resolution-based indexing).
    */
   for (size_t i = 0; i < map.blocks().size(); ++i) {
-    if (map.blocks()[i].discrete_loc().first != 100) {
-      cell2D& cell = map.access(map.blocks()[i].discrete_loc().first,
-                                map.blocks()[i].discrete_loc().second);
+    if (map.blocks()[i].dloc().first != 100) {
+      cell2D& cell = map.access(map.blocks()[i].dloc().first,
+                                map.blocks()[i].dloc().second);
       printf("Verify cell at (%d, %d) contains block %d: %p/%p\n",
              cell.loc().first, cell.loc().second, i, cell.block(),
               &map.blocks()[i]);
@@ -102,8 +102,8 @@ CATCH_TEST_CASE("distribute-test", "[arena_map]") {
 
   /* Verify all cells that actually contain blocks think they contain blocks */
   for (size_t i = 0; i < map.blocks().size(); ++i) {
-    cell2D& cell = map.access(map.blocks()[i].discrete_loc().first,
-                              map.blocks()[i].discrete_loc().second);
+    cell2D& cell = map.access(map.blocks()[i].dloc().first,
+                              map.blocks()[i].dloc().second);
     CATCH_REQUIRE(cell.state_has_block());
   } /* for(i..) */
 
@@ -114,8 +114,8 @@ CATCH_TEST_CASE("distribute-test", "[arena_map]") {
 
   /* Verify all cells that actually contain blocks think they contain blocks */
   for (size_t i = 0; i < map.blocks().size(); ++i) {
-    cell2D& cell = map.access(map.blocks()[i].discrete_loc().first,
-                              map.blocks()[i].discrete_loc().second);
+    cell2D& cell = map.access(map.blocks()[i].dloc().first,
+                              map.blocks()[i].dloc().second);
     CATCH_REQUIRE(cell.state_has_block());
   } /* for(i..) */
 
@@ -137,8 +137,8 @@ CATCH_TEST_CASE("block-move-test", "[arena_map]") {
   for (size_t i = 0; i < map.blocks().size(); ++i) {
     printf("Test moving block %d\n", i);
     CATCH_REQUIRE(map.blocks()[i].id() != -1);
-    cell2D& old_cell = map.access(map.blocks()[i].discrete_loc().first,
-                              map.blocks()[i].discrete_loc().second);
+    cell2D& old_cell = map.access(map.blocks()[i].dloc().first,
+                              map.blocks()[i].dloc().second);
 
     events::block_pickup op1(rcppsw::er::g_server, &map.blocks()[i], 0);
     map.accept(op1);
@@ -146,8 +146,8 @@ CATCH_TEST_CASE("block-move-test", "[arena_map]") {
     CATCH_REQUIRE(map.blocks()[i].robot_index() != -1);
     events::block_drop op2(rcppsw::er::g_server, &map.blocks()[i]);
     map.accept(op2);
-    cell2D& new_cell = map.access(map.blocks()[i].discrete_loc().first,
-                                  map.blocks()[i].discrete_loc().second);
+    cell2D& new_cell = map.access(map.blocks()[i].dloc().first,
+                                  map.blocks()[i].dloc().second);
     CATCH_REQUIRE(new_cell.state_has_block());
 
     map_sanity_check(map, 0);

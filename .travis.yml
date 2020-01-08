@@ -1,0 +1,23 @@
+# Travis params
+sudo: required
+language: cpp
+dist: xenial
+os: linux
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update
+  - sudo apt-get install -y gcc-8 g++-8
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 90
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
+
+branches:
+  only:
+    - master
+    - devel
+
+before_script:
+  - ./scripts/bootstrap-ci.sh 2
+
+script:
+  - cd build && cmake -DBUILD_FOR_TRAVIS=YES .. && make -j2

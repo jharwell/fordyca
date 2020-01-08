@@ -1,7 +1,7 @@
 /**
- * @file entity_list.hpp
+ * \file entity_list.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,19 +25,20 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include "rcppsw/common/common.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace representation {
-class multicell_entity;
-} // namespace representation
-NS_START(ds);
+namespace cosm::repr {
+class unicell_entity2D;
+} // namespace cosm::repr
 
-using entity_list_type = representation::multicell_entity*;
-using const_entity_list_type = const representation::multicell_entity*;
+NS_START(fordyca, ds);
+
+using entity_list_type = crepr::unicell_entity2D*;
+using const_entity_list_type = const crepr::unicell_entity2D*;
 
 /*******************************************************************************
  * Type Definitions

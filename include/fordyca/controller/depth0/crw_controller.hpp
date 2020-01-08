@@ -1,7 +1,7 @@
 /**
- * @file crw_controller.hpp
+ * \file crw_controller.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,65 +24,67 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/patterns/visitor/visitable.hpp"
-#include "fordyca/controller/depth0/depth0_controller.hpp"
-#include "rcppsw/patterns/state_machine/base_fsm.hpp"
+#include <memory>
+
+#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/fsm/block_transporter.hpp"
+#include "rcppsw/patterns/fsm/base_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace visitor = rcppsw::patterns::visitor;
 namespace fsm { namespace depth0 { class crw_fsm; }}
 
-NS_START(controller);
-using acquisition_goal_type = metrics::fsm::goal_acquisition_metrics::goal_type;
-using transport_goal_type = fsm::block_transporter::goal_type;
-NS_START(depth0);
+NS_START(controller, depth0);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class crw_controller
- * @ingroup controller depth0
+ * \class crw_controller
+ * \ingroup controller depth0
  *
- * @brief The most basic form of a foraging controller: roam around randomly
+ * \brief The most basic form of a foraging controller: roam around randomly
  * until you find a block, and then bring it back to the nest; repeat.
  */
-class crw_controller : public depth0_controller,
-                       public er::client<crw_controller>,
-                       public visitor::visitable_any<crw_controller> {
+class crw_controller : public base_controller,
+                       public fsm::block_transporter,
+                       public rer::client<crw_controller> {
  public:
-  crw_controller(void);
-  ~crw_controller(void) override;
+  crw_controller(void) RCSW_COLD;
+  ~crw_controller(void) override RCSW_COLD;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
-  void ControlStep(void) override;
-  void Reset(void) override;
-
-  /* movement metrics */
-  double distance(void) const override;
-  rmath::vector2d velocity(void) const override;
+  /* base_controller overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void control_step(void) override;
+  void reset(void) override RCSW_COLD;
+  std::type_index type_index(void) const override { return typeid(*this); }
 
   /* goal acquisition metrics */
-  bool is_exploring_for_goal(void) const override { return false; }
   bool is_vectoring_to_goal(void) const override { return false; }
-  FSM_WRAPPER_DECLAREC(bool, goal_acquired);
-  FSM_WRAPPER_DECLAREC(acquisition_goal_type, acquisition_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+                            acquisition_goal,
+                            const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  FSM_WRAPPER_DECLAREC(transport_goal_type, block_transport_goal);
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+                            block_transport_goal,
+                            const);
 
   const fsm::depth0::crw_fsm* fsm(void) const { return m_fsm.get(); }
   fsm::depth0::crw_fsm* fsm(void) { return m_fsm.get(); }
 
  private:
-  // clang-format off
+  /* clang-format off */
   std::unique_ptr<fsm::depth0::crw_fsm> m_fsm;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(depth0, controller, fordyca);

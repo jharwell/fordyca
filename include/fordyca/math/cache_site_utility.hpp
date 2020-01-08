@@ -1,7 +1,7 @@
 /**
- * @file cache_site_utility.hpp
+ * \file cache_site_utility.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -28,20 +28,21 @@
 #include "rcppsw/math/sigmoid.hpp"
 #include "rcppsw/math/vector2.hpp"
 
+#include "fordyca/fordyca.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, math);
-namespace rmath = rcppsw::math;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cache_site_utility
- * @ingroup math
+ * \class cache_site_utility
+ * \ingroup math
  *
- * @brief Calculates the utility associated with a cache to a robot as part
+ * \brief Calculates the utility associated with a cache to a robot as part
  * of its decision process for what to do with a block once it has picked it up.
  *
  * Depends on:
@@ -56,8 +57,8 @@ namespace rmath = rcppsw::math;
  * of the circle formed by the nest center and distance to the ideal
  * point. We do this via exponential falloff on either side of the arc.
  */
-class cache_site_utility : public rcppsw::math::sigmoid,
-                           public rcppsw::er::client<cache_site_utility> {
+class cache_site_utility : public rmath::sigmoid,
+                           public rer::client<cache_site_utility> {
  public:
   cache_site_utility(const rmath::vector2d& position,
                      const rmath::vector2d& nest_loc);
@@ -66,10 +67,10 @@ class cache_site_utility : public rcppsw::math::sigmoid,
   double operator()(const rmath::vector2d& site_loc) { return calc(site_loc); }
 
  private:
-  // clang-format off
+  /* clang-format off */
   const rmath::vector2d mc_position;
   const rmath::vector2d mc_nest_loc;
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(math, fordyca);

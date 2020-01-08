@@ -1,7 +1,7 @@
 /**
- * @file dispatcher.hpp
+ * \file dispatcher.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,22 +26,25 @@
  ******************************************************************************/
 #include <list>
 #include <string>
+#include <memory>
 
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/er/client.hpp"
-#include "fordyca/params/arena/block_dist_params.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/config/arena/block_dist_config.hpp"
 #include "fordyca/ds/entity_list.hpp"
 #include "fordyca/ds/block_vector.hpp"
+#include "rcppsw/types/discretize_ratio.hpp"
+#include "rcppsw/er/client.hpp"
+#include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 
-namespace representation {
-class base_block;
+namespace repr {
+class base_block2D;
 class multicell_entity;
-} // namespace representation
+} // namespace repr
 
 namespace ds {
 class arena_grid;
@@ -54,10 +57,10 @@ class base_distributor;
  * Class Definitions
  ******************************************************************************/
 /**
- * @class dispatcher
- * @ingroup block_dist support
+ * \class dispatcher
+ * \ingroup block_dist support
  *
- * @brief Dispatches call to distribute blocks (or a single block), as
+ * \brief Dispatches call to distribute blocks (or a single block), as
  * configured in simulation input file.
  *
  * - Single and dual source distribution assumes left-right rectangular arena.
@@ -65,44 +68,45 @@ class base_distributor;
  */
 class dispatcher {
  public:
-  static constexpr char kDIST_SINGLE_SRC[] = "single_source";
-  static constexpr char kDIST_RANDOM[] = "random";
-  static constexpr char kDIST_DUAL_SRC[] = "dual_source";
-  static constexpr char kDIST_QUAD_SRC[] = "quad_source";
-  static constexpr char kDIST_POWERLAW[] = "powerlaw";
+  static constexpr char kDistSingleSrc[] = "single_source";
+  static constexpr char kDistRandom[] = "random";
+  static constexpr char kDistDualSrc[] = "dual_source";
+  static constexpr char kDistQuadSrc[] = "quad_source";
+  static constexpr char kDistPowerlaw[] = "powerlaw";
 
-  dispatcher(ds::arena_grid& grid,
-             const struct params::arena::block_dist_params* params);
+  dispatcher(ds::arena_grid* grid,
+             rtypes::discretize_ratio resolution,
+             const config::arena::block_dist_config* config);
   ~dispatcher(void);
 
   dispatcher(const dispatcher& s) = delete;
   dispatcher& operator=(const dispatcher& s) = delete;
 
   /**
-   * @brief Initialize the selected block distributor. This is a separate
+   * \brief Initialize the selected block distributor. This is a separate
    * function, rather than happening in the constructor, so that error handling
    * can be done without exceptions.
    *
-   * @return \c TRUE if initialization successful, \c FALSE otherwise.
+   * \return \c TRUE if initialization successful, \c FALSE otherwise.
    */
-  bool initialize(void);
+  bool initialize(rmath::rng* rng);
 
   /**
-   * @brief Distribute a block in the arena.
+   * \brief Distribute a block in the arena.
    *
-   * @param block The block to distribute.
-   * @param entities List of all arena entities in the arena that distribution
+   * \param block The block to distribute.
+   * \param entities List of all arena entities in the arena that distribution
    * should treat as obstacles/things that blocks should not be placed in.
    *
-   * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
+   * \return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
-  bool distribute_block(std::shared_ptr<representation::base_block>& block,
+  bool distribute_block(std::shared_ptr<crepr::base_block2D>& block,
                         ds::const_entity_list& entities);
 
   /**
-   * @brief Distribute all blocks in the arena.
+   * \brief Distribute all blocks in the arena.
    *
-   * @return \c TRUE iff distribution was successful, \c FALSE otherwise.
+   * \return \c TRUE iff distribution was successful, \c FALSE otherwise.
    */
   bool distribute_blocks(ds::block_vector& blocks,
                          ds::const_entity_list& entities);
@@ -110,13 +114,15 @@ class dispatcher {
   const base_distributor* distributor(void) const { return m_dist.get(); }
 
  private:
-  // clang-format off
-  const struct params::arena::block_dist_params mc_params;
-  std::string                                   m_dist_type;
-  ds::arena_grid&                               m_grid;
-  std::unique_ptr<base_distributor>             m_dist;
+  /* clang-format off */
+  const rtypes::discretize_ratio         mc_resolution;
+  const config::arena::block_dist_config mc_config;
+  std::string                            mc_dist_type;
 
-  // clang-format on
+  ds::arena_grid*                        m_grid{nullptr};
+  std::unique_ptr<base_distributor>      m_dist;
+
+  /* clang-format on */
 };
 
 NS_END(block_dist, support, fordyca);

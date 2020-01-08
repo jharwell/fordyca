@@ -1,7 +1,7 @@
 /**
- * @file block_vector.hpp
+ * \file block_vector.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,24 +24,41 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <vector>
-#include "rcppsw/common/common.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace representation {
-class base_block;
+namespace cosm::repr {
+class base_block2D;
 }
-NS_START(ds);
+NS_START(fordyca, ds);
 
-using block_vector_type = std::shared_ptr<representation::base_block>;
+using block_vector_type = std::shared_ptr<crepr::base_block2D>;
 
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-using block_vector = std::vector<block_vector_type>;
+/**
+ * \class block_vector
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::vector with an additional \ref to_str()
+ * method.
+ */
+class block_vector : public std::vector<block_vector_type> {
+ public:
+  using std::vector<block_vector_type>::vector;
+  using value_type = std::vector<block_vector_type>::value_type;
+
+  /**
+   * \brief Get a string representation of the vector contents.
+   */
+  std::string to_str(void) const;
+};
 
 NS_END(ds, fordyca);
 

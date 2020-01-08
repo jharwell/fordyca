@@ -1,7 +1,7 @@
 /**
- * @file base_perception_subsystem.hpp
+ * \file base_perception_subsystem.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,15 +24,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <string>
-#include <vector>
+#include <memory>
 
-#include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/metrics/world_model_metrics.hpp"
-#include "fordyca/params/perception_params.hpp"
-#include "rcppsw/common/common.hpp"
-#include "rcppsw/er/client.hpp"
-#include "fordyca/representation/line_of_sight.hpp"
+#include "fordyca/config/perception/perception_config.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -40,105 +36,69 @@
 NS_START(fordyca);
 
 namespace ds {
-class perceived_arena_map;
-} // namespace ds
+class dpo_store;
+}
 
 NS_START(controller);
+class oracular_info_receptor;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_perception_subsystem
- * @ingroup controller
+ * \class base_perception_subsystem
+ * \ingroup controller
  *
- * @brief Manages all robot perception of the environment; vis a vie, how to
- * take what the sensors read and turn it into a useful internal
- * representation.
+ * \brief Base class for robot perception common to all controllers, which is
+ * just the \ref dpo_store of objects.
  */
-class base_perception_subsystem
-    : public rcppsw::er::client<base_perception_subsystem>,
-      public metrics::world_model_metrics {
+class base_perception_subsystem {
  public:
-  base_perception_subsystem(const params::perception_params* const params,
-                            const std::string& id);
+  explicit base_perception_subsystem(
+      const config::perception::perception_config* const pconfig)
+      : mc_los_dim(pconfig->los_dim) {}
 
-  /* world model metrics */
-  uint cell_state_inaccuracies(uint state) const override {
-    return m_cell_stats[state];
-  }
-  void reset_metrics(void) override;
-  double known_percentage(void) const override;
-  double unknown_percentage(void) const override;
+  virtual ~base_perception_subsystem(void) = default;
 
   /**
-   * @brief Update the robot's perception of the environment, passing it its
-   * current line of sight.
-   *
-   * @param los The current line of sight.
+   * \brief Reset the robot's perception of the environment to an initial state
    */
-  void update(const representation::line_of_sight* const los);
+  virtual void reset(void) {}
 
   /**
-   * @brief Reset the robot's perception of the environment to an initial state
+   * \brief Update the internal data structure/repr of the
+   * environment/arena, after the LOS has been updated.
    */
-  void reset(void);
+  virtual void update(oracular_info_receptor* receptor) = 0;
 
-  const ds::perceived_arena_map* map(void) const { return m_map.get(); }
-  ds::perceived_arena_map* map(void) { return m_map.get(); }
-
-  /**
-   * @brief Get the robot's current line-of-sight (LOS)
-   *
-   * Not used by \ref crw_controller.
-   */
-  const representation::line_of_sight* los(void) const { return m_los.get(); }
+  virtual const ds::dpo_store* dpo_store(void) const = 0;
+  virtual ds::dpo_store* dpo_store(void) = 0;
 
   /**
-   * @brief Set the robots LOS for the next timestep.
+   * \brief Set the robots LOS for the next timestep.
    *
    * This is a hack to make it easy for me to run simulations, as I can computer
    * the line of sight for a robot within the loop functions, and just pass it
    * in here. In real robots this routine would be MUCH messier and harder to
    * work with.
    *
-   * @param los The new los
+   * \param los The new los
    */
-  void los(std::unique_ptr<representation::line_of_sight>& los);
-
- protected:
-  /*
-   * @brief Update the perceived arena map with the current line-of-sight,
-   * update the relevance of information (density) within it, and fix any blocks
-   * that should be hidden from our awareness.
-   *
-   * @param c_los The LOS to process.
-   */
-  virtual void process_los(const representation::line_of_sight* const c_los);
+  void los(std::unique_ptr<repr::line_of_sight> los) { m_los = std::move(los); }
 
   /**
-   * @brief The processing of the current LOS after processing (i.e. does the
-   * PAM now accurately reflect what was in the LOS)?
-   *
-   * @param c_los Current LOS.
+   * \brief Get the robot's current line-of-sight (LOS)
    */
-  virtual void processed_los_verify(
-      const representation::line_of_sight* const c_los) const;
+  const repr::line_of_sight* los(void) const { return m_los.get(); }
+
+  double los_dim(void) const { return mc_los_dim; }
 
  private:
-  /**
-   * @brief Update the aggregate stats on inaccuracies in the robot's perceived
-   * arena map for this timestep.
-   *
-   * @param los The current LOS
-   */
-  void update_cell_stats(const representation::line_of_sight* const los);
+  /* clang-format off */
+  const double mc_los_dim;
 
-  // clang-format off
-  std::vector<uint>                              m_cell_stats;
-  std::unique_ptr<representation::line_of_sight> m_los;
-  std::unique_ptr<ds::perceived_arena_map>       m_map;
-  // clang-format on
+  std::unique_ptr<repr::line_of_sight> m_los{nullptr};
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);

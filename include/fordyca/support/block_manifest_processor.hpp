@@ -1,7 +1,7 @@
 /**
- * @file block_manifest_processor.hpp
+ * \file block_manifest_processor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,40 +24,46 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <string>
 #include <vector>
 
-#include "fordyca/params/arena/block_manifest.hpp"
 #include "rcppsw/math/vector2.hpp"
-#include "rcppsw/patterns/factory/sharing_factory.hpp"
+#include "rcppsw/patterns/factory/factory.hpp"
+#include "rcppsw/types/type_uuid.hpp"
+
+#include "fordyca/config/arena/block_manifest.hpp"
 #include "fordyca/ds/block_vector.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace rmath = rcppsw::math;
-namespace representation {
-class base_block;
-}
-NS_START(support);
-namespace factory = rcppsw::patterns::factory;
+NS_START(fordyca, support);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
+/**
+ * \class block_manifest_processor
+ * \ingroup support
+ *
+ * \brief Translates the parsed XML configuration for how many/what type of
+ * blocks should be used in simulation into a heterogeneous vector of actual
+ * blocks.
+ */
 class block_manifest_processor
-    : private factory::sharing_factory<representation::base_block,
-                                       const rmath::vector2d&,
-                                       int> {
+    : public rpfactory::sharing_factory<crepr::base_block2D,
+                                        std::string, /* key type */
+                                        const rmath::vector2d&,
+                                        const rtypes::type_uuid&> {
  public:
-  explicit block_manifest_processor(const params::arena::block_manifest* const m);
+  explicit block_manifest_processor(const config::arena::block_manifest* m);
 
   ds::block_vector create_blocks(void);
 
  private:
-  // clang-format off
-  const params::arena::block_manifest mc_manifest;
-  // clang-format on
+  /* clang-format off */
+  const config::arena::block_manifest mc_manifest;
+  /* clang-format on */
 };
 
 NS_END(support, fordyca);

@@ -1,7 +1,7 @@
 /**
- * @file cell_empty.cpp
+ * \file cell_empty.cpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,15 +22,16 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/events/cell_empty.hpp"
+
 #include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/cell2D.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/ds/occupancy_grid.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, events);
+NS_START(fordyca, events, detail);
 using ds::arena_grid;
 using ds::occupancy_grid;
 
@@ -39,7 +40,7 @@ using ds::occupancy_grid;
  ******************************************************************************/
 void cell_empty::visit(ds::cell2D& cell) {
   cell.entity(nullptr);
-  cell.fsm().accept(*this);
+  visit(cell.fsm());
 } /* visit() */
 
 void cell_empty::visit(fsm::cell2D_fsm& fsm) {
@@ -47,7 +48,7 @@ void cell_empty::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cell_empty::visit(ds::arena_map& map) {
-  map.access<arena_grid::kCell>(x(), y()).accept(*this);
+  visit(map.access<arena_grid::kCell>(x(), y()));
 } /* visit() */
 
 void cell_empty::visit(ds::occupancy_grid& grid) {
@@ -56,16 +57,16 @@ void cell_empty::visit(ds::occupancy_grid& grid) {
     grid.known_cells_inc();
   }
   ER_ASSERT(grid.known_cell_count() <= grid.xdsize() * grid.ydsize(),
-            "Known cell count (%u) >= arena dimensions (%ux%u)",
+            "Known cell count (%u) >= arena dimensions (%zux%zu)",
             grid.known_cell_count(),
             grid.xdsize(),
             grid.ydsize());
   grid.access<occupancy_grid::kPheromone>(x(), y()).reset();
-  cell.accept(*this);
+  visit(cell);
 } /* visit() */
 
-void cell_empty::visit(ds::perceived_arena_map& map) {
-  map.decoratee().accept(*this);
+void cell_empty::visit(ds::dpo_semantic_map& map) {
+  visit(map.decoratee());
 } /* visit() */
 
-NS_END(events, fordyca);
+NS_END(detail, events, fordyca);

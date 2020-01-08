@@ -1,7 +1,7 @@
 /**
- * @file multi_cluster_distributor.cpp
+ * \file multi_cluster_distributor.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,27 +22,28 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/block_dist/multi_cluster_distributor.hpp"
-#include <random>
+
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/ds/cell2D.hpp"
-#include "fordyca/representation/base_block.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, block_dist);
-namespace er = rcppsw::er;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 multi_cluster_distributor::multi_cluster_distributor(
     std::vector<ds::arena_grid::view>& grids,
-    double arena_resolution,
-    uint maxsize)
-    : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster") {
-  for (size_t i = 0; i < grids.size(); ++i) {
-    m_dists.emplace_back(grids[i], arena_resolution, maxsize);
+    rtypes::discretize_ratio resolution,
+    uint maxsize,
+    rmath::rng* rng)
+    : ER_CLIENT_INIT("fordyca.support.block_dist.multi_cluster"),
+      base_distributor(rng) {
+  for (auto& g : grids) {
+    m_dists.emplace_back(g, resolution, maxsize, rng);
   } /* for(i..) */
 }
 
@@ -50,27 +51,36 @@ multi_cluster_distributor::multi_cluster_distributor(
  * Member Functions
  ******************************************************************************/
 bool multi_cluster_distributor::distribute_block(
-    std::shared_ptr<representation::base_block>& block,
+    std::shared_ptr<crepr::base_block2D>& block,
     ds::const_entity_list& entities) {
   for (uint i = 0; i < kMAX_DIST_TRIES; ++i) {
-    uint idx = std::rand() % m_dists.size();
+    /* -1 because we are working with array indices */
+    uint idx = rng()->uniform(0, m_dists.size() - 1);
     cluster_distributor& dist = m_dists[idx];
-    const auto* clust = dist.block_clusters().front(); /* only 1 */
+
+    /* Always/only 1 cluster per cluster distributor, so this is safe to do */
+    auto* clust = dist.block_clusters().front();
     if (clust->capacity() == clust->block_count()) {
-      ER_DEBUG("block%d to cluster%u failed: Cluster capacity (%u) reached",
-               block->id(),
+      ER_DEBUG("Block%d to cluster%u failed: capacity (%u) reached",
+               block->id().v(),
                idx,
                clust->capacity());
     } else {
+      ER_DEBUG("Block%d to cluster%u: capacity=%u,size=%zu",
+               block->id().v(),
+               idx,
+               clust->capacity(),
+               clust->block_count());
       return dist.distribute_block(block, entities);
     }
   } /* for(i..) */
   return false;
 } /* distribute_block() */
 
-ds::const_block_cluster_list multi_cluster_distributor::block_clusters(void) const {
-  ds::const_block_cluster_list ret;
-  for (auto &dist : m_dists) {
+ds::block_cluster_vector multi_cluster_distributor::block_clusters(void) const {
+  ds::block_cluster_vector ret;
+
+  for (auto& dist : m_dists) {
     auto bclusts = dist.block_clusters();
     ret.insert(ret.end(), bclusts.begin(), bclusts.end());
   } /* for(&dist..) */

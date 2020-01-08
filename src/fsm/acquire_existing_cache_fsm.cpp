@@ -1,7 +1,7 @@
 /**
- * @file block_to_existing_cache_fsm.cpp
+ * \file block_to_existing_cache_fsm.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -22,121 +22,141 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/controller/depth1/existing_cache_selector.hpp"
-#include "fordyca/controller/sensing_subsystem.hpp"
-#include "fordyca/ds/perceived_arena_map.hpp"
-#include "fordyca/representation/base_cache.hpp"
+
+#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
+
+#include "fordyca/ds/dpo_store.hpp"
+#include "fordyca/fsm/arrival_tol.hpp"
+#include "fordyca/fsm/cache_acq_point_selector.hpp"
+#include "fordyca/fsm/cache_acq_validator.hpp"
+#include "fordyca/fsm/existing_cache_selector.hpp"
+#include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
+#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
+using cselm = controller::cache_sel_matrix;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
-    const controller::cache_sel_matrix* matrix,
-    bool is_pickup,
-    controller::saa_subsystem* const saa,
-    ds::perceived_arena_map* const map)
+    const fsm_ro_params* c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
+    rmath::rng* rng,
+    bool for_pickup)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_existing_cache"),
       acquire_goal_fsm(
           saa,
-          std::bind(&acquire_existing_cache_fsm::acquisition_goal_internal,
-                    this),
-          std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
-          std::bind(&acquire_existing_cache_fsm::existing_cache_select, this),
-          std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
-                    this,
-                    std::placeholders::_1),
-          std::bind(&acquire_existing_cache_fsm::cache_exploration_term_cb,
-                    this)),
-      mc_is_pickup(is_pickup),
-      mc_matrix(matrix),
-  mc_map(map) {}
+          std::move(exp_behavior),
+          rng,
+          acquire_goal_fsm::hook_list{
+              .acquisition_goal =
+                  std::bind(&acquire_existing_cache_fsm::acq_goal_internal),
+              .goal_select =
+                  std::bind(&acquire_existing_cache_fsm::existing_cache_select,
+                            this),
+              .candidates_exist =
+                  std::bind(&acquire_existing_cache_fsm::candidates_exist, this),
+
+              .goal_acquired_cb =
+                  std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
+
+                            this,
+                            std::placeholders::_1),
+              /*
+                 * We never ever want to be able to acquire a cache via
+                 * exploration, because if we are near/inside a cache exploring,
+                 * it is because that cache is not currently suitable for
+                 * acquisition (probably due to the current pickup
+                 * policy). Allowing acquisition via exploration can result in
+                 * violations of the pickup policy.
+                 */
+              .explore_term_cb = std::bind([]() noexcept { return false; }),
+              .goal_valid_cb =
+                  std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
+                            this,
+                            std::placeholders::_1,
+                            std::placeholders::_2)}),
+      mc_for_pickup(for_pickup),
+      mc_matrix(c_params->csel_matrix),
+      mc_store(c_params->store) {}
+
+/*******************************************************************************
+ * Non-Member Functions
+ ******************************************************************************/
+cfmetrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::acq_goal_internal(
+    void) {
+  return cfmetrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekEXISTING_CACHE);
+} /* acq_goal() */
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool acquire_existing_cache_fsm::calc_acquisition_location(
-    rmath::vector2d* const loc) {
-  controller::depth1::existing_cache_selector selector(mc_is_pickup, mc_matrix);
-  representation::perceived_cache best =
-      selector.calc_best(mc_map->perceived_caches(),
-                         saa_subsystem()->sensing()->position());
-  /*
-   * If this happens, all the caches we know of are too close for us to vector
-   * to, or otherwise unsuitable.
-   */
-  if (nullptr == best.ent) {
-    return false;
-  }
-  ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
-          best.ent->id(),
-          best.ent->real_loc().to_str().c_str(),
-          best.ent->discrete_loc().to_str().c_str(),
-          best.density.last_result());
+boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache_fsm::
+    calc_acq_location(void) {
+  existing_cache_selector selector(mc_for_pickup, mc_matrix, &mc_store->caches());
 
-  /*
-   * Now that we have the location of the best cache, we need to pick a random
-   * point inside it to vector to. This helps a LOT with maximimizing caches'
-   * potential for traffic/congestion regulation, because it does not require
-   * that all robots be able to make it to the center/near center of the cache
-   * in order to utilize it (this is more realistic too).
-   */
-  auto xrange = best.ent->xspan(best.ent->real_loc());
-  auto yrange = best.ent->yspan(best.ent->real_loc());
-  std::uniform_real_distribution<double> xrnd(xrange.lb(), xrange.ub());
-  std::uniform_real_distribution<double> yrnd(yrange.lb(), yrange.ub());
+  if (auto best = selector(mc_store->caches(),
+                           saa()->sensing()->position(),
+                           saa()->sensing()->tick())) {
+    ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
+            best->ent()->id().v(),
+            best->ent()->rloc().to_str().c_str(),
+            best->ent()->dloc().to_str().c_str(),
+            best->density().v());
 
-  *loc = rmath::vector2d(xrnd(m_rd), yrnd(m_rd));
-  ER_INFO("Selected point %s inside cache%d: xrange=%s, yrange=%s",
-          loc->to_str().c_str(),
-          best.ent->id(),
-          xrange.to_str().c_str(),
-          yrange.to_str().c_str());
-  return true;
-} /* calc_acquisition_location() */
+    rmath::vector2d point = cache_acq_point_selector(kFOOTBOT_CACHE_ACQ_FACTOR)(
+        saa()->sensing()->position(), best->ent(), rng());
 
-bool acquire_existing_cache_fsm::cache_exploration_term_cb(void) const {
-  return saa_subsystem()->sensing()->cache_detected();
-} /* cache_exploration_term_cb() */
-
-acquire_goal_fsm::candidate_type acquire_existing_cache_fsm::existing_cache_select(
-    void) {
-  rmath::vector2d loc;
-  if (!calc_acquisition_location(&loc)) {
-    return acquire_goal_fsm::candidate_type(false, rmath::vector2d(), -1);
+    return boost::make_optional(std::make_pair(best->ent()->id(), point));
   } else {
-    return acquire_goal_fsm::candidate_type(true,
-                                            loc,
-                                            vector_fsm::kCACHE_ARRIVAL_TOL);
+    /*
+     * If this happens, all the caches we know of are too close for us to vector
+     * to, or otherwise unsuitable.
+     */
+    return boost::optional<acq_loc_type>();
   }
+} /* calc_acq_location() */
+
+boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_existing_cache_fsm::
+    existing_cache_select(void) {
+  if (auto selection = calc_acq_location()) {
+    return boost::make_optional(acquire_goal_fsm::candidate_type(
+        selection.get().second, kCACHE_ARRIVAL_TOL, selection.get().first));
+  }
+  return boost::optional<acquire_goal_fsm::candidate_type>();
 } /* existing_cache_select() */
 
 bool acquire_existing_cache_fsm::candidates_exist(void) const {
-  return !mc_map->perceived_caches().empty();
+  return !mc_store->caches().empty();
 } /* candidates() */
 
 bool acquire_existing_cache_fsm::cache_acquired_cb(bool explore_result) const {
   if (explore_result) {
-    ER_ASSERT(saa_subsystem()->sensing()->cache_detected(),
-              "No cache detected after successful exploration?");
-    return true;
+    ER_FATAL_SENTINEL("Robot acquired cache via exploration");
+    return false;
   } else {
-    if (saa_subsystem()->sensing()->cache_detected()) {
+    if (saa()->sensing()->sensor<chal::sensors::ground_sensor>()->detect(
+            "cache")) {
       return true;
     }
-    ER_WARN("Robot arrived at goal, but no cache was detected.");
+    ER_WARN("Robot arrived at goal, but no cache was detected");
     return false;
   }
 } /* cache_acquired_cb() */
 
-acquisition_goal_type acquire_existing_cache_fsm::acquisition_goal_internal(
-    void) const {
-  return acquisition_goal_type::kExistingCache;
-} /* acquisition_goal() */
+bool acquire_existing_cache_fsm::cache_acq_valid(const rmath::vector2d& loc,
+                                                 const rtypes::type_uuid& id) {
+  return cache_acq_validator(&mc_store->caches(),
+                             mc_matrix,
+                             mc_for_pickup)(loc, id, saa()->sensing()->tick());
+} /* cache_acq_valid() */
 
 NS_END(controller, fordyca);

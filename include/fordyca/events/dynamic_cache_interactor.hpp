@@ -1,7 +1,7 @@
 /**
- * @file dynamic_cache_interactor.hpp
+ * \file dynamic_cache_interactor.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,28 +26,30 @@
  ******************************************************************************/
 #include "rcppsw/patterns/visitor/polymorphic_visitable.hpp"
 
+#include "fordyca/fordyca.hpp"
+
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events);
+namespace detail {
 class block_proximity;
 class cache_proximity;
-
-namespace visitor = rcppsw::patterns::visitor;
+} // namespace detail
 
 /*******************************************************************************
  * Structure Definitions
  ******************************************************************************/
 /**
- * @class dynamic_cache_interactor
- * @ingroup events
+ * \class dynamic_cache_interactor
+ * \ingroup events
  *
- * @brief Interactor specifying the event visit set for all foraging tasks that
+ * \brief Interactor specifying the event visit set for all foraging tasks that
  * interact with dynamic caches in FORDYCA.
  */
 class dynamic_cache_interactor
-    : public visitor::polymorphic_accept_set<block_proximity>,
-      public visitor::polymorphic_accept_set<cache_proximity> {};
+    : public rpvisitor::polymorphic_accept_set<detail::block_proximity,
+                                               detail::cache_proximity> {};
 
 NS_END(events, fordyca);
 

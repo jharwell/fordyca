@@ -1,7 +1,7 @@
 /**
- * @file depth2_qt_user_functions.cpp
+ * \file depth2_qt_user_functions.cpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *

@@ -1,7 +1,7 @@
 /**
- * @file static_cache_manager.hpp
+ * \file static_cache_manager.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,84 +25,140 @@
  * Includes
  ******************************************************************************/
 #include <vector>
-#include <utility>
+#include <boost/optional.hpp>
 
-#include "fordyca/params/caches/caches_params.hpp"
+#include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/ds/block_vector.hpp"
+#include "fordyca/ds/block_list.hpp"
+#include "fordyca/ds/block_cluster_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "rcppsw/math/vector2.hpp"
-
+#include "rcppsw/math/rng.hpp"
 #include "rcppsw/er/client.hpp"
+#include "fordyca/support/cache_create_ro_params.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca);
 namespace ds { class arena_grid; }
-namespace representation {
-class base_block;
+namespace repr {
+class base_block2D;
 class arena_cache;
 }
 NS_START(support, depth1);
-namespace er = rcppsw::er;
-namespace rmath = rcppsw::math;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class static_cache_manager
- * @ingroup support depth1
+ * \class static_cache_manager
+ * \ingroup support depth1
  *
- * @brief Manager for creation, depletion, and metric gathering for the static
- * cache in the arena, when it is employed.
+ * \brief Manager for creation, depletion, and metric gathering for the static
+ * cache(s) in the arena.
  */
-class static_cache_manager : public base_cache_manager,
-                             public er::client<static_cache_manager> {
+class static_cache_manager final : public base_cache_manager,
+                                   public rer::client<static_cache_manager> {
  public:
-  static_cache_manager(const struct params::caches::caches_params* params,
+  static_cache_manager(const config::caches::caches_config* config,
                        ds::arena_grid* arena_grid,
-                       const rmath::vector2d& cache_loc);
-
-
+                       const std::vector<rmath::vector2d>& cache_locs,
+                       rmath::rng* rng);
+  static_cache_manager(const static_cache_manager&) = delete;
+  static_cache_manager& operator=(const static_cache_manager&) = delete;
 
   /**
-   * @brief (Re)-create the static cache in the arena (depth 1 only).
+   * \brief (Re)-create the static cache in the arena (depth 1 only).
    *
-   * @param blocks The total block vector for the arena.
-   *
-   * @return \c TRUE iff a static cache was actually created. Non-fatal failures
-   * to create the static cache can occur if, for example, all blocks are
-   * currently being carried by robots and there are not enough free blocks with
-   * which to create a cache of the specified minimum size.
+   * \return The created caches. Non-fatal failures to create the static cache
+   * can occur if, for example, all blocks are currently being carried by robots
+   * and there are not enough free blocks with which to create a cache of the
+   * specified minimum size.
    */
-  creation_res_t create(ds::block_vector& blocks);
+  boost::optional<ds::cache_vector> create(const cache_create_ro_params& c_params,
+                                           const ds::block_vector&  c_alloc_blocks);
 
-  creation_res_t create_conditional(ds::block_vector& blocks,
-                                     uint n_harvesters,
-                                     uint n_collectors);
+  boost::optional<ds::cache_vector> create_conditional(
+      const cache_create_ro_params& c_params,
+      const ds::block_vector&  c_alloc_blocks,
+      uint n_harvesters,
+      uint n_collectors);
+
+  /**
+   * \brief Get the # of caches that are being managed.
+   */
+  size_t n_managed(void) const { return mc_cache_locs.size(); }
 
  private:
   /**
-   * @brief Compute the blocks that are going to go into the static cache when
-   * it is recreated by the arena map.
+   * \brief Allocate blocks for static cache(s) re-creation.
    *
-   * @param grid_resolution The resolution of the arena.
-   * @param blocks Empty block vector to be filled with references to the blocks
-   *               to be part of the new cache.
+   * \param existing_caches The caches that currently exist in the arena.
+   * \param blocks Vector of all blocks in the arena.
    *
-   * @return \c TRUE iff the calculate of blocks was successful. It may fail if
-   * they are not enough free blocks in the arena to meet the desired initial
-   * size of the cache. If it returns \c TRUE, then the second parameter of the
-   * pair is the vector of blocks to use for cache creation.
+   * \return A vector of all blocks that will be used in the re-creation of
+   * caches in the arena this timestep. There may not be enough free blocks in
+   * the arena to meet the desired initial size of at least one cache, which is
+   * not an error (all blocks can currently be carried by robots, for example).
    */
-  block_calc_res_t calc_blocks_for_creation(ds::block_vector& blocks);
+  boost::optional<ds::block_vector> blocks_alloc(
+      const ds::cache_vector& existing_caches,
+      const ds::block_vector& all_blocks) const;
 
-  // clang-format off
-  const params::caches::caches_params mc_cache_params;
-  const rmath::vector2d               mc_cache_loc;
-  // clang-format on
+  /**
+   * \brief Allocate the blocks that should be used when re-creating cache i.
+   *
+   * Only blocks that are not:
+   *
+   * - Already part of an existing cache
+   * - Currently carried by a robot
+   * - Currently placed on the cell where cache i is to be created
+   * - Placed on the cell where any other cache besides cache i *might* be
+   *   recreated. We have to allocate blocks so that ALL static caches can be
+   *   recreated on the same timestep if needed.
+   * - Already allocated for the re-creation of a different static cache
+   *
+   * are eligible.
+   *
+   * \param existing_caches Vector of existing static caches.
+   * \param allocated_blocks Vector of blocks that have already been allocated
+   *                         to the re-creation of other static caches this
+   *                         timestep.
+   * \param all_blocks All blocks available for cache creation (already
+   *                   allocated blocks are not filtered out).
+   * \param loc The location the new cache is to be created at.
+   * \param n_blocks How many blocks to try to allocate for cache i.
+   */
+  boost::optional<ds::block_vector> cache_i_blocks_alloc(
+      const ds::cache_vector& existing_caches,
+      const ds::block_vector& allocated_blocks,
+      const ds::block_vector& all_blocks,
+      const rmath::vector2d& loc,
+      size_t n_blocks) const;
+
+  /**
+   * \brief Absorb free blocks that are under caches into the newly created
+   * caches.
+   *
+   * This is necessary for the current static cache creation strategy of
+   * randomly picking free blocks in the arena when it is necessary to re-create
+   * the cache. There *may* be free blocks that will be within the newly created
+   * cache's extent that are NOT considered during cache creation.
+   *
+   * This is generally only an issue at the start of simulation if random block
+   * distribution is used, but weird cases can arise due to task abort+block
+   * drop as well, so it is best to be safe and do it unconditionally after
+   * creation.
+   */
+  void post_creation_blocks_absorb(const ds::cache_vector& caches,
+                                   const ds::block_vector& blocks);
+
+  /* clang-format off */
+  const config::caches::caches_config mc_cache_config;
+  const std::vector<rmath::vector2d>  mc_cache_locs;
+  rmath::rng*                         m_rng;
+  /* clang-format on */
 };
 
 NS_END(depth1, support, fordyca);

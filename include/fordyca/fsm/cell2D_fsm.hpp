@@ -1,7 +1,7 @@
 /**
- * @file cell2D_fsm.hpp
+ * \file cell2D_fsm.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,56 +26,78 @@
  ******************************************************************************/
 #include <string>
 
-#include "rcppsw/patterns/state_machine/simple_fsm.hpp"
-#include "rcppsw/patterns/visitor/visitable.hpp"
 #include "rcsw/common/common.h"
+
+#include "rcppsw/patterns/fsm/simple_fsm.hpp"
+
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/cell2D_states.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
-namespace state_machine = rcppsw::patterns::state_machine;
-namespace visitor = rcppsw::patterns::visitor;
-namespace er = rcppsw::er;
-
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class cell2D_fsm
- * @ingroup fsm
+ * \class cell2D_fsm
+ * \ingroup fsm
  *
- * @brief Per-cell FSM containing the current state of the cell (empty, has a
+ * \brief Per-cell FSM containing the current state of the cell (empty, has a
  * block, has a cache, or unknown, etc.).
  *
  */
-class cell2D_fsm : public state_machine::simple_fsm,
-                   public visitor::visitable_any<cell2D_fsm>,
-                   public er::client<cell2D_fsm> {
+class cell2D_fsm final : public rpfsm::simple_fsm,
+                         public rer::client<cell2D_fsm> {
  public:
-  enum state {
-    ST_UNKNOWN,
-    ST_EMPTY,
-    ST_HAS_BLOCK,
-    ST_HAS_CACHE,
-    ST_CACHE_EXTENT,
-    ST_MAX_STATES
-  };
+  using states = cell2D_states;
 
   cell2D_fsm(void);
-  ~cell2D_fsm(void) override = default;
-  cell2D_fsm(const cell2D_fsm& other) = default;
 
+  ~cell2D_fsm(void) override = default;
+  cell2D_fsm& operator=(const cell2D_fsm&) = delete;
+
+  /**
+   * \brief Initialize a COPY of a class instance via copy construction.
+   *
+   * This function is necessary to use this class with \ref
+   * rcppsw::ds::stacked_grid, because the boost::multi_array it is built on
+   * only calls the constructor for the cell object type ONCE, and then uses the
+   * copy constructor to initialize the rest of the cells.
+   *
+   * My FSM paradigm uses *MEMBER* function pointers, so you need to initialize
+   * the state map cleanly WITHOUT copy construction (even though this is the
+   * copy constructor), otherwise all copies of the object will use the \p other
+   * object's state map (default behavior in default copy constructor). If \p
+   * other is destructed, then you will get a segfault due to dangling pointers.
+   */
+  cell2D_fsm(const cell2D_fsm& other);
+
+  /* simple_fsm overrides */
   void init(void) override;
 
-  bool state_is_known(void) const { return current_state() != ST_UNKNOWN; }
-  bool state_has_block(void) const { return current_state() == ST_HAS_BLOCK; }
-  bool state_has_cache(void) const { return current_state() == ST_HAS_CACHE; }
-  bool state_in_cache_extent(void) const {
-    return current_state() == ST_CACHE_EXTENT;
+  bool state_is_known(void) const {
+    return current_state() !=
+           std::underlying_type<states>::type(states::ekST_UNKNOWN);
   }
-  bool state_is_empty(void) const { return current_state() == ST_EMPTY; }
+  bool state_has_block(void) const {
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_HAS_BLOCK);
+  }
+  bool state_has_cache(void) const {
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_HAS_CACHE);
+  }
+  bool state_in_cache_extent(void) const {
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_CACHE_EXTENT);
+  }
+  bool state_is_empty(void) const {
+    return current_state() ==
+           std::underlying_type<states>::type(states::ekST_EMPTY);
+  }
 
   /* events */
   void event_unknown(void);
@@ -87,8 +109,8 @@ class cell2D_fsm : public state_machine::simple_fsm,
   size_t block_count(void) const { return m_block_count; }
 
  private:
-  struct block_data : public state_machine::event_data {
-    explicit block_data(bool pickup_) : pickup(pickup_) {}
+  struct block_data final : public rpfsm::event_data {
+    explicit block_data(bool pickup_in) : pickup(pickup_in) {}
     bool pickup;
   };
 
@@ -99,20 +121,13 @@ class cell2D_fsm : public state_machine::simple_fsm,
   FSM_STATE_DECLARE_ND(cell2D_fsm, state_cache_extent);
 
   FSM_DEFINE_STATE_MAP_ACCESSOR(state_map, index) override {
-    FSM_DEFINE_STATE_MAP(state_map, kSTATE_MAP){
-        FSM_STATE_MAP_ENTRY(&state_unknown),
-        FSM_STATE_MAP_ENTRY(&state_empty),
-        FSM_STATE_MAP_ENTRY(&state_block),
-        FSM_STATE_MAP_ENTRY(&state_cache),
-        FSM_STATE_MAP_ENTRY(&state_cache_extent),
-    };
-    FSM_VERIFY_STATE_MAP(state_map, kSTATE_MAP, ST_MAX_STATES);
-    return &kSTATE_MAP[index];
+    return &mc_state_map[index];
   }
 
-  // clang-format off
+  FSM_DECLARE_STATE_MAP(state_map, mc_state_map, states::ekST_MAX_STATES);
+  /* clang-format off */
   uint m_block_count{0};
-  // clang-format on
+  /* clang-format on */
 };
 
 NS_END(fsm, forydca);

@@ -1,7 +1,7 @@
 /**
- * @file depth2_metrics_aggregator.hpp
+ * \file depth2_metrics_aggregator.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -26,46 +26,53 @@
  ******************************************************************************/
 #include <string>
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
+#include "fordyca/tasks/depth2/foraging_task.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace controller { namespace depth2 { class greedy_recpart_controller; }}
-
-NS_START(support, depth2);
-namespace er = rcppsw::er;
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class depth2_metrics_aggregator
- * @ingroup support depth2
+ * \class depth2_metrics_aggregator
+ * \ingroup support depth2
  *
- * @brief Aggregates and metrics collection for depth2 foraging. That
+ * \brief Aggregates and metrics collection for depth2 foraging. That
  * includes everything from \ref depth1_metrics_aggregator, and also:
  *
- * - TAB metrics (rooted at harvester)
- * - TAB metrics (rooted at collector)
+ * - TAB metrics (rooted at Harvester)
+ * - TAB metrics (rooted at Collector)
+ * - Cache site selection
  */
-class depth2_metrics_aggregator : public depth1::depth1_metrics_aggregator,
-                                  public er::client<depth2_metrics_aggregator> {
+class depth2_metrics_aggregator final : public depth1::depth1_metrics_aggregator,
+                                  public rer::client<depth2_metrics_aggregator> {
  public:
-  depth2_metrics_aggregator(const struct params::metrics_params* params,
+  depth2_metrics_aggregator(const cmconfig::metrics_config* mconfig,
+                            const config::grid_config* const gconfig,
                             const std::string& output_root);
 
-  void task_alloc_cb(const ta::polled_task* task,
-                     const ta::bi_tab* tab);
-  void task_finish_or_abort_cb(const ta::polled_task* const task);
+  void task_start_cb(const cta::polled_task* task,
+                     const cta::ds::bi_tab* tab);
+  void task_finish_or_abort_cb(const cta::polled_task* task);
 
   /**
-   * @brief Collect metrics from the depth2 controller.
+   * \brief Collect metrics from the depth2 controller.
    */
   template<class ControllerType>
   void collect_from_controller(const ControllerType* c) {
     depth1::depth1_metrics_aggregator::collect_from_controller(c);
+
+    auto task = dynamic_cast<const cta::polled_task*>(c->current_task());
+
+    /* only Cache Starter implements these metrics */
+    if (nullptr != task &&
+        tasks::depth2::foraging_task::kCacheStarterName == task->name()) {
+      collect("caches::site_selection", *task);
+    }
   }
 };
 

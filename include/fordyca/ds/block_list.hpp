@@ -1,7 +1,7 @@
 /**
- * @file block_list.hpp
+ * \file block_list.hpp
  *
- * @copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2018 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -25,28 +25,60 @@
  * Includes
  ******************************************************************************/
 #include <list>
-#include "rcppsw/common/common.hpp"
+#include <string>
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace representation {
-class base_block;
-struct perceived_block;
-} // namespace representation
-NS_START(ds);
+namespace cosm::repr {
+class base_block2D;
+} /* namespace cosm::repr */
 
-using block_list_type = std::shared_ptr<representation::base_block>;
-using const_block_list_type = std::shared_ptr<const representation::base_block>;
-using perceived_block_list_type = representation::perceived_block;
+NS_START(fordyca, ds);
+
+using block_list_type = std::shared_ptr<crepr::base_block2D>;
+using const_block_list_type = std::shared_ptr<const crepr::base_block2D>;
 
 /*******************************************************************************
- * Type Definitions
+ * Class Definitions
  ******************************************************************************/
-using block_list = std::list<block_list_type>;
-using const_block_list = std::list<const_block_list_type>;
-using perceived_block_list = std::list<perceived_block_list_type>;
+/**
+ * \class block_list
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::list with an additional \ref to_str()
+ * method.
+ */
+class block_list : public std::list<block_list_type> {
+ public:
+  using std::list<block_list_type>::list;
+  using value_type = std::list<block_list_type>::value_type;
+
+  /**
+   * \brief Get a string representation of the list contents.
+   */
+  std::string to_str(void) const;
+};
+
+/**
+ * \class const_block_list
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::list with an additional \ref to_str()
+ * method.
+ */
+class const_block_list : public std::list<const_block_list_type> {
+ public:
+  using std::list<const_block_list_type>::list;
+  using value_type = std::list<const_block_list_type>::value_type;
+
+  /**
+   * \brief Get a string representation of the list contents.
+   */
+  std::string to_str(void) const;
+};
 
 NS_END(ds, fordyca);
 

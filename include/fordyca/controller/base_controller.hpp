@@ -1,7 +1,7 @@
 /**
- * @file base_controller.hpp
+ * \file base_controller.hpp
  *
- * @copyright 2017 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -24,102 +24,126 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <argos3/core/control_interface/ci_controller.h>
+#include <memory>
 #include <string>
-#include "rcppsw/er/client.hpp"
-#include "rcppsw/math/vector2.hpp"
+#include <typeindex>
+
+#include "cosm/controller/irv_recipient_controller.hpp"
+#include "cosm/pal/argos_controller2D_adaptor.hpp"
+#include "cosm/metrics/config/output_config.hpp"
+
+#include "fordyca/controller/block_manip_collator.hpp"
+#include "fordyca/fordyca.hpp"
+#include "fordyca/fsm/subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace representation {
-class base_block;
-class line_of_sight;
-} // namespace representation
-namespace params {
-struct output_params;
+namespace cosm::subsystem::config {
+struct actuation_subsystem2D_config;
+struct sensing_subsystem2D_config;
+} // namespace cosm::subsystem::config
+namespace cosm::steer2D::config {
+struct force_calculator_config;
+}
+namespace cosm::tv {
+class robot_dynamics_applicator;
+}
+namespace cosm::repr {
+class base_block2D;
 }
 
-NS_START(controller);
+namespace rcppsw::math::config {
+struct rng_config;
+} // namespace rcppsw::math::config
 
-class saa_subsystem;
-namespace rmath = rcppsw::math;
-namespace er = rcppsw::er;
+NS_START(fordyca);
+
+namespace repr {
+class line_of_sight;
+} // namespace repr
+
+NS_START(controller);
+class base_perception_subsystem;
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * @class base_controller
- * @ingroup controller
+ * \class base_controller
+ * \ingroup controller
  *
- * @brief The base controller foraging class that all FORDYCA controllers derive
+ * \brief The base controller foraging class that all FORDYCA controllers derive
  * from. It holds all functionality common to all controllers, as well that some
  * that is stubbed out here, but overridden in derived classes which allows this
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_controller : public argos::CCI_Controller,
-                        public rcppsw::er::client<base_controller> {
+class base_controller : public cpal::argos_controller2D_adaptor,
+                        public ccontroller::irv_recipient_controller,
+                        rer::client<base_controller> {
  public:
-  base_controller(void);
-  ~base_controller(void) override = default;
+  base_controller(void) RCSW_COLD;
+  ~base_controller(void) override RCSW_COLD;
 
-  base_controller(const base_controller& other) = delete;
-  base_controller& operator=(const base_controller& other) = delete;
+  base_controller(const base_controller&) = delete;
+  base_controller& operator=(const base_controller&) = delete;
 
-  /* CCI_Controller overrides */
-  void Init(ticpp::Element& node) override;
-  void Reset(void) override;
+  /* base_controller2D overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void reset(void) override RCSW_COLD;
+  rtypes::type_uuid entity_id(void) const override final;
+
+  /* rda_recipient_controller overrides */
+  double applied_movement_throttle(void) const override final;
+  void irv_init(const ctv::robot_dynamics_applicator* rda) override final;
 
   /**
-   * @brief Get the ID of the entity. Argos also provides this, but it doesn't
-   * work in gdb, so I provide my own.
+   * \brief By default controllers have no perception subsystem, and are
+   * basically blind centipedes.
    */
-  int entity_id(void) const;
+  virtual const base_perception_subsystem* perception(void) const {
+    return nullptr;
+  }
 
   /**
-   * @brief Set whether or not a robot is supposed to display it's ID above its
-   * head during simulation.
+   * \brief By default controllers have no perception subsystem, and are
+   * basically blind centipedes.
    */
-  void display_id(bool display_id) { m_display_id = display_id; }
+  virtual base_perception_subsystem* perception(void) { return nullptr; }
 
   /**
-   * @brief If \c TRUE, then the robot should display its ID above its head
-   * during simulation.
-   */
-  bool display_id(void) const { return m_display_id; }
-
-  /**
-   * @brief If \c TRUE, the robot is currently at least most of the way in the
+   * \brief If \c TRUE, the robot is currently at least most of the way in the
    * nest, as reported by the sensors.
    */
   bool in_nest(void) const;
 
   /**
-   * @brief Return if the robot is currently carrying a block.
+   * \brief Return if the robot is currently carrying a block.
    */
   bool is_carrying_block(void) const { return nullptr != m_block; }
 
   /**
-   * @brief Return the block robot is carrying, or NULL if the robot is not
+   * \brief Return the block robot is carrying, or NULL if the robot is not
    * currently carrying a block.
    */
-  std::shared_ptr<representation::base_block> block(void) const {
-    return m_block;
-  }
+  const crepr::base_block2D* block(void) const { return m_block.get(); }
+  crepr::base_block2D* block(void) { return m_block.get(); }
 
   /**
-   * @brief Set the block that the robot is carrying.
+   * \brief Release the held block as part of a drop operation.
    */
-  void block(const std::shared_ptr<representation::base_block>& block) {
-    m_block = block;
-  }
+  std::unique_ptr<crepr::base_block2D> block_release(void);
 
   /**
-   * @brief If \c TRUE, then the robot thinks that it is on top of a block.
+   * \brief Set the block that the robot is carrying. We use a unique_ptr to
+   * convey that the robot owns the block it picks up from a C++ point of
+   * view. In actuality it gets a clone of the block in the arena map.
+   */
+  void block(std::unique_ptr<crepr::base_block2D> block);
+
+  /**
+   * \brief If \c TRUE, then the robot thinks that it is on top of a block.
    *
    * On rare occasions this may be a false positive, which is why it is also
    * checked in the loop functions before passing any events to the
@@ -130,59 +154,27 @@ class base_controller : public argos::CCI_Controller,
    */
   bool block_detected(void) const;
 
-  /**
-   * @brief Set the current clock tick.
-   *
-   * In a real world, each robot would maintain its own clock tick, and overall
-   * there would no doubt be considerable skew; this is a simulation hack that
-   * makes things much nicer/easier to deal with.
-   */
-  void tick(uint tick);
-
-  /**
-   * @brief Set the current location of the robot.
-   *
-   * This is a hack, as real world robot's would have to do their own
-   * localization. This is far superior to that, in terms of ease of
-   * programming. Plus it helps me focus in on my actual research. Ideally,
-   * robots would calculate this from sensor values, rather than it being set by
-   * the loop functions.
-   */
-  void position(const rmath::vector2d& loc);
-  rmath::vector2d position(void) const;
-
-  /**
-   * @brief Convenience function to add footbot ID to salient messages during
-   * loop function execution (timestep is already there).
-   */
-  void ndc_push(void) { ER_NDC_PUSH("[" + GetId() + "]"); }
-
-  /**
-   * @brief Convenience function to add footbot ID+timestep to messages during
-   * \ref ControlStep().
-   */
-  void ndc_pusht(void);
-
-  /**
-   * @brief Remove the last NDC.
-   */
-  void ndc_pop(void) { ER_NDC_POP(); }
-
+  const class block_manip_collator* block_manip_collator(void) const {
+    return &m_block_manip;
+  }
+  class block_manip_collator* block_manip_collator(void) {
+    return &m_block_manip;
+  }
 
  protected:
-  class saa_subsystem* saa_subsystem(void) {
-    return m_saa.get();
-  }
-  const class saa_subsystem* saa_subsystem(void) const { return m_saa.get(); }
+  class crfootbot::footbot_saa_subsystem* saa(void);
+  const class crfootbot::footbot_saa_subsystem* saa(void) const;
 
  private:
-  void output_init(const struct params::output_params* params);
+  void saa_init(
+      const csubsystem::config::actuation_subsystem2D_config* actuation_p,
+      const csubsystem::config::sensing_subsystem2D_config* sensing_p);
+  void output_init(const cmconfig::output_config* outputp);
 
-  // clang-format off
-  bool                                        m_display_id{false};
-  std::shared_ptr<representation::base_block> m_block{nullptr};
-  std::unique_ptr<controller::saa_subsystem>  m_saa;
-  // clang-format on
+  /* clang-format off */
+  class block_manip_collator           m_block_manip{};
+  std::unique_ptr<crepr::base_block2D> m_block;
+  /* clang-format on */
 };
 
 NS_END(controller, fordyca);
