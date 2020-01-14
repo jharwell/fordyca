@@ -57,8 +57,8 @@ struct functor_maps_initializer;
  * Handles all operations robots perform relating to dynamic caches: pickup,
  * drop, creation, depletion, etc.
  */
-class depth2_loop_functions : public depth1::depth1_loop_functions,
-                              public rer::client<depth2_loop_functions> {
+class depth2_loop_functions final : public depth1::depth1_loop_functions,
+                                    public rer::client<depth2_loop_functions> {
  public:
   depth2_loop_functions(void) RCSW_COLD;
   ~depth2_loop_functions(void) override RCSW_COLD;

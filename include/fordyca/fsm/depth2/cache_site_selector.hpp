@@ -140,7 +140,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * chugs. We *should* be able to get something good enough in this many
    * iterations.
    */
-  static constexpr uint kMAX_ITERATIONS = 5000;
+  static constexpr uint kMAX_ITERATIONS = 10000;
 
   struct opt_init_conditions {
     const ds::dp_cache_map& known_caches;

@@ -38,7 +38,6 @@ else()
 endif()
 
 # Support libraries
-add_subdirectory(ext/rcppsw)
 add_subdirectory(ext/cosm)
 
 set(FORDYCA_WITH_VIS "${COSM_WITH_VIS}")
@@ -104,7 +103,7 @@ if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS" OR "${LIBRA_BUILD_FOR}" MATCHES "MSI")
     # For nlopt
     set(${target}_LIBRARY_DIRS
       ${$target}_LIBRARY_DIRS}
-      ${LOCAL_INSTALL_PREFIX}/lib
+      ${LOCAL_INSTALL_PREFIX}/lib/argos3
       ${LOCAL_INSTALL_PREFIX}/lib64)
   endif()
 endif()
@@ -126,7 +125,7 @@ set(${target}_INCLUDE_DIRS
   /usr/include/eigen3)
 
 set(${target}_SYS_INCLUDE_DIRS
-  ${rcppsw_SYS_INCLUDE_DIRS}
+  ${cosm_SYS_INCLUDE_DIRS}
   ${NLOPT_INCLUDE_DIRS})
 
 if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")

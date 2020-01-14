@@ -32,13 +32,14 @@ NS_START(fordyca, config, tv);
  * Member Functions
  ******************************************************************************/
 void tv_manager_parser::parse(const ticpp::Element& node) {
+  m_config = std::make_unique<config_type>();
+
   /* No temporal variance configured */
   if (nullptr == node.FirstChild(kXMLRoot, false)) {
     return;
   }
 
   ticpp::Element tvnode = node_get(node, kXMLRoot);
-  m_config = std::make_unique<config_type>();
 
   m_envd.parse(tvnode);
   m_popd.parse(tvnode);

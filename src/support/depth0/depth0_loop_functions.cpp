@@ -292,7 +292,6 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
 void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   auto controller = static_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
-
   /*
    * Watch the robot interact with its environment after physics have been
    * updated and its controller has run.

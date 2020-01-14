@@ -409,7 +409,6 @@ void depth1_loop_functions::PostStep(void) {
    * Parallel iteration over the swarm within the following set of ordered
    * tasks:
    *
-   * - Interactions with environment
    * - Metric collection
    * - Task counts collection
    *
