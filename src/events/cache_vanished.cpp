@@ -68,7 +68,7 @@ void cache_vanished::dispatch_cache_interactor(
  * Depth1 Foraging
  ******************************************************************************/
 void cache_vanished::visit(controller::depth1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -76,7 +76,7 @@ void cache_vanished::visit(controller::depth1::bitd_dpo_controller& controller) 
 } /* visit() */
 
 void cache_vanished::visit(controller::depth1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -84,7 +84,7 @@ void cache_vanished::visit(controller::depth1::bitd_mdpo_controller& controller)
 } /* visit() */
 
 void cache_vanished::visit(controller::depth1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -92,7 +92,7 @@ void cache_vanished::visit(controller::depth1::bitd_odpo_controller& controller)
 } /* visit() */
 
 void cache_vanished::visit(controller::depth1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -121,7 +121,7 @@ void cache_vanished::visit(fsm::block_to_goal_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void cache_vanished::visit(controller::depth2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -129,7 +129,7 @@ void cache_vanished::visit(controller::depth2::birtd_dpo_controller& controller)
 } /* visit() */
 
 void cache_vanished::visit(controller::depth2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -137,7 +137,7 @@ void cache_vanished::visit(controller::depth2::birtd_mdpo_controller& controller
 } /* visit() */
 
 void cache_vanished::visit(controller::depth2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 
@@ -146,7 +146,7 @@ void cache_vanished::visit(controller::depth2::birtd_odpo_controller& controller
 
 void cache_vanished::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_cache_interactor(controller.current_task());
 

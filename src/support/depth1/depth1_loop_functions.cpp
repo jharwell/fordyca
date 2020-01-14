@@ -250,10 +250,16 @@ void depth1_loop_functions::private_init(void) {
     boost::apply_visitor(detail::robot_configurer_adaptor(controller),
                          config_map.at(controller->type_index()));
   };
+
+  /*
+   * Even though this CAN be done in dynamic order, during initialization ARGoS
+   * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
+   * only happens once, so it doesn't really matter if it is slow.
+   */
   swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::dynamic_order>(this,
-                                                             cb,
-                                                             "foot-bot");
+                              swarm_iterator::static_order>(this,
+                                                            cb,
+                                                            "foot-bot");
 } /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
@@ -386,9 +392,12 @@ void depth1_loop_functions::PreStep() {
   base_loop_functions::PreStep();
 
   /* Process all robots */
-  auto cb = [&](auto* robot) { robot_pre_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
-      this, cb, "foot-bot");
+  auto cb = [&](argos::CControllableEntity* robot) {
+    ndc_push();
+    robot_pre_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    ndc_pop();
+  };
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
   ndc_pop();
 } /* PreStep() */
 
@@ -396,19 +405,31 @@ void depth1_loop_functions::PostStep(void) {
   ndc_push();
   base_loop_functions::PostStep();
 
-  /* Process all robots: interact with environment then collect metrics */
-  auto cb = [&](auto* robot) { robot_post_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
-      this, cb, "foot-bot");
+  /*
+   * Parallel iteration over the swarm within the following set of ordered
+   * tasks:
+   *
+   * - Interactions with environment
+   * - Metric collection
+   * - Task counts collection
+   *
+   * This has to all be in 1 callback when passing to ARGoS, because we are only
+   * allowed 1 usage of ARGoS threads per PreStep()/PostStep() function call.
+   */
+  auto cb = [&](argos::CControllableEntity* robot) {
+    ndc_push();
+    robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    caches_recreation_task_counts_collect(&
+        static_cast<controller::base_controller&>(robot->GetController()));
+    ndc_pop();
+  };
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
 
   /*
-   * Manage the static cache and handle cache removal as a result of robot
-   * interactions with arena.
+   * Manage the static cache and handle cache removal/re-creation as a result of
+   * robot interactions with arena.
    */
   static_cache_monitor();
-  if (m_cache_manager->caches_depleted() > 0) {
-    floor()->SetChanged();
-  }
 
   /* Update block distribution status */
   auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
@@ -517,7 +538,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
  * General Member Functions
  ******************************************************************************/
 void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::base_controller*>(
+  auto controller = static_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /* Set robot position, time, and send it its new LOS */
@@ -530,7 +551,7 @@ void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
 } /* robot_pre_step() */
 
 void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::base_controller*>(
+  auto controller = static_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -576,34 +597,19 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
 
 void depth1_loop_functions::static_cache_monitor(void) {
   /* nothing to do--all our managed caches exist */
-  if (arena_map()->caches().size() == m_cache_manager->n_managed()) {
+  if (!caches_depleted()) {
     return;
   }
-  /*
-   * Caches are recreated with a probability that depends on the relative ratio
-   * between the # harvesters and the # collectors. If there are more harvesters
-   * than collectors, then the cache will be recreated very quickly. If there
-   * are more collectors than harvesters, then it will probably not be recreated
-   * immediately. And if there are no harvesters, there is no chance that the
-   * cache could be recreated (trying to emulate depth2 behavior here).
-   */
-  std::pair<uint, uint> counts{0, 0};
-  auto cb = [&](const auto* controller) {
-    auto [is_harvester, is_collector] = boost::apply_visitor(
-        detail::d1_subtask_status_extractor_adaptor(controller),
-        m_subtask_status_map->at(controller->type_index()));
-    counts.first += is_harvester;
-    counts.second += is_collector;
-  };
-  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+
   cache_create_ro_params ccp = {
       .current_caches = arena_map()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create_conditional(
-          ccp, arena_map()->blocks(), counts.first, counts.second)) {
+  if (auto created = m_cache_manager->create_conditional(ccp,
+                                                         arena_map()->blocks(),
+                                                         m_cache_counts.first,
+                                                         m_cache_counts.second)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return;
@@ -611,11 +617,35 @@ void depth1_loop_functions::static_cache_monitor(void) {
   ER_INFO(
       "Could not create static caches: n_harvesters=%u,n_collectors=%u,free "
       "blocks=%zu",
-      counts.first,
-      counts.second,
+      m_cache_counts.first.load(),
+      m_cache_counts.second.load(),
       utils::free_blocks_calc(arena_map()->caches(), arena_map()->blocks())
           .size());
 } /* static_cache_monitor() */
+
+bool depth1_loop_functions::caches_depleted(void) const {
+  return arena_map()->caches().size() != m_cache_manager->n_managed();
+} /* caches_depleted() */
+
+void depth1_loop_functions::caches_recreation_task_counts_collect(
+    const controller::base_controller* const controller) {
+  if (caches_depleted()) {
+    /*
+     * Caches are recreated with a probability that depends on the relative
+     * ratio between the # harvesters and the # collectors. If there are more
+     * harvesters than collectors, then the cache will be recreated very
+     * quickly. If there are more collectors than harvesters, then it will
+     * probably not be recreated immediately. And if there are no harvesters,
+     * there is no chance that the cache could be recreated (trying to emulate
+     * depth2 behavior here).
+     */
+    auto [is_harvester, is_collector] = boost::apply_visitor(
+        detail::d1_subtask_status_extractor_adaptor(controller),
+        m_subtask_status_map->at(controller->type_index()));
+    m_cache_counts.first += is_harvester;
+    m_cache_counts.second += is_collector;
+  }
+} /* caches_recreation_task_counts_collect() */
 
 using namespace argos; // NOLINT
 

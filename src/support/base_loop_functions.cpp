@@ -68,8 +68,6 @@ base_loop_functions::~base_loop_functions(void) = default;
  * Initialization Functions
  ******************************************************************************/
 void base_loop_functions::init(ticpp::Element& node) {
-  ndc_push();
-
   /* parse simulation input file */
   m_config.parse_all(node);
 
@@ -96,8 +94,6 @@ void base_loop_functions::init(ticpp::Element& node) {
 
   /* initialize oracle, if configured */
   oracle_init(config()->config_get<config::oracle::oracle_manager_config>());
-
-  ndc_pop();
 } /* init() */
 
 void base_loop_functions::convergence_init(

@@ -120,7 +120,7 @@ void free_block_pickup::visit(crepr::base_block2D& block) {
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
   visit(*controller.fsm());
   auto robot_block = m_block->clone();
   robot_block->robot_id(mc_robot_id);
@@ -186,7 +186,7 @@ void free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   visit(*controller.fsm());
@@ -202,7 +202,7 @@ void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   visit(*controller.fsm());
@@ -218,7 +218,7 @@ void free_block_pickup::visit(controller::depth0::omdpo_controller& controller) 
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
   visit(*controller.fsm());
@@ -234,7 +234,7 @@ void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
 } /* visit() */
 
 void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
   visit(*controller.fsm());
@@ -254,7 +254,7 @@ void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
  ******************************************************************************/
 void free_block_pickup::visit(
     controller::depth1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
@@ -271,7 +271,7 @@ void free_block_pickup::visit(
 
 void free_block_pickup::visit(
     controller::depth1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
@@ -288,7 +288,7 @@ void free_block_pickup::visit(
 
 void free_block_pickup::visit(
     controller::depth1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
@@ -305,7 +305,7 @@ void free_block_pickup::visit(
 
 void free_block_pickup::visit(
     controller::depth1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
@@ -343,7 +343,7 @@ void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
  ******************************************************************************/
 void free_block_pickup::visit(
     controller::depth2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
@@ -360,7 +360,7 @@ void free_block_pickup::visit(
 
 void free_block_pickup::visit(
     controller::depth2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);
@@ -377,7 +377,7 @@ void free_block_pickup::visit(
 
 void free_block_pickup::visit(
     controller::depth2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block_manip_collator()->free_pickup_event(true);
@@ -394,7 +394,7 @@ void free_block_pickup::visit(
 
 void free_block_pickup::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   controller.block_manip_collator()->free_pickup_event(true);

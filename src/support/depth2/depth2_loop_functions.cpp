@@ -204,10 +204,16 @@ void depth2_loop_functions::private_init(void) {
     boost::apply_visitor(detail::robot_configurer_adaptor(controller),
                          config_map.at(controller->type_index()));
   };
+
+  /*
+   * Even though this CAN be done in dynamic order, during initialization ARGoS
+   * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
+   * only happens once, so it doesn't really matter if it is slow.
+   */
   swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::dynamic_order>(this,
-                                                             cb,
-                                                             "foot-bot");
+                              swarm_iterator::static_order>(this,
+                                                            cb,
+                                                            "foot-bot");
 } /* private_init() */
 
 void depth2_loop_functions::cache_handling_init(
@@ -243,23 +249,27 @@ void depth2_loop_functions::PreStep() {
   base_loop_functions::PreStep();
 
   /* Process all robots */
-  auto cb = [&](auto* robot) { robot_pre_step(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+  auto cb = [&](argos::CControllableEntity* robot) {
+    ndc_push();
+    robot_pre_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    ndc_pop();
+  };
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
 
   ndc_pop();
 } /* PreStep() */
 
 void depth2_loop_functions::PostStep(void) {
   ndc_push();
+  base_loop_functions::PostStep();
 
-  /* Process all robots: environment interactions then metric collection */
-  auto cb1 = [&](auto* robot) { robot_post_step1(*robot); };
-  auto cb2 = [&](auto* robot) { robot_post_step2(*robot); };
-  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb1, "foot-bot");
-  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::dynamic_order>(
-      this, cb2, "foot-bot");
+  /* Process all robots: environment interactions then collect metrics */
+  auto cb = [&](argos::CControllableEntity* robot) {
+    ndc_push();
+    robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
+    ndc_pop();
+  };
+  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
 
   /* Update block distribution status */
   auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
@@ -359,7 +369,7 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
 
-void depth2_loop_functions::robot_post_step1(argos::CFootBotEntity& robot) {
+void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   auto controller = dynamic_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
@@ -398,11 +408,6 @@ void depth2_loop_functions::robot_post_step1(argos::CFootBotEntity& robot) {
       oracle_manager()->update(arena_map());
     }
   }
-} /* robot_post_step1() */
-
-void depth2_loop_functions::robot_post_step2(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::base_controller*>(
-      &robot.GetControllableEntity().GetController());
 
   /* get stats from this robot before its state changes */
   auto madaptor =
@@ -410,7 +415,7 @@ void depth2_loop_functions::robot_post_step2(argos::CFootBotEntity& robot) {
   boost::apply_visitor(madaptor,
                        m_metric_extractor_map->at(controller->type_index()));
   controller->block_manip_collator()->reset();
-} /* robot_post_step2() */
+} /* robot_post_step() */
 
 bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
   auto* cachep = config()->config_get<config::caches::caches_config>();

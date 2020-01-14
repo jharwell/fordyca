@@ -156,14 +156,15 @@ void base_cache_creator::update_host_cells(ds::cache_vector& caches) {
     for (uint i = xmin; i < xmax; ++i) {
       for (uint j = ymin; j < ymax; ++j) {
         rmath::vector2u c = rmath::vector2u(i, j);
+        auto& cell = m_grid->access<arena_grid::kCell>(i, j);
+        ER_ASSERT(cache->contains_point(
+            rmath::uvec2dvec(c, m_grid->resolution().v())),
+                  "Cache%d does not contain point (%u, %u) within its extent",
+                  cache->id().v(),
+                  i,
+                  j);
+
         if (c != cache->dloc()) {
-          ER_ASSERT(cache->contains_point(
-                        rmath::uvec2dvec(c, m_grid->resolution().v())),
-                    "Cache%d does not contain point (%u, %u) within its extent",
-                    cache->id().v(),
-                    i,
-                    j);
-          auto& cell = m_grid->access<arena_grid::kCell>(i, j);
           ER_ASSERT(!cell.state_in_cache_extent(),
                     "Cell@(%u, %u) already in CACHE_EXTENT",
                     i,
@@ -182,7 +183,7 @@ bool base_cache_creator::creation_sanity_checks(
     const ds::block_cluster_vector& clusters) const {
   /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {
-    auto cell = m_grid->access<arena_grid::kCell>(c1->dloc());
+    auto& cell = m_grid->access<arena_grid::kCell>(c1->dloc());
     ER_CHECK(cell.fsm().state_has_cache(),
              "Cell@%s not in HAS_CACHE state",
              cell.loc().to_str().c_str());

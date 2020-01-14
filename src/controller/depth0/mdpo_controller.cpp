@@ -70,7 +70,7 @@ void mdpo_controller::init(ticpp::Element& node) {
    */
   base_controller::init(node);
 
-  ndc_push();
+  ndc_pusht();
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */

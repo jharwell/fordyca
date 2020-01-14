@@ -71,17 +71,12 @@ one ``bootstrap.sh`` uses for you. Something like the following, run from the
   -DWITH_FOOTBOT_LEDS=NO \
   -DCMAKE_BUILD_TYPE=OPT \
   -DLIBRA_ER=NONE \
-  -DLIBRA_OPENMP=YES \
   -DLIBRA_BUILD_FOR=ARGOS \
   \..
 
 To get an idea of what some of the non-project specific options mean, head over
 to the `libra <https://github.com/swarm-robotics/libra/tree/devel/README.md>`_
 repo and look at the README.
-
-.. IMPORTANT:: ``LIBRA_OPENMP`` should only be set to ``YES`` if you are going
-   to be running with really large swarms (> 1000), otherwise the overhead from
-   using threads will probably be greater than any speedup you will get. YMMV.
 
 ``WITH_FOOTBOT_BATTERY``, ``WITH_FOOTBOT_RAB``, ``WITH_FOOTBOT_LEDS`` are things
 that are only needed if you are running experiments which utilize those

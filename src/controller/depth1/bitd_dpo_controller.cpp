@@ -74,9 +74,9 @@ void bitd_dpo_controller::control_step(void) {
 } /* control_step() */
 
 void bitd_dpo_controller::init(ticpp::Element& node) {
-  base_controller::Init(node);
+  base_controller::init(node);
 
-  ndc_push();
+  ndc_pusht();
   ER_INFO("Initializing...");
   config::depth1::controller_repository config_repo;
 
@@ -138,24 +138,16 @@ void bitd_dpo_controller::task_abort_cb(const cta::polled_task*) {
   m_task_status = tasks::task_status::ekABORT_PENDING;
 } /* task_abort_cb() */
 
-void bitd_dpo_controller::task_start_cb(const cta::polled_task*) {
+void bitd_dpo_controller::task_start_cb(cta::polled_task* task) {
   if (tasks::task_status::ekABORT_PENDING != m_task_status) {
     m_task_status = tasks::task_status::ekRUNNING;
   }
+  m_current_task = dynamic_cast<tasks::base_foraging_task*>(task);
 } /* task_start_cb() */
 
 const cta::ds::bi_tab* bitd_dpo_controller::active_tab(void) const {
   return m_executive->active_tab();
 } /* active_tab() */
-
-tasks::base_foraging_task* bitd_dpo_controller::current_task(void) {
-  return dynamic_cast<tasks::base_foraging_task*>(m_executive->current_task());
-} /* current_task() */
-
-const tasks::base_foraging_task* bitd_dpo_controller::current_task(void) const {
-  return dynamic_cast<const tasks::base_foraging_task*>(
-      m_executive->current_task());
-} /* current_task() */
 
 void bitd_dpo_controller::executive(
     std::unique_ptr<cta::bi_tdgraph_executive> executive) {
@@ -191,14 +183,12 @@ RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,
  * Task Distribution Metrics
  ******************************************************************************/
 int bitd_dpo_controller::current_task_depth(void) const {
-  return executive()->graph()->vertex_depth(
-      dynamic_cast<const cta::polled_task*>(current_task()));
+  return executive()->graph()->vertex_depth(executive()->current_task());
 } /* current_task_depth() */
 
 int bitd_dpo_controller::current_task_id(void) const {
-  auto task = dynamic_cast<const cta::polled_task*>(current_task());
-  if (nullptr != task) {
-    return executive()->graph()->vertex_id(task);
+  if (nullptr != executive()->current_task()) {
+    return executive()->graph()->vertex_id(executive()->current_task());
   }
   return -1;
 } /* current_task_id() */
@@ -209,8 +199,7 @@ int bitd_dpo_controller::task_id(const std::string& task_name) const {
 } /* task_id() */
 
 int bitd_dpo_controller::current_task_tab(void) const {
-  return dynamic_cast<const cta::ds::bi_tdgraph*>(executive()->graph())
-      ->active_tab_id();
+  return executive()->graph()->active_tab_id();
 } /* current_task_tab() */
 
 using namespace argos; // NOLINT

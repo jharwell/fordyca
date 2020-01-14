@@ -51,22 +51,25 @@ acquire_new_cache_fsm::acquire_new_cache_fsm(
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
-              .acquisition_goal =
+            RCPPSW_STRUCT_DOT_INITIALIZER(acquisition_goal,
                   std::bind(&acquire_new_cache_fsm::acquisition_goal_internal,
-                            this),
-              .goal_select =
-                  std::bind(&acquire_new_cache_fsm::cache_select, this),
-              .candidates_exist =
-                  std::bind(&acquire_new_cache_fsm::candidates_exist, this),
-              .goal_acquired_cb =
+                            this)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(goal_select,
+                                              std::bind(&acquire_new_cache_fsm::cache_select, this)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(candidates_exist,
+                                              std::bind(&acquire_new_cache_fsm::candidates_exist, this)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
+                RCPPSW_STRUCT_DOT_INITIALIZER(goal_acquired_cb,
                   std::bind(&acquire_new_cache_fsm::cache_acquired_cb,
                             this,
-                            std::placeholders::_1),
+                            std::placeholders::_1)),
 
               /* new caches never acquired via exploration */
-              .explore_term_cb = std::bind([](void) noexcept { return false; }),
-              .goal_valid_cb = [](const rmath::vector2d&,
-                                  const rtypes::type_uuid&) { return true; }}),
+                RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb,
+                                              std::bind([](void) noexcept { return false; })),
+                RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
+                                              [](const rmath::vector2d&,
+                                                 const rtypes::type_uuid&) { return true; })}),
       mc_matrix(c_params->csel_matrix),
       mc_store(c_params->store) {}
 

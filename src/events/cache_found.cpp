@@ -220,7 +220,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
  * Depth2 Foraging
  ******************************************************************************/
 void cache_found::visit(controller::depth2::birtd_mdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
 
@@ -228,7 +228,7 @@ void cache_found::visit(controller::depth2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void cache_found::visit(controller::depth2::birtd_dpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
 
@@ -236,7 +236,7 @@ void cache_found::visit(controller::depth2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void cache_found::visit(controller::depth2::birtd_omdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.mdpo_perception()->map());
 
@@ -244,7 +244,7 @@ void cache_found::visit(controller::depth2::birtd_omdpo_controller& c) {
 } /* visit() */
 
 void cache_found::visit(controller::depth2::birtd_odpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   visit(*c.dpo_perception()->dpo_store());
 

@@ -194,7 +194,7 @@ void cache_block_drop::visit(repr::arena_cache& cache) {
 } /* visit() */
 
 void cache_block_drop::visit(controller::depth1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_d1_cache_interactor(controller.current_task());
   controller.block(nullptr);
@@ -212,7 +212,7 @@ void cache_block_drop::visit(controller::depth1::bitd_dpo_controller& controller
 
 void cache_block_drop::visit(
     controller::depth1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   dispatch_d1_cache_interactor(controller.current_task());
@@ -231,7 +231,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::depth1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_d1_cache_interactor(controller.current_task());
   controller.block(nullptr);
@@ -249,7 +249,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::depth1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
   dispatch_d1_cache_interactor(controller.current_task());
@@ -280,7 +280,7 @@ void cache_block_drop::visit(tasks::depth1::harvester& task) {
  ******************************************************************************/
 void cache_block_drop::visit(
     controller::depth2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -300,7 +300,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::depth2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -321,7 +321,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::depth2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {
@@ -341,7 +341,7 @@ void cache_block_drop::visit(
 
 void cache_block_drop::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   if (dispatch_d2_cache_interactor(controller.current_task(),
                                    controller.cache_sel_matrix())) {

@@ -49,7 +49,7 @@ crw_controller::~crw_controller(void) = default;
  ******************************************************************************/
 void crw_controller::init(ticpp::Element& node) {
   base_controller::init(node);
-  ndc_push();
+  ndc_pusht();
   ER_INFO("Initializing...");
 
   fsm::expstrat::foraging_expstrat::params p(saa(), nullptr, nullptr, nullptr);

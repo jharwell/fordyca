@@ -26,6 +26,7 @@
  ******************************************************************************/
 #include <vector>
 #include <memory>
+#include <atomic>
 
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include "fordyca/support/robot_los_updater.hpp"
@@ -189,6 +190,20 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    */
   void static_cache_monitor(void);
 
+  /**
+   * \brief Return \c TRUE iff one or more static caches have been depleted this
+   * timestep (or on previous timesteps and have not been re-created yet, for
+   * whatever reason).
+   */
+  bool caches_depleted(void) const;
+
+  /**
+   * \brief Collect task counts from controllers on timesteps one or more static
+   * caches have been depleted in order to calculate re-creation probabilities.
+   */
+  void caches_recreation_task_counts_collect(
+      const controller::base_controller* const controller);
+
   /* clang-format off */
   std::unique_ptr<interactor_map_type>                m_interactor_map;
   std::unique_ptr<metric_extractor_map_type>          m_metric_extractor_map;
@@ -198,6 +213,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
 
   std::unique_ptr<depth1_metrics_aggregator>          m_metrics_agg;
   std::unique_ptr<static_cache_manager>               m_cache_manager;
+  std::pair<std::atomic_uint, std::atomic_uint>       m_cache_counts{0, 0};
   /* clang-format on */
 };
 

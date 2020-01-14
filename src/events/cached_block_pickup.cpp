@@ -358,7 +358,7 @@ void cached_block_pickup::visit(crepr::base_block2D& block) {
 
 void cached_block_pickup::visit(
     controller::depth1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
 
@@ -374,7 +374,7 @@ void cached_block_pickup::visit(
 
 void cached_block_pickup::visit(
     controller::depth1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
 
@@ -390,7 +390,7 @@ void cached_block_pickup::visit(
 
 void cached_block_pickup::visit(
     controller::depth1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
 
@@ -406,7 +406,7 @@ void cached_block_pickup::visit(
 
 void cached_block_pickup::visit(
     controller::depth1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
 
@@ -439,7 +439,7 @@ void cached_block_pickup::visit(fsm::depth1::cached_block_to_nest_fsm& fsm) {
  ******************************************************************************/
 void cached_block_pickup::visit(
     controller::depth2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
 
@@ -459,7 +459,7 @@ void cached_block_pickup::visit(
 
 void cached_block_pickup::visit(
     controller::depth2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
 
@@ -477,7 +477,7 @@ void cached_block_pickup::visit(
 
 void cached_block_pickup::visit(
     controller::depth2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
 
@@ -497,7 +497,7 @@ void cached_block_pickup::visit(
 
 void cached_block_pickup::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
 

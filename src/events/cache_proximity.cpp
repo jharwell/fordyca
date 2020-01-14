@@ -66,7 +66,7 @@ void cache_proximity::dispatch_cache_interactor(
  * Depth2 Foraging
  ******************************************************************************/
 void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -79,7 +79,7 @@ void cache_proximity::visit(controller::depth2::birtd_dpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -92,7 +92,7 @@ void cache_proximity::visit(controller::depth2::birtd_mdpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 
@@ -105,7 +105,7 @@ void cache_proximity::visit(controller::depth2::birtd_odpo_controller& c) {
 } /* visit() */
 
 void cache_proximity::visit(controller::depth2::birtd_omdpo_controller& c) {
-  c.ndc_push();
+  c.ndc_pusht();
 
   ER_INFO("Abort block drop: cache%d proximity", m_cache->id().v());
 

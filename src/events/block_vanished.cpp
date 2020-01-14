@@ -74,7 +74,7 @@ void block_vanished::dispatch_free_block_interactor(
  * Depth0 Foraging
  ******************************************************************************/
 void block_vanished::visit(controller::depth0::crw_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -83,7 +83,7 @@ void block_vanished::visit(controller::depth0::crw_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(controller::depth0::dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -92,7 +92,7 @@ void block_vanished::visit(controller::depth0::dpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -101,7 +101,7 @@ void block_vanished::visit(controller::depth0::mdpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(controller::depth0::odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -110,7 +110,7 @@ void block_vanished::visit(controller::depth0::odpo_controller& controller) {
 } /* visit() */
 
 void block_vanished::visit(controller::depth0::omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   ER_INFO("Abort pickup: block%d vanished", mc_block_id.v());
   visit(*controller.fsm());
@@ -132,7 +132,7 @@ void block_vanished::visit(fsm::depth0::dpo_fsm& fsm) {
  * Depth1 Foraging
  ******************************************************************************/
 void block_vanished::visit(controller::depth1::bitd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -140,7 +140,7 @@ void block_vanished::visit(controller::depth1::bitd_dpo_controller& controller) 
 } /* visit() */
 
 void block_vanished::visit(controller::depth1::bitd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -148,7 +148,7 @@ void block_vanished::visit(controller::depth1::bitd_mdpo_controller& controller)
 } /* visit() */
 
 void block_vanished::visit(controller::depth1::bitd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -156,7 +156,7 @@ void block_vanished::visit(controller::depth1::bitd_odpo_controller& controller)
 } /* visit() */
 
 void block_vanished::visit(controller::depth1::bitd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -186,7 +186,7 @@ void block_vanished::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
  * Depth2 Foraging
  ******************************************************************************/
 void block_vanished::visit(controller::depth2::birtd_mdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -194,7 +194,7 @@ void block_vanished::visit(controller::depth2::birtd_mdpo_controller& controller
 } /* visit() */
 
 void block_vanished::visit(controller::depth2::birtd_dpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -203,7 +203,7 @@ void block_vanished::visit(controller::depth2::birtd_dpo_controller& controller)
 
 void block_vanished::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 
@@ -211,7 +211,7 @@ void block_vanished::visit(
 } /* visit() */
 
 void block_vanished::visit(controller::depth2::birtd_odpo_controller& controller) {
-  controller.ndc_push();
+  controller.ndc_pusht();
 
   dispatch_free_block_interactor(controller.current_task());
 

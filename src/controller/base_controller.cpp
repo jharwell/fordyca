@@ -81,7 +81,7 @@ void base_controller::init(ticpp::Element& node) {
   config::base_controller_repository repo;
   repo.parse_all(node);
 
-  ndc_push();
+  ndc_pusht();
   if (!repo.validate_all()) {
     ER_FATAL_SENTINEL("Not all parameters were validated");
     std::exit(EXIT_FAILURE);

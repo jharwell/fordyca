@@ -40,6 +40,7 @@
  ******************************************************************************/
 NS_START(fordyca, fsm);
 
+
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
@@ -54,24 +55,25 @@ acquire_free_block_fsm::acquire_free_block_fsm(
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
-              .acquisition_goal =
-                  std::bind(&acquire_free_block_fsm::acq_goal_internal),
-              .goal_select =
-                  std::bind(&acquire_free_block_fsm::block_select, this),
-              .candidates_exist =
-                  std::bind(&acquire_free_block_fsm::candidates_exist, this),
-              .goal_acquired_cb =
-                  std::bind(&acquire_free_block_fsm::block_acquired_cb,
-                            this,
-                            std::placeholders::_1),
-              .explore_term_cb =
-                  std::bind(&acquire_free_block_fsm::block_exploration_term_cb,
-                            this),
-              .goal_valid_cb =
-                  std::bind(&acquire_free_block_fsm::block_acq_valid,
-                            this,
-                            std::placeholders::_1,
-                            std::placeholders::_2)}),
+            RCPPSW_STRUCT_DOT_INITIALIZER(acquisition_goal,
+                                          std::bind(&acquire_free_block_fsm::acq_goal_internal)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(goal_select,
+                                              std::bind(&acquire_free_block_fsm::block_select, this)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(candidates_exist,
+                                              std::bind(&acquire_free_block_fsm::candidates_exist, this)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
+                RCPPSW_STRUCT_DOT_INITIALIZER(goal_acquired_cb,
+                                              std::bind(&acquire_free_block_fsm::block_acquired_cb,
+                                                        this,
+                                                        std::placeholders::_1)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb,
+                                              std::bind(&acquire_free_block_fsm::block_exploration_term_cb,
+                                                        this)),
+                RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
+                                              std::bind(&acquire_free_block_fsm::block_acq_valid,
+                                                        this,
+                                                        std::placeholders::_1,
+                                                        std::placeholders::_2))}),
       mc_matrix(c_params->bsel_matrix),
       mc_store(c_params->store) {}
 

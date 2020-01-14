@@ -81,7 +81,7 @@ class base_perception_subsystem;
  */
 class base_controller : public cpal::argos_controller2D_adaptor,
                         public ccontroller::irv_recipient_controller,
-                        rer::client<base_controller> {
+                        public rer::client<base_controller> {
  public:
   base_controller(void) RCSW_COLD;
   ~base_controller(void) override RCSW_COLD;
