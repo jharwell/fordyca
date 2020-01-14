@@ -52,7 +52,7 @@ bitd_mdpo_controller::~bitd_mdpo_controller(void) = default;
 void bitd_mdpo_controller::init(ticpp::Element& node) {
   base_controller::init(node);
 
-  ndc_pusht();
+  ndc_push();
   ER_INFO("Initializing...");
   config::depth1::controller_repository config_repo;
 

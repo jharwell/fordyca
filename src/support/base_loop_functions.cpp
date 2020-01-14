@@ -189,16 +189,16 @@ void base_loop_functions::output_init(const cmconfig::output_config* output) {
   swarm_manager::output_init(output->output_root, output->output_dir);
 
 #if (LIBRA_ER == LIBRA_ER_ALL)
-  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.events"),
-                      output_root() + "/events.log");
-  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.support"),
-                      output_root() + "/support.log");
-  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.loop"),
-                      output_root() + "/sim.log");
-  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
-                      output_root() + "/sim.log");
-  client<decltype(*this)>::set_logfile(log4cxx::Logger::getLogger("fordyca.metrics"),
-                      output_root() + "/metrics.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"),
+                 output_root() + "/events.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.support"),
+                 output_root() + "/support.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.loop"),
+                 output_root() + "/sim.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
+                 output_root() + "/sim.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.metrics"),
+                 output_root() + "/metrics.log");
 #endif
 } /* output_init() */
 

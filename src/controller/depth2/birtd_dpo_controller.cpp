@@ -65,7 +65,7 @@ void birtd_dpo_controller::control_step(void) {
 
 void birtd_dpo_controller::init(ticpp::Element& node) {
   base_controller::init(node);
-  ndc_pusht();
+  ndc_push();
   ER_INFO("Initializing");
 
   config::depth2::controller_repository config_repo;

@@ -98,7 +98,7 @@ void dpo_controller::init(ticpp::Element& node) {
    */
   base_controller::init(node);
 
-  ndc_pusht();
+  ndc_push();
   ER_INFO("Initializing...");
 
   /* parse and validate parameters */

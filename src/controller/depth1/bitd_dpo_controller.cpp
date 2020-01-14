@@ -76,7 +76,7 @@ void bitd_dpo_controller::control_step(void) {
 void bitd_dpo_controller::init(ticpp::Element& node) {
   base_controller::init(node);
 
-  ndc_pusht();
+  ndc_push();
   ER_INFO("Initializing...");
   config::depth1::controller_repository config_repo;
 

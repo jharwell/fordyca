@@ -46,7 +46,7 @@ birtd_mdpo_controller::~birtd_mdpo_controller(void) = default;
  ******************************************************************************/
 void birtd_mdpo_controller::init(ticpp::Element& node) {
   base_controller::init(node);
-  ndc_pusht();
+  ndc_push();
   ER_INFO("Initializing");
 
   config::depth2::controller_repository config_repo;

@@ -61,12 +61,10 @@ argos_pd_adaptor::argos_pd_adaptor(
  * Member Functions
  ******************************************************************************/
 argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
-  /**
-   * @bug ARGoS does not like simulating 0 robots and usually crashes
-   */
   size_t current_pop = swarm_population();
   rtypes::type_uuid id = rtypes::constants::kNoUUID;
-  if (1 == current_pop) {
+
+  if (0 == current_pop) {
     ER_WARN("Not killing robot: pop_size=%zu", current_pop);
     return {id, current_pop};
   }

@@ -66,22 +66,12 @@ fi;
 
 cd ../../
 
-# Bootstrap rcppsw
-if [ -d rcppsw ]; then rm -rf rcppsw; fi
-git clone https://github.com/swarm-robotics/rcppsw.git
-cd rcppsw
-git checkout devel
-git submodule update --init --recursive --remote
-cd ..
-
 # Bootstrap cosm
 if [ -d cosm ]; then rm -rf cosm; fi
 git clone https://github.com/swarm-robotics/cosm.git
 cd cosm
 git checkout devel
 git submodule update --init --recursive --remote
-
-ln -s $1/rcppsw ext/rcppsw
 
 cd ..
 
@@ -93,9 +83,7 @@ git checkout devel
 git submodule update --init --recursive --remote
 npm install
 
-rm -rf ext/rcppsw
 rm -rf ext/cosm
-ln -s $1/rcppsw ext/rcppsw
 ln -s $1/cosm ext/cosm
 
 # Build fordyca and documentation
