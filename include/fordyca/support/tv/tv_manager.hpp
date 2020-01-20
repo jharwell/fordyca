@@ -65,12 +65,8 @@ class tv_manager {
    * timestep.
    */
   void update(const rtypes::timestep& t) {
-    if (m_envd) {
-      m_envd->update(t);
-    }
-    if (m_popd) {
-      m_popd->update(t);
-    }
+    m_envd->update(t);
+    m_popd->update(t);
   }
 
  private:

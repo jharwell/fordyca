@@ -462,12 +462,14 @@ void depth1_loop_functions::PostStep(void) {
   /* Collect metrics from loop functions */
   m_metrics_agg->collect_from_loop(this);
 
-  /* Not a clean way to do this in the convergence metrics collector... */
+  /* Not a clean way to do this in the metrics collectors... */
   if (m_metrics_agg->metrics_write_all(
-          rtypes::timestep(GetSpace().GetSimulationClock())) &&
-      nullptr != conv_calculator()) {
-    conv_calculator()->reset_metrics();
+          rtypes::timestep(GetSpace().GetSimulationClock()))) {
+    if (nullptr != conv_calculator()) {
+      conv_calculator()->reset_metrics();
+    }
   }
+
   m_metrics_agg->timestep_inc_all();
   m_metrics_agg->interval_reset_all();
 

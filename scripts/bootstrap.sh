@@ -47,6 +47,8 @@ mkdir -p build && cd build
 
 git checkout devel
 cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_C_COMPILER=gcc-8\
+      -DCMAKE_CXX_COMPILER=g++-8\
       -DARGOS_BUILD_FOR=simulator\
       -DARGOS_BUILD_NATIVE=ON\
       -DARGOS_THREADSAFE_LOG=ON\

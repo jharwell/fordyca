@@ -128,11 +128,11 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
 } /* robot_kill() */
 
 argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
-    size_t max_pop,
+    int max_pop,
     const rtypes::type_uuid& id) {
   size_t current_pop = m_lf->GetSpace().GetEntitiesByType("foot-bot").size();
-  if (current_pop >= max_pop) {
-    ER_INFO("Not adding new robot %s%d: max_pop=%zu reached",
+  if (max_pop != -1 && current_pop >= static_cast<size_t>(max_pop)) {
+    ER_INFO("Not adding new robot %s%d: max_pop=%d reached",
             mc_entity_prefix.c_str(),
             id.v(),
             max_pop);

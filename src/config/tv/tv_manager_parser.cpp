@@ -32,6 +32,12 @@ NS_START(fordyca, config, tv);
  * Member Functions
  ******************************************************************************/
 void tv_manager_parser::parse(const ticpp::Element& node) {
+  /*
+   * This needs to be non-NULL in ALL situations, because the environmental
+   * dynamics part of temporal variance must ALWAYS be present (even if it is
+   * not used). Using whether the config is NULL or not and creating a
+   * std::unique_ptr if it is results in use-after-free. See #621.
+   */
   m_config = std::make_unique<config_type>();
 
   /* No temporal variance configured */

@@ -80,8 +80,7 @@ class argos_pd_adaptor final : public rer::client<argos_pd_adaptor>,
   const argos_pd_adaptor& operator=(const argos_pd_adaptor&) = delete;
 
   op_result robot_kill(void) override;
-  op_result robot_add(size_t max_pop,
-                      const rtypes::type_uuid& id) override;
+  op_result robot_add(int max_pop, const rtypes::type_uuid& id) override;
   op_result robot_malfunction(void) override;
   op_result robot_repair(const rtypes::type_uuid& id) override;
 

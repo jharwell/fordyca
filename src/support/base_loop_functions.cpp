@@ -115,28 +115,23 @@ void base_loop_functions::convergence_init(
 void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
   ER_INFO("Creating temporal variance manager");
 
-  const config::tv::env_dynamics_config* envp;
   /*
-   * Need environmental dynamics even if they are omitted from input file in
-   * order to correctly calculate 1 timestep penalties for things.
+   * We unconditionally create environmental dynamics because they are used to
+   * generate the 1 timestep penalties for robot-arena interactions even when
+   * they are disabled, and trying to figure out how to get things to work if
+   * they are omitted is waaayyyy too much work. See #621 too.
    */
-  if (nullptr == tvp) {
-    envp = std::make_unique<config::tv::env_dynamics_config>().get();
-  } else {
-    envp = &tvp->env_dynamics;
-  }
-  auto envd = std::make_unique<tv::env_dynamics>(envp, this, arena_map());
+  auto envd = std::make_unique<tv::env_dynamics>(&tvp->env_dynamics,
+                                                 this,
+                                                 arena_map());
 
-  std::unique_ptr<tv::argos_pd_adaptor> popd = nullptr;
-  if (nullptr != tvp) {
-    popd = std::make_unique<tv::argos_pd_adaptor>(&tvp->population_dynamics,
+  auto popd = std::make_unique<tv::argos_pd_adaptor>(&tvp->population_dynamics,
                                                   this,
                                                   arena_map(),
                                                   envd.get(),
                                                   "fb",
                                                   "ffc",
                                                   rng());
-  }
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
