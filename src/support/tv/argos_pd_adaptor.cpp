@@ -139,24 +139,42 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
     return {rtypes::constants::kNoUUID, current_pop};
   }
 
-  /* Create and add a new entity at the origin */
-  auto* fb = new argos::CFootBotEntity(mc_entity_prefix + rcppsw::to_string(id),
-                                       mc_controller_xml_id);
-  m_lf->AddEntity(*fb);
+  /*
+   * Give 2.0 buffer around the edges of the arena so that robots are not too
+   * close to the boundaries of physics engines, which can cause "no engine can
+   * house entity" exceptions in rare cases otherwise.
+   */
+  rmath::ranged xrange(2.0, mc_lf->arena_map()->xrsize() - 2.0);
+  rmath::ranged yrange(2.0, mc_lf->arena_map()->yrsize() - 2.0);
+  argos::CFootBotEntity* fb = nullptr;
 
-  rmath::ranged xrange(2.0, mc_lf->arena_map()->xrsize() - 1.0);
-  rmath::ranged yrange(2.0, mc_lf->arena_map()->yrsize() - 1.0);
-  argos::CQuaternion quat;
-
+  /*
+   * You CANNOT first create the entity, then attempt to move it to a
+   * collision free location within ARGoS when there are multiple physics
+   * engines used--you always get an exception thrown. The only way to ensure
+   * correct operation is to pass the desired location to the entity constructor
+   * BEFORE calling AddEntity(). This is suboptimal, because it involves
+   * potentially a lot of dynamic memory management that can slow things down,
+   * but it is required. See #623.
+   *
+   * This is a @bug in ARGoS, and so this code can be reverted to something like
+   * what is was originally once this is fixed in the ARGoS master. Diffing the
+   * branch for #623 against the previous commit should show the changes.
+   */
   for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
     auto x = m_rng->uniform(xrange);
     auto y = m_rng->uniform(yrange);
-    quat.FromAngleAxis(argos::CRadians(0.0), argos::CVector3::Z);
     try {
-      m_lf->MoveEntity(fb->GetEmbodiedEntity(), argos::CVector3(x, y, 0.0), quat);
-      ER_INFO("Placed new robot %s at %s",
+      /* ick raw pointers--thanks ARGoS... */
+      fb = new argos::CFootBotEntity(mc_entity_prefix + rcppsw::to_string(id),
+                                           mc_controller_xml_id,
+                                           argos::CVector3(x, y, 0.0));
+      m_lf->AddEntity(*fb);
+      ER_INFO("Added entity %s attached to physics engine %s at %s",
               fb->GetId().c_str(),
+              fb->GetEmbodiedEntity().GetPhysicsModel(0).GetEngine().GetId().c_str(),
               rmath::vector2d(x, y).to_str().c_str());
+
       /* Register controller for environmental variances */
       auto* controller = dynamic_cast<controller::base_controller*>(
           &fb->GetControllableEntity().GetController());
@@ -165,6 +183,9 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
 
       return {id, m_lf->GetSpace().GetEntitiesByType("foot-bot").size()};
     } catch (argos::CARGoSException& e) {
+      if (nullptr != fb) {
+        delete fb; /* ick raw pointers--thanks ARGoS... */
+      }
       ER_TRACE("Failed to place new robot %s at %s",
                fb->GetId().c_str(),
                rmath::vector2d(x, y).to_str().c_str());
