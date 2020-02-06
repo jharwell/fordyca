@@ -195,6 +195,9 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    */
   void task_start_cb(cta::polled_task* task);
 
+ protected:
+  void current_task(tasks::base_foraging_task* t) { m_current_task = t; }
+
  private:
   void private_init(const config::depth1::controller_repository& config_repo) RCSW_COLD;
 
@@ -205,7 +208,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
    * \brief The current task the controller is executing. This is also tracked
    * by the executive, so it might seem redundant to also track it here. This is
    * done to avoid having to dynamically cast from \ref cta::polled_task to \ref
-   * tasks::base_foraging_task on multiple times EVERY timestep for EVERY robot,
+   * tasks::base_foraging_task multiple times EVERY timestep for EVERY robot,
    * which was enough to make it show up in VTune as a minor bottleneck. See
    * #547.
    */

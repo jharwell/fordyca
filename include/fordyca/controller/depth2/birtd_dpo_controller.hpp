@@ -68,7 +68,15 @@ class birtd_dpo_controller : public depth1::bitd_dpo_controller,
   void csel_exception_added(bool b) { m_csel_exception_added = b; }
 
  private:
-  void task_start_cb(const cta::polled_task* task,
+  /**
+   * \brief Callback for task alloc. Needed to reset the task state of the
+   * controller (not the task, which is handled by the executive) in the case
+   * that the previous task was aborted. Not reseting this results in erroneous
+   * handling of the newly allocated task as if it was aborted by the loop
+   * functions, resulting in inconsistent state with the robot's executive. See
+   * #532,#587.
+   */
+  void task_start_cb(cta::polled_task* task,
                      const cta::ds::bi_tab*);
   void private_init(const config::depth2::controller_repository& config_repo) RCSW_COLD;
 
