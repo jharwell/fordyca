@@ -58,6 +58,7 @@ void crw_controller::init(ticpp::Element& node) {
       fsm::expstrat::block_factory().create(
           fsm::expstrat::block_factory::kCRW, &p, rng()),
       rng());
+  supervisor()->supervisee_update(m_fsm.get());
   ER_INFO("Initialization finished");
   ndc_pop();
 } /* init() */

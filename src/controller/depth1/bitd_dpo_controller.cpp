@@ -69,8 +69,14 @@ void bitd_dpo_controller::control_step(void) {
             block()->md()->robot_id().v());
 
   dpo_perception()->update(nullptr);
-  executive()->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Execute the current task/allocate a new task/abort a task/etc and apply
+   * steering forces if normal operation, otherwise handle abnormal operation
+   * state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 
@@ -111,7 +117,7 @@ void bitd_dpo_controller::shared_init(
   /*
    * Cache detection via ground sensors. This is *NOT* enabled by the
    * initialization in the base controller, and needs to happen here when we
-   * have an XML repository with the correct configuration init.
+   * have an XML repository with the correct configuration in it.
    */
   auto saa_names = config::saa_xml_names();
   auto sensing_p =
@@ -133,6 +139,7 @@ void bitd_dpo_controller::private_init(
       &bitd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
   executive()->task_start_notify(std::bind(
       &bitd_dpo_controller::task_start_cb, this, std::placeholders::_1));
+  supervisor()->supervisee_update(m_executive.get());
 } /* private_init() */
 
 void bitd_dpo_controller::task_abort_cb(const cta::polled_task*) {
@@ -144,6 +151,7 @@ void bitd_dpo_controller::task_start_cb(cta::polled_task* task) {
     m_task_status = tasks::task_status::ekRUNNING;
   }
   m_current_task = dynamic_cast<tasks::base_foraging_task*>(task);
+  supervisor()->supervisee_update(task);
 } /* task_start_cb() */
 
 const cta::ds::bi_tab* bitd_dpo_controller::active_tab(void) const {

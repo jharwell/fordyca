@@ -77,6 +77,7 @@ HFSM_STATE_DEFINE(dpo_fsm, block_to_nest, rpfsm::event_data* data) {
     return fsm::foraging_signal::ekHANDLED;
   }
   if (m_block_fsm.task_finished()) {
+    m_task_finished = true;
     m_block_fsm.task_reset();
     internal_event(ekST_LEAVING_NEST);
   } else {
@@ -117,6 +118,7 @@ void dpo_fsm::init(void) {
 } /* init() */
 
 void dpo_fsm::run(void) {
+  m_task_finished = false;
   inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* run() */
 

@@ -36,6 +36,7 @@
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -161,6 +162,8 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   class block_manip_collator* block_manip_collator(void) {
     return &m_block_manip;
   }
+  cfsm::supervisor_fsm* supervisor(void) { return m_supervisor.get(); }
+  const cfsm::supervisor_fsm* supervisor(void) const { return m_supervisor.get(); }
 
  protected:
   class crfootbot::footbot_saa_subsystem2D* saa(void) RCSW_PURE;
@@ -173,8 +176,9 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   void output_init(const cmconfig::output_config* outputp);
 
   /* clang-format off */
-  class block_manip_collator           m_block_manip{};
-  std::unique_ptr<crepr::base_block2D> m_block;
+  class block_manip_collator            m_block_manip{};
+  std::unique_ptr<crepr::base_block2D>  m_block;
+  std::unique_ptr<cfsm::supervisor_fsm> m_supervisor;
   /* clang-format on */
 };
 

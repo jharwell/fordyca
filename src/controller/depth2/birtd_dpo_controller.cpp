@@ -59,8 +59,14 @@ void birtd_dpo_controller::control_step(void) {
             block()->id().v(),
             block()->md()->robot_id().v());
   dpo_perception()->update(nullptr);
-  executive()->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Execute the current task/allocate a new task/abort a task/etc and apply
+   * steering forces if normal operation, otherwise handle abnormal operation
+   * state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 
@@ -104,6 +110,8 @@ void birtd_dpo_controller::private_init(
                                            std::placeholders::_2));
   executive()->task_abort_notify(std::bind(
       &birtd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
+
+  supervisor()->supervisee_update(executive());
 } /* private_init() */
 
 void birtd_dpo_controller::task_start_cb(cta::polled_task* const task,

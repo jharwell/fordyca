@@ -245,6 +245,7 @@ rmath::vector2u block_to_goal_fsm::current_explore_loc(void) const {
 rmath::vector2u block_to_goal_fsm::current_vector_loc(void) const {
   return saa()->sensing()->discrete_position();
 } /* current_vector_loc() */
+
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/

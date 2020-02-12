@@ -125,7 +125,7 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
 };
 
 /**
- * \brief We use the picky visitor in order to force compile errors if a call to
+ * \brief We use the precise visitor in order to force compile errors if a call to
  * a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).

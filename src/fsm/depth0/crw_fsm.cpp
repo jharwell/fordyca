@@ -120,6 +120,7 @@ HFSM_STATE_DEFINE(crw_fsm, wait_for_block_pickup, rpfsm::event_data* data) {
 HFSM_STATE_DEFINE(crw_fsm, wait_for_block_drop, rpfsm::event_data* data) {
   if (fsm::foraging_signal::ekBLOCK_DROP == data->signal()) {
     m_explore_fsm.task_reset();
+    m_task_finished = true;
     ER_INFO("Block drop signal received");
     internal_event(ekST_LEAVING_NEST);
   }
@@ -202,6 +203,7 @@ void crw_fsm::init(void) {
 } /* init() */
 
 void crw_fsm::run(void) {
+  m_task_finished = false;
   inject_event(fsm::foraging_signal::ekRUN, rpfsm::event_type::ekNORMAL);
 } /* run() */
 

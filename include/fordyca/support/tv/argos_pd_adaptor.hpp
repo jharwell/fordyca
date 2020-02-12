@@ -33,16 +33,16 @@
 #include "cosm/tv/population_dynamics.hpp"
 #include "cosm/cosm.hpp"
 
+#include "fordyca/controller/controller_fwd.hpp"
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
 namespace cosm::foraging::ds {
 class arena_map;
-} /* namespace repr */
+} /* namespace ds */
 
-NS_START(fordyca);
-
-NS_START(support);
+NS_START(fordyca, support);
 
 class base_loop_functions;
 
@@ -86,6 +86,8 @@ class argos_pd_adaptor final : public rer::client<argos_pd_adaptor>,
   op_result robot_repair(const rtypes::type_uuid& id) override;
 
  private:
+  controller::foraging_controller* victim_locate(size_t current_pop) const;
+
   /* clang-format off */
   const std::string                   mc_entity_prefix;
   const std::string                   mc_controller_xml_id;

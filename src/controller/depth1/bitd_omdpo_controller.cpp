@@ -57,8 +57,14 @@ void bitd_omdpo_controller::control_step(void) {
             block()->md()->robot_id().v());
 
   mdpo_perception()->update(m_receptor.get());
-  executive()->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Execute the current task/allocate a new task/abort a task/etc and apply
+   * steering forces if normal operation, otherwise handle abnormal operation
+   * state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 

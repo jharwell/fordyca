@@ -87,8 +87,13 @@ void dpo_controller::control_step(void) {
             block()->md()->robot_id().v());
 
   m_perception->update(nullptr);
-  m_fsm->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Run the FSM and apply steering forces if normal operation, otherwise handle
+   * abnormal operation state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 

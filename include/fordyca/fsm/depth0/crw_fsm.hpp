@@ -60,7 +60,8 @@ NS_START(depth0);
 class crw_fsm final : public cfsm::util_hfsm,
                       public rer::client<crw_fsm>,
                       public cfsm::metrics::goal_acq_metrics,
-                      public block_transporter {
+                      public block_transporter,
+                      public cta::taskable {
  public:
   crw_fsm(crfootbot::footbot_saa_subsystem2D* saa,
           std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
@@ -87,6 +88,13 @@ class crw_fsm final : public cfsm::util_hfsm,
 
   /* block transportation */
   foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+
+  /* taskable overrides */
+  void task_execute(void) override { run(); }
+  void task_start(const cta::taskable_argument*) override {}
+  bool task_finished(void) const override { return m_task_finished; }
+  bool task_running(void) const override { return !m_task_finished; }
+  void task_reset(void) override { init(); }
 
   /**
    * \brief (Re)-initialize the FSM.
@@ -144,6 +152,7 @@ class crw_fsm final : public cfsm::util_hfsm,
   HFSM_DECLARE_STATE_MAP(state_map_ex, mc_state_map, ekST_MAX_STATES);
 
   /* clang-format off */
+  bool                       m_task_finished{false};
   cfsm::explore_for_goal_fsm m_explore_fsm;
   /* clang-format on */
 };

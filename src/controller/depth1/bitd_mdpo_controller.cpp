@@ -77,8 +77,14 @@ void bitd_mdpo_controller::control_step(void) {
             block()->md()->robot_id().v());
 
   perception()->update(nullptr);
-  executive()->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Execute the current task/allocate a new task/abort a task/etc and apply
+   * steering forces if normal operation, otherwise handle abnormal operation
+   * state.
+   */
+  supervisor()->run();
+
   ndc_pop();
 } /* control_step() */
 
@@ -98,8 +104,8 @@ void bitd_mdpo_controller::shared_init(
 
   /*
    * Task executive. Even though we use the same executive as the \ref
-   * bitd_dpo_controller, we have to replace it because we have our own perception
-   * subsystem, which is used to create the executive's graph.
+   * bitd_dpo_controller, we have to replace it because we have our own
+   * perception subsystem, which is used to create the executive's graph.
    */
   executive(task_executive_builder(block_sel_matrix(),
                                    cache_sel_matrix(),
@@ -107,7 +113,7 @@ void bitd_mdpo_controller::shared_init(
                                    perception())(config_repo, rng()));
   executive()->task_abort_notify(std::bind(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
-
+  supervisor()->supervisee_update(executive());
 } /* shared_init() */
 
 mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) {

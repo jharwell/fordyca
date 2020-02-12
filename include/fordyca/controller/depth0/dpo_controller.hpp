@@ -85,6 +85,15 @@ class dpo_controller : public crw_controller,
                             const);
 
   /**
+   * \brief Mutator to allow replacement of the the FSM used by this class to
+   * perform foraging tasks (strategy pattern), so that derived classes can
+   * reuse the same accessors that this classes provides. Cleaner to do it this
+   * way than to have each derived class have its own private version and
+   * require duplicate accessors in each derived class.
+   */
+    void fsm(std::unique_ptr<class fsm::depth0::dpo_fsm> fsm);
+
+  /**
    * \brief Set the robot's current line of sight (LOS).
    */
   void los(std::unique_ptr<repr::line_of_sight> new_los);
@@ -139,15 +148,6 @@ class dpo_controller : public crw_controller,
    * require duplicate accessors in each derived class.
    */
   void perception(std::unique_ptr<base_perception_subsystem> perception);
-
-  /**
-   * \brief Mutator to allow replacement of the the FSM used by this class to
-   * perform foraging tasks (strategy pattern), so that derived classes can
-   * reuse the same accessors that this classes provides. Cleaner to do it this
-   * way than to have each derived class have its own private version and
-   * require duplicate accessors in each derived class.
-   */
-  void fsm(std::unique_ptr<class fsm::depth0::dpo_fsm> fsm);
 
   /**
    * \brief Initialization that derived classes may also need to perform, if

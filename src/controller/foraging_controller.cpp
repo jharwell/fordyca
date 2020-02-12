@@ -204,9 +204,6 @@ void foraging_controller::saa_init(
      * use the governed version).
      */
       csubsystem::actuation_subsystem2D::map_entry_create(diff_drivea),
-      /* {typeid(chal::actuators::diff_drive_actuator), */
-      /*  csubsystem::actuation_subsystem2D::variant_type(diff_drivea)}, */
-
       csubsystem::actuation_subsystem2D::map_entry_create(leds),
       csubsystem::actuation_subsystem2D::map_entry_create(raba)};
 
