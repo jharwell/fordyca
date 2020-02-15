@@ -160,14 +160,18 @@ void depth0_loop_functions::private_init(void) {
   auto config_map = detail::configurer_map_type();
 
   /*
-   * Intitialize robot interactions with environment via various functors/type
-   * maps.
+   * Intitialize controller interactions with environment via various
+   * functors/type maps for all depth0 controller types.
    */
   detail::functor_maps_initializer f_initializer(&config_map, this);
   boost::mpl::for_each<controller::depth0::typelist>(f_initializer);
 
   /* configure robots */
   auto cb = [&](auto* controller) {
+    ER_ASSERT(config_map.end() != config_map.find(controller->type_index()),
+              "Controller '%s' type '%s' not in depth0 configuration map",
+              controller->GetId().c_str(),
+              controller->type_index().name());
     boost::apply_visitor(detail::robot_configurer_adaptor(controller),
                          config_map.at(controller->type_index()));
   };
@@ -286,6 +290,12 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                                               arena_map()->grid_resolution());
   utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
+
+  auto it = m_los_update_map->find(controller->type_index());
+  ER_ASSERT(m_los_update_map->end() != it,
+            "Controller '%s' type '%s' not in depth0 LOS update map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
   boost::apply_visitor(detail::robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -297,6 +307,12 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * Watch the robot interact with its environment after physics have been
    * updated and its controller has run.
    */
+  auto it = m_interactor_map->find(controller->type_index());
+  ER_ASSERT(m_interactor_map->end() != it,
+            "Controller '%s' type '%s' not in depth0 interactor map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
+
   auto iadaptor =
       robot_interactor_adaptor<depth0::robot_arena_interactor, interactor_status>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
@@ -322,6 +338,11 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.
    */
+  auto it2 = m_metrics_map->find(controller->type_index());
+  ER_ASSERT(m_metrics_map->end() != it2,
+            "Controller '%s' type '%s' not in depth0 metrics map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
   auto madaptor =
       robot_metric_extractor_adaptor<depth0_metrics_aggregator>(controller);
   boost::apply_visitor(madaptor, m_metrics_map->at(controller->type_index()));

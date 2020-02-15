@@ -201,6 +201,11 @@ void depth2_loop_functions::private_init(void) {
 
   /* configure robots */
   auto cb = [&](auto* controller) {
+    ER_ASSERT(config_map.end() != config_map.find(controller->type_index()),
+              "Controller '%s' type '%s' not in depth2 configuration map",
+              controller->GetId().c_str(),
+              controller->type_index().name());
+
     boost::apply_visitor(detail::robot_configurer_adaptor(controller),
                          config_map.at(controller->type_index()));
   };
@@ -232,6 +237,11 @@ void depth2_loop_functions::cache_handling_init(
 std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   auto cb = [&](auto* controller) {
+    auto it = m_task_extractor_map->find(controller->type_index());
+    ER_ASSERT(m_task_extractor_map->end() != it,
+              "Controller '%s' type '%s' not in depth2 task extraction map",
+              controller->GetId().c_str(),
+              controller->type_index().name());
     v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
                                      m_task_extractor_map->at(
                                          controller->type_index())));
@@ -366,6 +376,13 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                                               arena_map()->grid_resolution());
   utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
+
+  auto it = m_los_update_map->find(controller->type_index());
+  ER_ASSERT(m_los_update_map->end() != it,
+            "Controller '%s' type '%s' not in depth2 LOS update map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
+
   boost::apply_visitor(robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -381,6 +398,12 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * If said interaction results in a block being dropped in a new cache, then
    * we need to re-run dynamic cache creation.
    */
+  auto it = m_interactor_map->find(controller->type_index());
+  ER_ASSERT(m_interactor_map->end() != it,
+            "Controller '%s' type '%s' not in depth2 LOS update map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
+
   auto iadaptor =
       robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
@@ -413,6 +436,13 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
   /* get stats from this robot before its state changes */
   auto madaptor =
       robot_metric_extractor_adaptor<depth2_metrics_aggregator>(controller);
+
+  auto it2 = m_metric_extractor_map->find(controller->type_index());
+  ER_ASSERT(m_metric_extractor_map->end() != it2,
+            "Controller '%s' type '%s' not in depth2 LOS update map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
+
   boost::apply_visitor(madaptor,
                        m_metric_extractor_map->at(controller->type_index()));
   controller->block_manip_collator()->reset();

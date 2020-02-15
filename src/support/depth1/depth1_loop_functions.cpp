@@ -242,11 +242,19 @@ void depth1_loop_functions::private_init(void) {
   /* only needed for initialization, so not a member */
   auto config_map = detail::configurer_map_type();
 
+  /*
+   * Intitialize controller interactions with environment via various
+   * functors/type maps for all depth1 controller types.
+   */
   detail::functor_maps_initializer f_initializer(&config_map, this);
   boost::mpl::for_each<controller::depth1::typelist>(f_initializer);
 
   /* configure robots */
   auto cb = [&](auto* controller) {
+    ER_ASSERT(config_map.end() != config_map.find(controller->type_index()),
+              "Controller '%s' type '%s' not in depth1 configuration map",
+              controller->GetId().c_str(),
+              controller->type_index().name());
     boost::apply_visitor(detail::robot_configurer_adaptor(controller),
                          config_map.at(controller->type_index()));
   };
@@ -375,6 +383,11 @@ std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
 std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
   std::vector<int> v;
   auto cb = [&](const auto* controller) {
+    auto it = m_task_extractor_map->find(controller->type_index());
+    ER_ASSERT(m_task_extractor_map->end() != it,
+              "Controller '%s' type '%s' not in depth1 task extractor map",
+              controller->GetId().c_str(),
+              controller->type_index().name());
     v.push_back(boost::apply_visitor(robot_task_extractor_adaptor(controller),
                                      m_task_extractor_map->at(
                                          controller->type_index())));
@@ -547,6 +560,13 @@ void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
                                               arena_map()->grid_resolution());
   utils::set_robot_tick<decltype(*controller)>(
       robot, rtypes::timestep(GetSpace().GetSimulationClock()));
+
+  auto it = m_los_update_map->find(controller->type_index());
+  ER_ASSERT(m_los_update_map->end() != it,
+            "Controller '%s' type '%s' not in depth1 LOS Update map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
+
   boost::apply_visitor(robot_los_updater_adaptor(controller),
                        m_los_update_map->at(controller->type_index()));
 } /* robot_pre_step() */
@@ -559,9 +579,15 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * Watch the robot interact with its environment after physics have been
    * updated and its controller has run.
    */
+  auto it = m_interactor_map->find(controller->type_index());
+  ER_ASSERT(m_interactor_map->end() != it,
+            "Controller '%s' type '%s' not in depth1 interactor map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
   auto iadaptor =
       robot_interactor_adaptor<robot_arena_interactor, interactor_status>(
           controller, rtypes::timestep(GetSpace().GetSimulationClock()));
+
   auto status =
       boost::apply_visitor(iadaptor,
                            m_interactor_map->at(controller->type_index()));
@@ -589,6 +615,12 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * Collect metrics from robot, now that it has finished interacting with the
    * environment and no more changes to its state will occur this timestep.
    */
+  auto it2 = m_metric_extractor_map->find(controller->type_index());
+  ER_ASSERT(m_metric_extractor_map->end() != it2,
+            "Controller '%s' type '%s' not in depth1 metrics map",
+            controller->GetId().c_str(),
+            controller->type_index().name());
+
   auto madaptor =
       robot_metric_extractor_adaptor<depth1_metrics_aggregator>(controller);
   boost::apply_visitor(madaptor,
@@ -631,6 +663,12 @@ bool depth1_loop_functions::caches_depleted(void) const {
 void depth1_loop_functions::caches_recreation_task_counts_collect(
     const controller::base_controller* const controller) {
   if (caches_depleted()) {
+    auto it = m_subtask_status_map->find(controller->type_index());
+    ER_ASSERT(m_subtask_status_map->end() != it,
+              "Controller '%s' type '%s' not in depth1 subtask status map",
+              controller->GetId().c_str(),
+              controller->type_index().name());
+
     /*
      * Caches are recreated with a probability that depends on the relative
      * ratio between the # harvesters and the # collectors. If there are more

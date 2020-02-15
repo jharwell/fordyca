@@ -6,7 +6,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="4" method="balance_quantity" />
+    <system threads="0" method="balance_quantity" />
     <experiment length="10000"
                 ticks_per_second="5"
                 random_seed="123" />
@@ -289,7 +289,7 @@
       </env_dynamics>
       <population_dynamics
           birth_lambda="0.0"
-          death_lambda="1.0"
+          death_lambda="0.0"
           malfunction_lambda="0.0"
           max_size="16"
           repair_mu="0.0"/>
