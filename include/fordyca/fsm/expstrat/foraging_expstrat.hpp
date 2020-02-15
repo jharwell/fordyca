@@ -86,8 +86,8 @@ class foraging_expstrat : public cfsm::expstrat::base_expstrat,
   foraging_expstrat& operator=(const foraging_expstrat&) = delete;
 
  protected:
-  crfootbot::footbot_saa_subsystem* saa(void) const;
-  crfootbot::footbot_saa_subsystem* saa(void);
+  crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
+  crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
   rmath::rng* rng(void) { return m_rng; }
   rmath::rng* rng(void) const { return m_rng; }
 

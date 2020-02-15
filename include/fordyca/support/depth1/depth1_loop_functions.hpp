@@ -27,6 +27,7 @@
 #include <vector>
 #include <memory>
 #include <atomic>
+#include <utility>
 
 #include "fordyca/support/depth0/depth0_loop_functions.hpp"
 #include "fordyca/support/robot_los_updater.hpp"
@@ -75,11 +76,12 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
   depth1_loop_functions(void) RCSW_COLD;
   ~depth1_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void PreStep() override;
-  void PostStep() override;
-  void Reset(void) override RCSW_COLD;
-  void Destroy(void) override RCSW_COLD;
+  /* swarm manager overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void pre_step() override;
+  void post_step() override;
+  void reset(void) override RCSW_COLD;
+  void destroy(void) override RCSW_COLD;
 
  protected:
   /**

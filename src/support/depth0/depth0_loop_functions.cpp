@@ -129,7 +129,7 @@ depth0_loop_functions::~depth0_loop_functions(void) = default;
 /*******************************************************************************
  * Initialization Functions
  ******************************************************************************/
-void depth0_loop_functions::Init(ticpp::Element& node) {
+void depth0_loop_functions::init(ticpp::Element& node) {
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -138,10 +138,10 @@ void depth0_loop_functions::Init(ticpp::Element& node) {
 
   ER_INFO("Initialization finished");
   ndc_pop();
-} /* Init() */
+} /* init() */
 
 void depth0_loop_functions::shared_init(ticpp::Element& node) {
-  base_loop_functions::Init(node);
+  base_loop_functions::init(node);
 } /* shared_init() */
 
 void depth0_loop_functions::private_init(void) {
@@ -186,9 +186,9 @@ void depth0_loop_functions::private_init(void) {
 /*******************************************************************************
  * ARGoS Hooks
  ******************************************************************************/
-void depth0_loop_functions::PreStep(void) {
+void depth0_loop_functions::pre_step(void) {
   ndc_push();
-  base_loop_functions::PreStep();
+  base_loop_functions::pre_step();
 
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
@@ -198,11 +198,11 @@ void depth0_loop_functions::PreStep(void) {
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
   ndc_pop();
-} /* PreStep() */
+} /* pre_step() */
 
-void depth0_loop_functions::PostStep(void) {
+void depth0_loop_functions::post_step(void) {
   ndc_push();
-  base_loop_functions::PostStep();
+  base_loop_functions::post_step();
 
   /* Process all robots: interact with environment then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
@@ -234,20 +234,20 @@ void depth0_loop_functions::PostStep(void) {
   m_metrics_agg->interval_reset_all();
 
   ndc_pop();
-} /* PostStep() */
+} /* post_step() */
 
-void depth0_loop_functions::Destroy(void) {
+void depth0_loop_functions::destroy(void) {
   if (nullptr != m_metrics_agg) {
     m_metrics_agg->finalize_all();
   }
-} /* Destroy() */
+} /* destroy() */
 
-void depth0_loop_functions::Reset(void) {
+void depth0_loop_functions::reset(void) {
   ndc_push();
-  base_loop_functions::Reset();
+  base_loop_functions::reset();
   m_metrics_agg->reset_all();
   ndc_pop();
-} /* Reset() */
+} /* reset() */
 
 argos::CColor depth0_loop_functions::GetFloorColor(
     const argos::CVector2& plane_pos) {

@@ -49,7 +49,7 @@ NS_START(depth1);
  * - Task durations/estimates
  */
 class bitd_odpo_controller : public depth1::bitd_dpo_controller,
-                          public rer::client<bitd_odpo_controller> {
+                             public rer::client<bitd_odpo_controller> {
  public:
   using bitd_dpo_controller::perception;
 

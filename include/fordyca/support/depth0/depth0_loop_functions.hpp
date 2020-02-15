@@ -69,11 +69,12 @@ class depth0_loop_functions : public base_loop_functions,
   depth0_loop_functions(void) RCSW_COLD;
   ~depth0_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void PreStep(void) override;
-  void PostStep(void) override;
-  void Reset(void) override RCSW_COLD;
-  void Destroy(void) override RCSW_COLD;
+  /* swarm manager overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void pre_step(void) override;
+  void post_step(void) override;
+  void reset(void) override RCSW_COLD;
+  void destroy(void) override RCSW_COLD;
 
  protected:
   /**

@@ -63,11 +63,12 @@ class depth2_loop_functions final : public depth1::depth1_loop_functions,
   depth2_loop_functions(void) RCSW_COLD;
   ~depth2_loop_functions(void) override RCSW_COLD;
 
-  void Init(ticpp::Element& node) override RCSW_COLD;
-  void PreStep() override;
-  void PostStep() override;
-  void Reset(void) override RCSW_COLD;
-  void Destroy(void) override RCSW_COLD;
+  /* swarm manager overrides */
+  void init(ticpp::Element& node) override RCSW_COLD;
+  void pre_step() override;
+  void post_step() override;
+  void reset(void) override RCSW_COLD;
+  void destroy(void) override RCSW_COLD;
 
   /**
    * \brief Initialize depth2 support to be shared with derived classes

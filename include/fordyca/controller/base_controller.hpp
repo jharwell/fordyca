@@ -162,8 +162,8 @@ class base_controller : public cpal::argos_controller2D_adaptor,
   }
 
  protected:
-  class crfootbot::footbot_saa_subsystem* saa(void);
-  const class crfootbot::footbot_saa_subsystem* saa(void) const;
+  class crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
+  const class crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
 
  private:
   void saa_init(

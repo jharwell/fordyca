@@ -101,10 +101,11 @@ class base_loop_functions : public cpal::swarm_manager,
   base_loop_functions(void) RCSW_COLD;
   ~base_loop_functions(void) override RCSW_COLD;
 
+  /* Not copy constructible/assignable by default */
   base_loop_functions(const base_loop_functions& s) = delete;
   base_loop_functions& operator=(const base_loop_functions& s) = delete;
 
-  /* swarm manager noverrides */
+  /* swarm manager overrides */
   void init(ticpp::Element&) override RCSW_COLD;
   void reset(void) override RCSW_COLD;
   void pre_step(void) override;
