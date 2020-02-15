@@ -40,8 +40,8 @@
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics_collector.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/metrics/convergence_metrics.hpp"
-#include "cosm/metrics/convergence_metrics_collector.hpp"
+#include "cosm/convergence/metrics/convergence_metrics.hpp"
+#include "cosm/convergence/metrics/convergence_metrics_collector.hpp"
 #include "cosm/metrics/spatial_dist2D_metrics.hpp"
 #include "cosm/metrics/spatial_dist2D_pos_metrics_collector.hpp"
 #include "cosm/repr/base_block2D.hpp"
@@ -74,7 +74,7 @@ using collector_typelist = rmpl::typelist<
     collector_registerer::type_wrap<cmetrics::blocks::transport_metrics_collector>,
     collector_registerer::type_wrap<blocks::manipulation_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::spatial_dist2D_pos_metrics_collector>,
-    collector_registerer::type_wrap<cmetrics::convergence_metrics_collector>,
+  collector_registerer::type_wrap<cconvergence::metrics::convergence_metrics_collector>,
     collector_registerer::type_wrap<tv::env_dynamics_metrics_collector>,
     collector_registerer::type_wrap<ctvmetrics::population_dynamics_metrics_collector> >;
 
@@ -125,7 +125,7 @@ base_metrics_aggregator::base_metrics_aggregator(
       {typeid(cmetrics::spatial_dist2D_pos_metrics_collector),
        "swarm_dist2D_pos",
        "swarm::spatial_dist2D::pos"},
-      {typeid(cmetrics::convergence_metrics_collector),
+      {typeid(cconvergence::metrics::convergence_metrics_collector),
        "swarm_convergence",
        "swarm::convergence"},
       {typeid(tv::env_dynamics_metrics_collector),
