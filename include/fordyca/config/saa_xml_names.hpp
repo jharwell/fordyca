@@ -49,6 +49,7 @@ struct saa_xml_names {
   static constexpr char leds_saa[] = "leds";
   static constexpr char rab_saa[] = "range_and_bearing";
   static constexpr char prox_sensor[] = "footbot_proximity";
+  static constexpr char position_sensor[] = "positioning";
   static constexpr char camera_sensor[] = "colored_blob_omnidirectional_camera";
   static constexpr char light_sensor[] = "footbot_light";
   static constexpr char ground_sensor[] = "footbot_motor_ground";

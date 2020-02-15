@@ -371,12 +371,15 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
   auto controller = dynamic_cast<controller::base_controller*>(
       &robot.GetControllableEntity().GetController());
 
-  /* Set robot position, time, and send it its new LOS */
-  utils::set_robot_pos<decltype(*controller)>(robot,
-                                              arena_map()->grid_resolution());
-  utils::set_robot_tick<decltype(*controller)>(
-      robot, rtypes::timestep(GetSpace().GetSimulationClock()));
+  /*
+   * Update robot position, time. This can't be done as part of the robot's
+   * control step because we need access to information only available in the
+   * loop functions.
+   */
+  controller->sensing_update(rtypes::timestep(GetSpace().GetSimulationClock()),
+                             arena_map()->grid_resolution());
 
+  /* Send robot its new LOS */
   auto it = m_los_update_map->find(controller->type_index());
   ER_ASSERT(m_los_update_map->end() != it,
             "Controller '%s' type '%s' not in depth2 LOS update map",

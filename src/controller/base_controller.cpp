@@ -149,6 +149,8 @@ void base_controller::saa_init(
   auto battery = chal::sensors::battery_sensor(nullptr);
 #endif /* FORDYCA_WITH_ROBOT_BATTERY */
 
+  auto position = chal::sensors::position_sensor(
+      GetSensor<argos::CCI_PositioningSensor>(saa_names.position_sensor));
   auto proximity = chal::sensors::proximity_sensor(
       GetSensor<argos::CCI_FootBotProximitySensor>(saa_names.prox_sensor),
       &sensing_p->proximity);
@@ -211,7 +213,7 @@ void base_controller::saa_init(
       csubsystem::actuation_subsystem2D::map_entry_create(raba)};
 
   base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
-      sensors, actuators, &actuation_p->steering));
+      position, sensors, actuators, &actuation_p->steering));
 } /* saa_init() */
 
 rtypes::type_uuid base_controller::entity_id(void) const {
