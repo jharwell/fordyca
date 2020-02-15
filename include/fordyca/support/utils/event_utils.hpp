@@ -41,6 +41,7 @@
 namespace cosm::repr {
 class base_block2D;
 class entity2D;
+class nest;
 } /* namespace cosm::repr */
 
 NS_START(fordyca);
@@ -50,7 +51,6 @@ class base_controller;
 }
 namespace repr {
 class arena_cache;
-class nest;
 class line_of_sight;
 }
 
@@ -128,7 +128,7 @@ bool block_drop_near_arena_boundary(
  */
 bool block_drop_overlap_with_nest(
     const crepr::base_block2D* block,
-    const repr::nest& nest,
+    const crepr::nest& nest,
     const rmath::vector2d& drop_loc) RCSW_PURE;
 
 /**

@@ -63,7 +63,7 @@ bool block_drop_near_arena_boundary(const ds::arena_map& map,
 } /* block_drop_overlap_with_nest() */
 
 bool block_drop_overlap_with_nest(const crepr::base_block2D* const block,
-                                  const repr::nest& nest,
+                                  const crepr::nest& nest,
                                   const rmath::vector2d& drop_loc) {
   auto drop_xspan = crepr::entity2D::xspan(drop_loc, block->dims().x());
   auto drop_yspan = crepr::entity2D::yspan(drop_loc, block->dims().y());

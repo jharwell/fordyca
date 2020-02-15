@@ -36,7 +36,7 @@
 #include "fordyca/ds/block_vector.hpp"
 #include "fordyca/ds/cache_vector.hpp"
 #include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/nest.hpp"
+#include "cosm/repr/nest.hpp"
 #include "fordyca/support/block_dist/dispatcher.hpp"
 #include "fordyca/support/block_dist/redist_governor.hpp"
 
@@ -237,7 +237,7 @@ class arena_map final : public rer::client<arena_map>,
     return decoratee().resolution();
   }
 
-  const repr::nest& nest(void) const { return m_nest; }
+  const crepr::nest& nest(void) const { return m_nest; }
 
   const support::block_dist::base_distributor* block_distributor(void) const {
     return m_block_dispatcher.distributor();
@@ -301,7 +301,7 @@ class arena_map final : public rer::client<arena_map>,
   cache_vector                         m_caches{};
   cache_vector                         m_zombie_caches{};
 
-  repr::nest                           m_nest;
+  crepr::nest                          m_nest;
   support::block_dist::dispatcher      m_block_dispatcher;
   support::block_dist::redist_governor m_redist_governor;
   /* clang-format on */
