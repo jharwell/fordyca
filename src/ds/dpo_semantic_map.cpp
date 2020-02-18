@@ -23,9 +23,10 @@
  ******************************************************************************/
 #include "fordyca/ds/dpo_semantic_map.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -46,11 +47,11 @@ dpo_semantic_map::dpo_semantic_map(
  * Member Functions
  ******************************************************************************/
 bool dpo_semantic_map::cache_remove(
-    const std::shared_ptr<repr::base_cache>& victim) {
+    const std::shared_ptr<cfrepr::base_cache>& victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
              victim->dloc().to_str().c_str());
-    events::cell_empty_visitor op(victim->dloc());
+    events::cell2D_empty_visitor op(victim->dloc());
     op.visit(decoratee().access<occupancy_grid::kCell>(victim->dloc()));
     return true;
   }
@@ -62,7 +63,7 @@ bool dpo_semantic_map::block_remove(
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->dloc().to_str().c_str());
-    events::cell_empty_visitor op(victim->dloc());
+    events::cell2D_empty_visitor op(victim->dloc());
     op.visit(access<occupancy_grid::kCell>(victim->dloc()));
     return true;
   }

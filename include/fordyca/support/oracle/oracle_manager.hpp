@@ -27,19 +27,21 @@
 #include <memory>
 #include "rcppsw/common/common.hpp"
 
+#include "fordyca/fordyca.hpp"
+
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::foraging::ds {
+class arena_map;
+} /* namespace cosm::foraging::ds */
+
 NS_START(fordyca);
 namespace config {
 namespace oracle {
 struct oracle_manager_config;
 } /* namespace oracle */
 } /* namespace config */
-
-namespace ds {
-class arena_map;
-} /* namespace ds */
 
 NS_START(support, oracle);
 class entities_oracle;
@@ -82,7 +84,7 @@ class oracle_manager {
    * from the loop functions before processing any robots for that timestep (at
    * a minimum).
    */
-  void update(ds::arena_map* map);
+  void update(cfds::arena_map* map);
 
  private:
   /* clang-format off */

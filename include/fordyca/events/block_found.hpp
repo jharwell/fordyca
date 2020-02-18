@@ -28,8 +28,9 @@
 
 #include "rcppsw/er/client.hpp"
 
+#include "cosm/events/cell2D_op.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/events/cell_op.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -58,10 +59,10 @@ NS_START(events, detail);
  * \brief Event that is created whenever a block (possibly known, possibly
  * unknown) appears in a robot's LOS.
  */
-class block_found : public rer::client<block_found>, public cell_op {
+class block_found : public rer::client<block_found>, public cevents::cell2D_op {
  private:
   struct visit_typelist_impl {
-    using inherited = cell_op::visit_typelist;
+    using inherited = cell2D_op::visit_typelist;
     using controllers = controller::depth2::typelist;
     using others = rmpl::typelist<ds::dpo_store, ds::dpo_semantic_map>;
 
@@ -84,8 +85,8 @@ class block_found : public rer::client<block_found>, public cell_op {
   void visit(ds::dpo_store& store);
 
   /* MDPO foraging */
-  void visit(ds::cell2D& cell);
-  void visit(fsm::cell2D_fsm& fsm);
+  void visit(cds::cell2D& cell);
+  void visit(cfsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
 
   /* depth2 foraging */

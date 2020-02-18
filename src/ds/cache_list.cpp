@@ -25,7 +25,7 @@
 
 #include <numeric>
 
-#include "fordyca/repr/base_cache.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

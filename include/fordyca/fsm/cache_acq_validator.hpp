@@ -59,8 +59,6 @@ NS_START(fsm);
  * \brief Determine if the acquisition of a cache at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and
  * current simulation state.
- *
- * Handles acquisition validity determinations for robots AND the arena.
  */
 class cache_acq_validator : public rer::client<cache_acq_validator> {
  public:
@@ -77,13 +75,6 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
    */
   bool operator()(const rmath::vector2d& loc,
                   const rtypes::type_uuid& id,
-                  const rtypes::timestep& t) const;
-
-  /**
-   * \brief Determine if the robot's acquisition of an ACTUAL cache that exists
-   * in the arena is valid.
-   */
-  bool operator()(const cfrepr::base_cache* cache,
                   const rtypes::timestep& t) const;
 
  private:

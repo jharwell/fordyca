@@ -30,8 +30,9 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/timestep.hpp"
 
+#include "cosm/foraging/events/block_drop_base_visit_set.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/events/block_drop_base_visit_set.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 
@@ -52,7 +53,7 @@ NS_START(fordyca, events, detail);
 class nest_block_drop : public rer::client<nest_block_drop> {
  private:
   struct visit_typelist_impl {
-    using inherited = block_drop_base_visit_typelist;
+    using inherited = cfevents::block_drop_base_visit_typelist;
     using controllers = boost::mpl::joint_view<
         boost::mpl::joint_view<controller::depth0::typelist,
                                controller::depth1::typelist>,
@@ -96,7 +97,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
    * Internally takes \ref arena_map block, grid mutexes to protect block
    * re-distribution and block updates, and releases afterwards. See #594.
    */
-  void visit(ds::arena_map& map);
+  void visit(cfds::arena_map& map);
 
   void visit(crepr::base_block2D& block);
   void visit(fsm::depth0::crw_fsm& fsm);
@@ -127,7 +128,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   void dispatch_nest_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  const rtypes::timestep            mc_timestep;
+  const rtypes::timestep               mc_timestep;
 
   std::unique_ptr<crepr::base_block2D> m_robot_block;
   std::shared_ptr<crepr::base_block2D> m_arena_block{};

@@ -26,10 +26,10 @@
 #include <boost/range/adaptor/map.hpp>
 #include <numeric>
 
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/config/perception/pheromone_config.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -48,7 +48,7 @@ dpo_store::dpo_store(const config::perception::pheromone_config* const config)
  * Member Functions
  ******************************************************************************/
 dpo_store::update_res_t dpo_store::cache_update(
-    const dpo_entity<repr::base_cache>& cache) {
+    const dpo_entity<cfrepr::base_cache>& cache) {
   update_res_t res = {.status = true,
                       .reason = kNO_CHANGE,
                       .old_loc = rmath::vector2u()};
@@ -69,7 +69,7 @@ dpo_store::update_res_t dpo_store::cache_update(
   return res;
 } /* cache_update() */
 
-bool dpo_store::cache_remove(const std::shared_ptr<repr::base_cache>& victim) {
+bool dpo_store::cache_remove(const std::shared_ptr<cfrepr::base_cache>& victim) {
   auto range = m_caches.const_values_range();
 
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
@@ -205,7 +205,7 @@ bool dpo_store::contains(const std::shared_ptr<crepr::base_block2D>& block) cons
   return m_blocks.contains(block->id());
 } /* contains() */
 
-bool dpo_store::contains(const std::shared_ptr<repr::base_cache>& cache) const {
+bool dpo_store::contains(const std::shared_ptr<cfrepr::base_cache>& cache) const {
   return m_caches.contains(cache->dloc());
 } /* contains() */
 
@@ -215,7 +215,7 @@ const dp_block_map::value_type* dpo_store::find(
 } /* find() */
 
 const dp_cache_map::value_type* dpo_store::find(
-    const std::shared_ptr<repr::base_cache>& cache) const {
+    const std::shared_ptr<cfrepr::base_cache>& cache) const {
   return m_caches.find(cache->dloc());
 } /* find() */
 

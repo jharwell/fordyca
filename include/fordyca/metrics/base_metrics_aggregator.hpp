@@ -41,21 +41,18 @@
 namespace cosm::repr {
 class base_block2D;
 }
+namespace cosm::ds::config {
+struct grid_config;
+} // namespace cosm::ds::config
 
 NS_START(fordyca);
 
 namespace support {
 class base_loop_functions;
 }
-namespace ds {
-class arena_map;
-}
 namespace controller {
 class base_controller;
 } /* namespace controller */
-namespace config {
-struct grid_config;
-} /* namespace config */
 
 NS_START(metrics);
 
@@ -74,7 +71,7 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
                                 public rmetrics::collector_group {
  public:
   base_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                          const config::grid_config* const gconfig,
+                          const cdconfig::grid_config* const gconfig,
                           const std::string& output_root);
   ~base_metrics_aggregator(void) override = default;
 

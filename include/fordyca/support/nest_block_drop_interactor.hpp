@@ -28,7 +28,8 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/ds/arena_map.hpp"
+#include "cosm/foraging/ds/arena_map.hpp"
+
 #include "fordyca/events/nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
@@ -55,7 +56,7 @@ template <typename T>
 class nest_block_drop_interactor
     : public rer::client<nest_block_drop_interactor<T>> {
  public:
-  nest_block_drop_interactor(ds::arena_map* const map,
+  nest_block_drop_interactor(cfds::arena_map* const map,
                              depth0::depth0_metrics_aggregator* const metrics_agg,
                              argos::CFloorEntity* const floor,
                              tv::env_dynamics* envd)
@@ -167,7 +168,7 @@ class nest_block_drop_interactor
   /* clang-format off */
   argos::CFloorEntity* const               m_floor;
   depth0::depth0_metrics_aggregator* const m_metrics_agg;
-  ds::arena_map* const                     m_map;
+  cfds::arena_map* const                   m_map;
   tv::block_op_penalty_handler* const      m_penalty_handler;
   /* clang-format on */
 };

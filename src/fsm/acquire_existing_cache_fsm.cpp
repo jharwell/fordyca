@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
@@ -33,7 +34,6 @@
 #include "fordyca/fsm/existing_cache_selector.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -56,16 +56,20 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
           std::move(exp_behavior),
           rng,
           acquire_goal_fsm::hook_list{
-            RCPPSW_STRUCT_DOT_INITIALIZER(acquisition_goal,
-                                          std::bind(&acquire_existing_cache_fsm::acq_goal_internal)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(goal_select,
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  acquisition_goal,
+                  std::bind(&acquire_existing_cache_fsm::acq_goal_internal)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_select,
                   std::bind(&acquire_existing_cache_fsm::existing_cache_select,
                             this)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(candidates_exist,
-                                              std::bind(&acquire_existing_cache_fsm::candidates_exist, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  candidates_exist,
+                  std::bind(&acquire_existing_cache_fsm::candidates_exist, this)),
 
-                RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
-                RCPPSW_STRUCT_DOT_INITIALIZER(goal_acquired_cb,
+              RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, nullptr),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_acquired_cb,
                   std::bind(&acquire_existing_cache_fsm::cache_acquired_cb,
 
                             this,
@@ -78,9 +82,12 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
                  * policy). Allowing acquisition via exploration can result in
                  * violations of the pickup policy.
                  */
-                RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb,
-                                              std::bind([]() noexcept { return false; })),
-                RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
+              RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb,
+                                            std::bind([]() noexcept {
+                                              return false;
+                                            })),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_valid_cb,
                   std::bind(&acquire_existing_cache_fsm::cache_acq_valid,
                             this,
                             std::placeholders::_1,

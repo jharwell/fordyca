@@ -23,9 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis.hpp"
 
+#include "cosm/foraging/repr/light_type_index.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-
-#include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,7 +65,7 @@ void ledtaxis::task_execute(void) {
     saa()->actuation()->leds()->set_color(-1, rutils::color::kMAGENTA);
     auto force = saa()->steer_force2D().phototaxis(
         saa()->sensing()->blobs()->readings(),
-        support::light_type_index()[support::light_type_index::kCache]);
+        cfrepr::light_type_index()[cfrepr::light_type_index::kCache]);
     saa()->steer_force2D().accum(force);
   }
 } /* task_execute() */

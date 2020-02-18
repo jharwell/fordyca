@@ -217,7 +217,7 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
      * all robots to always obey cache pickup policies. See FORDYCA#625.
      */
     std::scoped_lock lock(m_list_mtx);
-    auto duration = penalty_finish_uniqueify(orig_duration);
+    auto duration = penalty_finish_uniqueify(start, orig_duration);
     m_penalty_list.push_back(temporal_penalty(controller, id, duration, start));
     return duration;
   }
@@ -238,9 +238,10 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
    * \param duration The calculated penalty sans deconfliction. Passed by value
    *                 and modified, in order to make calculations simpler.
    */
-  rtypes::timestep penalty_finish_uniqueify(rtypes::timestep duration) const {
+  rtypes::timestep penalty_finish_uniqueify(const rtypes::timestep& start,
+                                            rtypes::timestep duration) const {
     for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
-      if (it->start_time() + it->penalty() == duration) {
+      if (it->start_time() + it->penalty() == start + duration) {
         duration += 1;
         it = m_penalty_list.begin();
       }

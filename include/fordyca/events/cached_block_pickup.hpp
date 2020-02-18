@@ -30,26 +30,31 @@
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
+#include "cosm/events/cell2D_op.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::foraging::repr {
+class arena_cache;
+}
+namespace cosm::pal {
+class swarm_manager;
+} /* namespace cosm::pal */
+
 NS_START(fordyca);
 
 namespace controller {
 class cache_sel_matrix;
 }
-namespace repr {
-class arena_cache;
-}
+
 namespace support {
 class base_cache_manager;
-class base_loop_functions;
 } /* namespace support */
 
 NS_START(events, detail);
@@ -67,11 +72,11 @@ NS_START(events, detail);
  * being created, at a higher level.
  */
 class cached_block_pickup : public rer::client<cached_block_pickup>,
-                            public cell_op {
+                            public cevents::cell2D_op {
  private:
   struct visit_typelist_impl {
     using inherited =
-        boost::mpl::joint_view<cell_op::visit_typelist::type,
+        boost::mpl::joint_view<cell2D_op::visit_typelist::type,
                                block_pickup_base_visit_typelist::type>;
     using controllers =
         boost::mpl::joint_view<controller::depth1::typelist::type,
@@ -85,7 +90,7 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
         /* depth2 */
         tasks::depth2::cache_transferer,
         tasks::depth2::cache_collector,
-        repr::arena_cache>;
+        cfrepr::arena_cache>;
 
     using value =
         boost::mpl::joint_view<boost::mpl::joint_view<inherited, controllers>,
@@ -95,8 +100,8 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  cached_block_pickup(support::base_loop_functions* loop,
-                      const std::shared_ptr<repr::arena_cache>& cache,
+  cached_block_pickup(cpal::swarm_manager* sm,
+                      const std::shared_ptr<cfrepr::arena_cache>& cache,
                       const rtypes::type_uuid& robot_id,
                       const rtypes::timestep& t);
   ~cached_block_pickup(void) override = default;
@@ -111,14 +116,14 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
    * Assumes caller is holding \ref arena_map cache mutex. Takes \ref arena_map
    * block mutex, and then releases it after cache updates.
    */
-  void visit(ds::arena_map& map);
+  void visit(cfds::arena_map& map);
 
-  void visit(ds::cell2D& cell);
-  void visit(fsm::cell2D_fsm& fsm);
+  void visit(cds::cell2D& cell);
+  void visit(cfsm::cell2D_fsm& fsm);
   void visit(ds::dpo_semantic_map& map);
   void visit(ds::dpo_store& store);
   void visit(crepr::base_block2D& block);
-  void visit(repr::arena_cache& cache);
+  void visit(cfrepr::arena_cache& cache);
   void visit(tasks::depth1::collector& task);
   void visit(fsm::block_to_goal_fsm& fsm);
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
@@ -148,11 +153,11 @@ class cached_block_pickup : public rer::client<cached_block_pickup>,
                                     controller::cache_sel_matrix* csel_matrix);
 
   /* clang-format off */
-  const rtypes::type_uuid          mc_robot_id;
-  const rtypes::timestep             mc_timestep;
+  const rtypes::type_uuid              mc_robot_id;
+  const rtypes::timestep               mc_timestep;
 
-  support::base_loop_functions       *m_loop;
-  std::shared_ptr<repr::arena_cache> m_real_cache;
+  cpal::swarm_manager*                 m_sm;
+  std::shared_ptr<cfrepr::arena_cache> m_real_cache;
 
   /**
    * \brief The block that will be picked up by the robot.

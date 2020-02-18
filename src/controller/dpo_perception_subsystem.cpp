@@ -23,13 +23,14 @@
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
+
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -135,7 +136,7 @@ void dpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::block_list los_blocks = c_los->blocks();
+  cfds::block_list los_blocks = c_los->blocks();
   ER_DEBUG("Blocks in DPO store: [%s]",
            rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
@@ -216,7 +217,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::line_of_sight* const c_los,
-    const ds::block_list& los_blocks) {
+    const cfds::block_list& los_blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
    * the corresponding block should also be in our LOS. If it is not, then our

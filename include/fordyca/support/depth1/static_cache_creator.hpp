@@ -48,7 +48,7 @@ NS_START(fordyca, support, depth1);
 class static_cache_creator : public base_cache_creator,
                              public rer::client<static_cache_creator> {
  public:
-  static_cache_creator(ds::arena_grid* grid,
+  static_cache_creator(cds::arena_grid* grid,
                        const std::vector<rmath::vector2d>& cache_locs,
                        rtypes::spatial_dist cache_dim);
 
@@ -57,8 +57,8 @@ class static_cache_creator : public base_cache_creator,
    * the locations of the static caches do not change and are known to be
    * conflict free.
    */
-  ds::cache_vector create_all(const cache_create_ro_params& c_params,
-                              const ds::block_vector&  c_alloc_blocks) override;
+  cfds::cache_vector create_all(const cache_create_ro_params& c_params,
+                              const cfds::block_vector&  c_alloc_blocks) override;
 
  private:
   /* clang-format off */

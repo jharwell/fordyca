@@ -37,7 +37,7 @@ NS_START(fordyca, metrics, perception);
  ******************************************************************************/
 dpo_perception_metrics_collector::dpo_perception_metrics_collector(
     const std::string& ofname,
-    uint interval)
+    const rtypes::timestep& interval)
     : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************

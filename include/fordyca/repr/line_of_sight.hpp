@@ -32,21 +32,18 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/ds/block_list.hpp"
+#include "cosm/foraging/ds/block_list.hpp"
+
 #include "fordyca/ds/cache_list.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
+namespace cosm::ds {
 class cell2D;
-}
+} /* namespace cosm::ds */
 
-NS_START(repr);
-class base_block2D;
-class base_cache;
+NS_START(fordyca, repr);
 
 /*******************************************************************************
  * Class Definitions
@@ -68,15 +65,15 @@ class base_cache;
  */
 class line_of_sight final : public rer::client<line_of_sight> {
  public:
-  using grid_view = rds::base_grid2D<ds::cell2D>::grid_view;
-  using const_grid_view = rds::base_grid2D<ds::cell2D>::const_grid_view;
+  using grid_view = rds::base_grid2D<cds::cell2D>::grid_view;
+  using const_grid_view = rds::base_grid2D<cds::cell2D>::const_grid_view;
 
   line_of_sight(const const_grid_view& c_view, const rmath::vector2u& center)
       : ER_CLIENT_INIT("fordyca.repr.line_of_sight"),
         mc_center(center),
         mc_view(c_view) {}
 
-  ds::block_list blocks(void) const;
+  cfds::block_list blocks(void) const;
   ds::cache_list caches(void) const;
 
   /**
@@ -120,7 +117,7 @@ class line_of_sight final : public rer::client<line_of_sight> {
    *
    * \return A reference to the cell.
    */
-  const ds::cell2D& cell(uint i, uint j) const RCSW_PURE;
+  const cds::cell2D& cell(uint i, uint j) const RCSW_PURE;
 
   /**
    * \brief Get the coordinates for the center of the LOS.

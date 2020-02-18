@@ -1,5 +1,5 @@
 /**
- * \file cell2D.cpp
+ * \file cell2D_empty.cpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,39 +21,36 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/ds/cell2D.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
-
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/ds/dpo_semantic_map.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, ds);
-
-/*******************************************************************************
- * Constructors/Destructor
- ******************************************************************************/
-cell2D::cell2D(void) { decoratee().init(); }
+NS_START(fordyca, events, detail);
+using ds::occupancy_grid;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-std::shared_ptr<crepr::base_block2D> cell2D::block(void) const {
-  return std::dynamic_pointer_cast<crepr::base_block2D>(m_entity);
-} /* block() */
+void cell2D_empty::visit(ds::occupancy_grid& grid) {
+  cds::cell2D& cell = grid.access<occupancy_grid::kCell>(x(), y());
+  if (!cell.state_is_known()) {
+    grid.known_cells_inc();
+  }
+  ER_ASSERT(grid.known_cell_count() <= grid.xdsize() * grid.ydsize(),
+            "Known cell count (%u) >= arena dimensions (%zux%zu)",
+            grid.known_cell_count(),
+            grid.xdsize(),
+            grid.ydsize());
+  grid.access<occupancy_grid::kPheromone>(x(), y()).reset();
+  visit(cell);
+} /* visit() */
 
-std::shared_ptr<crepr::base_block2D> cell2D::block(void) {
-  return std::dynamic_pointer_cast<crepr::base_block2D>(m_entity);
-} /* block() */
+void cell2D_empty::visit(ds::dpo_semantic_map& map) {
+  visit(map.decoratee());
+} /* visit() */
 
-std::shared_ptr<repr::base_cache> cell2D::cache(void) {
-  return std::dynamic_pointer_cast<repr::base_cache>(m_entity);
-} /* cache() */
-
-std::shared_ptr<repr::base_cache> cell2D::cache(void) const {
-  return std::dynamic_pointer_cast<repr::base_cache>(m_entity);
-} /* cache() */
-
-NS_END(ds, fordyca);
+NS_END(detail, events, fordyca);

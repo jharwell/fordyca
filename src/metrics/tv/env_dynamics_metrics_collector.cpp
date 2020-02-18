@@ -35,7 +35,7 @@ NS_START(fordyca, metrics, tv);
  ******************************************************************************/
 env_dynamics_metrics_collector::env_dynamics_metrics_collector(
     const std::string& ofname)
-    : base_metrics_collector(ofname, 1) {}
+    : base_metrics_collector(ofname, rtypes::timestep(1)) {}
 
 /*******************************************************************************
  * Member Functions

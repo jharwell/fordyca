@@ -25,7 +25,7 @@
 
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/cache_proximity.hpp"
-#include "fordyca/events/free_block_drop.hpp"
+#include "fordyca/events/robot_free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth2/block_to_new_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
@@ -140,7 +140,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_finisher::accept(events::detail::free_block_drop& visitor) {
+void cache_finisher::accept(events::detail::robot_free_block_drop& visitor) {
   visitor.visit(*this);
 }
 void cache_finisher::accept(events::detail::free_block_pickup& visitor) {

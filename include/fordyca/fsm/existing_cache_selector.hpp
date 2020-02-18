@@ -86,7 +86,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
    * \return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool cache_is_excluded(const rmath::vector2d& position,
-                         const repr::base_cache* cache) const;
+                         const cfrepr::base_cache* cache) const;
 
   /* clang-format off */
   const bool                                mc_is_pickup;

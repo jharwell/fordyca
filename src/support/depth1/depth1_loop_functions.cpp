@@ -34,20 +34,21 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/config/arena_map_config.hpp"
+#include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
-#include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_omdpo_controller.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/repr/block_cluster.hpp"
-#include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/support/depth1/robot_arena_interactor.hpp"
 #include "fordyca/support/depth1/robot_configurer.hpp"
@@ -66,7 +67,6 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using ds::arena_grid;
 
 /*******************************************************************************
  * Struct Definitions
@@ -207,7 +207,7 @@ void depth1_loop_functions::shared_init(ticpp::Element& node) {
 
 void depth1_loop_functions::private_init(void) {
   /* initialize stat collecting */
-  auto* arena = config()->config_get<config::arena::arena_map_config>();
+  auto* arena = config()->config_get<cfconfig::arena_map_config>();
   auto* output = config()->config_get<cmconfig::output_config>();
   m_metrics_agg = std::make_unique<depth1_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
@@ -216,7 +216,7 @@ void depth1_loop_functions::private_init(void) {
   /* initialize cache handling and create initial cache */
   cache_handling_init(
       config()->config_get<config::caches::caches_config>(),
-      &config()->config_get<config::arena::arena_map_config>()->blocks.dist);
+      &config()->config_get<cfconfig::arena_map_config>()->blocks.dist);
 
   /*
    * Initialize convergence calculations to include task distribution (not
@@ -264,10 +264,8 @@ void depth1_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this,
-                                                            cb,
-                                                            "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
 } /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
@@ -295,7 +293,7 @@ void depth1_loop_functions::oracle_init(void) {
 
 void depth1_loop_functions::cache_handling_init(
     const config::caches::caches_config* cachep,
-    const config::arena::block_dist_config* distp) {
+    const cfconfig::block_dist_config* distp) {
   ER_ASSERT(nullptr != cachep && cachep->static_.enable,
             "FATAL: Caches not enabled in depth1 loop functions");
   /*
@@ -310,28 +308,28 @@ void depth1_loop_functions::cache_handling_init(
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this);
+    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
     floor()->SetChanged();
   }
 } /* cache_handling_init() */
 
 std::vector<rmath::vector2d> depth1_loop_functions::calc_cache_locs(
-    const config::arena::block_dist_config* distp) {
+    const cfconfig::block_dist_config* distp) {
   std::vector<rmath::vector2d> cache_locs;
 
   /*
-   * For all block distributions that are supported, and each of the static
+   * For all block distributions that are supported, each of the static
    * caches is halfway between the center of the nest and a block cluster.
    */
-  if (support::block_dist::dispatcher::kDistSingleSrc == distp->dist_type ||
-      support::block_dist::dispatcher::kDistDualSrc == distp->dist_type) {
+  if (cfbd::dispatcher::kDistSingleSrc == distp->dist_type ||
+      cfbd::dispatcher::kDistDualSrc == distp->dist_type) {
     auto clusters = arena_map()->block_distributor()->block_clusters();
     for (auto& c : clusters) {
       cache_locs.push_back(
           {(c->xspan().center() + arena_map()->nest().rloc().x()) / 2.0,
            (c->yspan().center() + arena_map()->nest().rloc().y()) / 2.0});
     } /* for(i..) */
-  } else if (support::block_dist::dispatcher::kDistQuadSrc == distp->dist_type) {
+  } else if (cfbd::dispatcher::kDistQuadSrc == distp->dist_type) {
     /*
      * Quad source is a tricky distribution to use with static caches, so we
      * have to tweak the static cache locations in tandem with the block cluster
@@ -431,8 +429,8 @@ void depth1_loop_functions::post_step(void) {
   auto cb = [&](argos::CControllableEntity* robot) {
     ndc_push();
     robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
-    caches_recreation_task_counts_collect(&
-        static_cast<controller::base_controller&>(robot->GetController()));
+    caches_recreation_task_counts_collect(
+        &static_cast<controller::base_controller&>(robot->GetController()));
     ndc_pop();
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
@@ -500,7 +498,7 @@ void depth1_loop_functions::reset() {
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this);
+    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
     floor()->SetChanged();
   }
   ndc_pop();
@@ -642,11 +640,12 @@ void depth1_loop_functions::static_cache_monitor(void) {
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create_conditional(ccp,
-                                                         arena_map()->blocks(),
-                                                         m_cache_counts.first,
-                                                         m_cache_counts.second)) {
-    arena_map()->caches_add(*created, this);
+  if (auto created =
+          m_cache_manager->create_conditional(ccp,
+                                              arena_map()->blocks(),
+                                              m_cache_counts.first,
+                                              m_cache_counts.second)) {
+    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
     floor()->SetChanged();
     return;
   }

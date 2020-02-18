@@ -25,7 +25,6 @@
 
 #include <numeric>
 
-#include "fordyca/fsm/cell2D_states.hpp"
 #include "fordyca/metrics/perception/mdpo_perception_metrics.hpp"
 
 /*******************************************************************************
@@ -38,7 +37,7 @@ NS_START(fordyca, metrics, perception);
  ******************************************************************************/
 mdpo_perception_metrics_collector::mdpo_perception_metrics_collector(
     const std::string& ofname,
-    uint interval)
+    const rtypes::timestep& interval)
     : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
@@ -77,14 +76,14 @@ boost::optional<std::string> mdpo_perception_metrics_collector::csv_line_build()
     return boost::none;
   }
   std::string line;
-  line += csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_EMPTY]);
+  line += csv_entry_intavg(m_interval.states[cfsm::cell2D_states::ekST_EMPTY]);
   line +=
-      csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_HAS_BLOCK]);
+      csv_entry_intavg(m_interval.states[cfsm::cell2D_states::ekST_HAS_BLOCK]);
   line +=
-      csv_entry_intavg(m_interval.states[fsm::cell2D_states::ekST_HAS_CACHE]);
-  line += csv_entry_tsavg(m_cum.states[fsm::cell2D_states::ekST_EMPTY]);
-  line += csv_entry_tsavg(m_cum.states[fsm::cell2D_states::ekST_HAS_BLOCK]);
-  line += csv_entry_tsavg(m_cum.states[fsm::cell2D_states::ekST_HAS_CACHE]);
+      csv_entry_intavg(m_interval.states[cfsm::cell2D_states::ekST_HAS_CACHE]);
+  line += csv_entry_tsavg(m_cum.states[cfsm::cell2D_states::ekST_EMPTY]);
+  line += csv_entry_tsavg(m_cum.states[cfsm::cell2D_states::ekST_HAS_BLOCK]);
+  line += csv_entry_tsavg(m_cum.states[cfsm::cell2D_states::ekST_HAS_CACHE]);
 
   line += csv_entry_intavg(m_interval.known_percent);
   line += csv_entry_intavg(m_interval.unknown_percent);
@@ -100,18 +99,18 @@ boost::optional<std::string> mdpo_perception_metrics_collector::csv_line_build()
 void mdpo_perception_metrics_collector::collect(
     const rmetrics::base_metrics& metrics) {
   auto& m = dynamic_cast<const mdpo_perception_metrics&>(metrics);
-  m_interval.states[fsm::cell2D_states::ekST_EMPTY] +=
-      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_EMPTY);
-  m_interval.states[fsm::cell2D_states::ekST_HAS_BLOCK] +=
-      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_BLOCK);
-  m_interval.states[fsm::cell2D_states::ekST_HAS_CACHE] +=
-      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_CACHE);
-  m_cum.states[fsm::cell2D_states::ekST_EMPTY] +=
-      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_EMPTY);
-  m_cum.states[fsm::cell2D_states::ekST_HAS_BLOCK] +=
-      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_BLOCK);
-  m_cum.states[fsm::cell2D_states::ekST_HAS_CACHE] +=
-      m.cell_state_inaccuracies(fsm::cell2D_states::ekST_HAS_CACHE);
+  m_interval.states[cfsm::cell2D_states::ekST_EMPTY] +=
+      m.cell_state_inaccuracies(cfsm::cell2D_states::ekST_EMPTY);
+  m_interval.states[cfsm::cell2D_states::ekST_HAS_BLOCK] +=
+      m.cell_state_inaccuracies(cfsm::cell2D_states::ekST_HAS_BLOCK);
+  m_interval.states[cfsm::cell2D_states::ekST_HAS_CACHE] +=
+      m.cell_state_inaccuracies(cfsm::cell2D_states::ekST_HAS_CACHE);
+  m_cum.states[cfsm::cell2D_states::ekST_EMPTY] +=
+      m.cell_state_inaccuracies(cfsm::cell2D_states::ekST_EMPTY);
+  m_cum.states[cfsm::cell2D_states::ekST_HAS_BLOCK] +=
+      m.cell_state_inaccuracies(cfsm::cell2D_states::ekST_HAS_BLOCK);
+  m_cum.states[cfsm::cell2D_states::ekST_HAS_CACHE] +=
+      m.cell_state_inaccuracies(cfsm::cell2D_states::ekST_HAS_CACHE);
 
   auto int_known_percent = m_interval.known_percent.load();
   auto int_unknown_percent = m_interval.unknown_percent.load();
@@ -131,7 +130,7 @@ void mdpo_perception_metrics_collector::collect(
 } /* collect() */
 
 void mdpo_perception_metrics_collector::reset_after_interval(void) {
-  for (size_t i = 0; i < fsm::cell2D_states::ekST_MAX_STATES; ++i) {
+  for (size_t i = 0; i < cfsm::cell2D_states::ekST_MAX_STATES; ++i) {
     std::atomic_init(&m_interval.states[i], 0U);
   } /* for(i..) */
 

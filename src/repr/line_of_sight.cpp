@@ -23,8 +23,8 @@
  *****************************************************************************/
 #include "fordyca/repr/line_of_sight.hpp"
 
-#include "fordyca/ds/cell2D.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,11 +34,11 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::block_list line_of_sight::blocks(void) const {
-  ds::block_list blocks{};
+cfds::block_list line_of_sight::blocks(void) const {
+  cfds::block_list blocks{};
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {
-      const ds::cell2D& cell = mc_view[i][j];
+      const cds::cell2D& cell = mc_view[i][j];
       if (cell.state_has_block()) {
         ER_ASSERT(nullptr != cell.block(),
                   "Cell at(%u,%u) in HAS_BLOCK state, but does not have block",
@@ -56,19 +56,19 @@ ds::cache_list line_of_sight::caches(void) const {
 
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {
-      const ds::cell2D& cell = mc_view[i][j];
+      const cds::cell2D& cell = mc_view[i][j];
       if (cell.state_has_cache() || cell.state_in_cache_extent()) {
         auto cache = cell.cache();
         ER_ASSERT(
             nullptr != cache,
             "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
             cell.loc().to_str().c_str());
-        ER_ASSERT(cache->n_blocks() >= base_cache::kMinBlocks,
+        ER_ASSERT(cache->n_blocks() >= cfrepr::base_cache::kMinBlocks,
                   "Cache%d@%s has too few blocks (%zu < %zu)",
                   cache->id().v(),
                   cache->dloc().to_str().c_str(),
                   cache->n_blocks(),
-                  base_cache::kMinBlocks);
+                  cfrepr::base_cache::kMinBlocks);
         /*
          * We can't add the cache unconditionally, because cache host cells and
          * extent cells both refer to the same cache, and doing so will give you
@@ -96,7 +96,7 @@ bool line_of_sight::contains_loc(const rmath::vector2u& loc) const {
   return false;
 } /* contains_loc() */
 
-const ds::cell2D& line_of_sight::cell(uint i, uint j) const {
+const cds::cell2D& line_of_sight::cell(uint i, uint j) const {
   ER_ASSERT(i < mc_view.shape()[0],
             "Out of bounds X access: %u >= %lu",
             i,

@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <list>
+#include <memory>
 #include <string>
 
 #include "fordyca/fordyca.hpp"
@@ -32,14 +33,14 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
+namespace cosm::foraging::repr {
 class base_cache;
 }
-NS_START(ds);
 
-using cache_list_type = std::shared_ptr<repr::base_cache>;
-using const_cache_list_type = std::shared_ptr<const repr::base_cache>;
+NS_START(fordyca, ds);
+
+using cache_list_type = std::shared_ptr<cfrepr::base_cache>;
+using const_cache_list_type = std::shared_ptr<const cfrepr::base_cache>;
 
 /*******************************************************************************
  * Type Definitions

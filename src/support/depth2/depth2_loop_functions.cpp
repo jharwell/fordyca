@@ -36,17 +36,18 @@
 #include "rcppsw/ds/type_map.hpp"
 
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/foraging/block_dist/base_distributor.hpp"
+#include "cosm/foraging/config/arena_map_config.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
-#include "fordyca/config/arena/arena_map_config.hpp"
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
-#include "fordyca/support/block_dist/base_distributor.hpp"
 #include "fordyca/support/depth2/depth2_metrics_aggregator.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "fordyca/support/depth2/robot_arena_interactor.hpp"
@@ -64,7 +65,6 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-using ds::arena_grid;
 
 /*******************************************************************************
  * Struct Definitions
@@ -163,7 +163,7 @@ void depth2_loop_functions::shared_init(ticpp::Element& node) {
 
 void depth2_loop_functions::private_init(void) {
   /* initialize stat collecting */
-  auto* arena = config()->config_get<config::arena::arena_map_config>();
+  auto* arena = config()->config_get<cfconfig::arena_map_config>();
   auto* output = config()->config_get<cmconfig::output_config>();
   m_metrics_agg = std::make_unique<depth2_metrics_aggregator>(&output->metrics,
                                                               &arena->grid,
@@ -215,10 +215,8 @@ void depth2_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this,
-                                                            cb,
-                                                            "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
 } /* private_init() */
 
 void depth2_loop_functions::cache_handling_init(
@@ -467,7 +465,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this);
+    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
     floor()->SetChanged();
     return true;
   }

@@ -117,13 +117,13 @@ class dpo_store final : public rer::client<dpo_store> {
   void clear_all(void);
 
   bool contains(const std::shared_ptr<crepr::base_block2D>& block) const RCSW_PURE;
-  bool contains(const std::shared_ptr<repr::base_cache>& cache) const;
+  bool contains(const std::shared_ptr<cfrepr::base_cache>& cache) const;
 
   const dp_block_map::value_type* find(
       const std::shared_ptr<crepr::base_block2D>& block) const RCSW_PURE;
 
   const dp_cache_map::value_type* find(
-      const std::shared_ptr<repr::base_cache>& cache) const;
+      const std::shared_ptr<cfrepr::base_cache>& cache) const;
 
   /**
    * \brief Update the known caches set with the new cache.
@@ -133,7 +133,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \param cache Cache to add.
    */
-  update_res_t cache_update(const dpo_entity<repr::base_cache>& cache);
+  update_res_t cache_update(const dpo_entity<cfrepr::base_cache>& cache);
 
   /*
    * \brief Update the known blocks set with the new block.
@@ -150,7 +150,7 @@ class dpo_store final : public rer::client<dpo_store> {
   /**
    * \brief Remove a cache from the set of of known caches.
    */
-  bool cache_remove(const std::shared_ptr<repr::base_cache>& victim);
+  bool cache_remove(const std::shared_ptr<cfrepr::base_cache>& victim);
 
   /*
    * \brief Remove a block from the set of known blocks. If the victim is not

@@ -36,7 +36,7 @@ NS_START(fordyca, metrics, caches);
  * Constructors/Destructor
  ******************************************************************************/
 lifecycle_metrics_collector::lifecycle_metrics_collector(const std::string& ofname,
-                                                         uint interval)
+                                                         const rtypes::timestep& interval)
     : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************

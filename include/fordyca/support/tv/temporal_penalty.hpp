@@ -55,7 +55,7 @@ class temporal_penalty {
    * \brief Initialize the penalty.
    *
    * \param controller The controller for the robot being subjected to the
-   * penalty.
+   *                   penalty.
    * \param id The ID to associate with the penalty.
    * \param penalty The # of timesteps for the penalty.
    * \param start_time The timestep the penalty will start on.

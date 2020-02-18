@@ -1,5 +1,5 @@
 /**
- * \file cell_empty.hpp
+ * \file cell2D_unknown.hpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_CELL_EMPTY_HPP_
-#define INCLUDE_FORDYCA_EVENTS_CELL_EMPTY_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_CELL2D_UNKNOWN_HPP_
+#define INCLUDE_FORDYCA_EVENTS_CELL2D_UNKNOWN_HPP_
 
 /*******************************************************************************
  * Includes
@@ -27,55 +27,52 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/events/cell_op.hpp"
+#include "cosm/events/cell2D_unknown.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-
-namespace ds {
-class arena_map;
+namespace fordyca::ds {
 class occupancy_grid;
-class dpo_semantic_map;
-} // namespace ds
+} // namespace fordyca::ds
 
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class cell_empty
+ * \class cell2D_unknown
  * \ingroup events detail
  *
- * \brief Created whenever a cell needs to go from some other state to being
- * empty.
+ * \brief Created whenever a cell within an occupancy grid needs to go into an
+ * unknown state.
  *
- * The most common example of this is when a free block is picked up, and the
- * square that the block was on is now  (probably) empty. It might not be if in
- * the same timestep a new cache is created on that same cell.
+ * This happens in two cases:
+ *
+ * 1. After its relevance expires.
+ * 2. Before the robot sees it for the first time (ala Fog of War).
  */
-class cell_empty : public cell_op, public rer::client<cell_empty> {
+class cell2D_unknown : public cevents::cell2D_unknown,
+                       public rer::client<cell2D_unknown> {
  private:
   struct visit_typelist_impl {
-    using inherited = cell_op::visit_typelist;
-    using others =
-        rmpl::typelist<ds::arena_map, ds::occupancy_grid, ds::dpo_semantic_map>;
+    using inherited = cevents::cell2D_unknown::visit_typelist;
+    using others = rmpl::typelist<ds::occupancy_grid>;
     using value = boost::mpl::joint_view<inherited::type, others::type>;
   };
 
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cell_empty(const rmath::vector2u& coord)
-      : cell_op(coord), ER_CLIENT_INIT("fordyca.events.cell_empty") {}
+  /* parent class visit functions */
+  using cevents::cell2D_unknown::visit;
 
-  void visit(ds::cell2D& cell);
-  void visit(fsm::cell2D_fsm& fsm);
-  void visit(ds::arena_map& map);
+  explicit cell2D_unknown(const rmath::vector2u& coord)
+      : cevents::cell2D_unknown(coord),
+        ER_CLIENT_INIT("fordyca.events.cell2D_unknown") {}
+
   void visit(ds::occupancy_grid& grid);
-  void visit(ds::dpo_semantic_map& map);
 };
 
 /**
@@ -84,16 +81,16 @@ class cell_empty : public cell_op, public rer::client<cell_empty> {
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cell_empty_visitor_impl =
-    rpvisitor::precise_visitor<detail::cell_empty,
-                               detail::cell_empty::visit_typelist>;
+using cell2D_unknown_visitor_impl =
+    rpvisitor::precise_visitor<detail::cell2D_unknown,
+                               detail::cell2D_unknown::visit_typelist>;
 
 NS_END(detail);
 
-class cell_empty_visitor : public detail::cell_empty_visitor_impl {
-  using detail::cell_empty_visitor_impl::cell_empty_visitor_impl;
+class cell2D_unknown_visitor : public detail::cell2D_unknown_visitor_impl {
+  using detail::cell2D_unknown_visitor_impl::cell2D_unknown_visitor_impl;
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_CELL_EMPTY_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_CELL2D_UNKNOWN_HPP_ */

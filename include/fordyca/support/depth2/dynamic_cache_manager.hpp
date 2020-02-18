@@ -29,9 +29,9 @@
 
 #include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
-#include "fordyca/ds/block_vector.hpp"
-#include "fordyca/ds/cache_vector.hpp"
-#include "fordyca/ds/block_cluster_vector.hpp"
+#include "cosm/foraging/ds/block_vector.hpp"
+#include "cosm/foraging/ds/cache_vector.hpp"
+#include "cosm/foraging/ds/block_cluster_vector.hpp"
 #include "fordyca/support/cache_create_ro_params.hpp"
 
 #include "rcppsw/math/rng.hpp"
@@ -41,13 +41,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace ds { class arena_grid; }
-namespace repr {
-class base_block2D;
-class arena_cache;
-}
-NS_START(support, depth2);
+NS_START(fordyca, support, depth2);
 
 /*******************************************************************************
  * Class Definitions
@@ -60,10 +54,10 @@ NS_START(support, depth2);
  * caches in the arena.
  */
 class dynamic_cache_manager final : public base_cache_manager,
-                              public rer::client<dynamic_cache_manager> {
+                                    public rer::client<dynamic_cache_manager> {
  public:
   dynamic_cache_manager(const config::caches::caches_config* config,
-                        ds::arena_grid* arena_grid,
+                        cds::arena_grid* arena_grid,
                         rmath::rng* rng);
   dynamic_cache_manager(const dynamic_cache_manager&) = delete;
   dynamic_cache_manager& operator=(const dynamic_cache_manager&) = delete;
@@ -74,8 +68,8 @@ class dynamic_cache_manager final : public base_cache_manager,
    *
    * \return The created caches (if any were created).
    */
-  boost::optional<ds::cache_vector> create(const cache_create_ro_params& c_params,
-                                           const ds::block_vector&  c_alloc_blocks);
+  boost::optional<cfds::cache_vector> create(const cache_create_ro_params& c_params,
+                                           const cfds::block_vector&  c_alloc_blocks);
 
   /**
    * \brief Get the minimum distance that must be maintained between two caches
@@ -98,10 +92,10 @@ class dynamic_cache_manager final : public base_cache_manager,
    *
    * are eligible.
    */
-  boost::optional<ds::block_vector> calc_blocks_for_creation(
-      const ds::cache_vector& existing_caches,
-      const ds::block_cluster_vector& clusters,
-      const ds::block_vector& blocks);
+  boost::optional<cfds::block_vector> calc_blocks_for_creation(
+      const cfds::cache_vector& existing_caches,
+      const cfds::block_cluster_vector& clusters,
+      const cfds::block_vector& blocks);
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

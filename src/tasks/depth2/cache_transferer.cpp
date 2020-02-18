@@ -24,7 +24,7 @@
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/events/cache_block_drop.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
@@ -101,7 +101,7 @@ void cache_transferer::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void cache_transferer::accept(events::detail::cache_block_drop& visitor) {
+void cache_transferer::accept(events::detail::robot_cache_block_drop& visitor) {
   visitor.visit(*this);
 }
 

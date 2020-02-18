@@ -27,12 +27,13 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "fordyca/events/free_block_drop.hpp"
+#include "cosm/foraging/events/arena_block_drop.hpp"
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
-#include "fordyca/ds/arena_map.hpp"
+#include "cosm/foraging/ds/arena_map.hpp"
 #include "fordyca/support/interactor_status.hpp"
+#include "fordyca/events/robot_free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,7 +53,7 @@ NS_START(fordyca, support, depth2);
 template <typename T>
 class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_interactor<T>> {
  public:
-  new_cache_block_drop_interactor(ds::arena_map* const map_in,
+  new_cache_block_drop_interactor(cfds::arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
                                   tv::env_dynamics* const envd,
                                    dynamic_cache_manager* const cache_manager)
@@ -204,20 +205,24 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    */
   void perform_new_cache_block_drop(T& controller,
                                     const tv::temporal_penalty& penalty) {
-    events::free_block_drop_visitor drop_op(m_map->blocks()[penalty.id().v()],
-                                            rmath::dvec2uvec(controller.position2D(),
-                                                             m_map->grid_resolution().v()),
-                                            m_map->grid_resolution(),
-                                            true);
+    auto loc = rmath::dvec2uvec(controller.position2D(),
+                                m_map->grid_resolution().v());
+    cfevents::arena_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
+                                                loc,
+                                                m_map->grid_resolution(),
+                                                true);
+    events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
+                                                   loc,
+                                                   m_map->grid_resolution());
 
-    drop_op.visit(controller);
-    drop_op.visit(*m_map);
+    rdrop_op.visit(controller);
+    adrop_op.visit(*m_map);
     m_floor->SetChanged();
   }
 
   /* clang-format off */
   argos::CFloorEntity*  const         m_floor;
-  ds::arena_map* const                m_map;
+  cfds::arena_map* const              m_map;
   dynamic_cache_manager*const         m_cache_manager;
   tv::block_op_penalty_handler* const m_penalty_handler;
   /* clang-format on */

@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <crw_controller id="ffc"
+    <dpo_controller id="ffc"
                          library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -183,11 +183,11 @@
             <phototaxis_force max="8"/>
           </force_calculator>
 
-          <diff_drive soft_turn_max="60"
+          <diff_drive soft_turn_max="45"
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </crw_controller>
+    </dpo_controller>
 
   </controllers>
 
@@ -202,9 +202,6 @@
       <metrics
           output_dir="metrics"
           block_acq_counts="block-acq-counts.csv"
-          block_acq_locs="block-acq-locs.csv"
-          block_acq_explore_locs="block-acq-explore-locs.csv"
-          block_acq_vector_locs="block-acq-vector-locs.csv"
           block_transport="block-transport.csv"
           block_manipulation="block-manipulation.csv"
           cache_acq_counts="cache-acq-counts.csv"
@@ -228,7 +225,6 @@
           task_distribution="task-distribution.csv"
           perception_dpo="perception-dpo.csv"
           perception_mdpo="perception-mdpo.csv"
-          swarm_dist_pos2D="swarm-dist-pos2D.csv"
           swarm_convergence="swarm-convergence.csv"
           tv_population="tv-population.csv"
           tv_environment="tv-environment.csv"
@@ -362,7 +358,7 @@
     <distribute>
       <position method="uniform" min="1,1,0" max="10,5,0" />
       <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="128" max_trials="1000">
+      <entity quantity="16" max_trials="1000">
         <foot-bot id="fb" omnidirectional_camera_aperture="89">
           <controller config="ffc" />
           <!-- <battery model= "time_motion"/> -->

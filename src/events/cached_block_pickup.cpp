@@ -23,8 +23,13 @@
  ******************************************************************************/
 #include "fordyca/events/cached_block_pickup.hpp"
 
+#include "cosm/events/cell2D_empty.hpp"
+#include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/fsm/cell2D_fsm.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
+#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
@@ -38,15 +43,11 @@
 #include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/events/cell_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
-#include "fordyca/fsm/cell2D_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
-#include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth1/collector.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -57,23 +58,23 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events, detail);
-using ds::arena_grid;
+using cds::arena_grid;
+using cfrepr::base_cache;
 using ds::occupancy_grid;
-using repr::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 cached_block_pickup::cached_block_pickup(
-    support::base_loop_functions* loop,
-    const std::shared_ptr<repr::arena_cache>& cache,
+    cpal::swarm_manager* sm,
+    const std::shared_ptr<cfrepr::arena_cache>& cache,
     const rtypes::type_uuid& robot_id,
     const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.cached_block_pickup"),
-      cell_op(cache->dloc()),
+      cell2D_op(cache->dloc()),
       mc_robot_id(robot_id),
       mc_timestep(t),
-      m_loop(loop),
+      m_sm(sm),
       m_real_cache(cache) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
             "< %zu blocks in cache",
@@ -131,11 +132,11 @@ bool cached_block_pickup::dispatch_d2_cache_interactor(
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void cached_block_pickup::visit(fsm::cell2D_fsm& fsm) {
+void cached_block_pickup::visit(cfsm::cell2D_fsm& fsm) {
   fsm.event_block_pickup();
 } /* visit() */
 
-void cached_block_pickup::visit(ds::cell2D& cell) {
+void cached_block_pickup::visit(cds::cell2D& cell) {
   ER_ASSERT(0 != cell.loc().x() && 0 != cell.loc().y(),
             "Cell does not have coordinates");
   ER_ASSERT(cell.state_has_cache(), "Cell does not have cache");
@@ -148,12 +149,12 @@ void cached_block_pickup::visit(ds::cell2D& cell) {
   visit(cell.fsm());
 } /* visit() */
 
-void cached_block_pickup::visit(repr::arena_cache& cache) {
+void cached_block_pickup::visit(cfrepr::arena_cache& cache) {
   cache.block_remove(m_pickup_block);
   cache.has_block_pickup();
 } /* visit() */
 
-void cached_block_pickup::visit(ds::arena_map& map) {
+void cached_block_pickup::visit(cfds::arena_map& map) {
   ER_ASSERT(m_real_cache->n_blocks() >= base_cache::kMinBlocks,
             "< %zu blocks in cache",
             base_cache::kMinBlocks);
@@ -162,13 +163,14 @@ void cached_block_pickup::visit(ds::arena_map& map) {
             "Cache ID undefined on block pickup");
 
   rmath::vector2u cache_coord = m_real_cache->dloc();
-  ER_ASSERT(cache_coord == cell_op::coord(),
+  ER_ASSERT(cache_coord == cell2D_op::coord(),
             "Coordinates for cache%d%s/cell@%s do not agree",
             cache_id.v(),
             cache_coord.to_str().c_str(),
-            cell_op::coord().to_str().c_str());
+            cell2D_op::coord().to_str().c_str());
 
-  ds::cell2D& cell = map.access<arena_grid::kCell>(cell_op::x(), cell_op::y());
+  cds::cell2D& cell =
+      map.access<arena_grid::kCell>(cell2D_op::x(), cell2D_op::y());
   ER_ASSERT(m_real_cache->n_blocks() == cell.block_count(),
             "Cache%d/cell@%s disagree on # of blocks: cache=%zu/cell=%zu",
             m_real_cache->id().v(),
@@ -197,8 +199,8 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
     ER_ASSERT(cell.state_has_cache(),
               "Cell@(%u, %u) with >= %zu blocks does not have cache",
-              cell_op::x(),
-              cell_op::y(),
+              cell2D_op::x(),
+              cell2D_op::y(),
               base_cache::kMinBlocks);
 
     ER_INFO(
@@ -206,8 +208,8 @@ void cached_block_pickup::visit(ds::arena_map& map) {
         mc_robot_id.v(),
         m_pickup_block->id().v(),
         cache_id.v(),
-        cell_op::x(),
-        cell_op::y(),
+        cell2D_op::x(),
+        cell2D_op::y(),
         rcppsw::to_string(m_real_cache->blocks()).c_str(),
         m_real_cache->n_blocks());
   } else {
@@ -226,8 +228,8 @@ void cached_block_pickup::visit(ds::arena_map& map) {
 
     ER_ASSERT(cell.state_has_block(),
               "cell@(%u, %u) with 1 block has cache",
-              cell_op::x(),
-              cell_op::y());
+              cell2D_op::x(),
+              cell2D_op::y());
 
     /*
      * Already holding cache mutex from \ref cached_block_pickup_interactor,
@@ -236,14 +238,14 @@ void cached_block_pickup::visit(ds::arena_map& map) {
     map.cache_extent_clear(m_real_cache);
 
     /* Already holding cache mutex from \ref cached_block_pickup_interactor */
-    map.cache_remove(m_real_cache, m_loop);
+    map.cache_remove(m_real_cache, m_sm, config::saa_xml_names().leds_saa);
 
     ER_INFO("arena_map: fb%u: block%d from cache%d@(%u, %u) [depleted]",
             mc_robot_id.v(),
             m_pickup_block->id().v(),
             cache_id.v(),
-            cell_op::x(),
-            cell_op::y());
+            cell2D_op::x(),
+            cell2D_op::y());
   }
   std::scoped_lock lock(map.block_mtx());
   visit(*m_pickup_block);
@@ -281,7 +283,7 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
             mc_robot_id.v(),
             m_pickup_block->id().v(),
             pcache->ent()->id().v(),
-            cell_op::coord().to_str().c_str(),
+            cell2D_op::coord().to_str().c_str(),
             rcppsw::to_string(pcache->ent()->blocks()).c_str(),
             pcache->ent()->n_blocks());
 
@@ -293,12 +295,12 @@ void cached_block_pickup::visit(ds::dpo_store& store) {
             mc_robot_id.v(),
             m_pickup_block->id().v(),
             id.v(),
-            cell_op::coord().to_str().c_str());
+            cell2D_op::coord().to_str().c_str());
   }
 } /* visit() */
 
 void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
-  ds::cell2D& cell = map.access<occupancy_grid::kCell>(cell_op::coord());
+  cds::cell2D& cell = map.access<occupancy_grid::kCell>(cell2D_op::coord());
   ER_ASSERT(cell.state_has_cache(), "Cell does not contain cache");
   ER_ASSERT(cell.cache()->n_blocks() == cell.block_count(),
             "Perceived cache/cell disagree on # of blocks: "
@@ -318,13 +320,13 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
     visit(cell);
     ER_ASSERT(cell.state_has_cache(),
               "cell@%s with >= 2 blocks does not have cache",
-              cell_op::coord().to_str().c_str());
+              cell2D_op::coord().to_str().c_str());
 
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s,remaining=[%s] (%zu)",
             mc_robot_id.v(),
             m_pickup_block->id().v(),
             cell.cache()->id().v(),
-            cell_op::coord().to_str().c_str(),
+            cell2D_op::coord().to_str().c_str(),
             rcppsw::to_string(cell.cache()->blocks()).c_str(),
             cell.cache()->n_blocks());
 
@@ -337,7 +339,7 @@ void cached_block_pickup::visit(ds::dpo_semantic_map& map) {
             mc_robot_id.v(),
             m_pickup_block->id().v(),
             id.v(),
-            cell_op::coord().to_str().c_str());
+            cell2D_op::coord().to_str().c_str());
   }
 } /* visit() */
 

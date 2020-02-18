@@ -23,9 +23,10 @@
  ******************************************************************************/
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
+
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/math/new_cache_utility.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

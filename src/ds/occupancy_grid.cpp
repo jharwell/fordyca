@@ -24,7 +24,7 @@
 #include "fordyca/ds/occupancy_grid.hpp"
 
 #include "fordyca/config/perception/perception_config.hpp"
-#include "fordyca/events/cell_unknown.hpp"
+#include "fordyca/events/cell2D_unknown.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -89,14 +89,13 @@ void occupancy_grid::reset(void) {
 
 void occupancy_grid::cell_init(uint i, uint j, double pheromone_rho) {
   access<kPheromone>(i, j).rho(pheromone_rho);
-  cell2D& cell = access<kCell>(i, j);
-  cell.robot_id(m_robot_id);
+  cds::cell2D& cell = access<kCell>(i, j);
   cell.loc(rmath::vector2u(i, j));
 } /* cell_init() */
 
 void occupancy_grid::cell_state_update(uint i, uint j) {
   crepr::pheromone_density& density = access<kPheromone>(i, j);
-  cell2D& cell = access<kCell>(i, j);
+  cds::cell2D& cell = access<kCell>(i, j);
 
   if (!m_pheromone_repeat_deposit) {
     ER_ASSERT(density.v() <= 1.0,
@@ -121,7 +120,7 @@ void occupancy_grid::cell_state_update(uint i, uint j) {
              j,
              kEPSILON,
              m_robot_id.c_str());
-    events::cell_unknown_visitor op(cell.loc());
+    events::cell2D_unknown_visitor op(cell.loc());
     op.visit(*this);
     density.reset();
   }

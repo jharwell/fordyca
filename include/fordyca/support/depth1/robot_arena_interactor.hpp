@@ -63,7 +63,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
  public:
   using controller_type = T;
   struct params {
-    ds::arena_map* const map;
+    cfds::arena_map* const map;
     depth0::depth0_metrics_aggregator *const metrics_agg;
     argos::CFloorEntity* const floor;
     tv::env_dynamics* const envd;

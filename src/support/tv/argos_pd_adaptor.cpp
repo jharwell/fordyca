@@ -23,11 +23,12 @@
  ******************************************************************************/
 #include "fordyca/support/tv/argos_pd_adaptor.hpp"
 
+#include "cosm/foraging/ds/arena_map.hpp"
 #include "cosm/tv/config/population_dynamics_config.hpp"
 
-#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
+#include "cosm/foraging/events/arena_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -40,7 +41,7 @@ NS_START(fordyca, support, tv);
 argos_pd_adaptor::argos_pd_adaptor(
     const ctv::config::population_dynamics_config* config,
     support::base_loop_functions* const lf,
-    ds::arena_map* map,
+    cfds::arena_map* map,
     env_dynamics* envd,
     const std::string& entity_prefix,
     const std::string& controller_xml_id,
@@ -104,7 +105,7 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
                            [&](const auto& b) {
                              return controller->block()->id() == b->id();
                            });
-    events::free_block_drop_visitor drop_op(
+    cfevents::arena_block_drop_visitor adrop_op(
         *it,
         rmath::dvec2uvec(controller->position2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),
@@ -113,7 +114,7 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
     bool conflict = utils::free_block_drop_conflict(*m_map,
                                                     it->get(),
                                                     controller->position2D());
-    utils::handle_arena_free_block_drop(drop_op, *m_map, conflict);
+    utils::handle_arena_free_block_drop(adrop_op, *m_map, conflict);
   }
 
   /* remove controller from any applied environmental variances */
@@ -167,13 +168,14 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
     try {
       /* ick raw pointers--thanks ARGoS... */
       fb = new argos::CFootBotEntity(mc_entity_prefix + rcppsw::to_string(id),
-                                           mc_controller_xml_id,
-                                           argos::CVector3(x, y, 0.0));
+                                     mc_controller_xml_id,
+                                     argos::CVector3(x, y, 0.0));
       m_lf->AddEntity(*fb);
-      ER_INFO("Added entity %s attached to physics engine %s at %s",
-              fb->GetId().c_str(),
-              fb->GetEmbodiedEntity().GetPhysicsModel(0).GetEngine().GetId().c_str(),
-              rmath::vector2d(x, y).to_str().c_str());
+      ER_INFO(
+          "Added entity %s attached to physics engine %s at %s",
+          fb->GetId().c_str(),
+          fb->GetEmbodiedEntity().GetPhysicsModel(0).GetEngine().GetId().c_str(),
+          rmath::vector2d(x, y).to_str().c_str());
 
       /* Register controller for environmental variances */
       auto* controller = dynamic_cast<controller::base_controller*>(

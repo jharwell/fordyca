@@ -29,8 +29,8 @@
 #include <typeindex>
 
 #include "cosm/controller/irv_recipient_controller.hpp"
-#include "cosm/pal/argos_controller2D_adaptor.hpp"
 #include "cosm/metrics/config/output_config.hpp"
+#include "cosm/pal/argos_controller2D_adaptor.hpp"
 
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"

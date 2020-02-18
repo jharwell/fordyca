@@ -64,7 +64,7 @@ NS_START(fsm, depth2);
 class cache_site_selector: public rer::client<cache_site_selector> {
  public:
   struct cache_constraint_data {
-    const repr::base_cache* mc_cache{nullptr};
+    const cfrepr::base_cache* mc_cache{nullptr};
     cache_site_selector*    selector{nullptr};
     rtypes::spatial_dist     cache_prox{0.0};
   };
@@ -140,7 +140,7 @@ class cache_site_selector: public rer::client<cache_site_selector> {
    * chugs. We *should* be able to get something good enough in this many
    * iterations.
    */
-  static constexpr uint kMAX_ITERATIONS = 10000;
+  static constexpr uint kMAX_ITERATIONS = 5000;
 
   struct opt_init_conditions {
     const ds::dp_cache_map& known_caches;

@@ -35,10 +35,13 @@ namespace cosm::repr {
 class base_block2D;
 } // namespace cosm::repr
 
+namespace cosm::foraging::ds {
+class arena_map;
+} /* namespace cosm::foraging::ds */
+
 NS_START(fordyca);
 
 namespace ds {
-class arena_map;
 class dpo_semantic_map;
 class dpo_store;
 } // namespace ds
@@ -54,7 +57,7 @@ NS_START(events, detail);
  * \brief Interface specifying the core class of classes any action involving
  * dropping a block will need to visit (think data structures).
  */
-using block_pickup_base_visit_typelist = rmpl::typelist<ds::arena_map,
+using block_pickup_base_visit_typelist = rmpl::typelist<cfds::arena_map,
                                                         ds::dpo_semantic_map,
                                                         ds::dpo_store,
                                                         crepr::base_block2D>;

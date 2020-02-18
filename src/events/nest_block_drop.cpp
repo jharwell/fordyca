@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/nest_block_drop.hpp"
 
+#include "cosm/foraging/ds/arena_map.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -38,8 +39,6 @@
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
-#include "fordyca/ds/arena_map.hpp"
-#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
@@ -78,7 +77,7 @@ void nest_block_drop::dispatch_nest_interactor(
 /*******************************************************************************
  * Depth0 Foraging
  ******************************************************************************/
-void nest_block_drop::visit(ds::arena_map& map) {
+void nest_block_drop::visit(cfds::arena_map& map) {
   ER_ASSERT(rtypes::constants::kNoUUID != m_robot_block->robot_id(),
             "Undefined robot index");
 
@@ -110,7 +109,6 @@ void nest_block_drop::visit(crepr::base_block2D& block) {
 void nest_block_drop::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_pusht();
   visit(*controller.fsm());
-  controller.block(nullptr);
   controller.block_manip_collator()->free_drop_event(true);
 
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -126,7 +124,6 @@ void nest_block_drop::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block(nullptr);
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
 
@@ -137,7 +134,6 @@ void nest_block_drop::visit(controller::depth0::odpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block(nullptr);
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
 
@@ -153,7 +149,6 @@ void nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block(nullptr);
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
 
@@ -164,7 +159,6 @@ void nest_block_drop::visit(controller::depth0::omdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
-  controller.block(nullptr);
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
 
@@ -177,7 +171,6 @@ void nest_block_drop::visit(controller::depth0::omdpo_controller& controller) {
 void nest_block_drop::visit(controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -188,7 +181,6 @@ void nest_block_drop::visit(controller::depth1::bitd_dpo_controller& controller)
 void nest_block_drop::visit(controller::depth1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -199,7 +191,6 @@ void nest_block_drop::visit(controller::depth1::bitd_odpo_controller& controller
 void nest_block_drop::visit(controller::depth1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -211,7 +202,6 @@ void nest_block_drop::visit(
     controller::depth1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -244,7 +234,6 @@ void nest_block_drop::visit(
     controller::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -255,7 +244,6 @@ void nest_block_drop::visit(
 void nest_block_drop::visit(controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -267,7 +255,6 @@ void nest_block_drop::visit(
     controller::depth2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());
@@ -279,7 +266,6 @@ void nest_block_drop::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
-  controller.block(nullptr);
   dispatch_nest_interactor(controller.current_task());
   controller.block_manip_collator()->free_drop_event(true);
   ER_INFO("Dropped block%d in nest", m_arena_block->id().v());

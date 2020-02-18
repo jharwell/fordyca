@@ -1,7 +1,7 @@
 /**
- * \file entity_list.hpp
+ * \file cell2D_unknown.cpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,34 +18,33 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_DS_ENTITY_LIST_HPP_
-#define INCLUDE_FORDYCA_DS_ENTITY_LIST_HPP_
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <list>
+#include "fordyca/events/cell2D_unknown.hpp"
 
-#include "fordyca/fordyca.hpp"
+#include "fordyca/ds/occupancy_grid.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class unicell_entity2D;
-} // namespace cosm::repr
-
-NS_START(fordyca, ds);
-
-using entity_list_type = crepr::unicell_entity2D*;
-using const_entity_list_type = const crepr::unicell_entity2D*;
+NS_START(fordyca, events, detail);
+using ds::occupancy_grid;
 
 /*******************************************************************************
- * Type Definitions
+ * Member Functions
  ******************************************************************************/
-using entity_list = std::list<entity_list_type>;
-using const_entity_list = std::list<const_entity_list_type>;
+void cell2D_unknown::visit(ds::occupancy_grid& grid) {
+  cds::cell2D& cell = grid.access<occupancy_grid::kCell>(x(), y());
 
-NS_END(ds, fordyca);
+  if (cell.state_is_known()) {
+    ER_ASSERT(grid.known_cell_count() >= 1,
+              "Known cell count (%u) < 1 before event",
+              grid.known_cell_count());
 
-#endif /* INCLUDE_FORDYCA_DS_ENTITY_LIST_HPP_ */
+    grid.known_cells_dec();
+  }
+  visit(cell);
+} /* visit() */
+
+NS_END(detail, events, fordyca);

@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 
+#include "cosm/ds/arena_grid.hpp"
+#include "cosm/events/cell2D_empty.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/foraging/events/arena_block_drop.hpp"
 
-#include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/math/cache_respawn_probability.hpp"
-#include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
 
@@ -36,14 +36,14 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using ds::arena_grid;
+using cds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 static_cache_manager::static_cache_manager(
     const config::caches::caches_config* config,
-    ds::arena_grid* const arena_grid,
+    cds::arena_grid* const arena_grid,
     const std::vector<rmath::vector2d>& cache_locs,
     rmath::rng* rng)
     : base_cache_manager(arena_grid),
@@ -55,14 +55,14 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<ds::cache_vector> static_cache_manager::create(
+boost::optional<cfds::cache_vector> static_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const ds::block_vector& c_alloc_blocks) {
+    const cfds::block_vector& c_alloc_blocks) {
   ER_DEBUG("(Re)-Creating static cache(s)");
-  ER_ASSERT(mc_cache_config.static_.size >= repr::base_cache::kMinBlocks,
+  ER_ASSERT(mc_cache_config.static_.size >= cfrepr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
             mc_cache_config.static_.size,
-            repr::base_cache::kMinBlocks);
+            cfrepr::base_cache::kMinBlocks);
 
   auto to_use = blocks_alloc(c_params.current_caches, c_alloc_blocks);
   if (!to_use) {
@@ -71,7 +71,7 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
         "(n_caches=%zu,n_alloc_blocks=%zu)",
         c_params.current_caches.size(),
         c_alloc_blocks.size());
-    return boost::optional<ds::cache_vector>();
+    return boost::optional<cfds::cache_vector>();
   }
   static_cache_creator creator(arena_grid(),
                                mc_cache_locs,
@@ -95,9 +95,9 @@ boost::optional<ds::cache_vector> static_cache_manager::create(
   return boost::make_optional(created);
 } /* create() */
 
-boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
+boost::optional<cfds::cache_vector> static_cache_manager::create_conditional(
     const cache_create_ro_params& c_params,
-    const ds::block_vector& c_alloc_blocks,
+    const cfds::block_vector& c_alloc_blocks,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
@@ -106,17 +106,20 @@ boost::optional<ds::cache_vector> static_cache_manager::create_conditional(
   if (p.calc(n_harvesters, n_collectors) >= m_rng->uniform(0.0, 1.0)) {
     return create(c_params, c_alloc_blocks);
   } else {
-    return boost::optional<ds::cache_vector>();
+    return boost::optional<cfds::cache_vector>();
   }
 } /* create_conditional() */
 
-boost::optional<ds::block_vector> static_cache_manager::blocks_alloc(
-    const ds::cache_vector& existing_caches,
-    const ds::block_vector& blocks) const {
-  ds::block_vector alloc_i;
+boost::optional<cfds::block_vector> static_cache_manager::blocks_alloc(
+    const cfds::cache_vector& existing_caches,
+    const cfds::block_vector& blocks) const {
+  cfds::block_vector alloc_i;
   for (auto& loc : mc_cache_locs) {
-    if (auto cache_i = cache_i_blocks_alloc(
-            existing_caches, alloc_i, blocks, loc, repr::base_cache::kMinBlocks)) {
+    if (auto cache_i = cache_i_blocks_alloc(existing_caches,
+                                            alloc_i,
+                                            blocks,
+                                            loc,
+                                            cfrepr::base_cache::kMinBlocks)) {
       ER_DEBUG("Alloc_blocks=[%s] for cache@%s",
                rcppsw::to_string(*cache_i).c_str(),
                loc.to_str().c_str());
@@ -125,19 +128,19 @@ boost::optional<ds::block_vector> static_cache_manager::blocks_alloc(
   } /* for(&loc..) */
 
   if (alloc_i.empty()) {
-    return boost::optional<ds::block_vector>();
+    return boost::optional<cfds::block_vector>();
   } else {
     return boost::make_optional(alloc_i);
   }
 } /* blocks_alloc() */
 
-boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
-    const ds::cache_vector& existing_caches,
-    const ds::block_vector& allocated_blocks,
-    const ds::block_vector& all_blocks,
+boost::optional<cfds::block_vector> static_cache_manager::cache_i_blocks_alloc(
+    const cfds::cache_vector& existing_caches,
+    const cfds::block_vector& allocated_blocks,
+    const cfds::block_vector& all_blocks,
     const rmath::vector2d& loc,
     size_t n_blocks) const {
-  ds::block_vector cache_i_blocks;
+  cfds::block_vector cache_i_blocks;
   rmath::vector2u dcenter =
       rmath::dvec2uvec(loc, arena_grid()->resolution().v());
   std::copy_if(
@@ -170,7 +173,7 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
                            });
       });
 
-  if (cache_i_blocks.size() < repr::base_cache::kMinBlocks) {
+  if (cache_i_blocks.size() < cfrepr::base_cache::kMinBlocks) {
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
@@ -201,15 +204,15 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
                   });
     ER_TRACE("Cache i alloc_blocks locs: [%s]", accum.c_str());
 
-    ER_ASSERT(cache_i_blocks.size() - count < repr::base_cache::kMinBlocks,
+    ER_ASSERT(cache_i_blocks.size() - count < cfrepr::base_cache::kMinBlocks,
               "For new cache @%s/%s: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
               loc.to_str().c_str(),
               dcenter.to_str().c_str(),
               cache_i_blocks.size() - count,
               cache_i_blocks.size(),
-              repr::base_cache::kMinBlocks);
-    return boost::optional<ds::block_vector>();
+              cfrepr::base_cache::kMinBlocks);
+    return boost::optional<cfds::block_vector>();
   }
   if (cache_i_blocks.size() < mc_cache_config.static_.size) {
     ER_WARN(
@@ -219,21 +222,21 @@ boost::optional<ds::block_vector> static_cache_manager::cache_i_blocks_alloc(
         dcenter.to_str().c_str(),
         cache_i_blocks.size(),
         mc_cache_config.static_.size);
-    return boost::optional<ds::block_vector>();
+    return boost::optional<cfds::block_vector>();
   }
   return boost::make_optional(cache_i_blocks);
 } /* cache_i_blocks_alloc() */
 
 void static_cache_manager::post_creation_blocks_absorb(
-    const ds::cache_vector& caches,
-    const ds::block_vector& blocks) {
+    const cfds::cache_vector& caches,
+    const cfds::block_vector& blocks) {
   for (auto& b : blocks) {
     for (auto& c : caches) {
       if (!c->contains_block(b) && c->xspan().overlaps_with(b->xspan()) &&
           c->yspan().overlaps_with(b->yspan())) {
-        events::cell_empty_visitor empty(b->dloc());
+        cevents::cell2D_empty_visitor empty(b->dloc());
         empty.visit(arena_grid()->access<arena_grid::kCell>(b->dloc()));
-        events::free_block_drop_visitor op(
+        cfevents::arena_block_drop_visitor op(
             b,
             rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
             arena_grid()->resolution(),

@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/grid_config.hpp"
+#include "cosm/ds/config/grid_config.hpp"
 #include "fordyca/config/perception/pheromone_config.hpp"
 #include "rcppsw/config/base_config.hpp"
 
@@ -44,7 +44,7 @@ NS_START(fordyca, config, perception);
  */
 struct perception_config final : public rconfig::base_config {
   double los_dim{-1};
-  struct grid_config occupancy_grid {};
+  cds::config::grid_config occupancy_grid {};
   struct pheromone_config pheromone {};
 };
 

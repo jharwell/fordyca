@@ -26,12 +26,12 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/ds/arena_map.hpp"
+#include "cosm/foraging/ds/arena_map.hpp"
+
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
-#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
@@ -58,7 +58,7 @@ template <typename T>
 class cached_block_pickup_interactor
     : public rer::client<cached_block_pickup_interactor<T>> {
  public:
-  cached_block_pickup_interactor(ds::arena_map* const map_in,
+  cached_block_pickup_interactor(cfds::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
                                  tv::env_dynamics* envd,
                                  support::base_cache_manager* cache_manager,
@@ -181,26 +181,10 @@ class cached_block_pickup_interactor
        * cache's status will be picked up by the second robot next timestep.
        */
       if (v(controller.position2D(), p.id(), t)) {
-        auto it =
-            std::find_if(m_map->caches().begin(),
-                         m_map->caches().end(),
-                         [&](const auto& c) { return c->id() == p.id(); });
-        /*
-         * If the robot THINKS it has a valid pickup, we double check AGAIN with
-         * the actual cache in the arena, not the one the robot thinks exists,
-         * before doing the actual pickup.
-         */
-        if (v(it, t)) {
-          status = perform_cached_block_pickup(controller, p, t);
-          m_floor->SetChanged();
-        } else {
-          ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy (actual cache)",
-                  controller.GetId().c_str(),
-                  p.id().v());
-        }
-
+        status = perform_cached_block_pickup(controller, p, t);
+        m_floor->SetChanged();
       } else {
-        ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy (perceived cache)",
+        ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
                 controller.GetId().c_str(),
                 p.id().v());
       }
@@ -257,7 +241,7 @@ class cached_block_pickup_interactor
  private:
   /* clang-format off */
   argos::CFloorEntity* const          m_floor;
-  ds::arena_map* const                m_map;
+  cfds::arena_map* const              m_map;
   tv::cache_op_penalty_handler* const m_penalty_handler;
   base_cache_manager *                m_cache_manager;
   base_loop_functions*                m_loop;

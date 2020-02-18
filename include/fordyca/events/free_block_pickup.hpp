@@ -30,9 +30,10 @@
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
+#include "cosm/events/cell2D_op.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 
@@ -51,11 +52,12 @@ NS_START(fordyca, events, detail);
  * \brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
  */
-class free_block_pickup : public rer::client<free_block_pickup>, public cell_op {
+class free_block_pickup : public rer::client<free_block_pickup>,
+                          public cevents::cell2D_op {
  private:
   struct visit_typelist_impl {
     using inherited = boost::mpl::joint_view<block_pickup_base_visit_typelist,
-                                             cell_op::visit_typelist>;
+                                             cevents::cell2D_op::visit_typelist>;
     using controllers = boost::mpl::joint_view<
         boost::mpl::joint_view<controller::depth0::typelist,
                                controller::depth1::typelist>,
@@ -94,7 +96,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
    * updates. \ref arena_map block mutex assumed to be held when calling this
    * function.
    */
-  void visit(ds::arena_map& map);
+  void visit(cfds::arena_map& map);
   void visit(crepr::base_block2D& block);
   void visit(controller::depth0::crw_controller& controller);
   void visit(fsm::depth0::crw_fsm& fsm);
@@ -131,7 +133,7 @@ class free_block_pickup : public rer::client<free_block_pickup>, public cell_op 
 
   /* clang-format off */
   const rtypes::timestep               mc_timestep;
-  const rtypes::type_uuid            mc_robot_id;
+  const rtypes::type_uuid              mc_robot_id;
 
   std::shared_ptr<crepr::base_block2D> m_block;
   /* clang-format on */

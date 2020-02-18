@@ -141,7 +141,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * \brief Initialize static cache handling/management:
    */
   void cache_handling_init(const config::caches::caches_config *cachep,
-                           const config::arena::block_dist_config* distp) RCSW_COLD;
+                           const cfconfig::block_dist_config* distp) RCSW_COLD;
 
   /**
    * \brief Map the block distribution type to the locations of one or more
@@ -149,7 +149,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * initialization.
    */
   std::vector<rmath::vector2d> calc_cache_locs(
-      const config::arena::block_dist_config* distp) RCSW_COLD;
+      const cfconfig::block_dist_config* distp) RCSW_COLD;
 
   /**
    * \brief Initialize all oracles.

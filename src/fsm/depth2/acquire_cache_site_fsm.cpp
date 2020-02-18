@@ -41,32 +41,42 @@ using cselm = controller::cache_sel_matrix;
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-acquire_cache_site_fsm::acquire_cache_site_fsm(const fsm_ro_params* c_params,
-                                               crfootbot::footbot_saa_subsystem* saa,
-                                               rmath::rng* rng)
+acquire_cache_site_fsm::acquire_cache_site_fsm(
+    const fsm_ro_params* c_params,
+    crfootbot::footbot_saa_subsystem* saa,
+    rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
           saa,
           nullptr, /* never explore for cache sites */
           rng,
           acquire_goal_fsm::hook_list{
-            RCPPSW_STRUCT_DOT_INITIALIZER(acquisition_goal,
-                                          std::bind(&acquire_cache_site_fsm::acquisition_goal_internal,
-                                                    this)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(goal_select,
-                                              std::bind(&acquire_cache_site_fsm::site_select, this)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(candidates_exist,
-                                              std::bind(&acquire_cache_site_fsm::candidates_exist,
-                                                        this)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(begin_acq_cb, std::bind(&acquire_cache_site_fsm::reset_metrics, this)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(goal_acquired_cb,
-                                              std::bind(&acquire_cache_site_fsm::site_acquired_cb,
-                                                        this,
-                                                        std::placeholders::_1)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(explore_term_cb, std::bind(&acquire_cache_site_fsm::site_exploration_term_cb,
-                                                                         this)),
-                RCPPSW_STRUCT_DOT_INITIALIZER(goal_valid_cb,
-                                              [](const rmath::vector2d&, const rtypes::type_uuid&) noexcept { return true; })}),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  acquisition_goal,
+                  std::bind(&acquire_cache_site_fsm::acquisition_goal_internal,
+                            this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_select,
+                  std::bind(&acquire_cache_site_fsm::site_select, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  candidates_exist,
+                  std::bind(&acquire_cache_site_fsm::candidates_exist, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  begin_acq_cb,
+                  std::bind(&acquire_cache_site_fsm::reset_metrics, this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_acquired_cb,
+                  std::bind(&acquire_cache_site_fsm::site_acquired_cb,
+                            this,
+                            std::placeholders::_1)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  explore_term_cb,
+                  std::bind(&acquire_cache_site_fsm::site_exploration_term_cb,
+                            this)),
+              RCPPSW_STRUCT_DOT_INITIALIZER(
+                  goal_valid_cb,
+                  [](const rmath::vector2d&,
+                     const rtypes::type_uuid&) noexcept { return true; })}),
       mc_matrix(c_params->csel_matrix),
       mc_store(c_params->store) {}
 

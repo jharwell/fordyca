@@ -56,7 +56,7 @@ struct dpo_store_updater {
     events::block_found_visitor e(block);
     e.visit(*store);
   }
-  void operator()(std::shared_ptr<repr::base_cache>& cache) const {
+  void operator()(std::shared_ptr<cfrepr::base_cache>& cache) const {
     events::cache_found_visitor e(cache);
     e.visit(*store);
   }

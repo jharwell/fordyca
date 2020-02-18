@@ -30,8 +30,10 @@
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
+#include "rcppsw/types/timestep.hpp"
 
-#include "fordyca/config/grid_config.hpp"
+#include "cosm/ds/config/grid_config.hpp"
+
 #include "fordyca/fordyca.hpp"
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
 
@@ -100,8 +102,9 @@ class collector_registerer : public rer::client<collector_registerer> {
    * \brief A collector is constructible using the expected function arguments.
    */
   template <typename T>
-  using expected_constructible =
-      std::is_constructible<T, const std::string&, uint>;
+  using expected_constructible = std::is_constructible<T,
+                                                       const std::string&,
+                                                       const rtypes::timestep&>;
 
   /**
    * \brief Some metrics collectors (e.g. \ref
@@ -119,7 +122,10 @@ class collector_registerer : public rer::client<collector_registerer> {
    */
   template <typename T>
   using constructible_with_arena_dim =
-      std::is_constructible<T, const std::string&, uint, const rmath::vector2u&>;
+      std::is_constructible<T,
+                            const std::string&,
+                            const rtypes::timestep&,
+                            const rmath::vector2u&>;
 
   /**
    * \brief Some metrics collectors (e.g. \ref bi_tdgraph_metrics_collector)
@@ -127,7 +133,10 @@ class collector_registerer : public rer::client<collector_registerer> {
    */
   template <typename T>
   using constructible_with_uint =
-      std::is_constructible<T, const std::string&, uint, uint>;
+      std::is_constructible<T,
+                            const std::string&,
+                            const rtypes::timestep&,
+                            uint>;
 
   /**
    * \brief Initialize the registerer.
@@ -146,7 +155,7 @@ class collector_registerer : public rer::client<collector_registerer> {
    * purpose and not tied to a specific input format.
    */
   collector_registerer(const cmconfig::metrics_config* const config,
-                       const config::grid_config* const grid_config,
+                       const cdconfig::grid_config* const grid_config,
                        const creatable_set& create_set,
                        base_metrics_aggregator* const agg,
                        int decomposition_depth = -1)

@@ -23,24 +23,23 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
 
-#include "fordyca/ds/cell2D.hpp"
-#include "fordyca/events/cell_cache_extent.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/block_cluster.hpp"
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/events/cell2D_empty.hpp"
+#include "cosm/foraging/events/cell2D_cache_extent.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/foraging/repr/block_cluster.hpp"
+
 #include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
+cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
                                                  rtypes::spatial_dist cache_dim)
     : ER_CLIENT_INIT("fordyca.support.depth2.cache_center_calculator"),
       mc_cache_dim(cache_dim),
@@ -50,9 +49,9 @@ cache_center_calculator::cache_center_calculator(ds::arena_grid* const grid,
  * Member Functions
  ******************************************************************************/
 boost::optional<rmath::vector2u> cache_center_calculator::operator()(
-    const ds::block_vector& c_cache_i_blocks,
-    const ds::cache_vector& c_existing_caches,
-    const ds::block_cluster_vector& c_clusters,
+    const cfds::block_vector& c_cache_i_blocks,
+    const cfds::cache_vector& c_existing_caches,
+    const cfds::block_cluster_vector& c_clusters,
     rmath::rng* rng) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),
                                 c_cache_i_blocks.end(),
@@ -114,8 +113,8 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
 } /* calc_center() */
 
 boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
-    const ds::cache_vector& c_existing_caches,
-    const ds::block_cluster_vector& c_clusters,
+    const cfds::cache_vector& c_existing_caches,
+    const cfds::block_cluster_vector& c_clusters,
     const rmath::vector2u& c_center,
     rmath::rng* rng) const {
   bool conflict = false;

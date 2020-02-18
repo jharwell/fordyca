@@ -40,18 +40,16 @@
 namespace cosm::repr {
 class base_block2D;
 }
-NS_START(fordyca);
-namespace config {
-namespace oracle {
-struct entities_oracle_config;
-} /* namespace oracle */
-} /* namespace config */
-namespace repr {
-class base_block2D;
-class base_cache;
-} /* namespace repr */
 
-NS_START(support, oracle);
+namespace cosm::foraging::repr {
+class base_cache;
+} /* namespace cosm::foraging::repr */
+
+namespace fordyca::config::oracle {
+struct entities_oracle_config;
+} /* namespace fordyca::config::oracle */
+
+NS_START(fordyca, support, oracle);
 
 /*******************************************************************************
  * Class Definitions
@@ -67,7 +65,7 @@ NS_START(support, oracle);
 class entities_oracle final : public rer::client<entities_oracle> {
  public:
   using variant_type = boost::variant<std::shared_ptr<crepr::base_block2D>,
-                                      std::shared_ptr<repr::base_cache>>;
+                                      std::shared_ptr<cfrepr::base_cache>>;
   using variant_vector_type = std::vector<variant_type>;
 
   static std::string result_to_string(const variant_vector_type& v);

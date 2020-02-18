@@ -114,18 +114,16 @@ void base_controller::output_init(const cmconfig::output_config* outputp) {
    * lines within it are not always ordered, which is not overly helpful for
    * debugging.
    */
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("rcppsw.ta"),
-                                       dir + "/ta.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("rcppsw.ta"), dir + "/ta.log");
 
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller"),
                  dir + "/controller.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ds"),
-                                       dir + "/ds.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"),
-                 dir + "/fsm.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ds"), dir + "/ds.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.fsm"), dir + "/fsm.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.saa"),
                  dir + "/saa.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller.explore_behavior"),
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger(
+                     "fordyca.controller.explore_behavior"),
                  dir + "/saa.log");
 #endif
 } /* output_init() */

@@ -29,6 +29,8 @@
 #include "rcppsw/mpl/typelist.hpp"
 
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/convergence/metrics/convergence_metrics.hpp"
+#include "cosm/convergence/metrics/convergence_metrics_collector.hpp"
 #include "cosm/fsm/metrics/collision_locs_metrics_collector.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "cosm/fsm/metrics/collision_metrics_collector.hpp"
@@ -40,8 +42,6 @@
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics_collector.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/convergence/metrics/convergence_metrics.hpp"
-#include "cosm/convergence/metrics/convergence_metrics_collector.hpp"
 #include "cosm/metrics/spatial_dist2D_metrics.hpp"
 #include "cosm/metrics/spatial_dist2D_pos_metrics_collector.hpp"
 #include "cosm/repr/base_block2D.hpp"
@@ -74,9 +74,11 @@ using collector_typelist = rmpl::typelist<
     collector_registerer::type_wrap<cmetrics::blocks::transport_metrics_collector>,
     collector_registerer::type_wrap<blocks::manipulation_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::spatial_dist2D_pos_metrics_collector>,
-  collector_registerer::type_wrap<cconvergence::metrics::convergence_metrics_collector>,
+    collector_registerer::type_wrap<
+        cconvergence::metrics::convergence_metrics_collector>,
     collector_registerer::type_wrap<tv::env_dynamics_metrics_collector>,
-    collector_registerer::type_wrap<ctvmetrics::population_dynamics_metrics_collector> >;
+    collector_registerer::type_wrap<
+        ctvmetrics::population_dynamics_metrics_collector> >;
 
 NS_END(detail);
 
@@ -85,7 +87,7 @@ NS_END(detail);
  ******************************************************************************/
 base_metrics_aggregator::base_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const config::grid_config* const gconfig,
+    const cdconfig::grid_config* const gconfig,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
       m_metrics_path(output_root + "/" + mconfig->output_dir) {

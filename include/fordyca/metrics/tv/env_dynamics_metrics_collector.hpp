@@ -45,7 +45,8 @@ NS_START(fordyca, metrics, tv);
  *
  * \brief Collector for \ref env_dynamics_metrics.
  *
- * Metrics are written out every timestep.
+ * Metrics CANNOT be collected in parallel; concurrent updates to the gathered
+ * stats are not supported. Metrics are written out every timestep.
  */
 class env_dynamics_metrics_collector final
     : public rmetrics::base_metrics_collector {

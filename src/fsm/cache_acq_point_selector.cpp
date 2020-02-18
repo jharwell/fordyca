@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <list>
 
-#include "fordyca/repr/base_cache.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -42,7 +42,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 rmath::vector2d cache_acq_point_selector::operator()(
     const rmath::vector2d& robot_loc,
-    const repr::base_cache* const cache,
+    const cfrepr::base_cache* const cache,
     rmath::rng* rng) {
   auto xspan = cache->xspan();
   auto yspan = cache->yspan();

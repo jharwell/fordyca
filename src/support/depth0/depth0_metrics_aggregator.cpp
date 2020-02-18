@@ -38,7 +38,6 @@
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
-#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
@@ -79,7 +78,7 @@ template void depth0_metrics_aggregator::collect_from_controller(
  ******************************************************************************/
 depth0_metrics_aggregator::depth0_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const config::grid_config* const gconfig,
+    const cdconfig::grid_config* const gconfig,
     const std::string& output_root)
     : base_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth0.depth0_aggregator") {

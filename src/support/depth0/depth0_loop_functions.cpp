@@ -36,9 +36,9 @@
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/foraging/config/arena_map_config.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 
-#include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
@@ -63,7 +63,6 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, support, depth0);
-using ds::arena_grid;
 
 /*******************************************************************************
  * Struct Definitions
@@ -146,7 +145,7 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
 
 void depth0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
-  auto* arena = config()->config_get<config::arena::arena_map_config>();
+  auto* arena = config()->config_get<cfconfig::arena_map_config>();
   auto* output = config()->config_get<cmconfig::output_config>();
 
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
@@ -181,10 +180,8 @@ void depth0_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  swarm_iterator::controllers<argos::CFootBotEntity,
-                              swarm_iterator::static_order>(this,
-                                                            cb,
-                                                            "foot-bot");
+  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
+      this, cb, "foot-bot");
 } /* private_init() */
 
 /*******************************************************************************

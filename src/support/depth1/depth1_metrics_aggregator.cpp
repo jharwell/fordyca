@@ -28,6 +28,11 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
+#include "cosm/foraging/metrics/caches/location_metrics.hpp"
+#include "cosm/foraging/metrics/caches/location_metrics_collector.hpp"
+#include "cosm/foraging/metrics/caches/utilization_metrics.hpp"
+#include "cosm/foraging/metrics/caches/utilization_metrics_collector.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "cosm/fsm/metrics/current_explore_locs_metrics_collector.hpp"
 #include "cosm/fsm/metrics/current_vector_locs_metrics_collector.hpp"
@@ -45,11 +50,7 @@
 
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
-#include "fordyca/metrics/caches/location_metrics.hpp"
-#include "fordyca/metrics/caches/location_metrics_collector.hpp"
-#include "fordyca/metrics/caches/utilization_metrics_collector.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
-#include "fordyca/repr/arena_cache.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -71,11 +72,11 @@ using collector_typelist = rmpl::typelist<
     metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
     metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
     metrics::collector_registerer::type_wrap<
-        metrics::caches::utilization_metrics_collector>,
+        cforaging::metrics::caches::utilization_metrics_collector>,
     metrics::collector_registerer::type_wrap<
         metrics::caches::lifecycle_metrics_collector>,
     metrics::collector_registerer::type_wrap<
-        metrics::caches::location_metrics_collector> >;
+        cforaging::metrics::caches::location_metrics_collector> >;
 NS_END(detail);
 
 using task0 = tasks::depth0::foraging_task;
@@ -86,7 +87,7 @@ using task1 = tasks::depth1::foraging_task;
  ******************************************************************************/
 depth1_metrics_aggregator::depth1_metrics_aggregator(
     const cmconfig::metrics_config* const mconfig,
-    const config::grid_config* const gconfig,
+    const cdconfig::grid_config* const gconfig,
     const std::string& output_root)
     : depth0_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
@@ -118,13 +119,13 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
       {typeid(ctametrics::bi_tdgraph_metrics_collector),
        "task_distribution",
        "tasks::distribution"},
-      {typeid(metrics::caches::utilization_metrics_collector),
+      {typeid(cforaging::metrics::caches::utilization_metrics_collector),
        "cache_utilization",
        "caches::utilization"},
       {typeid(metrics::caches::lifecycle_metrics_collector),
        "cache_lifecycle",
        "caches::lifecycle"},
-      {typeid(metrics::caches::location_metrics_collector),
+      {typeid(cforaging::metrics::caches::location_metrics_collector),
        "cache_locations",
        "caches::locations"}};
   metrics::collector_registerer registerer(
@@ -138,9 +139,12 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void depth1_metrics_aggregator::collect_from_cache(
-    const repr::arena_cache* const cache) {
-  auto util_m = dynamic_cast<const metrics::caches::utilization_metrics*>(cache);
-  auto loc_m = dynamic_cast<const metrics::caches::location_metrics*>(cache);
+    const cfrepr::arena_cache* const cache) {
+  auto util_m =
+      dynamic_cast<const cforaging::metrics::caches::utilization_metrics*>(
+          cache);
+  auto loc_m =
+      dynamic_cast<const cforaging::metrics::caches::location_metrics*>(cache);
   collect("caches::utilization", *util_m);
   collect("caches::locations", *loc_m);
 } /* collect_from_cache() */

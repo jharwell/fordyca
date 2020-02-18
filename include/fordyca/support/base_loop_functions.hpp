@@ -53,6 +53,10 @@ struct convergence_config;
 } /* namespace config */
 } /* namespace cosm::convergence */
 
+namespace cosm::foraging::ds {
+class arena_map;
+} /* namespace cosm::foraging::ds */
+
 namespace cosm::metrics::config {
 struct output_config;
 } /* namespace cosm::metrics::config */
@@ -68,9 +72,6 @@ namespace oracle {
 struct oracle_manager_config;
 } /* namespace oracle */
 } // namespace config
-namespace ds {
-class arena_map;
-}
 NS_START(support);
 
 namespace tv {
@@ -115,11 +116,11 @@ class base_loop_functions : public cpal::swarm_manager,
   const cconvergence::convergence_calculator* conv_calculator(void) const {
     return m_conv_calc.get();
   }
-  const ds::arena_map* arena_map(void) const { return m_arena_map.get(); }
+  const cfds::arena_map* arena_map(void) const { return m_arena_map.get(); }
 
  protected:
   tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
-  ds::arena_map* arena_map(void) { return m_arena_map.get(); }
+  cfds::arena_map* arena_map(void) { return m_arena_map.get(); }
   const config::loop_function_repository* config(void) const {
     return &m_config;
   }
@@ -177,7 +178,7 @@ class base_loop_functions : public cpal::swarm_manager,
 
   /* clang-format off */
   config::loop_function_repository                      m_config{};
-  std::unique_ptr<ds::arena_map>                        m_arena_map;
+  std::unique_ptr<cfds::arena_map>                      m_arena_map;
   std::unique_ptr<tv::tv_manager>                       m_tv_manager;
   std::unique_ptr<cconvergence::convergence_calculator> m_conv_calc;
   std::unique_ptr<oracle::oracle_manager>               m_oracle_manager;

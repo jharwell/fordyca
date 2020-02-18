@@ -26,8 +26,10 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "fordyca/ds/arena_map.hpp"
-#include "fordyca/events/cache_block_drop.hpp"
+#include "cosm/foraging/ds/arena_map.hpp"
+
+#include "fordyca/events/robot_cache_block_drop.hpp"
+#include "cosm/foraging/events/arena_cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
@@ -53,7 +55,7 @@ template <typename T>
 class existing_cache_block_drop_interactor
     : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
-  existing_cache_block_drop_interactor(ds::arena_map* const map_in,
+  existing_cache_block_drop_interactor(cfds::arena_map* const map_in,
                                        tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
@@ -172,9 +174,18 @@ class existing_cache_block_drop_interactor
               "Cache%d from penalty does not exist",
               penalty.id().v());
 
-    events::cache_block_drop_visitor drop_op(controller.block_release(),
-                                             *cache_it,
-                                             m_map->grid_resolution());
+    rtypes::type_uuid block_id = controller.block()->id();
+    /*
+     * Safe to directly index into arena map block vector without locking
+     * because the blocks never move from their original locations.
+     */
+    cfevents::arena_cache_block_drop_visitor adrop_op(m_map->blocks()[block_id.v()],
+                                                      *cache_it,
+                                                      m_map->grid_resolution());
+    events::robot_cache_block_drop_visitor rdrop_op(controller.block_release(),
+                                                    *cache_it,
+                                                    m_map->grid_resolution());
+
     (*cache_it)->penalty_served(penalty.penalty());
 
     /*
@@ -185,12 +196,12 @@ class existing_cache_block_drop_interactor
      *
      * In order for proper \ref events::cache_block_drop processing.
      */
-    drop_op.visit(*m_map);
-    drop_op.visit(controller);
+    adrop_op.visit(*m_map);
+    rdrop_op.visit(controller);
   }
 
   /* clang-format off */
-  ds::arena_map* const               m_map;
+  cfds::arena_map* const             m_map;
   tv::cache_op_penalty_handler*const m_penalty_handler;
   /* clang-format on */
 };

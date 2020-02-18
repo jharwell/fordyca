@@ -41,15 +41,17 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::ta {
-namespace ds {
+namespace cosm::ta::ds {
 class bi_tab;
 } /* namespace ds */
-}
+
+namespace cosm::foraging::repr {
+class arena_cache;
+} /* namespace cosm::foraging::repr */
+
 NS_START(fordyca);
 
 namespace controller { namespace depth1 { class bitd_mdpo_controller; }}
-namespace repr { class arena_cache; }
 namespace support { class base_cache_manager; }
 NS_START(support, depth1);
 
@@ -74,7 +76,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
                                   public rer::client<depth1_metrics_aggregator> {
  public:
   depth1_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const config::grid_config* const gconfig,
+                            const cdconfig::grid_config* const gconfig,
                             const std::string& output_root);
 
   /**
@@ -123,7 +125,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    * \brief Collect utilization metrics from a cache in the arena.
    */
   void collect_from_cache(
-      const repr::arena_cache* cache);
+      const cfrepr::arena_cache* cache);
 
   /**
    * \brief Collect lifecycle metrics across all caches in the arena.

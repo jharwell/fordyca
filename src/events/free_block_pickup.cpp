@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/free_block_pickup.hpp"
 
+#include "cosm/foraging/ds/arena_map.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -40,9 +41,8 @@
 #include "fordyca/controller/depth2/birtd_omdpo_controller.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
-#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/events/cell_empty.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/fsm/block_to_goal_fsm.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
@@ -68,7 +68,7 @@ free_block_pickup::free_block_pickup(
     const rtypes::type_uuid& robot_id,
     const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
-      cell_op(block->dloc()),
+      cell2D_op(block->dloc()),
       mc_timestep(t),
       mc_robot_id(robot_id),
       m_block(block) {}
@@ -89,14 +89,14 @@ void free_block_pickup::dispatch_free_block_interactor(
 /*******************************************************************************
  * CRW Foraging
  ******************************************************************************/
-void free_block_pickup::visit(ds::arena_map& map) {
-  ER_ASSERT(m_block->dloc() == rmath::vector2u(cell_op::x(), cell_op::y()),
+void free_block_pickup::visit(cfds::arena_map& map) {
+  ER_ASSERT(m_block->dloc() == rmath::vector2u(cell2D_op::x(), cell2D_op::y()),
             "Coordinates for block/cell do not agree");
   RCSW_UNUSED rmath::vector2d old_r = m_block->rloc();
 
-  events::cell_empty_visitor op(cell_op::coord());
+  events::cell2D_empty_visitor op(cell2D_op::coord());
   map.grid_mtx().lock();
-  op.visit(map);
+  op.visit(map.decoratee());
   map.grid_mtx().unlock();
 
   /*
@@ -109,7 +109,7 @@ void free_block_pickup::visit(ds::arena_map& map) {
           mc_robot_id.v(),
           m_block->id().v(),
           old_r.to_str().c_str(),
-          cell_op::coord().to_str().c_str());
+          cell2D_op::coord().to_str().c_str());
 } /* visit() */
 
 void free_block_pickup::visit(crepr::base_block2D& block) {
@@ -152,8 +152,8 @@ void free_block_pickup::visit(ds::dpo_store& store) {
 } /* visit() */
 
 void free_block_pickup::visit(ds::dpo_semantic_map& map) {
-  ds::cell2D& cell =
-      map.access<occupancy_grid::kCell>(cell_op::x(), cell_op::y());
+  cds::cell2D& cell =
+      map.access<occupancy_grid::kCell>(cell2D_op::x(), cell2D_op::y());
 
   ER_ASSERT(m_block->dloc() == cell.loc(),
             "Coordinates for block%d@%s/cell@%s do not agree",

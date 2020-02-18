@@ -71,7 +71,7 @@ class collector : public foraging_task,
   void accept(events::detail::cached_block_pickup& visitor) override;
   void accept(events::detail::nest_block_drop& visitor) override;
   void accept(events::detail::cache_vanished& visitor) override;
-  void accept(events::detail::cache_block_drop&) override {}
+  void accept(events::detail::robot_cache_block_drop&) override {}
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);

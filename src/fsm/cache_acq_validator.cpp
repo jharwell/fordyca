@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/fsm/cache_acq_validator.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
+
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
@@ -89,21 +91,6 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   return pickup_policy_validate(it->ent(), t);
 } /* operator()() */
 
-bool cache_acq_validator::operator()(const cfrepr::base_cache* cache,
-                                     const rtypes::timestep& t) const {
-  /*
-   * As long as (1) the cache exists, (2) the point we are trying to acquire is
-   * inside it, (3) we are dropping something in the cache, we can go ahead and
-   * acquire it without further checking.
-   */
-  if (!mc_for_pickup) {
-    return true;
-  }
-
-  /* verify pickup policy */
-  return pickup_policy_validate(cache, t);
-} /* operator()() */
-
 bool cache_acq_validator::pickup_policy_validate(
     const cfrepr::base_cache* cache,
     const rtypes::timestep& t) const {
@@ -112,7 +99,7 @@ bool cache_acq_validator::pickup_policy_validate(
 
   if (cselm::kPickupPolicyTime == config.policy && t < config.timestep) {
     ER_WARN("Cache%d invalid for acquisition: policy=%s, %u < %u",
-            id.v(),
+            cache->id().v(),
             config.policy.c_str(),
             t.v(),
             config.timestep.v());
@@ -120,7 +107,7 @@ bool cache_acq_validator::pickup_policy_validate(
   } else if (cselm::kPickupPolicyCacheSize == config.policy &&
              cache->n_blocks() < config.cache_size) {
     ER_WARN("Cache%d invalid for acquisition: policy=%s, %zu < %u",
-            id.v(),
+            cache->id().v(),
             config.policy.c_str(),
             cache->n_blocks(),
             config.cache_size);

@@ -103,7 +103,7 @@ class dpo_perception_subsystem final
   void los_tracking_sync(const repr::line_of_sight* c_los,
                          const ds::cache_list& los_caches);
   void los_tracking_sync(const repr::line_of_sight* c_los,
-                         const ds::block_list& los_blocks);
+                         const cfds::block_list& los_blocks);
 
  private:
   /* clang-format off */

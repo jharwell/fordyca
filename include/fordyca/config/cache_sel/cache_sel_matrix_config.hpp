@@ -50,8 +50,8 @@ struct cache_sel_matrix_config final : public rconfig::base_config {
   rtypes::spatial_dist         cache_prox_dist{0.0};
   rtypes::spatial_dist         block_prox_dist{0.0};
   rtypes::spatial_dist         nest_prox_dist{0.0};
-  rmath::rangeu site_xrange{0, 0};
-  rmath::rangeu site_yrange{0, 0};
+  rmath::rangeu                site_xrange{0, 0};
+  rmath::rangeu                site_yrange{0, 0};
   cache_pickup_policy_config   pickup_policy{};
 };
 

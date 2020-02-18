@@ -1,7 +1,7 @@
 /**
- * \file cell_cache_extent.hpp
+ * \file cell2D_empty.hpp
  *
- * \copyright 2018 John Harwell, All rights reserved.
+ * \copyright 2017 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -18,68 +18,66 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_CELL_CACHE_EXTENT_HPP_
-#define INCLUDE_FORDYCA_EVENTS_CELL_CACHE_EXTENT_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_CELL2D_EMPTY_HPP_
+#define INCLUDE_FORDYCA_EVENTS_CELL2D_EMPTY_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <memory>
-
+#include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "fordyca/events/cell_op.hpp"
+#include "cosm/events/cell2D_empty.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
-class base_cache;
-} // namespace repr
-
-namespace ds {
+namespace fordyca::ds {
 class arena_map;
-} // namespace ds
+class occupancy_grid;
+class dpo_semantic_map;
+} /* namespace fordyca::ds */
 
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class cell_cache_extent
- * \ingroup events
+ * \class cell2D_empty
+ * \ingroup events detail
  *
  * \brief Created whenever a cell needs to go from some other state to being
- * part of a cache's extent (dub). All the blocks (and the cache itself) live in
- * a single cell, but the cells that the cache covers need to be in a special
- * state in order to avoid corner cases when picking up from/dropping in a cache
- * (See #432).
+ * empty.
+ *
+ * The most common example of this is when a free block is picked up, and the
+ * square that the block was on is now  (probably) empty. It might not be if in
+ * the same timestep a new cache is created on that same cell.
  */
-class cell_cache_extent : public cell_op {
+class cell2D_empty : public cevents::cell2D_empty,
+                     public rer::client<cell2D_empty> {
  private:
   struct visit_typelist_impl {
-    using inherited = cell_op::visit_typelist;
-    using others = rmpl::typelist<ds::arena_map>;
+    using inherited = cell2D_empty::visit_typelist;
+    using others =
+        rmpl::typelist<ds::arena_map, ds::occupancy_grid, ds::dpo_semantic_map>;
     using value = boost::mpl::joint_view<inherited::type, others::type>;
   };
 
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  cell_cache_extent(const rmath::vector2u& coord,
-                    const std::shared_ptr<repr::base_cache>& cache);
+  /* parent class visit functions */
+  using cevents::cell2D_empty::visit;
 
-  /* depth1 foraging */
-  void visit(ds::cell2D& cell);
-  void visit(fsm::cell2D_fsm& fsm);
-  void visit(ds::arena_map& map);
+  explicit cell2D_empty(const rmath::vector2u& coord)
+      : cevents::cell2D_empty(coord),
+        ER_CLIENT_INIT("fordyca.events.cell2D_empty") {}
 
- private:
-  /* clang-format off */
-  std::shared_ptr<repr::base_cache> m_cache;
-  /* clang-format on */
+  void visit(ds::occupancy_grid& grid);
+  void visit(ds::dpo_semantic_map& map);
 };
 
 /**
@@ -88,16 +86,16 @@ class cell_cache_extent : public cell_op {
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using cell_cache_extent_visitor_impl =
-    rpvisitor::precise_visitor<detail::cell_cache_extent,
-                               detail::cell_cache_extent::visit_typelist>;
+using cell2D_empty_visitor_impl =
+    rpvisitor::precise_visitor<detail::cell2D_empty,
+                               detail::cell2D_empty::visit_typelist>;
 
 NS_END(detail);
 
-class cell_cache_extent_visitor : public detail::cell_cache_extent_visitor_impl {
-  using detail::cell_cache_extent_visitor_impl::cell_cache_extent_visitor_impl;
+class cell2D_empty_visitor : public detail::cell2D_empty_visitor_impl {
+  using detail::cell2D_empty_visitor_impl::cell2D_empty_visitor_impl;
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_CELL_CACHE_EXTENT_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_CELL2D_EMPTY_HPP_ */

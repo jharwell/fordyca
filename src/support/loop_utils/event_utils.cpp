@@ -23,8 +23,9 @@
  ******************************************************************************/
 #include "fordyca/support/utils/event_utils.hpp"
 
+#include "cosm/foraging/ds/arena_map.hpp"
+
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/ds/arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,25 +36,26 @@ NS_START(fordyca, support, utils);
  * Functions
  ******************************************************************************/
 rtypes::type_uuid robot_on_block(const controller::base_controller& controller,
-                                 const ds::arena_map& map) {
+                                 const cfds::arena_map& map) {
   return map.robot_on_block(controller.position2D());
 } /* robot_on_block() */
 
 rtypes::type_uuid robot_on_cache(const controller::base_controller& controller,
-                                 const ds::arena_map& map) {
+                                 const cfds::arena_map& map) {
   return map.robot_on_cache(controller.position2D());
 } /* robot_on_cache() */
 
-bool block_drop_overlap_with_cache(const crepr::base_block2D* const block,
-                                   const std::shared_ptr<repr::arena_cache>& cache,
-                                   const rmath::vector2d& drop_loc) {
+bool block_drop_overlap_with_cache(
+    const crepr::base_block2D* const block,
+    const std::shared_ptr<cfrepr::arena_cache>& cache,
+    const rmath::vector2d& drop_loc) {
   auto drop_xspan = crepr::entity2D::xspan(drop_loc, block->dims().x());
   auto drop_yspan = crepr::entity2D::yspan(drop_loc, block->dims().y());
   return cache->xspan().overlaps_with(drop_xspan) &&
          cache->yspan().overlaps_with(drop_yspan);
 } /* block_drop_overlap_with_cache() */
 
-bool block_drop_near_arena_boundary(const ds::arena_map& map,
+bool block_drop_near_arena_boundary(const cfds::arena_map& map,
                                     const crepr::base_block2D* const block,
                                     const rmath::vector2d& drop_loc) {
   return (drop_loc.x() <= block->xdimr() * 2 ||
@@ -74,7 +76,7 @@ bool block_drop_overlap_with_nest(const crepr::base_block2D* const block,
 
 proximity_status_t new_cache_cache_proximity(
     const controller::base_controller& c,
-    const ds::arena_map& map,
+    const cfds::arena_map& map,
     rtypes::spatial_dist new_cache_prox) {
   std::scoped_lock lock(map.cache_mtx());
   for (const auto& cache : map.caches()) {
@@ -85,8 +87,8 @@ proximity_status_t new_cache_cache_proximity(
   return {rtypes::constants::kNoUUID, rmath::vector2d(), rmath::vector2d()};
 } /* new_cache_cache_proximity() */
 
-void handle_arena_free_block_drop(events::free_block_drop_visitor& drop_op,
-                                  ds::arena_map& map,
+void handle_arena_free_block_drop(cfevents::arena_block_drop_visitor& drop_op,
+                                  cfds::arena_map& map,
                                   bool drop_conflict) {
   map.block_mtx().lock();
   map.grid_mtx().lock();
@@ -101,7 +103,7 @@ void handle_arena_free_block_drop(events::free_block_drop_visitor& drop_op,
   map.block_mtx().unlock();
 } /* handle_arena_free_block_drop() */
 
-bool free_block_drop_conflict(const ds::arena_map& map,
+bool free_block_drop_conflict(const cfds::arena_map& map,
                               const crepr::base_block2D* const block,
                               const rmath::vector2d& loc) {
   /*

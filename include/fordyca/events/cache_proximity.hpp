@@ -24,22 +24,23 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <memory>
+
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/events/cell_op.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca);
-namespace repr {
+namespace cosm::foraging::repr {
 class base_cache;
 }
 
-NS_START(events, detail);
+NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
@@ -64,7 +65,7 @@ class cache_proximity : public rer::client<cache_proximity> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cache_proximity(const std::shared_ptr<repr::base_cache>& cache);
+  explicit cache_proximity(const std::shared_ptr<cfrepr::base_cache>& cache);
   ~cache_proximity(void) override = default;
 
   cache_proximity(const cache_proximity& op) = delete;
@@ -82,7 +83,7 @@ class cache_proximity : public rer::client<cache_proximity> {
  private:
   /* clang-format off */
   void dispatch_cache_interactor(tasks::base_foraging_task* task);
-  std::shared_ptr<repr::base_cache> m_cache;
+  std::shared_ptr<cfrepr::base_cache> m_cache;
   /* clang-format on */
 };
 

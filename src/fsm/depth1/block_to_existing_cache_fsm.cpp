@@ -23,10 +23,11 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 
+#include "cosm/foraging/repr/light_type_index.hpp"
+
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/fsm/expstrat/cache_factory.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "fordyca/support/light_type_index.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +52,7 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
                   nullptr,
                   c_params->csel_matrix,
                   c_params->store,
-                  support::light_type_index()[support::light_type_index::kCache])
+                  cfrepr::light_type_index()[cfrepr::light_type_index::kCache])
                   .get(),
               rng),
           rng,

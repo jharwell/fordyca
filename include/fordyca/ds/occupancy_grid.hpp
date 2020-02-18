@@ -30,9 +30,8 @@
 #include "rcppsw/ds/stacked_grid.hpp"
 #include "rcppsw/math/vector2.hpp"
 
+#include "cosm/ds/cell2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
-
-#include "fordyca/ds/cell2D.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -49,7 +48,7 @@ NS_START(ds);
  * \brief The types of layers used by \ref occupancy_grid (i.e. a heterogeneous
  * 3D grid).
  */
-using robot_layer_stack = std::tuple<crepr::pheromone_density, cell2D>;
+using robot_layer_stack = std::tuple<crepr::pheromone_density, cds::cell2D>;
 
 /*******************************************************************************
  * Class Definitions

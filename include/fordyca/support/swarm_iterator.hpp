@@ -100,8 +100,7 @@ struct swarm_iterator {
   static void controllers(const cpal::swarm_manager* const sm,
                           const TFunction& cb) {
     auto wrapper = [&](auto* robot) {
-      cb(static_cast<controller::base_controller*>(
-          &robot->GetController()));
+      cb(static_cast<controller::base_controller*>(&robot->GetController()));
     };
     sm->IterateOverControllableEntities(wrapper);
   }
@@ -146,8 +145,7 @@ struct swarm_iterator {
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             dynamic_order::type>::value)>
-  static void robots(const cpal::swarm_manager* const sm,
-                     const TFunction& cb) {
+  static void robots(const cpal::swarm_manager* const sm, const TFunction& cb) {
     sm->IterateOverControllableEntities(cb);
   }
 };

@@ -28,11 +28,10 @@
 
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/cache_block_drop.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/cached_block_pickup.hpp"
-#include "fordyca/events/free_block_drop.hpp"
 #include "fordyca/events/free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
@@ -105,7 +104,7 @@ void harvester::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void harvester::accept(events::detail::cache_block_drop& visitor) {
+void harvester::accept(events::detail::robot_cache_block_drop& visitor) {
   visitor.visit(*this);
 }
 void harvester::accept(events::detail::free_block_pickup& visitor) {

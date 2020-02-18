@@ -25,17 +25,17 @@
 
 #include <algorithm>
 
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/fsm/cell2D_states.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/los_proc_verify.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
-#include "fordyca/ds/cell2D.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/fsm/cell2D_states.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +51,7 @@ mdpo_perception_subsystem::mdpo_perception_subsystem(
     const std::string& id)
     : ER_CLIENT_INIT("fordyca.controller.mdpo_perception"),
       base_perception_subsystem(config),
-      m_cell_stats(fsm::cell2D_states::ekST_MAX_STATES),
+      m_cell_stats(cfsm::cell2D_states::ekST_MAX_STATES),
       m_los(),
       m_map(std::make_unique<ds::dpo_semantic_map>(config, id)) {}
 
@@ -102,7 +102,7 @@ void mdpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::block_list blocks = c_los->blocks();
+  cfds::block_list blocks = c_los->blocks();
   if (!blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
@@ -130,7 +130,7 @@ void mdpo_perception_subsystem::process_los_blocks(
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
-        events::cell_empty_visitor e(d);
+        events::cell2D_empty_visitor e(d);
         e.visit(*m_map);
       }
     } /* for(j..) */
@@ -250,15 +250,15 @@ void mdpo_perception_subsystem::update_cell_stats(
       if (c_los->cell(i, j).state_is_empty() &&
           m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
           !m_map->access<occupancy_grid::kCell>(d).state_is_empty()) {
-        m_cell_stats[fsm::cell2D_states::ekST_EMPTY]++;
+        m_cell_stats[cfsm::cell2D_states::ekST_EMPTY]++;
       } else if (c_los->cell(i, j).state_has_block() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_block()) {
-        m_cell_stats[fsm::cell2D_states::ekST_HAS_BLOCK]++;
+        m_cell_stats[cfsm::cell2D_states::ekST_HAS_BLOCK]++;
       } else if (c_los->cell(i, j).state_has_cache() &&
                  m_map->access<occupancy_grid::kCell>(d).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_has_cache()) {
-        m_cell_stats[fsm::cell2D_states::ekST_HAS_CACHE]++;
+        m_cell_stats[cfsm::cell2D_states::ekST_HAS_CACHE]++;
       }
     } /* for(j..) */
   }   /* for(i..) */

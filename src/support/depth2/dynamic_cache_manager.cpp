@@ -22,27 +22,25 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 
+#include "cosm/ds/arena_grid.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/ds/arena_grid.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/repr/arena_cache.hpp"
-#include "fordyca/repr/block_cluster.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth2);
-using ds::arena_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 dynamic_cache_manager::dynamic_cache_manager(
     const config::caches::caches_config* config,
-    ds::arena_grid* const arena_grid,
+    cds::arena_grid* const arena_grid,
     rmath::rng* rng)
     : base_cache_manager(arena_grid),
       ER_CLIENT_INIT("fordyca.support.depth2.dynamic_cache_manager"),
@@ -52,9 +50,9 @@ dynamic_cache_manager::dynamic_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<ds::cache_vector> dynamic_cache_manager::create(
+boost::optional<cfds::cache_vector> dynamic_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const ds::block_vector& c_alloc_blocks) {
+    const cfds::block_vector& c_alloc_blocks) {
   if (auto to_use = calc_blocks_for_creation(
           c_params.current_caches, c_params.clusters, c_alloc_blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
@@ -64,7 +62,7 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
         .min_blocks = mc_cache_config.dynamic.min_blocks};
     support::depth2::dynamic_cache_creator creator(&params, m_rng);
 
-    ds::cache_vector created = creator.create_all(c_params, *to_use);
+    cfds::cache_vector created = creator.create_all(c_params, *to_use);
     caches_created(created.size());
 
     /*
@@ -74,15 +72,15 @@ boost::optional<ds::cache_vector> dynamic_cache_manager::create(
     creator.update_host_cells(created);
     return boost::make_optional(created);
   } else {
-    return boost::optional<ds::cache_vector>();
+    return boost::optional<cfds::cache_vector>();
   }
 } /* create() */
 
-boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creation(
-    const ds::cache_vector& existing_caches,
-    const ds::block_cluster_vector& clusters,
-    const ds::block_vector& blocks) {
-  ds::block_vector to_use;
+boost::optional<cfds::block_vector> dynamic_cache_manager::calc_blocks_for_creation(
+    const cfds::cache_vector& existing_caches,
+    const cfds::block_cluster_vector& clusters,
+    const cfds::block_vector& blocks) {
+  cfds::block_vector to_use;
   auto filter = [&](const auto& b) {
     /* Blocks cannot be in existing caches */
     return std::all_of(existing_caches.begin(),
@@ -140,13 +138,13 @@ boost::optional<ds::block_vector> dynamic_cache_manager::calc_blocks_for_creatio
               to_use.size() - count,
               to_use.size(),
               mc_cache_config.dynamic.min_blocks);
-    return boost::optional<ds::block_vector>();
+    return boost::optional<cfds::block_vector>();
   }
   if (to_use.size() < mc_cache_config.static_.size) {
     ER_WARN("Free block count < min blocks for new caches (%zu < %u)",
             to_use.size(),
             mc_cache_config.dynamic.min_blocks);
-    return boost::optional<ds::block_vector>();
+    return boost::optional<cfds::block_vector>();
   }
   return boost::make_optional(to_use);
 } /* calc_blocks_for_creation() */

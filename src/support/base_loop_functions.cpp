@@ -32,13 +32,13 @@
 
 #include "cosm/convergence/config/convergence_config.hpp"
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/foraging/config/arena_map_config.hpp"
+#include "cosm/foraging/ds/arena_map.hpp"
 
-#include "fordyca/config/arena/arena_map_config.hpp"
 #include "fordyca/config/oracle/oracle_manager_config.hpp"
 #include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/ds/arena_map.hpp"
 #include "fordyca/support/oracle/entities_oracle.hpp"
 #include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/oracle/tasking_oracle.hpp"
@@ -121,17 +121,16 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * they are disabled, and trying to figure out how to get things to work if
    * they are omitted is waaayyyy too much work. See #621 too.
    */
-  auto envd = std::make_unique<tv::env_dynamics>(&tvp->env_dynamics,
-                                                 this,
-                                                 arena_map());
+  auto envd =
+      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics, this, arena_map());
 
   auto popd = std::make_unique<tv::argos_pd_adaptor>(&tvp->population_dynamics,
-                                                  this,
-                                                  arena_map(),
-                                                  envd.get(),
-                                                  "fb",
-                                                  "ffc",
-                                                  rng());
+                                                     this,
+                                                     arena_map(),
+                                                     envd.get(),
+                                                     "fb",
+                                                     "ffc",
+                                                     rng());
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
@@ -151,10 +150,10 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
 
 void base_loop_functions::arena_map_init(
     const config::loop_function_repository* const repo) {
-  auto* aconfig = repo->config_get<config::arena::arena_map_config>();
+  auto* aconfig = repo->config_get<cfconfig::arena_map_config>();
   auto* vconfig = repo->config_get<config::visualization_config>();
 
-  m_arena_map = std::make_unique<ds::arena_map>(aconfig);
+  m_arena_map = std::make_unique<cfds::arena_map>(aconfig);
   if (!m_arena_map->initialize(this, rng())) {
     ER_ERR("Could not initialize arena map");
     std::exit(EXIT_FAILURE);
@@ -190,7 +189,7 @@ void base_loop_functions::output_init(const cmconfig::output_config* output) {
                  output_root() + "/support.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.loop"),
                  output_root() + "/sim.log");
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.ds.arena_map"),
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("cosm.foraging.ds.arena_map"),
                  output_root() + "/sim.log");
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.metrics"),
                  output_root() + "/metrics.log");

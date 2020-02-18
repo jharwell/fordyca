@@ -23,12 +23,11 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
+#include "cosm/foraging/ds/block_list.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/ds/block_list.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/events/free_block_drop.hpp"
-#include "fordyca/repr/arena_cache.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
 
@@ -51,10 +50,10 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-ds::cache_vector dynamic_cache_creator::create_all(
+cfds::cache_vector dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const ds::block_vector& c_alloc_blocks) {
-  ds::cache_vector created_caches;
+    const cfds::block_vector& c_alloc_blocks) {
+  cfds::cache_vector created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
            mc_min_dist.v(),
@@ -62,9 +61,9 @@ ds::cache_vector dynamic_cache_creator::create_all(
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
 
-  ds::block_vector used_blocks;
+  cfds::block_vector used_blocks;
   for (size_t i = 0; i < c_alloc_blocks.size() - 1; ++i) {
-    ds::block_vector cache_i_blocks =
+    cfds::block_vector cache_i_blocks =
         cache_i_blocks_alloc(used_blocks, c_alloc_blocks, i);
 
     /*
@@ -72,7 +71,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
      * included in a new cache, so attempt cache creation.
      */
     if (cache_i_blocks.size() >= mc_min_blocks) {
-      ds::cache_vector c_avoid =
+      cfds::cache_vector c_avoid =
           avoidance_caches_calc(c_params.current_caches, created_caches);
 
       if (auto center = cache_center_calculator(grid(), cache_dim())(
@@ -96,7 +95,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
          * which keeps asserts about cache extent from triggering right after
          * creation, which can happen otherwise.
          */
-        auto cache_p = std::shared_ptr<repr::arena_cache>(create_single_cache(
+        auto cache_p = std::shared_ptr<cfrepr::arena_cache>(create_single_cache(
             rmath::uvec2dvec(*center), cache_i_blocks, c_params.t));
         created_caches.push_back(cache_p);
       }
@@ -109,7 +108,7 @@ ds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  ds::block_vector free_blocks =
+  cfds::block_vector free_blocks =
       utils::free_blocks_calc(created_caches, c_alloc_blocks);
 
   ER_ASSERT(
@@ -118,21 +117,21 @@ ds::cache_vector dynamic_cache_creator::create_all(
   return created_caches;
 } /* create_all() */
 
-ds::cache_vector dynamic_cache_creator::avoidance_caches_calc(
-    const ds::cache_vector& c_previous_caches,
-    const ds::cache_vector& c_created_caches) const {
-  ds::cache_vector avoid = c_previous_caches;
+cfds::cache_vector dynamic_cache_creator::avoidance_caches_calc(
+    const cfds::cache_vector& c_previous_caches,
+    const cfds::cache_vector& c_created_caches) const {
+  cfds::cache_vector avoid = c_previous_caches;
   avoid.insert(avoid.end(), c_created_caches.begin(), c_created_caches.end());
   return avoid;
 } /* avoidance_caches_calc() */
 
-ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
-    const ds::block_vector& c_alloc_blocks,
-    const ds::block_vector& c_cache_i_blocks,
-    const ds::block_vector& c_used_blocks,
+cfds::block_vector dynamic_cache_creator::absorb_blocks_calc(
+    const cfds::block_vector& c_alloc_blocks,
+    const cfds::block_vector& c_cache_i_blocks,
+    const cfds::block_vector& c_used_blocks,
     const rmath::vector2u& c_center,
     rtypes::spatial_dist cache_dim) const {
-  ds::block_vector absorb_blocks;
+  cfds::block_vector absorb_blocks;
   std::copy_if(c_alloc_blocks.begin(),
                c_alloc_blocks.end(),
                std::back_inserter(absorb_blocks),
@@ -154,11 +153,11 @@ ds::block_vector dynamic_cache_creator::absorb_blocks_calc(
   return absorb_blocks;
 } /* absorb_blocks_calc() */
 
-ds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
-    const ds::block_vector& c_used_blocks,
-    const ds::block_vector& c_alloc_blocks,
+cfds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
+    const cfds::block_vector& c_used_blocks,
+    const cfds::block_vector& c_alloc_blocks,
     uint index) const {
-  ds::block_vector src_blocks;
+  cfds::block_vector src_blocks;
 
   /*
    * Block already in a new cache, so bail out.

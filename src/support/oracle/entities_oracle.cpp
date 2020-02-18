@@ -25,10 +25,10 @@
 
 #include <numeric>
 
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/config/oracle/entities_oracle_config.hpp"
-#include "fordyca/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -70,7 +70,7 @@ std::string entities_oracle::result_to_string(const variant_vector_type& v) {
     } else if (1 == ent.which()) {
       return a + "c" +
              rcppsw::to_string(
-                 boost::get<std::shared_ptr<repr::base_cache>>(ent)->id()) +
+                 boost::get<std::shared_ptr<cfrepr::base_cache>>(ent)->id()) +
              ",";
     } else {
       return a + "unknown entity type,";

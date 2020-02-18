@@ -23,6 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
+
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
@@ -30,26 +32,25 @@
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
-#include "fordyca/events/cell_empty.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "fordyca/events/cell2D_empty.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events, detail);
+using cfrepr::base_cache;
 using ds::occupancy_grid;
-using repr::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(std::unique_ptr<repr::base_cache> cache)
-    : cell_op(cache->dloc()),
+cache_found::cache_found(std::unique_ptr<cfrepr::base_cache> cache)
+    : cell2D_op(cache->dloc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(std::move(cache)) {}
 
-cache_found::cache_found(const std::shared_ptr<repr::base_cache>& cache)
-    : cell_op(cache->dloc()),
+cache_found::cache_found(const std::shared_ptr<cfrepr::base_cache>& cache)
+    : cell2D_op(cache->dloc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
 
@@ -100,14 +101,14 @@ void cache_found::visit(ds::dpo_store& store) {
 /*******************************************************************************
  * MDPO Foraging
  ******************************************************************************/
-void cache_found::visit(ds::cell2D& cell) {
+void cache_found::visit(cds::cell2D& cell) {
   cell.entity(m_cache);
   visit(cell.fsm());
   ER_ASSERT(cell.state_has_cache(),
             "Cell does not have cache after cache found event");
 } /* visit() */
 
-void cache_found::visit(fsm::cell2D_fsm& fsm) {
+void cache_found::visit(cfsm::cell2D_fsm& fsm) {
   /*
    * If there are more blocks in the cache than currently exist in the cell,
    * then other robots have dropped blocks in cache since the last time we saw
@@ -140,7 +141,7 @@ void cache_found::visit(fsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void cache_found::visit(ds::dpo_semantic_map& map) {
-  ds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
+  cds::cell2D& cell = map.access<occupancy_grid::kCell>(x(), y());
   crepr::pheromone_density& density =
       map.access<occupancy_grid::kPheromone>(x(), y());
   if (!cell.state_is_known()) {
@@ -173,7 +174,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    events::cell_empty_visitor op((*b)->dloc());
+    cevents::cell2D_empty_visitor op((*b)->dloc());
     op.visit(map.access<occupancy_grid::kCell>((*b)->dloc()));
     map.block_remove(*b);
   } /* for(&&b..) */

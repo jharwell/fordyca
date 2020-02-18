@@ -35,7 +35,7 @@ NS_START(fordyca, metrics, blocks);
  ******************************************************************************/
 manipulation_metrics_collector::manipulation_metrics_collector(
     const std::string& ofname,
-    uint interval)
+    const rtypes::timestep& interval)
     : base_metrics_collector(ofname, interval) {}
 
 /*******************************************************************************
