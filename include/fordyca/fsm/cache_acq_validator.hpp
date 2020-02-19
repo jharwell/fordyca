@@ -34,6 +34,10 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::foraging::repr {
+class base_cache;
+} /* namespace cosm::foraging::repr */
+
 NS_START(fordyca);
 namespace ds {
 class dp_cache_map;
@@ -55,6 +59,8 @@ NS_START(fsm);
  * \brief Determine if the acquisition of a cache at a specific location/with a
  * specific ID is currently valid, according to simulation parameters and
  * current simulation state.
+ *
+ * Handles acquisition validity determinations for robots AND the arena.
  */
 class cache_acq_validator : public rer::client<cache_acq_validator> {
  public:
@@ -65,9 +71,24 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
   cache_acq_validator(const cache_acq_validator& v) = delete;
   cache_acq_validator& operator=(const cache_acq_validator& v) = delete;
 
+  /**
+   * \brief Determine if the robot's acquisition of a cache is valid, according
+   * to parameters and the current state of simulation.
+   */
   bool operator()(const rmath::vector2d& loc,
                   const rtypes::type_uuid& id,
                   const rtypes::timestep& t) const;
+
+  /**
+   * \brief Determine if the robot's acquisition of an ACTUAL cache that exists
+   * in the arena is valid.
+   */
+  bool operator()(const cfrepr::base_cache* cache,
+                  const rtypes::timestep& t) const;
+
+ private:
+  bool pickup_policy_validate(const cfrepr::base_cache* cache,
+                              const rtypes::timestep& t) const;
 
   /* clang-format off */
   const bool                                mc_for_pickup;

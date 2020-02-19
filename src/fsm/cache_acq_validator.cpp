@@ -26,7 +26,7 @@
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
-#include "fordyca/repr/base_cache.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -64,7 +64,7 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   });
 
   if (range.end() == it) {
-    ER_WARN("Cache%d near %s invalid for acquisition: no such cache",
+    ER_WARN("Cache%d near %s invalid for acquisition: cache unknown",
             id.v(),
             loc.to_str().c_str());
     return false;
@@ -85,7 +85,28 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
     return true;
   }
 
-  auto cache = it->ent();
+  /* verify pickup policy */
+  return pickup_policy_validate(it->ent(), t);
+} /* operator()() */
+
+bool cache_acq_validator::operator()(const cfrepr::base_cache* cache,
+                                     const rtypes::timestep& t) const {
+  /*
+   * As long as (1) the cache exists, (2) the point we are trying to acquire is
+   * inside it, (3) we are dropping something in the cache, we can go ahead and
+   * acquire it without further checking.
+   */
+  if (!mc_for_pickup) {
+    return true;
+  }
+
+  /* verify pickup policy */
+  return pickup_policy_validate(cache, t);
+} /* operator()() */
+
+bool cache_acq_validator::pickup_policy_validate(
+    const cfrepr::base_cache* cache,
+    const rtypes::timestep& t) const {
   auto& config = boost::get<config::cache_sel::cache_pickup_policy_config>(
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 
@@ -106,6 +127,6 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
     return false;
   }
   return true;
-} /* operator()() */
+} /* pickup_policy_validate() */
 
 NS_END(fsm, fordyca);

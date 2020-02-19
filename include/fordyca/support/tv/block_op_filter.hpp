@@ -66,7 +66,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
    * \return (\c TRUE, penalty_status) iff the controller should be filtered out
    * and the reason why. (\c FALSE, -1) otherwise.
    */
-  op_filter_status operator()(T& controller,
+  op_filter_status operator()(const T& controller,
                               block_op_src src,
                               rtypes::spatial_dist cache_prox) {
     /*

@@ -37,6 +37,7 @@
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -163,6 +164,9 @@ class cached_block_pickup_interactor
       events::cache_vanished_visitor vanished_op(p.id());
       vanished_op.visit(controller);
     } else {
+      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
+                                 controller.cache_sel_matrix(),
+                                 true);
       /*
        * If the cache still exists after a robot serves its penalty we still
        * need to double check that it does not violate the robot's cache pickup
@@ -176,14 +180,27 @@ class cached_block_pickup_interactor
        * In this case, you don't need to do anything, as the change in the
        * cache's status will be picked up by the second robot next timestep.
        */
-      fsm::cache_acq_validator v(&controller.perception()->dpo_store()->caches(),
-                                 controller.cache_sel_matrix(),
-                                 true);
       if (v(controller.position2D(), p.id(), t)) {
-        status = perform_cached_block_pickup(controller, p, t);
-        m_floor->SetChanged();
+        auto it =
+            std::find_if(m_map->caches().begin(),
+                         m_map->caches().end(),
+                         [&](const auto& c) { return c->id() == p.id(); });
+        /*
+         * If the robot THINKS it has a valid pickup, we double check AGAIN with
+         * the actual cache in the arena, not the one the robot thinks exists,
+         * before doing the actual pickup.
+         */
+        if (v(it, t)) {
+          status = perform_cached_block_pickup(controller, p, t);
+          m_floor->SetChanged();
+        } else {
+          ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy (actual cache)",
+                  controller.GetId().c_str(),
+                  p.id().v());
+        }
+
       } else {
-        ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
+        ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy (perceived cache)",
                 controller.GetId().c_str(),
                 p.id().v());
       }

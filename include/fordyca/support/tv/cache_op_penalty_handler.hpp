@@ -40,7 +40,6 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Classes
  ******************************************************************************/
-
 /**
  * \class cache_op_penalty_handler
  * \ingroup support
@@ -71,7 +70,7 @@ class cache_op_penalty_handler final
    *
    * \tparam TControllerType The type of the controller. Must be a template
    * parameter, rather than \ref controller::base_controller, because of the
-   * goal acquisition determination done by \ref cacheilter.
+   * goal acquisition determination done by \ref cache_op_filter.
 
    * \param controller The robot to check.
    * \param src The penalty source (i.e. what event caused this penalty to be
@@ -79,7 +78,7 @@ class cache_op_penalty_handler final
    * \param t The current timestep.
   */
   template<typename TControllerType>
-  op_filter_status penalty_init(TControllerType& controller,
+  op_filter_status penalty_init(const TControllerType& controller,
                                 cache_op_src src,
                                 const rtypes::timestep& t) {
     /*
@@ -96,11 +95,12 @@ class cache_op_penalty_handler final
               controller.GetId().c_str());
 
     rtypes::timestep orig_duration = penalty_calc(t);
-    rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
     auto id = utils::robot_on_cache(controller, *m_map);
     ER_ASSERT(rtypes::constants::kNoUUID != id,
               "%s not in cache?",
               controller.GetId().c_str());
+
+    RCSW_UNUSED auto duration = penalty_add(&controller, id, orig_duration, t);
     ER_INFO("%s: cache%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
             id.v(),
@@ -109,7 +109,6 @@ class cache_op_penalty_handler final
             duration.v(),
             static_cast<int>(src));
 
-    penalty_add(temporal_penalty(&controller, id, duration, t));
     return filter;
   }
 

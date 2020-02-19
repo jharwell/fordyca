@@ -28,6 +28,7 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <algorithm>
 
 #include "fordyca/support/utils/loop_utils.hpp"
 #include "fordyca/support/tv/temporal_penalty.hpp"
@@ -205,11 +206,24 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
   }
 
  protected:
-  void penalty_add(const temporal_penalty& penalty) {
+  template<typename TControllerType>
+  rtypes::timestep penalty_add(const TControllerType* controller,
+                               const rtypes::type_uuid& id,
+                               const rtypes::timestep& orig_duration,
+                               const rtypes::timestep& start) {
+    /*
+     * Note that the uniqueify AND actual list add operations must be covered by
+     * the SAME lock-unlock sequence (not two separate sequences) in order for
+     * all robots to always obey cache pickup policies. See FORDYCA#625.
+     */
     std::scoped_lock lock(m_list_mtx);
-    m_penalty_list.push_back(penalty);
+    auto duration = penalty_finish_uniqueify(orig_duration);
+    m_penalty_list.push_back(temporal_penalty(controller, id, duration, start));
+    return duration;
   }
 
+
+ private:
   /*
    * \brief Deconflict penalties such that at most 1 robot finishes
    * serving their penalty per block/cache operation per timestep.
@@ -219,22 +233,21 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
    * impacting performance from an avg # blocks collected/timestep
    * perspective).
    *
-   * \param penalty The calculated penalty sans deconfliction. Passed by value
-   *                and modified, in order to make calculations simpler.
+   * No locking is needed because this is a private function.
+   *
+   * \param duration The calculated penalty sans deconfliction. Passed by value
+   *                 and modified, in order to make calculations simpler.
    */
-  rtypes::timestep penalty_finish_uniqueify(rtypes::timestep penalty) const {
-    std::scoped_lock lock(m_list_mtx);
-
+  rtypes::timestep penalty_finish_uniqueify(rtypes::timestep duration) const {
     for (auto it = m_penalty_list.begin(); it != m_penalty_list.end(); ++it) {
-      if (it->start_time() + it->penalty() == penalty) {
-        penalty += 1;
+      if (it->start_time() + it->penalty() == duration) {
+        duration += 1;
         it = m_penalty_list.begin();
       }
     } /* for(i..) */
-    return penalty;
+    return duration;
   }
 
- private:
   /**
    * \brief *Possibly* lock the penalty list mutex.
    *

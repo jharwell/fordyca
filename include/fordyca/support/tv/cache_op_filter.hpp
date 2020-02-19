@@ -62,7 +62,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
    * \brief Filters out controllers that actually are not eligible to start
    * serving penalties.
    */
-  op_filter_status operator()(T& controller, cache_op_src src) {
+  op_filter_status operator()(const T& controller, cache_op_src src) {
     /*
      * If the robot has not acquired a cache, or thinks it has but actually has
      * not, nothing to do. If a robot is carrying a cache but is still

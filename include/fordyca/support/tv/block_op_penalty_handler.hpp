@@ -81,7 +81,7 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
    *                  all caches in the arena.
    */
   template<typename TControllerType>
-  op_filter_status penalty_init(TControllerType& controller,
+  op_filter_status penalty_init(const TControllerType& controller,
                                 block_op_src src,
                                 const rtypes::timestep& t,
                                 rtypes::spatial_dist cache_prox = rtypes::spatial_dist(-1)) {
@@ -96,7 +96,11 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
 
     rtypes::type_uuid id = penalty_id_calc(controller, src, cache_prox);
     rtypes::timestep orig_duration = penalty_calc(t);
-    rtypes::timestep duration = penalty_finish_uniqueify(orig_duration);
+    RCSW_UNUSED auto duration = penalty_add(&controller,
+                                            id,
+                                            orig_duration,
+                                            t);
+
     ER_INFO("%s: block%d start=%u, penalty=%u, adjusted penalty=%u src=%d",
             controller.GetId().c_str(),
             id.v(),
@@ -105,7 +109,6 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
             duration.v(),
             static_cast<int>(src));
 
-    penalty_add(temporal_penalty(&controller, id, duration, t));
     return filter;
   }
 
