@@ -105,16 +105,18 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
                            [&](const auto& b) {
                              return controller->block()->id() == b->id();
                            });
+    /*
+     * We are not REALLY holding all the arena map locks, but since population
+     * dynamics are always applied AFTER all robots have had their control steps
+     * run, we are in a non-concurrent context, so no reason to grab them.
+     */
     cfevents::arena_block_drop_visitor adrop_op(
         *it,
         rmath::dvec2uvec(controller->position2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),
-        true);
+        cfds::arena_map_locking::ekALL_HELD);
 
-    bool conflict = utils::free_block_drop_conflict(*m_map,
-                                                    it->get(),
-                                                    controller->position2D());
-    utils::handle_arena_free_block_drop(adrop_op, *m_map, conflict);
+    adrop_op.visit(*m_map);
   }
 
   /* remove controller from any applied environmental variances */

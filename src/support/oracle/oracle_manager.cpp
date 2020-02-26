@@ -57,7 +57,7 @@ void oracle_manager::update(cfds::arena_map* const map) {
      * Updates to oracle manager can happen in parallel, so we want to make sure
      * we don't get a set of blocks in a partially updated state. See #594.
      */
-    std::scoped_lock lock(map->block_mtx());
+    std::scoped_lock lock(*map->block_mtx());
 
     std::copy_if(map->blocks().begin(),
                  map->blocks().end(),
@@ -77,10 +77,10 @@ void oracle_manager::update(cfds::arena_map* const map) {
                                        });
                  });
     m_entities->set_blocks(v);
-    map->block_mtx().unlock();
   }
+
   if (m_entities->caches_enabled()) {
-    std::scoped_lock lock(map->cache_mtx());
+    std::scoped_lock lock(*map->cache_mtx());
     entities_oracle::variant_vector_type v;
     for (auto& b : map->caches()) {
       v.push_back(b);

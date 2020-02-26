@@ -236,11 +236,16 @@ void static_cache_manager::post_creation_blocks_absorb(
           c->yspan().overlaps_with(b->yspan())) {
         cevents::cell2D_empty_visitor empty(b->dloc());
         empty.visit(arena_grid()->access<arena_grid::kCell>(b->dloc()));
+        /*
+         * We are not REALLY holding all the arena map locks, but since cache
+         * creation always happens AFTER all robot control steps have been run,
+         * no locking is needed.
+         */
         cfevents::arena_block_drop_visitor op(
             b,
             rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
             arena_grid()->resolution(),
-            true);
+            cfds::arena_map_locking::ekALL_HELD);
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id().v(), c->id().v());

@@ -53,7 +53,7 @@ base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
 std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
     const rmath::vector2d& center,
     cfds::block_vector blocks,
-    rtypes::timestep t) {
+    const rtypes::timestep& t) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
             center.to_str().c_str());
@@ -79,7 +79,7 @@ std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
      */
     if (blocks.end() == std::find(blocks.begin(), blocks.end(), cell.block())) {
       /*
-       * We use insert() instead of push_back() here so that it there was a
+       * We use insert() instead of push_back() here so that if there was a
        * leftover block on the cell where a cache used to be that is also where
        * this cache is being created, it becomes the "front" of the cache, and
        * will be the first block picked up by a robot from the new cache. This
@@ -93,17 +93,22 @@ std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
   }
 
   /*
-   * The cells for all blocks that will comprise the cache should be set to
-   * cache extent, and all blocks be deposited in a single cell.
+   * We don't need to lock around the cell empty and block drop events because
+   * cache creation always happens AFTER all robots have had their control steps
+   * run, never DURING. We are not REALLY holding all the locks, but no need to
+   * grab them in a non-concurrent context.
    */
   for (auto& block : blocks) {
     events::cell2D_empty_visitor op(block->dloc());
-    op.visit(m_grid->access<arena_grid::kCell>(op.x(), op.y()));
+    op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
 
   for (auto& block : blocks) {
-    cfevents::arena_block_drop_visitor op(block, d, m_grid->resolution(), false);
-    op.visit(m_grid->access<arena_grid::kCell>(op.x(), op.y()));
+    cfevents::arena_block_drop_visitor op(block,
+                                          d,
+                                          m_grid->resolution(),
+                                          cfds::arena_map_locking::ekALL_HELD);
+    op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
 
   cfds::block_vector block_vec(blocks.begin(), blocks.end());

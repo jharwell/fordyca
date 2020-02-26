@@ -217,12 +217,9 @@ void cached_block_pickup::visit(cfds::arena_map& map) {
     visit(*m_real_cache);
     m_orphan_block = m_real_cache->oldest_block();
     /*
-     * Do not need to hold grid mutex because we know we are the only robot
-     * picking up from the cache right now (though others can do it later) this
-     * timestep, and caches by definition have a unique location, AND that it is
-     * not possible for another robot's \ref nest_block_drop to trigger a block
-     * re-distribution to the cache host cell right now  (re-distribution avoids
-     * caches).
+     * Do not need to hold grid mutex because all caches have a unique location,
+     * and when this one is depleted there will still be a block on the host
+     * cell, so block distribution will avoid it regardless.
      */
     visit(cell);
 
@@ -231,10 +228,7 @@ void cached_block_pickup::visit(cfds::arena_map& map) {
               cell2D_op::x(),
               cell2D_op::y());
 
-    /*
-     * Already holding cache mutex from \ref cached_block_pickup_interactor,
-     * and grid mutex from above.
-     */
+    /* Already holding cache mutex from \ref cached_block_pickup_interactor. */
     map.cache_extent_clear(m_real_cache);
 
     /* Already holding cache mutex from \ref cached_block_pickup_interactor */
@@ -247,7 +241,7 @@ void cached_block_pickup::visit(cfds::arena_map& map) {
             cell2D_op::x(),
             cell2D_op::y());
   }
-  std::scoped_lock lock(map.block_mtx());
+  std::scoped_lock lock(*map.block_mtx());
   visit(*m_pickup_block);
 } /* visit() */
 

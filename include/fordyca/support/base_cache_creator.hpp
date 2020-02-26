@@ -63,7 +63,8 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * \param cache_dim Dimension of the cache (caches are square so can use a
    *                  scalar).
    */
-  base_cache_creator(cds::arena_grid* grid, rtypes::spatial_dist cache_dim);
+  base_cache_creator(cds::arena_grid* grid,
+                     rtypes::spatial_dist cache_dim);
 
   base_cache_creator(const base_cache_creator&) = delete;
   base_cache_creator& operator=(const base_cache_creator&) = delete;
@@ -127,7 +128,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
   std::unique_ptr<cfrepr::arena_cache> create_single_cache(
       const rmath::vector2d& center,
       cfds::block_vector blocks,
-      rtypes::timestep t);
+      const rtypes::timestep& t);
 
   rtypes::spatial_dist cache_dim(void) const { return mc_cache_dim; }
 

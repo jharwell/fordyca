@@ -95,9 +95,9 @@ void free_block_pickup::visit(cfds::arena_map& map) {
   RCSW_UNUSED rmath::vector2d old_r = m_block->rloc();
 
   events::cell2D_empty_visitor op(cell2D_op::coord());
-  map.grid_mtx().lock();
+  map.grid_mtx()->lock();
   op.visit(map.decoratee());
-  map.grid_mtx().unlock();
+  map.grid_mtx()->unlock();
 
   /*
    * Already holding block mutex from \ref free_block_pickup_interactor, though

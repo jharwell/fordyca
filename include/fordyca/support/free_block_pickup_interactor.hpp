@@ -130,7 +130,7 @@ class free_block_pickup_interactor
      * before one of them actually finishes picking up a block, then the second
      * one will not get the necessary \ref block_vanished event. See #594.
      */
-    m_map->block_mtx().lock();
+    m_map->block_mtx()->lock();
 
     /*
      * If two robots both are serving penalties on the same ramp block (possible
@@ -158,7 +158,7 @@ class free_block_pickup_interactor
       perform_free_block_pickup(controller, p, t);
       m_floor->SetChanged();
     }
-    m_map->block_mtx().unlock();
+    m_map->block_mtx()->unlock();
 
     m_penalty_handler->penalty_remove(p);
     ER_ASSERT(

@@ -157,6 +157,9 @@ class depth2_loop_functions final : public depth1::depth1_loop_functions,
   argos::CColor GetFloorColor(const argos::CVector2& plane_pos) override;
 
   /* clang-format off */
+  std::mutex                                 m_dynamic_cache_mtx{};
+  bool                                       m_dynamic_cache_create{false};
+
   std::unique_ptr<depth2_metrics_aggregator> m_metrics_agg;
   std::unique_ptr<dynamic_cache_manager>     m_cache_manager;
   std::unique_ptr<interactor_map_type>       m_interactor_map;

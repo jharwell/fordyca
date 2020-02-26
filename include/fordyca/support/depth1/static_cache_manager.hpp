@@ -72,7 +72,7 @@ class static_cache_manager final : public base_cache_manager,
    * specified minimum size.
    */
   boost::optional<cfds::cache_vector> create(const cache_create_ro_params& c_params,
-                                           const cfds::block_vector&  c_alloc_blocks);
+                                             const cfds::block_vector&  c_alloc_blocks);
 
   boost::optional<cfds::cache_vector> create_conditional(
       const cache_create_ro_params& c_params,

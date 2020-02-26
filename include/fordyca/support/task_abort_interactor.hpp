@@ -125,14 +125,11 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
     cfevents::arena_block_drop_visitor adrop_op(m_map->blocks()[block_id.v()],
                                                 loc,
                                                 m_map->grid_resolution(),
-                                                true);
+                                                cfds::arena_map_locking::ekNONE_HELD);
 
-    bool conflict = utils::free_block_drop_conflict(*m_map,
-                                                    m_map->blocks()[block_id.v()].get(),
-                                                    controller.position2D());
-    utils::handle_arena_free_block_drop(adrop_op, *m_map, conflict);
-
+    adrop_op.visit(*m_map);
     rdrop_op.visit(controller);
+
     m_floor->SetChanged();
   } /* perform_block_drop() */
 

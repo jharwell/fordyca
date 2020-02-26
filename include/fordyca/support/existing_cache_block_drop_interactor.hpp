@@ -122,7 +122,7 @@ class existing_cache_block_drop_interactor
      * Grid and block mutexes are also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
      */
-    m_map->cache_mtx().lock();
+    m_map->cache_mtx()->lock();
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -153,7 +153,7 @@ class existing_cache_block_drop_interactor
     } else {
       perform_cache_block_drop(controller, p);
     }
-    m_map->cache_mtx().unlock();
+    m_map->cache_mtx()->unlock();
 
     m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),
@@ -175,13 +175,18 @@ class existing_cache_block_drop_interactor
               penalty.id().v());
 
     rtypes::type_uuid block_id = controller.block()->id();
+
     /*
      * Safe to directly index into arena map block vector without locking
      * because the blocks never move from their original locations.
+     *
+     * Need to tell event to perform \ref arena_map block locking because there
+     * we are only holding the cache mutex.
      */
     cfevents::arena_cache_block_drop_visitor adrop_op(m_map->blocks()[block_id.v()],
                                                       *cache_it,
-                                                      m_map->grid_resolution());
+                                                      m_map->grid_resolution(),
+                                                      cfds::arena_map_locking::ekCACHES_HELD);
     events::robot_cache_block_drop_visitor rdrop_op(controller.block_release(),
                                                     *cache_it,
                                                     m_map->grid_resolution());

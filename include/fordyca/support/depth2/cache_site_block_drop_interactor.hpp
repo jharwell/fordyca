@@ -181,7 +181,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
     cfevents::arena_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
                                                 loc,
                                                 m_map->grid_resolution(),
-                                                true);
+                                                cfds::arena_map_locking::ekNONE_HELD);
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,
                                                    m_map->grid_resolution());

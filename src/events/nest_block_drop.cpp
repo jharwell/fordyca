@@ -81,8 +81,15 @@ void nest_block_drop::visit(cfds::arena_map& map) {
   ER_ASSERT(rtypes::constants::kNoUUID != m_robot_block->robot_id(),
             "Undefined robot index");
 
-  std::scoped_lock lock2(map.block_mtx());
-  std::scoped_lock lock1(map.grid_mtx());
+  /*
+   * We don't need the cache mutex held here, BUT we do need the other two, and
+   * all mutexes always have to be acquired in the same order everywhere in
+   * order to avoid deadlocks. If we let arena map acquire the cache mutex
+   * during block distribution, we can get a deadlock due to ordering.
+   */
+  std::scoped_lock lock1(*map.cache_mtx());
+  std::scoped_lock lock2(*map.block_mtx());
+  std::scoped_lock lock3(*map.grid_mtx());
 
   /*
    * The robot owns a unique copy of a block originally from the arena, so we
@@ -97,7 +104,8 @@ void nest_block_drop::visit(cfds::arena_map& map) {
             "Robot block%d not found in arena map blocks",
             m_robot_block->id().v());
   m_arena_block = *it;
-  map.distribute_single_block(m_arena_block);
+  map.distribute_single_block(m_arena_block,
+                              cfds::arena_map_locking::ekALL_HELD);
   visit(*m_arena_block);
 } /* visit() */
 

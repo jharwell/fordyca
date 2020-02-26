@@ -279,6 +279,18 @@ void depth2_loop_functions::post_step(void) {
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
 
+  /*
+   * Run dynamic cache creation if it was triggered. We don't wan't to run it
+   * unconditionally each timestep, because it is VERRRYYYYY expensive to
+   * compute.
+   */
+  if (m_dynamic_cache_create) {
+    if (!cache_creation_handle(true)) {
+      ER_WARN("Unable to create cache after block drop(s) in new cache");
+    }
+    m_dynamic_cache_create = false;
+  }
+
   /* Update block distribution status */
   auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);
@@ -412,11 +424,14 @@ void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
       boost::apply_visitor(iadaptor,
                            m_interactor_map->at(controller->type_index()));
   if (interactor_status::ekNO_EVENT != status) {
+    /*
+     * Signal that dynamic cache creation needs to be run AFTER all robots have
+     * finished their control steps.
+     */
     if (interactor_status::ekNEW_CACHE_BLOCK_DROP & status) {
-      bool ret = cache_creation_handle(true);
-      if (!ret) {
-        ER_WARN("Unable to create cache after block drop in new cache");
-      }
+      m_dynamic_cache_mtx.lock();
+      m_dynamic_cache_create = true;
+      m_dynamic_cache_mtx.unlock();
     }
 
     /*

@@ -94,27 +94,22 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   /**
    * \brief Perform actual nest block drop in the arena.
    *
-   * Internally takes \ref arena_map block, grid mutexes to protect block
+   * Takes \ref arena_map block and grid mutexes to protect block
    * re-distribution and block updates, and releases afterwards. See #594.
    */
   void visit(cfds::arena_map& map);
 
-  void visit(crepr::base_block2D& block);
-  void visit(fsm::depth0::crw_fsm& fsm);
   void visit(controller::depth0::crw_controller& controller);
-  void visit(fsm::depth0::dpo_fsm& fsm);
   void visit(controller::depth0::dpo_controller& controller);
   void visit(controller::depth0::mdpo_controller& controller);
   void visit(controller::depth0::odpo_controller& controller);
   void visit(controller::depth0::omdpo_controller& controller);
 
   /* Depth1 foraging */
-  void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
   void visit(controller::depth1::bitd_dpo_controller& controller);
   void visit(controller::depth1::bitd_mdpo_controller& controller);
   void visit(controller::depth1::bitd_odpo_controller& controller);
   void visit(controller::depth1::bitd_omdpo_controller& controller);
-  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
   void visit(tasks::depth1::collector& task);
   void visit(tasks::depth0::generalist& task);
 
@@ -125,6 +120,12 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   void visit(controller::depth2::birtd_omdpo_controller& controller);
 
  private:
+  void visit(crepr::base_block2D& block);
+  void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
+  void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
+  void visit(fsm::depth0::dpo_fsm& fsm);
+  void visit(fsm::depth0::crw_fsm& fsm);
+
   void dispatch_nest_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */

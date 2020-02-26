@@ -136,7 +136,7 @@ class cached_block_pickup_interactor
      * Grid and block mutexes are also required, but only within the actual \ref
      * cached_block_pickup event visit to the arena map.
      */
-    m_map->cache_mtx().lock();
+    m_map->cache_mtx()->lock();
 
     /*
      * If two collector robots enter a cache that only contains 2 blocks on the
@@ -189,7 +189,7 @@ class cached_block_pickup_interactor
                 p.id().v());
       }
     }
-    m_map->cache_mtx().unlock();
+    m_map->cache_mtx()->unlock();
 
     m_penalty_handler->penalty_remove(p);
     ER_ASSERT(!m_penalty_handler->is_serving_penalty(controller),

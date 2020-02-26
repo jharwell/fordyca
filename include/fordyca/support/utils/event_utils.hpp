@@ -97,39 +97,6 @@ rtypes::type_uuid robot_on_cache(const controller::base_controller& controller,
                    const cfds::arena_map& map) RCSW_PURE;
 
 /**
- * \brief Determine if dropping the specified block at the specified location
- * will overlap with the specified cache.
- *
- * \return \c TRUE if so, \c FALSE otherwise.
- */
-bool block_drop_overlap_with_cache(
-    const crepr::base_block2D* block,
-    const std::shared_ptr<cfrepr::arena_cache>& cache,
-    const rmath::vector2d& drop_loc) RCSW_CONST;
-
-/**
- * \brief Determine if dropping the specified block at the specified location
- * will be too close to arena boundaries.
- *
- * \return \c TRUE if so, \c FALSE otherwise.
- */
-bool block_drop_near_arena_boundary(
-    const cfds::arena_map& map,
-    const crepr::base_block2D* block,
-    const rmath::vector2d& drop_loc) RCSW_PURE;
-
-/**
- * \brief Determine if dropping the specified block at the specified location
- * will overlap with the nest.
- *
- * \return \c TRUE if so, \c FALSE otherwise.
- */
-bool block_drop_overlap_with_nest(
-    const crepr::base_block2D* block,
-    const crepr::nest& nest,
-    const rmath::vector2d& drop_loc) RCSW_PURE;
-
-/**
  * \brief Determine if creating a new cache centered at the robot's current
  * position will overlap with any other caches in the arena/be too close to
  * them. This is an approximate check, because the weighted centroid of
@@ -147,24 +114,6 @@ proximity_status_t new_cache_cache_proximity(const controller::base_controller& 
                                              const cfds::arena_map& map,
                                              rtypes::spatial_dist new_cache_prox);
 
-/**
- * \brief Handle a free block drop in the arena with proper locking. The
- * controller associated with the block drop is *NOT* updated.
- *
- * \param drop_op The block drop event.
- * \param map \ref arena_map reference.
- * \param drop_conflict Does this block drop conflict with the positions of
- *                      other things in the arena? If so, if it will be
- *                      distributed instead of being dropped (i.e. the block
- *                      drop operation does not visit the map).
- */
-void handle_arena_free_block_drop(cfevents::arena_block_drop_visitor& drop_op,
-                                  cfds::arena_map& map,
-                                  bool drop_conflict);
-
-bool free_block_drop_conflict(const cfds::arena_map& map,
-                              const crepr::base_block2D* const block,
-                              const rmath::vector2d& loc);
 
 NS_END(utils, support, fordyca);
 
