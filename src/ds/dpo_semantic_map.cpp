@@ -46,8 +46,7 @@ dpo_semantic_map::dpo_semantic_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool dpo_semantic_map::cache_remove(
-    const std::shared_ptr<cfrepr::base_cache>& victim) {
+bool dpo_semantic_map::cache_remove(cfrepr::base_cache * const victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
              victim->dloc().to_str().c_str());
@@ -58,8 +57,7 @@ bool dpo_semantic_map::cache_remove(
   return false;
 } /* cache_remove() */
 
-bool dpo_semantic_map::block_remove(
-    const std::shared_ptr<crepr::base_block2D>& victim) {
+bool dpo_semantic_map::block_remove(crepr::base_block2D* const victim) {
   if (m_store.block_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed block",
              victim->dloc().to_str().c_str());

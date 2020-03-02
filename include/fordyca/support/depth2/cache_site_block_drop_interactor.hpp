@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/foraging/events/arena_block_drop.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "fordyca/events/robot_free_block_drop.hpp"
 
 #include "fordyca/events/block_proximity.hpp"
@@ -178,10 +178,10 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
      * Safe to directly index into arena map block vector without locking
      * because the blocks never move from their original locations.
      */
-    cfevents::arena_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
-                                                loc,
-                                                m_map->grid_resolution(),
-                                                cfds::arena_map_locking::ekNONE_HELD);
+    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
+                                                     loc,
+                                                     m_map->grid_resolution(),
+                                                     cfds::arena_map_locking::ekNONE_HELD);
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,
                                                    m_map->grid_resolution());

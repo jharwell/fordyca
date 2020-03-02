@@ -65,12 +65,12 @@ class harvester final : public foraging_task,
    * statements, which is a brittle design. This is not the cleanest, but is
    * still more elegant than the alternative.
    */
-  void accept(events::detail::free_block_pickup& visitor) override;
+  void accept(events::detail::robot_free_block_pickup& visitor) override;
   void accept(events::detail::robot_free_block_drop&) override {}
   void accept(events::detail::block_vanished&) override;
 
   void accept(events::detail::robot_cache_block_drop& visitor) override;
-  void accept(events::detail::cached_block_pickup&) override {}
+  void accept(events::detail::robot_cached_block_pickup&) override {}
   void accept(events::detail::cache_vanished& visitor) override;
 
   /* goal acquisition metrics */

@@ -1,5 +1,5 @@
 /**
- * \file free_block_pickup.cpp
+ * \file robot_free_block_pickup.cpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,9 +21,8 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/robot_free_block_pickup.hpp"
 
-#include "cosm/foraging/ds/arena_map.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/depth0/crw_controller.hpp"
@@ -63,11 +62,11 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-free_block_pickup::free_block_pickup(
-    const std::shared_ptr<crepr::base_block2D>& block,
+robot_free_block_pickup::robot_free_block_pickup(
+    std::shared_ptr<crepr::base_block2D> block,
     const rtypes::type_uuid& robot_id,
     const rtypes::timestep& t)
-    : ER_CLIENT_INIT("fordyca.events.free_block_pickup"),
+    : ER_CLIENT_INIT("fordyca.events.robot_free_block_pickup"),
       cell2D_op(block->dloc()),
       mc_timestep(t),
       mc_robot_id(robot_id),
@@ -76,7 +75,7 @@ free_block_pickup::free_block_pickup(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void free_block_pickup::dispatch_free_block_interactor(
+void robot_free_block_pickup::dispatch_robot_free_block_interactor(
     tasks::base_foraging_task* const task) {
   RCSW_UNUSED auto* polled = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
@@ -84,42 +83,12 @@ void free_block_pickup::dispatch_free_block_interactor(
             "Non free block interactor task %s causing free block pickup",
             polled->name().c_str());
   interactor->accept(*this);
-} /* dispatch_free_block_interactor() */
+} /* dispatch_robot_free_block_interactor() */
 
 /*******************************************************************************
  * CRW Foraging
  ******************************************************************************/
-void free_block_pickup::visit(cfds::arena_map& map) {
-  ER_ASSERT(m_block->dloc() == rmath::vector2u(cell2D_op::x(), cell2D_op::y()),
-            "Coordinates for block/cell do not agree");
-  RCSW_UNUSED rmath::vector2d old_r = m_block->rloc();
-
-  events::cell2D_empty_visitor op(cell2D_op::coord());
-  map.grid_mtx()->lock();
-  op.visit(map.decoratee());
-  map.grid_mtx()->unlock();
-
-  /*
-   * Already holding block mutex from \ref free_block_pickup_interactor, though
-   * it is not necessary for block visitation for this event.
-   */
-  visit(*m_block);
-
-  ER_INFO("arena_map: fb%u: block%d@%s/%s",
-          mc_robot_id.v(),
-          m_block->id().v(),
-          old_r.to_str().c_str(),
-          cell2D_op::coord().to_str().c_str());
-} /* visit() */
-
-void free_block_pickup::visit(crepr::base_block2D& block) {
-  ER_ASSERT(rtypes::constants::kNoUUID != block.id(), "Unamed block");
-  block.robot_pickup_event(mc_robot_id);
-  block.first_pickup_time(mc_timestep);
-  ER_INFO("Block%d is now carried by fb%u", m_block->id().v(), mc_robot_id.v());
-} /* visit() */
-
-void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
+void robot_free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_pusht();
   visit(*controller.fsm());
   auto robot_block = m_block->clone();
@@ -131,7 +100,7 @@ void free_block_pickup::visit(controller::depth0::crw_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
+void robot_free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
@@ -139,19 +108,19 @@ void free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
 /*******************************************************************************
  * DPO/MDPO Depth0 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(ds::dpo_store& store) {
-  ER_ASSERT(store.contains(m_block),
+void robot_free_block_pickup::visit(ds::dpo_store& store) {
+  ER_ASSERT(store.contains(m_block.get()),
             "Block%d@%s not in DPO store",
             m_block->id().v(),
             m_block->dloc().to_str().c_str());
-  store.block_remove(m_block);
-  ER_ASSERT(!store.contains(m_block),
+  store.block_remove(m_block.get());
+  ER_ASSERT(!store.contains(m_block.get()),
             "Block%d@%s in DPO store after removal",
             m_block->id().v(),
             m_block->dloc().to_str().c_str());
 } /* visit() */
 
-void free_block_pickup::visit(ds::dpo_semantic_map& map) {
+void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
   cds::cell2D& cell =
       map.access<occupancy_grid::kCell>(cell2D_op::x(), cell2D_op::y());
 
@@ -167,7 +136,7 @@ void free_block_pickup::visit(ds::dpo_semantic_map& map) {
             cell.block()->id().v());
   /*
    * @bug: This should just be an assert. However, due to #242, the fact that
-   * blocks can appear close to the wall, and rcppsw #82, this may not always be
+   * blocks can appear close to the wall, and RCPPSW#82, this may not always be
    * true (and the fact that it isn't is not an indication of inconsistent
    * simulation state :-( ). This can happen if, for example, a robot is
    * exploring for a block very near the edge of the arena, and happens to drive
@@ -176,16 +145,16 @@ void free_block_pickup::visit(ds::dpo_semantic_map& map) {
    */
   /* ER_ASSERT(cell.state_has_block(), "cell does not contain block"); */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block());
+    map.block_remove(cell.block().get());
   }
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
+void robot_free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
+void robot_free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
@@ -201,7 +170,7 @@ void free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(controller::depth0::omdpo_controller& controller) {
+void robot_free_block_pickup::visit(controller::depth0::omdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
@@ -217,7 +186,7 @@ void free_block_pickup::visit(controller::depth0::omdpo_controller& controller) 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
+void robot_free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -233,7 +202,7 @@ void free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
+void robot_free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -252,7 +221,7 @@ void free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
 /*******************************************************************************
  * DPO/MDPO Depth1 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -263,13 +232,13 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -280,13 +249,13 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -297,13 +266,13 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth1::bitd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -314,26 +283,26 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(tasks::depth0::generalist& task) {
+void robot_free_block_pickup::visit(tasks::depth0::generalist& task) {
   visit(*static_cast<fsm::depth0::free_block_to_nest_fsm*>(task.mechanism()));
 } /* visit() */
 
-void free_block_pickup::visit(tasks::depth1::harvester& task) {
+void robot_free_block_pickup::visit(tasks::depth1::harvester& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
-void free_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
+void robot_free_block_pickup::visit(fsm::block_to_goal_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
+void robot_free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
   fsm.inject_event(fsm::foraging_signal::ekBLOCK_PICKUP,
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
@@ -341,7 +310,7 @@ void free_block_pickup::visit(fsm::depth0::free_block_to_nest_fsm& fsm) {
 /*******************************************************************************
  * DPO/MDPO Depth2 Foraging
  ******************************************************************************/
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -352,13 +321,13 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth2::birtd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -369,13 +338,13 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth2::birtd_odpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -386,13 +355,13 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(
+void robot_free_block_pickup::visit(
     controller::depth2::birtd_omdpo_controller& controller) {
   controller.ndc_pusht();
 
@@ -403,17 +372,17 @@ void free_block_pickup::visit(
   robot_block->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
-  dispatch_free_block_interactor(controller.current_task());
+  dispatch_robot_free_block_interactor(controller.current_task());
   ER_INFO("Picked up block%d", m_block->id().v());
 
   controller.ndc_pop();
 } /* visit() */
 
-void free_block_pickup::visit(tasks::depth2::cache_starter& task) {
+void robot_free_block_pickup::visit(tasks::depth2::cache_starter& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 
-void free_block_pickup::visit(tasks::depth2::cache_finisher& task) {
+void robot_free_block_pickup::visit(tasks::depth2::cache_finisher& task) {
   visit(*static_cast<fsm::block_to_goal_fsm*>(task.mechanism()));
 } /* visit() */
 

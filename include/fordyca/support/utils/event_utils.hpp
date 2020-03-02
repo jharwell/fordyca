@@ -27,7 +27,6 @@
 #include <memory>
 
 #include <argos3/core/simulator/entity/floor_entity.h>
-#include "cosm/foraging/events/arena_block_drop.hpp"
 
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/fordyca.hpp"

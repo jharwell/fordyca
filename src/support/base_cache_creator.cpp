@@ -29,7 +29,7 @@
 #include "cosm/foraging/repr/light_type_index.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
-#include "cosm/foraging/events/arena_block_drop.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
@@ -104,10 +104,10 @@ std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
   } /* for(block..) */
 
   for (auto& block : blocks) {
-    cfevents::arena_block_drop_visitor op(block,
-                                          d,
-                                          m_grid->resolution(),
-                                          cfds::arena_map_locking::ekALL_HELD);
+    cfevents::arena_free_block_drop_visitor op(block,
+                                               d,
+                                               m_grid->resolution(),
+                                               cfds::arena_map_locking::ekALL_HELD);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
 

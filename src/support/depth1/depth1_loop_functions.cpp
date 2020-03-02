@@ -307,8 +307,10 @@ void depth1_loop_functions::cache_handling_init(
       .current_caches = arena_map()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
+
+  cpal::swarm_manager::led_medium(config::saa_xml_names().leds_saa);
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
 } /* cache_handling_init() */
@@ -498,7 +500,7 @@ void depth1_loop_functions::reset() {
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
   ndc_pop();
@@ -645,7 +647,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
                                               arena_map()->blocks(),
                                               m_cache_counts.first,
                                               m_cache_counts.second)) {
-    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return;
   }

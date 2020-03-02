@@ -30,7 +30,8 @@
 
 #include "cosm/foraging/ds/arena_map.hpp"
 
-#include "fordyca/events/nest_block_drop.hpp"
+#include "cosm/foraging/events/arena_nest_block_drop.hpp"
+#include "fordyca/events/robot_nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"
 #include "fordyca/support/interactor_status.hpp"
@@ -144,8 +145,15 @@ class nest_block_drop_interactor
      * classes--no clean way to mix the two.
      */
     controller.block_manip_collator()->penalty_served(penalty.penalty());
+    rtypes::type_uuid id = controller.block()->id();
 
-    events::nest_block_drop_visitor drop_op(controller.block_release(), t);
+    cfevents::arena_nest_block_drop_visitor adrop_op(controller.block_release(),
+                                                     t);
+    /*
+     * Safe to index directly even in multi-threaded contexts because the
+     * location of blocks within their arena map vector never changes.
+     */
+    events::robot_nest_block_drop_visitor rdrop_op(m_map->blocks()[id.v()], t);
 
     /*
      * Order of visitation must be:
@@ -153,13 +161,13 @@ class nest_block_drop_interactor
      * 1. Arena map
      * 2. Controller
      *
-     * In order for \ref events::nest_block_drop to process properly.
+     * In order for the event to process properly.
      */
     /* Update arena map state due to a block nest drop */
-    drop_op.visit(*m_map);
+    adrop_op.visit(*m_map);
 
     /* Actually drop the block */
-    drop_op.visit(controller);
+    rdrop_op.visit(controller);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();

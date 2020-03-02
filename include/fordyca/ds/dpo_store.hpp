@@ -116,14 +116,14 @@ class dpo_store final : public rer::client<dpo_store> {
 
   void clear_all(void);
 
-  bool contains(const std::shared_ptr<crepr::base_block2D>& block) const RCSW_PURE;
-  bool contains(const std::shared_ptr<cfrepr::base_cache>& cache) const;
+  bool contains(const crepr::base_block2D* block) const RCSW_PURE;
+  bool contains(const cfrepr::base_cache* cache) const;
 
-  const dp_block_map::value_type* find(
-      const std::shared_ptr<crepr::base_block2D>& block) const RCSW_PURE;
+  const dp_cache_map::value_type* find(const cfrepr::base_cache* cache) const;
+  dp_cache_map::value_type* find(const cfrepr::base_cache* cache);
 
-  const dp_cache_map::value_type* find(
-      const std::shared_ptr<cfrepr::base_cache>& cache) const;
+  const dp_block_map::value_type* find(const crepr::base_block2D* block) const RCSW_PURE;
+  dp_block_map::value_type* find(const crepr::base_block2D* block) RCSW_PURE;
 
   /**
    * \brief Update the known caches set with the new cache.
@@ -131,9 +131,9 @@ class dpo_store final : public rer::client<dpo_store> {
    * If there is already a known cache at the location of the incoming cache, it
    * is removed and replaced with a new one.
    *
-   * \param cache Cache to add.
+   * \param cache Cache to update.
    */
-  update_res_t cache_update(const dpo_entity<cfrepr::base_cache>& cache);
+  update_res_t cache_update(dpo_entity<cfrepr::base_cache>* cache);
 
   /*
    * \brief Update the known blocks set with the new block.
@@ -145,12 +145,12 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(const dpo_entity<crepr::base_block2D>& block_in);
+  update_res_t block_update(dpo_entity<crepr::base_block2D>* block_in);
 
   /**
    * \brief Remove a cache from the set of of known caches.
    */
-  bool cache_remove(const std::shared_ptr<cfrepr::base_cache>& victim);
+  bool cache_remove(cfrepr::base_cache* victim);
 
   /*
    * \brief Remove a block from the set of known blocks. If the victim is not
@@ -158,7 +158,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was removed, \c FALSE otherwise.
    */
-  bool block_remove(const std::shared_ptr<crepr::base_block2D>& victim);
+  bool block_remove(crepr::base_block2D* victim);
 
   double pheromone_rho(void) const { return mc_pheromone_rho; }
 

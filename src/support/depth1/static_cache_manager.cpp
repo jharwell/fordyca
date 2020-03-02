@@ -26,7 +26,7 @@
 #include "cosm/events/cell2D_empty.hpp"
 #include "cosm/foraging/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/foraging/events/arena_block_drop.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
@@ -241,7 +241,7 @@ void static_cache_manager::post_creation_blocks_absorb(
          * creation always happens AFTER all robot control steps have been run,
          * no locking is needed.
          */
-        cfevents::arena_block_drop_visitor op(
+        cfevents::arena_free_block_drop_visitor op(
             b,
             rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
             arena_grid()->resolution(),

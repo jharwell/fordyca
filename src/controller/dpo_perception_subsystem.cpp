@@ -100,16 +100,16 @@ void dpo_perception_subsystem::process_los_caches(
   los_tracking_sync(c_los, los_caches);
 
   for (auto& cache : los_caches) {
-    if (!m_store->contains(cache)) {
+    if (!m_store->contains(cache.get())) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id().v(),
               cache->rloc().to_str().c_str(),
               cache->dloc().to_str().c_str());
-    } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
+    } else if (cache->n_blocks() != m_store->find(cache.get())->ent()->n_blocks()) {
       ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
               cache->id().v(),
               cache->dloc().to_str().c_str(),
-              m_store->find(cache)->ent()->n_blocks(),
+              m_store->find(cache.get())->ent()->n_blocks(),
               cache->n_blocks());
     }
     /*
@@ -156,7 +156,7 @@ void dpo_perception_subsystem::process_los_blocks(
               block->rloc().to_str().c_str(),
               block->dloc().to_str().c_str());
 
-    if (!m_store->contains(block)) {
+    if (!m_store->contains(block.get())) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id().v(),
               block->rloc().to_str().c_str(),
@@ -205,8 +205,8 @@ void dpo_perception_subsystem::los_tracking_sync(
        */
       auto tmp = *it;
       ++it;
-      m_store->cache_remove(tmp.ent_obj());
-      ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
+      m_store->cache_remove(tmp.ent());
+      ER_ASSERT(nullptr == m_store->find(tmp.ent()),
                 "Cache%d still exists in store after removal",
                 tmp.ent()->id().v());
     } else {
@@ -258,8 +258,8 @@ void dpo_perception_subsystem::los_tracking_sync(
        */
       auto tmp = *it;
       ++it;
-      m_store->block_remove(tmp.ent_obj());
-      ER_ASSERT(nullptr == m_store->find(tmp.ent_obj()),
+      m_store->block_remove(tmp.ent());
+      ER_ASSERT(nullptr == m_store->find(tmp.ent()),
                 "Block%d still exists in store after removal",
                 tmp.ent()->id().v());
     } else {

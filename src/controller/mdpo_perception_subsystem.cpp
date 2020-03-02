@@ -126,7 +126,7 @@ void mdpo_perception_subsystem::process_los_blocks(
                  block->id().v(),
                  block->rloc().to_str().c_str(),
                  block->dloc().to_str().c_str());
-        m_map->block_remove(block);
+        m_map->block_remove(block.get());
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
@@ -192,7 +192,7 @@ void mdpo_perception_subsystem::process_los_caches(
                  cache->id().v(),
                  cache->rloc().to_str().c_str(),
                  cache->dloc().to_str().c_str());
-        map()->cache_remove(cache);
+        map()->cache_remove(cache.get());
       }
     } /* for(j..) */
   }   /* for(i..) */

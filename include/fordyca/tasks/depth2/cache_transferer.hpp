@@ -62,7 +62,7 @@ class cache_transferer final : public foraging_task,
    * still more elegant than the alternative.
    */
   void accept(events::detail::robot_cache_block_drop& visitor) override;
-  void accept(events::detail::cached_block_pickup& visitor) override;
+  void accept(events::detail::robot_cached_block_pickup& visitor) override;
   void accept(events::detail::cache_vanished& visitor) override;
 
   /* goal acquisition metrics */

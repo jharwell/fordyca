@@ -35,6 +35,7 @@
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/task_status.hpp"
 #include "fordyca/events/robot_free_block_drop.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -122,10 +123,10 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
                                                    loc,
                                                    m_map->grid_resolution());
 
-    cfevents::arena_block_drop_visitor adrop_op(m_map->blocks()[block_id.v()],
-                                                loc,
-                                                m_map->grid_resolution(),
-                                                cfds::arena_map_locking::ekNONE_HELD);
+    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[block_id.v()],
+                                                     loc,
+                                                     m_map->grid_resolution(),
+                                                     cfds::arena_map_locking::ekNONE_HELD);
 
     adrop_op.visit(*m_map);
     rdrop_op.visit(controller);

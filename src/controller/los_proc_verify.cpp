@@ -51,7 +51,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
   for (auto& cache : c_dpo->caches().const_values_range()) {
     for (auto& block : mc_los->blocks()) {
       if (!cache.ent()->contains_point(block->rloc())) {
-        ER_ASSERT(c_dpo->contains(block),
+        ER_ASSERT(c_dpo->contains(block.get()),
                   "Store does not contain block%d@%s",
                   block->id().v(),
                   block->dloc().to_str().c_str());
@@ -67,7 +67,7 @@ bool los_proc_verify::operator()(const ds::dpo_store* const c_dpo) const {
    *   location, and ID.
    */
   for (auto& c1 : mc_los->caches()) {
-    auto exists = c_dpo->find(c1);
+    auto exists = c_dpo->find(c1.get());
     ER_ASSERT(nullptr != exists,
               "LOS Cache%d@%s does not exist in DPO store",
               c1->id().v(),

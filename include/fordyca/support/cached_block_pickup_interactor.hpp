@@ -27,10 +27,11 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/foraging/events/arena_cached_block_pickup.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
+#include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
@@ -212,9 +213,18 @@ class cached_block_pickup_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist",
               penalty.id().v());
-    events::cached_block_pickup_visitor pickup_op(
-        m_loop, *it, controller.entity_id(), t);
+    cfevents::arena_cached_block_pickup_visitor apickup_op(*it,
+                                                           m_loop,
+                                                           controller.entity_id(),
+                                                           t);
+    const crepr::base_block2D* to_pickup = (*it)->oldest_block().get();
+    events::robot_cached_block_pickup_visitor rpickup_op(it->get(),
+                                                         to_pickup,
+                                                         controller.entity_id(),
+                                                         t);
     (*it)->penalty_served(penalty.penalty());
+
+    uint old_n_caches = m_map->caches().size();
 
     /*
      * Visitation order must be:
@@ -226,11 +236,9 @@ class cached_block_pickup_interactor
      * No need to lock arena map cache mutex--already holding it from parent
      * function.
      */
-    uint old_n_caches = m_map->caches().size();
-
-    pickup_op.visit(*m_cache_manager);
-    pickup_op.visit(*m_map);
-    pickup_op.visit(controller);
+    rpickup_op.visit(*m_cache_manager);
+    apickup_op.visit(*m_map);
+    rpickup_op.visit(controller);
 
     if (m_map->caches().size() < old_n_caches) {
       return interactor_status::ekCACHE_DEPLETION;

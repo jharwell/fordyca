@@ -64,7 +64,7 @@ class cache_starter final : public foraging_task,
    * still more elegant than the alternative.
    */
   void accept(events::detail::robot_free_block_drop& visitor) override;
-  void accept(events::detail::free_block_pickup& visitor) override;
+  void accept(events::detail::robot_free_block_pickup& visitor) override;
   void accept(events::detail::block_vanished& visitor) override;
   void accept(events::detail::block_proximity& visitor) override;
   void accept(events::detail::cache_proximity&) override;

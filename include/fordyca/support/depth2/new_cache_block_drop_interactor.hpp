@@ -27,7 +27,7 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/foraging/events/arena_block_drop.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
@@ -208,10 +208,10 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     auto loc = rmath::dvec2uvec(controller.position2D(),
                                 m_map->grid_resolution().v());
 
-    cfevents::arena_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
-                                                loc,
-                                                m_map->grid_resolution(),
-                                                cfds::arena_map_locking::ekNONE_HELD);
+    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
+                                                     loc,
+                                                     m_map->grid_resolution(),
+                                                     cfds::arena_map_locking::ekNONE_HELD);
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,
                                                    m_map->grid_resolution());

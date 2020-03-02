@@ -31,7 +31,8 @@
 #include "cosm/foraging/ds/arena_map.hpp"
 
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/free_block_pickup.hpp"
+#include "fordyca/events/robot_free_block_pickup.hpp"
+#include "cosm/foraging/events/arena_free_block_pickup.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
@@ -190,7 +191,12 @@ class free_block_pickup_interactor
      * classes--no clean way to mix the two.
      */
     controller.block_manip_collator()->penalty_served(penalty.penalty());
-    events::free_block_pickup_visitor pickup_op(*it, controller.entity_id(), t);
+    events::robot_free_block_pickup_visitor rpickup_op(*it,
+                                                       controller.entity_id(),
+                                                       t);
+    cfevents::arena_free_block_pickup_visitor apickup_op(*it,
+                                                         controller.entity_id(),
+                                                         t);
 
     /*
      * Visitation order must be:
@@ -198,10 +204,10 @@ class free_block_pickup_interactor
      * 1. Arena map
      * 2. Controller
      *
-     * In order for \ref events::free_block_pickup to process properly.
+     * In order for the pickup event to process properly.
      */
-    pickup_op.visit(*m_map);
-    pickup_op.visit(controller);
+    apickup_op.visit(*m_map);
+    rpickup_op.visit(controller);
 
     /* The floor texture must be updated */
     m_floor->SetChanged();

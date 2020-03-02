@@ -28,7 +28,7 @@
 
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/foraging/events/arena_block_drop.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -110,7 +110,7 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
      * dynamics are always applied AFTER all robots have had their control steps
      * run, we are in a non-concurrent context, so no reason to grab them.
      */
-    cfevents::arena_block_drop_visitor adrop_op(
+    cfevents::arena_free_block_drop_visitor adrop_op(
         *it,
         rmath::dvec2uvec(controller->position2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),

@@ -225,7 +225,7 @@ void depth2_loop_functions::cache_handling_init(
             "FATAL: Caches not enabled in depth2 loop functions");
   m_cache_manager = std::make_unique<dynamic_cache_manager>(
       cachep, &arena_map()->decoratee(), rng());
-
+  cpal::swarm_manager::led_medium(config::saa_xml_names().leds_saa);
   cache_creation_handle(false);
 } /* cache_handlng_init() */
 
@@ -480,7 +480,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this, config::saa_xml_names().leds_saa);
+    arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;
   }

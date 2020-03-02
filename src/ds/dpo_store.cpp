@@ -48,28 +48,28 @@ dpo_store::dpo_store(const config::perception::pheromone_config* const config)
  * Member Functions
  ******************************************************************************/
 dpo_store::update_res_t dpo_store::cache_update(
-    const dpo_entity<cfrepr::base_cache>& cache) {
+    dpo_entity<cfrepr::base_cache>* const cache) {
   update_res_t res = {.status = true,
                       .reason = kNO_CHANGE,
                       .old_loc = rmath::vector2u()};
   ER_TRACE("Updating cache%d@%s",
-           cache.ent()->id().v(),
-           cache.ent()->dloc().to_str().c_str());
+           cache->ent()->id().v(),
+           cache->ent()->dloc().to_str().c_str());
   /*
    * If we are currently tracking the cache, we unconditionally remove it,
    * because the # blocks in the cache could have changed since we last saw
    * it.
    */
-  if (cache_remove(cache.ent_obj())) {
+  if (cache_remove(cache->ent())) {
     res.reason = kCACHE_UPDATED;
   } else {
     res.reason = kNEW_CACHE_ADDED;
   }
-  m_caches.obj_add({cache.ent()->dloc(), cache});
+  m_caches.obj_add({cache->ent()->dloc(), *cache});
   return res;
 } /* cache_update() */
 
-bool dpo_store::cache_remove(const std::shared_ptr<cfrepr::base_cache>& victim) {
+bool dpo_store::cache_remove(cfrepr::base_cache* const victim) {
   auto range = m_caches.const_values_range();
 
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& c) {
@@ -90,19 +90,19 @@ bool dpo_store::cache_remove(const std::shared_ptr<cfrepr::base_cache>& victim) 
 } /* cache_remove() */
 
 dpo_store::update_res_t dpo_store::block_update(
-    const dpo_entity<crepr::base_block2D>& block_in) {
-  auto range = m_blocks.const_values_range();
+    dpo_entity<crepr::base_block2D>* block_in) {
+  auto range = m_blocks.values_range();
 
   auto it1 = std::find_if(range.begin(),
                           range.end(),
                           [&block_in](const dpo_entity<crepr::base_block2D>& b) {
-                            return b.ent()->idcmp(*block_in.ent());
+                            return b.ent()->idcmp(*block_in->ent());
                           });
   auto it2 = std::find_if(range.begin(),
                           range.end(),
                           [&block_in](const dpo_entity<crepr::base_block2D>& b) {
-                            return b.ent()->dloccmp(*block_in.ent()) &&
-                                   !b.ent()->idcmp(*block_in.ent());
+                            return b.ent()->dloccmp(*block_in->ent()) &&
+                                   !b.ent()->idcmp(*block_in->ent());
                           });
 
   /*
@@ -116,36 +116,36 @@ dpo_store::update_res_t dpo_store::block_update(
   if (it2 != range.end()) {
     ER_TRACE("Remove old block%d@%s: new block%d found there",
              it2->ent()->id().v(),
-             block_in.ent()->dloc().to_str().c_str(),
-             block_in.ent()->id().v());
-    block_remove(it2->ent_obj());
+             block_in->ent()->dloc().to_str().c_str(),
+             block_in->ent()->id().v());
+    block_remove(it2->ent());
   }
 
   if (range.end() != it1) { /* block is known */
     ER_TRACE("Known incoming block%d@%s",
-             block_in.ent()->id().v(),
-             block_in.ent()->dloc().to_str().c_str());
+             block_in->ent()->id().v(),
+             block_in->ent()->dloc().to_str().c_str());
     /*
      * Unless a given block's location has changed, there is no need to update
      * the state of the world.
      */
-    if (block_in.ent()->dloc() != it1->ent()->dloc()) {
+    if (block_in->ent()->dloc() != it1->ent()->dloc()) {
       ER_TRACE("Block%d has moved: %s -> %s",
-               block_in.ent()->id().v(),
+               block_in->ent()->id().v(),
                it1->ent()->dloc().to_str().c_str(),
-               block_in.ent()->dloc().to_str().c_str());
-      block_remove(it1->ent_obj());
+               block_in->ent()->dloc().to_str().c_str());
+      block_remove(it1->ent());
 
       /*
        * it1 will point to new block after this, so we need to save the old
        * location beforehand.
        */
       rmath::vector2u old_loc = it1->ent()->dloc();
-      m_blocks.obj_add({block_in.ent()->id(), block_in});
-      RCSW_UNUSED rtypes::type_uuid id = block_in.ent()->id();
+      m_blocks.obj_add({block_in->ent()->id(), *block_in});
+      RCSW_UNUSED rtypes::type_uuid id = block_in->ent()->id();
       ER_TRACE("Add block%d@%s (n_blocks=%zu)",
                id.v(),
-               block_in.ent()->dloc().to_str().c_str(),
+               block_in->ent()->dloc().to_str().c_str(),
                m_blocks.size());
       return update_res_t{true, kBLOCK_MOVED, old_loc};
     }
@@ -153,27 +153,27 @@ dpo_store::update_res_t dpo_store::block_update(
      * Even if the block's location has not changed, if we have seen it again we
      * need to update its density.
      */
-    dp_block_map::value_type* known = m_blocks.find(block_in.ent()->id());
+    dp_block_map::value_type* known = m_blocks.find(block_in->ent()->id());
     if (nullptr != known) {
-      known->density(block_in.density());
+      known->density(block_in->density());
       ER_TRACE("Update density of known block%d@%s to %f",
-               block_in.ent()->id().v(),
-               block_in.ent()->dloc().to_str().c_str(),
-               block_in.density().v());
+               block_in->ent()->id().v(),
+               block_in->ent()->dloc().to_str().c_str(),
+               block_in->density().v());
     }
   } else { /* block is not known */
-    ER_TRACE("Unknown incoming block%d", block_in.ent()->id().v());
-    m_blocks.obj_add({block_in.ent()->id(), block_in});
+    ER_TRACE("Unknown incoming block%d", block_in->ent()->id().v());
+    m_blocks.obj_add({block_in->ent()->id(), *block_in});
     ER_TRACE("Add block%d@%s (n_blocks=%zu)",
-             block_in.ent()->id().v(),
-             block_in.ent()->dloc().to_str().c_str(),
+             block_in->ent()->id().v(),
+             block_in->ent()->dloc().to_str().c_str(),
              m_blocks.size());
     return {true, kNEW_BLOCK_ADDED, rmath::vector2u()};
   }
   return {false, kNO_CHANGE, rmath::vector2u()};
 } /* block_update() */
 
-bool dpo_store::block_remove(const std::shared_ptr<crepr::base_block2D>& victim) {
+bool dpo_store::block_remove(crepr::base_block2D* const victim) {
   auto range = m_blocks.const_values_range();
   auto it = std::find_if(range.begin(), range.end(), [&](const auto& b) {
     return b.ent()->idcmp(*victim);
@@ -201,21 +201,31 @@ void dpo_store::clear_all(void) {
   m_caches.clear();
 } /* clear_all() */
 
-bool dpo_store::contains(const std::shared_ptr<crepr::base_block2D>& block) const {
+bool dpo_store::contains(const crepr::base_block2D* const block) const {
   return m_blocks.contains(block->id());
 } /* contains() */
 
-bool dpo_store::contains(const std::shared_ptr<cfrepr::base_cache>& cache) const {
+bool dpo_store::contains(const cfrepr::base_cache* const cache) const {
   return m_caches.contains(cache->dloc());
 } /* contains() */
 
 const dp_block_map::value_type* dpo_store::find(
-    const std::shared_ptr<crepr::base_block2D>& block) const {
+    const crepr::base_block2D* const block) const {
+  return m_blocks.find(block->id());
+} /* find() */
+
+dp_block_map::value_type* dpo_store::find(
+    const crepr::base_block2D* const block) {
   return m_blocks.find(block->id());
 } /* find() */
 
 const dp_cache_map::value_type* dpo_store::find(
-    const std::shared_ptr<cfrepr::base_cache>& cache) const {
+    const cfrepr::base_cache* const cache) const {
+  return m_caches.find(cache->dloc());
+} /* find() */
+
+dp_cache_map::value_type* dpo_store::find(
+    const cfrepr::base_cache* const cache) {
   return m_caches.find(cache->dloc());
 } /* find() */
 

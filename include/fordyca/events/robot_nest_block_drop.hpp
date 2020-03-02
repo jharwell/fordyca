@@ -1,5 +1,5 @@
 /**
- * \file nest_block_drop.hpp
+ * \file robot_nest_block_drop.hpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_NEST_BLOCK_DROP_HPP_
-#define INCLUDE_FORDYCA_EVENTS_NEST_BLOCK_DROP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_ROBOT_NEST_BLOCK_DROP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_ROBOT_NEST_BLOCK_DROP_HPP_
 
 /*******************************************************************************
  * Includes
@@ -30,8 +30,6 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/timestep.hpp"
 
-#include "cosm/foraging/events/block_drop_base_visit_set.hpp"
-
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
@@ -39,21 +37,24 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+} /* namespace cosm::repr */
+
 NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class nest_block_drop
+ * \class robot_nest_block_drop
  * \ingroup events detail
  *
  * \brief Fired whenever a robot drops a block in the nest.
  */
-class nest_block_drop : public rer::client<nest_block_drop> {
+class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
  private:
   struct visit_typelist_impl {
-    using inherited = cfevents::block_drop_base_visit_typelist;
     using controllers = boost::mpl::joint_view<
         boost::mpl::joint_view<controller::depth0::typelist,
                                controller::depth1::typelist>,
@@ -66,39 +67,20 @@ class nest_block_drop : public rer::client<nest_block_drop> {
     using tasks =
         rmpl::typelist<tasks::depth0::generalist, tasks::depth1::collector>;
 
-    using value = boost::mpl::joint_view<
-        boost::mpl::joint_view<boost::mpl::joint_view<controllers::type, tasks::type>,
-                               fsms::type>,
-        boost::mpl::joint_view<inherited::type, controllers::type> >;
+    using value = boost::mpl::joint_view<boost::mpl::joint_view<controllers::type,
+                                                                tasks::type>,
+                                         fsms::type>;
   };
 
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  /**
-   * \brief Initialize a nest block drop event.
-   *
-   * \param robot_block Clone of arena block which it is giving up ownership of
-   *                    for the drop.
-   * \param t Current timestep.
-   */
-  nest_block_drop(std::unique_ptr<crepr::base_block2D> robot_block,
-                  const rtypes::timestep& t);
-  ~nest_block_drop(void) override = default;
+  ~robot_nest_block_drop(void) override = default;
 
-  nest_block_drop(const nest_block_drop& op) = delete;
-  nest_block_drop& operator=(const nest_block_drop& op) = delete;
+  robot_nest_block_drop(const robot_nest_block_drop& op) = delete;
+  robot_nest_block_drop& operator=(const robot_nest_block_drop& op) = delete;
 
   /* Depth0 DPO/MDPO foraging */
-
-  /**
-   * \brief Perform actual nest block drop in the arena.
-   *
-   * Takes \ref arena_map block and grid mutexes to protect block
-   * re-distribution and block updates, and releases afterwards. See #594.
-   */
-  void visit(cfds::arena_map& map);
-
   void visit(controller::depth0::crw_controller& controller);
   void visit(controller::depth0::dpo_controller& controller);
   void visit(controller::depth0::mdpo_controller& controller);
@@ -119,8 +101,18 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   void visit(controller::depth2::birtd_odpo_controller& controller);
   void visit(controller::depth2::birtd_omdpo_controller& controller);
 
+ protected:
+  /**
+   * \brief Initialize a nest block drop event.
+   *
+   * \param block The block the robot has just dropped into the nest, owned by
+   *              the arena.
+   * \param t Current timestep.
+   */
+  robot_nest_block_drop(std::shared_ptr<crepr::base_block2D> block,
+                        const rtypes::timestep& t);
+
  private:
-  void visit(crepr::base_block2D& block);
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
   void visit(fsm::depth0::dpo_fsm& fsm);
@@ -131,8 +123,7 @@ class nest_block_drop : public rer::client<nest_block_drop> {
   /* clang-format off */
   const rtypes::timestep               mc_timestep;
 
-  std::unique_ptr<crepr::base_block2D> m_robot_block;
-  std::shared_ptr<crepr::base_block2D> m_arena_block{};
+  std::shared_ptr<crepr::base_block2D> m_block;
   /* clang-format on */
 };
 
@@ -142,16 +133,16 @@ class nest_block_drop : public rer::client<nest_block_drop> {
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using nest_block_drop_visitor_impl =
-    rpvisitor::precise_visitor<detail::nest_block_drop,
-                               detail::nest_block_drop::visit_typelist>;
+using robot_nest_block_drop_visitor_impl =
+    rpvisitor::precise_visitor<detail::robot_nest_block_drop,
+                               detail::robot_nest_block_drop::visit_typelist>;
 
 NS_END(detail);
 
-class nest_block_drop_visitor : public detail::nest_block_drop_visitor_impl {
-  using detail::nest_block_drop_visitor_impl::nest_block_drop_visitor_impl;
+class robot_nest_block_drop_visitor : public detail::robot_nest_block_drop_visitor_impl {
+  using detail::robot_nest_block_drop_visitor_impl::robot_nest_block_drop_visitor_impl;
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_NEST_BLOCK_DROP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_ROBOT_NEST_BLOCK_DROP_HPP_ */

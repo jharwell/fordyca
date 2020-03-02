@@ -26,8 +26,8 @@
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/cached_block_pickup.hpp"
-#include "fordyca/events/nest_block_drop.hpp"
+#include "fordyca/events/robot_cached_block_pickup.hpp"
+#include "fordyca/events/robot_nest_block_drop.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
 
@@ -103,10 +103,10 @@ void collector::active_interface_update(int) {
 /*******************************************************************************
  * Event Handling
  ******************************************************************************/
-void collector::accept(events::detail::cached_block_pickup& visitor) {
+void collector::accept(events::detail::robot_cached_block_pickup& visitor) {
   visitor.visit(*this);
 }
-void collector::accept(events::detail::nest_block_drop& visitor) {
+void collector::accept(events::detail::robot_nest_block_drop& visitor) {
   visitor.visit(*this);
 }
 void collector::accept(events::detail::cache_vanished& visitor) {

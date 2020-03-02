@@ -1,5 +1,5 @@
 /**
- * \file free_block_pickup.hpp
+ * \file robot_free_block_pickup.hpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_
-#define INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_
+#ifndef INCLUDE_FORDYCA_EVENTS_ROBOT_FREE_BLOCK_PICKUP_HPP_
+#define INCLUDE_FORDYCA_EVENTS_ROBOT_FREE_BLOCK_PICKUP_HPP_
 
 /*******************************************************************************
  * Includes
@@ -29,35 +29,42 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 
 #include "cosm/events/cell2D_op.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/events/block_pickup_base_visit_set.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::repr {
+class base_block2D;
+} /* namespace cosm::repr */
+
+namespace fordyca::ds {
+class dpo_store;
+class dpo_semantic_map;
+} /* namespace fordyca::ds */
+
 NS_START(fordyca, events, detail);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class free_block_pickup
+ * \class robot_free_block_pickup
  * \ingroup events detail
  *
  * \brief Fired whenever a robot picks up a free block in the arena (i.e. one
  * that is not part of a cache).
  */
-class free_block_pickup : public rer::client<free_block_pickup>,
-                          public cevents::cell2D_op {
+class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
+                                public cevents::cell2D_op {
  private:
   struct visit_typelist_impl {
-    using inherited = boost::mpl::joint_view<block_pickup_base_visit_typelist,
-                                             cevents::cell2D_op::visit_typelist>;
     using controllers = boost::mpl::joint_view<
         boost::mpl::joint_view<controller::depth0::typelist,
                                controller::depth1::typelist>,
@@ -70,34 +77,19 @@ class free_block_pickup : public rer::client<free_block_pickup>,
                                 fsm::depth0::dpo_fsm,
                                 fsm::depth0::free_block_to_nest_fsm,
                                 fsm::block_to_goal_fsm>;
-    using value = boost::mpl::joint_view<
-        boost::mpl::joint_view<boost::mpl::joint_view<controllers::type, tasks::type>,
-                               fsms::type>,
-        boost::mpl::joint_view<inherited::type, controllers::type> >;
+    using value1 = boost::mpl::joint_view<controllers::type, tasks::type>;
+    using value = boost::mpl::joint_view<value1, fsms::type>;
   };
 
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  free_block_pickup(const std::shared_ptr<crepr::base_block2D>& block,
-                    const rtypes::type_uuid& robot_id,
-                    const rtypes::timestep& t);
-  ~free_block_pickup(void) override = default;
+  ~robot_free_block_pickup(void) override = default;
 
-  free_block_pickup(const free_block_pickup& op) = delete;
-  free_block_pickup& operator=(const free_block_pickup& op) = delete;
+  robot_free_block_pickup(const robot_free_block_pickup& op) = delete;
+  robot_free_block_pickup& operator=(const robot_free_block_pickup& op) = delete;
 
   /* CRW foraging */
-
-  /**
-   * \brief Perform actual block pickup in the arena.
-   *
-   * Takes \ref arena_map grid mutex to protect block re-distribution and block
-   * updates. \ref arena_map block mutex assumed to be held when calling this
-   * function.
-   */
-  void visit(cfds::arena_map& map);
-  void visit(crepr::base_block2D& block);
   void visit(controller::depth0::crw_controller& controller);
   void visit(fsm::depth0::crw_fsm& fsm);
 
@@ -128,14 +120,20 @@ class free_block_pickup : public rer::client<free_block_pickup>,
   void visit(tasks::depth2::cache_starter& task);
   void visit(tasks::depth2::cache_finisher& task);
 
+ protected:
+  robot_free_block_pickup(std::shared_ptr<crepr::base_block2D> block,
+                          const rtypes::type_uuid& robot_id,
+                          const rtypes::timestep& t);
+
  private:
-  void dispatch_free_block_interactor(tasks::base_foraging_task* task);
+  void dispatch_robot_free_block_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
   const rtypes::timestep               mc_timestep;
   const rtypes::type_uuid              mc_robot_id;
 
   std::shared_ptr<crepr::base_block2D> m_block;
+
   /* clang-format on */
 };
 
@@ -145,16 +143,16 @@ class free_block_pickup : public rer::client<free_block_pickup>,
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
-using free_block_pickup_visitor_impl =
-    rpvisitor::precise_visitor<detail::free_block_pickup,
-                               detail::free_block_pickup::visit_typelist>;
+using robot_free_block_pickup_visitor_impl =
+    rpvisitor::precise_visitor<detail::robot_free_block_pickup,
+                               detail::robot_free_block_pickup::visit_typelist>;
 
 NS_END(detail);
 
-class free_block_pickup_visitor : public detail::free_block_pickup_visitor_impl {
-  using detail::free_block_pickup_visitor_impl::free_block_pickup_visitor_impl;
+class robot_free_block_pickup_visitor : public detail::robot_free_block_pickup_visitor_impl {
+  using detail::robot_free_block_pickup_visitor_impl::robot_free_block_pickup_visitor_impl;
 };
 
 NS_END(events, fordyca);
 
-#endif /* INCLUDE_FORDYCA_EVENTS_FREE_BLOCK_PICKUP_HPP_ */
+#endif /* INCLUDE_FORDYCA_EVENTS_ROBOT_FREE_BLOCK_PICKUP_HPP_ */

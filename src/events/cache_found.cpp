@@ -68,16 +68,16 @@ void cache_found::visit(ds::dpo_store& store) {
    * a new cache there, we are tracking blocks that no longer exist in the
    * arena.
    */
-  for (auto&& b : store.blocks().const_values_range()) {
+  for (auto&& b : store.blocks().values_range()) {
     if (m_cache->contains_point(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id().v(),
                m_cache->id().v());
-      store.block_remove(b.ent_obj());
+      store.block_remove(b.ent());
     }
   } /* while(it..) */
 
-  auto known = store.find(m_cache);
+  auto known = store.find(m_cache.get());
   crepr::pheromone_density density(store.pheromone_rho());
   if (nullptr != known) {
     density = known->density();
@@ -95,7 +95,8 @@ void cache_found::visit(ds::dpo_store& store) {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  store.cache_update(ds::dp_cache_map::value_type(m_cache, density));
+  auto ent = ds::dp_cache_map::value_type(m_cache, density);
+  store.cache_update(&ent);
 } /* visit() */
 
 /*******************************************************************************
@@ -163,20 +164,20 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * created. When we return to the arena and find a new cache there, we are
    * tracking blocks that no longer exist in our perception.
    */
-  std::list<const std::shared_ptr<crepr::base_block2D>*> rms;
-  for (auto&& b : map.blocks().const_values_range()) {
+  std::list<crepr::base_block2D*> rms;
+  for (auto&& b : map.blocks().values_range()) {
     if (m_cache->contains_point(b.ent()->rloc())) {
       ER_TRACE("Remove block%d hidden behind cache%d",
                b.ent()->id().v(),
                m_cache->id().v());
-      rms.push_back(&b.ent_obj());
+      rms.push_back(b.ent());
     }
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    cevents::cell2D_empty_visitor op((*b)->dloc());
-    op.visit(map.access<occupancy_grid::kCell>((*b)->dloc()));
-    map.block_remove(*b);
+    cevents::cell2D_empty_visitor op(b->dloc());
+    op.visit(map.access<occupancy_grid::kCell>(b->dloc()));
+    map.block_remove(b);
   } /* for(&&b..) */
 
   /*
@@ -188,7 +189,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * kind of cell entity.
    */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block());
+    map.block_remove(cell.block().get());
   }
 
   /*
@@ -213,7 +214,8 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   }
-  map.cache_update(ds::dp_cache_map::value_type(m_cache, density));
+  auto ent = ds::dp_cache_map::value_type(m_cache, density);
+  map.cache_update(&ent);
   visit(cell);
 } /* visit() */
 

@@ -35,7 +35,7 @@ NS_START(fordyca, events);
 
 namespace detail {
 class block_vanished;
-class free_block_pickup;
+class robot_free_block_pickup;
 class robot_free_block_drop;
 } // namespace detail
 
@@ -51,7 +51,7 @@ class robot_free_block_drop;
  */
 class free_block_interactor
     : public rpvisitor::polymorphic_accept_set<detail::robot_free_block_drop,
-                                               detail::free_block_pickup,
+                                               detail::robot_free_block_pickup,
                                                detail::block_vanished> {};
 
 NS_END(events, fordyca);
