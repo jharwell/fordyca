@@ -168,6 +168,12 @@ RCPPSW_WRAP_OVERRIDE_DEF(harvester,
                              polled_task::mechanism()),
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(harvester,
+                         entity_acquired_id,
+                         *static_cast<fsm::depth1::block_to_existing_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/

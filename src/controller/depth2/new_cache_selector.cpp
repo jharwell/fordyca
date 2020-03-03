@@ -45,11 +45,11 @@ new_cache_selector::new_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
+const crepr::base_block2D* new_cache_selector::operator()(
     const ds::dp_block_map& new_caches,
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position) const {
-  ds::dp_block_map::value_type best(nullptr, {});
+  const crepr::base_block2D* best = nullptr;
   ER_ASSERT(!new_caches.empty(), "No known new caches");
 
   double max_utility = 0.0;
@@ -65,27 +65,27 @@ boost::optional<ds::dp_block_map::value_type> new_cache_selector::operator()(
     ER_ASSERT(utility > 0.0, "Bad utility calculation");
     ER_DEBUG("Utility for new cache%d@%s/%s, density=%f: %f",
              c.ent()->id().v(),
-             best.ent()->rloc().to_str().c_str(),
-             best.ent()->dloc().to_str().c_str(),
+             best->rloc().to_str().c_str(),
+             best->dloc().to_str().c_str(),
              c.density().v(),
              utility);
 
     if (utility > max_utility) {
-      best = c;
+      best = c.ent();
       max_utility = utility;
     }
   } /* for(new_cache..) */
 
-  if (nullptr != best.ent()) {
+  if (nullptr != best) {
     ER_INFO("Best utility: new cache%d@%s/%s: %f",
-            best.ent()->id().v(),
-            best.ent()->rloc().to_str().c_str(),
-            best.ent()->dloc().to_str().c_str(),
+            best->id().v(),
+            best->rloc().to_str().c_str(),
+            best->dloc().to_str().c_str(),
             max_utility);
-    return boost::make_optional(best);
+    return best;
   } else {
     ER_WARN("No best new cache found: all known new caches excluded!");
-    return boost::optional<ds::dp_block_map::value_type>();
+    return best;
   }
 } /* operator() */
 

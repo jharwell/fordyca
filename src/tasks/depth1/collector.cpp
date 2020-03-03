@@ -163,6 +163,12 @@ RCPPSW_WRAP_OVERRIDE_DEF(collector,
                              polled_task::mechanism()),
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(collector,
+                         entity_acquired_id,
+                         *static_cast<fsm::depth1::cached_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
 /*******************************************************************************
  * Task Metrics
  ******************************************************************************/

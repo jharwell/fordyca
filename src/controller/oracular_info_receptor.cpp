@@ -24,6 +24,7 @@
 #include "fordyca/controller/oracular_info_receptor.hpp"
 
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/polled_task.hpp"
 #include "cosm/ta/time_estimate.hpp"
@@ -52,11 +53,11 @@ NS_START(fordyca, controller);
 struct dpo_store_updater {
   explicit dpo_store_updater(ds::dpo_store* const s) : store(s) {}
 
-  void operator()(std::shared_ptr<crepr::base_block2D>& block) const {
+  void operator()(crepr::base_block2D* block) const {
     events::block_found_visitor e(block);
     e.visit(*store);
   }
-  void operator()(std::shared_ptr<cfrepr::base_cache>& cache) const {
+  void operator()(cfrepr::base_cache* cache) const {
     events::cache_found_visitor e(cache);
     e.visit(*store);
   }

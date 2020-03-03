@@ -61,7 +61,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * together.
    */
   cfds::cache_vector create_all(const cache_create_ro_params& c_params,
-                              const cfds::block_vector&  c_alloc_blocks) override;
+                                const cfds::block_vector2&  c_alloc_blocks) override;
 
  private:
   /**
@@ -74,9 +74,9 @@ class dynamic_cache_creator : public base_cache_creator,
    *                     creation when the creator was called.
    * \param index Our current index within the candidate vector.
    */
-  cfds::block_vector cache_i_blocks_alloc(const cfds::block_vector& c_used_blocks,
-                                        const cfds::block_vector& c_alloc_blocks,
-                                        uint index) const;
+  cfds::block_vector2 cache_i_blocks_alloc(const cfds::block_vector2& c_used_blocks,
+                                           const cfds::block_vector2& c_alloc_blocks,
+                                           uint index) const;
 
   /**
    * \brief Calculate the blocks a cache will absorb as a result of its center
@@ -93,10 +93,10 @@ class dynamic_cache_creator : public base_cache_creator,
    * blocks getting added to created caches twice, which causes all sorts of
    * problems. See #578.
    */
-  cfds::block_vector absorb_blocks_calc(
-      const cfds::block_vector& c_alloc_blocks,
-      const cfds::block_vector& c_cache_i_blocks,
-      const cfds::block_vector& c_used_blocks,
+  cfds::block_vector2 absorb_blocks_calc(
+      const cfds::block_vector2& c_alloc_blocks,
+      const cfds::block_vector2& c_cache_i_blocks,
+      const cfds::block_vector2& c_used_blocks,
       const rmath::vector2u& c_center,
       rtypes::spatial_dist cache_dim) const;
 

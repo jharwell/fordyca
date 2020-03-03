@@ -70,10 +70,9 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
    *
    * \return The "best" existing cache.
    */
-  boost::optional<ds::dp_cache_map::value_type> operator()(
-      const ds::dp_cache_map& existing_caches,
-      const rmath::vector2d& position,
-      const rtypes::timestep& t);
+  const cfrepr::base_cache* operator()(const ds::dp_cache_map& existing_caches,
+                                       const rmath::vector2d& position,
+                                       const rtypes::timestep& t);
 
  private:
   /**

@@ -123,7 +123,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
                                                    loc,
                                                    m_map->grid_resolution());
 
-    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[block_id.v()],
+    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks2()[block_id.v()],
                                                      loc,
                                                      m_map->grid_resolution(),
                                                      cfds::arena_map_locking::ekNONE_HELD);

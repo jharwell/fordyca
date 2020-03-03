@@ -139,11 +139,14 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
      * the index position of cache i to be the same as its ID, so we need to
      * search for the correct cache.
      */
+    m_map->cache_mtx()->lock();
     auto it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == status.entity_id; });
-    events::cache_proximity_visitor prox_op(*it);
+    m_map->cache_mtx()->unlock();
+
+    events::cache_proximity_visitor prox_op((*it).get());
     prox_op.visit(controller);
   }
 
@@ -178,7 +181,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
      * Safe to directly index into arena map block vector without locking
      * because the blocks never move from their original locations.
      */
-    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
+    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks2()[penalty.id().v()],
                                                      loc,
                                                      m_map->grid_resolution(),
                                                      cfds::arena_map_locking::ekNONE_HELD);

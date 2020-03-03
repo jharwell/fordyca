@@ -106,6 +106,7 @@ RCPPSW_WRAP_DEF(dpo_fsm, goal_acquired, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, acquisition_loc, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, current_explore_loc, m_block_fsm, const);
 RCPPSW_WRAP_DEF(dpo_fsm, current_vector_loc, m_block_fsm, const);
+RCPPSW_WRAP_DEF(dpo_fsm, entity_acquired_id, m_block_fsm, const);
 
 /*******************************************************************************
  * General Member Functions

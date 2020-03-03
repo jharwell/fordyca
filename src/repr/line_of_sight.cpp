@@ -34,8 +34,8 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cfds::block_list line_of_sight::blocks(void) const {
-  cfds::block_list blocks{};
+cfds::block_list2 line_of_sight::blocks(void) const {
+  cfds::block_list2 blocks{};
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {
       const cds::cell2D& cell = mc_view[i][j];
@@ -51,8 +51,8 @@ cfds::block_list line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-ds::cache_list line_of_sight::caches(void) const {
-  ds::cache_list caches = m_caches;
+ds::cache_list2 line_of_sight::caches(void) const {
+  ds::cache_list2 caches;
 
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {

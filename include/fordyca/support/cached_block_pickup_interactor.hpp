@@ -217,7 +217,7 @@ class cached_block_pickup_interactor
                                                            m_loop,
                                                            controller.entity_id(),
                                                            t);
-    const crepr::base_block2D* to_pickup = (*it)->oldest_block().get();
+    const crepr::base_block2D* to_pickup = (*it)->oldest_block();
     events::robot_cached_block_pickup_visitor rpickup_op(it->get(),
                                                          to_pickup,
                                                          controller.entity_id(),

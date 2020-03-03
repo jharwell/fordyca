@@ -26,6 +26,7 @@
 #include <fstream>
 
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
@@ -165,6 +166,7 @@ void dpo_controller::reset(void) {
  * FSM Metrics
  ******************************************************************************/
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, block_transport_goal, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, entity_acquired_id, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, acquisition_loc, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(dpo_controller, goal_acquired, *m_fsm, const);

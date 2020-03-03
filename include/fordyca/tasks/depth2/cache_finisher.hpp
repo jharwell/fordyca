@@ -78,6 +78,7 @@ class cache_finisher final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,

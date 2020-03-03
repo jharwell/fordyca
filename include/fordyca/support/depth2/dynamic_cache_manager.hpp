@@ -69,7 +69,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    * \return The created caches (if any were created).
    */
   boost::optional<cfds::cache_vector> create(const cache_create_ro_params& c_params,
-                                           const cfds::block_vector&  c_alloc_blocks);
+                                             const cfds::block_vector2&  c_alloc_blocks);
 
   /**
    * \brief Get the minimum distance that must be maintained between two caches
@@ -92,10 +92,10 @@ class dynamic_cache_manager final : public base_cache_manager,
    *
    * are eligible.
    */
-  boost::optional<cfds::block_vector> calc_blocks_for_creation(
+  boost::optional<cfds::block_vector2> calc_blocks_for_creation(
       const cfds::cache_vector& existing_caches,
       const cfds::block_cluster_vector& clusters,
-      const cfds::block_vector& blocks);
+      const cfds::block_vector2& blocks);
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

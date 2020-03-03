@@ -85,6 +85,7 @@ class dpo_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
   RCPPSW_WRAP_OVERRIDE_DECL(foraging_transport_goal::type,
@@ -131,7 +132,6 @@ class dpo_fsm final : public cfsm::util_hfsm,
   /* clang-format off */
   free_block_to_nest_fsm m_block_fsm;
   /* clang-format on */
-
 };
 
 NS_END(depth0, fsm, fordyca);

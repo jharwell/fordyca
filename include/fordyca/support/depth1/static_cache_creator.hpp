@@ -58,7 +58,7 @@ class static_cache_creator : public base_cache_creator,
    * conflict free.
    */
   cfds::cache_vector create_all(const cache_create_ro_params& c_params,
-                              const cfds::block_vector&  c_alloc_blocks) override;
+                                const cfds::block_vector2&  c_alloc_blocks) override;
 
  private:
   /* clang-format off */

@@ -145,7 +145,7 @@ void robot_free_block_pickup::visit(ds::dpo_semantic_map& map) {
    */
   /* ER_ASSERT(cell.state_has_block(), "cell does not contain block"); */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block().get());
+    map.block_remove(cell.block());
   }
 } /* visit() */
 

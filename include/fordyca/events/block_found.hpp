@@ -74,8 +74,7 @@ class block_found : public rer::client<block_found>, public cevents::cell2D_op {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit block_found(std::unique_ptr<crepr::base_block2D> block);
-  explicit block_found(const std::shared_ptr<crepr::base_block2D>& block);
+  explicit block_found(crepr::base_block2D* block);
   ~block_found(void) override = default;
 
   block_found(const block_found& op) = delete;
@@ -99,7 +98,7 @@ class block_found : public rer::client<block_found>, public cevents::cell2D_op {
   void pheromone_update(ds::dpo_semantic_map& map);
 
   /* clang-format off */
-  std::shared_ptr<crepr::base_block2D> m_block;
+  crepr::base_block2D* m_block;
   /* clang-format on */
 };
 

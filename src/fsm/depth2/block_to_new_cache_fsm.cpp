@@ -68,4 +68,11 @@ foraging_transport_goal::type block_to_new_cache_fsm::block_transport_goal(
   return foraging_transport_goal::type::ekNONE;
 } /* acquisition_goal() */
 
+rtypes::type_uuid block_to_new_cache_fsm::entity_acquired_id(void) const {
+  if (foraging_acq_goal::type::ekBLOCK == acquisition_goal()) {
+    return m_block_fsm.entity_acquired_id();
+  }
+  return rtypes::constants::kNoUUID;
+} /* entity_acquired_id() */
+
 NS_END(depth2, controller, fordyca);

@@ -49,7 +49,7 @@ cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
  * Member Functions
  ******************************************************************************/
 boost::optional<rmath::vector2u> cache_center_calculator::operator()(
-    const cfds::block_vector& c_cache_i_blocks,
+    const cfds::block_vector2& c_cache_i_blocks,
     const cfds::cache_vector& c_existing_caches,
     const cfds::block_cluster_vector& c_clusters,
     rmath::rng* rng) const {

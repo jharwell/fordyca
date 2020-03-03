@@ -190,6 +190,7 @@ void depth0_loop_functions::private_init(void) {
 void depth0_loop_functions::pre_step(void) {
   ndc_push();
   base_loop_functions::pre_step();
+  ndc_pop();
 
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
@@ -198,12 +199,12 @@ void depth0_loop_functions::pre_step(void) {
     ndc_pop();
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
-  ndc_pop();
 } /* pre_step() */
 
 void depth0_loop_functions::post_step(void) {
   ndc_push();
   base_loop_functions::post_step();
+  ndc_pop();
 
   /* Process all robots: interact with environment then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
@@ -213,6 +214,7 @@ void depth0_loop_functions::post_step(void) {
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
 
+  ndc_push();
   /* Update block distribution status */
   auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
       *(*m_metrics_agg)["blocks::transport"]);

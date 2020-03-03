@@ -45,6 +45,16 @@ std::string cache_list::to_str(void) const {
                          });
 } /* to_str() */
 
+std::string cache_list2::to_str(void) const {
+  return std::accumulate(this->begin(),
+                         this->end(),
+                         std::string(),
+                         [&](const std::string& a, const auto& c) {
+                           return a + "c" + rcppsw::to_string(c->id()) + "@" +
+                                  c->dloc().to_str() + ",";
+                         });
+} /* to_str() */
+
 std::string const_cache_list::to_str(void) const {
   return std::accumulate(this->begin(),
                          this->end(),

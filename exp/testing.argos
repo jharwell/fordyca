@@ -16,7 +16,7 @@
   <!-- *************** -->
   <controllers>
 
-    <dpo_controller id="ffc"
+    <bitd_dpo_controller id="ffc"
                          library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
@@ -187,7 +187,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </dpo_controller>
+    </bitd_dpo_controller>
 
   </controllers>
 
@@ -195,7 +195,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth0_loop_functions">
+                  label="depth1_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">

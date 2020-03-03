@@ -25,6 +25,7 @@
  * Includes
  ******************************************************************************/
 #include <memory>
+#include <utility>
 
 #include "cosm/repr/pheromone_density.hpp"
 
@@ -52,9 +53,9 @@ template <class T>
 class dpo_entity {
  public:
   dpo_entity(void) = default;
-  dpo_entity(const std::shared_ptr<T>& ent,
+  dpo_entity(std::unique_ptr<T> ent,
              const crepr::pheromone_density& density)
-      : m_ent(ent), m_density(density) {}
+      : m_ent(std::move(ent)), m_density(density) {}
 
   /**
    * \brief Compare two entities for equality. We must explicitly invoke
@@ -64,8 +65,6 @@ class dpo_entity {
   bool operator==(const dpo_entity<T>& other) const {
     return m_ent->idcmp(*other.ent());
   }
-
-  const std::shared_ptr<T>& ent_obj(void) const { return m_ent; }
 
   T* ent(void) { return m_ent.get(); }
   const T* ent(void) const { return m_ent.get(); }
@@ -77,7 +76,7 @@ class dpo_entity {
 
  private:
   /* clang-format off */
-  std::shared_ptr<T>       m_ent;
+  std::unique_ptr<T>       m_ent;
   crepr::pheromone_density m_density;
   /* clang-format on */
 };

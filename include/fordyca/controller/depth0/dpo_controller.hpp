@@ -77,6 +77,7 @@ class dpo_controller : public crw_controller,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
+  RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
   RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
@@ -167,7 +168,7 @@ class dpo_controller : public crw_controller,
    *   perception subsystem, and derived classes can override the copy
    *   instantiated in \ref shared_init if they wish.
    *
-   * This is called after \ref shared_init() during \ref Init().xo
+   * This is called after \ref shared_init() during \ref Init().
    */
   void private_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 

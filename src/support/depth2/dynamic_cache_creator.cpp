@@ -52,7 +52,7 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
  ******************************************************************************/
 cfds::cache_vector dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cfds::block_vector& c_alloc_blocks) {
+    const cfds::block_vector2& c_alloc_blocks) {
   cfds::cache_vector created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
@@ -61,9 +61,9 @@ cfds::cache_vector dynamic_cache_creator::create_all(
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
 
-  cfds::block_vector used_blocks;
+  cfds::block_vector2 used_blocks;
   for (size_t i = 0; i < c_alloc_blocks.size() - 1; ++i) {
-    cfds::block_vector cache_i_blocks =
+    cfds::block_vector2 cache_i_blocks =
         cache_i_blocks_alloc(used_blocks, c_alloc_blocks, i);
 
     /*
@@ -108,7 +108,7 @@ cfds::cache_vector dynamic_cache_creator::create_all(
     }
   } /* for(i..) */
 
-  cfds::block_vector free_blocks =
+  cfds::block_vector2 free_blocks =
       utils::free_blocks_calc(created_caches, c_alloc_blocks);
 
   ER_ASSERT(
@@ -125,17 +125,17 @@ cfds::cache_vector dynamic_cache_creator::avoidance_caches_calc(
   return avoid;
 } /* avoidance_caches_calc() */
 
-cfds::block_vector dynamic_cache_creator::absorb_blocks_calc(
-    const cfds::block_vector& c_alloc_blocks,
-    const cfds::block_vector& c_cache_i_blocks,
-    const cfds::block_vector& c_used_blocks,
+cfds::block_vector2 dynamic_cache_creator::absorb_blocks_calc(
+    const cfds::block_vector2& c_alloc_blocks,
+    const cfds::block_vector2& c_cache_i_blocks,
+    const cfds::block_vector2& c_used_blocks,
     const rmath::vector2u& c_center,
     rtypes::spatial_dist cache_dim) const {
-  cfds::block_vector absorb_blocks;
+  cfds::block_vector2 absorb_blocks;
   std::copy_if(c_alloc_blocks.begin(),
                c_alloc_blocks.end(),
                std::back_inserter(absorb_blocks),
-               [&](const auto& b) RCSW_PURE {
+               [&](crepr::base_block2D* b) RCSW_PURE {
                  auto xspan = rmath::ranged(c_center.x() - cache_dim.v() / 2.0,
                                             c_center.x() + cache_dim.v() / 2.0);
                  auto yspan = rmath::ranged(c_center.y() - cache_dim.v() / 2.0,
@@ -153,11 +153,11 @@ cfds::block_vector dynamic_cache_creator::absorb_blocks_calc(
   return absorb_blocks;
 } /* absorb_blocks_calc() */
 
-cfds::block_vector dynamic_cache_creator::cache_i_blocks_alloc(
-    const cfds::block_vector& c_used_blocks,
-    const cfds::block_vector& c_alloc_blocks,
+cfds::block_vector2 dynamic_cache_creator::cache_i_blocks_alloc(
+    const cfds::block_vector2& c_used_blocks,
+    const cfds::block_vector2& c_alloc_blocks,
     uint index) const {
-  cfds::block_vector src_blocks;
+  cfds::block_vector2 src_blocks;
 
   /*
    * Block already in a new cache, so bail out.

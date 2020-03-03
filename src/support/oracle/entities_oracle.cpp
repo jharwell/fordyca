@@ -65,12 +65,12 @@ std::string entities_oracle::result_to_string(const variant_vector_type& v) {
     if (0 == ent.which()) {
       return a + "b" +
              rcppsw::to_string(
-                 boost::get<std::shared_ptr<crepr::base_block2D>>(ent)->id()) +
+                 boost::get<crepr::base_block2D*>(ent)->id()) +
              ",";
     } else if (1 == ent.which()) {
       return a + "c" +
              rcppsw::to_string(
-                 boost::get<std::shared_ptr<cfrepr::base_cache>>(ent)->id()) +
+                 boost::get<cfrepr::base_cache*>(ent)->id()) +
              ",";
     } else {
       return a + "unknown entity type,";

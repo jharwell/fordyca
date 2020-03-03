@@ -100,8 +100,9 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
     ER_INFO("Victim robot %s is carrying block%d",
             controller->GetId().c_str(),
             controller->block()->id().v());
-    auto it = std::find_if(m_map->blocks().begin(),
-                           m_map->blocks().end(),
+    auto blocks = m_map->blocks2();
+    auto it = std::find_if(blocks.begin(),
+                           blocks.end(),
                            [&](const auto& b) {
                              return controller->block()->id() == b->id();
                            });

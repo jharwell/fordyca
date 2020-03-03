@@ -163,4 +163,10 @@ RCPPSW_WRAP_OVERRIDE_DEF(
     *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
     const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(
+    cache_transferer,
+    entity_acquired_id,
+    *static_cast<fsm::depth2::cache_transferer_fsm*>(polled_task::mechanism()),
+    const);
+
 NS_END(depth2, tasks, fordyca);

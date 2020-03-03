@@ -50,11 +50,11 @@ existing_cache_selector::existing_cache_selector(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator()(
+const cfrepr::base_cache* existing_cache_selector::operator()(
     const ds::dp_cache_map& existing_caches,
     const rmath::vector2d& position,
     const rtypes::timestep& t) {
-  ds::dp_cache_map::value_type best(nullptr, {});
+  const cfrepr::base_cache* best = nullptr;
   ER_ASSERT(!existing_caches.empty(), "No known existing caches");
 
   double max_utility = 0.0;
@@ -79,22 +79,22 @@ boost::optional<ds::dp_cache_map::value_type> existing_cache_selector::operator(
              utility);
 
     if (utility > max_utility) {
-      best = c;
+      best = c.ent();
       max_utility = utility;
     }
   } /* for(existing_cache..) */
 
-  if (nullptr != best.ent()) {
+  if (nullptr != best) {
     ER_INFO("Best utility: existing_cache%d@%s/%s w/%zu blocks: %f",
-            best.ent()->id().v(),
-            best.ent()->rloc().to_str().c_str(),
-            best.ent()->dloc().to_str().c_str(),
-            best.ent()->n_blocks(),
+            best->id().v(),
+            best->rloc().to_str().c_str(),
+            best->dloc().to_str().c_str(),
+            best->n_blocks(),
             max_utility);
-    return boost::make_optional(best);
+    return best;
   } else {
     ER_WARN("No best existing cache found: all known caches excluded!");
-    return boost::optional<ds::dp_cache_map::value_type>();
+    return best;
   }
 } /* operator()() */
 

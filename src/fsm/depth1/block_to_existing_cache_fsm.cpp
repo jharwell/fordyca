@@ -106,4 +106,14 @@ bool block_to_existing_cache_fsm::goal_acquired(void) const {
   return false;
 } /* goal_acquired() */
 
+rtypes::type_uuid block_to_existing_cache_fsm::entity_acquired_id(void) const {
+  if (foraging_acq_goal::type::ekBLOCK == acquisition_goal()) {
+    return m_block_fsm.entity_acquired_id();
+  } else if (foraging_transport_goal::type::ekEXISTING_CACHE ==
+             block_transport_goal()) {
+    return m_cache_fsm.entity_acquired_id();
+  }
+  return rtypes::constants::kNoUUID;
+} /* entity_acquired_id() */
+
 NS_END(depth1, controller, fordyca);

@@ -114,8 +114,8 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
  * \param all_caches All existing caches in the arena.
  * \param all_blocks All blocks in the arena.
  */
-cfds::block_vector free_blocks_calc(const cfds::cache_vector& all_caches,
-                                    const cfds::block_vector& all_blocks);
+cfds::block_vector2 free_blocks_calc(const cfds::cache_vector& all_caches,
+                                     const cfds::block_vector2& all_blocks);
 
 NS_END(utils, support, fordyca);
 

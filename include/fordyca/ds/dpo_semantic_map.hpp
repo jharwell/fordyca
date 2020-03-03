@@ -123,7 +123,7 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
   RCPPSW_DECORATE_FUNC(known_cells_inc)
   RCPPSW_DECORATE_FUNC(known_cells_dec)
   RCPPSW_DECORATE_FUNC(known_cell_count, const)
-  RCPPSW_DECORATE_FUNC(resolution, const);
+  RCPPSW_DECORATE_FUNC(resolution, const)
 
   bool cache_remove(cfrepr::base_cache* victim);
   bool block_remove(crepr::base_block2D* victim);
@@ -138,8 +138,6 @@ class dpo_semantic_map final : public rer::client<dpo_semantic_map>,
 
  public:
   /* wrapping DPO store--must be after declaration -_- */
-  RCPPSW_DECLDEF_WRAP(block_update, (*store()))
-  RCPPSW_DECLDEF_WRAP(cache_update, (*store()))
   RCPPSW_DECLDEF_WRAP(blocks, (*store()))
   RCPPSW_DECLDEF_WRAP(caches, (*store()))
   RCPPSW_DECLDEF_WRAP(blocks, (*store()), const)

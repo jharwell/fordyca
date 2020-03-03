@@ -102,7 +102,7 @@ void mdpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cfds::block_list blocks = c_los->blocks();
+  cfds::block_list2 blocks = c_los->blocks();
   if (!blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
@@ -126,7 +126,7 @@ void mdpo_perception_subsystem::process_los_blocks(
                  block->id().v(),
                  block->rloc().to_str().c_str(),
                  block->dloc().to_str().c_str());
-        m_map->block_remove(block.get());
+        m_map->block_remove(block);
       } else if (c_los->cell(i, j).state_is_known() &&
                  !m_map->access<occupancy_grid::kCell>(d).state_is_known()) {
         ER_TRACE("Cell@%s now known to be empty", d.to_str().c_str());
@@ -157,7 +157,7 @@ void mdpo_perception_subsystem::process_los_blocks(
       });
       ER_ASSERT(it != range.end(), "Known block%d not in PAM", block->id().v());
     }
-    events::block_found_visitor op(block->clone());
+    events::block_found_visitor op(block);
     op.visit(*m_map);
   } /* for(block..) */
 } /* process_los_blocks() */
@@ -169,7 +169,7 @@ void mdpo_perception_subsystem::process_los_caches(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::cache_list los_caches = c_los->caches();
+  ds::cache_list2 los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
     ER_DEBUG("Caches in DPO store: [%s]",
@@ -192,7 +192,7 @@ void mdpo_perception_subsystem::process_los_caches(
                  cache->id().v(),
                  cache->rloc().to_str().c_str(),
                  cache->dloc().to_str().c_str());
-        map()->cache_remove(cache.get());
+        map()->cache_remove(cache);
       }
     } /* for(j..) */
   }   /* for(i..) */
@@ -225,19 +225,7 @@ void mdpo_perception_subsystem::process_los_caches(
               cache->n_blocks(),
               cell.cache()->n_blocks());
     }
-    /*
-     * The cache we get a handle to is owned by the simulation, and we don't
-     * want to just pass that into the robot's arena_map, as keeping them in
-     * sync is not possible in all situations.
-     *
-     * For example, if a block executing the collector task picks up a block and
-     * tries to compute the best cache to bring it to, only to have one or more
-     * of its cache references be invalid due to other robots causing caches to
-     * be created/destroyed.
-     *
-     * Cloning is definitely necessary here.
-     */
-    events::cache_found_visitor op(cache->clone());
+    events::cache_found_visitor op(cache);
     op.visit(*m_map);
   } /* for(cache..) */
 } /* process_los_caches() */

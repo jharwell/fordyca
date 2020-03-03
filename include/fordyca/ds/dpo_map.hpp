@@ -97,9 +97,9 @@ class dpo_map {
    * type. If it is already in the map of known objects of that type, the old
    * version is replaced.
    */
-  void obj_add(const std::pair<key_type, value_type>& obj) {
+  void obj_add(std::pair<key_type, value_type>&& obj) {
     m_obj.erase(obj.first);
-    m_obj.insert(obj);
+    m_obj.insert(std::move(obj));
   }
 
   /**

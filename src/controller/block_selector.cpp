@@ -43,11 +43,11 @@ block_selector::block_selector(const block_sel_matrix* const sel_matrix)
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
+const crepr::base_block2D* block_selector::operator()(
     const ds::dp_block_map& blocks,
     const rmath::vector2d& position) {
   double max_utility = 0.0;
-  ds::dp_block_map::value_type best{nullptr, {}};
+  const crepr::base_block2D* best = nullptr;
 
   ER_ASSERT(!blocks.empty(), "No known perceived blocks");
   for (const auto& b : blocks.const_values_range()) {
@@ -77,21 +77,21 @@ boost::optional<ds::dp_block_map::value_type> block_selector::operator()(
              b.density().v(),
              utility);
     if (utility > max_utility) {
-      best = b;
+      best = b.ent();
       max_utility = utility;
     }
   } /* for(block..) */
 
-  if (nullptr != best.ent()) {
+  if (nullptr != best) {
     ER_INFO("Best utility: block%d@%s/%s: %f",
-            best.ent()->id().v(),
-            best.ent()->rloc().to_str().c_str(),
-            best.ent()->dloc().to_str().c_str(),
+            best->id().v(),
+            best->rloc().to_str().c_str(),
+            best->dloc().to_str().c_str(),
             max_utility);
-    return boost::make_optional(best);
+    return best;
   } else {
     ER_WARN("No best block found: all known blocks excluded!");
-    return boost::optional<ds::dp_block_map::value_type>();
+    return best;
   }
 } /* operator() */
 

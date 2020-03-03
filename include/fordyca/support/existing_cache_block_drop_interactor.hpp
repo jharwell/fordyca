@@ -183,8 +183,8 @@ class existing_cache_block_drop_interactor
      * Need to tell event to perform \ref arena_map block locking because there
      * we are only holding the cache mutex.
      */
-    cfevents::arena_cache_block_drop_visitor adrop_op(m_map->blocks()[block_id.v()],
-                                                      *cache_it,
+    cfevents::arena_cache_block_drop_visitor adrop_op(m_map->blocks2()[block_id.v()],
+                                                      (*cache_it).get(),
                                                       m_map->grid_resolution(),
                                                       cfds::arena_map_locking::ekCACHES_HELD);
     events::robot_cache_block_drop_visitor rdrop_op(controller.block_release(),

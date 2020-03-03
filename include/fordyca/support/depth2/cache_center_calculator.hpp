@@ -99,7 +99,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * \return Coordinates of the new cache, if any were found.
    */
   boost::optional<rmath::vector2u> operator()(
-      const cfds::block_vector& c_cache_i_blocks,
+      const cfds::block_vector2& c_cache_i_blocks,
       const cfds::cache_vector& c_existing_caches,
       const cfds::block_cluster_vector& c_clusters,
       rmath::rng* rng) const;

@@ -75,4 +75,13 @@ bool cache_transferer_fsm::is_acquiring_src_cache(void) const {
          m_src_cache_fsm.task_running();
 } /* is_acquiring_src_cache() */
 
+rtypes::type_uuid cache_transferer_fsm::entity_acquired_id(void) const {
+  if (is_acquiring_dest_cache()) {
+    return m_dest_cache_fsm.entity_acquired_id();
+  } else if (is_acquiring_src_cache()) {
+    return m_src_cache_fsm.entity_acquired_id();
+  }
+  return rtypes::constants::kNoUUID;
+} /* entity_acquired_id() */
+
 NS_END(depth2, fsm, fordyca);

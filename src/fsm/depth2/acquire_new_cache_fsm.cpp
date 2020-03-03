@@ -95,13 +95,12 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_new_cache_fsm::
   /* A "new" cache is the same as a single block  */
   if (auto best = selector(
           mc_store->blocks(), mc_store->caches(), sensing()->position())) {
-    ER_INFO("Select new cache%d@%s/%s,density=%f for acquisition",
-            best->ent()->id().v(),
-            best->ent()->rloc().to_str().c_str(),
-            best->ent()->dloc().to_str().c_str(),
-            best->density().v());
+    ER_INFO("Select new cache%d@%s/%s for acquisition",
+            best->id().v(),
+            best->rloc().to_str().c_str(),
+            best->dloc().to_str().c_str());
     return boost::make_optional(acquire_goal_fsm::candidate_type(
-        best->ent()->rloc(), kNEW_CACHE_ARRIVAL_TOL, best->ent()->id()));
+        best->rloc(), kNEW_CACHE_ARRIVAL_TOL, best->id()));
   } else {
     /*
      * If this happens, all the blocks we know of are ineligible for us to

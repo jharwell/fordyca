@@ -119,4 +119,10 @@ RCPPSW_WRAP_OVERRIDE_DEF(generalist,
                              polled_task::mechanism()),
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(generalist,
+                         entity_acquired_id,
+                         *static_cast<fsm::depth0::free_block_to_nest_fsm*>(
+                             polled_task::mechanism()),
+                         const);
+
 NS_END(depth0, tasks, fordyca);

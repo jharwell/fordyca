@@ -255,6 +255,7 @@ std::vector<int> depth2_loop_functions::robot_tasks_extract(uint) const {
 void depth2_loop_functions::pre_step() {
   ndc_push();
   base_loop_functions::pre_step();
+  ndc_pop();
 
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
@@ -263,13 +264,12 @@ void depth2_loop_functions::pre_step() {
     ndc_pop();
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
-
-  ndc_pop();
 } /* pre_step() */
 
 void depth2_loop_functions::post_step(void) {
   ndc_push();
   base_loop_functions::post_step();
+  ndc_pop();
 
   /* Process all robots: environment interactions then collect metrics */
   auto cb = [&](argos::CControllableEntity* robot) {
@@ -279,6 +279,7 @@ void depth2_loop_functions::post_step(void) {
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
 
+  ndc_push();
   /*
    * Run dynamic cache creation if it was triggered. We don't wan't to run it
    * unconditionally each timestep, because it is VERRRYYYYY expensive to
@@ -479,7 +480,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks2())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;

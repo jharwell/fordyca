@@ -32,6 +32,8 @@
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_map.hpp"
+#include "cosm/repr/base_block2D.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -133,7 +135,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \param cache Cache to update.
    */
-  update_res_t cache_update(dpo_entity<cfrepr::base_cache>* cache);
+  update_res_t cache_update(dpo_entity<cfrepr::base_cache> cache);
 
   /*
    * \brief Update the known blocks set with the new block.
@@ -145,7 +147,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \return \c TRUE if a block was added, and \c FALSE otherwise.
    */
-  update_res_t block_update(dpo_entity<crepr::base_block2D>* block_in);
+  update_res_t block_update(dpo_entity<crepr::base_block2D> block_in);
 
   /**
    * \brief Remove a cache from the set of of known caches.
@@ -170,13 +172,10 @@ class dpo_store final : public rer::client<dpo_store> {
   }
 
  private:
-  /*
-   * Sets are used for object storage because there is no concept of order
-   * among the known blocks/caches.
-   */
   /* clang-format off */
   const bool                       mc_repeat_deposit;
   const double                     mc_pheromone_rho;
+
   ds::dp_block_map                 m_blocks{};
   ds::dp_cache_map                 m_caches{};
   boost::optional<rmath::vector2d> m_last_block_loc{};

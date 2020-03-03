@@ -47,7 +47,7 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_proximity::cache_proximity(const std::shared_ptr<cfrepr::base_cache>& cache)
+cache_proximity::cache_proximity(cfrepr::base_cache* cache)
     : ER_CLIENT_INIT("fordyca.events.cache_proximity"), m_cache(cache) {}
 
 /*******************************************************************************

@@ -40,6 +40,7 @@ class base_cache;
 NS_START(fordyca, ds);
 
 using cache_list_type = std::shared_ptr<cfrepr::base_cache>;
+using cache_list_type2 = cfrepr::base_cache*;
 using const_cache_list_type = std::shared_ptr<const cfrepr::base_cache>;
 
 /*******************************************************************************
@@ -56,6 +57,24 @@ class cache_list : public std::list<cache_list_type> {
  public:
   using std::list<cache_list_type>::list;
   using value_type = std::list<cache_list_type>::value_type;
+
+  /**
+   * \brief Get a string representation of the list contents.
+   */
+  std::string to_str(void) const;
+};
+
+/**
+ * \class cache_list2
+ * \ingroup ds
+ *
+ * \brief Specialization of \ref std::list with an additional \ref to_str()
+ * method.
+ */
+class cache_list2 : public std::list<cache_list_type2> {
+ public:
+  using std::list<cache_list_type2>::list;
+  using value_type = std::list<cache_list_type2>::value_type;
 
   /**
    * \brief Get a string representation of the list contents.

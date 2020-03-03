@@ -24,6 +24,7 @@
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
 
 #include "cosm/repr/base_block2D.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 

@@ -155,6 +155,11 @@ rmath::vector2u crw_fsm::current_vector_loc(void) const {
   return saa()->sensing()->discrete_position();
 } /* current_vector_loc() */
 
+rtypes::type_uuid crw_fsm::entity_acquired_id(void) const {
+  /* CRW FSM has no concept of state, so it doesn't know what it has acquired */
+  return rtypes::constants::kNoUUID;
+} /* entity_acquired_id() */
+
 /*******************************************************************************
  * Collision Metrics
  ******************************************************************************/

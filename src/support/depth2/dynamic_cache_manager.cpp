@@ -52,7 +52,7 @@ dynamic_cache_manager::dynamic_cache_manager(
  ******************************************************************************/
 boost::optional<cfds::cache_vector> dynamic_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const cfds::block_vector& c_alloc_blocks) {
+    const cfds::block_vector2& c_alloc_blocks) {
   if (auto to_use = calc_blocks_for_creation(
           c_params.current_caches, c_params.clusters, c_alloc_blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
@@ -76,11 +76,11 @@ boost::optional<cfds::cache_vector> dynamic_cache_manager::create(
   }
 } /* create() */
 
-boost::optional<cfds::block_vector> dynamic_cache_manager::calc_blocks_for_creation(
+boost::optional<cfds::block_vector2> dynamic_cache_manager::calc_blocks_for_creation(
     const cfds::cache_vector& existing_caches,
     const cfds::block_cluster_vector& clusters,
-    const cfds::block_vector& blocks) {
-  cfds::block_vector to_use;
+    const cfds::block_vector2& blocks) {
+  cfds::block_vector2 to_use;
   auto filter = [&](const auto& b) {
     /* Blocks cannot be in existing caches */
     return std::all_of(existing_caches.begin(),
@@ -138,13 +138,13 @@ boost::optional<cfds::block_vector> dynamic_cache_manager::calc_blocks_for_creat
               to_use.size() - count,
               to_use.size(),
               mc_cache_config.dynamic.min_blocks);
-    return boost::optional<cfds::block_vector>();
+    return boost::optional<cfds::block_vector2>();
   }
   if (to_use.size() < mc_cache_config.static_.size) {
     ER_WARN("Free block count < min blocks for new caches (%zu < %u)",
             to_use.size(),
             mc_cache_config.dynamic.min_blocks);
-    return boost::optional<cfds::block_vector>();
+    return boost::optional<cfds::block_vector2>();
   }
   return boost::make_optional(to_use);
 } /* calc_blocks_for_creation() */

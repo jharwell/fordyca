@@ -52,7 +52,7 @@ base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
  ******************************************************************************/
 std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
     const rmath::vector2d& center,
-    cfds::block_vector blocks,
+    cfds::block_vector2 blocks,
     const rtypes::timestep& t) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
@@ -111,7 +111,7 @@ std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
 
-  cfds::block_vector block_vec(blocks.begin(), blocks.end());
+  cfds::block_vector2 block_vec(blocks.begin(), blocks.end());
   auto ret = std::make_unique<cfrepr::arena_cache>(
       cfrepr::arena_cache::params{mc_cache_dim,
                                   m_grid->resolution(),
@@ -145,7 +145,7 @@ void base_cache_creator::update_host_cells(cfds::cache_vector& caches) {
    * creation process and setting it here will trigger an assert later.
    */
   for (auto& cache : caches) {
-    m_grid->access<arena_grid::kCell>(cache->dloc()).entity(cache);
+    m_grid->access<arena_grid::kCell>(cache->dloc()).entity(cache.get());
 
     auto xspan = cache->xspan();
     auto yspan = cache->yspan();
@@ -174,7 +174,7 @@ void base_cache_creator::update_host_cells(cfds::cache_vector& caches) {
                     "Cell@(%u, %u) already in CACHE_EXTENT",
                     i,
                     j);
-          cfevents::cell2D_cache_extent_visitor e(c, cache);
+          cfevents::cell2D_cache_extent_visitor e(c, cache.get());
           e.visit(cell);
         }
       } /* for(j..) */
@@ -184,7 +184,7 @@ void base_cache_creator::update_host_cells(cfds::cache_vector& caches) {
 
 bool base_cache_creator::creation_sanity_checks(
     const cfds::cache_vector& caches,
-    const cfds::block_vector& free_blocks,
+    const cfds::block_vector2& free_blocks,
     const cfds::block_cluster_vector& clusters) const {
   /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {

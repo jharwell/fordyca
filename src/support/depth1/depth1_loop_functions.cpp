@@ -309,7 +309,7 @@ void depth1_loop_functions::cache_handling_init(
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   cpal::swarm_manager::led_medium(config::saa_xml_names().leds_saa);
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks2())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -403,6 +403,7 @@ std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
 void depth1_loop_functions::pre_step() {
   ndc_push();
   base_loop_functions::pre_step();
+  ndc_pop();
 
   /* Process all robots */
   auto cb = [&](argos::CControllableEntity* robot) {
@@ -411,12 +412,12 @@ void depth1_loop_functions::pre_step() {
     ndc_pop();
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
-  ndc_pop();
 } /* pre_step() */
 
 void depth1_loop_functions::post_step(void) {
   ndc_push();
   base_loop_functions::post_step();
+  ndc_pop();
 
   /*
    * Parallel iteration over the swarm within the following set of ordered
@@ -436,6 +437,8 @@ void depth1_loop_functions::post_step(void) {
     ndc_pop();
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
+
+  ndc_push();
 
   /*
    * Manage the static cache and handle cache removal/re-creation as a result of
@@ -499,7 +502,7 @@ void depth1_loop_functions::reset() {
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks2())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -644,7 +647,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
 
   if (auto created =
           m_cache_manager->create_conditional(ccp,
-                                              arena_map()->blocks(),
+                                              arena_map()->blocks2(),
                                               m_cache_counts.first,
                                               m_cache_counts.second)) {
     arena_map()->caches_add(*created, this);
@@ -656,7 +659,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
       "blocks=%zu",
       m_cache_counts.first.load(),
       m_cache_counts.second.load(),
-      utils::free_blocks_calc(arena_map()->caches(), arena_map()->blocks())
+      utils::free_blocks_calc(arena_map()->caches(), arena_map()->blocks2())
           .size());
 } /* static_cache_monitor() */
 

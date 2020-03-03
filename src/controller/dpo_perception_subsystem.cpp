@@ -89,7 +89,7 @@ void dpo_perception_subsystem::process_los(
 
 void dpo_perception_subsystem::process_los_caches(
     const repr::line_of_sight* const c_los) {
-  ds::cache_list los_caches = c_los->caches();
+  ds::cache_list2 los_caches = c_los->caches();
   ER_DEBUG("Caches in DPO store: [%s]",
            rcppsw::to_string(m_store->caches()).c_str());
   if (!los_caches.empty()) {
@@ -100,31 +100,19 @@ void dpo_perception_subsystem::process_los_caches(
   los_tracking_sync(c_los, los_caches);
 
   for (auto& cache : los_caches) {
-    if (!m_store->contains(cache.get())) {
+    if (!m_store->contains(cache)) {
       ER_INFO("Discovered Cache%d@%s/%s",
               cache->id().v(),
               cache->rloc().to_str().c_str(),
               cache->dloc().to_str().c_str());
-    } else if (cache->n_blocks() != m_store->find(cache.get())->ent()->n_blocks()) {
+    } else if (cache->n_blocks() != m_store->find(cache)->ent()->n_blocks()) {
       ER_INFO("Update cache%d@%s blocks: %zu -> %zu",
               cache->id().v(),
               cache->dloc().to_str().c_str(),
-              m_store->find(cache.get())->ent()->n_blocks(),
+              m_store->find(cache)->ent()->n_blocks(),
               cache->n_blocks());
     }
-    /*
-     * The cache we get a handle to is owned by the simulation, and we don't
-     * want to just pass that into the robot's arena_map, as keeping them in
-     * sync is not possible in all situations.
-     *
-     * For example, if a block executing the collector task picks up a block
-     * and tries to compute the best cache to bring it to, only to have one or
-     * more of its cache references be invalid due to other robots causing
-     * caches to be created/destroyed.
-     *
-     * Cloning is definitely necessary here.
-     */
-    events::cache_found_visitor op(cache->clone());
+    events::cache_found_visitor op(cache);
     op.visit(*m_store);
   } /* for(cache..) */
 } /* process_los_caches() */
@@ -136,7 +124,7 @@ void dpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cfds::block_list los_blocks = c_los->blocks();
+  cfds::block_list2 los_blocks = c_los->blocks();
   ER_DEBUG("Blocks in DPO store: [%s]",
            rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
@@ -156,7 +144,7 @@ void dpo_perception_subsystem::process_los_blocks(
               block->rloc().to_str().c_str(),
               block->dloc().to_str().c_str());
 
-    if (!m_store->contains(block.get())) {
+    if (!m_store->contains(block)) {
       ER_INFO("Discovered block%d@%s/%s",
               block->id().v(),
               block->rloc().to_str().c_str(),
@@ -167,20 +155,20 @@ void dpo_perception_subsystem::process_los_blocks(
                block->rloc().to_str().c_str(),
                block->dloc().to_str().c_str());
     }
-    events::block_found_visitor op(block->clone());
+    events::block_found_visitor op(block);
     op.visit(*m_store);
   } /* for(block..) */
 } /* process_los() */
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::line_of_sight* const c_los,
-    const ds::cache_list& los_caches) {
+    const ds::cache_list2& los_caches) {
   /*
    * If the location of one of the caches we are tracking is in our LOS, then
    * the corresponding cache should also be in our LOS. If it is not, then our
    * tracked version is out of date and needs to be removed.
    */
-  auto range = m_store->caches().const_values_range();
+  auto range = m_store->caches().values_range();
   auto it = range.begin();
 
   while (it != range.end()) {
@@ -191,7 +179,7 @@ void dpo_perception_subsystem::los_tracking_sync(
     auto exists_in_los =
         los_caches.end() !=
         std::find_if(los_caches.begin(), los_caches.end(), [&](const auto& c) {
-          return c->dloccmp(*it->ent_obj());
+          return c->dloccmp(*it->ent());
         });
 
     if (!exists_in_los) {
@@ -203,12 +191,12 @@ void dpo_perception_subsystem::los_tracking_sync(
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See #589.
        */
-      auto tmp = *it;
+      cfrepr::base_cache* tmp = (*it).ent();
       ++it;
-      m_store->cache_remove(tmp.ent());
-      ER_ASSERT(nullptr == m_store->find(tmp.ent()),
+      m_store->cache_remove(tmp);
+      ER_ASSERT(nullptr == m_store->find(tmp),
                 "Cache%d still exists in store after removal",
-                tmp.ent()->id().v());
+                tmp->id().v());
     } else {
       ++it;
     }
@@ -217,7 +205,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::line_of_sight* const c_los,
-    const cfds::block_list& los_blocks) {
+    const cfds::block_list2& los_blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
    * the corresponding block should also be in our LOS. If it is not, then our
@@ -227,7 +215,7 @@ void dpo_perception_subsystem::los_tracking_sync(
    * has moved since we last saw it (since that is limited to at most a single
    * block, it is handled by the \ref block_found event).
    */
-  auto range = m_store->blocks().const_values_range();
+  auto range = m_store->blocks().values_range();
   auto it = range.begin();
 
   while (it != range.end()) {
@@ -243,7 +231,7 @@ void dpo_perception_subsystem::los_tracking_sync(
     auto exists_in_los =
         los_blocks.end() !=
         std::find_if(los_blocks.begin(), los_blocks.end(), [&](const auto& b) {
-          return b->idcmp(*(it->ent_obj()));
+          return b->idcmp(*(it->ent()));
         });
     ER_TRACE("Block%d location in LOS", it->ent()->id().v());
     if (!exists_in_los) {
@@ -256,12 +244,9 @@ void dpo_perception_subsystem::los_tracking_sync(
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See #589.
        */
-      auto tmp = *it;
+      crepr::base_block2D* tmp = (*it).ent();
       ++it;
-      m_store->block_remove(tmp.ent());
-      ER_ASSERT(nullptr == m_store->find(tmp.ent()),
-                "Block%d still exists in store after removal",
-                tmp.ent()->id().v());
+      m_store->block_remove(tmp);
     } else {
       ++it;
     }

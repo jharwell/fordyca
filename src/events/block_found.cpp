@@ -49,12 +49,7 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-block_found::block_found(std::unique_ptr<crepr::base_block2D> block)
-    : ER_CLIENT_INIT("fordyca.events.block_found"),
-      cell2D_op(block->dloc()),
-      m_block(std::move(block)) {}
-
-block_found::block_found(const std::shared_ptr<crepr::base_block2D>& block)
+block_found::block_found(crepr::base_block2D* block)
     : ER_CLIENT_INIT("fordyca.events.block_found"),
       cell2D_op(block->dloc()),
       m_block(block) {}
@@ -67,21 +62,21 @@ void block_found::visit(ds::dpo_store& store) {
    * If the cell in the arena that we thought contained a cache now contains a
    * block, remove the out-of-date cache.
    */
-  for (auto& c : store.caches().values_range()) {
-    if (m_block->dloc() == c.ent()->dloc()) {
-      store.cache_remove(c.ent());
-
-      /*
-       * We need to start a new decay count because the type of object in a
-       * given cell has changed. This is regardless of the status repeat
-       * deposits, which only affect repeated sightings of KNOWN objects.
-       */
-      c.density().reset();
+  auto it = store.caches().values_range().begin();
+  while (it != store.caches().values_range().end()) {
+    if (m_block->dloc() == it->ent()->dloc()) {
+      cfrepr::base_cache* tmp = (*it).ent();
+      ++it;
+      ER_TRACE("Remove cache");
+      store.cache_remove(tmp);
+      ER_TRACE("Removed cache");
+    } else {
+      ++it;
     }
-  } /* for(&&c..) */
+  } /* while(it..) */
 
   crepr::pheromone_density density(store.pheromone_rho());
-  auto known = store.find(m_block.get());
+  auto known = store.find(m_block);
   if (nullptr != known) {
     /*
      * If the block we just "found" is already known and has a different
@@ -113,8 +108,8 @@ void block_found::visit(ds::dpo_store& store) {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  auto ent = ds::dp_block_map::value_type(m_block, density);
-  store.block_update(&ent);
+  store.block_update(repr::dpo_entity<crepr::base_block2D>(m_block->clone(),
+                                                           density));
 } /* visit() */
 
 /*******************************************************************************
@@ -159,7 +154,7 @@ void block_found::visit(ds::dpo_semantic_map& map) {
    * kind of cell entity.
    */
   if (cell.state_has_cache()) {
-    map.cache_remove(cell.cache().get());
+    map.cache_remove(cell.cache());
   }
 
   /*
@@ -206,8 +201,8 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
    * #229.
    */
-  auto ent = ds::dp_block_map::value_type(m_block, density);
-  auto res = map.block_update(&ent);
+  auto res = map.store()->block_update(repr::dpo_entity(m_block->clone(),
+                                                        density));
   if (res.status) {
     if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",

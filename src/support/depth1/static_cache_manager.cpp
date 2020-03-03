@@ -57,7 +57,7 @@ static_cache_manager::static_cache_manager(
  ******************************************************************************/
 boost::optional<cfds::cache_vector> static_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const cfds::block_vector& c_alloc_blocks) {
+    const cfds::block_vector2& c_alloc_blocks) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= cfrepr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
@@ -97,7 +97,7 @@ boost::optional<cfds::cache_vector> static_cache_manager::create(
 
 boost::optional<cfds::cache_vector> static_cache_manager::create_conditional(
     const cache_create_ro_params& c_params,
-    const cfds::block_vector& c_alloc_blocks,
+    const cfds::block_vector2& c_alloc_blocks,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
@@ -110,10 +110,10 @@ boost::optional<cfds::cache_vector> static_cache_manager::create_conditional(
   }
 } /* create_conditional() */
 
-boost::optional<cfds::block_vector> static_cache_manager::blocks_alloc(
+boost::optional<cfds::block_vector2> static_cache_manager::blocks_alloc(
     const cfds::cache_vector& existing_caches,
-    const cfds::block_vector& blocks) const {
-  cfds::block_vector alloc_i;
+    const cfds::block_vector2& blocks) const {
+  cfds::block_vector2 alloc_i;
   for (auto& loc : mc_cache_locs) {
     if (auto cache_i = cache_i_blocks_alloc(existing_caches,
                                             alloc_i,
@@ -128,19 +128,19 @@ boost::optional<cfds::block_vector> static_cache_manager::blocks_alloc(
   } /* for(&loc..) */
 
   if (alloc_i.empty()) {
-    return boost::optional<cfds::block_vector>();
+    return boost::optional<cfds::block_vector2>();
   } else {
     return boost::make_optional(alloc_i);
   }
 } /* blocks_alloc() */
 
-boost::optional<cfds::block_vector> static_cache_manager::cache_i_blocks_alloc(
+boost::optional<cfds::block_vector2> static_cache_manager::cache_i_blocks_alloc(
     const cfds::cache_vector& existing_caches,
-    const cfds::block_vector& allocated_blocks,
-    const cfds::block_vector& all_blocks,
+    const cfds::block_vector2& allocated_blocks,
+    const cfds::block_vector2& all_blocks,
     const rmath::vector2d& loc,
     size_t n_blocks) const {
-  cfds::block_vector cache_i_blocks;
+  cfds::block_vector2 cache_i_blocks;
   rmath::vector2u dcenter =
       rmath::dvec2uvec(loc, arena_grid()->resolution().v());
   std::copy_if(
@@ -212,7 +212,7 @@ boost::optional<cfds::block_vector> static_cache_manager::cache_i_blocks_alloc(
               cache_i_blocks.size() - count,
               cache_i_blocks.size(),
               cfrepr::base_cache::kMinBlocks);
-    return boost::optional<cfds::block_vector>();
+    return boost::optional<cfds::block_vector2>();
   }
   if (cache_i_blocks.size() < mc_cache_config.static_.size) {
     ER_WARN(
@@ -222,14 +222,14 @@ boost::optional<cfds::block_vector> static_cache_manager::cache_i_blocks_alloc(
         dcenter.to_str().c_str(),
         cache_i_blocks.size(),
         mc_cache_config.static_.size);
-    return boost::optional<cfds::block_vector>();
+    return boost::optional<cfds::block_vector2>();
   }
   return boost::make_optional(cache_i_blocks);
 } /* cache_i_blocks_alloc() */
 
 void static_cache_manager::post_creation_blocks_absorb(
     const cfds::cache_vector& caches,
-    const cfds::block_vector& blocks) {
+    const cfds::block_vector2& blocks) {
   for (auto& b : blocks) {
     for (auto& c : caches) {
       if (!c->contains_block(b) && c->xspan().overlaps_with(b->xspan()) &&

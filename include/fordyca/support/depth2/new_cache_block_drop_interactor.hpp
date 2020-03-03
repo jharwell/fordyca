@@ -139,7 +139,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     ER_ASSERT(m_map->caches().end() != it,
               "FATAL: Cache%d does not exist?",
               status.entity_id.v());
-    events::cache_proximity_visitor prox_op(*it);
+    events::cache_proximity_visitor prox_op((*it).get());
     prox_op.visit(controller);
   }
 
@@ -187,7 +187,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
       ER_ASSERT(m_map->caches().end() != it,
                 "FATAL: Cache%d does not exist?",
                 status.entity_id.v());
-      events::cache_proximity_visitor prox_op(*it);
+      events::cache_proximity_visitor prox_op((*it).get());
       prox_op.visit(controller);
       return interactor_status::ekNO_EVENT;
     } else {
@@ -208,7 +208,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     auto loc = rmath::dvec2uvec(controller.position2D(),
                                 m_map->grid_resolution().v());
 
-    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
+    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks2()[penalty.id().v()],
                                                      loc,
                                                      m_map->grid_resolution(),
                                                      cfds::arena_map_locking::ekNONE_HELD);

@@ -167,7 +167,7 @@ void robot_free_block_drop::visit(fsm::block_to_goal_fsm& fsm) {
 void robot_free_block_drop::visit(cds::cell2D& cell) {
   visit(*m_block);
   visit(cell.fsm());
-  cell.entity(m_block);
+  cell.entity(m_block.get());
 } /* visit() */
 
 void robot_free_block_drop::visit(cfsm::cell2D_fsm& fsm) {

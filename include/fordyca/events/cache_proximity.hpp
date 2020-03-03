@@ -65,7 +65,7 @@ class cache_proximity : public rer::client<cache_proximity> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cache_proximity(const std::shared_ptr<cfrepr::base_cache>& cache);
+  explicit cache_proximity(cfrepr::base_cache* cache);
   ~cache_proximity(void) override = default;
 
   cache_proximity(const cache_proximity& op) = delete;
@@ -81,9 +81,10 @@ class cache_proximity : public rer::client<cache_proximity> {
   void visit(fsm::block_to_goal_fsm& fsm);
 
  private:
-  /* clang-format off */
   void dispatch_cache_interactor(tasks::base_foraging_task* task);
-  std::shared_ptr<cfrepr::base_cache> m_cache;
+
+  /* clang-format off */
+  cfrepr::base_cache* m_cache;
   /* clang-format on */
 };
 

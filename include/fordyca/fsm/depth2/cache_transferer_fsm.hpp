@@ -68,6 +68,7 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
 
   /* goal acquisition metrics */
   cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  rtypes::type_uuid entity_acquired_id(void) const override;
 
   /* block transportation */
   foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;

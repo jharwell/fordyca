@@ -72,11 +72,11 @@ class static_cache_manager final : public base_cache_manager,
    * specified minimum size.
    */
   boost::optional<cfds::cache_vector> create(const cache_create_ro_params& c_params,
-                                             const cfds::block_vector&  c_alloc_blocks);
+                                             const cfds::block_vector2&  c_alloc_blocks);
 
   boost::optional<cfds::cache_vector> create_conditional(
       const cache_create_ro_params& c_params,
-      const cfds::block_vector&  c_alloc_blocks,
+      const cfds::block_vector2&  c_alloc_blocks,
       uint n_harvesters,
       uint n_collectors);
 
@@ -97,9 +97,9 @@ class static_cache_manager final : public base_cache_manager,
    * the arena to meet the desired initial size of at least one cache, which is
    * not an error (all blocks can currently be carried by robots, for example).
    */
-  boost::optional<cfds::block_vector> blocks_alloc(
+  boost::optional<cfds::block_vector2> blocks_alloc(
       const cfds::cache_vector& existing_caches,
-      const cfds::block_vector& all_blocks) const;
+      const cfds::block_vector2& all_blocks) const;
 
   /**
    * \brief Allocate the blocks that should be used when re-creating cache i.
@@ -125,10 +125,10 @@ class static_cache_manager final : public base_cache_manager,
    * \param loc The location the new cache is to be created at.
    * \param n_blocks How many blocks to try to allocate for cache i.
    */
-  boost::optional<cfds::block_vector> cache_i_blocks_alloc(
+  boost::optional<cfds::block_vector2> cache_i_blocks_alloc(
       const cfds::cache_vector& existing_caches,
-      const cfds::block_vector& allocated_blocks,
-      const cfds::block_vector& all_blocks,
+      const cfds::block_vector2& allocated_blocks,
+      const cfds::block_vector2& all_blocks,
       const rmath::vector2d& loc,
       size_t n_blocks) const;
 
@@ -147,7 +147,7 @@ class static_cache_manager final : public base_cache_manager,
    * creation.
    */
   void post_creation_blocks_absorb(const cfds::cache_vector& caches,
-                                   const cfds::block_vector& blocks);
+                                   const cfds::block_vector2& blocks);
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

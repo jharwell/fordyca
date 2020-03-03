@@ -85,6 +85,7 @@ void crw_controller::control_step(void) {
  * FSM Metrics
  ******************************************************************************/
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, goal_acquired, *m_fsm, const);
+RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, entity_acquired_id, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, is_exploring_for_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, acquisition_goal, *m_fsm, const);
 RCPPSW_WRAP_OVERRIDE_DEF(crw_controller, block_transport_goal, *m_fsm, const);

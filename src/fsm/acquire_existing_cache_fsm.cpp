@@ -115,16 +115,15 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
   if (auto best = selector(mc_store->caches(),
                            saa()->sensing()->position(),
                            saa()->sensing()->tick())) {
-    ER_INFO("Selected existing cache%d@%s/%s, utility=%f for acquisition",
-            best->ent()->id().v(),
-            best->ent()->rloc().to_str().c_str(),
-            best->ent()->dloc().to_str().c_str(),
-            best->density().v());
+    ER_INFO("Selected existing cache%d@%s/%s for acquisition",
+            best->id().v(),
+            best->rloc().to_str().c_str(),
+            best->dloc().to_str().c_str());
 
     rmath::vector2d point = cache_acq_point_selector(kFOOTBOT_CACHE_ACQ_FACTOR)(
-        saa()->sensing()->position(), best->ent(), rng());
+        saa()->sensing()->position(), best, rng());
 
-    return boost::make_optional(std::make_pair(best->ent()->id(), point));
+    return boost::make_optional(std::make_pair(best->id(), point));
   } else {
     /*
      * If this happens, all the caches we know of are too close for us to vector

@@ -25,6 +25,7 @@
 
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/foraging/repr/base_cache.hpp"
 
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"

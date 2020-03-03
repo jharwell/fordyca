@@ -44,12 +44,7 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(std::unique_ptr<cfrepr::base_cache> cache)
-    : cell2D_op(cache->dloc()),
-      ER_CLIENT_INIT("fordyca.events.cache_found"),
-      m_cache(std::move(cache)) {}
-
-cache_found::cache_found(const std::shared_ptr<cfrepr::base_cache>& cache)
+cache_found::cache_found(cfrepr::base_cache* cache)
     : cell2D_op(cache->dloc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}
@@ -68,16 +63,22 @@ void cache_found::visit(ds::dpo_store& store) {
    * a new cache there, we are tracking blocks that no longer exist in the
    * arena.
    */
-  for (auto&& b : store.blocks().values_range()) {
-    if (m_cache->contains_point(b.ent()->rloc())) {
+  auto it = store.blocks().values_range().begin();
+  while (it != store.blocks().values_range().end()) {
+    if (m_cache->contains_point(it->ent()->rloc())) {
+      crepr::base_block2D* tmp = (*it).ent();
+      ++it;
       ER_TRACE("Remove block%d hidden behind cache%d",
-               b.ent()->id().v(),
+               tmp->id().v(),
                m_cache->id().v());
-      store.block_remove(b.ent());
+      store.block_remove(tmp);
+      ER_TRACE("Removed block");
+    } else {
+      ++it;
     }
   } /* while(it..) */
 
-  auto known = store.find(m_cache.get());
+  auto known = store.find(m_cache);
   crepr::pheromone_density density(store.pheromone_rho());
   if (nullptr != known) {
     density = known->density();
@@ -95,8 +96,8 @@ void cache_found::visit(ds::dpo_store& store) {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  auto ent = ds::dp_cache_map::value_type(m_cache, density);
-  store.cache_update(&ent);
+  auto ent = ds::dp_cache_map::value_type(m_cache->clone(), density);
+  store.cache_update(std::move(ent));
 } /* visit() */
 
 /*******************************************************************************
@@ -189,7 +190,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
    * kind of cell entity.
    */
   if (cell.state_has_block()) {
-    map.block_remove(cell.block().get());
+    map.block_remove(cell.block());
   }
 
   /*
@@ -214,8 +215,20 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
       density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
     }
   }
-  auto ent = ds::dp_cache_map::value_type(m_cache, density);
-  map.cache_update(&ent);
+  /*
+   * The cache we get a handle to is owned by the simulation, and we don't
+   * want to just pass that into the robot's arena_map, as keeping them in
+   * sync is not possible in all situations.
+   *
+   * For example, if a block executing the collector task picks up a block
+   * and tries to compute the best cache to bring it to, only to have one or
+   * more of its cache references be invalid due to other robots causing
+   * caches to be created/destroyed.
+   *
+   * Cloning is definitely necessary here.
+   */
+  auto ent = ds::dp_cache_map::value_type(m_cache->clone(), density);
+  map.store()->cache_update(std::move(ent));
   visit(cell);
 } /* visit() */
 

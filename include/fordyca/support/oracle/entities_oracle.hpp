@@ -64,8 +64,8 @@ NS_START(fordyca, support, oracle);
  */
 class entities_oracle final : public rer::client<entities_oracle> {
  public:
-  using variant_type = boost::variant<std::shared_ptr<crepr::base_block2D>,
-                                      std::shared_ptr<cfrepr::base_cache>>;
+  using variant_type = boost::variant<crepr::base_block2D*,
+                                      cfrepr::base_cache*>;
   using variant_vector_type = std::vector<variant_type>;
 
   static std::string result_to_string(const variant_vector_type& v);

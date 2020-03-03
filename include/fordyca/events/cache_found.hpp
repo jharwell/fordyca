@@ -71,8 +71,7 @@ class cache_found : public cevents::cell2D_op, public rer::client<cache_found> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cache_found(std::unique_ptr<cfrepr::base_cache> cache);
-  explicit cache_found(const std::shared_ptr<cfrepr::base_cache>& cache);
+  explicit cache_found(cfrepr::base_cache* cache);
   ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
@@ -93,7 +92,9 @@ class cache_found : public cevents::cell2D_op, public rer::client<cache_found> {
   void visit(controller::depth2::birtd_omdpo_controller& c);
 
  private:
-  std::shared_ptr<cfrepr::base_cache> m_cache;
+  /* clang-format off */
+  cfrepr::base_cache* m_cache;
+  /* clang-format on */
 };
 
 /**

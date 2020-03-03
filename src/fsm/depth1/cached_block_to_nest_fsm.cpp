@@ -187,6 +187,11 @@ RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
                          m_cache_fsm,
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
+                         entity_acquired_id,
+                         m_cache_fsm,
+                         const);
+
 bool cached_block_to_nest_fsm::goal_acquired(void) const {
   if (foraging_acq_goal::type::ekEXISTING_CACHE == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;

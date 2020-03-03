@@ -73,8 +73,8 @@ class line_of_sight final : public rer::client<line_of_sight> {
         mc_center(center),
         mc_view(c_view) {}
 
-  cfds::block_list blocks(void) const;
-  ds::cache_list caches(void) const;
+  cfds::block_list2 blocks(void) const;
+  ds::cache_list2 caches(void) const;
 
   /**
    * \brief Get the size of the X dimension for a LOS.
@@ -130,8 +130,6 @@ class line_of_sight final : public rer::client<line_of_sight> {
   /* clang-format off */
   const rmath::vector2u mc_center;
   const const_grid_view mc_view;
-
-  ds::cache_list        m_caches{};
   /* clang-format on */
 };
 

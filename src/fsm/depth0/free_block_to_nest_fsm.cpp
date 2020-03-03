@@ -191,6 +191,11 @@ RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
                          m_block_fsm,
                          const);
 
+RCPPSW_WRAP_OVERRIDE_DEF(free_block_to_nest_fsm,
+                         entity_acquired_id,
+                         m_block_fsm,
+                         const);
+
 goal_type free_block_to_nest_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {

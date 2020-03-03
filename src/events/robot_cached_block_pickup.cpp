@@ -217,7 +217,7 @@ void robot_cached_block_pickup::visit(ds::dpo_semantic_map& map) {
     RCSW_UNUSED rtypes::type_uuid id = cell.cache()->id();
     cell.cache()->block_remove(m_robot_block.get());
 
-    map.cache_remove(cell.cache().get());
+    map.cache_remove(cell.cache());
     ER_INFO("DPO Map: fb%u: block%d from cache%d@%s [depleted]",
             mc_robot_id.v(),
             mc_block->id().v(),
