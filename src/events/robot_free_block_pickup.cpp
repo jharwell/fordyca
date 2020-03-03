@@ -62,10 +62,9 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-robot_free_block_pickup::robot_free_block_pickup(
-    std::shared_ptr<crepr::base_block2D> block,
-    const rtypes::type_uuid& robot_id,
-    const rtypes::timestep& t)
+robot_free_block_pickup::robot_free_block_pickup(crepr::base_block2D* block,
+                                                 const rtypes::type_uuid& robot_id,
+                                                 const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.robot_free_block_pickup"),
       cell2D_op(block->dloc()),
       mc_timestep(t),
@@ -77,7 +76,7 @@ robot_free_block_pickup::robot_free_block_pickup(
  ******************************************************************************/
 void robot_free_block_pickup::dispatch_robot_free_block_interactor(
     tasks::base_foraging_task* const task) {
-  RCSW_UNUSED auto* polled = dynamic_cast<cta::polled_task*>(task);
+  auto* polled RCSW_UNUSED = dynamic_cast<cta::polled_task*>(task);
   auto* interactor = dynamic_cast<events::free_block_interactor*>(task);
   ER_ASSERT(nullptr != interactor,
             "Non free block interactor task %s causing free block pickup",
@@ -88,7 +87,8 @@ void robot_free_block_pickup::dispatch_robot_free_block_interactor(
 /*******************************************************************************
  * CRW Foraging
  ******************************************************************************/
-void robot_free_block_pickup::visit(controller::depth0::crw_controller& controller) {
+void robot_free_block_pickup::visit(
+    controller::depth0::crw_controller& controller) {
   controller.ndc_pusht();
   visit(*controller.fsm());
   auto robot_block = m_block->clone();
@@ -109,12 +109,12 @@ void robot_free_block_pickup::visit(fsm::depth0::crw_fsm& fsm) {
  * DPO/MDPO Depth0 Foraging
  ******************************************************************************/
 void robot_free_block_pickup::visit(ds::dpo_store& store) {
-  ER_ASSERT(store.contains(m_block.get()),
+  ER_ASSERT(store.contains(m_block),
             "Block%d@%s not in DPO store",
             m_block->id().v(),
             m_block->dloc().to_str().c_str());
-  store.block_remove(m_block.get());
-  ER_ASSERT(!store.contains(m_block.get()),
+  store.block_remove(m_block);
+  ER_ASSERT(!store.contains(m_block),
             "Block%d@%s in DPO store after removal",
             m_block->id().v(),
             m_block->dloc().to_str().c_str());
@@ -154,7 +154,8 @@ void robot_free_block_pickup::visit(fsm::depth0::dpo_fsm& fsm) {
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-void robot_free_block_pickup::visit(controller::depth0::mdpo_controller& controller) {
+void robot_free_block_pickup::visit(
+    controller::depth0::mdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
@@ -170,7 +171,8 @@ void robot_free_block_pickup::visit(controller::depth0::mdpo_controller& control
   controller.ndc_pop();
 } /* visit() */
 
-void robot_free_block_pickup::visit(controller::depth0::omdpo_controller& controller) {
+void robot_free_block_pickup::visit(
+    controller::depth0::omdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.mdpo_perception()->map());
@@ -186,7 +188,8 @@ void robot_free_block_pickup::visit(controller::depth0::omdpo_controller& contro
   controller.ndc_pop();
 } /* visit() */
 
-void robot_free_block_pickup::visit(controller::depth0::dpo_controller& controller) {
+void robot_free_block_pickup::visit(
+    controller::depth0::dpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());
@@ -202,7 +205,8 @@ void robot_free_block_pickup::visit(controller::depth0::dpo_controller& controll
   controller.ndc_pop();
 } /* visit() */
 
-void robot_free_block_pickup::visit(controller::depth0::odpo_controller& controller) {
+void robot_free_block_pickup::visit(
+    controller::depth0::odpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.dpo_perception()->dpo_store());

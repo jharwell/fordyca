@@ -29,8 +29,8 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "cosm/foraging/ds/arena_map.hpp"
-
 #include "cosm/foraging/events/arena_nest_block_drop.hpp"
+
 #include "fordyca/events/robot_nest_block_drop.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/depth0/depth0_metrics_aggregator.hpp"

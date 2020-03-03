@@ -261,7 +261,7 @@ argos::CColor depth0_loop_functions::GetFloorColor(
                          arena_map()->nest().color().blue());
   }
 
-  for (auto& block : arena_map()->blocks()) {
+  for (auto* block : arena_map()->blocks()) {
     /*
      * Even though each block type has a unique color, the only distinction
      * that robots can make to determine if they are on a block or not is

@@ -102,7 +102,7 @@ void mdpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cfds::block_list2 blocks = c_los->blocks();
+  cfds::block_vectorno blocks = c_los->blocks();
   if (!blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",
@@ -169,7 +169,7 @@ void mdpo_perception_subsystem::process_los_caches(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  ds::cache_list2 los_caches = c_los->caches();
+  cfds::bcache_vectorno los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
     ER_DEBUG("Caches in DPO store: [%s]",

@@ -27,11 +27,11 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "cosm/foraging/ds/arena_map.hpp"
-
-#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "cosm/foraging/events/arena_cache_block_drop.hpp"
+
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -183,10 +183,11 @@ class existing_cache_block_drop_interactor
      * Need to tell event to perform \ref arena_map block locking because there
      * we are only holding the cache mutex.
      */
-    cfevents::arena_cache_block_drop_visitor adrop_op(m_map->blocks2()[block_id.v()],
-                                                      (*cache_it).get(),
-                                                      m_map->grid_resolution(),
-                                                      cfds::arena_map_locking::ekCACHES_HELD);
+    cfevents::arena_cache_block_drop_visitor adrop_op(
+        m_map->blocks()[block_id.v()],
+        *cache_it,
+        m_map->grid_resolution(),
+        cfds::arena_map_locking::ekCACHES_HELD);
     events::robot_cache_block_drop_visitor rdrop_op(controller.block_release(),
                                                     *cache_it,
                                                     m_map->grid_resolution());

@@ -101,9 +101,9 @@ class dpo_perception_subsystem final
   void process_los_caches(const repr::line_of_sight* c_los);
 
   void los_tracking_sync(const repr::line_of_sight* c_los,
-                         const ds::cache_list2& los_caches);
+                         const cfds::bcache_vectorno& los_caches);
   void los_tracking_sync(const repr::line_of_sight* c_los,
-                         const cfds::block_list2& los_blocks);
+                         const cfds::block_vectorno& los_blocks);
 
  private:
   /* clang-format off */

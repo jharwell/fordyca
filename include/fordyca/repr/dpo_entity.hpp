@@ -53,8 +53,7 @@ template <class T>
 class dpo_entity {
  public:
   dpo_entity(void) = default;
-  dpo_entity(std::unique_ptr<T> ent,
-             const crepr::pheromone_density& density)
+  dpo_entity(std::unique_ptr<T> ent, const crepr::pheromone_density& density)
       : m_ent(std::move(ent)), m_density(density) {}
 
   /**

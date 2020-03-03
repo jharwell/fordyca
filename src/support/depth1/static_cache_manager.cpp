@@ -24,9 +24,9 @@
 
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/events/cell2D_empty.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "cosm/foraging/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
 
 #include "fordyca/math/cache_respawn_probability.hpp"
 #include "fordyca/support/depth1/static_cache_creator.hpp"
@@ -55,9 +55,9 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<cfds::cache_vector> static_cache_manager::create(
+boost::optional<cfds::acache_vectoro> static_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const cfds::block_vector2& c_alloc_blocks) {
+    const cfds::block_vectorno& c_alloc_blocks) {
   ER_DEBUG("(Re)-Creating static cache(s)");
   ER_ASSERT(mc_cache_config.static_.size >= cfrepr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
@@ -71,7 +71,7 @@ boost::optional<cfds::cache_vector> static_cache_manager::create(
         "(n_caches=%zu,n_alloc_blocks=%zu)",
         c_params.current_caches.size(),
         c_alloc_blocks.size());
-    return boost::optional<cfds::cache_vector>();
+    return boost::optional<cfds::acache_vectoro>();
   }
   static_cache_creator creator(arena_grid(),
                                mc_cache_locs,
@@ -95,9 +95,9 @@ boost::optional<cfds::cache_vector> static_cache_manager::create(
   return boost::make_optional(created);
 } /* create() */
 
-boost::optional<cfds::cache_vector> static_cache_manager::create_conditional(
+boost::optional<cfds::acache_vectoro> static_cache_manager::create_conditional(
     const cache_create_ro_params& c_params,
-    const cfds::block_vector2& c_alloc_blocks,
+    const cfds::block_vectorno& c_alloc_blocks,
     uint n_harvesters,
     uint n_collectors) {
   math::cache_respawn_probability p(
@@ -106,14 +106,14 @@ boost::optional<cfds::cache_vector> static_cache_manager::create_conditional(
   if (p.calc(n_harvesters, n_collectors) >= m_rng->uniform(0.0, 1.0)) {
     return create(c_params, c_alloc_blocks);
   } else {
-    return boost::optional<cfds::cache_vector>();
+    return boost::optional<cfds::acache_vectoro>();
   }
 } /* create_conditional() */
 
-boost::optional<cfds::block_vector2> static_cache_manager::blocks_alloc(
-    const cfds::cache_vector& existing_caches,
-    const cfds::block_vector2& blocks) const {
-  cfds::block_vector2 alloc_i;
+boost::optional<cfds::block_vectorno> static_cache_manager::blocks_alloc(
+    const cfds::acache_vectorno& existing_caches,
+    const cfds::block_vectorno& blocks) const {
+  cfds::block_vectorno alloc_i;
   for (auto& loc : mc_cache_locs) {
     if (auto cache_i = cache_i_blocks_alloc(existing_caches,
                                             alloc_i,
@@ -128,19 +128,19 @@ boost::optional<cfds::block_vector2> static_cache_manager::blocks_alloc(
   } /* for(&loc..) */
 
   if (alloc_i.empty()) {
-    return boost::optional<cfds::block_vector2>();
+    return boost::optional<cfds::block_vectorno>();
   } else {
     return boost::make_optional(alloc_i);
   }
 } /* blocks_alloc() */
 
-boost::optional<cfds::block_vector2> static_cache_manager::cache_i_blocks_alloc(
-    const cfds::cache_vector& existing_caches,
-    const cfds::block_vector2& allocated_blocks,
-    const cfds::block_vector2& all_blocks,
+boost::optional<cfds::block_vectorno> static_cache_manager::cache_i_blocks_alloc(
+    const cfds::acache_vectorno& existing_caches,
+    const cfds::block_vectorno& allocated_blocks,
+    const cfds::block_vectorno& all_blocks,
     const rmath::vector2d& loc,
     size_t n_blocks) const {
-  cfds::block_vector2 cache_i_blocks;
+  cfds::block_vectorno cache_i_blocks;
   rmath::vector2u dcenter =
       rmath::dvec2uvec(loc, arena_grid()->resolution().v());
   std::copy_if(
@@ -212,7 +212,7 @@ boost::optional<cfds::block_vector2> static_cache_manager::cache_i_blocks_alloc(
               cache_i_blocks.size() - count,
               cache_i_blocks.size(),
               cfrepr::base_cache::kMinBlocks);
-    return boost::optional<cfds::block_vector2>();
+    return boost::optional<cfds::block_vectorno>();
   }
   if (cache_i_blocks.size() < mc_cache_config.static_.size) {
     ER_WARN(
@@ -222,14 +222,14 @@ boost::optional<cfds::block_vector2> static_cache_manager::cache_i_blocks_alloc(
         dcenter.to_str().c_str(),
         cache_i_blocks.size(),
         mc_cache_config.static_.size);
-    return boost::optional<cfds::block_vector2>();
+    return boost::optional<cfds::block_vectorno>();
   }
   return boost::make_optional(cache_i_blocks);
 } /* cache_i_blocks_alloc() */
 
 void static_cache_manager::post_creation_blocks_absorb(
-    const cfds::cache_vector& caches,
-    const cfds::block_vector2& blocks) {
+    const cfds::acache_vectoro& caches,
+    const cfds::block_vectorno& blocks) {
   for (auto& b : blocks) {
     for (auto& c : caches) {
       if (!c->contains_block(b) && c->xspan().overlaps_with(b->xspan()) &&

@@ -23,9 +23,9 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
 
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"

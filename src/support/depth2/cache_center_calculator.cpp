@@ -49,8 +49,8 @@ cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
  * Member Functions
  ******************************************************************************/
 boost::optional<rmath::vector2u> cache_center_calculator::operator()(
-    const cfds::block_vector2& c_cache_i_blocks,
-    const cfds::cache_vector& c_existing_caches,
+    const cfds::block_vectorno& c_cache_i_blocks,
+    const cfds::acache_vectorno& c_existing_caches,
     const cfds::block_cluster_vector& c_clusters,
     rmath::rng* rng) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),
@@ -113,7 +113,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
 } /* calc_center() */
 
 boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
-    const cfds::cache_vector& c_existing_caches,
+    const cfds::acache_vectorno& c_existing_caches,
     const cfds::block_cluster_vector& c_clusters,
     const rmath::vector2u& c_center,
     rmath::rng* rng) const {
@@ -129,7 +129,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
 
       /* check the current cache */
       if (auto new_loc =
-              deconflict_loc_entity(c_existing_caches[j].get(), c_center, rng)) {
+              deconflict_loc_entity(c_existing_caches[j], c_center, rng)) {
         new_center = new_loc.get();
         conflict = true;
       }

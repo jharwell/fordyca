@@ -54,9 +54,8 @@ NS_START(fordyca, events, detail);
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-robot_nest_block_drop::robot_nest_block_drop(
-    std::shared_ptr<crepr::base_block2D> block,
-    const rtypes::timestep& t)
+robot_nest_block_drop::robot_nest_block_drop(crepr::base_block2D* block,
+                                             const rtypes::timestep& t)
     : ER_CLIENT_INIT("fordyca.events.robot_nest_block_drop"),
       mc_timestep(t),
       m_block(block) {}
@@ -101,7 +100,8 @@ void robot_nest_block_drop::visit(controller::depth0::dpo_controller& controller
   controller.ndc_pop();
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::depth0::odpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::depth0::odpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
@@ -116,7 +116,8 @@ void robot_nest_block_drop::visit(fsm::depth0::dpo_fsm& fsm) {
                    rpfsm::event_type::ekNORMAL);
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::depth0::mdpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::depth0::mdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
@@ -126,7 +127,8 @@ void robot_nest_block_drop::visit(controller::depth0::mdpo_controller& controlle
   controller.ndc_pop();
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::depth0::omdpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::depth0::omdpo_controller& controller) {
   controller.ndc_pusht();
 
   visit(*controller.fsm());
@@ -139,7 +141,8 @@ void robot_nest_block_drop::visit(controller::depth0::omdpo_controller& controll
 /*******************************************************************************
  * Depth1 Foraging
  ******************************************************************************/
-void robot_nest_block_drop::visit(controller::depth1::bitd_dpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -149,7 +152,8 @@ void robot_nest_block_drop::visit(controller::depth1::bitd_dpo_controller& contr
   controller.ndc_pop();
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::depth1::bitd_odpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::depth1::bitd_odpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -159,7 +163,8 @@ void robot_nest_block_drop::visit(controller::depth1::bitd_odpo_controller& cont
   controller.ndc_pop();
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::depth1::bitd_mdpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::depth1::bitd_mdpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());
@@ -212,7 +217,8 @@ void robot_nest_block_drop::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void robot_nest_block_drop::visit(controller::depth2::birtd_dpo_controller& controller) {
+void robot_nest_block_drop::visit(
+    controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_nest_interactor(controller.current_task());

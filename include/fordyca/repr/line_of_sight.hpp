@@ -32,9 +32,8 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/foraging/ds/block_list.hpp"
-
-#include "fordyca/ds/cache_list.hpp"
+#include "cosm/foraging/ds/block_vector.hpp"
+#include "cosm/foraging/ds/cache_vector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -62,6 +61,10 @@ NS_START(fordyca, repr);
  *
  * All coordinates within a LOS are relative to the LOS itself (not its location
  * within the arena). The origin is in the lower left corner of the LOS.
+ *
+ * The line of sight itself is meant to be a read-only view of part of the
+ * arena, but it also exposes non-const access to the blocks and caches within
+ * that part of the arena by necessity for event processing.
  */
 class line_of_sight final : public rer::client<line_of_sight> {
  public:
@@ -73,8 +76,8 @@ class line_of_sight final : public rer::client<line_of_sight> {
         mc_center(center),
         mc_view(c_view) {}
 
-  cfds::block_list2 blocks(void) const;
-  ds::cache_list2 caches(void) const;
+  cfds::block_vectorno blocks(void) const;
+  cfds::bcache_vectorno caches(void) const;
 
   /**
    * \brief Get the size of the X dimension for a LOS.

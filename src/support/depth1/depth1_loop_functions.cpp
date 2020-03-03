@@ -309,7 +309,7 @@ void depth1_loop_functions::cache_handling_init(
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   cpal::swarm_manager::led_medium(config::saa_xml_names().leds_saa);
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks2())) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -455,8 +455,8 @@ void depth1_loop_functions::post_step(void) {
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about existing caches */
-  for (auto& c : arena_map()->caches()) {
-    m_metrics_agg->collect_from_cache(c.get());
+  for (auto* c : arena_map()->caches()) {
+    m_metrics_agg->collect_from_cache(c);
     c->reset_metrics();
   } /* for(&c..) */
 
@@ -464,7 +464,7 @@ void depth1_loop_functions::post_step(void) {
    * Collect metrics from/about zombie caches (caches that have been depleted
    * this timestep). These are not captured by the usual metric collection
    * process as they have been depleted and do not exist anymore in the \ref
-   * arena_map::caches() array.
+   * arena_map::cacheso() array.
    */
   for (auto& c : arena_map()->zombie_caches()) {
     m_metrics_agg->collect_from_cache(c.get());
@@ -502,7 +502,7 @@ void depth1_loop_functions::reset() {
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks2())) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
   }
@@ -527,7 +527,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks render inside of caches.
    */
-  for (auto& cache : arena_map()->caches()) {
+  for (auto* cache : arena_map()->caches()) {
     if (cache->contains_point(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
@@ -535,7 +535,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
     }
   } /* for(&cache..) */
 
-  for (auto& block : arena_map()->blocks()) {
+  for (auto* block : arena_map()->blocks()) {
     /*
      * Even though each block type has a unique color, the only distinction
      * that robots can make to determine if they are on a block or not is
@@ -647,20 +647,16 @@ void depth1_loop_functions::static_cache_monitor(void) {
 
   if (auto created =
           m_cache_manager->create_conditional(ccp,
-                                              arena_map()->blocks2(),
+                                              arena_map()->blocks(),
                                               m_cache_counts.first,
                                               m_cache_counts.second)) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return;
   }
-  ER_INFO(
-      "Could not create static caches: n_harvesters=%u,n_collectors=%u,free "
-      "blocks=%zu",
-      m_cache_counts.first.load(),
-      m_cache_counts.second.load(),
-      utils::free_blocks_calc(arena_map()->caches(), arena_map()->blocks2())
-          .size());
+  ER_INFO("Could not create static caches: n_harvesters=%u,n_collectors=%u",
+          m_cache_counts.first.load(),
+          m_cache_counts.second.load());
 } /* static_cache_monitor() */
 
 bool depth1_loop_functions::caches_depleted(void) const {

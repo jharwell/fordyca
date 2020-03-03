@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/controller/oracular_info_receptor.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
 #include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/polled_task.hpp"
 #include "cosm/ta/time_estimate.hpp"

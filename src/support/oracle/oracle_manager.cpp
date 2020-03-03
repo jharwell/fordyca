@@ -52,28 +52,25 @@ void oracle_manager::tasking_oracle(std::unique_ptr<class tasking_oracle> o) {
 void oracle_manager::update(cfds::arena_map* const map) {
   if (m_entities->blocks_enabled()) {
     entities_oracle::variant_vector_type v;
-    auto caches = map->caches2();
-    auto blocks = map->blocks2();
-
     /*
      * Updates to oracle manager can happen in parallel, so we want to make sure
      * we don't get a set of blocks in a partially updated state. See #594.
      */
     std::scoped_lock lock(*map->block_mtx());
 
-    std::copy_if(blocks.begin(),
-                 blocks.end(),
+    std::copy_if(map->blocks().begin(),
+                 map->blocks().end(),
                  std::back_inserter(v),
                  [&](const auto& b) {
                    /* don't include blocks robot's are carrying */
                    return rtypes::constants::kNoUUID == b->robot_id() &&
-                       /*
+                          /*
                         * Don't include blocks that are currently in a cache
                         * (harmless, but causes repeated "removed block hidden
                         * behind cache" warnings)
                         */
-                          std::none_of(caches.begin(),
-                                       caches.end(),
+                          std::none_of(map->caches().begin(),
+                                       map->caches().end(),
                                        [&](const auto& c) {
                                          return c->contains_block(b);
                                        });
@@ -84,8 +81,7 @@ void oracle_manager::update(cfds::arena_map* const map) {
   if (m_entities->caches_enabled()) {
     std::scoped_lock lock(*map->cache_mtx());
     entities_oracle::variant_vector_type v;
-    auto caches = map->caches2();
-    for (auto& c : caches) {
+    for (auto& c : map->caches()) {
       v.push_back(c);
     } /* for(&b..) */
     m_entities->set_caches(v);

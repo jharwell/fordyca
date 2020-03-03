@@ -96,7 +96,7 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
 
     rtypes::type_uuid id = penalty_id_calc(controller, src, cache_prox);
     rtypes::timestep orig_duration = penalty_calc(t);
-    auto RCSW_UNUSED duration = penalty_add(&controller,
+    auto duration RCSW_UNUSED = penalty_add(&controller,
                                             id,
                                             orig_duration,
                                             t);

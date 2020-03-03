@@ -28,17 +28,17 @@
 
 #include "cosm/foraging/ds/arena_map.hpp"
 #include "cosm/foraging/events/arena_cached_block_pickup.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
-#include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
+#include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -211,17 +211,13 @@ class cached_block_pickup_interactor
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == penalty.id(); });
     ER_ASSERT(it != m_map->caches().end(),
-              "Cache%d from penalty does not exist",
+              "Cache%d from penalty does not exist?",
               penalty.id().v());
-    cfevents::arena_cached_block_pickup_visitor apickup_op(*it,
-                                                           m_loop,
-                                                           controller.entity_id(),
-                                                           t);
+    cfevents::arena_cached_block_pickup_visitor apickup_op(
+        *it, m_loop, controller.entity_id(), t);
     const crepr::base_block2D* to_pickup = (*it)->oldest_block();
-    events::robot_cached_block_pickup_visitor rpickup_op(it->get(),
-                                                         to_pickup,
-                                                         controller.entity_id(),
-                                                         t);
+    events::robot_cached_block_pickup_visitor rpickup_op(
+        *it, to_pickup, controller.entity_id(), t);
     (*it)->penalty_served(penalty.penalty());
 
     uint old_n_caches = m_map->caches().size();

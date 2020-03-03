@@ -29,11 +29,12 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/dp_block_map.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
 #include "fordyca/ds/dpo_map.hpp"
-#include "cosm/repr/base_block2D.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -124,7 +125,8 @@ class dpo_store final : public rer::client<dpo_store> {
   const dp_cache_map::value_type* find(const cfrepr::base_cache* cache) const;
   dp_cache_map::value_type* find(const cfrepr::base_cache* cache);
 
-  const dp_block_map::value_type* find(const crepr::base_block2D* block) const RCSW_PURE;
+  const dp_block_map::value_type* find(
+      const crepr::base_block2D* block) const RCSW_PURE;
   dp_block_map::value_type* find(const crepr::base_block2D* block) RCSW_PURE;
 
   /**

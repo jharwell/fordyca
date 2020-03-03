@@ -24,7 +24,7 @@
 #include "fordyca/repr/line_of_sight.hpp"
 
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,8 +34,8 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cfds::block_list2 line_of_sight::blocks(void) const {
-  cfds::block_list2 blocks{};
+cfds::block_vectorno line_of_sight::blocks(void) const {
+  cfds::block_vectorno blocks{};
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {
       const cds::cell2D& cell = mc_view[i][j];
@@ -51,8 +51,8 @@ cfds::block_list2 line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-ds::cache_list2 line_of_sight::caches(void) const {
-  ds::cache_list2 caches;
+cfds::bcache_vectorno line_of_sight::caches(void) const {
+  cfds::bcache_vectorno caches;
 
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {

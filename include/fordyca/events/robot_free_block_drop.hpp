@@ -30,10 +30,11 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
+#include "cosm/events/cell2D_op.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
-#include "cosm/events/cell2D_op.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -87,10 +88,9 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
         fsm::block_to_goal_fsm,
         ds::dpo_semantic_map>;
 
-    using value =
-        boost::mpl::joint_view<boost::mpl::joint_view<controllers::type,
-                                                      others::type>,
-                               inherited>;
+    using value = boost::mpl::joint_view<
+        boost::mpl::joint_view<controllers::type, others::type>,
+        inherited>;
   };
 
  public:
@@ -100,7 +100,6 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
 
   robot_free_block_drop(const robot_free_block_drop& op) = delete;
   robot_free_block_drop& operator=(const robot_free_block_drop& op) = delete;
-
 
   /* depth1 */
   void visit(class cds::cell2D& cell);
@@ -159,7 +158,8 @@ using robot_free_block_drop_visitor_impl =
 
 NS_END(detail);
 
-class robot_free_block_drop_visitor : public detail::robot_free_block_drop_visitor_impl {
+class robot_free_block_drop_visitor
+    : public detail::robot_free_block_drop_visitor_impl {
   using detail::robot_free_block_drop_visitor_impl::robot_free_block_drop_visitor_impl;
 };
 

@@ -28,7 +28,6 @@
 #include "fordyca/config/cache_sel/cache_pickup_policy_config.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dp_cache_map.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -91,9 +90,8 @@ bool cache_acq_validator::operator()(const rmath::vector2d& loc,
   return pickup_policy_validate(it->ent(), t);
 } /* operator()() */
 
-bool cache_acq_validator::pickup_policy_validate(
-    const cfrepr::base_cache* cache,
-    const rtypes::timestep& t) const {
+bool cache_acq_validator::pickup_policy_validate(const cfrepr::base_cache* cache,
+                                                 const rtypes::timestep& t) const {
   auto& config = boost::get<config::cache_sel::cache_pickup_policy_config>(
       mc_csel_matrix->find(cselm::kPickupPolicy)->second);
 

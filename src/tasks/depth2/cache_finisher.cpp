@@ -137,11 +137,11 @@ RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
                              polled_task::mechanism()),
                          const);
 
-RCPPSW_WRAP_OVERRIDE_DEF(
-    cache_finisher,
-    entity_acquired_id,
-    *static_cast<fsm::depth2::block_to_new_cache_fsm*>(polled_task::mechanism()),
-    const);
+RCPPSW_WRAP_OVERRIDE_DEF(cache_finisher,
+                         entity_acquired_id,
+                         *static_cast<fsm::depth2::block_to_new_cache_fsm*>(
+                             polled_task::mechanism()),
+                         const);
 
 /*******************************************************************************
  * Event Handling

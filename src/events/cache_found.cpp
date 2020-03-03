@@ -72,7 +72,6 @@ void cache_found::visit(ds::dpo_store& store) {
                tmp->id().v(),
                m_cache->id().v());
       store.block_remove(tmp);
-      ER_TRACE("Removed block");
     } else {
       ++it;
     }

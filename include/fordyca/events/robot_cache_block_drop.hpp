@@ -85,9 +85,9 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
         /* depth2 */
         tasks::depth2::cache_transferer>;
 
-    using value = boost::mpl::joint_view<boost::mpl::joint_view<others::type,
-                                                                controllers::type>,
-                                         inherited::type>;
+    using value = boost::mpl::joint_view<
+        boost::mpl::joint_view<others::type, controllers::type>,
+        inherited::type>;
   };
 
  public:
@@ -126,7 +126,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
    * \param resolution Arena resolution.
    */
   robot_cache_block_drop(std::unique_ptr<crepr::base_block2D> block,
-                         const std::shared_ptr<cfrepr::arena_cache>& cache,
+                         cfrepr::arena_cache* cache,
                          const rtypes::discretize_ratio& resolution);
 
  private:
@@ -138,7 +138,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
   const rtypes::discretize_ratio       mc_resolution;
 
   std::unique_ptr<crepr::base_block2D> m_block;
-  std::shared_ptr<cfrepr::arena_cache> m_cache;
+  cfrepr::arena_cache*                 m_cache;
   /* clang-format on */
 };
 
@@ -154,7 +154,8 @@ using robot_cache_block_drop_visitor_impl =
 
 NS_END(detail);
 
-class robot_cache_block_drop_visitor : public detail::robot_cache_block_drop_visitor_impl {
+class robot_cache_block_drop_visitor
+    : public detail::robot_cache_block_drop_visitor_impl {
   using detail::robot_cache_block_drop_visitor_impl::robot_cache_block_drop_visitor_impl;
 };
 

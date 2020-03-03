@@ -23,13 +23,13 @@
  ******************************************************************************/
 #include "fordyca/support/base_cache_creator.hpp"
 
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "cosm/foraging/events/cell2D_cache_extent.hpp"
 #include "cosm/foraging/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/foraging/repr/light_type_index.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
  ******************************************************************************/
 std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
     const rmath::vector2d& center,
-    cfds::block_vector2 blocks,
+    cfds::block_vectorno blocks,
     const rtypes::timestep& t) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
@@ -104,14 +104,12 @@ std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
   } /* for(block..) */
 
   for (auto& block : blocks) {
-    cfevents::arena_free_block_drop_visitor op(block,
-                                               d,
-                                               m_grid->resolution(),
-                                               cfds::arena_map_locking::ekALL_HELD);
+    cfevents::arena_free_block_drop_visitor op(
+        block, d, m_grid->resolution(), cfds::arena_map_locking::ekALL_HELD);
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
 
-  cfds::block_vector2 block_vec(blocks.begin(), blocks.end());
+  cfds::block_vectorno block_vec(blocks.begin(), blocks.end());
   auto ret = std::make_unique<cfrepr::arena_cache>(
       cfrepr::arena_cache::params{mc_cache_dim,
                                   m_grid->resolution(),
@@ -137,7 +135,7 @@ std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
   return ret;
 } /* create_single_cache() */
 
-void base_cache_creator::update_host_cells(cfds::cache_vector& caches) {
+void base_cache_creator::update_host_cells(cfds::acache_vectoro& caches) {
   /*
    * To reset all cells covered by a cache's extent, we simply send them a
    * CACHE_EXTENT event. EXCEPT for the cell that hosted the actual cache,
@@ -183,8 +181,8 @@ void base_cache_creator::update_host_cells(cfds::cache_vector& caches) {
 } /* update_host_cells() */
 
 bool base_cache_creator::creation_sanity_checks(
-    const cfds::cache_vector& caches,
-    const cfds::block_vector2& free_blocks,
+    const cfds::acache_vectoro& caches,
+    const cfds::block_vectorno& free_blocks,
     const cfds::block_cluster_vector& clusters) const {
   /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {

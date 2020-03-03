@@ -120,8 +120,8 @@ boost::optional<acquire_existing_cache_fsm::acq_loc_type> acquire_existing_cache
             best->rloc().to_str().c_str(),
             best->dloc().to_str().c_str());
 
-    rmath::vector2d point = cache_acq_point_selector(kFOOTBOT_CACHE_ACQ_FACTOR)(
-        saa()->sensing()->position(), best, rng());
+    rmath::vector2d point = cache_acq_point_selector(
+        kFOOTBOT_CACHE_ACQ_FACTOR)(saa()->sensing()->position(), best, rng());
 
     return boost::make_optional(std::make_pair(best->id(), point));
   } else {

@@ -60,8 +60,8 @@ class dynamic_cache_creator : public base_cache_creator,
    * \brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  cfds::cache_vector create_all(const cache_create_ro_params& c_params,
-                                const cfds::block_vector2&  c_alloc_blocks) override;
+  cfds::acache_vectoro create_all(const cache_create_ro_params& c_params,
+                                const cfds::block_vectorno&  c_alloc_blocks) override;
 
  private:
   /**
@@ -74,8 +74,8 @@ class dynamic_cache_creator : public base_cache_creator,
    *                     creation when the creator was called.
    * \param index Our current index within the candidate vector.
    */
-  cfds::block_vector2 cache_i_blocks_alloc(const cfds::block_vector2& c_used_blocks,
-                                           const cfds::block_vector2& c_alloc_blocks,
+  cfds::block_vectorno cache_i_blocks_alloc(const cfds::block_vectorno& c_used_blocks,
+                                           const cfds::block_vectorno& c_alloc_blocks,
                                            uint index) const;
 
   /**
@@ -93,10 +93,10 @@ class dynamic_cache_creator : public base_cache_creator,
    * blocks getting added to created caches twice, which causes all sorts of
    * problems. See #578.
    */
-  cfds::block_vector2 absorb_blocks_calc(
-      const cfds::block_vector2& c_alloc_blocks,
-      const cfds::block_vector2& c_cache_i_blocks,
-      const cfds::block_vector2& c_used_blocks,
+  cfds::block_vectorno absorb_blocks_calc(
+      const cfds::block_vectorno& c_alloc_blocks,
+      const cfds::block_vectorno& c_cache_i_blocks,
+      const cfds::block_vectorno& c_used_blocks,
       const rmath::vector2u& c_center,
       rtypes::spatial_dist cache_dim) const;
 
@@ -105,9 +105,9 @@ class dynamic_cache_creator : public base_cache_creator,
    * placement from the set of caches that existed prior to this invocation of
    * the creator + the set of caches we have created thus far during invocation.
    */
-  cfds::cache_vector avoidance_caches_calc(
-      const cfds::cache_vector& c_previous_caches,
-      const cfds::cache_vector& c_created_caches) const;
+  cfds::acache_vectorno avoidance_caches_calc(
+      const cfds::acache_vectorno& c_previous_caches,
+      const cfds::acache_vectoro& c_created_caches) const;
 
   /* clang-format off */
   const rtypes::spatial_dist mc_min_dist;

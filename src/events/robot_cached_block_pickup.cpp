@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/events/robot_cached_block_pickup.hpp"
 
-#include "cosm/repr/base_block2D.hpp"
 #include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"

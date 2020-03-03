@@ -23,6 +23,10 @@
  ******************************************************************************/
 #include "fordyca/events/robot_cache_block_drop.hpp"
 
+#include "cosm/ds/cell2D.hpp"
+#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
@@ -39,10 +43,6 @@
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth1/harvester.hpp"
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
-#include "cosm/ds/cell2D.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
-#include "cosm/repr/base_block2D.hpp"
-
 
 /*******************************************************************************
  * Namespaces
@@ -55,7 +55,7 @@ using ds::occupancy_grid;
  ******************************************************************************/
 robot_cache_block_drop::robot_cache_block_drop(
     std::unique_ptr<crepr::base_block2D> block,
-    const std::shared_ptr<cfrepr::arena_cache>& cache,
+    cfrepr::arena_cache* cache,
     const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.events.robot_cache_block_drop"),
       cell2D_op(cache->dloc()),
@@ -122,7 +122,8 @@ void robot_cache_block_drop::visit(cfsm::cell2D_fsm& fsm) {
   fsm.event_block_drop();
 } /* visit() */
 
-void robot_cache_block_drop::visit(controller::depth1::bitd_dpo_controller& controller) {
+void robot_cache_block_drop::visit(
+    controller::depth1::bitd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   dispatch_d1_cache_interactor(controller.current_task());

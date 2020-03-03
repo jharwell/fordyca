@@ -67,9 +67,9 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
     using tasks =
         rmpl::typelist<tasks::depth0::generalist, tasks::depth1::collector>;
 
-    using value = boost::mpl::joint_view<boost::mpl::joint_view<controllers::type,
-                                                                tasks::type>,
-                                         fsms::type>;
+    using value = boost::mpl::joint_view<
+        boost::mpl::joint_view<controllers::type, tasks::type>,
+        fsms::type>;
   };
 
  public:
@@ -109,8 +109,7 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
    *              the arena.
    * \param t Current timestep.
    */
-  robot_nest_block_drop(std::shared_ptr<crepr::base_block2D> block,
-                        const rtypes::timestep& t);
+  robot_nest_block_drop(crepr::base_block2D* block, const rtypes::timestep& t);
 
  private:
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
@@ -121,9 +120,9 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
   void dispatch_nest_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  const rtypes::timestep               mc_timestep;
+  const rtypes::timestep mc_timestep;
 
-  std::shared_ptr<crepr::base_block2D> m_block;
+  crepr::base_block2D*   m_block;
   /* clang-format on */
 };
 
@@ -139,7 +138,8 @@ using robot_nest_block_drop_visitor_impl =
 
 NS_END(detail);
 
-class robot_nest_block_drop_visitor : public detail::robot_nest_block_drop_visitor_impl {
+class robot_nest_block_drop_visitor
+    : public detail::robot_nest_block_drop_visitor_impl {
   using detail::robot_nest_block_drop_visitor_impl::robot_nest_block_drop_visitor_impl;
 };
 

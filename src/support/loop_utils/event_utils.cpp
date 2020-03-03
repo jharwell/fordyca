@@ -52,7 +52,7 @@ proximity_status_t new_cache_cache_proximity(
     const cfds::arena_map& map,
     rtypes::spatial_dist new_cache_prox) {
   std::scoped_lock lock(*map.cache_mtx());
-  for (const auto& cache : map.caches()) {
+  for (const auto* cache : map.caches()) {
     if (new_cache_prox >= (cache->rloc() - c.position2D()).length()) {
       return {cache->id(), cache->rloc(), cache->rloc() - c.position2D()};
     }

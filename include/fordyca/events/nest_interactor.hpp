@@ -46,7 +46,8 @@ class robot_nest_block_drop;
  * interact with the nest in FORDYCA.
  */
 class nest_interactor
-    : public rpvisitor::polymorphic_accept_set<detail::robot_nest_block_drop> {};
+    : public rpvisitor::polymorphic_accept_set<detail::robot_nest_block_drop> {
+};
 
 NS_END(tasks, fordyca);
 

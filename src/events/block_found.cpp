@@ -67,9 +67,7 @@ void block_found::visit(ds::dpo_store& store) {
     if (m_block->dloc() == it->ent()->dloc()) {
       cfrepr::base_cache* tmp = (*it).ent();
       ++it;
-      ER_TRACE("Remove cache");
       store.cache_remove(tmp);
-      ER_TRACE("Removed cache");
     } else {
       ++it;
     }
@@ -108,8 +106,8 @@ void block_found::visit(ds::dpo_store& store) {
     density.pheromone_set(ds::dpo_store::kNRD_MAX_PHEROMONE);
   }
 
-  store.block_update(repr::dpo_entity<crepr::base_block2D>(m_block->clone(),
-                                                           density));
+  store.block_update(
+      repr::dpo_entity<crepr::base_block2D>(m_block->clone(), density));
 } /* visit() */
 
 /*******************************************************************************
@@ -201,8 +199,8 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    * with dangling references as a result of mixing unique_ptr and raw ptr. See
    * #229.
    */
-  auto res = map.store()->block_update(repr::dpo_entity(m_block->clone(),
-                                                        density));
+  auto res =
+      map.store()->block_update(repr::dpo_entity(m_block->clone(), density));
   if (res.status) {
     if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",

@@ -24,11 +24,11 @@
 #include "fordyca/support/tv/argos_pd_adaptor.hpp"
 
 #include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "cosm/tv/config/population_dynamics_config.hpp"
 
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -100,9 +100,8 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
     ER_INFO("Victim robot %s is carrying block%d",
             controller->GetId().c_str(),
             controller->block()->id().v());
-    auto blocks = m_map->blocks2();
-    auto it = std::find_if(blocks.begin(),
-                           blocks.end(),
+    auto it = std::find_if(m_map->blocks().begin(),
+                           m_map->blocks().end(),
                            [&](const auto& b) {
                              return controller->block()->id() == b->id();
                            });

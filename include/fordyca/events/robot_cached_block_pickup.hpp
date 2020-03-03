@@ -73,7 +73,7 @@ NS_START(events, detail);
  * being created, at a higher level.
  */
 class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
-                            public cevents::cell2D_op {
+                                  public cevents::cell2D_op {
  private:
   struct visit_typelist_impl {
     using controllers =
@@ -102,7 +102,8 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   ~robot_cached_block_pickup(void) override;
 
   robot_cached_block_pickup(const robot_cached_block_pickup& op) = delete;
-  robot_cached_block_pickup& operator=(const robot_cached_block_pickup& op) = delete;
+  robot_cached_block_pickup& operator=(const robot_cached_block_pickup& op) =
+      delete;
 
   /* depth1 foraging */
 
@@ -163,7 +164,8 @@ NS_END(detail);
 
 class robot_cached_block_pickup_visitor
     : public detail::robot_cached_block_pickup_visitor_impl {
-  using detail::robot_cached_block_pickup_visitor_impl::robot_cached_block_pickup_visitor_impl;
+  using detail::robot_cached_block_pickup_visitor_impl::
+      robot_cached_block_pickup_visitor_impl;
 };
 
 NS_END(events, fordyca);

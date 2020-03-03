@@ -29,10 +29,10 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/foraging/events/arena_free_block_pickup.hpp"
 
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/robot_free_block_pickup.hpp"
-#include "cosm/foraging/events/arena_free_block_pickup.hpp"
 #include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
@@ -180,7 +180,7 @@ class free_block_pickup_interactor
                      m_map->blocks().end(),
                      [&](const auto& b) { return b->id() == penalty.id(); });
     ER_ASSERT(it != m_map->blocks().end(),
-              "Block%d from penalty does not exist",
+              "Block%d from penalty does not exist?",
               penalty.id().v());
     ER_ASSERT(!(*it)->is_out_of_sight(),
               "Attempt to pick up out of sight block%d",

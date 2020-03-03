@@ -23,6 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 
+#include "cosm/foraging/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/base_cache.hpp"
 
 #include "fordyca/config/perception/perception_config.hpp"
@@ -89,7 +90,7 @@ void dpo_perception_subsystem::process_los(
 
 void dpo_perception_subsystem::process_los_caches(
     const repr::line_of_sight* const c_los) {
-  ds::cache_list2 los_caches = c_los->caches();
+  cfds::bcache_vectorno los_caches = c_los->caches();
   ER_DEBUG("Caches in DPO store: [%s]",
            rcppsw::to_string(m_store->caches()).c_str());
   if (!los_caches.empty()) {
@@ -124,7 +125,7 @@ void dpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cfds::block_list2 los_blocks = c_los->blocks();
+  cfds::block_vectorno los_blocks = c_los->blocks();
   ER_DEBUG("Blocks in DPO store: [%s]",
            rcppsw::to_string(m_store->blocks()).c_str());
   if (!los_blocks.empty()) {
@@ -137,7 +138,7 @@ void dpo_perception_subsystem::process_los_blocks(
    */
   los_tracking_sync(c_los, los_blocks);
 
-  for (auto&& block : c_los->blocks()) {
+  for (auto& block : c_los->blocks()) {
     ER_ASSERT(!block->is_out_of_sight(),
               "Block%d@%s/%s out of sight in LOS?",
               block->id().v(),
@@ -162,7 +163,7 @@ void dpo_perception_subsystem::process_los_blocks(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::line_of_sight* const c_los,
-    const ds::cache_list2& los_caches) {
+    const cfds::bcache_vectorno& los_caches) {
   /*
    * If the location of one of the caches we are tracking is in our LOS, then
    * the corresponding cache should also be in our LOS. If it is not, then our
@@ -205,7 +206,7 @@ void dpo_perception_subsystem::los_tracking_sync(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::line_of_sight* const c_los,
-    const cfds::block_list2& los_blocks) {
+    const cfds::block_vectorno& los_blocks) {
   /*
    * If the location of one of the blocks we are tracking is in our LOS, then
    * the corresponding block should also be in our LOS. If it is not, then our

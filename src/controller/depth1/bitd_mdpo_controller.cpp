@@ -23,10 +23,10 @@
  ******************************************************************************/
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/perception/perception_config.hpp"

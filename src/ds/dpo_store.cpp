@@ -214,8 +214,7 @@ const dp_block_map::value_type* dpo_store::find(
   return m_blocks.find(block->id());
 } /* find() */
 
-dp_block_map::value_type* dpo_store::find(
-    const crepr::base_block2D* const block) {
+dp_block_map::value_type* dpo_store::find(const crepr::base_block2D* const block) {
   return m_blocks.find(block->id());
 } /* find() */
 
@@ -224,8 +223,7 @@ const dp_cache_map::value_type* dpo_store::find(
   return m_caches.find(cache->dloc());
 } /* find() */
 
-dp_cache_map::value_type* dpo_store::find(
-    const cfrepr::base_cache* const cache) {
+dp_cache_map::value_type* dpo_store::find(const cfrepr::base_cache* const cache) {
   return m_caches.find(cache->dloc());
 } /* find() */
 

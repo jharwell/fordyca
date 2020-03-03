@@ -55,9 +55,10 @@ using ds::occupancy_grid;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-robot_free_block_drop::robot_free_block_drop(std::unique_ptr<crepr::base_block2D> block,
-                                             const rmath::vector2u& coord,
-                                             const rtypes::discretize_ratio& resolution)
+robot_free_block_drop::robot_free_block_drop(
+    std::unique_ptr<crepr::base_block2D> block,
+    const rmath::vector2u& coord,
+    const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.events.robot_free_block_drop"),
       cell2D_op(coord),
       mc_resolution(resolution),
@@ -111,7 +112,8 @@ void robot_free_block_drop::visit(
   controller.ndc_pop();
 } /* visit() */
 
-void robot_free_block_drop::visit(controller::depth2::birtd_dpo_controller& controller) {
+void robot_free_block_drop::visit(
+    controller::depth2::birtd_dpo_controller& controller) {
   controller.ndc_pusht();
 
   if (dispatch_free_block_interactor(controller.current_task(),
@@ -180,6 +182,5 @@ void robot_free_block_drop::visit(crepr::base_block2D& block) {
   block.rloc(rmath::uvec2dvec(cell2D_op::coord(), mc_resolution.v()));
   block.dloc(cell2D_op::coord());
 } /* visit() */
-
 
 NS_END(detail, events, fordyca);

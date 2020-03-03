@@ -301,8 +301,8 @@ void depth2_loop_functions::post_step(void) {
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about caches */
-  for (auto& c : arena_map()->caches()) {
-    m_metrics_agg->collect_from_cache(c.get());
+  for (auto* c : arena_map()->caches()) {
+    m_metrics_agg->collect_from_cache(c);
     c->reset_metrics();
   } /* for(&c..) */
 
@@ -351,7 +351,7 @@ argos::CColor depth2_loop_functions::GetFloorColor(
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks rendering inside of caches.
    */
-  for (auto& cache : arena_map()->caches()) {
+  for (auto* cache : arena_map()->caches()) {
     if (cache->contains_point(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
@@ -359,7 +359,7 @@ argos::CColor depth2_loop_functions::GetFloorColor(
     }
   } /* for(&cache..) */
 
-  for (auto& block : arena_map()->blocks()) {
+  for (auto* block : arena_map()->blocks()) {
     /*
      * Even though each block type has a unique color, the only distinction
      * that robots can make to determine if they are on a block or not is
@@ -480,7 +480,7 @@ bool depth2_loop_functions::cache_creation_handle(bool on_drop) {
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks2())) {
+  if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
     return true;

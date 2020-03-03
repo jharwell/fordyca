@@ -28,9 +28,9 @@
 
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/block_vanished.hpp"
-#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/events/cache_found.hpp"
 #include "fordyca/events/cache_vanished.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/events/robot_free_block_pickup.hpp"
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"

@@ -21,6 +21,16 @@ module unload gcc/6.1.0
 export CC=gcc
 export CXX=g++
 
+# I should NOT have to do this, but the MSI help staff have not been helpful on
+# this at all.
+if lscpu | grep -q AuthenticAMD; then
+    export MSICLUSTER=mangi
+    echo "Environment: MSI Mangi, AMD EPYC"
+else
+    export MSICLUSTER=mesabi
+    echo "Environment: MSI Mesabi, Intel Xeon"
+fi
+
 # Add argos to our path
 gcc_prefix=$(gcc -v 2>&1  |grep prefix | awk -F'=' '{print $2}' | awk '{print $1}')
 export PATH=$PATH:$SWARMROOT/bin

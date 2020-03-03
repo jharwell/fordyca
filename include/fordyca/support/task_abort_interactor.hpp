@@ -29,13 +29,13 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "cosm/ta/logical_task.hpp"
 #include "cosm/ta/polled_task.hpp"
 
+#include "fordyca/events/robot_free_block_drop.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/tasks/task_status.hpp"
-#include "fordyca/events/robot_free_block_drop.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -116,17 +116,18 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
 
  private:
   void task_abort_with_block(T& controller) {
-    auto loc = rmath::dvec2uvec(controller.position2D(),
-                                m_map->grid_resolution().v());
+    auto loc =
+        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution().v());
     rtypes::type_uuid block_id = controller.block()->id();
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,
                                                    m_map->grid_resolution());
 
-    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks2()[block_id.v()],
-                                                     loc,
-                                                     m_map->grid_resolution(),
-                                                     cfds::arena_map_locking::ekNONE_HELD);
+    cfevents::arena_free_block_drop_visitor adrop_op(
+        m_map->blocks()[block_id.v()],
+        loc,
+        m_map->grid_resolution(),
+        cfds::arena_map_locking::ekNONE_HELD);
 
     adrop_op.visit(*m_map);
     rdrop_op.visit(controller);

@@ -25,6 +25,8 @@
 
 #include <vector>
 
+#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
@@ -32,8 +34,6 @@
 #include "cosm/ta/config/task_alloc_config.hpp"
 #include "cosm/ta/config/task_executive_config.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/repr/base_block2D.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
 
 #include "fordyca/config/depth1/controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"

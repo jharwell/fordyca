@@ -25,12 +25,12 @@
 
 #include <fstream>
 
+#include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"

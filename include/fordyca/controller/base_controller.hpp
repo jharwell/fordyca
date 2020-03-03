@@ -52,7 +52,7 @@ class robot_dynamics_applicator;
 namespace cosm::repr {
 class base_block2D;
 class unicell_entity2D;
-}
+} // namespace cosm::repr
 
 namespace rcppsw::math::config {
 struct rng_config;

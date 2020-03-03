@@ -102,9 +102,8 @@ class collector_registerer : public rer::client<collector_registerer> {
    * \brief A collector is constructible using the expected function arguments.
    */
   template <typename T>
-  using expected_constructible = std::is_constructible<T,
-                                                       const std::string&,
-                                                       const rtypes::timestep&>;
+  using expected_constructible =
+      std::is_constructible<T, const std::string&, const rtypes::timestep&>;
 
   /**
    * \brief Some metrics collectors (e.g. \ref
@@ -133,10 +132,7 @@ class collector_registerer : public rer::client<collector_registerer> {
    */
   template <typename T>
   using constructible_with_uint =
-      std::is_constructible<T,
-                            const std::string&,
-                            const rtypes::timestep&,
-                            uint>;
+      std::is_constructible<T, const std::string&, const rtypes::timestep&, uint>;
 
   /**
    * \brief Initialize the registerer.

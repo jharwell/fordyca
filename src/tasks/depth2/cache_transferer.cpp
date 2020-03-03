@@ -24,8 +24,8 @@
 #include "fordyca/tasks/depth2/cache_transferer.hpp"
 
 #include "fordyca/events/block_found.hpp"
-#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/events/cache_vanished.hpp"
+#include "fordyca/events/robot_cache_block_drop.hpp"
 #include "fordyca/events/robot_cached_block_pickup.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/fsm/depth2/cache_transferer_fsm.hpp"

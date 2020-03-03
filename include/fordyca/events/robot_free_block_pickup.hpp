@@ -27,9 +27,9 @@
 #include <memory>
 
 #include "rcppsw/er/client.hpp"
+#include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
-#include "rcppsw/patterns/visitor/visitor.hpp"
 
 #include "cosm/events/cell2D_op.hpp"
 
@@ -121,7 +121,7 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
   void visit(tasks::depth2::cache_finisher& task);
 
  protected:
-  robot_free_block_pickup(std::shared_ptr<crepr::base_block2D> block,
+  robot_free_block_pickup(crepr::base_block2D* block,
                           const rtypes::type_uuid& robot_id,
                           const rtypes::timestep& t);
 
@@ -129,11 +129,10 @@ class robot_free_block_pickup : public rer::client<robot_free_block_pickup>,
   void dispatch_robot_free_block_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  const rtypes::timestep               mc_timestep;
-  const rtypes::type_uuid              mc_robot_id;
+  const rtypes::timestep  mc_timestep;
+  const rtypes::type_uuid mc_robot_id;
 
-  std::shared_ptr<crepr::base_block2D> m_block;
-
+  crepr::base_block2D*    m_block;
   /* clang-format on */
 };
 
@@ -149,8 +148,10 @@ using robot_free_block_pickup_visitor_impl =
 
 NS_END(detail);
 
-class robot_free_block_pickup_visitor : public detail::robot_free_block_pickup_visitor_impl {
-  using detail::robot_free_block_pickup_visitor_impl::robot_free_block_pickup_visitor_impl;
+class robot_free_block_pickup_visitor
+    : public detail::robot_free_block_pickup_visitor_impl {
+  using detail::robot_free_block_pickup_visitor_impl::
+      robot_free_block_pickup_visitor_impl;
 };
 
 NS_END(events, fordyca);
