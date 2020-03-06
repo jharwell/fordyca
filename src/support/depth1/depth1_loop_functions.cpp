@@ -40,10 +40,10 @@
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/oracle/oracle_manager.hpp"
+#include "cosm/oracle/config/oracle_manager_config.hpp"
 
-#include "fordyca/config/oracle/oracle_manager_config.hpp"
 #include "fordyca/config/saa_xml_names.hpp"
-#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
@@ -54,7 +54,6 @@
 #include "fordyca/support/depth1/robot_configurer.hpp"
 #include "fordyca/support/depth1/robot_configurer_adaptor.hpp"
 #include "fordyca/support/depth1/static_cache_manager.hpp"
-#include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/robot_interactor_adaptor.hpp"
 #include "fordyca/support/robot_los_updater_adaptor.hpp"
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
@@ -142,7 +141,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       config_map->emplace(
           typeid(controller),
           robot_configurer<T, depth1_metrics_aggregator>(
-              lf->config()->config_get<config::visualization_config>(),
+              lf->config()->config_get<cvconfig::visualization_config>(),
               lf->oracle_manager()->entities_oracle(),
               lf->oracle_manager()->tasking_oracle(),
               lf->m_metrics_agg.get()));
@@ -150,7 +149,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       config_map->emplace(
           typeid(controller),
           robot_configurer<T, depth1_metrics_aggregator>(
-              lf->config()->config_get<config::visualization_config>(),
+              lf->config()->config_get<cvconfig::visualization_config>(),
               nullptr,
               nullptr,
               lf->m_metrics_agg.get()));
@@ -269,7 +268,7 @@ void depth1_loop_functions::private_init(void) {
 } /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
-  auto* oraclep = config()->config_get<config::oracle::oracle_manager_config>();
+  auto* oraclep = config()->config_get<coconfig::oracle_manager_config>();
   if (nullptr == oraclep || nullptr == oracle_manager()) {
     return;
   }
@@ -286,8 +285,8 @@ void depth1_loop_functions::oracle_init(void) {
     auto* bigraph = dynamic_cast<const cta::ds::bi_tdgraph*>(
         controller0.executive()->graph());
     oracle_manager()->tasking_oracle(
-        std::make_unique<support::oracle::tasking_oracle>(&oraclep->tasking,
-                                                          bigraph));
+        std::make_unique<coracle::tasking_oracle>(&oraclep->tasking,
+                                                  bigraph));
   }
 } /* oracle_init() */
 
@@ -308,7 +307,7 @@ void depth1_loop_functions::cache_handling_init(
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  cpal::swarm_manager::led_medium(config::saa_xml_names().leds_saa);
+  cpal::argos_sm_adaptor::led_medium(config::saa_xml_names().leds_saa);
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();

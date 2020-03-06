@@ -29,7 +29,7 @@
 #include "cosm/tv/switchable_tv_generator.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
 #include "cosm/cosm.hpp"
-#include "cosm/pal/swarm_manager.hpp"
+#include "cosm/pal/argos_sm_adaptor.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -50,7 +50,7 @@ class argos_rda_adaptor final : public rer::client<argos_rda_adaptor>,
                                 public ctv::robot_dynamics_applicator {
  public:
   argos_rda_adaptor(const ctv::config::robot_dynamics_applicator_config* config,
-                 const cpal::swarm_manager* sm);
+                 const cpal::argos_sm_adaptor* sm);
 
   argos_rda_adaptor(const argos_rda_adaptor&) = delete;
   const argos_rda_adaptor& operator=(const argos_rda_adaptor&) = delete;
@@ -60,7 +60,7 @@ class argos_rda_adaptor final : public rer::client<argos_rda_adaptor>,
 
  private:
   /* clang-format off */
-  const cpal::swarm_manager* const mc_sm;
+  const cpal::argos_sm_adaptor* const mc_sm;
   /* clang-format on */
 };
 

@@ -27,9 +27,8 @@
 #include <utility>
 
 #include "fordyca/controller/controller_fwd.hpp"
-#include "fordyca/support/oracle/entities_oracle.hpp"
-#include "fordyca/support/oracle/tasking_oracle.hpp"
-#include "fordyca/config/visualization_config.hpp"
+#include "cosm/oracle/tasking_oracle.hpp"
+#include "cosm/vis/config/visualization_config.hpp"
 #include "fordyca/support/depth1/depth1_metrics_aggregator.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
 
@@ -56,9 +55,9 @@ class robot_configurer {
  public:
   using controller_type = TController;
 
-  robot_configurer(const config::visualization_config* const config,
-                   oracle::entities_oracle* const ent_oracle,
-                   oracle::tasking_oracle* const task_oracle,
+  robot_configurer(const cvconfig::visualization_config* const config,
+                   coracle::entities_oracle* const ent_oracle,
+                   coracle::tasking_oracle* const task_oracle,
                    TAggregator* const agg)
       : mc_config(config),
         m_tasking_oracle(task_oracle),
@@ -123,10 +122,10 @@ class robot_configurer {
 
  private:
   /* clang-format off */
-  const config::visualization_config* const mc_config;
-  oracle::tasking_oracle* const             m_tasking_oracle;
-  oracle::entities_oracle* const            m_ent_oracle;
-  TAggregator* const                        m_agg;
+  const cvconfig::visualization_config* const mc_config;
+  coracle::tasking_oracle* const              m_tasking_oracle;
+  coracle::entities_oracle* const             m_ent_oracle;
+  TAggregator* const                          m_agg;
   /* clang-format on */
 };
 

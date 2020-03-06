@@ -32,16 +32,13 @@
 
 #include "cosm/convergence/config/convergence_config.hpp"
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/oracle/config/oracle_manager_config.hpp"
+#include "cosm/oracle/oracle_manager.hpp"
 #include "cosm/foraging/config/arena_map_config.hpp"
-#include "cosm/foraging/ds/arena_map.hpp"
 
-#include "fordyca/config/oracle/oracle_manager_config.hpp"
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "fordyca/config/visualization_config.hpp"
+#include "cosm/vis/config/visualization_config.hpp"
 #include "fordyca/controller/base_controller.hpp"
-#include "fordyca/support/oracle/entities_oracle.hpp"
-#include "fordyca/support/oracle/oracle_manager.hpp"
-#include "fordyca/support/oracle/tasking_oracle.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/argos_pd_adaptor.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
@@ -57,10 +54,8 @@ NS_START(fordyca, support);
  ******************************************************************************/
 base_loop_functions::base_loop_functions(void)
     : ER_CLIENT_INIT("fordyca.loop.base"),
-      m_arena_map(nullptr),
       m_tv_manager(nullptr),
-      m_conv_calc(nullptr),
-      m_oracle_manager(nullptr) {}
+      m_conv_calc(nullptr) {}
 
 base_loop_functions::~base_loop_functions(void) = default;
 
@@ -83,17 +78,19 @@ void base_loop_functions::init(ticpp::Element& node) {
   output_init(m_config.config_get<cmconfig::output_config>());
 
   /* initialize arena map and distribute blocks */
-  arena_map_init(config());
+  auto* aconfig = config()->config_get<cfconfig::arena_map_config>();
+  auto* vconfig = config()->config_get<cvconfig::visualization_config>();
+  arena_map_init(aconfig, vconfig);
 
   /* initialize convergence calculations */
   convergence_init(
-      m_config.config_get<cconvergence::config::convergence_config>());
+      config()->config_get<cconvergence::config::convergence_config>());
 
   /* initialize temporal variance injection */
   tv_init(config()->config_get<config::tv::tv_manager_config>());
 
   /* initialize oracle, if configured */
-  oracle_init(config()->config_get<config::oracle::oracle_manager_config>());
+  oracle_init(config()->config_get<coconfig::oracle_manager_config>());
 } /* init() */
 
 void base_loop_functions::convergence_init(
@@ -148,39 +145,8 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
       this, cb, "foot-bot");
 } /* tv_init() */
 
-void base_loop_functions::arena_map_init(
-    const config::loop_function_repository* const repo) {
-  auto* aconfig = repo->config_get<cfconfig::arena_map_config>();
-  auto* vconfig = repo->config_get<config::visualization_config>();
-
-  m_arena_map = std::make_unique<cfds::arena_map>(aconfig);
-  if (!m_arena_map->initialize(this, rng())) {
-    ER_ERR("Could not initialize arena map");
-    std::exit(EXIT_FAILURE);
-  }
-
-  m_arena_map->distribute_all_blocks();
-
-  /*
-   * If null, visualization has been disabled.
-   */
-  if (nullptr != vconfig) {
-    for (auto& block : m_arena_map->blocks()) {
-      block->vis_id(vconfig->block_id);
-    } /* for(&block..) */
-  }
-} /* arena_map_init() */
-
-void base_loop_functions::oracle_init(
-    const config::oracle::oracle_manager_config* const oraclep) {
-  if (nullptr != oraclep) {
-    ER_INFO("Creating oracle manager");
-    m_oracle_manager = std::make_unique<oracle::oracle_manager>(oraclep);
-  }
-} /* oracle_init() */
-
 void base_loop_functions::output_init(const cmconfig::output_config* output) {
-  swarm_manager::output_init(output->output_root, output->output_dir);
+  argos_sm_adaptor::output_init(output->output_root, output->output_dir);
 
 #if (LIBRA_ER == LIBRA_ER_ALL)
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.events"),
@@ -208,8 +174,8 @@ void base_loop_functions::pre_step(void) {
     m_tv_manager->update(rtypes::timestep(GetSpace().GetSimulationClock()));
   }
 
-  if (nullptr != m_oracle_manager) {
-    m_oracle_manager->update(arena_map());
+  if (nullptr != oracle_manager()) {
+    oracle_manager()->update(arena_map());
   }
 } /* pre_step() */
 
@@ -224,7 +190,7 @@ void base_loop_functions::post_step(void) {
 } /* post_step() */
 
 void base_loop_functions::reset(void) {
-  m_arena_map->distribute_all_blocks();
+  arena_map()->distribute_all_blocks();
 } /* reset() */
 
 /*******************************************************************************

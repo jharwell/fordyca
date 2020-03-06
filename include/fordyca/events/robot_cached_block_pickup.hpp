@@ -40,10 +40,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::pal {
-class swarm_manager;
-} /* namespace cosm::pal */
-
 namespace cosm::foraging::repr {
 class arena_cache;
 } /* namespace cosm::foraging::repr */

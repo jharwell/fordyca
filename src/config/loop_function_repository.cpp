@@ -31,9 +31,9 @@
 #include "cosm/tv/config/xml/population_dynamics_parser.hpp"
 
 #include "fordyca/config/caches/caches_parser.hpp"
-#include "fordyca/config/oracle/oracle_manager_parser.hpp"
+#include "cosm/oracle/config/xml/oracle_manager_parser.hpp"
 #include "fordyca/config/tv/tv_manager_parser.hpp"
-#include "fordyca/config/visualization_parser.hpp"
+#include "cosm/vis/config/xml/visualization_parser.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,11 +50,13 @@ loop_function_repository::loop_function_repository(void) noexcept {
       cfconfig::arena_map_parser::kXMLRoot);
   parser_register<tv::tv_manager_parser, tv::tv_manager_config>(
       tv::tv_manager_parser::kXMLRoot);
-  parser_register<visualization_parser, visualization_config>(
-      visualization_parser::kXMLRoot);
+  parser_register<cvconfig::xml::visualization_parser,
+                  cvconfig::visualization_config>(
+                      cvconfig::xml::visualization_parser::kXMLRoot);
 
-  parser_register<oracle::oracle_manager_parser, oracle::oracle_manager_config>(
-      oracle::oracle_manager_parser::kXMLRoot);
+  parser_register<coconfig::xml::oracle_manager_parser,
+                  coconfig::oracle_manager_config>(
+                      coconfig::xml::oracle_manager_parser::kXMLRoot);
   parser_register<caches::caches_parser, caches::caches_config>(
       caches::caches_parser::kXMLRoot);
   parser_register<cconvergence::config::xml::convergence_parser,

@@ -45,7 +45,7 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 argos_rda_adaptor::argos_rda_adaptor(
     const ctv::config::robot_dynamics_applicator_config* config,
-    const cpal::swarm_manager* const sm)
+    const cpal::argos_sm_adaptor* const sm)
     : ER_CLIENT_INIT("fordyca.support.tv.argos_rda_adaptor"),
       robot_dynamics_applicator(config),
       mc_sm(sm) {}

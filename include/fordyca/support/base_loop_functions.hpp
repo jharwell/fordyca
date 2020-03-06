@@ -38,7 +38,7 @@
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/utils/color.hpp"
 
-#include "cosm/pal/swarm_manager.hpp"
+#include "cosm/pal/argos_sm_adaptor.hpp"
 
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/fordyca.hpp"
@@ -53,10 +53,6 @@ struct convergence_config;
 } /* namespace config */
 } /* namespace cosm::convergence */
 
-namespace cosm::foraging::ds {
-class arena_map;
-} /* namespace cosm::foraging::ds */
-
 namespace cosm::metrics::config {
 struct output_config;
 } /* namespace cosm::metrics::config */
@@ -67,19 +63,12 @@ namespace config {
 class loop_function_repository;
 namespace tv {
 struct tv_manager_config;
-}
-namespace oracle {
-struct oracle_manager_config;
-} /* namespace oracle */
-} // namespace config
+}}
 NS_START(support);
 
 namespace tv {
 class tv_manager;
 }
-namespace oracle {
-class oracle_manager;
-} /* namespace oracle */
 
 /*******************************************************************************
  * Classes
@@ -96,7 +85,7 @@ class oracle_manager;
  * could not just be free functions because they require access to members in
  * the \ref argos::CLoopFunctions class.
  */
-class base_loop_functions : public cpal::swarm_manager,
+class base_loop_functions : public cpal::argos_sm_adaptor,
                             public rer::client<base_loop_functions> {
  public:
   base_loop_functions(void) RCSW_COLD;
@@ -116,23 +105,15 @@ class base_loop_functions : public cpal::swarm_manager,
   const cconvergence::convergence_calculator* conv_calculator(void) const {
     return m_conv_calc.get();
   }
-  const cfds::arena_map* arena_map(void) const { return m_arena_map.get(); }
 
  protected:
   tv::tv_manager* tv_manager(void) { return m_tv_manager.get(); }
-  cfds::arena_map* arena_map(void) { return m_arena_map.get(); }
   const config::loop_function_repository* config(void) const {
     return &m_config;
   }
   config::loop_function_repository* config(void) { return &m_config; }
   cconvergence::convergence_calculator* conv_calculator(void) {
     return m_conv_calc.get();
-  }
-  const oracle::oracle_manager* oracle_manager(void) const {
-    return m_oracle_manager.get();
-  }
-  oracle::oracle_manager* oracle_manager(void) {
-    return m_oracle_manager.get();
   }
 
  private:
@@ -145,25 +126,12 @@ class base_loop_functions : public cpal::swarm_manager,
       const cconvergence::config::convergence_config* config) RCSW_COLD;
 
   /**
-   * \brief Initialize the arena contents.
-   *
-   * \param repo Repository of parsed parameters.
-   */
-  void arena_map_init(const config::loop_function_repository* repo) RCSW_COLD;
-
-  /**
    * \brief Initialize temporal variance handling.
    *
    * \param tvp Parsed TV parameters.
    */
   void tv_init(const config::tv::tv_manager_config* tvp) RCSW_COLD;
 
-  /**
-   * \brief Initialize oracular information injection.
-   *
-   * \param oraclep Parsed \ref oracle_manager parameters.
-   */
-  void oracle_init(const config::oracle::oracle_manager_config* oraclep) RCSW_COLD;
 
   /**
    * \brief Initialize logging for all support/loop function code.
@@ -178,10 +146,8 @@ class base_loop_functions : public cpal::swarm_manager,
 
   /* clang-format off */
   config::loop_function_repository                      m_config{};
-  std::unique_ptr<cfds::arena_map>                      m_arena_map;
   std::unique_ptr<tv::tv_manager>                       m_tv_manager;
   std::unique_ptr<cconvergence::convergence_calculator> m_conv_calc;
-  std::unique_ptr<oracle::oracle_manager>               m_oracle_manager;
   /* clang-format on */
 };
 

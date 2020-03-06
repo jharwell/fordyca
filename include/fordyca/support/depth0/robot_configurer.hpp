@@ -25,10 +25,9 @@
  * Includes
  ******************************************************************************/
 #include <boost/variant/static_visitor.hpp>
-#include "fordyca/config/visualization_config.hpp"
+#include "cosm/vis/config/visualization_config.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
-#include "fordyca/support/oracle/entities_oracle.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -48,8 +47,8 @@ template<typename TController>
 class robot_configurer : public boost::static_visitor<void> {
  public:
   using controller_type = TController;
-  robot_configurer(const config::visualization_config* const config,
-                   oracle::entities_oracle* const oracle)
+  robot_configurer(const cvconfig::visualization_config* const config,
+                   coracle::entities_oracle* const oracle)
       : mc_config(config),
         m_oracle(oracle) {}
 
@@ -79,8 +78,8 @@ class robot_configurer : public boost::static_visitor<void> {
 
  private:
   /* clang-format off */
-  const config::visualization_config * const mc_config;
-  oracle::entities_oracle *                  m_oracle;
+  const cvconfig::visualization_config * const mc_config;
+  coracle::entities_oracle *                   m_oracle;
   /* clang-format on */
 };
 

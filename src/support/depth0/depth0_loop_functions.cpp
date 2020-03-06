@@ -38,8 +38,8 @@
 #include "cosm/convergence/convergence_calculator.hpp"
 #include "cosm/foraging/config/arena_map_config.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
+#include "cosm/oracle/oracle_manager.hpp"
 
-#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
@@ -51,7 +51,6 @@
 #include "fordyca/support/depth0/robot_configurer.hpp"
 #include "fordyca/support/depth0/robot_configurer_adaptor.hpp"
 #include "fordyca/support/depth0/robot_los_updater_adaptor.hpp"
-#include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/robot_interactor_adaptor.hpp"
 #include "fordyca/support/robot_los_updater_adaptor.hpp"
 #include "fordyca/support/robot_metric_extractor.hpp"
@@ -97,7 +96,7 @@ struct functor_maps_initializer {
     config_map->emplace(
         typeid(controller),
         robot_configurer<T>(
-            lf->config()->config_get<config::visualization_config>(),
+            lf->config()->config_get<cvconfig::visualization_config>(),
             nullptr != lf->oracle_manager()
                 ? lf->oracle_manager()->entities_oracle()
                 : nullptr));

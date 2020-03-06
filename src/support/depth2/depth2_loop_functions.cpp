@@ -41,9 +41,9 @@
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/oracle/oracle_manager.hpp"
 
 #include "fordyca/config/saa_xml_names.hpp"
-#include "fordyca/config/visualization_config.hpp"
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_odpo_controller.hpp"
@@ -53,7 +53,6 @@
 #include "fordyca/support/depth2/robot_arena_interactor.hpp"
 #include "fordyca/support/depth2/robot_configurer.hpp"
 #include "fordyca/support/depth2/robot_configurer_adaptor.hpp"
-#include "fordyca/support/oracle/oracle_manager.hpp"
 #include "fordyca/support/robot_interactor_adaptor.hpp"
 #include "fordyca/support/robot_los_updater_adaptor.hpp"
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
@@ -103,7 +102,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       config_map->emplace(
           typeid(controller),
           robot_configurer<T, depth2_metrics_aggregator>(
-              lf->config()->config_get<config::visualization_config>(),
+              lf->config()->config_get<cvconfig::visualization_config>(),
               lf->oracle_manager()->entities_oracle(),
               lf->oracle_manager()->tasking_oracle(),
               lf->m_metrics_agg.get()));
@@ -111,7 +110,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
       config_map->emplace(
           typeid(controller),
           robot_configurer<T, depth2_metrics_aggregator>(
-              lf->config()->config_get<config::visualization_config>(),
+              lf->config()->config_get<cvconfig::visualization_config>(),
               nullptr,
               nullptr,
               lf->m_metrics_agg.get()));
@@ -225,7 +224,7 @@ void depth2_loop_functions::cache_handling_init(
             "FATAL: Caches not enabled in depth2 loop functions");
   m_cache_manager = std::make_unique<dynamic_cache_manager>(
       cachep, &arena_map()->decoratee(), rng());
-  cpal::swarm_manager::led_medium(config::saa_xml_names().leds_saa);
+  argos_sm_adaptor::led_medium(config::saa_xml_names().leds_saa);
   cache_creation_handle(false);
 } /* cache_handlng_init() */
 
