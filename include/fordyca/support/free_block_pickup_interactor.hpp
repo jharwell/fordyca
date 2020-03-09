@@ -157,7 +157,6 @@ class free_block_pickup_interactor
       vanished_op.visit(controller);
     } else {
       perform_free_block_pickup(controller, p, t);
-      m_floor->SetChanged();
     }
     m_map->block_mtx()->unlock();
 
@@ -173,7 +172,7 @@ class free_block_pickup_interactor
    */
   void perform_free_block_pickup(T& controller,
                                  const tv::temporal_penalty& penalty,
-                                 rtypes::timestep t) {
+                                 const rtypes::timestep& t) {
     /* Holding block mutex not necessary here, but does not hurt */
     auto it =
         std::find_if(m_map->blocks().begin(),

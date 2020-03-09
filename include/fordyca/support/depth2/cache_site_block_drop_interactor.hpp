@@ -113,13 +113,19 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                                                   tv::block_op_src::ekCACHE_SITE_DROP,
                                                   t,
                                                   m_cache_manager->cache_proximity_dist());
+
     if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
       auto prox_status = utils::new_cache_cache_proximity(controller,
                                                           *m_map,
                                                           m_cache_manager->cache_proximity_dist());
-      ER_ASSERT(rtypes::constants::kNoUUID != prox_status.entity_id,
-                "No cache too close with CacheProximity return status");
-      cache_proximity_notify(controller, prox_status);
+      /*
+       * This is a check, not an assert, because we are not holding the cache
+       * mutex between the first and second checks, and the cache could have
+       * become depleted in between. See FORDYCA#633. See FORDYCA#633.
+       */
+      if (rtypes::constants::kNoUUID != prox_status.entity_id) {
+        cache_proximity_notify(controller, prox_status);
+      }
     }
     return interactor_status::ekNO_EVENT;
   }
@@ -127,13 +133,13 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
  private:
   void cache_proximity_notify(T& controller,
                               const utils::proximity_status_t& status) {
-    ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
-            controller.GetId().c_str(),
-            controller.position2D().to_str().c_str(),
-            status.entity_id.v(),
-            status.entity_loc.to_str().c_str(),
-            status.distance.length(),
-            m_cache_manager->cache_proximity_dist().v());
+     ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
+             controller.GetId().c_str(),
+             controller.position2D().to_str().c_str(),
+             status.entity_id.v(),
+             status.entity_loc.to_str().c_str(),
+             status.distance.length(),
+             m_cache_manager->cache_proximity_dist().v());
     /*
      * Because caches can be dynamically created/destroyed, we cannot rely on
      * the index position of cache i to be the same as its ID, so we need to
@@ -144,10 +150,22 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
                      [&](const auto& c) { return c->id() == status.entity_id; });
-    m_map->cache_mtx()->unlock();
 
-    events::cache_proximity_visitor prox_op(*it);
-    prox_op.visit(controller);
+    /*
+     * After verifying that (1) we are too close to a cache, (2) that cache
+     * still exists (it could have been depleted by another robot between when
+     * we checked the first time and now, because we were not holding the cache
+     * mutex), we visit the robot.
+     *
+     * This is necessary because if the cache we are referencing is depleted and
+     * deleted while we are in the middle of updating the robot's DPO store, we
+     * will get a segfault/memory error of some kind. See FORDYCA#633.
+     */
+    if (it != m_map->caches().end()) {
+      events::cache_proximity_visitor prox_op(*it);
+      prox_op.visit(controller);
+    }
+    m_map->cache_mtx()->unlock();
   }
 
   /**

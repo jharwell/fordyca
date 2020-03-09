@@ -183,7 +183,9 @@ class cached_block_pickup_interactor
        */
       if (v(controller.position2D(), p.id(), t)) {
         status = perform_cached_block_pickup(controller, p, t);
-        m_floor->SetChanged();
+        if (status == interactor_status::ekCACHE_DEPLETION) {
+          m_floor->SetChanged();
+        }
       } else {
         ER_WARN("%s cannot pickup from cache%d: Violation of pickup policy",
                 controller.GetId().c_str(),
@@ -205,7 +207,7 @@ class cached_block_pickup_interactor
   interactor_status perform_cached_block_pickup(
       T& controller,
       const tv::temporal_penalty& penalty,
-      rtypes::timestep t) {
+      const rtypes::timestep& t) {
     auto it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),
