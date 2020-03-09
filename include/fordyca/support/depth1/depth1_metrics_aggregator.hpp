@@ -35,7 +35,7 @@
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "cosm/ta/polled_task.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 
 /*******************************************************************************
@@ -147,14 +147,14 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
     collect_if("fsm::collision_locs",
                *task->mechanism(),
                [&](const rmetrics::base_metrics& metrics) {
-                 auto& m = dynamic_cast<const cfmetrics::collision_metrics&>(metrics);
+                 auto& m = dynamic_cast<const cfsm::metrics::collision_metrics&>(metrics);
                  return m.in_collision_avoidance();
                });
     collect_if(
         "blocks::acq_counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal();
         });
@@ -162,7 +162,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "blocks::acq_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
               m.goal_acquired();
@@ -176,7 +176,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "blocks::acq_explore_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
@@ -185,7 +185,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "blocks::acq_vector_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
@@ -195,7 +195,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_counts",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal();
         });
@@ -203,7 +203,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.goal_acquired();
@@ -217,7 +217,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_explore_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
@@ -226,7 +226,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         "caches::acq_vector_locs",
         *task->mechanism(),
         [&](const rmetrics::base_metrics& metrics) {
-          auto& m = dynamic_cast<const cfmetrics::goal_acq_metrics&>(
+          auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
           return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();

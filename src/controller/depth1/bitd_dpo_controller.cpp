@@ -27,7 +27,7 @@
 
 #include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
@@ -75,7 +75,7 @@ void bitd_dpo_controller::control_step(void) {
 } /* control_step() */
 
 void bitd_dpo_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");
@@ -171,7 +171,7 @@ RCPPSW_WRAP_OVERRIDE_DEFP(
     bitd_dpo_controller,
     acquisition_goal,
     current_task(),
-    cfmetrics::goal_acq_metrics::goal_type(fsm::foraging_acq_goal::ekNONE),
+    cfsm::metrics::goal_acq_metrics::goal_type(fsm::foraging_acq_goal::ekNONE),
     const);
 
 RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,

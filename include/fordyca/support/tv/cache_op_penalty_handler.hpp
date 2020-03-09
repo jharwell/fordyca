@@ -69,7 +69,7 @@ class cache_op_penalty_handler final
    * and associate it with the robot.
    *
    * \tparam TControllerType The type of the controller. Must be a template
-   * parameter, rather than \ref controller::base_controller, because of the
+   * parameter, rather than \ref controller::foraging_controller, because of the
    * goal acquisition determination done by \ref cache_op_filter.
 
    * \param controller The robot to check.

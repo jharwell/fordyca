@@ -83,7 +83,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
   bitd_dpo_controller(const bitd_dpo_controller&) = delete;
   bitd_dpo_controller& operator=(const bitd_dpo_controller&) = delete;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }
@@ -95,7 +95,7 @@ class bitd_dpo_controller : public depth0::dpo_controller,
 
   /* goal acquisition metrics */
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const final);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const final);
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);

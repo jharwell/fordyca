@@ -54,7 +54,7 @@ class localized_search : public foraging_expstrat,
                    rmath::rng* rng)
       : localized_search(c_params->saa, rng) {}
 
-  localized_search(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng)
+  localized_search(crfootbot::footbot_saa_subsystem2D* saa, rmath::rng* rng)
       : foraging_expstrat(saa, rng),
         ER_CLIENT_INIT("fordyca.fsm.expstrat.localized_search"),
         m_vfsm(saa, rng),

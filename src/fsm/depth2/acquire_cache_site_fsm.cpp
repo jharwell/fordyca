@@ -24,7 +24,7 @@
 #include "fordyca/fsm/depth2/acquire_cache_site_fsm.hpp"
 
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -43,7 +43,7 @@ using cselm = controller::cache_sel_matrix;
  ******************************************************************************/
 acquire_cache_site_fsm::acquire_cache_site_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_cache_site"),
       acquire_goal_fsm(
@@ -114,9 +114,9 @@ boost::optional<cfsm::acquire_goal_fsm::candidate_type> acquire_cache_site_fsm::
   }
 } /* site_select() */
 
-cfmetrics::goal_acq_metrics::goal_type acquire_cache_site_fsm::
+cfsm::metrics::goal_acq_metrics::goal_type acquire_cache_site_fsm::
     acquisition_goal_internal(void) const {
-  return cfmetrics::goal_acq_metrics::goal_type(
+  return cfsm::metrics::goal_acq_metrics::goal_type(
       foraging_acq_goal::type::ekCACHE_SITE);
 } /* acquisition_goal_internal() */
 

@@ -36,7 +36,7 @@ NS_START(fordyca, fsm, depth1);
  ******************************************************************************/
 cached_block_to_nest_fsm::cached_block_to_nest_fsm(
     const fsm_ro_params* const c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
@@ -201,18 +201,18 @@ bool cached_block_to_nest_fsm::goal_acquired(void) const {
   return false;
 }
 
-cfmetrics::goal_acq_metrics::goal_type cached_block_to_nest_fsm::acquisition_goal(
+cfsm::metrics::goal_acq_metrics::goal_type cached_block_to_nest_fsm::acquisition_goal(
     void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
-    return cfmetrics::goal_acq_metrics::goal_type(
+    return cfsm::metrics::goal_acq_metrics::goal_type(
         foraging_acq_goal::type::ekEXISTING_CACHE);
   } else if (ekST_ACQUIRE_BLOCK == current_state() ||
              ekST_WAIT_FOR_PICKUP == current_state()) {
-    return cfmetrics::goal_acq_metrics::goal_type(
+    return cfsm::metrics::goal_acq_metrics::goal_type(
         foraging_acq_goal::type::ekEXISTING_CACHE);
   }
-  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 /*******************************************************************************

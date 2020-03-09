@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/tv/temporal_penalty_handler.hpp"
 
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,7 +34,7 @@ NS_START(fordyca, support, tv);
  * Member Functions
  ******************************************************************************/
 void temporal_penalty_handler::penalty_abort(
-    const controller::base_controller& controller) {
+    const controller::foraging_controller& controller) {
   std::scoped_lock lock(m_list_mtx);
   auto it = penalty_find(controller, false);
   if (m_penalty_list.end() != it) {

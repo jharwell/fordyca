@@ -58,7 +58,7 @@ NS_START(depth2);
 class cache_transferer_fsm final : public block_to_goal_fsm {
  public:
   cache_transferer_fsm(const fsm_ro_params* c_params,
-                       crfootbot::footbot_saa_subsystem* saa,
+                       crfootbot::footbot_saa_subsystem2D* saa,
                        std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
                        rmath::rng* rng);
   ~cache_transferer_fsm(void) override = default;
@@ -67,7 +67,7 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
   cache_transferer_fsm& operator=(const cache_transferer_fsm&) = delete;
 
   /* goal acquisition metrics */
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   rtypes::type_uuid entity_acquired_id(void) const override;
 
   /* block transportation */

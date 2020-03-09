@@ -24,7 +24,7 @@
 #include "fordyca/support/tv/env_dynamics.hpp"
 
 #include "fordyca/config/tv/env_dynamics_config.hpp"
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
@@ -58,16 +58,16 @@ rtypes::timestep env_dynamics::cache_usage_penalty(void) const {
       ->penalty_calc(m_timestep);
 } /* cache_usage_penalty() */
 
-void env_dynamics::register_controller(const controller::base_controller& c) {
+void env_dynamics::register_controller(const controller::foraging_controller& c) {
   m_rda.register_controller(c.entity_id());
 } /* register_controller() */
 
-void env_dynamics::unregister_controller(const controller::base_controller& c) {
+void env_dynamics::unregister_controller(const controller::foraging_controller& c) {
   m_rda.unregister_controller(c.entity_id());
   penalties_flush(c);
 } /* unregister_controller() */
 
-bool env_dynamics::penalties_flush(const controller::base_controller& c) {
+bool env_dynamics::penalties_flush(const controller::foraging_controller& c) {
   bool aborted = false;
   for (auto& h : all_penalty_handlers()) {
     if (h->is_serving_penalty(c)) {

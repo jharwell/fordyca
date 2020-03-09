@@ -32,14 +32,14 @@
  ******************************************************************************/
 NS_START(fordyca, fsm, depth0);
 
-using goal_type = cfmetrics::goal_acq_metrics::goal_type;
+using goal_type = cfsm::metrics::goal_acq_metrics::goal_type;
 
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
 free_block_to_nest_fsm::free_block_to_nest_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),

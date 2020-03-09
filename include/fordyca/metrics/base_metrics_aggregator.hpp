@@ -51,7 +51,7 @@ namespace support {
 class base_loop_functions;
 }
 namespace controller {
-class base_controller;
+class foraging_controller;
 } /* namespace controller */
 
 NS_START(metrics);
@@ -83,9 +83,9 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator>,
   void collect_from_block(const crepr::base_block2D* block);
 
   /**
-   * \brief Collect metrics from \ref base_controller.
+   * \brief Collect metrics from \ref foraging_controller.
    */
-  void collect_from_controller(const controller::base_controller* controller);
+  void collect_from_controller(const controller::foraging_controller* controller);
 
   const std::string& metrics_path(void) const { return m_metrics_path; }
 

@@ -61,7 +61,7 @@ class dpo_controller : public crw_controller,
   dpo_controller(void) RCSW_COLD;
   ~dpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void control_step(void) override;
   void reset(void) override RCSW_COLD;
@@ -71,7 +71,7 @@ class dpo_controller : public crw_controller,
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);

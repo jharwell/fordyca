@@ -70,7 +70,7 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
    * and associate it with the robot.
    *
    * \tparam TControllerType The type of the controller. Must be a template
-   * parameter, rather than \ref controller::base_controller, because of the
+   * parameter, rather than \ref controller::foraging_controller, because of the
    * goal acquisition determination done by \ref block_op_filter.
    *
    * \param controller The robot to check.

@@ -25,7 +25,7 @@
 
 #include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/config/depth0/mdpo_controller_repository.hpp"
 #include "fordyca/config/exploration_config.hpp"
@@ -69,7 +69,7 @@ void mdpo_controller::init(ticpp::Element& node) {
    * Note that we do not call \ref crw_controller::init()--there
    * is nothing in there that we need.
    */
-  base_controller::init(node);
+  foraging_controller::init(node);
 
   ndc_push();
   ER_INFO("Initializing...");

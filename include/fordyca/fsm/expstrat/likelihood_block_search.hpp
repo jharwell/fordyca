@@ -57,7 +57,7 @@ class likelihood_block_search : public localized_search {
                                 c_params->dpo_store,
                                 rng) {}
 
-  likelihood_block_search(crfootbot::footbot_saa_subsystem* saa,
+  likelihood_block_search(crfootbot::footbot_saa_subsystem2D* saa,
                           const ds::dpo_store* store,
                           rmath::rng* rng)
       : localized_search(saa, rng),

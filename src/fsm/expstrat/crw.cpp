@@ -24,7 +24,7 @@
 #include "fordyca/fsm/expstrat/crw.hpp"
 
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************
@@ -37,9 +37,9 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 crw::crw(const fsm::expstrat::foraging_expstrat::params* const c_params,
          rmath::rng* rng)
-    : crw(static_cast<crfootbot::footbot_saa_subsystem*>(c_params->saa), rng) {}
+    : crw(static_cast<crfootbot::footbot_saa_subsystem2D*>(c_params->saa), rng) {}
 
-crw::crw(crfootbot::footbot_saa_subsystem* saa, rmath::rng* rng)
+crw::crw(crfootbot::footbot_saa_subsystem2D* saa, rmath::rng* rng)
     : foraging_expstrat(saa, rng),
       ER_CLIENT_INIT("fordyca.fsm.expstrat.crw"),
       m_tracker(saa->sensing()) {}

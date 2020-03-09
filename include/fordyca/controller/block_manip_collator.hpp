@@ -26,7 +26,6 @@
  ******************************************************************************/
 #include "rcppsw/types/timestep.hpp"
 
-#include "fordyca/controller/base_controller.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"

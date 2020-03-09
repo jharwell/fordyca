@@ -72,7 +72,7 @@ class cache_finisher final : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);

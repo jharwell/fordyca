@@ -1,5 +1,5 @@
 /**
- * \file base_controller_repository.hpp
+ * \file foraging_controller_repository.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONFIG_BASE_CONTROLLER_REPOSITORY_HPP_
-#define INCLUDE_FORDYCA_CONFIG_BASE_CONTROLLER_REPOSITORY_HPP_
+#ifndef INCLUDE_FORDYCA_CONFIG_FORAGING_CONTROLLER_REPOSITORY_HPP_
+#define INCLUDE_FORDYCA_CONFIG_FORAGING_CONTROLLER_REPOSITORY_HPP_
 
 /*******************************************************************************
  * Includes
@@ -37,17 +37,17 @@ NS_START(fordyca, config);
  * Class Definitions
  ******************************************************************************/
 /**
- * \class base_controller_repository
+ * \class foraging_controller_repository
  * \ingroup config
  *
  * \brief Collection of all parameter parsers and parse results needed by
  * all foraging controllers.
  */
-class base_controller_repository : public rconfig::xml::xml_config_repository {
+class foraging_controller_repository : public rconfig::xml::xml_config_repository {
  public:
-  base_controller_repository(void) RCSW_COLD;
+  foraging_controller_repository(void) RCSW_COLD;
 };
 
 NS_END(config, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONFIG_BASE_CONTROLLER_REPOSITORY_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONFIG_FORAGING_CONTROLLER_REPOSITORY_HPP_ */

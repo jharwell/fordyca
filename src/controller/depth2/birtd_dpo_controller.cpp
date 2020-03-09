@@ -27,7 +27,7 @@
 
 #include "cosm/foraging/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
@@ -65,7 +65,7 @@ void birtd_dpo_controller::control_step(void) {
 } /* control_step() */
 
 void birtd_dpo_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
   ndc_push();
   ER_INFO("Initializing");
 

@@ -56,7 +56,7 @@ class bitd_odpo_controller : public depth1::bitd_dpo_controller,
   bitd_odpo_controller(void) RCSW_COLD;
   ~bitd_odpo_controller(void) override RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void control_step(void) override;
   std::type_index type_index(void) const override { return {typeid(*this)}; }
 

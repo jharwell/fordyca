@@ -24,7 +24,7 @@
 #include "fordyca/fsm/acquire_existing_cache_fsm.hpp"
 
 #include "cosm/foraging/repr/base_cache.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
@@ -46,7 +46,7 @@ using cselm = controller::cache_sel_matrix;
  ******************************************************************************/
 acquire_existing_cache_fsm::acquire_existing_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng,
     bool for_pickup)
@@ -99,9 +99,9 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-cfmetrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::acq_goal_internal(
+cfsm::metrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::acq_goal_internal(
     void) {
-  return cfmetrics::goal_acq_metrics::goal_type(
+  return cfsm::metrics::goal_acq_metrics::goal_type(
       foraging_acq_goal::type::ekEXISTING_CACHE);
 } /* acq_goal() */
 

@@ -72,12 +72,12 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
   auto range = rmath::rangei(0, current_pop - 1);
 
   argos::CFootBotEntity* entity;
-  controller::base_controller* controller;
+  controller::foraging_controller* controller;
   for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
     auto it = m_lf->GetSpace().GetEntitiesByType("foot-bot").begin();
     std::advance(it, m_rng->uniform(range));
     entity = argos::any_cast<argos::CFootBotEntity*>(it->second);
-    controller = dynamic_cast<controller::base_controller*>(
+    controller = dynamic_cast<controller::foraging_controller*>(
         &entity->GetControllableEntity().GetController());
     if (!already_killed(controller->entity_id())) {
       id = controller->entity_id();
@@ -112,7 +112,7 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
      */
     cfevents::arena_free_block_drop_visitor adrop_op(
         *it,
-        rmath::dvec2uvec(controller->position2D(), m_map->grid_resolution().v()),
+        rmath::dvec2uvec(controller->pos2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),
         cfds::arena_map_locking::ekALL_HELD);
 
@@ -180,7 +180,7 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
           rmath::vector2d(x, y).to_str().c_str());
 
       /* Register controller for environmental variances */
-      auto* controller = dynamic_cast<controller::base_controller*>(
+      auto* controller = dynamic_cast<controller::foraging_controller*>(
           &fb->GetControllableEntity().GetController());
 
       m_envd->register_controller(*controller);

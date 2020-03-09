@@ -36,6 +36,7 @@
 #include "fordyca/fordyca.hpp"
 #include "cosm/foraging/ds/block_vector.hpp"
 #include "cosm/foraging/ds/cache_vector.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -50,9 +51,6 @@ class arena_map;
 
 namespace fordyca::repr {
 class line_of_sight;
-}
-namespace fordyca::controller {
-class base_controller;
 }
 
 NS_START(fordyca, support, utils);
@@ -92,7 +90,7 @@ void set_robot_los(T* const controller,
                    cfds::arena_map& map) {
   controller->los(std::move(compute_robot_los(map,
                                               los_grid_size,
-                                              controller->position2D())));
+                                              controller->pos2D())));
 }
 
 /**

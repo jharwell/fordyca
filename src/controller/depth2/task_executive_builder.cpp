@@ -57,7 +57,7 @@ NS_START(fordyca, controller, depth2);
 task_executive_builder::task_executive_builder(
     const controller::block_sel_matrix* bsel_matrix,
     const controller::cache_sel_matrix* csel_matrix,
-    crfootbot::footbot_saa_subsystem* const saa,
+    crfootbot::footbot_saa_subsystem2D* const saa,
     base_perception_subsystem* const perception)
     : depth1::task_executive_builder(bsel_matrix, csel_matrix, saa, perception),
       ER_CLIENT_INIT("fordyca.controller.depth2.task_executive_builder") {}

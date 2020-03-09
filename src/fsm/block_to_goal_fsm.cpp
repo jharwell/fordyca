@@ -25,7 +25,7 @@
 
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/fsm/foraging_signal.hpp"
@@ -41,7 +41,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 block_to_goal_fsm::block_to_goal_fsm(cfsm::acquire_goal_fsm* const goal_fsm,
                                      cfsm::acquire_goal_fsm* const block_fsm,
-                                     crfootbot::footbot_saa_subsystem* saa,
+                                     crfootbot::footbot_saa_subsystem2D* saa,
                                      rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.block_to_goal"),
       util_hfsm(saa, rng, ekST_MAX_STATES),
@@ -223,14 +223,14 @@ bool block_to_goal_fsm::goal_acquired(void) const {
          (ekST_WAIT_FOR_BLOCK_DROP == current_state());
 } /* goal_acquired() */
 
-cfmetrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
+cfsm::metrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
     void) const {
   if (m_block_fsm->task_running()) {
     return m_block_fsm->acquisition_goal();
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->acquisition_goal();
   }
-  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {

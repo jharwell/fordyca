@@ -45,14 +45,14 @@ NS_START(fordyca, support);
  * convergence calculations.
  */
 struct robot_task_extractor_adaptor : public boost::static_visitor<int> {
-  explicit robot_task_extractor_adaptor(const controller::base_controller* const c)
+  explicit robot_task_extractor_adaptor(const controller::foraging_controller* const c)
       : mc_controller(c) {}
 
   template <typename ControllerType>
   int operator()(const robot_task_extractor<ControllerType>& extractor) const {
     return extractor(dynamic_cast<const ControllerType*>(mc_controller));
   }
-  const controller::base_controller* const mc_controller;
+  const controller::foraging_controller* const mc_controller;
 };
 
 NS_END(support, fordyca);

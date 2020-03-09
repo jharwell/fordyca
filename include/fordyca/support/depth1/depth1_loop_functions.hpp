@@ -204,7 +204,7 @@ class depth1_loop_functions : public depth0::depth0_loop_functions,
    * caches have been depleted in order to calculate re-creation probabilities.
    */
   void caches_recreation_task_counts_collect(
-      const controller::base_controller* const controller);
+      const controller::foraging_controller* const controller);
 
   /* clang-format off */
   std::unique_ptr<interactor_map_type>                m_interactor_map;

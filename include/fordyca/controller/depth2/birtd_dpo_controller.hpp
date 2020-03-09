@@ -59,7 +59,7 @@ class birtd_dpo_controller : public depth1::bitd_dpo_controller,
  public:
   birtd_dpo_controller(void) RCSW_COLD;
 
-  /* base_controller overrides */
+  /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void control_step(void) override;
   std::type_index type_index(void) const override { return typeid(*this); }

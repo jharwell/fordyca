@@ -24,7 +24,7 @@
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
 #include "cosm/foraging/repr/base_cache.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/controller/depth2/new_cache_selector.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
@@ -42,7 +42,7 @@ NS_START(fordyca, fsm, depth2);
  ******************************************************************************/
 acquire_new_cache_fsm::acquire_new_cache_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.depth2.acquire_new_cache"),
@@ -126,9 +126,9 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-cfmetrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
+cfsm::metrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
     acquisition_goal_internal(void) const {
-  return cfmetrics::goal_acq_metrics::goal_type(
+  return cfsm::metrics::goal_acq_metrics::goal_type(
       foraging_acq_goal::type::ekNEW_CACHE);
 } /* acquisition_goal() */
 

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/ledtaxis_cache_search.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 /*******************************************************************************

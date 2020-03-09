@@ -1,5 +1,5 @@
 /**
- * \file base_controller.cpp
+ * \file foraging_controller.cpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <experimental/filesystem>
@@ -32,14 +32,14 @@
 
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/steer2D/config/force_calculator_config.hpp"
 #include "cosm/subsystem/config/actuation_subsystem2D_config.hpp"
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
 
-#include "fordyca/config/base_controller_repository.hpp"
+#include "fordyca/config/foraging_controller_repository.hpp"
 #include "fordyca/config/saa_xml_names.hpp"
 
 /*******************************************************************************
@@ -51,24 +51,24 @@ namespace fs = std::experimental::filesystem;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_controller::base_controller(void)
+foraging_controller::foraging_controller(void)
     : ER_CLIENT_INIT("fordyca.controller.base"), m_block(nullptr) {}
 
-base_controller::~base_controller(void) = default;
+foraging_controller::~foraging_controller(void) = default;
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool base_controller::in_nest(void) const {
+bool foraging_controller::in_nest(void) const {
   return saa()->sensing()->ground()->detect(
       chal::sensors::ground_sensor::kNestTarget);
 } /* in_nest() */
 
-bool base_controller::block_detected(void) const {
+bool foraging_controller::block_detected(void) const {
   return saa()->sensing()->ground()->detect("block");
 } /* block_detected() */
 
-void base_controller::init(ticpp::Element& node) {
+void foraging_controller::init(ticpp::Element& node) {
 #if (LIBRA_ER == LIBRA_ER_ALL)
   if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
     ER_LOGGING_INIT(std::string(env_p));
@@ -78,7 +78,7 @@ void base_controller::init(ticpp::Element& node) {
   }
 #endif
 
-  config::base_controller_repository repo;
+  config::foraging_controller_repository repo;
   repo.parse_all(node);
 
   ndc_push();
@@ -101,9 +101,9 @@ void base_controller::init(ticpp::Element& node) {
   ndc_pop();
 } /* init() */
 
-void base_controller::reset(void) { m_block.reset(); } /* Reset() */
+void foraging_controller::reset(void) { m_block.reset(); } /* Reset() */
 
-void base_controller::output_init(const cmconfig::output_config* outputp) {
+void foraging_controller::output_init(const cmconfig::output_config* outputp) {
   std::string dir =
       base_controller2D::output_init(outputp->output_root, outputp->output_dir);
 
@@ -128,7 +128,7 @@ void base_controller::output_init(const cmconfig::output_config* outputp) {
 #endif
 } /* output_init() */
 
-void base_controller::saa_init(
+void foraging_controller::saa_init(
     const csubsystem::config::actuation_subsystem2D_config* actuation_p,
     const csubsystem::config::sensing_subsystem2D_config* sensing_p) {
   auto saa_names = config::saa_xml_names();
@@ -210,39 +210,39 @@ void base_controller::saa_init(
       csubsystem::actuation_subsystem2D::map_entry_create(leds),
       csubsystem::actuation_subsystem2D::map_entry_create(raba)};
 
-  base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem>(
+  base_controller2D::saa(std::make_unique<crfootbot::footbot_saa_subsystem2D>(
       position, sensors, actuators, &actuation_p->steering));
 } /* saa_init() */
 
-rtypes::type_uuid base_controller::entity_id(void) const {
+rtypes::type_uuid foraging_controller::entity_id(void) const {
   return rtypes::type_uuid(std::atoi(GetId().c_str() + 2));
 } /* entity_id() */
 
-double base_controller::applied_movement_throttle(void) const {
+double foraging_controller::applied_movement_throttle(void) const {
   return saa()->actuation()->governed_diff_drive()->applied_throttle();
 } /* applied_movement_throttle() */
 
-void base_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
+void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
   if (rda->motion_throttling_enabled()) {
     saa()->actuation()->governed_diff_drive()->tv_generator(
         rda->motion_throttler(entity_id()));
   }
 } /* irv_init() */
 
-void base_controller::block(std::unique_ptr<crepr::base_block2D> block) {
+void foraging_controller::block(std::unique_ptr<crepr::base_block2D> block) {
   m_block = std::move(block);
 }
 
-std::unique_ptr<crepr::base_block2D> base_controller::block_release(void) {
+std::unique_ptr<crepr::base_block2D> foraging_controller::block_release(void) {
   return std::move(m_block);
 }
 
-class crfootbot::footbot_saa_subsystem* base_controller::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(
+class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(void) {
+  return static_cast<crfootbot::footbot_saa_subsystem2D*>(
       base_controller2D::saa());
 }
-const class crfootbot::footbot_saa_subsystem* base_controller::saa(void) const {
-  return static_cast<const crfootbot::footbot_saa_subsystem*>(
+const class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(void) const {
+  return static_cast<const crfootbot::footbot_saa_subsystem2D*>(
       base_controller2D::saa());
 }
 NS_END(controller, fordyca);

@@ -25,7 +25,7 @@
 
 #include "cosm/foraging/ds/arena_map.hpp"
 
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -35,26 +35,26 @@ NS_START(fordyca, support, utils);
 /*******************************************************************************
  * Functions
  ******************************************************************************/
-rtypes::type_uuid robot_on_block(const controller::base_controller& controller,
+rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
                                  const cfds::arena_map& map) {
-  return map.robot_on_block(controller.position2D(),
+  return map.robot_on_block(controller.pos2D(),
                             controller.entity_acquired_id());
 } /* robot_on_block() */
 
-rtypes::type_uuid robot_on_cache(const controller::base_controller& controller,
+rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controller,
                                  const cfds::arena_map& map) {
-  return map.robot_on_cache(controller.position2D(),
+  return map.robot_on_cache(controller.pos2D(),
                             controller.entity_acquired_id());
 } /* robot_on_cache() */
 
 proximity_status_t new_cache_cache_proximity(
-    const controller::base_controller& c,
+    const controller::foraging_controller& c,
     const cfds::arena_map& map,
     rtypes::spatial_dist new_cache_prox) {
   std::scoped_lock lock(*map.cache_mtx());
   for (const auto* cache : map.caches()) {
-    if (new_cache_prox >= (cache->rloc() - c.position2D()).length()) {
-      return {cache->id(), cache->rloc(), cache->rloc() - c.position2D()};
+    if (new_cache_prox >= (cache->rloc() - c.pos2D()).length()) {
+      return {cache->id(), cache->rloc(), cache->rloc() - c.pos2D()};
     }
   } /* for(&b..) */
   return {rtypes::constants::kNoUUID, rmath::vector2d(), rmath::vector2d()};

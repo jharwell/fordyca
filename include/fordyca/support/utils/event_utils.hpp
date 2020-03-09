@@ -33,6 +33,7 @@
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 #include "cosm/foraging/ds/arena_map.hpp"
+#include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -44,9 +45,6 @@ class nest;
 class arena_cache;
 } /* namespace cosm::repr */
 
-namespace fordyca::controller {
-class base_controller;
-}
 namespace fordyca::repr {
 class line_of_sight;
 }
@@ -77,7 +75,7 @@ struct proximity_status_t {
  * \return The block index, or \ref rtypes::constants::kNoUUID if the robot is
  * not on top of a block.
  */
-rtypes::type_uuid robot_on_block(const controller::base_controller& controller,
+rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
                                  const cfds::arena_map& map) RCSW_PURE;
 
 /**
@@ -92,7 +90,7 @@ rtypes::type_uuid robot_on_block(const controller::base_controller& controller,
  * \return The cache index, or \ref rtypes::constants::kNoUUID if the robot is
  * not on top of a cache.
  */
-rtypes::type_uuid robot_on_cache(const controller::base_controller& controller,
+rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controller,
                    const cfds::arena_map& map) RCSW_PURE;
 
 /**
@@ -109,7 +107,7 @@ rtypes::type_uuid robot_on_cache(const controller::base_controller& controller,
  * \return (cache id of cache that is too close (-1 if none), distance to said
  *         cache).
  */
-proximity_status_t new_cache_cache_proximity(const controller::base_controller& c,
+proximity_status_t new_cache_cache_proximity(const controller::foraging_controller& c,
                                              const cfds::arena_map& map,
                                              rtypes::spatial_dist new_cache_prox);
 

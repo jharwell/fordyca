@@ -1,5 +1,5 @@
 /**
- * \file base_controller_repository.cpp
+ * \file foraging_controller_repository.cpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -21,7 +21,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/config/base_controller_repository.hpp"
+#include "fordyca/config/foraging_controller_repository.hpp"
 
 #include "rcppsw/math/config/xml/rng_parser.hpp"
 
@@ -41,7 +41,7 @@ namespace cscxml = csconfig::xml;
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-base_controller_repository::base_controller_repository(void) {
+foraging_controller_repository::foraging_controller_repository(void) {
   parser_register<cmconfig::xml::output_parser, cmconfig::output_config>(
       cmconfig::xml::output_parser::kXMLRoot);
   parser_register<cscxml::actuation_subsystem2D_parser,

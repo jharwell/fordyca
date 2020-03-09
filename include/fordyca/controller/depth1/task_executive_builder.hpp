@@ -74,7 +74,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
  public:
   task_executive_builder(const controller::block_sel_matrix* bsel_matrix,
                       const controller::cache_sel_matrix* csel_matrix,
-                      crfootbot::footbot_saa_subsystem* saa,
+                      crfootbot::footbot_saa_subsystem2D* saa,
                       base_perception_subsystem* perception) RCSW_COLD;
 
   ~task_executive_builder(void) override RCSW_COLD;
@@ -91,7 +91,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   RCSW_COLD const base_perception_subsystem* perception(void) const { return m_perception; }
   RCSW_COLD base_perception_subsystem* perception(void) { return m_perception; }
 
-  RCSW_COLD crfootbot::footbot_saa_subsystem* saa(void) const {
+  RCSW_COLD crfootbot::footbot_saa_subsystem2D* saa(void) const {
     return m_saa;
   }
 
@@ -119,7 +119,7 @@ class task_executive_builder : public rer::client<task_executive_builder> {
   const controller::cache_sel_matrix* const mc_csel_matrix;
   const controller::block_sel_matrix* const mc_bsel_matrix;
 
-  crfootbot::footbot_saa_subsystem* const   m_saa;
+  crfootbot::footbot_saa_subsystem2D* const   m_saa;
   base_perception_subsystem* const          m_perception;
 
   /* clang-format on */

@@ -118,7 +118,7 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
    *
    * \param controller The robot to abort the penalty for.
    */
-  void penalty_abort(const controller::base_controller& controller);
+  void penalty_abort(const controller::foraging_controller& controller);
 
   /**
    * \brief Find the penalty object currently associated with the given
@@ -131,7 +131,7 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
    *
    * \return Iterator pointing to the penalty, or end() if none was found.
    */
-  const_iterator_type penalty_find(const controller::base_controller& controller,
+  const_iterator_type penalty_find(const controller::foraging_controller& controller,
                                    bool lock = true) const {
     maybe_lock(lock);
     auto it = std::find_if(m_penalty_list.begin(),
@@ -151,7 +151,7 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
    *             Should *ALWAYS* be \c TRUE if the function is called external
    *             to this class.
    */
-  RCSW_PURE bool is_serving_penalty(const controller::base_controller& controller,
+  RCSW_PURE bool is_serving_penalty(const controller::foraging_controller& controller,
                                     bool lock = true) const {
     maybe_lock(lock);
     auto it = penalty_find(controller, false);
@@ -172,7 +172,7 @@ class temporal_penalty_handler : public rer::client<temporal_penalty_handler> {
    * \return \c TRUE If the robot is currently waiting AND it has satisfied its
    * penalty.
    */
-  RCSW_PURE bool is_penalty_satisfied(const controller::base_controller& controller,
+  RCSW_PURE bool is_penalty_satisfied(const controller::foraging_controller& controller,
                                       const rtypes::timestep& t) const {
     std::scoped_lock lock(m_list_mtx);
     auto it = penalty_find(controller, false);

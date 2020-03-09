@@ -25,7 +25,7 @@
 
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/controller/block_selector.hpp"
@@ -45,7 +45,7 @@ NS_START(fordyca, fsm);
  ******************************************************************************/
 acquire_free_block_fsm::acquire_free_block_fsm(
     const fsm_ro_params* c_params,
-    crfootbot::footbot_saa_subsystem* saa,
+    crfootbot::footbot_saa_subsystem2D* saa,
     std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
     rmath::rng* rng)
     : ER_CLIENT_INIT("fordyca.fsm.acquire_free_block"),
@@ -85,9 +85,9 @@ acquire_free_block_fsm::acquire_free_block_fsm(
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-cfmetrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
+cfsm::metrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
     void) {
-  return cfmetrics::goal_acq_metrics::goal_type(
+  return cfsm::metrics::goal_acq_metrics::goal_type(
       foraging_acq_goal::type::ekBLOCK);
 } /* acq_goal_internal() */
 

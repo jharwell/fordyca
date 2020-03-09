@@ -96,7 +96,7 @@ struct d1_subtask_status_extractor
 struct d1_subtask_status_extractor_adaptor
     : public boost::static_visitor<std::pair<bool, bool>> {
   explicit d1_subtask_status_extractor_adaptor(
-      const controller::base_controller* const c)
+      const controller::foraging_controller* const c)
       : mc_controller(c) {}
 
   template <typename ControllerType>
@@ -106,7 +106,7 @@ struct d1_subtask_status_extractor_adaptor
         ControllerType>::controller_type*>(mc_controller);
     return extractor(cast);
   }
-  const controller::base_controller* const mc_controller;
+  const controller::foraging_controller* const mc_controller;
 };
 
 /**
@@ -432,7 +432,7 @@ void depth1_loop_functions::post_step(void) {
     ndc_push();
     robot_post_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
     caches_recreation_task_counts_collect(
-        &static_cast<controller::base_controller&>(robot->GetController()));
+        &static_cast<controller::foraging_controller&>(robot->GetController()));
     ndc_pop();
   };
   swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
@@ -554,7 +554,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
  * General Member Functions
  ******************************************************************************/
 void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::base_controller*>(
+  auto controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -577,7 +577,7 @@ void depth1_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
 } /* robot_pre_step() */
 
 void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::base_controller*>(
+  auto controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -663,7 +663,7 @@ bool depth1_loop_functions::caches_depleted(void) const {
 } /* caches_depleted() */
 
 void depth1_loop_functions::caches_recreation_task_counts_collect(
-    const controller::base_controller* const controller) {
+    const controller::foraging_controller* const controller) {
   if (caches_depleted()) {
     auto it = m_subtask_status_map->find(controller->type_index());
     ER_ASSERT(m_subtask_status_map->end() != it,

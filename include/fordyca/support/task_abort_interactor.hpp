@@ -116,8 +116,8 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
 
  private:
   void task_abort_with_block(T& controller) {
-    auto loc =
-        rmath::dvec2uvec(controller.position2D(), m_map->grid_resolution().v());
+    auto loc = rmath::dvec2uvec(controller.pos2D(),
+                                m_map->grid_resolution().v());
     rtypes::type_uuid block_id = controller.block()->id();
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,

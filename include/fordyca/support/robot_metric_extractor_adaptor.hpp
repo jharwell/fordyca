@@ -49,7 +49,7 @@ NS_START(fordyca, support);
 template <class AggregatorType>
 struct robot_metric_extractor_adaptor {
   explicit robot_metric_extractor_adaptor(
-      const controller::base_controller* const c)
+      const controller::foraging_controller* const c)
       : controller(c) {}
   template <class ControllerType>
   void operator()(const robot_metric_extractor<AggregatorType, ControllerType>&
@@ -60,7 +60,7 @@ struct robot_metric_extractor_adaptor {
         controller);
     extractor(cast);
   }
-  const controller::base_controller* const controller;
+  const controller::foraging_controller* const controller;
 };
 
 NS_END(support, fordyca);

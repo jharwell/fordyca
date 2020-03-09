@@ -57,11 +57,11 @@ NS_START(fsm, depth0);
  */
 class dpo_fsm final : public cfsm::util_hfsm,
                       public rer::client<dpo_fsm>,
-                      public cfmetrics::goal_acq_metrics,
+                      public cfsm::metrics::goal_acq_metrics,
                       public block_transporter {
  public:
   dpo_fsm(const fsm_ro_params * params,
-          crfootbot::footbot_saa_subsystem* saa,
+          crfootbot::footbot_saa_subsystem2D* saa,
           std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
           rmath::rng* rng);
   ~dpo_fsm(void) override = default;
@@ -79,7 +79,7 @@ class dpo_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(exp_status, is_exploring_for_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, is_vectoring_to_goal, const);
   RCPPSW_WRAP_OVERRIDE_DECL(bool, goal_acquired, const);
-  RCPPSW_WRAP_OVERRIDE_DECL(cfmetrics::goal_acq_metrics::goal_type,
+  RCPPSW_WRAP_OVERRIDE_DECL(cfsm::metrics::goal_acq_metrics::goal_type,
                             acquisition_goal,
                             const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, acquisition_loc, const);

@@ -26,7 +26,7 @@
 #include <fstream>
 
 #include "cosm/repr/base_block2D.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/expstrat/block_factory.hpp"
@@ -48,7 +48,7 @@ crw_controller::~crw_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void crw_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
   ndc_push();
   ER_INFO("Initializing...");
 
@@ -63,7 +63,7 @@ void crw_controller::init(ticpp::Element& node) {
 } /* init() */
 
 void crw_controller::reset(void) {
-  base_controller::reset();
+  foraging_controller::reset();
   if (nullptr != m_fsm) {
     m_fsm->init();
   }

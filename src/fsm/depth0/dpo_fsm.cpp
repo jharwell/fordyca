@@ -35,7 +35,7 @@ NS_START(fordyca, fsm, depth0);
  * Constructors/Destructors
  ******************************************************************************/
 dpo_fsm::dpo_fsm(const fsm_ro_params* params,
-                 crfootbot::footbot_saa_subsystem* saa,
+                 crfootbot::footbot_saa_subsystem2D* saa,
                  std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),

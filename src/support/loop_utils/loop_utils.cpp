@@ -25,7 +25,7 @@
 
 #include "cosm/foraging/ds/arena_map.hpp"
 
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
 
 /*******************************************************************************

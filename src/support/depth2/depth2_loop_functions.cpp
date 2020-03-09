@@ -378,7 +378,7 @@ argos::CColor depth2_loop_functions::GetFloorColor(
  * General Member Functions
  ******************************************************************************/
 void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::base_controller*>(
+  auto controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -401,7 +401,7 @@ void depth2_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
 } /* robot_pre_step() */
 
 void depth2_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
-  auto controller = dynamic_cast<controller::base_controller*>(
+  auto controller = dynamic_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*

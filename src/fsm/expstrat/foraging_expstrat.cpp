@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -37,12 +37,12 @@ NS_START(fordyca, fsm, expstrat);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) const {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
+crfootbot::footbot_saa_subsystem2D* foraging_expstrat::saa(void) const {
+  return static_cast<crfootbot::footbot_saa_subsystem2D*>(base_expstrat::saa());
 } /* saa() */
 
-crfootbot::footbot_saa_subsystem* foraging_expstrat::saa(void) {
-  return static_cast<crfootbot::footbot_saa_subsystem*>(base_expstrat::saa());
+crfootbot::footbot_saa_subsystem2D* foraging_expstrat::saa(void) {
+  return static_cast<crfootbot::footbot_saa_subsystem2D*>(base_expstrat::saa());
 } /* saa() */
 
 NS_END(expstrat, fsm, fordyca);

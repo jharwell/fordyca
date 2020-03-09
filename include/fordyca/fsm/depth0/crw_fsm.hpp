@@ -59,10 +59,10 @@ NS_START(depth0);
  */
 class crw_fsm final : public cfsm::util_hfsm,
                       public rer::client<crw_fsm>,
-                      public cfmetrics::goal_acq_metrics,
+                      public cfsm::metrics::goal_acq_metrics,
                       public block_transporter {
  public:
-  crw_fsm(crfootbot::footbot_saa_subsystem* saa,
+  crw_fsm(crfootbot::footbot_saa_subsystem2D* saa,
           std::unique_ptr<expstrat::foraging_expstrat> exp_behavior,
           rmath::rng* rng);
 
@@ -76,12 +76,12 @@ class crw_fsm final : public cfsm::util_hfsm,
   rtypes::timestep collision_avoidance_duration(void) const override RCSW_PURE;
   rmath::vector2u avoidance_loc(void) const override;
   /* goal acquisition metrics */
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
   exp_status is_exploring_for_goal(void) const override RCSW_PURE;
   bool is_vectoring_to_goal(void) const override { return false; }
   bool goal_acquired(void) const override RCSW_PURE;
   rmath::vector2u acquisition_loc(void) const override;
-  rtypes::type_uuid entity_acquired_id(void) const override;
+  rtypes::type_uuid entity_acquired_id(void) const override RCSW_PURE;
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_explore_loc, const);
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 

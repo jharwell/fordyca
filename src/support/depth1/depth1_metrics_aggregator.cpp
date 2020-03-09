@@ -61,13 +61,13 @@
 NS_START(fordyca, support, depth1, detail);
 
 using collector_typelist = rmpl::typelist<
-    metrics::collector_registerer::type_wrap<cfmetrics::goal_acq_metrics_collector>,
+    metrics::collector_registerer::type_wrap<cfsm::metrics::goal_acq_metrics_collector>,
     metrics::collector_registerer::type_wrap<
-        cfmetrics::goal_acq_locs_metrics_collector>,
+        cfsm::metrics::goal_acq_locs_metrics_collector>,
     metrics::collector_registerer::type_wrap<
-        cfmetrics::current_explore_locs_metrics_collector>,
+        cfsm::metrics::current_explore_locs_metrics_collector>,
     metrics::collector_registerer::type_wrap<
-        cfmetrics::current_vector_locs_metrics_collector>,
+        cfsm::metrics::current_vector_locs_metrics_collector>,
     metrics::collector_registerer::type_wrap<ctametrics::execution_metrics_collector>,
     metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
     metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
@@ -92,16 +92,16 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
     : depth0_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
   metrics::collector_registerer::creatable_set creatable_set = {
-      {typeid(cfmetrics::goal_acq_metrics_collector),
+      {typeid(cfsm::metrics::goal_acq_metrics_collector),
        "cache_acq_counts",
        "caches::acq_counts"},
-      {typeid(cfmetrics::goal_acq_locs_metrics_collector),
+      {typeid(cfsm::metrics::goal_acq_locs_metrics_collector),
        "cache_acq_locs",
        "caches::acq_locs"},
-      {typeid(cfmetrics::current_explore_locs_metrics_collector),
+      {typeid(cfsm::metrics::current_explore_locs_metrics_collector),
        "cache_acq_explore_locs",
        "caches::acq_explore_locs"},
-      {typeid(cfmetrics::current_vector_locs_metrics_collector),
+      {typeid(cfsm::metrics::current_vector_locs_metrics_collector),
        "cache_acq_vector_locs",
        "caches::acq_vector_locs"},
       {typeid(ctametrics::execution_metrics_collector),

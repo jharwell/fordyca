@@ -58,13 +58,13 @@ NS_START(fsm, depth0);
  */
 class free_block_to_nest_fsm final : public cfsm::util_hfsm,
                                      public rer::client<free_block_to_nest_fsm>,
-                                     public cfmetrics::goal_acq_metrics,
+                                     public cfsm::metrics::goal_acq_metrics,
                                      public block_transporter,
                                      public cta::taskable {
  public:
   free_block_to_nest_fsm(
       const fsm_ro_params* c_params,
-      crfootbot::footbot_saa_subsystem* saa,
+      crfootbot::footbot_saa_subsystem2D* saa,
       std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
       rmath::rng* rng);
 
@@ -99,7 +99,7 @@ class free_block_to_nest_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   bool goal_acquired(void) const override RCSW_PURE;
-  cfmetrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
+  cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
   fsm::foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;

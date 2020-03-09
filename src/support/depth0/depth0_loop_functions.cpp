@@ -280,7 +280,7 @@ argos::CColor depth0_loop_functions::GetFloorColor(
  * General Member Functions
  ******************************************************************************/
 void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::base_controller*>(
+  auto controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
 
   /*
@@ -302,7 +302,7 @@ void depth0_loop_functions::robot_pre_step(argos::CFootBotEntity& robot) {
 } /* robot_pre_step() */
 
 void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
-  auto controller = static_cast<controller::base_controller*>(
+  auto controller = static_cast<controller::foraging_controller*>(
       &robot.GetControllableEntity().GetController());
   /*
    * Watch the robot interact with its environment after physics have been

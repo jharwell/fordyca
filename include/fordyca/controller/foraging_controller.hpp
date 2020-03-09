@@ -1,5 +1,5 @@
 /**
- * \file base_controller.hpp
+ * \file foraging_controller.hpp
  *
  * \copyright 2017 John Harwell, All rights reserved.
  *
@@ -18,8 +18,8 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_
-#define INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_
+#ifndef INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
+#define INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_
 
 /*******************************************************************************
  * Includes
@@ -71,7 +71,7 @@ class base_perception_subsystem;
  * Class Definitions
  ******************************************************************************/
 /**
- * \class base_controller
+ * \class foraging_controller
  * \ingroup controller
  *
  * \brief The base controller foraging class that all FORDYCA controllers derive
@@ -80,17 +80,17 @@ class base_perception_subsystem;
  * class to be used as the robot controller handle when rendering QT graphics
  * overlays.
  */
-class base_controller : public cpal::argos_controller2D_adaptor,
-                        public ccontroller::irv_recipient_controller,
-                        public rer::client<base_controller> {
+class foraging_controller : public cpal::argos_controller2D_adaptor,
+                            public ccontroller::irv_recipient_controller,
+                            public rer::client<foraging_controller> {
  public:
-  base_controller(void) RCSW_COLD;
-  ~base_controller(void) override RCSW_COLD;
+  foraging_controller(void) RCSW_COLD;
+  ~foraging_controller(void) override RCSW_COLD;
 
-  base_controller(const base_controller&) = delete;
-  base_controller& operator=(const base_controller&) = delete;
+  foraging_controller(const foraging_controller&) = delete;
+  foraging_controller& operator=(const foraging_controller&) = delete;
 
-  /* base_controller2D overrides */
+  /* foraging_controller2D overrides */
   void init(ticpp::Element& node) override RCSW_COLD;
   void reset(void) override RCSW_COLD;
   rtypes::type_uuid entity_id(void) const override final;
@@ -163,8 +163,8 @@ class base_controller : public cpal::argos_controller2D_adaptor,
   }
 
  protected:
-  class crfootbot::footbot_saa_subsystem* saa(void) RCSW_PURE;
-  const class crfootbot::footbot_saa_subsystem* saa(void) const RCSW_PURE;
+  class crfootbot::footbot_saa_subsystem2D* saa(void) RCSW_PURE;
+  const class crfootbot::footbot_saa_subsystem2D* saa(void) const RCSW_PURE;
 
  private:
   void saa_init(
@@ -180,4 +180,4 @@ class base_controller : public cpal::argos_controller2D_adaptor,
 
 NS_END(controller, fordyca);
 
-#endif /* INCLUDE_FORDYCA_CONTROLLER_BASE_CONTROLLER_HPP_ */
+#endif /* INCLUDE_FORDYCA_CONTROLLER_FORAGING_CONTROLLER_HPP_ */

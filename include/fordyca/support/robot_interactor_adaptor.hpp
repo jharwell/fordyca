@@ -48,7 +48,7 @@ template <template <typename ControllerType> class InteractorType,
           class RetType = void>
 class robot_interactor_adaptor {
  public:
-  robot_interactor_adaptor(controller::base_controller* const controller,
+  robot_interactor_adaptor(controller::foraging_controller* const controller,
                            rtypes::timestep t)
       : mc_timestep(t), m_controller(controller) {}
 
@@ -62,7 +62,7 @@ class robot_interactor_adaptor {
  private:
   /* clang-format off */
   const rtypes::timestep             mc_timestep;
-  controller::base_controller* const m_controller;
+  controller::foraging_controller* const m_controller;
   /* clang-format on */
 };
 

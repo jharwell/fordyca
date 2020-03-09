@@ -95,15 +95,15 @@ class env_dynamics final : public rer::client<env_dynamics>,
    * \brief Register a robot controller for all possible types of environmental
    * variance that could be applied to it.
    */
-  void register_controller(const controller::base_controller& c);
+  void register_controller(const controller::foraging_controller& c);
 
   /**
    * \brief Undo \ref register_controller, as well as flushing the controller
    * from any penalty handlers it might be serving penalties for.
    */
-  void unregister_controller(const controller::base_controller& c);
+  void unregister_controller(const controller::foraging_controller& c);
 
-  bool penalties_flush(const controller::base_controller& c);
+  bool penalties_flush(const controller::foraging_controller& c);
 
   const argos_rda_adaptor* rda_adaptor(void) const { return &m_rda; }
 

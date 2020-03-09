@@ -24,7 +24,7 @@
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 
 #include "cosm/robots/footbot/footbot_actuation_subsystem.hpp"
-#include "cosm/robots/footbot/footbot_saa_subsystem.hpp"
+#include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/robots/footbot/footbot_sensing_subsystem.hpp"
 
 #include "fordyca/fsm/expstrat/crw.hpp"
@@ -38,7 +38,7 @@ NS_START(fordyca, fsm, depth0);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
-crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem* const saa,
+crw_fsm::crw_fsm(crfootbot::footbot_saa_subsystem2D* const saa,
                  std::unique_ptr<fsm::expstrat::foraging_expstrat> exp_behavior,
                  rmath::rng* rng)
     : util_hfsm(saa, rng, ekST_MAX_STATES),
@@ -218,13 +218,13 @@ foraging_transport_goal::type crw_fsm::block_transport_goal(void) const {
   return foraging_transport_goal::type::ekNONE;
 } /* block_transport_goal() */
 
-cfmetrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
+cfsm::metrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return cfmetrics::goal_acq_metrics::goal_type(
+    return cfsm::metrics::goal_acq_metrics::goal_type(
         foraging_acq_goal::type::ekBLOCK);
   }
-  return cfmetrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
 } /* block_transport_goal() */
 
 NS_END(depth0, fsm, fordyca);

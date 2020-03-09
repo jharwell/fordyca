@@ -38,9 +38,9 @@ occupancy_grid::occupancy_grid(
     const config::perception::perception_config* c_config,
     const std::string& robot_id)
     : ER_CLIENT_INIT("fordyca.ds.occupancy_grid"),
-      stacked_grid(c_config->occupancy_grid.resolution,
-                   c_config->occupancy_grid.upper.x(),
-                   c_config->occupancy_grid.upper.y()),
+      stacked_grid2D(c_config->occupancy_grid.resolution,
+                     c_config->occupancy_grid.upper.x(),
+                     c_config->occupancy_grid.upper.y()),
       m_pheromone_repeat_deposit(c_config->pheromone.repeat_deposit),
       m_robot_id(robot_id) {
   ER_INFO("real=(%fx%f), discrete=(%zux%zu), resolution=%f",

@@ -49,7 +49,7 @@ NS_START(fordyca, tasks);
  * in FORDYCA, as well as common metrics reported by/on all tasks.
  */
 class base_foraging_task : public fsm::block_transporter,
-                           public cfmetrics::goal_acq_metrics {
+                           public cfsm::metrics::goal_acq_metrics {
  public:
   base_foraging_task(void) = default;
   ~base_foraging_task(void) override = default;

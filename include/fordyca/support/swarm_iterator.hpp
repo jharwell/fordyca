@@ -31,7 +31,7 @@
 
 #include "cosm/pal/argos_sm_adaptor.hpp"
 
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
 
 /*******************************************************************************
@@ -79,7 +79,7 @@ struct swarm_iterator {
                           const std::string& entity_name) {
     for (auto& [name, robotp] : sm->GetSpace().GetEntitiesByType(entity_name)) {
       auto* robot = ::argos::any_cast<TRobotType*>(robotp);
-      auto* controller = static_cast<controller::base_controller*>(
+      auto* controller = static_cast<controller::foraging_controller*>(
           &robot->GetControllableEntity().GetController());
       cb(controller);
     } /* for(...) */
@@ -102,7 +102,7 @@ struct swarm_iterator {
   static void controllers(const cpal::argos_sm_adaptor* const sm,
                           const TFunction& cb) {
     auto wrapper = [&](auto* robot) {
-      cb(static_cast<controller::base_controller*>(&robot->GetController()));
+      cb(static_cast<controller::foraging_controller*>(&robot->GetController()));
     };
     sm->IterateOverControllableEntities(wrapper);
   }

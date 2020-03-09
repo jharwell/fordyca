@@ -42,13 +42,13 @@
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/fsm/metrics/movement_metrics_collector.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
-#include "cosm/metrics/spatial_dist2D_metrics.hpp"
-#include "cosm/metrics/spatial_dist2D_pos_metrics_collector.hpp"
+#include "cosm/metrics/spatial/dist2D_metrics.hpp"
+#include "cosm/metrics/spatial/dist2D_pos_metrics_collector.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/tv/metrics/population_dynamics_metrics.hpp"
 #include "cosm/tv/metrics/population_dynamics_metrics_collector.hpp"
 
-#include "fordyca/controller/base_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics.hpp"
 #include "fordyca/metrics/blocks/manipulation_metrics_collector.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
@@ -64,16 +64,16 @@ namespace fs = std::experimental::filesystem;
 NS_START(fordyca, metrics, detail);
 
 using collector_typelist = rmpl::typelist<
-    collector_registerer::type_wrap<cfmetrics::movement_metrics_collector>,
-    collector_registerer::type_wrap<cfmetrics::collision_metrics_collector>,
-    collector_registerer::type_wrap<cfmetrics::collision_locs_metrics_collector>,
-    collector_registerer::type_wrap<cfmetrics::goal_acq_metrics_collector>,
-    collector_registerer::type_wrap<cfmetrics::goal_acq_locs_metrics_collector>,
-    collector_registerer::type_wrap<cfmetrics::current_explore_locs_metrics_collector>,
-    collector_registerer::type_wrap<cfmetrics::current_vector_locs_metrics_collector>,
+    collector_registerer::type_wrap<cfsm::metrics::movement_metrics_collector>,
+    collector_registerer::type_wrap<cfsm::metrics::collision_metrics_collector>,
+    collector_registerer::type_wrap<cfsm::metrics::collision_locs_metrics_collector>,
+    collector_registerer::type_wrap<cfsm::metrics::goal_acq_metrics_collector>,
+    collector_registerer::type_wrap<cfsm::metrics::goal_acq_locs_metrics_collector>,
+    collector_registerer::type_wrap<cfsm::metrics::current_explore_locs_metrics_collector>,
+    collector_registerer::type_wrap<cfsm::metrics::current_vector_locs_metrics_collector>,
     collector_registerer::type_wrap<cmetrics::blocks::transport_metrics_collector>,
     collector_registerer::type_wrap<blocks::manipulation_metrics_collector>,
-    collector_registerer::type_wrap<cmetrics::spatial_dist2D_pos_metrics_collector>,
+  collector_registerer::type_wrap<cmetrics::spatial::dist2D_pos_metrics_collector>,
     collector_registerer::type_wrap<
         cconvergence::metrics::convergence_metrics_collector>,
     collector_registerer::type_wrap<tv::env_dynamics_metrics_collector>,
@@ -97,25 +97,25 @@ base_metrics_aggregator::base_metrics_aggregator(
     ER_WARN("Output metrics path '%s' already exists", m_metrics_path.c_str());
   }
   collector_registerer::creatable_set creatable_set = {
-      {typeid(cfmetrics::movement_metrics_collector),
+      {typeid(cfsm::metrics::movement_metrics_collector),
        "fsm_movement",
        "fsm::movement"},
-      {typeid(cfmetrics::collision_locs_metrics_collector),
+      {typeid(cfsm::metrics::collision_locs_metrics_collector),
        "fsm_collision_locs",
        "fsm::collision_locs"},
-      {typeid(cfmetrics::collision_metrics_collector),
+      {typeid(cfsm::metrics::collision_metrics_collector),
        "fsm_collision_counts",
        "fsm::collision_counts"},
-      {typeid(cfmetrics::goal_acq_metrics_collector),
+      {typeid(cfsm::metrics::goal_acq_metrics_collector),
        "block_acq_counts",
        "blocks::acq_counts"},
-      {typeid(cfmetrics::goal_acq_locs_metrics_collector),
+      {typeid(cfsm::metrics::goal_acq_locs_metrics_collector),
        "block_acq_locs",
        "blocks::acq_locs"},
-      {typeid(cfmetrics::current_explore_locs_metrics_collector),
+      {typeid(cfsm::metrics::current_explore_locs_metrics_collector),
        "block_acq_explore_locs",
        "blocks::acq_explore_locs"},
-      {typeid(cfmetrics::current_vector_locs_metrics_collector),
+      {typeid(cfsm::metrics::current_vector_locs_metrics_collector),
        "block_acq_vector_locs",
        "blocks::acq_vector_locs"},
       {typeid(cmetrics::blocks::transport_metrics_collector),
@@ -124,7 +124,7 @@ base_metrics_aggregator::base_metrics_aggregator(
       {typeid(blocks::manipulation_metrics_collector),
        "block_manipulation",
        "blocks::manipulation"},
-      {typeid(cmetrics::spatial_dist2D_pos_metrics_collector),
+      {typeid(cmetrics::spatial::dist2D_pos_metrics_collector),
        "swarm_dist2D_pos",
        "swarm::spatial_dist2D::pos"},
       {typeid(cconvergence::metrics::convergence_metrics_collector),
@@ -164,7 +164,7 @@ void base_metrics_aggregator::collect_from_block(
 } /* collect_from_block() */
 
 void base_metrics_aggregator::collect_from_controller(
-    const controller::base_controller* const controller) {
+    const controller::foraging_controller* const controller) {
   collect("swarm::spatial_dist2D::pos", *controller);
 } /* collect_from_controller() */
 

@@ -181,7 +181,7 @@ class cached_block_pickup_interactor
        * In this case, you don't need to do anything, as the change in the
        * cache's status will be picked up by the second robot next timestep.
        */
-      if (v(controller.position2D(), p.id(), t)) {
+      if (v(controller.pos2D(), p.id(), t)) {
         status = perform_cached_block_pickup(controller, p, t);
         if (status == interactor_status::ekCACHE_DEPLETION) {
           m_floor->SetChanged();

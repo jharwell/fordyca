@@ -48,7 +48,7 @@ birtd_mdpo_controller::~birtd_mdpo_controller(void) = default;
  * Member Functions
  ******************************************************************************/
 void birtd_mdpo_controller::init(ticpp::Element& node) {
-  base_controller::init(node);
+  foraging_controller::init(node);
   ndc_push();
   ER_INFO("Initializing");
 

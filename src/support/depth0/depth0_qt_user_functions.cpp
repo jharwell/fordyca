@@ -57,7 +57,7 @@ depth0_qt_user_functions::depth0_qt_user_functions(void) {
 void depth0_qt_user_functions::Draw(argos::CFootBotEntity& c_entity) {
   auto* mdpo = dynamic_cast<const controller::depth0::mdpo_controller*>(
       &c_entity.GetControllableEntity().GetController());
-  auto* base = dynamic_cast<const controller::base_controller*>(
+  auto* base = dynamic_cast<const controller::foraging_controller*>(
       &c_entity.GetControllableEntity().GetController());
 
   if (base->display_id()) {

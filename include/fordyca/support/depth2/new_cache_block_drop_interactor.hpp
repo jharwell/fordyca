@@ -221,7 +221,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    */
   void perform_new_cache_block_drop(T& controller,
                                     const tv::temporal_penalty& penalty) {
-    auto loc = rmath::dvec2uvec(controller.position2D(),
+    auto loc = rmath::dvec2uvec(controller.pos2D(),
                                 m_map->grid_resolution().v());
 
     cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],

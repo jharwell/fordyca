@@ -34,7 +34,7 @@
 NS_START(fordyca);
 
 namespace controller {
-class base_controller;
+class foraging_controller;
 } /* namespace controller */
 
 NS_START(support, tv);
@@ -60,7 +60,7 @@ class temporal_penalty {
    * \param penalty The # of timesteps for the penalty.
    * \param start_time The timestep the penalty will start on.
    */
-  temporal_penalty(const controller::base_controller* const controller,
+  temporal_penalty(const controller::foraging_controller* const controller,
                    const rtypes::type_uuid& id,
                    const rtypes::timestep& penalty,
                    const rtypes::timestep& start_time)
@@ -69,7 +69,7 @@ class temporal_penalty {
         mc_start_time(start_time),
         mc_controller(controller) {}
 
-  const controller::base_controller* controller(void) const {
+  const controller::foraging_controller* controller(void) const {
     return mc_controller;
   }
   const rtypes::timestep& start_time(void) const { return mc_start_time; }
@@ -90,10 +90,10 @@ class temporal_penalty {
 
  private:
   /* clang-format off */
-  const rtypes::type_uuid          mc_id;
-  const rtypes::timestep             mc_penalty;
-  const rtypes::timestep             mc_start_time;
-  const controller::base_controller* mc_controller;
+  const rtypes::type_uuid                mc_id;
+  const rtypes::timestep                 mc_penalty;
+  const rtypes::timestep                 mc_start_time;
+  const controller::foraging_controller* mc_controller;
   /* clang-format on */
 };
 

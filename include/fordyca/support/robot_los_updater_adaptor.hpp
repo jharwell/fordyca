@@ -44,7 +44,7 @@ NS_START(fordyca, support);
  */
 class robot_los_updater_adaptor {
  public:
-  explicit robot_los_updater_adaptor(controller::base_controller* const c)
+  explicit robot_los_updater_adaptor(controller::foraging_controller* const c)
       : controller(c) {}
 
   template <typename ControllerType>
@@ -54,7 +54,7 @@ class robot_los_updater_adaptor {
 
  private:
   /* clang-format off */
-  controller::base_controller* const controller;
+  controller::foraging_controller* const controller;
   /* clang-format on */
 };
 
