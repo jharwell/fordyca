@@ -48,7 +48,7 @@ static_cache_creator::static_cache_creator(
  ******************************************************************************/
 cfds::acache_vectoro static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
-    const cfds::block_vectorno& c_alloc_blocks) {
+    const cfds::block2D_vectorno& c_alloc_blocks) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
@@ -77,7 +77,7 @@ cfds::acache_vectoro static_cache_creator::create_all(
     }
     auto it2 = it;
     std::advance(it, base_cache::kMinBlocks);
-    cfds::block_vectorno cache_i_blocks(it2, it);
+    cfds::block2D_vectorno cache_i_blocks(it2, it);
 
     ER_INFO("Creating static cache@%s: blocks=[%s] (%zu)",
             center.to_str().c_str(),

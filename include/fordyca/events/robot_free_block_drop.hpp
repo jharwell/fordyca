@@ -31,6 +31,7 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
 #include "cosm/events/cell2D_op.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -39,10 +40,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-} /* namespace cosm::repr */
-
 namespace fordyca::controller {
 class block_sel_matrix;
 } /* namespace fordyca::controller */

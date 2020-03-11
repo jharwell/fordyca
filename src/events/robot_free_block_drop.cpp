@@ -177,7 +177,7 @@ void robot_free_block_drop::visit(cfsm::cell2D_fsm& fsm) {
 } /* visit() */
 
 void robot_free_block_drop::visit(crepr::base_block2D& block) {
-  block.reset_robot_id();
+  block.md()->robot_id_reset();
 
   block.rloc(rmath::uvec2dvec(cell2D_op::coord(), mc_resolution.v()));
   block.dloc(cell2D_op::coord());

@@ -242,7 +242,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block(std::move(m_robot_block));
@@ -262,7 +262,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.mdpo_perception()->map());
   controller.block(std::move(m_robot_block));
@@ -282,7 +282,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block(std::move(m_robot_block));
@@ -302,7 +302,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.mdpo_perception()->map());
   controller.block(std::move(m_robot_block));
@@ -339,7 +339,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block(std::move(m_robot_block));
@@ -363,7 +363,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.mdpo_perception()->map());
   controller.block(std::move(m_robot_block));
@@ -385,7 +385,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.dpo_perception()->dpo_store());
   controller.block(std::move(m_robot_block));
@@ -409,7 +409,7 @@ void robot_cached_block_pickup::visit(
    * block/cache removal work out.
    */
   m_robot_block = mc_block->clone();
-  m_robot_block->robot_id(mc_robot_id);
+  m_robot_block->md()->robot_id(mc_robot_id);
 
   visit(*controller.mdpo_perception()->map());
   controller.block(std::move(m_robot_block));

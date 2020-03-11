@@ -54,15 +54,15 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
       map.subgrid(position.x(), position.y(), los_grid_size), position);
 } /* compute_robot_los */
 
-cfds::block_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
-                                      const cfds::block_vectorno& all_blocks) {
-  cfds::block_vectorno free_blocks;
+cfds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
+                                      const cfds::block2D_vectorno& all_blocks) {
+  cfds::block2D_vectorno free_blocks;
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),
                std::back_inserter(free_blocks),
                [&](const auto& b) RCSW_PURE {
                  /* block not carried by robot */
-                 return rtypes::constants::kNoUUID == b->robot_id() &&
+                 return rtypes::constants::kNoUUID == b->md()->robot_id() &&
                         /*
                       * Block not inside cache (to catch blocks that were on the
                       * host cell for the cache, and we incorporated into it

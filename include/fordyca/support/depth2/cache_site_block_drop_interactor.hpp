@@ -135,7 +135,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
                               const utils::proximity_status_t& status) {
      ER_WARN("%s@%s cannot drop block in cache site: Cache%d@%s too close (%f <= %f)",
              controller.GetId().c_str(),
-             controller.position2D().to_str().c_str(),
+             controller.pos2D().to_str().c_str(),
              status.entity_id.v(),
              status.entity_loc.to_str().c_str(),
              status.distance.length(),

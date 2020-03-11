@@ -60,7 +60,7 @@ const crepr::base_block2D* block_selector::operator()(
      * undoubtedly have to change in the future.
      */
     double priority =
-        (crepr::block_type::ekCUBE == b.ent()->type())
+        (crepr::block_type::ekCUBE == b.ent()->md()->type())
             ? boost::get<double>(mc_matrix->find(bselm::kCubePriority)->second)
             : boost::get<double>(mc_matrix->find(bselm::kRampPriority)->second);
     rmath::vector2d nest_loc =

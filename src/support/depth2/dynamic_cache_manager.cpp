@@ -52,7 +52,7 @@ dynamic_cache_manager::dynamic_cache_manager(
  ******************************************************************************/
 boost::optional<cfds::acache_vectoro> dynamic_cache_manager::create(
     const cache_create_ro_params& c_params,
-    const cfds::block_vectorno& c_alloc_blocks) {
+    const cfds::block2D_vectorno& c_alloc_blocks) {
   if (auto to_use = calc_blocks_for_creation(
           c_params.current_caches, c_params.clusters, c_alloc_blocks)) {
     support::depth2::dynamic_cache_creator::params params = {
@@ -76,11 +76,11 @@ boost::optional<cfds::acache_vectoro> dynamic_cache_manager::create(
   }
 } /* create() */
 
-boost::optional<cfds::block_vectorno> dynamic_cache_manager::calc_blocks_for_creation(
+boost::optional<cfds::block2D_vectorno> dynamic_cache_manager::calc_blocks_for_creation(
     const cfds::acache_vectorno& existing_caches,
     const cfds::block_cluster_vector& clusters,
-    const cfds::block_vectorno& blocks) {
-  cfds::block_vectorno to_use;
+    const cfds::block2D_vectorno& blocks) {
+  cfds::block2D_vectorno to_use;
   auto filter = [&](const auto& b) {
     /* Blocks cannot be in existing caches */
     return std::all_of(existing_caches.begin(),
@@ -99,7 +99,7 @@ boost::optional<cfds::block_vectorno> dynamic_cache_manager::calc_blocks_for_cre
                                 std::find(cblocks.begin(), cblocks.end(), b);
                        }) &&
            /* blocks cannot be carried by a robot */
-           rtypes::constants::kNoUUID == b->robot_id();
+    rtypes::constants::kNoUUID == b->md()->robot_id();
   };
   std::copy_if(blocks.begin(), blocks.end(), std::back_inserter(to_use), filter);
 
@@ -121,7 +121,7 @@ boost::optional<cfds::block_vectorno> dynamic_cache_manager::calc_blocks_for_cre
     std::string accum;
     std::for_each(to_use.begin(), to_use.end(), [&](const auto& b) {
       accum += "b" + rcppsw::to_string(b->id()) + "->fb" +
-               rcppsw::to_string(b->robot_id()) + ",";
+               rcppsw::to_string(b->md()->robot_id()) + ",";
     });
     ER_DEBUG("Block carry statuses: [%s]", accum.c_str());
 
@@ -138,13 +138,13 @@ boost::optional<cfds::block_vectorno> dynamic_cache_manager::calc_blocks_for_cre
               to_use.size() - count,
               to_use.size(),
               mc_cache_config.dynamic.min_blocks);
-    return boost::optional<cfds::block_vectorno>();
+    return boost::optional<cfds::block2D_vectorno>();
   }
   if (to_use.size() < mc_cache_config.static_.size) {
     ER_WARN("Free block count < min blocks for new caches (%zu < %u)",
             to_use.size(),
             mc_cache_config.dynamic.min_blocks);
-    return boost::optional<cfds::block_vectorno>();
+    return boost::optional<cfds::block2D_vectorno>();
   }
   return boost::make_optional(to_use);
 } /* calc_blocks_for_creation() */

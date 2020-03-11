@@ -31,6 +31,7 @@
 #include "rcppsw/types/discretize_ratio.hpp"
 
 #include "cosm/events/cell2D_op.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fordyca.hpp"
@@ -43,10 +44,6 @@
 namespace cosm::foraging::repr {
 class arena_cache;
 } // namespace cosm::foraging::repr
-
-namespace cosm::repr {
-class base_block2D;
-} /* namespace cosm::repr */
 
 namespace fordyca::ds {
 class dpo_semantic_map;

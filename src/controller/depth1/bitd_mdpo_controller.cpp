@@ -71,10 +71,10 @@ void bitd_mdpo_controller::init(ticpp::Element& node) {
 void bitd_mdpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
 
   perception()->update(nullptr);
   executive()->run();

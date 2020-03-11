@@ -26,15 +26,13 @@
  ******************************************************************************/
 #include "rcppsw/mpl/typelist.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-} // namespace cosm::repr
-
 namespace cosm::foraging::ds {
 class arena_map;
 } /* namespace cosm::foraging::ds */

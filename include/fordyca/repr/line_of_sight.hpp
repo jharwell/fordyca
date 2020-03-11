@@ -32,7 +32,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/foraging/ds/block_vector.hpp"
+#include "cosm/foraging/ds/block2D_vector.hpp"
 #include "cosm/foraging/ds/cache_vector.hpp"
 
 /*******************************************************************************
@@ -76,7 +76,7 @@ class line_of_sight final : public rer::client<line_of_sight> {
         mc_center(center),
         mc_view(c_view) {}
 
-  cfds::block_vectorno blocks(void) const;
+  cfds::block2D_vectorno blocks(void) const;
   cfds::bcache_vectorno caches(void) const;
 
   /**

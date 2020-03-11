@@ -34,8 +34,8 @@ NS_START(fordyca, repr);
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cfds::block_vectorno line_of_sight::blocks(void) const {
-  cfds::block_vectorno blocks{};
+cfds::block2D_vectorno line_of_sight::blocks(void) const {
+  cfds::block2D_vectorno blocks{};
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {
       const cds::cell2D& cell = mc_view[i][j];

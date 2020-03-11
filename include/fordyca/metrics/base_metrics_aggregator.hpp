@@ -32,15 +32,13 @@
 #include "rcppsw/metrics/collector_group.hpp"
 
 #include "cosm/metrics/config/metrics_config.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-}
 namespace cosm::ds::config {
 struct grid_config;
 } // namespace cosm::ds::config

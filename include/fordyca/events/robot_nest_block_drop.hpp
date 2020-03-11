@@ -30,6 +30,8 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/timestep.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
 #include "fordyca/tasks/tasks_fwd.hpp"
@@ -37,10 +39,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-} /* namespace cosm::repr */
-
 NS_START(fordyca, events, detail);
 
 /*******************************************************************************

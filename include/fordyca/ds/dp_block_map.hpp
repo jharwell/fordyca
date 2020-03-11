@@ -28,16 +28,14 @@
 
 #include "rcppsw/types/type_uuid.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/ds/dpo_map.hpp"
 #include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-} /* namespace cosm::repr */
-
 NS_START(fordyca, ds);
 
 /*******************************************************************************

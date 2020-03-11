@@ -39,7 +39,6 @@
  * Namespaces/Decls
  ******************************************************************************/
 namespace cosm::repr {
-class base_block2D;
 class entity2D;
 class nest;
 class arena_cache;

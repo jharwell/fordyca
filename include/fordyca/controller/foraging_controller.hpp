@@ -31,6 +31,7 @@
 #include "cosm/controller/irv_recipient_controller.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"
@@ -50,7 +51,6 @@ namespace cosm::tv {
 class robot_dynamics_applicator;
 }
 namespace cosm::repr {
-class base_block2D;
 class unicell_entity2D;
 } // namespace cosm::repr
 

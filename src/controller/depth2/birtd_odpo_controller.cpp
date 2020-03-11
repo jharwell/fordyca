@@ -51,10 +51,10 @@ birtd_odpo_controller::~birtd_odpo_controller(void) = default;
 void birtd_odpo_controller::control_step(void) {
   ndc_pusht();
   ER_ASSERT(!(nullptr != block() &&
-              rtypes::constants::kNoUUID == block()->robot_id()),
+              rtypes::constants::kNoUUID == block()->md()->robot_id()),
             "Carried block%d has robot id=%d",
             block()->id().v(),
-            block()->robot_id().v());
+            block()->md()->robot_id().v());
   dpo_perception()->update(m_receptor.get());
   executive()->run();
   saa()->steer_force2D_apply();

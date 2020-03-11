@@ -102,7 +102,7 @@ void mdpo_perception_subsystem::process_los_blocks(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cfds::block_vectorno blocks = c_los->blocks();
+  cfds::block2D_vectorno blocks = c_los->blocks();
   if (!blocks.empty()) {
     ER_DEBUG("Blocks in LOS: [%s]", rcppsw::to_string(blocks).c_str());
     ER_DEBUG("Blocks in DPO store: [%s]",

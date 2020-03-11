@@ -52,7 +52,7 @@ base_cache_creator::base_cache_creator(cds::arena_grid* const grid,
  ******************************************************************************/
 std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
     const rmath::vector2d& center,
-    cfds::block_vectorno blocks,
+    cfds::block2D_vectorno blocks,
     const rtypes::timestep& t) {
   ER_ASSERT(center.x() > 0 && center.y() > 0,
             "Center@%s is not positive definite",
@@ -109,7 +109,7 @@ std::unique_ptr<cfrepr::arena_cache> base_cache_creator::create_single_cache(
     op.visit(m_grid->access<arena_grid::kCell>(op.coord()));
   } /* for(block..) */
 
-  cfds::block_vectorno block_vec(blocks.begin(), blocks.end());
+  cfds::block2D_vectorno block_vec(blocks.begin(), blocks.end());
   auto ret = std::make_unique<cfrepr::arena_cache>(
       cfrepr::arena_cache::params{mc_cache_dim,
                                   m_grid->resolution(),
@@ -182,7 +182,7 @@ void base_cache_creator::update_host_cells(cfds::acache_vectoro& caches) {
 
 bool base_cache_creator::creation_sanity_checks(
     const cfds::acache_vectoro& caches,
-    const cfds::block_vectorno& free_blocks,
+    const cfds::block2D_vectorno& free_blocks,
     const cfds::block_cluster_vector& clusters) const {
   /* check caches against each other and internally for consistency */
   for (auto& c1 : caches) {

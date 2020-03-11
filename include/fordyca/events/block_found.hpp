@@ -29,16 +29,13 @@
 #include "rcppsw/er/client.hpp"
 
 #include "cosm/events/cell2D_op.hpp"
+#include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-} /* namespace cosm::repr */
-
 NS_START(fordyca);
 
 namespace ds {

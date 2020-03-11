@@ -29,6 +29,8 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/patterns/visitor/visitor.hpp"
 
+#include "cosm/repr/base_block2D.hpp"
+
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/fsm_fwd.hpp"
@@ -37,10 +39,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::repr {
-class base_block2D;
-}
-
 NS_START(fordyca, events, detail);
 
 /*******************************************************************************

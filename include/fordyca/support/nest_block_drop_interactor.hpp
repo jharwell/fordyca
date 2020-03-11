@@ -136,7 +136,7 @@ class nest_block_drop_interactor
      * We have to do this asynchronous to the rest of metric collection, because
      * the \ref nest_block_drop event resets block metrics.
      */
-    controller.block()->dest_drop_time(t);
+    controller.block()->md()->dest_drop_time(t);
     m_metrics_agg->collect_from_block(controller.block());
 
     /*

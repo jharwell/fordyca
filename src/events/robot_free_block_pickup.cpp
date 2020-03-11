@@ -92,7 +92,7 @@ void robot_free_block_pickup::visit(
   controller.ndc_pusht();
   visit(*controller.fsm());
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
   controller.block_manip_collator()->free_pickup_event(true);
 
@@ -162,7 +162,7 @@ void robot_free_block_pickup::visit(
   visit(*controller.fsm());
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->free_pickup_event(true);
@@ -179,7 +179,7 @@ void robot_free_block_pickup::visit(
   visit(*controller.fsm());
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->free_pickup_event(true);
@@ -196,7 +196,7 @@ void robot_free_block_pickup::visit(
   visit(*controller.fsm());
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->free_pickup_event(true);
@@ -213,7 +213,7 @@ void robot_free_block_pickup::visit(
   visit(*controller.fsm());
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   controller.block_manip_collator()->free_pickup_event(true);
@@ -233,7 +233,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
@@ -250,7 +250,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
@@ -267,7 +267,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
@@ -284,7 +284,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
@@ -322,7 +322,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
@@ -339,7 +339,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
@@ -356,7 +356,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
@@ -373,7 +373,7 @@ void robot_free_block_pickup::visit(
   controller.block_manip_collator()->free_pickup_event(true);
 
   auto robot_block = m_block->clone();
-  robot_block->robot_id(mc_robot_id);
+  robot_block->md()->robot_id(mc_robot_id);
   controller.block(std::move(robot_block));
 
   dispatch_robot_free_block_interactor(controller.current_task());
