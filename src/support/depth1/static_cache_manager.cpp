@@ -151,7 +151,7 @@ boost::optional<cfds::block2D_vectorno> static_cache_manager::cache_i_blocks_all
         /* don't have enough blocks yet */
         return (cache_i_blocks.size() < n_blocks) &&
                /* not carried by robot */
-            rtypes::constants::kNoUUID == b->md()->robot_id() &&
+               rtypes::constants::kNoUUID == b->md()->robot_id() &&
                /* not already allocated for a different cache */
                allocated_blocks.end() == std::find(allocated_blocks.begin(),
                                                    allocated_blocks.end(),

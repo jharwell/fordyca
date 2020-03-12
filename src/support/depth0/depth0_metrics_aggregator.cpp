@@ -31,13 +31,13 @@
 #include "cosm/fsm/metrics/movement_metrics.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/depth0/crw_controller.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"
 #include "fordyca/controller/depth0/odpo_controller.hpp"
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/fsm/depth0/crw_fsm.hpp"
 #include "fordyca/fsm/depth0/dpo_fsm.hpp"
 #include "fordyca/metrics/collector_registerer.hpp"
@@ -85,10 +85,12 @@ depth0_metrics_aggregator::depth0_metrics_aggregator(
   metrics::collector_registerer::creatable_set creatable_set = {
       {typeid(metrics::perception::mdpo_perception_metrics_collector),
        "perception_mdpo",
-       "perception::mdpo"},
+       "perception::mdpo",
+       rmetrics::output_mode::ekAPPEND},
       {typeid(metrics::perception::dpo_perception_metrics_collector),
        "perception_dpo",
-       "perception::dpo"}};
+       "perception::dpo",
+       rmetrics::output_mode::ekAPPEND}};
 
   metrics::collector_registerer registerer(mconfig, gconfig, creatable_set, this);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
@@ -118,15 +120,14 @@ void depth0_metrics_aggregator::collect_from_controller(
                return controller->fsm()->ca_tracker()->in_collision_avoidance();
              });
 
-  collect_if("blocks::acq_locs",
-             *controller,
-             [&](const rmetrics::base_metrics& metrics) {
-               auto& m =
-                   dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
-               return fsm::foraging_acq_goal::type::ekBLOCK ==
-                          m.acquisition_goal() &&
-                      m.goal_acquired();
-             });
+  collect_if(
+      "blocks::acq_locs",
+      *controller,
+      [&](const rmetrics::base_metrics& metrics) {
+        auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
+        return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+               m.goal_acquired();
+      });
 
   /*
    * We count "false" explorations as part of gathering metrics on where robots

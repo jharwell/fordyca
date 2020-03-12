@@ -76,10 +76,10 @@ boost::optional<cfds::acache_vectoro> dynamic_cache_manager::create(
   }
 } /* create() */
 
-boost::optional<cfds::block2D_vectorno> dynamic_cache_manager::calc_blocks_for_creation(
-    const cfds::acache_vectorno& existing_caches,
-    const cfds::block_cluster_vector& clusters,
-    const cfds::block2D_vectorno& blocks) {
+boost::optional<cfds::block2D_vectorno> dynamic_cache_manager::
+    calc_blocks_for_creation(const cfds::acache_vectorno& existing_caches,
+                             const cfds::block_cluster_vector& clusters,
+                             const cfds::block2D_vectorno& blocks) {
   cfds::block2D_vectorno to_use;
   auto filter = [&](const auto& b) {
     /* Blocks cannot be in existing caches */
@@ -99,7 +99,7 @@ boost::optional<cfds::block2D_vectorno> dynamic_cache_manager::calc_blocks_for_c
                                 std::find(cblocks.begin(), cblocks.end(), b);
                        }) &&
            /* blocks cannot be carried by a robot */
-    rtypes::constants::kNoUUID == b->md()->robot_id();
+           rtypes::constants::kNoUUID == b->md()->robot_id();
   };
   std::copy_if(blocks.begin(), blocks.end(), std::back_inserter(to_use), filter);
 

@@ -212,7 +212,8 @@ cfsm::metrics::goal_acq_metrics::goal_type cached_block_to_nest_fsm::acquisition
     return cfsm::metrics::goal_acq_metrics::goal_type(
         foraging_acq_goal::type::ekEXISTING_CACHE);
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 /*******************************************************************************

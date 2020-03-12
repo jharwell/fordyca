@@ -230,7 +230,8 @@ cfsm::metrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->acquisition_goal();
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {

@@ -50,10 +50,10 @@ NS_START(fordyca, metrics, caches);
 class lifecycle_metrics_collector final : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname Output file name.
+   * \param ofname_stem Output file name stem.
    * \param interval Collection interval.
    */
-  lifecycle_metrics_collector(const std::string& ofname,
+  lifecycle_metrics_collector(const std::string& ofname_stem,
                               const rtypes::timestep& interval);
 
   void reset(void) override;

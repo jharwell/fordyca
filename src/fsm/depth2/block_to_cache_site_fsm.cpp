@@ -56,7 +56,8 @@ cfsm::metrics::goal_acq_metrics::goal_type block_to_cache_site_fsm::acquisition_
     return cfsm::metrics::goal_acq_metrics::goal_type(
         foraging_acq_goal::type::ekCACHE_SITE);
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 foraging_transport_goal::type block_to_cache_site_fsm::block_transport_goal(

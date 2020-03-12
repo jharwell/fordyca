@@ -55,7 +55,7 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
 } /* compute_robot_los */
 
 cfds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
-                                      const cfds::block2D_vectorno& all_blocks) {
+                                        const cfds::block2D_vectorno& all_blocks) {
   cfds::block2D_vectorno free_blocks;
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),

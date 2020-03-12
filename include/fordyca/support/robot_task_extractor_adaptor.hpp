@@ -45,7 +45,8 @@ NS_START(fordyca, support);
  * convergence calculations.
  */
 struct robot_task_extractor_adaptor : public boost::static_visitor<int> {
-  explicit robot_task_extractor_adaptor(const controller::foraging_controller* const c)
+  explicit robot_task_extractor_adaptor(
+      const controller::foraging_controller* const c)
       : mc_controller(c) {}
 
   template <typename ControllerType>

@@ -34,8 +34,10 @@ NS_START(fordyca, metrics, tv);
  * Constructors/Destructor
  ******************************************************************************/
 env_dynamics_metrics_collector::env_dynamics_metrics_collector(
-    const std::string& ofname)
-    : base_metrics_collector(ofname, rtypes::timestep(1)) {}
+    const std::string& ofname_stem)
+    : base_metrics_collector(ofname_stem,
+                             rtypes::timestep(1),
+                             rmetrics::output_mode::ekAPPEND) {}
 
 /*******************************************************************************
  * Member Functions

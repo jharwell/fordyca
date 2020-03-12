@@ -99,8 +99,8 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
 /*******************************************************************************
  * Non-Member Functions
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::acq_goal_internal(
-    void) {
+cfsm::metrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::
+    acq_goal_internal(void) {
   return cfsm::metrics::goal_acq_metrics::goal_type(
       foraging_acq_goal::type::ekEXISTING_CACHE);
 } /* acq_goal() */

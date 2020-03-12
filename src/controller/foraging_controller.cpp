@@ -241,7 +241,8 @@ class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(void) {
   return static_cast<crfootbot::footbot_saa_subsystem2D*>(
       base_controller2D::saa());
 }
-const class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(void) const {
+const class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(
+    void) const {
   return static_cast<const crfootbot::footbot_saa_subsystem2D*>(
       base_controller2D::saa());
 }

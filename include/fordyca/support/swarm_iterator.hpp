@@ -147,7 +147,8 @@ struct swarm_iterator {
             typename TFunction,
             RCPPSW_SFINAE_FUNC(std::is_same<typename TOrdering::type,
                                             dynamic_order::type>::value)>
-  static void robots(const cpal::argos_sm_adaptor* const sm, const TFunction& cb) {
+  static void robots(const cpal::argos_sm_adaptor* const sm,
+                     const TFunction& cb) {
     sm->IterateOverControllableEntities(cb);
   }
 };

@@ -52,9 +52,9 @@ class env_dynamics_metrics_collector final
     : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname The output file name.
+   * \param ofname_stem The output file name stem.
    */
-  explicit env_dynamics_metrics_collector(const std::string& ofname);
+  explicit env_dynamics_metrics_collector(const std::string& ofname_stem);
 
   void collect(const rmetrics::base_metrics& metrics) override;
 

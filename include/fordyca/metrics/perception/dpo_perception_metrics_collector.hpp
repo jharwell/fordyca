@@ -54,10 +54,10 @@ class dpo_perception_metrics_collector final
     : public rmetrics::base_metrics_collector {
  public:
   /**
-   * \param ofname The output file name.
+   * \param ofname_stem The output file name stem.
    * \param interval Collection interval.
    */
-  dpo_perception_metrics_collector(const std::string& ofname,
+  dpo_perception_metrics_collector(const std::string& ofname_stem,
                                    const rtypes::timestep& interval);
 
   void reset(void) override;

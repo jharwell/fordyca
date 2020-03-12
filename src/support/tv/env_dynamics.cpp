@@ -62,7 +62,8 @@ void env_dynamics::register_controller(const controller::foraging_controller& c)
   m_rda.register_controller(c.entity_id());
 } /* register_controller() */
 
-void env_dynamics::unregister_controller(const controller::foraging_controller& c) {
+void env_dynamics::unregister_controller(
+    const controller::foraging_controller& c) {
   m_rda.unregister_controller(c.entity_id());
   penalties_flush(c);
 } /* unregister_controller() */

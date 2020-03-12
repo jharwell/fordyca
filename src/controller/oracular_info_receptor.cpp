@@ -24,6 +24,8 @@
 #include "fordyca/controller/oracular_info_receptor.hpp"
 
 #include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/oracle/entities_oracle.hpp"
+#include "cosm/oracle/tasking_oracle.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/polled_task.hpp"
@@ -32,8 +34,6 @@
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/block_found.hpp"
 #include "fordyca/events/cache_found.hpp"
-#include "cosm/oracle/entities_oracle.hpp"
-#include "cosm/oracle/tasking_oracle.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -76,9 +76,8 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
      */
     auto blocks = m_entities_oracle->ask("entities.blocks");
     if (!(*blocks).empty()) {
-      ER_DEBUG(
-          "Blocks in receptor: [%s]",
-          coracle::entities_oracle::result_to_string(*blocks).c_str());
+      ER_DEBUG("Blocks in receptor: [%s]",
+               coracle::entities_oracle::result_to_string(*blocks).c_str());
       ER_DEBUG("Blocks in DPO store: [%s]",
                rcppsw::to_string(store->blocks()).c_str());
     }
@@ -93,9 +92,8 @@ void oracular_info_receptor::dpo_store_update(ds::dpo_store* const store) {
      */
     auto caches = m_entities_oracle->ask("entities.caches");
     if (!(*caches).empty()) {
-      ER_DEBUG(
-          "Caches in receptor: [%s]",
-          coracle::entities_oracle::result_to_string(*caches).c_str());
+      ER_DEBUG("Caches in receptor: [%s]",
+               coracle::entities_oracle::result_to_string(*caches).c_str());
       ER_DEBUG("Caches in DPO store: [%s]",
                rcppsw::to_string(store->caches()).c_str());
     }

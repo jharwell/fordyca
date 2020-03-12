@@ -36,9 +36,11 @@ NS_START(fordyca, metrics, perception);
  * Constructors/Destructor
  ******************************************************************************/
 dpo_perception_metrics_collector::dpo_perception_metrics_collector(
-    const std::string& ofname,
+    const std::string& ofname_stem,
     const rtypes::timestep& interval)
-    : base_metrics_collector(ofname, interval) {}
+    : base_metrics_collector(ofname_stem,
+                             interval,
+                             rmetrics::output_mode::ekAPPEND) {}
 
 /*******************************************************************************
  * Member Functions

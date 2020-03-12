@@ -37,14 +37,12 @@ NS_START(fordyca, support, utils);
  ******************************************************************************/
 rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
                                  const cfds::arena_map& map) {
-  return map.robot_on_block(controller.pos2D(),
-                            controller.entity_acquired_id());
+  return map.robot_on_block(controller.pos2D(), controller.entity_acquired_id());
 } /* robot_on_block() */
 
 rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controller,
                                  const cfds::arena_map& map) {
-  return map.robot_on_cache(controller.pos2D(),
-                            controller.entity_acquired_id());
+  return map.robot_on_cache(controller.pos2D(), controller.entity_acquired_id());
 } /* robot_on_cache() */
 
 proximity_status_t new_cache_cache_proximity(

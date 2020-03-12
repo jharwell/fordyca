@@ -73,8 +73,8 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
 /*******************************************************************************
  * FSM Metrics
  ******************************************************************************/
-cfsm::metrics::goal_acq_metrics::goal_type block_to_existing_cache_fsm::acquisition_goal(
-    void) const {
+cfsm::metrics::goal_acq_metrics::goal_type block_to_existing_cache_fsm::
+    acquisition_goal(void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
     return cfsm::metrics::goal_acq_metrics::goal_type(
@@ -84,7 +84,8 @@ cfsm::metrics::goal_acq_metrics::goal_type block_to_existing_cache_fsm::acquisit
     return cfsm::metrics::goal_acq_metrics::goal_type(
         foraging_acq_goal::type::ekEXISTING_CACHE);
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekNONE);
 } /* acquisition_goal() */
 
 foraging_transport_goal::type block_to_existing_cache_fsm::block_transport_goal(

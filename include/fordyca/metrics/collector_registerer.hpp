@@ -24,6 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include <experimental/filesystem>
 #include <set>
 #include <string>
 #include <tuple>
@@ -31,6 +32,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/types/timestep.hpp"
+#include "rcppsw/utils/maskable_enum.hpp"
 
 #include "cosm/ds/config/grid_config.hpp"
 
@@ -41,6 +43,7 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, metrics);
+namespace fs = std::experimental::filesystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -77,8 +80,11 @@ class collector_registerer : public rer::client<collector_registerer> {
    *
    * - The scoped name of the collector that will be used to refer to the
    *   created collector during simulation.
+   *
+   * - The set of output modes that are valid for the collector.
    */
-  using set_value_type = std::tuple<std::type_index, std::string, std::string>;
+  using set_value_type =
+      std::tuple<std::type_index, std::string, std::string, rmetrics::output_mode>;
 
   /**
    * \brief Comparator for \ref set_value_type objects within the \ref
@@ -169,10 +175,10 @@ class collector_registerer : public rer::client<collector_registerer> {
   void operator()(const TCollectorWrap&) const {
     std::type_index id(typeid(typename TCollectorWrap::type));
 
-    auto range = mc_create_set.equal_range(set_value_type(id, "", ""));
+    auto key = set_value_type(id, "", "", rmetrics::output_mode::ekNONE);
+    auto range = mc_create_set.equal_range(key);
 
-    ER_ASSERT(mc_create_set.end() !=
-                  mc_create_set.find(set_value_type(id, "", "")),
+    ER_ASSERT(mc_create_set.end() != mc_create_set.find(key),
               "Unknown collector: type_index='%s'",
               id.name());
 
@@ -181,47 +187,68 @@ class collector_registerer : public rer::client<collector_registerer> {
      * scoped/runtime names, so we need to iterate.
      */
     for (auto it = range.first; it != range.second; ++it) {
-      std::string fpath =
-          collector_fpath_create(mc_config->enabled, std::get<1>(*it));
-
-      if (!fpath.empty()) {
-        bool ret = do_register<TCollectorWrap>(std::get<2>(*it), fpath);
+      if (auto init =
+              collector_pre_initialize(std::get<1>(*it), std::get<3>(*it))) {
+        bool ret = do_register<TCollectorWrap>(
+            std::get<2>(*it), init->fpath, init->output_interval, init->mode);
         if (!ret) {
           ER_WARN("Collector with scoped_name='%s' already exists!",
                   std::get<2>(*it).c_str());
         } else {
-          ER_INFO("Metrics enabled: xml_name='%s',scoped_name='%s'",
-                  std::get<1>(*it).c_str(),
-                  std::get<2>(*it).c_str());
+          ER_INFO(
+              "Metrics enabled: "
+              "xml_name='%s',scoped_name='%s',fpath_stem=%s,output_interval=%d,"
+              "mode=%x",
+              std::get<1>(*it).c_str(),
+              std::get<2>(*it).c_str(),
+              init->fpath.c_str(),
+              init->output_interval.v(),
+              rcppsw::as_underlying(init->mode));
         }
       }
     } /* for(it..) */
   }
 
  private:
+  struct pre_init_ret_type {
+    std::string fpath;
+    rtypes::timestep output_interval;
+    rmetrics::output_mode mode;
+  };
+
   template <typename TCollectorWrap,
             RCPPSW_SFINAE_FUNC(constructible_with_arena_dim<
                                typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
-                   const std::string& fpath) const {
+                   const std::string& fpath,
+                   const rtypes::timestep& interval,
+                   rmetrics::output_mode mode) const {
+    m_agg->collector_preregister(scoped_name, mode);
     return m_agg->collector_register<typename TCollectorWrap::type>(
-        scoped_name, fpath, mc_config->output_interval, mc_arena_dim);
+        scoped_name, fpath, interval, mc_arena_dim);
   }
 
   template <typename TCollectorWrap,
             RCPPSW_SFINAE_FUNC(
                 expected_constructible<typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
-                   const std::string& fpath) const {
-    return m_agg->collector_register<typename TCollectorWrap::type>(
-        scoped_name, fpath, mc_config->output_interval);
+                   const std::string& fpath,
+                   const rtypes::timestep& interval,
+                   rmetrics::output_mode mode) const {
+    m_agg->collector_preregister(scoped_name, mode);
+    return m_agg->collector_register<typename TCollectorWrap::type>(scoped_name,
+                                                                    fpath,
+                                                                    interval);
   }
 
   template <typename TCollectorWrap,
             RCPPSW_SFINAE_FUNC(constructible_without_collect_interval<
                                typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
-                   const std::string& fpath) const {
+                   const std::string& fpath,
+                   const rtypes::timestep&,
+                   rmetrics::output_mode mode) const {
+    m_agg->collector_preregister(scoped_name, mode);
     return m_agg->collector_register<typename TCollectorWrap::type>(scoped_name,
                                                                     fpath);
   }
@@ -230,21 +257,71 @@ class collector_registerer : public rer::client<collector_registerer> {
             RCPPSW_SFINAE_FUNC(
                 constructible_with_uint<typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
-                   const std::string& fpath) const {
+                   const std::string& fpath,
+                   const rtypes::timestep& interval,
+                   rmetrics::output_mode mode) const {
+    m_agg->collector_preregister(scoped_name, mode);
     return m_agg->collector_register<typename TCollectorWrap::type>(
-        scoped_name, fpath, mc_config->output_interval, mc_decomp_depth);
+        scoped_name, fpath, interval, mc_decomp_depth);
   }
 
   /**
-   * \brief Return the output filename that should be associated with a
-   * collector if it is enabled, and "" otherwise.
+   * \brief Figure out:
+   *
+   * - If the selected output mode is valid for the specified collector.
+   * - The appropriate filename output stem for the collector if the output
+   *   mode is OK.
+   *
+   * \return (output filepath stem, output interval) for the collector or ("",
+   * 0) if the collector fails any pre-initialization checks.
    */
-  std::string collector_fpath_create(
-      const cmconfig::metrics_config::enabled_map_type& enabled,
-      const std::string& collector_name) const {
-    auto it = enabled.find(collector_name);
-    return (it == enabled.end()) ? std::string()
-                                 : m_agg->metrics_path() + "/" + it->second;
+  boost::optional<pre_init_ret_type> collector_pre_initialize(
+      const std::string& xml_name,
+      rmetrics::output_mode allowed) const {
+    auto append_it = mc_config->append.enabled.find(xml_name);
+    auto truncate_it = mc_config->truncate.enabled.find(xml_name);
+    auto create_it = mc_config->create.enabled.find(xml_name);
+    uint sum = (append_it != mc_config->append.enabled.end()) +
+               (truncate_it != mc_config->truncate.enabled.end()) +
+               (create_it != mc_config->create.enabled.end());
+    ER_ASSERT(
+        sum <= 1,
+        "Collector '%s' present in more than 1 collector group in XML file",
+        xml_name.c_str());
+    if (append_it != mc_config->append.enabled.end()) {
+      ER_ASSERT(allowed & rmetrics::output_mode::ekAPPEND,
+                "Output mode %d for collector '%s' does not contain ekAPPEND",
+                rcppsw::as_underlying(allowed),
+                xml_name.c_str());
+      auto ret =
+          pre_init_ret_type{m_agg->metrics_path() + "/" + append_it->second,
+                            mc_config->append.output_interval,
+                            rmetrics::output_mode::ekAPPEND};
+      return boost::make_optional(ret);
+    } else if (truncate_it != mc_config->truncate.enabled.end()) {
+      ER_ASSERT(allowed & rmetrics::output_mode::ekTRUNCATE,
+                "Output mode %d for collector '%s' does not contain ekTRUNCATE",
+                rcppsw::as_underlying(allowed),
+                xml_name.c_str());
+      auto ret =
+          pre_init_ret_type{m_agg->metrics_path() + "/" + truncate_it->second,
+                            mc_config->truncate.output_interval,
+                            rmetrics::output_mode::ekTRUNCATE};
+      return boost::make_optional(ret);
+    } else if (create_it != mc_config->create.enabled.end()) {
+      ER_ASSERT(allowed & rmetrics::output_mode::ekCREATE,
+                "Output mode %d for collector '%s' does not contain ekCREATE",
+                rcppsw::as_underlying(allowed),
+                xml_name.c_str());
+      /* Give them their own directory to output stuff into for cleanliness */
+      auto dirpath = m_agg->metrics_path() + "/" + create_it->second;
+      fs::create_directories(dirpath);
+      auto ret = pre_init_ret_type{dirpath + "/" + create_it->second,
+                                   mc_config->create.output_interval,
+                                   rmetrics::output_mode::ekCREATE};
+      return boost::make_optional(ret);
+    }
+    return boost::optional<pre_init_ret_type>();
   }
 
   /* clang-format off */

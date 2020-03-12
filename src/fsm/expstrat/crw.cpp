@@ -37,7 +37,8 @@ NS_START(fordyca, fsm, expstrat);
  ******************************************************************************/
 crw::crw(const fsm::expstrat::foraging_expstrat::params* const c_params,
          rmath::rng* rng)
-    : crw(static_cast<crfootbot::footbot_saa_subsystem2D*>(c_params->saa), rng) {}
+    : crw(static_cast<crfootbot::footbot_saa_subsystem2D*>(c_params->saa), rng) {
+}
 
 crw::crw(crfootbot::footbot_saa_subsystem2D* saa, rmath::rng* rng)
     : foraging_expstrat(saa, rng),

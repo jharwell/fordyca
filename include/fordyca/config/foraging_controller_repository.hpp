@@ -43,7 +43,8 @@ NS_START(fordyca, config);
  * \brief Collection of all parameter parsers and parse results needed by
  * all foraging controllers.
  */
-class foraging_controller_repository : public rconfig::xml::xml_config_repository {
+class foraging_controller_repository
+    : public rconfig::xml::xml_config_repository {
  public:
   foraging_controller_repository(void) RCSW_COLD;
 };

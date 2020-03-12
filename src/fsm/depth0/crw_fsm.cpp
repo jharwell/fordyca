@@ -224,7 +224,8 @@ cfsm::metrics::goal_acq_metrics::goal_type crw_fsm::acquisition_goal(void) const
     return cfsm::metrics::goal_acq_metrics::goal_type(
         foraging_acq_goal::type::ekBLOCK);
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(foraging_acq_goal::type::ekNONE);
+  return cfsm::metrics::goal_acq_metrics::goal_type(
+      foraging_acq_goal::type::ekNONE);
 } /* block_transport_goal() */
 
 NS_END(depth0, fsm, fordyca);

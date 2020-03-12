@@ -39,9 +39,9 @@
 #include "cosm/foraging/block_dist/base_distributor.hpp"
 #include "cosm/foraging/config/arena_map_config.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
+#include "cosm/oracle/oracle_manager.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
-#include "cosm/oracle/oracle_manager.hpp"
 
 #include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
@@ -292,11 +292,12 @@ void depth2_loop_functions::post_step(void) {
   }
 
   /* Update block distribution status */
-  auto& collector = static_cast<cmetrics::blocks::transport_metrics_collector&>(
-      *(*m_metrics_agg)["blocks::transport"]);
+  auto* collector =
+      m_metrics_agg->get<cmetrics::blocks::transport_metrics_collector>(
+          "blocks::transport");
   arena_map()->redist_governor()->update(
       rtypes::timestep(GetSpace().GetSimulationClock()),
-      collector.cum_transported(),
+      collector->cum_transported(),
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about caches */
@@ -311,9 +312,11 @@ void depth2_loop_functions::post_step(void) {
   /* Collect metrics from loop functions */
   m_metrics_agg->collect_from_loop(this);
 
+  m_metrics_agg->metrics_write(rmetrics::output_mode::ekTRUNCATE);
+  m_metrics_agg->metrics_write(rmetrics::output_mode::ekCREATE);
+
   /* Not a clean way to do this in the metrics collectors... */
-  if (m_metrics_agg->metrics_write_all(
-          rtypes::timestep(GetSpace().GetSimulationClock()))) {
+  if (m_metrics_agg->metrics_write(rmetrics::output_mode::ekAPPEND)) {
     if (nullptr != conv_calculator()) {
       conv_calculator()->reset_metrics();
     }

@@ -32,7 +32,7 @@
 NS_START(cosm, robots, footbot);
 
 class footbot_saa_subsystem2D;
-template<typename TSensingSubsystem>
+template <typename TSensingSubsystem>
 class footbot_sensing_subsystem;
 class footbot_actuation_subsystem;
 

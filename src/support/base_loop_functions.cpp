@@ -32,12 +32,12 @@
 
 #include "cosm/convergence/config/convergence_config.hpp"
 #include "cosm/convergence/convergence_calculator.hpp"
+#include "cosm/foraging/config/arena_map_config.hpp"
 #include "cosm/oracle/config/oracle_manager_config.hpp"
 #include "cosm/oracle/oracle_manager.hpp"
-#include "cosm/foraging/config/arena_map_config.hpp"
+#include "cosm/vis/config/visualization_config.hpp"
 
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "cosm/vis/config/visualization_config.hpp"
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/argos_pd_adaptor.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
@@ -256,9 +256,7 @@ std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
     uint) const {
   std::vector<rmath::vector2d> v;
 
-  auto cb = [&](const auto* controller) {
-    v.push_back(controller->pos2D());
-  };
+  auto cb = [&](const auto* controller) { v.push_back(controller->pos2D()); };
   swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
       this, cb, "foot-bot");
   return v;

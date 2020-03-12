@@ -63,7 +63,8 @@ namespace config {
 class loop_function_repository;
 namespace tv {
 struct tv_manager_config;
-}}
+}
+} // namespace config
 NS_START(support);
 
 namespace tv {
@@ -131,7 +132,6 @@ class base_loop_functions : public cpal::argos_sm_adaptor,
    * \param tvp Parsed TV parameters.
    */
   void tv_init(const config::tv::tv_manager_config* tvp) RCSW_COLD;
-
 
   /**
    * \brief Initialize logging for all support/loop function code.
