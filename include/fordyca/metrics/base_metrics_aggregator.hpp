@@ -29,6 +29,7 @@
 #include <string>
 #include <typeindex>
 #include <utility>
+#include <filesystem>
 
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/metrics/collector_group.hpp"
@@ -55,6 +56,7 @@ class foraging_controller;
 } /* namespace controller */
 
 NS_START(metrics);
+namespace fs = std::filesystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -86,7 +88,7 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator> {
    */
   void collect_from_controller(const controller::foraging_controller* controller);
 
-  const std::string& metrics_path(void) const { return m_metrics_path; }
+  const fs::path& metrics_path(void) const { return m_metrics_path; }
 
   /**
    * \brief To be called before \ref collector_register(), in order to correctly
@@ -208,7 +210,7 @@ class base_metrics_aggregator : public rer::client<base_metrics_aggregator> {
   using collector_map_type = std::map<std::string, rmetrics::collector_group*>;
 
   /* clang-format off */
-  std::string               m_metrics_path;
+  fs::path                  m_metrics_path;
   collector_map_type        m_collector_map{};
   rmetrics::collector_group m_append{};
   rmetrics::collector_group m_truncate{};

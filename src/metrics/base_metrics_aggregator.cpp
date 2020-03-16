@@ -24,7 +24,6 @@
 #include "fordyca/metrics/base_metrics_aggregator.hpp"
 
 #include <boost/mpl/for_each.hpp>
-#include <experimental/filesystem>
 
 #include "rcppsw/mpl/typelist.hpp"
 
@@ -60,7 +59,6 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace fs = std::experimental::filesystem;
 NS_START(fordyca, metrics, detail);
 
 using collector_typelist = rmpl::typelist<
@@ -92,7 +90,7 @@ base_metrics_aggregator::base_metrics_aggregator(
     const cdconfig::grid_config* const gconfig,
     const std::string& output_root)
     : ER_CLIENT_INIT("fordyca.metrics.base_aggregator"),
-      m_metrics_path(output_root + "/" + mconfig->output_dir) {
+      m_metrics_path(fs::path(output_root) / mconfig->output_dir) {
   if (!fs::exists(m_metrics_path)) {
     fs::create_directories(m_metrics_path);
   } else {

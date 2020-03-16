@@ -20,7 +20,7 @@ mkdir -p $1 && cd $1
 fordyca_pkgs=(qtbase5-dev libnlopt-dev libnlopt-cxx-dev libfreeimageplus-dev
               freeglut3-dev libeigen3-dev libudev-dev)
 rcppsw_pkgs=(libboost-all-dev liblog4cxx-dev catch ccache python3-pip)
-libra_pkgs=(make cmake git npm graphviz doxygen cppcheck cmake make gcc-8 g++-8
+libra_pkgs=(make cmake git npm graphviz doxygen cppcheck cmake make gcc-9 g++-9
             libclang-6.0-dev clang-tools-6.0 clang-format-6.0 clang-tidy-6.0)
 
 python_pkgs=(cpplint breathe)
@@ -47,8 +47,8 @@ mkdir -p build && cd build
 
 git checkout devel
 cmake -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_C_COMPILER=gcc-8\
-      -DCMAKE_CXX_COMPILER=g++-8\
+      -DCMAKE_C_COMPILER=gcc-9\
+      -DCMAKE_CXX_COMPILER=g++-9\
       -DARGOS_BUILD_FOR=simulator\
       -DARGOS_BUILD_NATIVE=ON\
       -DARGOS_THREADSAFE_LOG=ON\

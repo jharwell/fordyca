@@ -24,9 +24,6 @@ set(${target}_CHECK_LANGUAGE "CXX")
 if("${LIBRA_BUILD_FOR}" MATCHES "MSI" )
   message(STATUS "Building for MSI")
   set(LOCAL_INSTALL_PREFIX /home/gini/shared/swarm/$ENV{MSICLUSTER})
-elseif("${LIBRA_BUILD_FOR}" MATCHES "TRAVIS")
-  message(STATUS "Building for TRAVIS")
-  set(LOCAL_INSTALL_PREFIX /usr/local)
 elseif("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
   message(STATUS "Building for ARGoS")
   set(LOCAL_INSTALL_PREFIX /opt/data/local)
@@ -34,7 +31,7 @@ elseif("${LIBRA_BUILD_FOR}" MATCHES "EV3")
   message(STATUS "Building for EV3")
 else()
   message(FATAL_ERROR
-    "Unknown build target '${LIBRA_BUILD_FOR}'. Must be: [MSI,TRAVIS,ARGOS,EV3]")
+    "Unknown build target '${LIBRA_BUILD_FOR}'. Must be: [MSI,ARGOS,EV3]")
 endif()
 
 # Support libraries
@@ -66,8 +63,6 @@ endif()
 set(${target}_LIBRARIES
   cosm
   ${cosm_LIBRARIES}
-  rcppsw
-  ${rcppsw_LIBRARIES}
   nlopt
   stdc++fs
   rt)

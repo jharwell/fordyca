@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include <experimental/filesystem>
+#include <filesystem>
 #include <set>
 #include <string>
 #include <tuple>
@@ -43,7 +43,7 @@
  * Namespaces/Decls
  ******************************************************************************/
 NS_START(fordyca, metrics);
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 /*******************************************************************************
  * Class Definitions
@@ -105,17 +105,19 @@ class collector_registerer : public rer::client<collector_registerer> {
   using creatable_set = std::multiset<set_value_type, set_comparator>;
 
   /**
-   * \brief A collector is constructible using the expected function arguments.
+   * \brief A collector is constructible using the expected function
+   * arguments. These collectors always use \ref
+   * rmetrics::output_mode::ekAPPEND.
    */
   template <typename T>
   using expected_constructible =
       std::is_constructible<T, const std::string&, const rtypes::timestep&>;
 
   /**
-   * \brief Some metrics collectors (e.g. \ref
-   * temporal_variance_metrics_collector) do not require the collection interval
+   * \brief Some metrics collectors do not require the collection interval
    * argument to their constructor, as they MUST be gathered every timestep,
-   * regardless of configuration.
+   * regardless of configuration. These collectors always use \ref
+   * rmetrics::output_mode::ekAPPEND.
    */
   template <typename T>
   using constructible_without_collect_interval =
@@ -123,18 +125,20 @@ class collector_registerer : public rer::client<collector_registerer> {
 
   /**
    * \brief Some metrics collectors (e.g. \ref collision_locs_metrics_collector)
-   * require the arena dimensions as an argument to their constructor.
+   * require the arena dimensions+output mode as arguments to their constructor.
    */
   template <typename T>
-  using constructible_with_arena_dim =
+  using constructible_as_spatial_collector =
       std::is_constructible<T,
                             const std::string&,
                             const rtypes::timestep&,
-                            const rmath::vector2u&>;
+                            const rmath::vector2u&,
+                            const rmetrics::output_mode&>;
 
   /**
    * \brief Some metrics collectors (e.g. \ref bi_tdgraph_metrics_collector)
-   * require an additional integer as an argument to their constructor.
+   * require an additional integer as an argument to their constructor. These
+   * collectors always use \ref rmetrics::output_mode::ekAPPEND.
    */
   template <typename T>
   using constructible_with_uint =
@@ -211,13 +215,13 @@ class collector_registerer : public rer::client<collector_registerer> {
 
  private:
   struct pre_init_ret_type {
-    std::string fpath;
+    fs::path fpath;
     rtypes::timestep output_interval;
     rmetrics::output_mode mode;
   };
 
   template <typename TCollectorWrap,
-            RCPPSW_SFINAE_FUNC(constructible_with_arena_dim<
+            RCPPSW_SFINAE_FUNC(constructible_as_spatial_collector<
                                typename TCollectorWrap::type>::value)>
   bool do_register(const std::string& scoped_name,
                    const std::string& fpath,
@@ -225,7 +229,7 @@ class collector_registerer : public rer::client<collector_registerer> {
                    rmetrics::output_mode mode) const {
     m_agg->collector_preregister(scoped_name, mode);
     return m_agg->collector_register<typename TCollectorWrap::type>(
-        scoped_name, fpath, interval, mc_arena_dim);
+        scoped_name, fpath, interval, mc_arena_dim, mode);
   }
 
   template <typename TCollectorWrap,
@@ -272,8 +276,8 @@ class collector_registerer : public rer::client<collector_registerer> {
    * - The appropriate filename output stem for the collector if the output
    *   mode is OK.
    *
-   * \return (output filepath stem, output interval) for the collector or ("",
-   * 0) if the collector fails any pre-initialization checks.
+   * \return (output filepath stem, output interval, output mode) for the
+   * collector or empty if the collector fails any pre-initialization checks.
    */
   boost::optional<pre_init_ret_type> collector_pre_initialize(
       const std::string& xml_name,
@@ -294,7 +298,7 @@ class collector_registerer : public rer::client<collector_registerer> {
                 rcppsw::as_underlying(allowed),
                 xml_name.c_str());
       auto ret =
-          pre_init_ret_type{m_agg->metrics_path() + "/" + append_it->second,
+          pre_init_ret_type{m_agg->metrics_path() / append_it->second,
                             mc_config->append.output_interval,
                             rmetrics::output_mode::ekAPPEND};
       return boost::make_optional(ret);
@@ -304,7 +308,7 @@ class collector_registerer : public rer::client<collector_registerer> {
                 rcppsw::as_underlying(allowed),
                 xml_name.c_str());
       auto ret =
-          pre_init_ret_type{m_agg->metrics_path() + "/" + truncate_it->second,
+          pre_init_ret_type{m_agg->metrics_path() / truncate_it->second,
                             mc_config->truncate.output_interval,
                             rmetrics::output_mode::ekTRUNCATE};
       return boost::make_optional(ret);
@@ -314,9 +318,9 @@ class collector_registerer : public rer::client<collector_registerer> {
                 rcppsw::as_underlying(allowed),
                 xml_name.c_str());
       /* Give them their own directory to output stuff into for cleanliness */
-      auto dirpath = m_agg->metrics_path() + "/" + create_it->second;
+      auto dirpath = m_agg->metrics_path() / create_it->second;
       fs::create_directories(dirpath);
-      auto ret = pre_init_ret_type{dirpath + "/" + create_it->second,
+      auto ret = pre_init_ret_type{dirpath / create_it->second,
                                    mc_config->create.output_interval,
                                    rmetrics::output_mode::ekCREATE};
       return boost::make_optional(ret);
