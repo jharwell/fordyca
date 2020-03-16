@@ -59,6 +59,7 @@ class tv_manager {
   const env_dynamics* environ_dynamics(void) const { return m_envd.get(); }
   env_dynamics* environ_dynamics(void) { return m_envd.get(); }
   const argos_pd_adaptor* population_dynamics(void) const { return m_popd.get(); }
+  argos_pd_adaptor* population_dynamics(void) { return m_popd.get(); }
 
   /**
    * \brief Update the state of all applied variances. Should be called once per

@@ -15,6 +15,8 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
   FULL_DOCS "Default=NO.")
 
 set(LIBRA_BUILD_FOR "ARGOS" CACHE STRING "Build for ARGoS.")
+set(LOCAL_INSTALL_PREFIX "/opt/data/local" CACHE STRING "Prefix for where ARGoS
+and other packages needed by the project have been installed.")
 
 ################################################################################
 # External Projects                                                            #
@@ -26,7 +28,6 @@ if("${LIBRA_BUILD_FOR}" MATCHES "MSI" )
   set(LOCAL_INSTALL_PREFIX /home/gini/shared/swarm/$ENV{MSICLUSTER})
 elseif("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
   message(STATUS "Building for ARGoS")
-  set(LOCAL_INSTALL_PREFIX /opt/data/local)
 elseif("${LIBRA_BUILD_FOR}" MATCHES "EV3")
   message(STATUS "Building for EV3")
 else()

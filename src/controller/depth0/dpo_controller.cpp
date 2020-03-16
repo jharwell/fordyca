@@ -152,6 +152,9 @@ void dpo_controller::private_init(
       saa(),
       f.create(exp_config->block_strategy, &expstrat_params, rng()),
       rng());
+
+  /* Set DPO FSM supervision */
+  supervisor()->supervisee_update(m_fsm.get());
 } /* private_init() */
 
 dpo_perception_subsystem* dpo_controller::dpo_perception(void) {

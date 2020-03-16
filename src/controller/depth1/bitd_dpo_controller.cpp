@@ -139,7 +139,7 @@ void bitd_dpo_controller::private_init(
       &bitd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
   executive()->task_start_notify(std::bind(
       &bitd_dpo_controller::task_start_cb, this, std::placeholders::_1));
-  supervisor()->supervisee_update(m_executive.get());
+  supervisor()->supervisee_update(executive());
 } /* private_init() */
 
 void bitd_dpo_controller::task_abort_cb(const cta::polled_task*) {
@@ -151,7 +151,6 @@ void bitd_dpo_controller::task_start_cb(cta::polled_task* task) {
     m_task_status = tasks::task_status::ekRUNNING;
   }
   m_current_task = dynamic_cast<tasks::base_foraging_task*>(task);
-  supervisor()->supervisee_update(task);
 } /* task_start_cb() */
 
 const cta::ds::bi_tab* bitd_dpo_controller::active_tab(void) const {

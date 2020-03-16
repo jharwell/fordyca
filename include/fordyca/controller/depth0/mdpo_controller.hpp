@@ -84,7 +84,7 @@ class mdpo_controller : public dpo_controller,
    *
    * - DPO FSM
    *
-   * Called after \ref shared_init() in \ref Init().
+   * Called after \ref shared_init() in \ref init().
    */
   void private_init(const config::depth0::mdpo_controller_repository& config_repo) RCSW_COLD;
 };

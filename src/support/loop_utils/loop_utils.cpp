@@ -54,9 +54,9 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
       map.subgrid(position.x(), position.y(), los_grid_size), position);
 } /* compute_robot_los */
 
-cfds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
-                                        const cfds::block2D_vectorno& all_blocks) {
-  cfds::block2D_vectorno free_blocks;
+cds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
+                                        const cds::block2D_vectorno& all_blocks) {
+  cds::block2D_vectorno free_blocks;
   std::copy_if(all_blocks.begin(),
                all_blocks.end(),
                std::back_inserter(free_blocks),

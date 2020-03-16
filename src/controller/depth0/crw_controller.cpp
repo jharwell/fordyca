@@ -58,6 +58,7 @@ void crw_controller::init(ticpp::Element& node) {
       fsm::expstrat::block_factory().create(
           fsm::expstrat::block_factory::kCRW, &p, rng()),
       rng());
+  /* Set CRW FSM supervision */
   supervisor()->supervisee_update(m_fsm.get());
   ER_INFO("Initialization finished");
   ndc_pop();
@@ -77,8 +78,12 @@ void crw_controller::control_step(void) {
             "Carried block%d has robot id=%d",
             block()->id().v(),
             block()->md()->robot_id().v());
-  m_fsm->run();
-  saa()->steer_force2D_apply();
+
+  /*
+   * Run the FSM and apply steering forces if normal operation, otherwise handle
+   * abnormal operation state.
+   */
+  supervisor()->run();
   ndc_pop();
 } /* control_step() */
 

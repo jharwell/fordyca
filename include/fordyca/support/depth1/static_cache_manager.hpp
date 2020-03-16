@@ -29,7 +29,7 @@
 
 #include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
-#include "cosm/foraging/ds/block2D_vector.hpp"
+#include "cosm/ds/block2D_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
 #include "cosm/foraging/ds/cache_vector.hpp"
 #include "rcppsw/math/vector2.hpp"
@@ -71,11 +71,11 @@ class static_cache_manager final : public base_cache_manager,
    * specified minimum size.
    */
   boost::optional<cfds::acache_vectoro> create(const cache_create_ro_params& c_params,
-                                             const cfds::block2D_vectorno&  c_alloc_blocks);
+                                             const cds::block2D_vectorno&  c_alloc_blocks);
 
   boost::optional<cfds::acache_vectoro> create_conditional(
       const cache_create_ro_params& c_params,
-      const cfds::block2D_vectorno&  c_alloc_blocks,
+      const cds::block2D_vectorno&  c_alloc_blocks,
       uint n_harvesters,
       uint n_collectors);
 
@@ -96,9 +96,9 @@ class static_cache_manager final : public base_cache_manager,
    * the arena to meet the desired initial size of at least one cache, which is
    * not an error (all blocks can currently be carried by robots, for example).
    */
-  boost::optional<cfds::block2D_vectorno> blocks_alloc(
+  boost::optional<cds::block2D_vectorno> blocks_alloc(
       const cfds::acache_vectorno& existing_caches,
-      const cfds::block2D_vectorno& all_blocks) const;
+      const cds::block2D_vectorno& all_blocks) const;
 
   /**
    * \brief Allocate the blocks that should be used when re-creating cache i.
@@ -124,10 +124,10 @@ class static_cache_manager final : public base_cache_manager,
    * \param loc The location the new cache is to be created at.
    * \param n_blocks How many blocks to try to allocate for cache i.
    */
-  boost::optional<cfds::block2D_vectorno> cache_i_blocks_alloc(
+  boost::optional<cds::block2D_vectorno> cache_i_blocks_alloc(
       const cfds::acache_vectorno& existing_caches,
-      const cfds::block2D_vectorno& allocated_blocks,
-      const cfds::block2D_vectorno& all_blocks,
+      const cds::block2D_vectorno& allocated_blocks,
+      const cds::block2D_vectorno& all_blocks,
       const rmath::vector2d& loc,
       size_t n_blocks) const;
 
@@ -146,7 +146,7 @@ class static_cache_manager final : public base_cache_manager,
    * creation.
    */
   void post_creation_blocks_absorb(const cfds::acache_vectoro& caches,
-                                   const cfds::block2D_vectorno& blocks);
+                                   const cds::block2D_vectorno& blocks);
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

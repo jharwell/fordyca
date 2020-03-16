@@ -86,7 +86,9 @@ class argos_pd_adaptor final : public rer::client<argos_pd_adaptor>,
   op_result robot_repair(const rtypes::type_uuid& id) override;
 
  private:
-  controller::foraging_controller* victim_locate(size_t current_pop) const;
+  controller::foraging_controller* malfunction_victim_locate(size_t total_pop) const;
+  controller::foraging_controller* kill_victim_locate(size_t total_pop) const;
+  bool robot_attempt_add(const rtypes::type_uuid& id);
 
   /* clang-format off */
   const std::string                   mc_entity_prefix;

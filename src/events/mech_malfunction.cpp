@@ -52,13 +52,12 @@ void mech_malfunction::visit(controller::foraging_controller& controller) {
 
   visit(*controller.supervisor());
 
-  ER_INFO("Robot %s malfunctioned", controller.GetId());
+  ER_INFO("Robot %s malfunctioned", controller.GetId().c_str());
   controller.ndc_pop();
 } /* visit() */
 
 void mech_malfunction::visit(cfsm::supervisor_fsm& fsm) {
-  fsm.inject_event(fsm::foraging_signal::ekMECHANICAL_MALFUNCTION,
-                   rpfsm::event_type::ekNORMAL);
+  fsm.event_malfunction();
 } /* visit() */
 
 NS_END(detail, events, fordyca);

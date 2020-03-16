@@ -40,14 +40,13 @@ void mech_repair::visit(controller::foraging_controller& controller) {
 
   visit(*controller.supervisor());
 
-  ER_INFO("Robot %s repaired", controller.GetId());
+  ER_INFO("Robot %s repaired", controller.GetId().c_str());
   controller.ndc_pop();
 } /* visit() */
 
 
 void mech_repair::visit(cfsm::supervisor_fsm& fsm) {
-  fsm.inject_event(fsm::foraging_signal::ekMECHANICAL_REPAIR,
-                   rpfsm::event_type::ekNORMAL);
+  fsm.event_repair();
 } /* visit() */
 
 NS_END(detail, events, fordyca);

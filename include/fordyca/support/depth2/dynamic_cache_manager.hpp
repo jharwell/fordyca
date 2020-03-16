@@ -29,7 +29,7 @@
 
 #include "fordyca/config/caches/caches_config.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
-#include "cosm/foraging/ds/block2D_vector.hpp"
+#include "cosm/ds/block2D_vector.hpp"
 #include "cosm/foraging/ds/cache_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
 #include "fordyca/support/cache_create_ro_params.hpp"
@@ -69,7 +69,7 @@ class dynamic_cache_manager final : public base_cache_manager,
    * \return The created caches (if any were created).
    */
   boost::optional<cfds::acache_vectoro> create(const cache_create_ro_params& c_params,
-                                              const cfds::block2D_vectorno&  c_alloc_blocks);
+                                              const cds::block2D_vectorno&  c_alloc_blocks);
 
   /**
    * \brief Get the minimum distance that must be maintained between two caches
@@ -92,10 +92,10 @@ class dynamic_cache_manager final : public base_cache_manager,
    *
    * are eligible.
    */
-  boost::optional<cfds::block2D_vectorno> calc_blocks_for_creation(
+  boost::optional<cds::block2D_vectorno> calc_blocks_for_creation(
       const cfds::acache_vectorno& existing_caches,
       const cfds::block_cluster_vector& clusters,
-      const cfds::block2D_vectorno& blocks);
+      const cds::block2D_vectorno& blocks);
 
   /* clang-format off */
   const config::caches::caches_config mc_cache_config;

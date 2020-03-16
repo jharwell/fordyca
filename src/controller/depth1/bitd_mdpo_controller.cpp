@@ -113,7 +113,6 @@ void bitd_mdpo_controller::shared_init(
                                    perception())(config_repo, rng()));
   executive()->task_abort_notify(std::bind(
       &bitd_mdpo_controller::task_abort_cb, this, std::placeholders::_1));
-  supervisor()->supervisee_update(executive());
 } /* shared_init() */
 
 mdpo_perception_subsystem* bitd_mdpo_controller::mdpo_perception(void) {

@@ -34,7 +34,7 @@
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 #include "fordyca/fordyca.hpp"
-#include "cosm/foraging/ds/block2D_vector.hpp"
+#include "cosm/ds/block2D_vector.hpp"
 #include "cosm/foraging/ds/cache_vector.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 
@@ -112,8 +112,8 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
  * \param all_caches All existing caches in the arena.
  * \param all_blocks All blocks in the arena.
  */
-cfds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
-                                      const cfds::block2D_vectorno& all_blocks);
+cds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
+                                      const cds::block2D_vectorno& all_blocks);
 
 NS_END(utils, support, fordyca);
 

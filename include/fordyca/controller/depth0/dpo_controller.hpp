@@ -168,7 +168,9 @@ class dpo_controller : public crw_controller,
    *   perception subsystem, and derived classes can override the copy
    *   instantiated in \ref shared_init if they wish.
    *
-   * This is called after \ref shared_init() during \ref Init().
+   * - Supervisor FSM.
+   *
+   * This is called after \ref shared_init() during \ref init().
    */
   void private_init(const config::depth0::dpo_controller_repository& config_repo) RCSW_COLD;
 

@@ -52,6 +52,7 @@ argos_pd_adaptor::argos_pd_adaptor(
     : ER_CLIENT_INIT("fordyca.support.tv.argos_pd_adaptor"),
       population_dynamics(config,
                           lf->GetSpace().GetEntitiesByType("foot-bot").size(),
+                          lf->GetSpace().GetEntitiesByType("foot-bot").size(),
                           rng),
       mc_entity_prefix(entity_prefix),
       mc_controller_xml_id(controller_xml_id),
@@ -65,31 +66,22 @@ argos_pd_adaptor::argos_pd_adaptor(
  * Member Functions
  ******************************************************************************/
 argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
-  size_t current_pop = swarm_population();
+  size_t active_pop = swarm_active_population();
+  size_t total_pop = swarm_total_population();
 
-  if (0 == current_pop) {
-    ER_WARN("Not killing robot: pop_size=%zu", current_pop);
-    return {rtypes::constants::kNoUUID, current_pop};
+  if (0 == total_pop) {
+    ER_WARN("Not killing robot: total_pop=%zu active_pop=%zu",
+            total_pop,
+            active_pop);
+    return {rtypes::constants::kNoUUID, total_pop, active_pop};
   }
-  auto range = rmath::rangei(0, current_pop - 1);
-
-  argos::CFootBotEntity* entity;
-  controller::foraging_controller* controller = nullptr;
-  for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
-    auto it = m_lf->GetSpace().GetEntitiesByType("foot-bot").begin();
-    std::advance(it, m_rng->uniform(range));
-    entity = argos::any_cast<argos::CFootBotEntity*>(it->second);
-    auto* tmp = dynamic_cast<controller::foraging_controller*>(
-        &entity->GetControllableEntity().GetController());
-    if (!already_killed(tmp->entity_id())) {
-      controller = tmp;
-      break;
-    }
-  } /* for(i..) */
+  controller::foraging_controller* controller = kill_victim_locate(total_pop);
 
   if (nullptr == controller) {
-    ER_WARN("Unable to find kill victim: pop_size=%zu", current_pop);
-    return {rtypes::constants::kNoUUID, current_pop};
+    ER_WARN("Unable to find kill victim: total_pop=%zu, active_pop=%zu",
+            total_pop,
+            active_pop);
+    return {rtypes::constants::kNoUUID, total_pop, active_pop};
   }
   rtypes::type_uuid id = controller->entity_id();
   ER_INFO("Found kill victim with ID=%d", id.v());
@@ -129,21 +121,127 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
   ER_INFO("Remove entity %s", name.c_str());
   m_lf->RemoveEntity(name);
 
-  return {id, m_lf->GetSpace().GetEntitiesByType("foot-bot").size()};
+  /* killing a robot reduces both the active and total populations */
+  return {id,
+        m_lf->GetSpace().GetEntitiesByType("foot-bot").size(),
+        m_lf->GetSpace().GetEntitiesByType("foot-bot").size()};
 } /* robot_kill() */
 
-argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
-    int max_pop,
-    const rtypes::type_uuid& id) {
-  size_t current_pop = m_lf->GetSpace().GetEntitiesByType("foot-bot").size();
-  if (max_pop != -1 && current_pop >= static_cast<size_t>(max_pop)) {
+argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(int max_pop,
+                                                        const rtypes::type_uuid& id) {
+  size_t total_pop = swarm_total_population();
+  size_t active_pop = swarm_active_population();
+
+  if (max_pop != -1 && total_pop >= static_cast<size_t>(max_pop)) {
     ER_INFO("Not adding new robot %s%d: max_pop=%d reached",
             mc_entity_prefix.c_str(),
             id.v(),
             max_pop);
-    return {rtypes::constants::kNoUUID, current_pop};
+    return {rtypes::constants::kNoUUID, total_pop, active_pop};
   }
 
+  for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
+    if (robot_attempt_add(id)) {
+      /* adding a new robot increases both the total and active populations */
+      return {id,
+            m_lf->GetSpace().GetEntitiesByType("foot-bot").size(),
+            m_lf->GetSpace().GetEntitiesByType("foot-bot").size()};
+    }
+  } /* for(i..) */
+  ER_FATAL_SENTINEL("Unable to add new robot to simulation");
+  return {rtypes::constants::kNoUUID, total_pop, active_pop};
+} /* robot_add() */
+
+argos_pd_adaptor::op_result argos_pd_adaptor::robot_malfunction(void) {
+  size_t total_pop = swarm_total_population();
+  size_t active_pop = swarm_active_population();
+
+  if (0 == total_pop || 0 == active_pop) {
+    ER_WARN("Cannot force robot malfunction: total_pop=%zu, active_pop=%zu",
+            total_pop, active_pop);
+    return {rtypes::constants::kNoUUID, total_pop, active_pop};
+  }
+
+  auto* controller = malfunction_victim_locate(total_pop);
+
+  if (nullptr == controller) {
+    ER_WARN("Unable to find malfunction victim: total_pop=%zu, active_pop=%zu",
+            total_pop,
+            active_pop);
+    return {rtypes::constants::kNoUUID, total_pop, active_pop};
+  }
+  ER_INFO("Found malfunction victim with ID=%d,n_repairing=%zu",
+          controller->entity_id().v(),
+          repair_queue_status().size);
+
+  events::mech_malfunction_visitor visitor;
+  visitor.visit(*controller);
+
+  /*
+   * @todo: Once the ability to temporarily remove robots from ARGoS by removing
+   * it from physics engines is added, do that here.
+   */
+  return {controller->entity_id(), total_pop, active_pop - 1};
+} /* robot_malfunction() */
+
+argos_pd_adaptor::op_result argos_pd_adaptor::robot_repair(
+    const rtypes::type_uuid& id) {
+
+  ER_INFO("Robot with ID=%d repaired, n_repairing=%zu",
+          id.v(),
+          repair_queue_status().size);
+  std::string name = mc_entity_prefix + rcppsw::to_string(id);
+  events::mech_repair_visitor visitor;
+  auto* entity = dynamic_cast<argos::CFootBotEntity*>(
+      &m_lf->GetSpace().GetEntity(name));
+  auto* controller = dynamic_cast<controller::foraging_controller*>(
+      &entity->GetControllableEntity().GetController());
+  visitor.visit(*controller);
+
+  size_t total_pop = swarm_total_population();
+  size_t active_pop = swarm_active_population();
+
+  /*
+   * @todo: Once the ability to restore temporarily removed robots from
+   * simulation is added, do that here.
+   */
+  return {controller->entity_id(), total_pop, active_pop + 1};
+} /* robot_repair() */
+
+controller::foraging_controller* argos_pd_adaptor::malfunction_victim_locate(size_t total_pop) const {
+  auto range = rmath::rangei(0, total_pop - 1);
+
+  for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
+    auto it = m_lf->GetSpace().GetEntitiesByType("foot-bot").begin();
+    std::advance(it, m_rng->uniform(range));
+    auto* entity = argos::any_cast<argos::CFootBotEntity*>(it->second);
+    auto* controller = dynamic_cast<controller::foraging_controller*>(
+        &entity->GetControllableEntity().GetController());
+    if (!currently_repairing(controller->entity_id())) {
+      return controller;
+    }
+  } /* for(i..) */
+  return nullptr;
+} /* malfunction_victim_locate() */
+
+controller::foraging_controller* argos_pd_adaptor::kill_victim_locate(size_t total_pop) const {
+    auto range = rmath::rangei(0, total_pop - 1);
+  argos::CFootBotEntity* entity;
+  for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
+    auto it = m_lf->GetSpace().GetEntitiesByType("foot-bot").begin();
+    std::advance(it, m_rng->uniform(range));
+    entity = argos::any_cast<argos::CFootBotEntity*>(it->second);
+    auto* controller = dynamic_cast<controller::foraging_controller*>(
+        &entity->GetControllableEntity().GetController());
+    if (!already_killed(controller->entity_id())) {
+      return controller;
+      break;
+    }
+  } /* for(i..) */
+  return nullptr;
+} /* kill_victim_locate() */
+
+bool argos_pd_adaptor::robot_attempt_add(const rtypes::type_uuid& id) {
   /*
    * Give 2.0 buffer around the edges of the arena so that robots are not too
    * close to the boundaries of physics engines, which can cause "no engine can
@@ -152,6 +250,9 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
   rmath::ranged xrange(2.0, mc_lf->arena_map()->xrsize() - 2.0);
   rmath::ranged yrange(2.0, mc_lf->arena_map()->yrsize() - 2.0);
   argos::CFootBotEntity* fb = nullptr;
+
+  auto x = m_rng->uniform(xrange);
+  auto y = m_rng->uniform(yrange);
 
   /*
    * You CANNOT first create the entity, then attempt to move it to a
@@ -166,104 +267,34 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_add(
    * what is was originally once this is fixed in the ARGoS master. Diffing the
    * branch for #623 against the previous commit should show the changes.
    */
-  for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
-    auto x = m_rng->uniform(xrange);
-    auto y = m_rng->uniform(yrange);
-    try {
-      /* ick raw pointers--thanks ARGoS... */
-      fb = new argos::CFootBotEntity(mc_entity_prefix + rcppsw::to_string(id),
-                                     mc_controller_xml_id,
-                                     argos::CVector3(x, y, 0.0));
-      m_lf->AddEntity(*fb);
-      ER_INFO(
-          "Added entity %s attached to physics engine %s at %s",
-          fb->GetId().c_str(),
-          fb->GetEmbodiedEntity().GetPhysicsModel(0).GetEngine().GetId().c_str(),
-          rmath::vector2d(x, y).to_str().c_str());
+  try {
+    /* ick raw pointers--thanks ARGoS... */
+    fb = new argos::CFootBotEntity(mc_entity_prefix + rcppsw::to_string(id),
+                                   mc_controller_xml_id,
+                                   argos::CVector3(x, y, 0.0));
+    m_lf->AddEntity(*fb);
+    ER_INFO(
+        "Added entity %s attached to physics engine %s at %s",
+        fb->GetId().c_str(),
+        fb->GetEmbodiedEntity().GetPhysicsModel(0).GetEngine().GetId().c_str(),
+        rmath::vector2d(x, y).to_str().c_str());
 
-      /* Register controller for environmental variances */
-      auto* controller = dynamic_cast<controller::foraging_controller*>(
-          &fb->GetControllableEntity().GetController());
-
-      m_envd->register_controller(*controller);
-
-      return {id, m_lf->GetSpace().GetEntitiesByType("foot-bot").size()};
-    } catch (argos::CARGoSException& e) {
-      if (nullptr != fb) {
-        delete fb; /* ick raw pointers--thanks ARGoS... */
-      }
-      ER_TRACE("Failed to place new robot %s at %s",
-               fb->GetId().c_str(),
-               rmath::vector2d(x, y).to_str().c_str());
-    }
-  } /* for(i..) */
-  ER_FATAL_SENTINEL("Unable to add new robot to simulation");
-  return {rtypes::constants::kNoUUID, current_pop};
-} /* robot_add() */
-
-argos_pd_adaptor::op_result argos_pd_adaptor::robot_malfunction(void) {
-  if (0 == swarm_population()) {
-    ER_WARN("Cannot force robot malfunction: pop_size=%zu", current_pop);
-    return {rtypes::constants::kNoUUID, swarm_population()};
-  }
-
-  auto* controller = victim_locate(swarm_population());
-
-  if (nullptr == controller) {
-    ER_WARN("Unable to find malfunction victim: pop_size=%zu",
-            swarm_population());
-    return {rtypes::constants::kNoUUID, swarm_population()};
-  }
-  ER_INFO("Found malfunction victim with ID=%d", controller->entity_id().v());
-
-  events::mech_malfunction_visitor visitor;
-  visitor.visit(*controller);
-
-  /*
-   * @todo: Once the ability to temporarily remove robots from simulation is
-   * added, do that here.
-   */
-  return {controller->entity_id(), swarm_population()};
-} /* robot_malfunction() */
-
-argos_pd_adaptor::op_result argos_pd_adaptor::robot_repair(
-    const rtypes::type_uuid& id) {
-
-  ER_INFO("Robot with ID=%d repaired", id.v());
-  std::vector<argos::CEntity*> ents;
-  std::string name = mc_entity_prefix + rcppsw::to_string(id);
-  m_lf->GetSpace().GetEntitiesMatching(ents, name);
-  ER_ASSERT(1 == ents.size(),
-            "Wrong # repaired entities found for query %s: %zu != 1",
-            name.c_str(),
-            ents.size());
-  events::mech_repair_visitor visitor;
-  auto* entity = argos::any_cast<argos::CFootBotEntity*>(ents[0]);
-  auto* controller = dynamic_cast<controller::foraging_controller*>(
-      &entity->GetControllableEntity().GetController());
-  visitor.visit(*controller);
-
-  /*
-   * @todo: Once the ability to restore temporarily removed robots from
-   * simulation is added, do that here.
-   */
-  return {controller->entity_id(), swarm_population()};
-} /* robot_repair() */
-
-controller::foraging_controller* argos_pd_adaptor::victim_locate(size_t current_pop) const {
-  auto range = rmath::rangei(0, current_pop - 1);
-
-  for (size_t i = 0; i < kMaxOperationAttempts; ++i) {
-    auto it = m_lf->GetSpace().GetEntitiesByType("foot-bot").begin();
-    std::advance(it, m_rng->uniform(range));
-    auto* entity = argos::any_cast<argos::CFootBotEntity*>(it->second);
+    /* Register controller for environmental variances */
     auto* controller = dynamic_cast<controller::foraging_controller*>(
-        &entity->GetControllableEntity().GetController());
-    if (!currently_repairing(controller->entity_id())) {
-      return controller;
+        &fb->GetControllableEntity().GetController());
+
+    m_envd->register_controller(*controller);
+
+    return true;
+  } catch (argos::CARGoSException& e) {
+    if (nullptr != fb) {
+      delete fb; /* ick raw pointers--thanks ARGoS... */
     }
-  } /* for(i..) */
-  return nullptr;
-} /* victim_locate() */
+    ER_TRACE("Failed to place new robot %s at %s",
+             fb->GetId().c_str(),
+             rmath::vector2d(x, y).to_str().c_str());
+    return false;
+  }
+} /* robot_attempt_add() */
 
 NS_END(tv, support, fordyca);

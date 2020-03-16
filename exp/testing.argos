@@ -16,8 +16,8 @@
   <!-- *************** -->
   <controllers>
 
-    <bitd_dpo_controller id="ffc"
-                         library="libfordyca">
+    <birtd_dpo_controller id="ffc"
+                          library="libfordyca">
       <actuators>
         <differential_steering implementation="default" />
         <!-- <leds implementation="default" medium="leds" /> -->
@@ -187,7 +187,7 @@
                       max_speed="10.0" />
         </actuation_subsystem2D>
       </params>
-    </bitd_dpo_controller>
+    </birtd_dpo_controller>
 
   </controllers>
 
@@ -195,7 +195,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="libfordyca"
-                  label="depth1_loop_functions">
+                  label="depth2_loop_functions">
     <output
         output_root="output"
         output_dir="__current_date__">
@@ -293,9 +293,9 @@
       <population_dynamics
           birth_lambda="0.0"
           death_lambda="0.0"
-          malfunction_lambda="0.0"
+          malfunction_lambda="0.005"
           max_size="16"
-          repair_mu="0.0"/>
+          repair_mu="0.001"/>
     </temporal_variance>
 
     <arena_map>

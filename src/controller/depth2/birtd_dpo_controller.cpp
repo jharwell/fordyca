@@ -110,7 +110,6 @@ void birtd_dpo_controller::private_init(
                                            std::placeholders::_2));
   executive()->task_abort_notify(std::bind(
       &birtd_dpo_controller::task_abort_cb, this, std::placeholders::_1));
-
   supervisor()->supervisee_update(executive());
 } /* private_init() */
 
@@ -143,7 +142,7 @@ void birtd_dpo_controller::task_start_cb(cta::polled_task* const task,
    * that here, so it needs to also be here. See #622.
    */
   current_task(dynamic_cast<tasks::base_foraging_task*>(task));
-} /* task_alloc_cb() */
+} /* task_start_cb() */
 
 using namespace argos; // NOLINT
 

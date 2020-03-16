@@ -144,12 +144,25 @@ void depth0_loop_functions::shared_init(ticpp::Element& node) {
 
 void depth0_loop_functions::private_init(void) {
   /* initialize output and metrics collection */
-  auto* arena = config()->config_get<cfconfig::arena_map_config>();
   auto* output = config()->config_get<cmconfig::output_config>();
 
+  /*
+   * Need to give spatial metrics collectors the padded arena size in order to
+   * avoid boost::assert failures when robots are near the upper edge of the
+   * arena map. The arena map pads the size obtained from the XML file after
+   * initialization, so we just need to grab it.
+   */
+  auto padded_size = rmath::vector2d(arena_map()->xrsize(),
+                                     arena_map()->yrsize());
+  auto arena = *config()->config_get<cfconfig::arena_map_config>();
+  arena.grid.upper = padded_size;
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
-                                                              &arena->grid,
+                                                              &arena.grid,
                                                               output_root());
+  /* this starts at 0, and ARGoS starts at 1, so sync up */
+  m_metrics_agg->timestep_inc_all();
+
+
   m_interactor_map = std::make_unique<interactor_map_type>();
   m_metrics_map = std::make_unique<metric_extraction_map_type>();
   m_los_update_map = std::make_unique<detail::los_updater_map_type>();
@@ -234,9 +247,10 @@ void depth0_loop_functions::post_step(void) {
     if (nullptr != conv_calculator()) {
       conv_calculator()->reset_metrics();
     }
+    tv_manager()->population_dynamics()->reset_metrics();
   }
-  m_metrics_agg->timestep_inc_all();
   m_metrics_agg->interval_reset_all();
+  m_metrics_agg->timestep_inc_all();
 
   ndc_pop();
 } /* post_step() */

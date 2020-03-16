@@ -120,6 +120,9 @@ void mdpo_controller::private_init(
       saa(),
       f.create(exp_config->block_strategy, &expstrat_params, rng()),
       rng()));
+
+  /* Set MDPO FSM supervision */
+  supervisor()->supervisee_update(fsm());
 } /* private_init() */
 
 mdpo_perception_subsystem* mdpo_controller::mdpo_perception(void) {

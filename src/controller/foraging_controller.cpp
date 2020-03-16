@@ -52,7 +52,9 @@ namespace fs = std::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.base"), m_block(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller.base"),
+      m_block(nullptr),
+      m_supervisor(nullptr) {}
 
 foraging_controller::~foraging_controller(void) = default;
 
@@ -98,6 +100,9 @@ void foraging_controller::init(ticpp::Element& node) {
   /* initialize sensing and actuation (SAA) subsystem */
   saa_init(repo.config_get<csubsystem::config::actuation_subsystem2D_config>(),
            repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
+
+  /* initialize supervisor */
+  m_supervisor = std::make_unique<cfsm::supervisor_fsm>(saa());
   ndc_pop();
 } /* init() */
 

@@ -30,7 +30,7 @@
 
 #include "rcppsw/metrics/base_metrics_collector.hpp"
 #include "fordyca/fordyca.hpp"
-#include "cosm/fsm/cell2D_states.hpp"
+#include "cosm/fsm/cell2D_state.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -68,7 +68,7 @@ class mdpo_perception_metrics_collector final : public rmetrics::base_metrics_co
   boost::optional<std::string> csv_line_build(void) override;
 
   struct stats {
-    std::atomic_uint    states[cfsm::cell2D_states::ekST_MAX_STATES];
+    std::atomic_uint    states[cfsm::cell2D_state::ekST_MAX_STATES];
     std::atomic<double> known_percent{0.0};
     std::atomic<double> unknown_percent{0.0};
     std::atomic_uint    robots{0};
