@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/ds/dpo_semantic_map.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/events/cell2D_empty.hpp"
@@ -46,7 +46,7 @@ dpo_semantic_map::dpo_semantic_map(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-bool dpo_semantic_map::cache_remove(cfrepr::base_cache* const victim) {
+bool dpo_semantic_map::cache_remove(carepr::base_cache* const victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
              victim->dloc().to_str().c_str());

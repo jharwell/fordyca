@@ -70,7 +70,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
    *
    * \return The "best" existing cache.
    */
-  const cfrepr::base_cache* operator()(const ds::dp_cache_map& existing_caches,
+  const carepr::base_cache* operator()(const ds::dp_cache_map& existing_caches,
                                        const rmath::vector2d& position,
                                        const rtypes::timestep& t);
 
@@ -85,7 +85,7 @@ class existing_cache_selector : public rer::client<existing_cache_selector> {
    * \return \c TRUE if the cache should be excluded, \c FALSE otherwise.
    */
   bool cache_is_excluded(const rmath::vector2d& position,
-                         const cfrepr::base_cache* cache) const;
+                         const carepr::base_cache* cache) const;
 
   /* clang-format off */
   const bool                                mc_is_pickup;

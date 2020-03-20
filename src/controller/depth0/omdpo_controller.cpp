@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/depth0/omdpo_controller.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 

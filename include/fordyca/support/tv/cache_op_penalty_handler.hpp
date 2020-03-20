@@ -51,7 +51,7 @@ class cache_op_penalty_handler final
     : public temporal_penalty_handler,
       public rer::client<cache_op_penalty_handler> {
  public:
-  cache_op_penalty_handler(cfds::arena_map* const map,
+  cache_op_penalty_handler(carena::arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
@@ -114,7 +114,7 @@ class cache_op_penalty_handler final
 
  private:
   /* clang-format off */
-  cfds::arena_map* const m_map;
+  carena::arena_map* const m_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

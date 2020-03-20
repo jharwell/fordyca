@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/depth2/dynamic_cache_creator.hpp"
 
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/events/cell2D_empty.hpp"
@@ -49,10 +49,10 @@ dynamic_cache_creator::dynamic_cache_creator(const params* const p,
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cfds::acache_vectoro dynamic_cache_creator::create_all(
+cads::acache_vectoro dynamic_cache_creator::create_all(
     const cache_create_ro_params& c_params,
     const cds::block2D_vectorno& c_alloc_blocks) {
-  cfds::acache_vectoro created_caches;
+  cads::acache_vectoro created_caches;
 
   ER_DEBUG("Creating caches: min_dist=%f,min_blocks=%u,free_blocks=[%s] (%zu)",
            mc_min_dist.v(),
@@ -70,7 +70,7 @@ cfds::acache_vectoro dynamic_cache_creator::create_all(
      * included in a new cache, so attempt cache creation.
      */
     if (cache_i_blocks.size() >= mc_min_blocks) {
-      cfds::acache_vectorno c_avoid =
+      cads::acache_vectorno c_avoid =
           avoidance_caches_calc(c_params.current_caches, created_caches);
 
       if (auto center = cache_center_calculator(grid(), cache_dim())(
@@ -94,7 +94,7 @@ cfds::acache_vectoro dynamic_cache_creator::create_all(
          * which keeps asserts about cache extent from triggering right after
          * creation, which can happen otherwise.
          */
-        auto cache_p = std::shared_ptr<cfrepr::arena_cache>(create_single_cache(
+        auto cache_p = std::shared_ptr<carepr::arena_cache>(create_single_cache(
             rmath::uvec2dvec(*center), cache_i_blocks, c_params.t));
         created_caches.push_back(cache_p);
       }
@@ -116,10 +116,10 @@ cfds::acache_vectoro dynamic_cache_creator::create_all(
   return created_caches;
 } /* create_all() */
 
-cfds::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
-    const cfds::acache_vectorno& c_previous_caches,
-    const cfds::acache_vectoro& c_created_caches) const {
-  cfds::acache_vectorno avoid = c_previous_caches;
+cads::acache_vectorno dynamic_cache_creator::avoidance_caches_calc(
+    const cads::acache_vectorno& c_previous_caches,
+    const cads::acache_vectoro& c_created_caches) const {
+  cads::acache_vectorno avoid = c_previous_caches;
   for (auto& c : c_created_caches) {
     avoid.push_back(c.get());
   } /* for(&c..) */

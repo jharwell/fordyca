@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/utils/loop_utils.hpp"
 
-#include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/arena/arena_map.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/repr/line_of_sight.hpp"
@@ -46,7 +46,7 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
 } /* placement_conflict() */
 
 std::unique_ptr<repr::line_of_sight> compute_robot_los(
-    const cfds::arena_map& map,
+    const carena::arena_map& map,
     uint los_grid_size,
     const rmath::vector2d& pos) {
   rmath::vector2u position = rmath::dvec2uvec(pos, map.grid_resolution().v());
@@ -54,7 +54,7 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
       map.subgrid(position.x(), position.y(), los_grid_size), position);
 } /* compute_robot_los */
 
-cds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
+cds::block2D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
                                         const cds::block2D_vectorno& all_blocks) {
   cds::block2D_vectorno free_blocks;
   std::copy_if(all_blocks.begin(),

@@ -70,7 +70,7 @@ class env_dynamics final : public rer::client<env_dynamics>,
 
   env_dynamics(const config::tv::env_dynamics_config * config,
                const support::base_loop_functions* lf,
-               cfds::arena_map* map);
+               carena::arena_map* map);
 
   env_dynamics(const env_dynamics&) = delete;
   const env_dynamics& operator=(const env_dynamics&) = delete;

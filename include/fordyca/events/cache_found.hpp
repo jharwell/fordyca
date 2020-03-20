@@ -35,7 +35,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::foraging::repr {
+namespace cosm::arena::repr {
 class base_cache;
 }
 
@@ -71,7 +71,7 @@ class cache_found : public cevents::cell2D_op, public rer::client<cache_found> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cache_found(cfrepr::base_cache* cache);
+  explicit cache_found(carepr::base_cache* cache);
   ~cache_found(void) override = default;
 
   cache_found(const cache_found& op) = delete;
@@ -93,7 +93,7 @@ class cache_found : public cevents::cell2D_op, public rer::client<cache_found> {
 
  private:
   /* clang-format off */
-  cfrepr::base_cache* m_cache;
+  carepr::base_cache* m_cache;
   /* clang-format on */
 };
 

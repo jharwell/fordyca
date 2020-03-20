@@ -23,7 +23,7 @@
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 
 #include "cosm/ds/arena_grid.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
@@ -50,7 +50,7 @@ dynamic_cache_manager::dynamic_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<cfds::acache_vectoro> dynamic_cache_manager::create(
+boost::optional<cads::acache_vectoro> dynamic_cache_manager::create(
     const cache_create_ro_params& c_params,
     const cds::block2D_vectorno& c_alloc_blocks) {
   if (auto to_use = calc_blocks_for_creation(
@@ -62,7 +62,7 @@ boost::optional<cfds::acache_vectoro> dynamic_cache_manager::create(
         .min_blocks = mc_cache_config.dynamic.min_blocks};
     support::depth2::dynamic_cache_creator creator(&params, m_rng);
 
-    cfds::acache_vectoro created = creator.create_all(c_params, *to_use);
+    cads::acache_vectoro created = creator.create_all(c_params, *to_use);
     caches_created(created.size());
 
     /*
@@ -72,12 +72,12 @@ boost::optional<cfds::acache_vectoro> dynamic_cache_manager::create(
     creator.update_host_cells(created);
     return boost::make_optional(created);
   } else {
-    return boost::optional<cfds::acache_vectoro>();
+    return boost::optional<cads::acache_vectoro>();
   }
 } /* create() */
 
 boost::optional<cds::block2D_vectorno> dynamic_cache_manager::
-    calc_blocks_for_creation(const cfds::acache_vectorno& existing_caches,
+    calc_blocks_for_creation(const cads::acache_vectorno& existing_caches,
                              const cfds::block_cluster_vector& clusters,
                              const cds::block2D_vectorno& blocks) {
   cds::block2D_vectorno to_use;

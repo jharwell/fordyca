@@ -32,7 +32,6 @@
 #include "fordyca/fordyca.hpp"
 #include "rcppsw/types/spatial_dist.hpp"
 #include "rcppsw/types/type_uuid.hpp"
-#include "cosm/foraging/ds/arena_map.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
@@ -41,9 +40,13 @@
 namespace cosm::repr {
 class entity2D;
 class nest;
-class arena_cache;
 } /* namespace cosm::repr */
-
+namespace cosm::arena {
+class arena_map;
+namespace repr {
+class arena_cache;
+} /* namespace repr */
+} /* namespace cosm::arena */
 namespace fordyca::repr {
 class line_of_sight;
 }
@@ -75,7 +78,7 @@ struct proximity_status_t {
  * not on top of a block.
  */
 rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
-                                 const cfds::arena_map& map) RCSW_PURE;
+                                 const carena::arena_map& map) RCSW_PURE;
 
 /**
  * \brief Check if a robot is on top of a cache. If, so return the cache index.
@@ -90,7 +93,7 @@ rtypes::type_uuid robot_on_block(const controller::foraging_controller& controll
  * not on top of a cache.
  */
 rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controller,
-                   const cfds::arena_map& map) RCSW_PURE;
+                                 const carena::arena_map& map) RCSW_PURE;
 
 /**
  * \brief Determine if creating a new cache centered at the robot's current
@@ -107,7 +110,7 @@ rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controll
  *         cache).
  */
 proximity_status_t new_cache_cache_proximity(const controller::foraging_controller& c,
-                                             const cfds::arena_map& map,
+                                             const carena::arena_map& map,
                                              rtypes::spatial_dist new_cache_prox);
 
 

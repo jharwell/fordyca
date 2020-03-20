@@ -29,7 +29,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/ds/dp_block_map.hpp"
@@ -120,10 +120,10 @@ class dpo_store final : public rer::client<dpo_store> {
   void clear_all(void);
 
   bool contains(const crepr::base_block2D* block) const RCSW_PURE;
-  bool contains(const cfrepr::base_cache* cache) const;
+  bool contains(const carepr::base_cache* cache) const;
 
-  const dp_cache_map::value_type* find(const cfrepr::base_cache* cache) const;
-  dp_cache_map::value_type* find(const cfrepr::base_cache* cache);
+  const dp_cache_map::value_type* find(const carepr::base_cache* cache) const;
+  dp_cache_map::value_type* find(const carepr::base_cache* cache);
 
   const dp_block_map::value_type* find(
       const crepr::base_block2D* block) const RCSW_PURE;
@@ -137,7 +137,7 @@ class dpo_store final : public rer::client<dpo_store> {
    *
    * \param cache Cache to update.
    */
-  update_res_t cache_update(dpo_entity<cfrepr::base_cache> cache);
+  update_res_t cache_update(dpo_entity<carepr::base_cache> cache);
 
   /*
    * \brief Update the known blocks set with the new block.
@@ -154,7 +154,7 @@ class dpo_store final : public rer::client<dpo_store> {
   /**
    * \brief Remove a cache from the set of of known caches.
    */
-  bool cache_remove(cfrepr::base_cache* victim);
+  bool cache_remove(carepr::base_cache* victim);
 
   /*
    * \brief Remove a block from the set of known blocks. If the victim is not

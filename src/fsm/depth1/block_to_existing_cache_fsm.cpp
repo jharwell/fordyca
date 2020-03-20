@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth1/block_to_existing_cache_fsm.hpp"
 
-#include "cosm/foraging/repr/light_type_index.hpp"
+#include "cosm/arena/repr/light_type_index.hpp"
 
 #include "fordyca/fsm/expstrat/block_factory.hpp"
 #include "fordyca/fsm/expstrat/cache_factory.hpp"
@@ -52,7 +52,7 @@ block_to_existing_cache_fsm::block_to_existing_cache_fsm(
                   nullptr,
                   c_params->csel_matrix,
                   c_params->store,
-                  cfrepr::light_type_index()[cfrepr::light_type_index::kCache])
+                  carepr::light_type_index()[carepr::light_type_index::kCache])
                   .get(),
               rng),
           rng,

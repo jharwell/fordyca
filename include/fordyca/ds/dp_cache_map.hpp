@@ -34,7 +34,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::foraging::repr {
+namespace cosm::arena::repr {
 class base_cache;
 }
 
@@ -55,9 +55,9 @@ NS_START(fordyca, ds);
  * during LOS process (it would be inserted into the map, but the old version
  * would not be removed, as they would be considered different objects).
  */
-class dp_cache_map : public dpo_map<rmath::vector2u, cfrepr::base_cache> {
+class dp_cache_map : public dpo_map<rmath::vector2u, carepr::base_cache> {
  public:
-  using dpo_map<rmath::vector2u, cfrepr::base_cache>::dpo_map;
+  using dpo_map<rmath::vector2u, carepr::base_cache>::dpo_map;
 
   /**
    * \brief Build a string from the list of DP caches that a robot is tracking

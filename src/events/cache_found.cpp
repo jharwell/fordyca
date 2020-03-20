@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/cache_found.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 
 #include "fordyca/controller/depth2/birtd_dpo_controller.hpp"
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
@@ -38,13 +38,13 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events, detail);
-using cfrepr::base_cache;
+using carepr::base_cache;
 using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
-cache_found::cache_found(cfrepr::base_cache* cache)
+cache_found::cache_found(carepr::base_cache* cache)
     : cell2D_op(cache->dloc()),
       ER_CLIENT_INIT("fordyca.events.cache_found"),
       m_cache(cache) {}

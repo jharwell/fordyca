@@ -34,7 +34,7 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace cosm::foraging::repr {
+namespace cosm::arena::repr {
 class base_cache;
 } /* namespace cosm::foraging::repr */
 
@@ -78,7 +78,7 @@ class cache_acq_validator : public rer::client<cache_acq_validator> {
                   const rtypes::timestep& t) const;
 
  private:
-  bool pickup_policy_validate(const cfrepr::base_cache* cache,
+  bool pickup_policy_validate(const carepr::base_cache* cache,
                               const rtypes::timestep& t) const;
 
   /* clang-format off */

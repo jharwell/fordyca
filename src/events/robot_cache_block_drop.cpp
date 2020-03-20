@@ -24,7 +24,7 @@
 #include "fordyca/events/robot_cache_block_drop.hpp"
 
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/cache_sel_matrix.hpp"
@@ -55,7 +55,7 @@ using ds::occupancy_grid;
  ******************************************************************************/
 robot_cache_block_drop::robot_cache_block_drop(
     std::unique_ptr<crepr::base_block2D> block,
-    cfrepr::arena_cache* cache,
+    carepr::arena_cache* cache,
     const rtypes::discretize_ratio& resolution)
     : ER_CLIENT_INIT("fordyca.events.robot_cache_block_drop"),
       cell2D_op(cache->dloc()),

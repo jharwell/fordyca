@@ -24,7 +24,7 @@
 #include "fordyca/repr/line_of_sight.hpp"
 
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -51,8 +51,8 @@ cds::block2D_vectorno line_of_sight::blocks(void) const {
   return blocks;
 } /* blocks() */
 
-cfds::bcache_vectorno line_of_sight::caches(void) const {
-  cfds::bcache_vectorno caches;
+cads::bcache_vectorno line_of_sight::caches(void) const {
+  cads::bcache_vectorno caches;
 
   for (uint i = 0; i < xsize(); ++i) {
     for (uint j = 0; j < ysize(); ++j) {
@@ -63,12 +63,12 @@ cfds::bcache_vectorno line_of_sight::caches(void) const {
             nullptr != cache,
             "Cell@%s in HAS_CACHE/CACHE_EXTENT state, but does not have cache",
             cell.loc().to_str().c_str());
-        ER_ASSERT(cache->n_blocks() >= cfrepr::base_cache::kMinBlocks,
+        ER_ASSERT(cache->n_blocks() >= carepr::base_cache::kMinBlocks,
                   "Cache%d@%s has too few blocks (%zu < %zu)",
                   cache->id().v(),
                   cache->dloc().to_str().c_str(),
                   cache->n_blocks(),
-                  cfrepr::base_cache::kMinBlocks);
+                  carepr::base_cache::kMinBlocks);
         /*
          * We can't add the cache unconditionally, because cache host cells and
          * extent cells both refer to the same cache, and doing so will give you

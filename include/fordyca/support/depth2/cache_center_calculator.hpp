@@ -31,7 +31,7 @@
 
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/ds/block2D_vector.hpp"
-#include "cosm/foraging/ds/cache_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
 
 #include "rcppsw/er/client.hpp"
@@ -98,7 +98,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    */
   boost::optional<rmath::vector2u> operator()(
       const cds::block2D_vectorno& c_cache_i_blocks,
-      const cfds::acache_vectorno& c_existing_caches,
+      const cads::acache_vectorno& c_existing_caches,
       const cfds::block_cluster_vector& c_clusters,
       rmath::rng* rng) const;
 
@@ -110,7 +110,7 @@ class cache_center_calculator : public rer::client<cache_center_calculator> {
    * \return An updated cache center, if one is needed.
    */
   boost::optional<rmath::vector2u> deconflict_loc(
-      const cfds::acache_vectorno& c_existing_caches,
+      const cads::acache_vectorno& c_existing_caches,
       const cfds::block_cluster_vector& c_clusters,
       const rmath::vector2u& c_center,
       rmath::rng* rng) const;

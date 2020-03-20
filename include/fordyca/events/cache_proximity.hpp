@@ -36,7 +36,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::foraging::repr {
+namespace cosm::arena::repr {
 class base_cache;
 }
 
@@ -65,7 +65,7 @@ class cache_proximity : public rer::client<cache_proximity> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  explicit cache_proximity(cfrepr::base_cache* cache);
+  explicit cache_proximity(carepr::base_cache* cache);
   ~cache_proximity(void) override = default;
 
   cache_proximity(const cache_proximity& op) = delete;
@@ -84,7 +84,7 @@ class cache_proximity : public rer::client<cache_proximity> {
   void dispatch_cache_interactor(tasks::base_foraging_task* task);
 
   /* clang-format off */
-  cfrepr::base_cache* m_cache;
+  carepr::base_cache* m_cache;
   /* clang-format on */
 };
 

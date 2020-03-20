@@ -125,7 +125,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
    * \brief Collect utilization metrics from a cache in the arena.
    */
   void collect_from_cache(
-      const cfrepr::arena_cache* cache);
+      const carepr::arena_cache* cache);
 
   /**
    * \brief Collect lifecycle metrics across all caches in the arena.

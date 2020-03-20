@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/oracular_info_receptor.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/oracle/entities_oracle.hpp"
 #include "cosm/oracle/tasking_oracle.hpp"
 #include "cosm/repr/base_block2D.hpp"
@@ -57,7 +57,7 @@ struct dpo_store_updater {
     events::block_found_visitor e(block);
     e.visit(*store);
   }
-  void operator()(cfrepr::base_cache* cache) const {
+  void operator()(carepr::base_cache* cache) const {
     events::cache_found_visitor e(cache);
     e.visit(*store);
   }

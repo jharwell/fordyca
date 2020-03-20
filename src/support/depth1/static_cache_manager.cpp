@@ -24,8 +24,8 @@
 
 #include "cosm/ds/arena_grid.hpp"
 #include "cosm/events/cell2D_empty.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/operations/free_block_drop.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/math/cache_respawn_probability.hpp"
@@ -55,14 +55,14 @@ static_cache_manager::static_cache_manager(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-boost::optional<cfds::acache_vectoro> static_cache_manager::create(
+boost::optional<cads::acache_vectoro> static_cache_manager::create(
     const cache_create_ro_params& c_params,
     const cds::block2D_vectorno& c_alloc_blocks) {
   ER_DEBUG("(Re)-Creating static cache(s)");
-  ER_ASSERT(mc_cache_config.static_.size >= cfrepr::base_cache::kMinBlocks,
+  ER_ASSERT(mc_cache_config.static_.size >= carepr::base_cache::kMinBlocks,
             "Static cache size %u < minimum %zu",
             mc_cache_config.static_.size,
-            cfrepr::base_cache::kMinBlocks);
+            carepr::base_cache::kMinBlocks);
 
   auto to_use = blocks_alloc(c_params.current_caches, c_alloc_blocks);
   if (!to_use) {
@@ -71,7 +71,7 @@ boost::optional<cfds::acache_vectoro> static_cache_manager::create(
         "(n_caches=%zu,n_alloc_blocks=%zu)",
         c_params.current_caches.size(),
         c_alloc_blocks.size());
-    return boost::optional<cfds::acache_vectoro>();
+    return boost::optional<cads::acache_vectoro>();
   }
   static_cache_creator creator(arena_grid(),
                                mc_cache_locs,
@@ -95,7 +95,7 @@ boost::optional<cfds::acache_vectoro> static_cache_manager::create(
   return boost::make_optional(created);
 } /* create() */
 
-boost::optional<cfds::acache_vectoro> static_cache_manager::create_conditional(
+boost::optional<cads::acache_vectoro> static_cache_manager::create_conditional(
     const cache_create_ro_params& c_params,
     const cds::block2D_vectorno& c_alloc_blocks,
     uint n_harvesters,
@@ -106,12 +106,12 @@ boost::optional<cfds::acache_vectoro> static_cache_manager::create_conditional(
   if (p.calc(n_harvesters, n_collectors) >= m_rng->uniform(0.0, 1.0)) {
     return create(c_params, c_alloc_blocks);
   } else {
-    return boost::optional<cfds::acache_vectoro>();
+    return boost::optional<cads::acache_vectoro>();
   }
 } /* create_conditional() */
 
 boost::optional<cds::block2D_vectorno> static_cache_manager::blocks_alloc(
-    const cfds::acache_vectorno& existing_caches,
+    const cads::acache_vectorno& existing_caches,
     const cds::block2D_vectorno& blocks) const {
   cds::block2D_vectorno alloc_i;
   for (auto& loc : mc_cache_locs) {
@@ -119,7 +119,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::blocks_alloc(
                                             alloc_i,
                                             blocks,
                                             loc,
-                                            cfrepr::base_cache::kMinBlocks)) {
+                                            carepr::base_cache::kMinBlocks)) {
       ER_DEBUG("Alloc_blocks=[%s] for cache@%s",
                rcppsw::to_string(*cache_i).c_str(),
                loc.to_str().c_str());
@@ -135,7 +135,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::blocks_alloc(
 } /* blocks_alloc() */
 
 boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_alloc(
-    const cfds::acache_vectorno& existing_caches,
+    const cads::acache_vectorno& existing_caches,
     const cds::block2D_vectorno& allocated_blocks,
     const cds::block2D_vectorno& all_blocks,
     const rmath::vector2d& loc,
@@ -173,7 +173,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
                            });
       });
 
-  if (cache_i_blocks.size() < cfrepr::base_cache::kMinBlocks) {
+  if (cache_i_blocks.size() < carepr::base_cache::kMinBlocks) {
     /*
      * Cannot use std::accumulate for these, because that doesn't work with
      * C++14/gcc7 when you are accumulating into a different type (e.g. from a
@@ -204,14 +204,14 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
                   });
     ER_TRACE("Cache i alloc_blocks locs: [%s]", accum.c_str());
 
-    ER_ASSERT(cache_i_blocks.size() - count < cfrepr::base_cache::kMinBlocks,
+    ER_ASSERT(cache_i_blocks.size() - count < carepr::base_cache::kMinBlocks,
               "For new cache @%s/%s: %zu blocks SHOULD be "
               "available, but only %zu are (min=%zu)",
               loc.to_str().c_str(),
               dcenter.to_str().c_str(),
               cache_i_blocks.size() - count,
               cache_i_blocks.size(),
-              cfrepr::base_cache::kMinBlocks);
+              carepr::base_cache::kMinBlocks);
     return boost::optional<cds::block2D_vectorno>();
   }
   if (cache_i_blocks.size() < mc_cache_config.static_.size) {
@@ -228,7 +228,7 @@ boost::optional<cds::block2D_vectorno> static_cache_manager::cache_i_blocks_allo
 } /* cache_i_blocks_alloc() */
 
 void static_cache_manager::post_creation_blocks_absorb(
-    const cfds::acache_vectoro& caches,
+    const cads::acache_vectoro& caches,
     const cds::block2D_vectorno& blocks) {
   for (auto& b : blocks) {
     for (auto& c : caches) {
@@ -241,11 +241,11 @@ void static_cache_manager::post_creation_blocks_absorb(
          * creation always happens AFTER all robot control steps have been run,
          * no locking is needed.
          */
-        cfevents::arena_free_block_drop_visitor op(
+        caops::free_block_drop_visitor op(
             b,
             rmath::dvec2uvec(c->rloc(), arena_grid()->resolution().v()),
             arena_grid()->resolution(),
-            cfds::arena_map_locking::ekALL_HELD);
+            carena::arena_map_locking::ekALL_HELD);
         op.visit(arena_grid()->access<arena_grid::kCell>(op.x(), op.y()));
         c->block_add(b);
         ER_INFO("Hidden block%d added to cache%d", b->id().v(), c->id().v());

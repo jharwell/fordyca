@@ -28,8 +28,8 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/foraging/ds/arena_map.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
+#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/ta/logical_task.hpp"
 #include "cosm/ta/polled_task.hpp"
 
@@ -55,7 +55,7 @@ NS_START(fordyca, support);
 template <typename T>
 class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
  public:
-  task_abort_interactor(cfds::arena_map* const map,
+  task_abort_interactor(carena::arena_map* const map,
                         tv::env_dynamics* envd,
                         argos::CFloorEntity* const floor)
       : ER_CLIENT_INIT("fordyca.support.task_abort_interactor"),
@@ -123,11 +123,11 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
                                                    loc,
                                                    m_map->grid_resolution());
 
-    cfevents::arena_free_block_drop_visitor adrop_op(
+    caops::free_block_drop_visitor adrop_op(
         m_map->blocks()[block_id.v()],
         loc,
         m_map->grid_resolution(),
-        cfds::arena_map_locking::ekNONE_HELD);
+        carena::arena_map_locking::ekNONE_HELD);
 
     adrop_op.visit(*m_map);
     rdrop_op.visit(controller);
@@ -136,7 +136,7 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
   } /* perform_block_drop() */
 
   /* clang-format off */
-  cfds::arena_map* const     m_map;
+  carena::arena_map* const   m_map;
   tv::env_dynamics* const    m_envd;
   argos::CFloorEntity* const m_floor;
   /* clang-format on */

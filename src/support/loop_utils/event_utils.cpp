@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/support/utils/event_utils.hpp"
 
-#include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/arena/arena_map.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 
@@ -36,18 +36,18 @@ NS_START(fordyca, support, utils);
  * Functions
  ******************************************************************************/
 rtypes::type_uuid robot_on_block(const controller::foraging_controller& controller,
-                                 const cfds::arena_map& map) {
+                                 const carena::arena_map& map) {
   return map.robot_on_block(controller.pos2D(), controller.entity_acquired_id());
 } /* robot_on_block() */
 
 rtypes::type_uuid robot_on_cache(const controller::foraging_controller& controller,
-                                 const cfds::arena_map& map) {
+                                 const carena::arena_map& map) {
   return map.robot_on_cache(controller.pos2D(), controller.entity_acquired_id());
 } /* robot_on_cache() */
 
 proximity_status_t new_cache_cache_proximity(
     const controller::foraging_controller& c,
-    const cfds::arena_map& map,
+    const carena::arena_map& map,
     rtypes::spatial_dist new_cache_prox) {
   std::scoped_lock lock(*map.cache_mtx());
   for (const auto* cache : map.caches()) {

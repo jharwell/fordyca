@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/fsm/depth2/acquire_new_cache_fsm.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 
 #include "fordyca/controller/depth2/new_cache_selector.hpp"

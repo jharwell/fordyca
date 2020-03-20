@@ -51,7 +51,7 @@ NS_START(fordyca, support, tv);
 template <typename T>
 class cache_op_filter : public rer::client<cache_op_filter<T>> {
  public:
-  explicit cache_op_filter(const cfds::arena_map* const map)
+  explicit cache_op_filter(const carena::arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.cache_op_filter"), mc_map(map) {}
 
   ~cache_op_filter(void) override = default;
@@ -97,7 +97,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
   }
 
   /* clang-format off */
-  const cfds::arena_map* const mc_map;
+  const carena::arena_map* const mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

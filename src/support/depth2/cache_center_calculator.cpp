@@ -25,8 +25,7 @@
 
 #include "cosm/ds/cell2D.hpp"
 #include "cosm/events/cell2D_empty.hpp"
-#include "cosm/foraging/events/cell2D_cache_extent.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 
 #include "fordyca/support/utils/loop_utils.hpp"
@@ -50,7 +49,7 @@ cache_center_calculator::cache_center_calculator(cds::arena_grid* const grid,
  ******************************************************************************/
 boost::optional<rmath::vector2u> cache_center_calculator::operator()(
     const cds::block2D_vectorno& c_cache_i_blocks,
-    const cfds::acache_vectorno& c_existing_caches,
+    const cads::acache_vectorno& c_existing_caches,
     const cfds::block_cluster_vector& c_clusters,
     rmath::rng* rng) const {
   double sumx = std::accumulate(c_cache_i_blocks.begin(),
@@ -113,7 +112,7 @@ boost::optional<rmath::vector2u> cache_center_calculator::operator()(
 } /* calc_center() */
 
 boost::optional<rmath::vector2u> cache_center_calculator::deconflict_loc(
-    const cfds::acache_vectorno& c_existing_caches,
+    const cads::acache_vectorno& c_existing_caches,
     const cfds::block_cluster_vector& c_clusters,
     const rmath::vector2u& c_center,
     rmath::rng* rng) const {

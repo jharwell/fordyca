@@ -27,11 +27,11 @@
 #include <argos3/core/simulator/entity/floor_entity.h>
 
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
+#include "cosm/arena/operations/free_block_drop.hpp"
 #include "fordyca/events/cache_proximity.hpp"
 #include "fordyca/events/dynamic_cache_interactor.hpp"
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
-#include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/arena/arena_map.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/events/robot_free_block_drop.hpp"
 
@@ -53,7 +53,7 @@ NS_START(fordyca, support, depth2);
 template <typename T>
 class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_interactor<T>> {
  public:
-  new_cache_block_drop_interactor(cfds::arena_map* const map_in,
+  new_cache_block_drop_interactor(carena::arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
                                   tv::env_dynamics* const envd,
                                    dynamic_cache_manager* const cache_manager)
@@ -224,10 +224,10 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
     auto loc = rmath::dvec2uvec(controller.pos2D(),
                                 m_map->grid_resolution().v());
 
-    cfevents::arena_free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
-                                                     loc,
-                                                     m_map->grid_resolution(),
-                                                     cfds::arena_map_locking::ekNONE_HELD);
+    caops::free_block_drop_visitor adrop_op(m_map->blocks()[penalty.id().v()],
+                                            loc,
+                                            m_map->grid_resolution(),
+                                            carena::arena_map_locking::ekNONE_HELD);
     events::robot_free_block_drop_visitor rdrop_op(controller.block_release(),
                                                    loc,
                                                    m_map->grid_resolution());
@@ -239,7 +239,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
 
   /* clang-format off */
   argos::CFloorEntity*  const         m_floor;
-  cfds::arena_map* const              m_map;
+  carena::arena_map* const            m_map;
   dynamic_cache_manager*const         m_cache_manager;
   tv::block_op_penalty_handler* const m_penalty_handler;
   /* clang-format on */

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/depth2/task_executive_builder.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/ta/bi_tdgraph_allocator.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"

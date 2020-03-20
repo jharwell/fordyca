@@ -33,7 +33,7 @@
 #include "rcppsw/math/vector2.hpp"
 
 #include "cosm/ds/block2D_vector.hpp"
-#include "cosm/foraging/ds/cache_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -77,7 +77,7 @@ class line_of_sight final : public rer::client<line_of_sight> {
         mc_view(c_view) {}
 
   cds::block2D_vectorno blocks(void) const;
-  cfds::bcache_vectorno caches(void) const;
+  cads::bcache_vectorno caches(void) const;
 
   /**
    * \brief Get the size of the X dimension for a LOS.

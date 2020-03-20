@@ -35,7 +35,7 @@
 #include "rcppsw/types/spatial_dist.hpp"
 #include "fordyca/fordyca.hpp"
 #include "cosm/ds/block2D_vector.hpp"
-#include "cosm/foraging/ds/cache_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
 #include "fordyca/controller/controller_fwd.hpp"
 
 /*******************************************************************************
@@ -45,7 +45,7 @@ namespace cosm::repr {
 class entity2D;
 } /* namespace cosm::repr */
 
-namespace cosm::foraging::ds {
+namespace cosm::arena {
 class arena_map;
 } /* namespace cosm::foraging::repr */
 
@@ -72,7 +72,7 @@ struct placement_status_t {
  * Needed to eliminate header dependencies in this file.
  */
 std::unique_ptr<repr::line_of_sight> compute_robot_los(
-    const cfds::arena_map& map,
+    const carena::arena_map& map,
     uint los_grid_size,
     const rmath::vector2d& pos);
 
@@ -87,7 +87,7 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
 template <typename T>
 void set_robot_los(T* const controller,
                    uint los_grid_size,
-                   cfds::arena_map& map) {
+                   carena::arena_map& map) {
   controller->los(std::move(compute_robot_los(map,
                                               los_grid_size,
                                               controller->pos2D())));
@@ -112,7 +112,7 @@ placement_status_t placement_conflict(const rmath::vector2d& ent1_loc,
  * \param all_caches All existing caches in the arena.
  * \param all_blocks All blocks in the arena.
  */
-cds::block2D_vectorno free_blocks_calc(const cfds::acache_vectoro& all_caches,
+cds::block2D_vectorno free_blocks_calc(const cads::acache_vectoro& all_caches,
                                       const cds::block2D_vectorno& all_blocks);
 
 NS_END(utils, support, fordyca);

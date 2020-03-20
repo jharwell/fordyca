@@ -25,7 +25,7 @@
 
 #include <numeric>
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 
 /*******************************************************************************
  * Namespaces

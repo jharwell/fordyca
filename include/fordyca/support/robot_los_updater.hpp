@@ -29,7 +29,7 @@
 
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/foraging/ds/arena_map.hpp"
+#include "cosm/arena/arena_map.hpp"
 
 #include "fordyca/support/utils/loop_utils.hpp"
 
@@ -52,7 +52,7 @@ class robot_los_updater final
     : public boost::static_visitor<void>,
       public rer::client<robot_los_updater<ControllerType>> {
  public:
-  explicit robot_los_updater(cfds::arena_map* const map)
+  explicit robot_los_updater(carena::arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.robot_los_updater"), m_map(map) {}
 
   /*
@@ -87,7 +87,7 @@ class robot_los_updater final
 
  private:
   /* clang-format off */
-  cfds::arena_map * const m_map;
+  carena::arena_map * const m_map;
   /* clang-format on */
 };
 

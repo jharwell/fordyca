@@ -24,13 +24,13 @@
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 
 #include "cosm/events/cell2D_empty.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, support, depth1);
-using cfrepr::base_cache;
+using carepr::base_cache;
 
 /*******************************************************************************
  * Constructors/Destructor
@@ -46,14 +46,14 @@ static_cache_creator::static_cache_creator(
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-cfds::acache_vectoro static_cache_creator::create_all(
+cads::acache_vectoro static_cache_creator::create_all(
     const cache_create_ro_params& c_params,
     const cds::block2D_vectorno& c_alloc_blocks) {
   ER_DEBUG("Creating caches: alloc_blocks=[%s] (%zu)",
            rcppsw::to_string(c_alloc_blocks).c_str(),
            c_alloc_blocks.size());
 
-  cfds::acache_vectoro created;
+  cads::acache_vectoro created;
   auto it = c_alloc_blocks.begin();
   for (auto& center : mc_centers) {
     auto filter = [&](const auto& c) {

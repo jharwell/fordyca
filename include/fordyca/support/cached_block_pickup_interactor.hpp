@@ -26,9 +26,9 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/foraging/ds/arena_map.hpp"
-#include "cosm/foraging/events/arena_cached_block_pickup.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/operations/cached_block_pickup.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 
 #include "fordyca/ds/dpo_store.hpp"
 #include "fordyca/events/cache_vanished.hpp"
@@ -59,7 +59,7 @@ template <typename T>
 class cached_block_pickup_interactor
     : public rer::client<cached_block_pickup_interactor<T>> {
  public:
-  cached_block_pickup_interactor(cfds::arena_map* const map_in,
+  cached_block_pickup_interactor(carena::arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
                                  tv::env_dynamics* envd,
                                  support::base_cache_manager* cache_manager,
@@ -215,7 +215,7 @@ class cached_block_pickup_interactor
     ER_ASSERT(it != m_map->caches().end(),
               "Cache%d from penalty does not exist?",
               penalty.id().v());
-    cfevents::arena_cached_block_pickup_visitor apickup_op(
+    caops::cached_block_pickup_visitor apickup_op(
         *it, m_loop, controller.entity_id(), t);
     const crepr::base_block2D* to_pickup = (*it)->oldest_block();
     events::robot_cached_block_pickup_visitor rpickup_op(
@@ -247,7 +247,7 @@ class cached_block_pickup_interactor
  private:
   /* clang-format off */
   argos::CFloorEntity* const          m_floor;
-  cfds::arena_map* const              m_map;
+  carena::arena_map* const            m_map;
   tv::cache_op_penalty_handler* const m_penalty_handler;
   base_cache_manager *                m_cache_manager;
   base_loop_functions*                m_loop;

@@ -37,7 +37,7 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 env_dynamics::env_dynamics(const config::tv::env_dynamics_config* const config,
                            const support::base_loop_functions* const lf,
-                           cfds::arena_map* const map)
+                           carena::arena_map* const map)
     : ER_CLIENT_INIT("fordyca.support.tv.env_dynamics"),
       m_rda(&config->rda, lf),
       m_fb_pickup(map, &config->block_manip_penalty, "Free Block Pickup"),

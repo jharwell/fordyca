@@ -26,7 +26,7 @@
 #include <algorithm>
 
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/fsm/cell2D_state.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
@@ -169,7 +169,7 @@ void mdpo_perception_subsystem::process_los_caches(
    * variable, we can't use separate begin()/end() calls with it, and need to
    * explicitly assign it.
    */
-  cfds::bcache_vectorno los_caches = c_los->caches();
+  cads::bcache_vectorno los_caches = c_los->caches();
   if (!los_caches.empty()) {
     ER_DEBUG("Caches in LOS: [%s]", rcppsw::to_string(los_caches).c_str());
     ER_DEBUG("Caches in DPO store: [%s]",

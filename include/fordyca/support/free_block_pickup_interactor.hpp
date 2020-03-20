@@ -28,8 +28,8 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/foraging/ds/arena_map.hpp"
-#include "cosm/foraging/events/arena_free_block_pickup.hpp"
+#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/operations/free_block_pickup.hpp"
 
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/robot_free_block_pickup.hpp"
@@ -58,7 +58,7 @@ template <typename T>
 class free_block_pickup_interactor
     : public rer::client<free_block_pickup_interactor<T>> {
  public:
-  free_block_pickup_interactor(cfds::arena_map* const map,
+  free_block_pickup_interactor(carena::arena_map* const map,
                                argos::CFloorEntity* const floor,
                                tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
@@ -193,9 +193,9 @@ class free_block_pickup_interactor
     events::robot_free_block_pickup_visitor rpickup_op(*it,
                                                        controller.entity_id(),
                                                        t);
-    cfevents::arena_free_block_pickup_visitor apickup_op(*it,
-                                                         controller.entity_id(),
-                                                         t);
+    caops::free_block_pickup_visitor apickup_op(*it,
+                                                controller.entity_id(),
+                                                t);
 
     /*
      * Visitation order must be:
@@ -214,7 +214,7 @@ class free_block_pickup_interactor
 
   /* clang-format off */
   argos::CFloorEntity*const           m_floor;
-  cfds::arena_map* const              m_map;
+  carena::arena_map* const            m_map;
   tv::block_op_penalty_handler* const m_penalty_handler;
   /* clang-format on */
 };

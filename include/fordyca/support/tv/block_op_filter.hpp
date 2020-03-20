@@ -52,7 +52,7 @@ NS_START(fordyca, support, tv);
 template <typename T>
 class block_op_filter : public rer::client<block_op_filter<T>> {
  public:
-  explicit block_op_filter(const cfds::arena_map* const map)
+  explicit block_op_filter(const carena::arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.block_op_filter"), mc_map(map) {}
 
   ~block_op_filter(void) override = default;
@@ -165,7 +165,7 @@ class block_op_filter : public rer::client<block_op_filter<T>> {
   }
 
   /* clang-format off */
-  const cfds::arena_map* const mc_map;
+  const carena::arena_map* const mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

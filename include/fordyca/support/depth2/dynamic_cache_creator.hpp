@@ -60,7 +60,7 @@ class dynamic_cache_creator : public base_cache_creator,
    * \brief Create new caches in the arena from blocks that are close enough
    * together.
    */
-  cfds::acache_vectoro create_all(const cache_create_ro_params& c_params,
+  cads::acache_vectoro create_all(const cache_create_ro_params& c_params,
                                 const cds::block2D_vectorno&  c_alloc_blocks) override;
 
  private:
@@ -105,9 +105,9 @@ class dynamic_cache_creator : public base_cache_creator,
    * placement from the set of caches that existed prior to this invocation of
    * the creator + the set of caches we have created thus far during invocation.
    */
-  cfds::acache_vectorno avoidance_caches_calc(
-      const cfds::acache_vectorno& c_previous_caches,
-      const cfds::acache_vectoro& c_created_caches) const;
+  cads::acache_vectorno avoidance_caches_calc(
+      const cads::acache_vectorno& c_previous_caches,
+      const cads::acache_vectoro& c_created_caches) const;
 
   /* clang-format off */
   const rtypes::spatial_dist mc_min_dist;

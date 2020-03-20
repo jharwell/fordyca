@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/robot_cached_block_pickup.hpp"
 
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/config/saa_xml_names.hpp"
@@ -56,14 +56,14 @@
  ******************************************************************************/
 NS_START(fordyca, events, detail);
 using cds::arena_grid;
-using cfrepr::base_cache;
+using carepr::base_cache;
 using ds::occupancy_grid;
 
 /*******************************************************************************
  * Constructors/Destructor
  ******************************************************************************/
 robot_cached_block_pickup::robot_cached_block_pickup(
-    const cfrepr::arena_cache* cache,
+    const carepr::arena_cache* cache,
     const crepr::base_block2D* block,
     const rtypes::type_uuid& robot_id,
     const rtypes::timestep& t)

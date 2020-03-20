@@ -41,9 +41,9 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::foraging::repr {
+namespace cosm::arena::repr {
 class arena_cache;
-} // namespace cosm::foraging::repr
+} // namespace cosm::arena::repr
 
 namespace fordyca::ds {
 class dpo_semantic_map;
@@ -77,7 +77,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
         /* depth1 */
         fsm::block_to_goal_fsm,
         ds::dpo_semantic_map,
-        cfrepr::arena_cache,
+        carepr::arena_cache,
         tasks::depth1::harvester,
         /* depth2 */
         tasks::depth2::cache_transferer>;
@@ -123,7 +123,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
    * \param resolution Arena resolution.
    */
   robot_cache_block_drop(std::unique_ptr<crepr::base_block2D> block,
-                         cfrepr::arena_cache* cache,
+                         carepr::arena_cache* cache,
                          const rtypes::discretize_ratio& resolution);
 
  private:
@@ -135,7 +135,7 @@ class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
   const rtypes::discretize_ratio       mc_resolution;
 
   std::unique_ptr<crepr::base_block2D> m_block;
-  cfrepr::arena_cache*                 m_cache;
+  carepr::arena_cache*                 m_cache;
   /* clang-format on */
 };
 

@@ -40,7 +40,7 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-namespace cosm::foraging::repr {
+namespace cosm::arena::repr {
 class arena_cache;
 } /* namespace cosm::foraging::repr */
 
@@ -91,7 +91,7 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
  public:
   using visit_typelist = visit_typelist_impl::value;
 
-  robot_cached_block_pickup(const cfrepr::arena_cache* cache,
+  robot_cached_block_pickup(const carepr::arena_cache* cache,
                             const crepr::base_block2D* block,
                             const rtypes::type_uuid& robot_id,
                             const rtypes::timestep& t);
@@ -139,7 +139,7 @@ class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
   /* clang-format off */
   const rtypes::type_uuid              mc_robot_id;
   const rtypes::timestep               mc_timestep;
-  const cfrepr::arena_cache*           mc_cache;
+  const carepr::arena_cache*           mc_cache;
   const crepr::base_block2D*           mc_block;
 
   std::unique_ptr<crepr::base_block2D> m_robot_block;

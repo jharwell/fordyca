@@ -24,7 +24,7 @@
 #include "fordyca/events/block_found.hpp"
 
 #include "cosm/events/cell2D_empty.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
 
@@ -65,7 +65,7 @@ void block_found::visit(ds::dpo_store& store) {
   auto it = store.caches().values_range().begin();
   while (it != store.caches().values_range().end()) {
     if (m_block->dloc() == it->ent()->dloc()) {
-      cfrepr::base_cache* tmp = (*it).ent();
+      carepr::base_cache* tmp = (*it).ent();
       ++it;
       store.cache_remove(tmp);
     } else {

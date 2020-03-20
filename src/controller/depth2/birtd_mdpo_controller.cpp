@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"

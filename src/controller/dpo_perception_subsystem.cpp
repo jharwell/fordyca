@@ -23,8 +23,8 @@
  ******************************************************************************/
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 
-#include "cosm/foraging/repr/arena_cache.hpp"
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/controller/los_proc_verify.hpp"
@@ -90,7 +90,7 @@ void dpo_perception_subsystem::process_los(
 
 void dpo_perception_subsystem::process_los_caches(
     const repr::line_of_sight* const c_los) {
-  cfds::bcache_vectorno los_caches = c_los->caches();
+  cads::bcache_vectorno los_caches = c_los->caches();
   ER_DEBUG("Caches in DPO store: [%s]",
            rcppsw::to_string(m_store->caches()).c_str());
   if (!los_caches.empty()) {
@@ -163,7 +163,7 @@ void dpo_perception_subsystem::process_los_blocks(
 
 void dpo_perception_subsystem::los_tracking_sync(
     const repr::line_of_sight* const c_los,
-    const cfds::bcache_vectorno& los_caches) {
+    const cads::bcache_vectorno& los_caches) {
   /*
    * If the location of one of the caches we are tracking is in our LOS, then
    * the corresponding cache should also be in our LOS. If it is not, then our
@@ -192,7 +192,7 @@ void dpo_perception_subsystem::los_tracking_sync(
        * avoid iterator invalidation and undefined behavior (I've seen both a
        * segfault and infinite loop). See #589.
        */
-      cfrepr::base_cache* tmp = (*it).ent();
+      carepr::base_cache* tmp = (*it).ent();
       ++it;
       m_store->cache_remove(tmp);
       ER_ASSERT(nullptr == m_store->find(tmp),

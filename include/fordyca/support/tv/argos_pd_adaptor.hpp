@@ -38,9 +38,9 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-namespace cosm::foraging::ds {
+namespace cosm::arena {
 class arena_map;
-} /* namespace ds */
+} /* namespace arena */
 
 NS_START(fordyca, support);
 
@@ -71,7 +71,7 @@ class argos_pd_adaptor final : public rer::client<argos_pd_adaptor>,
 
   argos_pd_adaptor(const ctv::config::population_dynamics_config* config,
                 support::base_loop_functions* lf,
-                cfds::arena_map * map,
+                carena::arena_map * map,
                 env_dynamics *envd,
                 const std::string& entity_prefix,
                 const std::string& controller_xml_id,
@@ -95,7 +95,7 @@ class argos_pd_adaptor final : public rer::client<argos_pd_adaptor>,
   const std::string                   mc_controller_xml_id;
   const support::base_loop_functions* mc_lf;
 
-  cfds::arena_map *                   m_map;
+  carena::arena_map *                 m_map;
   env_dynamics*                       m_envd;
   rmath::rng*                         m_rng;
   support::base_loop_functions*       m_lf;

@@ -28,11 +28,11 @@
 
 #include "rcppsw/mpl/typelist.hpp"
 
-#include "cosm/foraging/metrics/caches/location_metrics.hpp"
-#include "cosm/foraging/metrics/caches/location_metrics_collector.hpp"
-#include "cosm/foraging/metrics/caches/utilization_metrics.hpp"
-#include "cosm/foraging/metrics/caches/utilization_metrics_collector.hpp"
-#include "cosm/foraging/repr/arena_cache.hpp"
+#include "cosm/arena/metrics/caches/location_metrics.hpp"
+#include "cosm/arena/metrics/caches/location_metrics_collector.hpp"
+#include "cosm/arena/metrics/caches/utilization_metrics.hpp"
+#include "cosm/arena/metrics/caches/utilization_metrics_collector.hpp"
+#include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "cosm/fsm/metrics/current_explore_locs_metrics_collector.hpp"
 #include "cosm/fsm/metrics/current_vector_locs_metrics_collector.hpp"
@@ -73,11 +73,11 @@ using collector_typelist = rmpl::typelist<
     metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
     metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
     metrics::collector_registerer::type_wrap<
-        cforaging::metrics::caches::utilization_metrics_collector>,
+        cametrics::caches::utilization_metrics_collector>,
     metrics::collector_registerer::type_wrap<
         metrics::caches::lifecycle_metrics_collector>,
     metrics::collector_registerer::type_wrap<
-        cforaging::metrics::caches::location_metrics_collector> >;
+        cametrics::caches::location_metrics_collector> >;
 NS_END(detail);
 
 using task0 = tasks::depth0::foraging_task;
@@ -129,7 +129,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
        "task_distribution",
        "tasks::distribution",
        rmetrics::output_mode::ekAPPEND},
-      {typeid(cforaging::metrics::caches::utilization_metrics_collector),
+      {typeid(cametrics::caches::utilization_metrics_collector),
        "cache_utilization",
        "caches::utilization",
        rmetrics::output_mode::ekAPPEND},
@@ -137,7 +137,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
        "cache_lifecycle",
        "caches::lifecycle",
        rmetrics::output_mode::ekAPPEND},
-      {typeid(cforaging::metrics::caches::location_metrics_collector),
+      {typeid(cametrics::caches::location_metrics_collector),
        "cache_locations",
        "caches::locations",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE}};
@@ -152,12 +152,12 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
  * Member Functions
  ******************************************************************************/
 void depth1_metrics_aggregator::collect_from_cache(
-    const cfrepr::arena_cache* const cache) {
+    const carepr::arena_cache* const cache) {
   auto util_m =
-      dynamic_cast<const cforaging::metrics::caches::utilization_metrics*>(
+      dynamic_cast<const cametrics::caches::utilization_metrics*>(
           cache);
   auto loc_m =
-      dynamic_cast<const cforaging::metrics::caches::location_metrics*>(cache);
+      dynamic_cast<const cametrics::caches::location_metrics*>(cache);
   collect("caches::utilization", *util_m);
   collect("caches::locations", *loc_m);
 } /* collect_from_cache() */

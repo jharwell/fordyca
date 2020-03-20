@@ -36,6 +36,7 @@
 #include "cosm/oracle/config/oracle_manager_config.hpp"
 #include "cosm/oracle/oracle_manager.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
+#include "cosm/arena/arena_map.hpp"
 
 #include "fordyca/config/tv/tv_manager_config.hpp"
 #include "fordyca/support/swarm_iterator.hpp"

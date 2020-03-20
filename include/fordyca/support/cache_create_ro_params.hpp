@@ -27,7 +27,7 @@
 #include "rcppsw/types/timestep.hpp"
 
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
-#include "cosm/foraging/ds/cache_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -49,7 +49,7 @@ struct cache_create_ro_params {
    * \brief Currently existing caches in the arena. For use in avoiding
    * overlaps during cache creation.
    */
-  cfds::acache_vectorno current_caches;
+  cads::acache_vectorno current_caches;
 
   /**
    * \brief The block clusters in the arena. For use in avoiding overlaps

@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/controller/los_proc_verify.hpp"
 
-#include "cosm/foraging/repr/base_cache.hpp"
+#include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/ds/dpo_semantic_map.hpp"

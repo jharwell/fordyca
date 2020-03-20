@@ -31,7 +31,7 @@
 #include "fordyca/support/base_cache_manager.hpp"
 #include "cosm/ds/block2D_vector.hpp"
 #include "cosm/foraging/ds/block_cluster_vector.hpp"
-#include "cosm/foraging/ds/cache_vector.hpp"
+#include "cosm/arena/ds/cache_vector.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "rcppsw/math/rng.hpp"
 #include "rcppsw/er/client.hpp"
@@ -70,10 +70,10 @@ class static_cache_manager final : public base_cache_manager,
    * and there are not enough free blocks with which to create a cache of the
    * specified minimum size.
    */
-  boost::optional<cfds::acache_vectoro> create(const cache_create_ro_params& c_params,
+  boost::optional<cads::acache_vectoro> create(const cache_create_ro_params& c_params,
                                              const cds::block2D_vectorno&  c_alloc_blocks);
 
-  boost::optional<cfds::acache_vectoro> create_conditional(
+  boost::optional<cads::acache_vectoro> create_conditional(
       const cache_create_ro_params& c_params,
       const cds::block2D_vectorno&  c_alloc_blocks,
       uint n_harvesters,
@@ -97,7 +97,7 @@ class static_cache_manager final : public base_cache_manager,
    * not an error (all blocks can currently be carried by robots, for example).
    */
   boost::optional<cds::block2D_vectorno> blocks_alloc(
-      const cfds::acache_vectorno& existing_caches,
+      const cads::acache_vectorno& existing_caches,
       const cds::block2D_vectorno& all_blocks) const;
 
   /**
@@ -125,7 +125,7 @@ class static_cache_manager final : public base_cache_manager,
    * \param n_blocks How many blocks to try to allocate for cache i.
    */
   boost::optional<cds::block2D_vectorno> cache_i_blocks_alloc(
-      const cfds::acache_vectorno& existing_caches,
+      const cads::acache_vectorno& existing_caches,
       const cds::block2D_vectorno& allocated_blocks,
       const cds::block2D_vectorno& all_blocks,
       const rmath::vector2d& loc,
@@ -145,7 +145,7 @@ class static_cache_manager final : public base_cache_manager,
    * drop as well, so it is best to be safe and do it unconditionally after
    * creation.
    */
-  void post_creation_blocks_absorb(const cfds::acache_vectoro& caches,
+  void post_creation_blocks_absorb(const cads::acache_vectoro& caches,
                                    const cds::block2D_vectorno& blocks);
 
   /* clang-format off */

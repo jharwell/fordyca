@@ -23,13 +23,12 @@
  ******************************************************************************/
 #include "fordyca/support/tv/argos_pd_adaptor.hpp"
 
-#include "cosm/foraging/ds/arena_map.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
+#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/tv/config/population_dynamics_config.hpp"
 
 #include "fordyca/support/swarm_iterator.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/foraging/events/arena_free_block_drop.hpp"
 #include "fordyca/events/mech_malfunction.hpp"
 #include "fordyca/events/mech_repair.hpp"
 
@@ -44,7 +43,7 @@ NS_START(fordyca, support, tv);
 argos_pd_adaptor::argos_pd_adaptor(
     const ctv::config::population_dynamics_config* config,
     support::base_loop_functions* const lf,
-    cfds::arena_map* map,
+    carena::arena_map* map,
     env_dynamics* envd,
     const std::string& entity_prefix,
     const std::string& controller_xml_id,
@@ -105,11 +104,11 @@ argos_pd_adaptor::op_result argos_pd_adaptor::robot_kill(void) {
      * dynamics are always applied AFTER all robots have had their control steps
      * run, we are in a non-concurrent context, so no reason to grab them.
      */
-    cfevents::arena_free_block_drop_visitor adrop_op(
+    caops::free_block_drop_visitor adrop_op(
         *it,
         rmath::dvec2uvec(controller->pos2D(), m_map->grid_resolution().v()),
         m_map->grid_resolution(),
-        cfds::arena_map_locking::ekALL_HELD);
+        carena::arena_map_locking::ekALL_HELD);
 
     adrop_op.visit(*m_map);
   }

@@ -77,7 +77,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *
    * \return A vector of created caches.
    */
-  virtual cfds::acache_vectoro create_all(
+  virtual cads::acache_vectoro create_all(
       const cache_create_ro_params& c_params,
       const cds::block2D_vectorno& c_alloc_blocks) = 0;
 
@@ -87,7 +87,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *
    * \param caches Vector of newly created caches.
    */
-  void update_host_cells(cfds::acache_vectoro& caches);
+  void update_host_cells(cads::acache_vectoro& caches);
 
   /**
    * \brief Basic sanity checks on newly created caches:
@@ -106,7 +106,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    * otherwise.
    */
   bool creation_sanity_checks(
-      const cfds::acache_vectoro& c_caches,
+      const cads::acache_vectoro& c_caches,
       const cds::block2D_vectorno& c_free_blocks,
       const cfds::block_cluster_vector& c_clusters) const RCSW_PURE;
 
@@ -124,7 +124,7 @@ class base_cache_creator : public rer::client<base_cache_creator> {
    *               way that callers probably do not want.
    * \param t The current timestep.
    */
-  std::unique_ptr<cfrepr::arena_cache> create_single_cache(
+  std::unique_ptr<carepr::arena_cache> create_single_cache(
       const rmath::vector2d& center,
       cds::block2D_vectorno blocks,
       const rtypes::timestep& t);

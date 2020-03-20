@@ -26,8 +26,8 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/foraging/ds/arena_map.hpp"
-#include "cosm/foraging/events/arena_cache_block_drop.hpp"
+#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/operations/cache_block_drop.hpp"
 
 #include "fordyca/events/cache_vanished.hpp"
 #include "fordyca/events/existing_cache_interactor.hpp"
@@ -55,7 +55,7 @@ template <typename T>
 class existing_cache_block_drop_interactor
     : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
-  existing_cache_block_drop_interactor(cfds::arena_map* const map_in,
+  existing_cache_block_drop_interactor(carena::arena_map* const map_in,
                                        tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
@@ -183,11 +183,11 @@ class existing_cache_block_drop_interactor
      * Need to tell event to perform \ref arena_map block locking because there
      * we are only holding the cache mutex.
      */
-    cfevents::arena_cache_block_drop_visitor adrop_op(
+    caops::cache_block_drop_visitor adrop_op(
         m_map->blocks()[block_id.v()],
         *cache_it,
         m_map->grid_resolution(),
-        cfds::arena_map_locking::ekCACHES_HELD);
+        carena::arena_map_locking::ekCACHES_HELD);
     events::robot_cache_block_drop_visitor rdrop_op(controller.block_release(),
                                                     *cache_it,
                                                     m_map->grid_resolution());
@@ -207,7 +207,7 @@ class existing_cache_block_drop_interactor
   }
 
   /* clang-format off */
-  cfds::arena_map* const             m_map;
+  carena::arena_map* const             m_map;
   tv::cache_op_penalty_handler*const m_penalty_handler;
   /* clang-format on */
 };
