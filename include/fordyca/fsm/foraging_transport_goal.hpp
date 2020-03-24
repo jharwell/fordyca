@@ -1,5 +1,5 @@
 /**
- * \file argos_rda_adaptor.hpp
+ * \file foraging_transport_goal.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,52 +18,57 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_TV_ARGOS_RDA_ADAPTOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_TV_ARGOS_RDA_ADAPTOR_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_FORAGING_TRANSPORT_GOAL_HPP_
+#define INCLUDE_FORDYCA_FSM_FORAGING_TRANSPORT_GOAL_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/er/client.hpp"
-
-#include "cosm/tv/switchable_tv_generator.hpp"
-#include "cosm/tv/robot_dynamics_applicator.hpp"
-#include "cosm/cosm.hpp"
-#include "cosm/pal/argos_sm_adaptor.hpp"
+#include "rcppsw/common/common.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, support, tv);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
- * Class Definitions
+ * Type Definitions
  ******************************************************************************/
 /**
- * \class argos_rda_adaptor
- * \ingroup support tv
- *
- * \brief Adapts \ref ctv::robot_dynamics_applicator to work within the ARGoS
- * simulator.
+ * \brief Represents the different locations/entities that a robot can transport
+ * a block to during foraging once they have picked one up.
  */
-class argos_rda_adaptor final : public rer::client<argos_rda_adaptor>,
-                                public ctv::robot_dynamics_applicator {
- public:
-  argos_rda_adaptor(const ctv::config::robot_dynamics_applicator_config* config,
-                 const cpal::argos_sm_adaptor* sm);
+enum class foraging_transport_goal {
+  /**
+   * \brief No goal--robot is probably not carrying a block.
+   */
+  ekNONE = -1,
 
-  argos_rda_adaptor(const argos_rda_adaptor&) = delete;
-  const argos_rda_adaptor& operator=(const argos_rda_adaptor&) = delete;
+  /**
+   * \brief A robot has acquired a block and is currently taking it back to
+   * the nest.
+   */
+  ekNEST,
 
-  void update(void) override;
-  double avg_motion_throttle(void) const override;
+  /**
+   * \brief A robot is currently transporting an acquired block to its
+   * existing cache of choice.
+   */
+  ekEXISTING_CACHE,
 
- private:
-  /* clang-format off */
-  const cpal::argos_sm_adaptor* const mc_sm;
-  /* clang-format on */
+  /**
+   * \brief A robot is currently transporting an acquired block to its new
+   * cache of choice.
+   */
+  ekNEW_CACHE,
+
+  /**
+   * \brief A robot is currently transporting an acquired block to its cache
+   * site of choice.
+   */
+  ekCACHE_SITE
 };
 
-NS_END(tv, support, fordyca);
+NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_TV_ARGOS_RDA_ADAPTOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_FORAGING_TRANSPORT_GOAL_HPP_ */

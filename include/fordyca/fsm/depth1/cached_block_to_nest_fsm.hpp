@@ -117,7 +117,7 @@ class cached_block_to_nest_fsm final : public cfsm::util_hfsm,
   cfsm::metrics::goal_acq_metrics::goal_type acquisition_goal(void) const override RCSW_PURE;
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
   /**
    * \brief Reset the FSM

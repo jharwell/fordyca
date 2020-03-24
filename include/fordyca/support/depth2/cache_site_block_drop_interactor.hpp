@@ -110,9 +110,9 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
      * is too close to a block.
      */
     auto status = m_penalty_handler->penalty_init(controller,
-                                                  tv::block_op_src::ekCACHE_SITE_DROP,
                                                   t,
-                                                  m_cache_manager->cache_proximity_dist());
+                                                  tv::block_op_src::ekCACHE_SITE_DROP,
+                                                  boost::make_optional(m_cache_manager->cache_proximity_dist()));
 
     if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
       auto prox_status = utils::new_cache_cache_proximity(controller,
@@ -173,13 +173,13 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    * has acquired a cache site and is looking to drop an object on it.
    */
   void finish_cache_site_block_drop(T& controller) {
-    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
+    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              fsm::foraging_acq_goal::type::ekCACHE_SITE == controller.current_task()->acquisition_goal(),
+              fsm::foraging_acq_goal::ekCACHE_SITE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache site block drop");
     perform_cache_site_block_drop(controller, p);
     m_penalty_handler->penalty_remove(p);
@@ -192,7 +192,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
    * preconditions have been satisfied.
    */
   void perform_cache_site_block_drop(T& controller,
-                                     const tv::temporal_penalty& penalty) {
+                                     const ctv::temporal_penalty& penalty) {
     auto loc = rmath::dvec2uvec(controller.pos2D(),
                                 m_map->grid_resolution().v());
     /*

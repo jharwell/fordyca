@@ -31,16 +31,18 @@
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 
 #include "fordyca/config/block_sel/block_sel_matrix_config.hpp"
 #include "fordyca/config/cache_sel/cache_sel_matrix_config.hpp"
 #include "fordyca/config/depth1/controller_repository.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
+#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth1/task_executive_builder.hpp"
 #include "fordyca/controller/dpo_perception_subsystem.hpp"
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/tasks/base_foraging_task.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -119,7 +121,7 @@ void bitd_dpo_controller::shared_init(
    * initialization in the base controller, and needs to happen here when we
    * have an XML repository with the correct configuration in it.
    */
-  auto saa_names = config::saa_xml_names();
+  auto saa_names = crfootbot::config::saa_xml_names();
   auto sensing_p =
       config_repo.config_get<csubsystem::config::sensing_subsystem2D_config>();
   auto ground = chal::sensors::ground_sensor(
@@ -178,7 +180,7 @@ RCPPSW_WRAP_OVERRIDE_DEFP(
     bitd_dpo_controller,
     acquisition_goal,
     current_task(),
-    cfsm::metrics::goal_acq_metrics::goal_type(fsm::foraging_acq_goal::ekNONE),
+    fsm::to_goal_type(fsm::foraging_acq_goal::ekNONE),
     const);
 
 RCPPSW_WRAP_OVERRIDE_DEFP(bitd_dpo_controller,

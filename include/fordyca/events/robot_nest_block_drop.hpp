@@ -73,6 +73,15 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
  public:
   using visit_typelist = visit_typelist_impl::value;
 
+  /**
+   * \brief Initialize a nest block drop event.
+   *
+   * \param block The block the robot has just dropped into the nest, owned by
+   *              the arena.
+   * \param t Current timestep.
+   */
+  robot_nest_block_drop(crepr::base_block2D* block, const rtypes::timestep& t);
+
   ~robot_nest_block_drop(void) override = default;
 
   robot_nest_block_drop(const robot_nest_block_drop& op) = delete;
@@ -99,16 +108,6 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
   void visit(controller::depth2::birtd_odpo_controller& controller);
   void visit(controller::depth2::birtd_omdpo_controller& controller);
 
- protected:
-  /**
-   * \brief Initialize a nest block drop event.
-   *
-   * \param block The block the robot has just dropped into the nest, owned by
-   *              the arena.
-   * \param t Current timestep.
-   */
-  robot_nest_block_drop(crepr::base_block2D* block, const rtypes::timestep& t);
-
  private:
   void visit(fsm::depth0::free_block_to_nest_fsm& fsm);
   void visit(fsm::depth1::cached_block_to_nest_fsm& fsm);
@@ -125,8 +124,8 @@ class robot_nest_block_drop : public rer::client<robot_nest_block_drop> {
 };
 
 /**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
+ * \brief We use the precise visitor in order to force compile errors if a call
+ * to a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */
@@ -138,6 +137,7 @@ NS_END(detail);
 
 class robot_nest_block_drop_visitor
     : public detail::robot_nest_block_drop_visitor_impl {
+ public:
   using detail::robot_nest_block_drop_visitor_impl::robot_nest_block_drop_visitor_impl;
 };
 

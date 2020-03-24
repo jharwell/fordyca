@@ -26,7 +26,6 @@
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
-#include "fordyca/config/saa_xml_names.hpp"
 #include "fordyca/controller/cache_sel_matrix.hpp"
 #include "fordyca/controller/depth0/dpo_controller.hpp"
 #include "fordyca/controller/depth0/mdpo_controller.hpp"

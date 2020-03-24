@@ -38,9 +38,10 @@
 #include "cosm/subsystem/config/sensing_subsystem2D_config.hpp"
 #include "cosm/subsystem/saa_subsystem2D.hpp"
 #include "cosm/tv/robot_dynamics_applicator.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 
 #include "fordyca/config/foraging_controller_repository.hpp"
-#include "fordyca/config/saa_xml_names.hpp"
+#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -52,9 +53,7 @@ namespace fs = std::filesystem;
  * Constructors/Destructor
  ******************************************************************************/
 foraging_controller::foraging_controller(void)
-    : ER_CLIENT_INIT("fordyca.controller.base"),
-      m_block(nullptr),
-      m_supervisor(nullptr) {}
+    : ER_CLIENT_INIT("fordyca.controller") {}
 
 foraging_controller::~foraging_controller(void) = default;
 
@@ -71,14 +70,8 @@ bool foraging_controller::block_detected(void) const {
 } /* block_detected() */
 
 void foraging_controller::init(ticpp::Element& node) {
-#if (LIBRA_ER == LIBRA_ER_ALL)
-  if (const char* env_p = std::getenv("LOG4CXX_CONFIGURATION")) {
-    ER_LOGGING_INIT(std::string(env_p));
-  } else {
-    std::cerr << "LOG4CXX_CONFIGURATION not defined" << std::endl;
-    std::exit(EXIT_FAILURE);
-  }
-#endif
+  /* verify environment variables set up for logging */
+  ER_ENV_VERIFY();
 
   config::foraging_controller_repository repo;
   repo.parse_all(node);
@@ -91,7 +84,8 @@ void foraging_controller::init(ticpp::Element& node) {
 
   /* initialize RNG */
   auto rngp = repo.config_get<rmath::config::rng_config>();
-  base_controller2D::rng_init((nullptr == rngp) ? -1 : rngp->seed, "footbot");
+  base_controller2D::rng_init((nullptr == rngp) ? -1 : rngp->seed,
+                              kARGoSRobotType);
 
   /* initialize output */
   auto* outputp = repo.config_get<cmconfig::output_config>();
@@ -102,11 +96,11 @@ void foraging_controller::init(ticpp::Element& node) {
            repo.config_get<csubsystem::config::sensing_subsystem2D_config>());
 
   /* initialize supervisor */
-  m_supervisor = std::make_unique<cfsm::supervisor_fsm>(saa());
+  supervisor(std::make_unique<cfsm::supervisor_fsm>(saa()));
   ndc_pop();
 } /* init() */
 
-void foraging_controller::reset(void) { m_block.reset(); } /* Reset() */
+void foraging_controller::reset(void) { block_carrying_controller::reset(); }
 
 void foraging_controller::output_init(const cmconfig::output_config* outputp) {
   std::string dir =
@@ -119,7 +113,7 @@ void foraging_controller::output_init(const cmconfig::output_config* outputp) {
    * lines within it are not always ordered, which is not overly helpful for
    * debugging.
    */
-  ER_LOGFILE_SET(log4cxx::Logger::getLogger("rcppsw.ta"), dir + "/ta.log");
+  ER_LOGFILE_SET(log4cxx::Logger::getLogger("cosm.ta"), dir + "/ta.log");
 
   ER_LOGFILE_SET(log4cxx::Logger::getLogger("fordyca.controller"),
                  dir + "/controller.log");
@@ -136,7 +130,7 @@ void foraging_controller::output_init(const cmconfig::output_config* outputp) {
 void foraging_controller::saa_init(
     const csubsystem::config::actuation_subsystem2D_config* actuation_p,
     const csubsystem::config::sensing_subsystem2D_config* sensing_p) {
-  auto saa_names = config::saa_xml_names();
+  auto saa_names = crfootbot::config::saa_xml_names();
 #ifdef FORDYCA_WITH_ROBOT_RAB
   /* auto rabs = chal::sensors::wifi_sensor( */
   /*     GetSensor<argos::CCI_RangeAndBearingSensor>(saa_names.rab_saa)); */
@@ -186,12 +180,12 @@ void foraging_controller::saa_init(
               saa_names.diff_steering_saa)),
       ckin2D::governed_diff_drive::drive_type::kFSMDrive);
 
-#ifdef FORDYCA_WITH_ROBOT_LEDS
+#ifdef COSM_ARGOS_WITH_ROBOT_LEDS
   auto leds = chal::actuators::led_actuator(
       GetActuator<argos::CCI_LEDsActuator>(saa_names.leds_saa));
 #else
   auto leds = chal::actuators::led_actuator(nullptr);
-#endif /* FORDYCA_WITH_ROBOT_LEDS */
+#endif /* COSM_ARGOS_WITH_ROBOT_LEDS */
 
 #ifdef FORDYCA_WITH_ROBOT_RAB
   auto raba = chal::actuators::wifi_actuator(
@@ -230,14 +224,6 @@ void foraging_controller::irv_init(const ctv::robot_dynamics_applicator* rda) {
         rda->motion_throttler(entity_id()));
   }
 } /* irv_init() */
-
-void foraging_controller::block(std::unique_ptr<crepr::base_block2D> block) {
-  m_block = std::move(block);
-}
-
-std::unique_ptr<crepr::base_block2D> foraging_controller::block_release(void) {
-  return std::move(m_block);
-}
 
 class crfootbot::footbot_saa_subsystem2D* foraging_controller::saa(void) {
   return static_cast<crfootbot::footbot_saa_subsystem2D*>(

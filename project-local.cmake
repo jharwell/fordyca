@@ -1,12 +1,9 @@
 ################################################################################
 # Configuration Options                                                        #
 ################################################################################
-set(WITH_FOOTBOT_LEDS "NO" CACHE STRING "Enable footbot robots to control their LEDS via actuators")
 set(WITH_FOOTBOT_RAB "NO" CACHE STRING "Enable footbot robots to read/write over the RAB medium via sensors/actuators.")
 set(WITH_FOOTBOT_BATTERY "NO" CACHE STRING "Enable footbot robots to use the battery.")
-define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_LEDS"
-  BRIEF_DOCS "Enable footbot robots to control their LEDS. Only for simulated robots."
-  FULL_DOCS "Default=NO.")
+
 define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_RAB"
   BRIEF_DOCS "Enable footbot robots to use the RAB medium. Only for simulated robots"
   FULL_DOCS "Default=NO.")
@@ -17,6 +14,11 @@ define_property(CACHED_VARIABLE PROPERTY "WITH_FOOTBOT_BATTERY"
 set(LIBRA_BUILD_FOR "ARGOS" CACHE STRING "Build for ARGoS.")
 set(LOCAL_INSTALL_PREFIX "/opt/data/local" CACHE STRING "Prefix for where ARGoS
 and other packages needed by the project have been installed.")
+
+# Needed by COSM for population dynamics and swarm iteration
+set(ARGOS_ROBOT_TYPE "foot-bot")
+set(ARGOS_ROBOT_NAME_PREFIX "fb")
+set(ARGOS_CONTROLLER_XML_ID "ffc")
 
 ################################################################################
 # External Projects                                                            #
@@ -146,9 +148,6 @@ target_link_libraries(${target} ${${target}_LIBRARIES} cosm nlopt)
 # Compile Options/Definitions                                                  #
 ################################################################################
 if ("${LIBRA_BUILD_FOR}" MATCHES "ARGOS")
-  if (WITH_FOOTBOT_LEDS)
-    target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_LEDS)
-  endif()
   if (WITH_FOOTBOT_RAB)
     target_compile_definitions(${target} PUBLIC FORDYCA_WITH_ROBOT_RAB)
   endif()

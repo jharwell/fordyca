@@ -23,7 +23,7 @@
  ******************************************************************************/
 #include "fordyca/events/block_found.hpp"
 
-#include "cosm/events/cell2D_empty.hpp"
+#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/arena/repr/base_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/repr/pheromone_density.hpp"
@@ -200,7 +200,8 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
    * #229.
    */
   auto res =
-      map.store()->block_update(repr::dpo_entity(m_block->clone(), density));
+      map.store()->block_update(repr::dpo_entity<crepr::base_block2D>(
+          m_block->clone(), density));
   if (res.status) {
     if (ds::dpo_store::update_status::kBLOCK_MOVED == res.reason) {
       ER_DEBUG("Updating cell@%s: Block%d moved %s -> %s",
@@ -208,7 +209,7 @@ void block_found::pheromone_update(ds::dpo_semantic_map& map) {
                m_block->id().v(),
                res.old_loc.to_str().c_str(),
                m_block->dloc().to_str().c_str());
-      cevents::cell2D_empty_visitor op(res.old_loc);
+      cdops::cell2D_empty_visitor op(res.old_loc);
       op.visit(map.access<occupancy_grid::kCell>(res.old_loc));
     } else {
       ER_ASSERT(ds::dpo_store::update_status::kNEW_BLOCK_ADDED == res.reason,

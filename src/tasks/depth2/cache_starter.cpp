@@ -70,7 +70,7 @@ rtypes::timestep cache_starter::interface_time_calc(
 void cache_starter::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth2::block_to_cache_site_fsm*>(mechanism());
 
-  if (fsm->goal_acquired() && fsm::foraging_transport_goal::type::ekCACHE_SITE ==
+  if (fsm->goal_acquired() && fsm::foraging_transport_goal::ekCACHE_SITE ==
                                   fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
@@ -78,7 +78,7 @@ void cache_starter::active_interface_update(int) {
       ER_TRACE("Interface finished at timestep %u", current_time().v());
     }
     ER_TRACE("Interface time: %u", interface_time(0).v());
-  } else if (fsm::foraging_transport_goal::type::ekCACHE_SITE ==
+  } else if (fsm::foraging_transport_goal::ekCACHE_SITE ==
              fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);

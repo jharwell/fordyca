@@ -50,7 +50,7 @@ bool dpo_semantic_map::cache_remove(carepr::base_cache* const victim) {
   if (m_store.cache_remove(victim)) {
     ER_DEBUG("Updating cell@%s for removed cache",
              victim->dloc().to_str().c_str());
-    events::cell2D_empty_visitor op(victim->dloc());
+    cdops::cell2D_empty_visitor op(victim->dloc());
     op.visit(decoratee().access<occupancy_grid::kCell>(victim->dloc()));
     return true;
   }

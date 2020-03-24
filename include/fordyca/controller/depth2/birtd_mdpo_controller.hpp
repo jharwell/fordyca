@@ -53,7 +53,7 @@ class birtd_mdpo_controller : public depth2::birtd_dpo_controller,
                             public rer::client<birtd_mdpo_controller> {
  public:
   birtd_mdpo_controller(void) RCSW_COLD;
-  ~birtd_mdpo_controller(void) RCSW_COLD;
+  ~birtd_mdpo_controller(void) override RCSW_COLD;
 
   /* foraging_controller overrides */
   void init(ticpp::Element& node) override RCSW_COLD;

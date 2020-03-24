@@ -34,9 +34,10 @@
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
 #include "cosm/ta/metrics/bi_tdgraph_metrics.hpp"
 #include "cosm/ta/polled_task.hpp"
+
 #include "fordyca/controller/base_perception_subsystem.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
-
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -156,7 +157,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal();
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal();
         });
     collect_if(
         "blocks::acq_locs",
@@ -164,7 +165,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.goal_acquired();
         });
 
@@ -178,7 +179,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
         });
     collect_if(
@@ -187,7 +188,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
 
@@ -197,7 +198,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal();
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal();
         });
     collect_if(
         "caches::acq_locs",
@@ -205,7 +206,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.goal_acquired();
         });
 
@@ -219,7 +220,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_exploring_for_goal().first;
         });
     collect_if(
@@ -228,7 +229,7 @@ class depth1_metrics_aggregator : public depth0::depth0_metrics_aggregator,
         [&](const rmetrics::base_metrics& metrics) {
           auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(
               metrics);
-          return fsm::foraging_acq_goal::type::ekEXISTING_CACHE == m.acquisition_goal() &&
+          return fsm::foraging_acq_goal::ekEXISTING_CACHE == m.acquisition_goal() &&
               m.is_vectoring_to_goal();
         });
     collect("tasks::distribution", *controller);

@@ -32,8 +32,9 @@
 #include "cosm/fsm/metrics/collision_metrics.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -87,7 +88,7 @@ class crw_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rmath::vector2u, current_vector_loc, const);
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
   /* taskable overrides */
   void task_execute(void) override { run(); }

@@ -100,14 +100,14 @@ class existing_cache_block_drop_interactor
    * has acquired a cache and is looking to drop an object in it.
    */
   void finish_cache_block_drop(T& controller) {
-    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
+    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-                  fsm::foraging_acq_goal::type::ekEXISTING_CACHE ==
+                  fsm::foraging_acq_goal::ekEXISTING_CACHE ==
                       controller.current_task()->acquisition_goal(),
               "Controller not waiting for cache block drop");
     /*
@@ -165,7 +165,7 @@ class existing_cache_block_drop_interactor
    * preconditions have been satisfied.
    */
   void perform_cache_block_drop(T& controller,
-                                const tv::temporal_penalty& penalty) {
+                                const ctv::temporal_penalty& penalty) {
     auto cache_it =
         std::find_if(m_map->caches().begin(),
                      m_map->caches().end(),

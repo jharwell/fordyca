@@ -37,12 +37,13 @@
 #include "cosm/oracle/oracle_manager.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
 #include "cosm/arena/arena_map.hpp"
+#include "cosm/metrics/config/output_config.hpp"
+#include "cosm/pal/argos_swarm_iterator.hpp"
 
 #include "fordyca/config/tv/tv_manager_config.hpp"
-#include "fordyca/support/swarm_iterator.hpp"
-#include "fordyca/support/tv/argos_pd_adaptor.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "fordyca/support/tv/tv_manager.hpp"
+#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -119,15 +120,15 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * they are omitted is waaayyyy too much work. See #621 too.
    */
   auto envd =
-      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics, this, arena_map());
+      std::make_unique<tv::env_dynamics>(&tvp->env_dynamics,
+                                         this,
+                                         arena_map());
 
-  auto popd = std::make_unique<tv::argos_pd_adaptor>(&tvp->population_dynamics,
-                                                     this,
-                                                     arena_map(),
-                                                     envd.get(),
-                                                     "fb",
-                                                     "ffc",
-                                                     rng());
+  auto popd = std::make_unique<tv::fordyca_pd_adaptor>(&tvp->population_dynamics,
+                                                       this,
+                                                       arena_map(),
+                                                       envd.get(),
+                                                       rng());
 
   m_tv_manager =
       std::make_unique<tv::tv_manager>(std::move(envd), std::move(popd));
@@ -138,11 +139,13 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
    * static ordering, because we use robot ID to create the mapping.
    */
   auto cb = [&](auto* c) {
-    m_tv_manager->environ_dynamics()->register_controller(*c);
-    c->irv_init(m_tv_manager->environ_dynamics()->rda_adaptor());
+    m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()->register_controller(*c);
+    c->irv_init(m_tv_manager->dynamics<ctv::dynamics_type::ekENVIRONMENT>()->rda_adaptor());
   };
-  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
+                                          controller::foraging_controller,
+                                          cpal::iteration_order::ekSTATIC>(
+                                              this, cb, kARGoSRobotType);
 } /* tv_init() */
 
 void base_loop_functions::output_init(const cmconfig::output_config* output) {
@@ -203,8 +206,9 @@ std::vector<double> base_loop_functions::calc_robot_nn(
     v.push_back({robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetX(),
                  robot->GetEmbodiedEntity().GetOriginAnchor().Position.GetY()});
   };
-  swarm_iterator::robots<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+  cpal::argos_swarm_iterator::robots<argos::CFootBotEntity,
+                                     cpal::iteration_order::ekSTATIC>(
+                                         this, cb, kARGoSRobotType);
 
   /*
    * For each closest pair of robots we find, we add the corresponding distance
@@ -213,7 +217,7 @@ std::vector<double> base_loop_functions::calc_robot_nn(
    * algorithm).
    */
   std::vector<double> res;
-  size_t n_robots = GetSpace().GetEntitiesByType("foot-bot").size();
+  size_t n_robots = GetSpace().GetEntitiesByType(kARGoSRobotType).size();
 
 #pragma omp parallel for num_threads(n_threads)
   for (size_t i = 0; i < n_robots / 2; ++i) {
@@ -248,8 +252,10 @@ std::vector<rmath::radians> base_loop_functions::calc_robot_headings(uint) const
   auto cb = [&](const auto* controller) {
     v.push_back(controller->heading2D());
   };
-  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
+                                          controller::foraging_controller,
+                                          cpal::iteration_order::ekSTATIC>(
+                                              this, cb, kARGoSRobotType);
   return v;
 } /* calc_robot_headings() */
 
@@ -258,8 +264,10 @@ std::vector<rmath::vector2d> base_loop_functions::calc_robot_positions(
   std::vector<rmath::vector2d> v;
 
   auto cb = [&](const auto* controller) { v.push_back(controller->pos2D()); };
-  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
+                                          controller::foraging_controller,
+                                          cpal::iteration_order::ekSTATIC>(
+      this, cb, kARGoSRobotType);
   return v;
 } /* calc_robot_positions() */
 

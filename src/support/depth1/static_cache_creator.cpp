@@ -23,7 +23,6 @@
  ******************************************************************************/
 #include "fordyca/support/depth1/static_cache_creator.hpp"
 
-#include "cosm/events/cell2D_empty.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 
 /*******************************************************************************

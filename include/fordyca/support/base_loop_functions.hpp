@@ -42,6 +42,7 @@
 
 #include "fordyca/config/loop_function_repository.hpp"
 #include "fordyca/fordyca.hpp"
+#include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -66,10 +67,6 @@ struct tv_manager_config;
 }
 } // namespace config
 NS_START(support);
-
-namespace tv {
-class tv_manager;
-}
 
 /*******************************************************************************
  * Classes

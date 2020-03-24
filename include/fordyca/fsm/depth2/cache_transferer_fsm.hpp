@@ -71,7 +71,7 @@ class cache_transferer_fsm final : public block_to_goal_fsm {
   rtypes::type_uuid entity_acquired_id(void) const override;
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
   bool is_acquiring_dest_cache(void) const RCSW_PURE;
   bool is_acquiring_src_cache(void) const RCSW_PURE;

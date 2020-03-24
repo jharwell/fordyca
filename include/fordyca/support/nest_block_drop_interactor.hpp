@@ -96,8 +96,9 @@ class nest_block_drop_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
+                                      t,
                                       tv::block_op_src::ekNEST_DROP,
-                                      t);
+                                      boost::none);
     }
     return interactor_status::ekNO_EVENT;
   }
@@ -107,9 +108,9 @@ class nest_block_drop_interactor
    * \brief Determine if a robot is waiting to drop a block in the nest, and if
    * so send it the \ref nest_block_drop event.
    */
-  void finish_nest_block_drop(T& controller, rtypes::timestep t) {
+  void finish_nest_block_drop(T& controller, const rtypes::timestep& t) {
     ER_ASSERT(controller.in_nest(), "Controller not in nest");
-    ER_ASSERT(fsm::foraging_transport_goal::type::ekNEST ==
+    ER_ASSERT(fsm::foraging_transport_goal::ekNEST ==
                   controller.block_transport_goal(),
               "Controller still has nest as goal");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
@@ -130,8 +131,8 @@ class nest_block_drop_interactor
    * preconditions have been satisfied.
    */
   void perform_nest_block_drop(T& controller,
-                               const tv::temporal_penalty& penalty,
-                               rtypes::timestep t) {
+                               const ctv::temporal_penalty& penalty,
+                               const rtypes::timestep& t) {
     /*
      * We have to do this asynchronous to the rest of metric collection, because
      * the \ref nest_block_drop event resets block metrics.

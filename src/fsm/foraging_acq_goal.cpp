@@ -1,7 +1,7 @@
 /**
- * \file temporal_penalty_handler.cpp
+ * \file foraging_acq_goal.cpp
  *
- * \copyright 2019 John Harwell, All rights reserved.
+ * \copyright 2020 John Harwell, All rights reserved.
  *
  * This file is part of FORDYCA.
  *
@@ -21,28 +21,38 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "fordyca/support/tv/temporal_penalty_handler.hpp"
-
-#include "fordyca/controller/foraging_controller.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
-NS_START(fordyca, support, tv);
+NS_START(fordyca, fsm);
 
 /*******************************************************************************
  * Member Functions
  ******************************************************************************/
-void temporal_penalty_handler::penalty_abort(
-    const controller::foraging_controller& controller) {
-  std::scoped_lock lock(m_list_mtx);
-  auto it = penalty_find(controller, false);
-  if (m_penalty_list.end() != it) {
-    penalty_remove(*it, false);
-  }
-  ER_INFO("%s", controller.GetId().c_str());
-  ER_ASSERT(!is_serving_penalty(controller, false),
-            "Robot still serving penalty after abort?!");
-} /* penalty_abort() */
+bool operator==(const cfsm::metrics::goal_acq_metrics::goal_type& goal1,
+                const foraging_acq_goal& goal2) {
+  return goal1.v() == rcppsw::as_underlying(goal2);
+}
 
-NS_END(tv, support, fordyca);
+bool operator==(const foraging_acq_goal& goal1,
+                const cfsm::metrics::goal_acq_metrics::goal_type& goal2) {
+  return goal2.v() == rcppsw::as_underlying(goal1);
+}
+
+bool operator!=(const cfsm::metrics::goal_acq_metrics::goal_type& goal1,
+                const foraging_acq_goal& goal2) {
+  return goal1.v() != rcppsw::as_underlying(goal2);
+}
+
+bool operator!=(const foraging_acq_goal& goal1,
+                const cfsm::metrics::goal_acq_metrics::goal_type& goal2) {
+  return goal2.v() != rcppsw::as_underlying(goal1);
+}
+
+cfsm::metrics::goal_acq_metrics::goal_type to_goal_type(const foraging_acq_goal& goal) {
+  return cfsm::metrics::goal_acq_metrics::goal_type(rcppsw::as_underlying(goal));
+}
+
+NS_END(fsm, fordyca);

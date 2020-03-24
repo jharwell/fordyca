@@ -52,7 +52,7 @@ template <typename T>
 class cache_op_filter : public rer::client<cache_op_filter<T>> {
  public:
   explicit cache_op_filter(const carena::arena_map* const map)
-      : ER_CLIENT_INIT("fordyca.support.cache_op_filter"), mc_map(map) {}
+      : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), mc_map(map) {}
 
   ~cache_op_filter(void) override = default;
   cache_op_filter& operator=(const cache_op_filter&) = delete;

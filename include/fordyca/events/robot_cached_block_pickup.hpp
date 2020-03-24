@@ -30,7 +30,7 @@
 #include "rcppsw/types/timestep.hpp"
 #include "rcppsw/types/type_uuid.hpp"
 
-#include "cosm/events/cell2D_op.hpp"
+#include "cosm/ds/operations/cell2D_op.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 #include "fordyca/events/block_pickup_base_visit_set.hpp"
@@ -69,7 +69,7 @@ NS_START(events, detail);
  * being created, at a higher level.
  */
 class robot_cached_block_pickup : public rer::client<robot_cached_block_pickup>,
-                                  public cevents::cell2D_op {
+                                  public cdops::cell2D_op {
  private:
   struct visit_typelist_impl {
     using controllers =
@@ -160,6 +160,7 @@ NS_END(detail);
 
 class robot_cached_block_pickup_visitor
     : public detail::robot_cached_block_pickup_visitor_impl {
+ public:
   using detail::robot_cached_block_pickup_visitor_impl::
       robot_cached_block_pickup_visitor_impl;
 };

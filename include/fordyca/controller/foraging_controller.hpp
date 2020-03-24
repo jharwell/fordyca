@@ -31,12 +31,11 @@
 #include "cosm/controller/irv_recipient_controller.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_controller2D_adaptor.hpp"
-#include "cosm/repr/base_block2D.hpp"
+#include "cosm/controller/block_carrying_controller.hpp"
 
 #include "fordyca/controller/block_manip_collator.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
-#include "cosm/fsm/supervisor_fsm.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -82,6 +81,7 @@ class base_perception_subsystem;
  * overlays.
  */
 class foraging_controller : public cpal::argos_controller2D_adaptor,
+                            public ccontroller::block_carrying_controller,
                             public ccontroller::irv_recipient_controller,
                             public rer::client<foraging_controller> {
  public:
@@ -99,6 +99,9 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   /* rda_recipient_controller overrides */
   double applied_movement_throttle(void) const override final;
   void irv_init(const ctv::robot_dynamics_applicator* rda) override final;
+
+  /* block carrying controller overrides */
+  bool block_detected(void) const override;
 
   /**
    * \brief By default controllers have no perception subsystem, and are
@@ -120,41 +123,6 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
    */
   bool in_nest(void) const;
 
-  /**
-   * \brief Return if the robot is currently carrying a block.
-   */
-  bool is_carrying_block(void) const { return nullptr != m_block; }
-
-  /**
-   * \brief Return the block robot is carrying, or NULL if the robot is not
-   * currently carrying a block.
-   */
-  const crepr::base_block2D* block(void) const { return m_block.get(); }
-  crepr::base_block2D* block(void) { return m_block.get(); }
-
-  /**
-   * \brief Release the held block as part of a drop operation.
-   */
-  std::unique_ptr<crepr::base_block2D> block_release(void);
-
-  /**
-   * \brief Set the block that the robot is carrying. We use a unique_ptr to
-   * convey that the robot owns the block it picks up from a C++ point of
-   * view. In actuality it gets a clone of the block in the arena map.
-   */
-  void block(std::unique_ptr<crepr::base_block2D> block);
-
-  /**
-   * \brief If \c TRUE, then the robot thinks that it is on top of a block.
-   *
-   * On rare occasions this may be a false positive, which is why it is also
-   * checked in the loop functions before passing any events to the
-   * controller. One such occasion that is known to occur is the first timestep,
-   * because the sensors have not yet finished initializing, and will return the
-   * values that are incidentally the same as those that correspond to a block
-   * being found.
-   */
-  bool block_detected(void) const;
 
   const class block_manip_collator* block_manip_collator(void) const {
     return &m_block_manip;
@@ -162,9 +130,6 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
   class block_manip_collator* block_manip_collator(void) {
     return &m_block_manip;
   }
-  cfsm::supervisor_fsm* supervisor(void) { return m_supervisor.get(); }
-  const cfsm::supervisor_fsm* supervisor(void) const { return m_supervisor.get(); }
-
  protected:
   class crfootbot::footbot_saa_subsystem2D* saa(void) RCSW_PURE;
   const class crfootbot::footbot_saa_subsystem2D* saa(void) const RCSW_PURE;
@@ -177,8 +142,6 @@ class foraging_controller : public cpal::argos_controller2D_adaptor,
 
   /* clang-format off */
   class block_manip_collator            m_block_manip{};
-  std::unique_ptr<crepr::base_block2D>  m_block;
-  std::unique_ptr<cfsm::supervisor_fsm> m_supervisor;
   /* clang-format on */
 };
 

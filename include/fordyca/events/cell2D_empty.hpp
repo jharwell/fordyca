@@ -27,7 +27,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/events/cell2D_empty.hpp"
+#include "cosm/ds/operations/cell2D_empty.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -56,7 +56,7 @@ NS_START(fordyca, events, detail);
  * square that the block was on is now  (probably) empty. It might not be if in
  * the same timestep a new cache is created on that same cell.
  */
-class cell2D_empty : public cevents::cell2D_empty,
+class cell2D_empty : public cdops::cell2D_empty,
                      public rer::client<cell2D_empty> {
  private:
   struct visit_typelist_impl {
@@ -70,10 +70,10 @@ class cell2D_empty : public cevents::cell2D_empty,
   using visit_typelist = visit_typelist_impl::value;
 
   /* parent class visit functions */
-  using cevents::cell2D_empty::visit;
+  using cdops::cell2D_empty::visit;
 
   explicit cell2D_empty(const rmath::vector2u& coord)
-      : cevents::cell2D_empty(coord),
+      : cdops::cell2D_empty(coord),
         ER_CLIENT_INIT("fordyca.events.cell2D_empty") {}
 
   void visit(ds::occupancy_grid& grid);

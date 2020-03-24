@@ -101,9 +101,9 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
        * robot is too close to a block/cache.
        */
       auto status = m_penalty_handler->penalty_init(controller,
-                                                   tv::block_op_src::ekNEW_CACHE_DROP,
                                                    t,
-                                                   m_cache_manager->cache_proximity_dist());
+                                                    tv::block_op_src::ekNEW_CACHE_DROP,
+                                                    boost::make_optional(m_cache_manager->cache_proximity_dist()));
       if (tv::op_filter_status::ekCACHE_PROXIMITY == status) {
         auto prox_status = utils::new_cache_cache_proximity(controller,
                                                             *m_map,
@@ -164,13 +164,13 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    * has acquired a cache site and is looking to drop an object on it.
    */
   interactor_status finish_new_cache_block_drop(T& controller) {
-    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
+    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::dynamic_cache_interactor*>(
         controller.current_task()), "Non-cache interface task!");
     ER_ASSERT(controller.current_task()->goal_acquired() &&
-              fsm::foraging_acq_goal::type::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
+              fsm::foraging_acq_goal::ekNEW_CACHE == controller.current_task()->acquisition_goal(),
               "Controller not waiting for new cache block drop");
     auto status = utils::new_cache_cache_proximity(controller,
                                                        *m_map,
@@ -220,7 +220,7 @@ class new_cache_block_drop_interactor : public rer::client<new_cache_block_drop_
    * preconditions have been satisfied.
    */
   void perform_new_cache_block_drop(T& controller,
-                                    const tv::temporal_penalty& penalty) {
+                                    const ctv::temporal_penalty& penalty) {
     auto loc = rmath::dvec2uvec(controller.pos2D(),
                                 m_map->grid_resolution().v());
 

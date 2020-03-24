@@ -43,7 +43,7 @@
 #include "cosm/ta/bi_tdgraph_executive.hpp"
 #include "cosm/ta/ds/bi_tdgraph.hpp"
 
-#include "fordyca/config/saa_xml_names.hpp"
+#include "cosm/robots/footbot/config/saa_xml_names.hpp"
 #include "fordyca/controller/depth1/bitd_dpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/controller/depth1/bitd_odpo_controller.hpp"
@@ -59,7 +59,7 @@
 #include "fordyca/support/robot_metric_extractor_adaptor.hpp"
 #include "fordyca/support/robot_task_extractor.hpp"
 #include "fordyca/support/robot_task_extractor_adaptor.hpp"
-#include "fordyca/support/swarm_iterator.hpp"
+#include "cosm/pal/argos_swarm_iterator.hpp"
 #include "fordyca/support/tv/tv_manager.hpp"
 
 /*******************************************************************************
@@ -128,7 +128,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
         lf->arena_map(),
         lf->m_metrics_agg.get(),
         lf->floor(),
-        lf->tv_manager()->environ_dynamics(),
+        lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
         lf->m_cache_manager.get(),
         lf};
     lf->m_interactor_map->emplace(typeid(controller),
@@ -275,8 +275,10 @@ void depth1_loop_functions::private_init(void) {
    * threads are not set up yet so doing dynamicaly causes a deadlock. Also, it
    * only happens once, so it doesn't really matter if it is slow.
    */
-  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
+                                          controller::foraging_controller,
+                                          cpal::iteration_order::ekSTATIC>(
+                                              this, cb, kARGoSRobotType);
 } /* private_init() */
 
 void depth1_loop_functions::oracle_init(void) {
@@ -290,7 +292,7 @@ void depth1_loop_functions::oracle_init(void) {
      * using--any robot will do.
      */
     argos::CFootBotEntity& robot0 = *argos::any_cast<argos::CFootBotEntity*>(
-        GetSpace().GetEntitiesByType("foot-bot").begin()->second);
+        GetSpace().GetEntitiesByType(kARGoSRobotType).begin()->second);
     const auto& controller0 =
         dynamic_cast<controller::depth1::bitd_dpo_controller&>(
             robot0.GetControllableEntity().GetController());
@@ -318,7 +320,7 @@ void depth1_loop_functions::cache_handling_init(
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
-  cpal::argos_sm_adaptor::led_medium(config::saa_xml_names().leds_saa);
+  cpal::argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names().leds_saa);
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
     arena_map()->caches_add(*created, this);
     floor()->SetChanged();
@@ -402,8 +404,10 @@ std::vector<int> depth1_loop_functions::robot_tasks_extract(uint) const {
                                      m_task_extractor_map->at(
                                          controller->type_index())));
   };
-  swarm_iterator::controllers<argos::CFootBotEntity, swarm_iterator::static_order>(
-      this, cb, "foot-bot");
+  cpal::argos_swarm_iterator::controllers<argos::CFootBotEntity,
+                                          controller::foraging_controller,
+                                          cpal::iteration_order::ekSTATIC>(
+                                              this, cb, kARGoSRobotType);
   return v;
 } /* robot_tasks_extract() */
 
@@ -421,7 +425,7 @@ void depth1_loop_functions::pre_step() {
     robot_pre_step(dynamic_cast<argos::CFootBotEntity&>(robot->GetParent()));
     ndc_pop();
   };
-  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
+  cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 } /* pre_step() */
 
 void depth1_loop_functions::post_step(void) {
@@ -446,7 +450,7 @@ void depth1_loop_functions::post_step(void) {
         &static_cast<controller::foraging_controller&>(robot->GetController()));
     ndc_pop();
   };
-  swarm_iterator::robots<swarm_iterator::dynamic_order>(this, cb);
+  cpal::argos_swarm_iterator::robots<cpal::iteration_order::ekDYNAMIC>(this, cb);
 
   ndc_push();
 
@@ -497,7 +501,7 @@ void depth1_loop_functions::post_step(void) {
     if (nullptr != conv_calculator()) {
       conv_calculator()->reset_metrics();
     }
-    tv_manager()->population_dynamics()->reset_metrics();
+    tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()->reset_metrics();
   }
   m_metrics_agg->interval_reset_all();
   m_metrics_agg->timestep_inc_all();

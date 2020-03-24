@@ -33,7 +33,8 @@
 #include "fordyca/fsm/cache_acq_validator.hpp"
 #include "fordyca/fsm/existing_cache_selector.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -101,8 +102,7 @@ acquire_existing_cache_fsm::acquire_existing_cache_fsm(
  ******************************************************************************/
 cfsm::metrics::goal_acq_metrics::goal_type acquire_existing_cache_fsm::
     acq_goal_internal(void) {
-  return cfsm::metrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekEXISTING_CACHE);
+  return fsm::to_goal_type(foraging_acq_goal::ekEXISTING_CACHE);
 } /* acq_goal() */
 
 /*******************************************************************************

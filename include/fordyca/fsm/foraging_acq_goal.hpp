@@ -1,5 +1,5 @@
 /**
- * \file foraging_goal_type.hpp
+ * \file foraging_acq_goal.hpp
  *
  * \copyright 2019 John Harwell, All rights reserved.
  *
@@ -18,13 +18,15 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_FSM_FORAGING_GOAL_TYPE_HPP_
-#define INCLUDE_FORDYCA_FSM_FORAGING_GOAL_TYPE_HPP_
+#ifndef INCLUDE_FORDYCA_FSM_FORAGING_ACQ_GOAL_HPP_
+#define INCLUDE_FORDYCA_FSM_FORAGING_ACQ_GOAL_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/common/common.hpp"
+#include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -34,50 +36,36 @@ NS_START(fordyca, fsm);
 /*******************************************************************************
  * Type Definitions
  ******************************************************************************/
-struct foraging_acq_goal {
-  enum type {
-    ekNONE = -1,
-    ekBLOCK,
-    ekNEST,
-    ekCACHE_SITE,
-    ekNEW_CACHE,
-    ekEXISTING_CACHE
-  };
+/**
+ * \brief Representats the different types of objects robots can acquire as part
+ * of the foraging process.
+ */
+enum class foraging_acq_goal {
+  ekNONE = -1,
+  ekBLOCK,
+  ekNEST,
+  ekCACHE_SITE,
+  ekNEW_CACHE,
+  ekEXISTING_CACHE
 };
 
-struct foraging_transport_goal {
-  enum type {
-    /**
-     * \brief No goal--robot is probably not carrying a block.
-     */
-    ekNONE = -1,
+/*******************************************************************************
+ * Operators
+ ******************************************************************************/
+bool operator==(const cfsm::metrics::goal_acq_metrics::goal_type& goal1,
+                const foraging_acq_goal& goal2) RCSW_PURE;
 
-    /**
-     * \brief A robot has acquired a block and is currently taking it back to
-     * the nest.
-     */
-    ekNEST,
+bool operator==(const foraging_acq_goal& goal1,
+                const cfsm::metrics::goal_acq_metrics::goal_type& goal2) RCSW_PURE;
 
-    /**
-     * \brief A robot is currently transporting an acquired block to its
-     * existing cache of choice.
-     */
-    ekEXISTING_CACHE,
+bool operator!=(const cfsm::metrics::goal_acq_metrics::goal_type& goal1,
+                const foraging_acq_goal& goal2) RCSW_PURE;
 
-    /**
-     * \brief A robot is currently transporting an acquired block to its new
-     * cache of choice.
-     */
-    ekNEW_CACHE,
+bool operator!=(const foraging_acq_goal& goal1,
+                const cfsm::metrics::goal_acq_metrics::goal_type& goal2) RCSW_PURE;
 
-    /**
-     * \brief A robot is currently transporting an acquired block to its cache
-     * site of choice.
-     */
-    ekCACHE_SITE
-  };
-};
+cfsm::metrics::goal_acq_metrics::goal_type to_goal_type(const foraging_acq_goal& goal);
 
 NS_END(fsm, fordyca);
 
-#endif /* INCLUDE_FORDYCA_FSM_FORAGING_GOAL_TYPE_HPP_ */
+#endif /* INCLUDE_FORDYCA_FSM_FORAGING_ACQ_GOAL_HPP_ */

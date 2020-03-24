@@ -49,28 +49,28 @@ cfsm::metrics::goal_acq_metrics::goal_type block_to_new_cache_fsm::acquisition_g
     void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_BLOCK_PICKUP == current_state()) {
-    return cfsm::metrics::goal_acq_metrics::goal_type(
-        foraging_acq_goal::type::ekBLOCK);
+    return fsm::to_goal_type(
+        foraging_acq_goal::ekBLOCK);
   } else if (ekST_TRANSPORT_TO_GOAL == current_state() ||
              ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return cfsm::metrics::goal_acq_metrics::goal_type(
-        foraging_acq_goal::type::ekNEW_CACHE);
+    return fsm::to_goal_type(
+        foraging_acq_goal::ekNEW_CACHE);
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekNONE);
+  return fsm::to_goal_type(
+      foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
-foraging_transport_goal::type block_to_new_cache_fsm::block_transport_goal(
+foraging_transport_goal block_to_new_cache_fsm::block_transport_goal(
     void) const {
   if (ekST_TRANSPORT_TO_GOAL == current_state() ||
       ekST_WAIT_FOR_BLOCK_DROP == current_state()) {
-    return foraging_transport_goal::type::ekNEW_CACHE;
+    return foraging_transport_goal::ekNEW_CACHE;
   }
-  return foraging_transport_goal::type::ekNONE;
+  return foraging_transport_goal::ekNONE;
 } /* acquisition_goal() */
 
 rtypes::type_uuid block_to_new_cache_fsm::entity_acquired_id(void) const {
-  if (foraging_acq_goal::type::ekBLOCK == acquisition_goal()) {
+  if (foraging_acq_goal::ekBLOCK == acquisition_goal()) {
     return m_block_fsm.entity_acquired_id();
   }
   return rtypes::constants::kNoUUID;

@@ -30,6 +30,7 @@
 #include "fordyca/events/robot_nest_block_drop.hpp"
 #include "fordyca/fsm/depth1/cached_block_to_nest_fsm.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -80,7 +81,7 @@ rtypes::timestep collector::interface_time_calc(
 
 void collector::active_interface_update(int) {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  if (fsm::foraging_acq_goal::type::ekEXISTING_CACHE != fsm->acquisition_goal()) {
+  if (fsm::foraging_acq_goal::ekEXISTING_CACHE != fsm->acquisition_goal()) {
     return;
   }
 
@@ -174,7 +175,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(collector,
  ******************************************************************************/
 bool collector::task_at_interface(void) const {
   auto* fsm = static_cast<fsm::depth1::cached_block_to_nest_fsm*>(mechanism());
-  return !(fsm::foraging_transport_goal::type::ekNEST ==
+  return !(fsm::foraging_transport_goal::ekNEST ==
            fsm->block_transport_goal());
 } /* task_at_interface() */
 

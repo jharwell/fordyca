@@ -30,7 +30,7 @@
 #include "fordyca/ds/dpo_semantic_map.hpp"
 #include "fordyca/fsm/arrival_tol.hpp"
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -128,8 +128,8 @@ bool acquire_new_cache_fsm::cache_acquired_cb(bool explore_result) const {
  ******************************************************************************/
 cfsm::metrics::goal_acq_metrics::goal_type acquire_new_cache_fsm::
     acquisition_goal_internal(void) const {
-  return cfsm::metrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekNEW_CACHE);
+  return fsm::to_goal_type(
+      foraging_acq_goal::ekNEW_CACHE);
 } /* acquisition_goal() */
 
 NS_END(depth2, controller, fordyca);

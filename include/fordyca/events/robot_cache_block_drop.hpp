@@ -30,7 +30,7 @@
 #include "rcppsw/patterns/visitor/visitor.hpp"
 #include "rcppsw/types/discretize_ratio.hpp"
 
-#include "cosm/events/cell2D_op.hpp"
+#include "cosm/ds/operations/cell2D_op.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
@@ -66,10 +66,10 @@ NS_START(fordyca, events, detail);
  * needed by robot controllers. Complement to \ref arena_robot_cache_block_drop.
  */
 class robot_cache_block_drop : public rer::client<robot_cache_block_drop>,
-                               public cevents::cell2D_op {
+                               public cdops::cell2D_op {
  private:
   struct visit_typelist_impl {
-    using inherited = cevents::cell2D_op::visit_typelist;
+    using inherited = cdops::cell2D_op::visit_typelist;
     using controllers = boost::mpl::joint_view<controller::depth1::typelist,
                                                controller::depth2::typelist>;
 
@@ -153,6 +153,7 @@ NS_END(detail);
 
 class robot_cache_block_drop_visitor
     : public detail::robot_cache_block_drop_visitor_impl {
+ public:
   using detail::robot_cache_block_drop_visitor_impl::robot_cache_block_drop_visitor_impl;
 };
 

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "cosm/fsm/acquire_goal_fsm.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics.hpp"
 #include <nlopt.hpp>

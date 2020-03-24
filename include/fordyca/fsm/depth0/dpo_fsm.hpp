@@ -100,7 +100,7 @@ class dpo_fsm final : public cfsm::util_hfsm,
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(foraging_transport_goal::type,
+  RCPPSW_WRAP_OVERRIDE_DECL(foraging_transport_goal,
                             block_transport_goal,
                             const);
 

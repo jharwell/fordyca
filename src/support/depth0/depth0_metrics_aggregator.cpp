@@ -125,7 +125,7 @@ void depth0_metrics_aggregator::collect_from_controller(
       *controller,
       [&](const rmetrics::base_metrics& metrics) {
         auto& m = dynamic_cast<const cfsm::metrics::goal_acq_metrics&>(metrics);
-        return fsm::foraging_acq_goal::type::ekBLOCK == m.acquisition_goal() &&
+        return fsm::foraging_acq_goal::ekBLOCK == m.acquisition_goal() &&
                m.goal_acquired();
       });
 

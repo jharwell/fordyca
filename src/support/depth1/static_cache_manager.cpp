@@ -23,7 +23,7 @@
 #include "fordyca/support/depth1/static_cache_manager.hpp"
 
 #include "cosm/ds/arena_grid.hpp"
-#include "cosm/events/cell2D_empty.hpp"
+#include "cosm/ds/operations/cell2D_empty.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/repr/base_block2D.hpp"
@@ -234,7 +234,7 @@ void static_cache_manager::post_creation_blocks_absorb(
     for (auto& c : caches) {
       if (!c->contains_block(b) && c->xspan().overlaps_with(b->xspan()) &&
           c->yspan().overlaps_with(b->yspan())) {
-        cevents::cell2D_empty_visitor empty(b->dloc());
+        cdops::cell2D_empty_visitor empty(b->dloc());
         empty.visit(arena_grid()->access<arena_grid::kCell>(b->dloc()));
         /*
          * We are not REALLY holding all the arena map locks, but since cache

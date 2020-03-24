@@ -30,7 +30,7 @@
 #include "rcppsw/er/client.hpp"
 #include "cosm/fsm/collision_tracker.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces

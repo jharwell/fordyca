@@ -87,8 +87,7 @@ acquire_free_block_fsm::acquire_free_block_fsm(
  ******************************************************************************/
 cfsm::metrics::goal_acq_metrics::goal_type acquire_free_block_fsm::acq_goal_internal(
     void) {
-  return cfsm::metrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekBLOCK);
+  return fsm::to_goal_type(foraging_acq_goal::ekBLOCK);
 } /* acq_goal_internal() */
 
 /*******************************************************************************

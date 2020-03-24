@@ -26,7 +26,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#include "rcppsw/config/xml/xml_config_repository.hpp"
+#include "cosm/pal/config/xml/base_sm_repository.hpp"
 
 #include "fordyca/fordyca.hpp"
 
@@ -42,9 +42,10 @@ NS_START(fordyca, config);
  * \class loop_function_repository
  * \ingroup config
  *
- * \brief Collection of all XML parsers used common to all loop functions.
+ * \brief Extra loop function XML parsers/results specific to the FORDYCA
+ * project.
  */
-class loop_function_repository : public rconfig::xml::xml_config_repository {
+class loop_function_repository : public cpal::config::xml::base_sm_repository {
  public:
   loop_function_repository(void) noexcept;
 };

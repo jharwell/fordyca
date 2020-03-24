@@ -25,13 +25,16 @@
  * Includes
  ******************************************************************************/
 #include <string>
+#include <boost/optional.hpp>
 
 #include "rcppsw/types/type_uuid.hpp"
+
+#include "cosm/tv/temporal_penalty_handler.hpp"
 
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/block_op_filter.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
-#include "fordyca/support/tv/temporal_penalty_handler.hpp"
+#include "fordyca/support/tv/block_op_penalty_id_calculator.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -47,17 +50,19 @@ NS_START(fordyca, support, tv);
  * \ingroup support tv
  *
  * \brief The handler for block operation penalties for robots (e.g. picking
- * up, dropping in places that do not involve existing caches.
+ * up, dropping in places that do not involve existing caches).
  */
-class block_op_penalty_handler final : public temporal_penalty_handler,
+class block_op_penalty_handler final : public ctv::temporal_penalty_handler,
                                        public rer::client<block_op_penalty_handler> {
  public:
   block_op_penalty_handler(carena::arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
-        ER_CLIENT_INIT("fordyca.support.block_op_penalty_handler"),
-        mc_map(map) {}
+        ER_CLIENT_INIT("fordyca.support.tv.block_op_penalty_handler"),
+        mc_map(map),
+        m_filter(mc_map),
+        m_id_calc(mc_map) {}
 
   ~block_op_penalty_handler(void) override = default;
   block_op_penalty_handler& operator=(const block_op_penalty_handler& other) =
@@ -82,11 +87,10 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
    */
   template<typename TControllerType>
   op_filter_status penalty_init(const TControllerType& controller,
-                                block_op_src src,
                                 const rtypes::timestep& t,
-                                rtypes::spatial_dist cache_prox = rtypes::spatial_dist(-1)) {
-    auto filter = block_op_filter<TControllerType>(
-        mc_map)(controller, src, cache_prox);
+                                block_op_src src,
+                                boost::optional<rtypes::spatial_dist> cache_prox) {
+    auto filter = m_filter(controller, src, cache_prox);
     if (filter != op_filter_status::ekSATISFIED) {
       return filter;
     }
@@ -94,7 +98,7 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
               "%s already serving block penalty?",
               controller.GetId().c_str());
 
-    rtypes::type_uuid id = penalty_id_calc(controller, src, cache_prox);
+    rtypes::type_uuid id = m_id_calc(controller, src);
     rtypes::timestep orig_duration = penalty_calc(t);
     auto duration RCSW_UNUSED = penalty_add(&controller,
                                             id,
@@ -113,44 +117,11 @@ class block_op_penalty_handler final : public temporal_penalty_handler,
   }
 
  private:
-  template<typename TControllerType>
-  rtypes::type_uuid penalty_id_calc(const TControllerType& controller,
-                      block_op_src src,
-                      rtypes::spatial_dist cache_prox) const {
-    rtypes::type_uuid id(-1);
-    switch (src) {
-      case block_op_src::ekFREE_PICKUP:
-        id = utils::robot_on_block(controller, *mc_map);
-        ER_ASSERT(rtypes::constants::kNoUUID != id, "Robot not on block?");
-        break;
-      case block_op_src::ekNEST_DROP:
-        ER_ASSERT(nullptr != controller.block() &&
-                  rtypes::constants::kNoUUID != controller.block()->id(),
-                  "Robot not carrying block?");
-        id = controller.block()->id();
-        break;
-      case block_op_src::ekCACHE_SITE_DROP:
-        ER_ASSERT(nullptr != controller.block() &&
-                      rtypes::constants::kNoUUID != controller.block()->id(),
-                  "Robot not carrying block?");
-        id = controller.block()->id();
-        break;
-      case block_op_src::ekNEW_CACHE_DROP:
-        ER_ASSERT(nullptr != controller.block() &&
-                      rtypes::constants::kNoUUID != controller.block()->id(),
-                  "Robot not carrying block?");
-        ER_ASSERT(cache_prox > 0.0,
-                  "Cache proximity distance not specified for new cache drop");
-        id = controller.block()->id();
-        break;
-      default:
-        break;
-    }
-    return id;
-  } /* penalty_id_calc() */
-
   /* clang-format off */
   const carena::arena_map* const mc_map;
+
+  block_op_filter                m_filter;
+  block_op_penalty_id_calculator m_id_calc;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

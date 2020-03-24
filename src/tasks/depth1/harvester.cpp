@@ -83,7 +83,7 @@ void harvester::active_interface_update(int) {
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
 
   if (fsm->goal_acquired() &&
-      fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
+      fsm::foraging_transport_goal::ekEXISTING_CACHE ==
           fsm->block_transport_goal()) {
     if (interface_in_prog(0)) {
       interface_exit(0);
@@ -91,7 +91,7 @@ void harvester::active_interface_update(int) {
       ER_DEBUG("Interface finished at timestep %u", current_time().v());
     }
     ER_TRACE("Interface time: %u", interface_time(0).v());
-  } else if (fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
+  } else if (fsm::foraging_transport_goal::ekEXISTING_CACHE ==
              fsm->block_transport_goal()) {
     if (!interface_in_prog(0)) {
       interface_enter(0);
@@ -180,7 +180,7 @@ RCPPSW_WRAP_OVERRIDE_DEF(harvester,
 bool harvester::task_at_interface(void) const {
   auto* fsm =
       static_cast<fsm::depth1::block_to_existing_cache_fsm*>(mechanism());
-  return fsm::foraging_transport_goal::type::ekEXISTING_CACHE ==
+  return fsm::foraging_transport_goal::ekEXISTING_CACHE ==
          fsm->block_transport_goal();
 } /* task_at_interface()() */
 

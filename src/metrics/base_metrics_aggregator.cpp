@@ -164,10 +164,12 @@ void base_metrics_aggregator::collect_from_loop(
     collect("swarm::convergence", *loop->conv_calculator());
   }
 
-  collect("tv::environment", *loop->tv_manager()->environ_dynamics());
+  collect("tv::environment",
+          *loop->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>());
 
-  if (loop->tv_manager()->population_dynamics()) {
-    collect("tv::population", *loop->tv_manager()->population_dynamics());
+  if (loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>()) {
+    collect("tv::population",
+            *loop->tv_manager()->dynamics<ctv::dynamics_type::ekPOPULATION>());
   }
 } /* collect_from_loop() */
 

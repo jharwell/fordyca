@@ -33,7 +33,6 @@
 
 #include "fordyca/events/block_vanished.hpp"
 #include "fordyca/events/robot_free_block_pickup.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
 #include "fordyca/support/interactor_status.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
 #include "fordyca/support/utils/loop_utils.hpp"
@@ -96,8 +95,9 @@ class free_block_pickup_interactor
       }
     } else {
       m_penalty_handler->penalty_init(controller,
+                                      t,
                                       tv::block_op_src::ekFREE_PICKUP,
-                                      t);
+                                      boost::none);
     }
     return interactor_status::ekNO_EVENT;
   }
@@ -107,9 +107,9 @@ class free_block_pickup_interactor
    * \brief Determine if a robot is waiting to pick up a free block, and if it
    * is actually on a free block, send it the \ref free_block_pickup event.
    */
-  void finish_free_block_pickup(T& controller, rtypes::timestep t) {
+  void finish_free_block_pickup(T& controller, const rtypes::timestep& t) {
     ER_ASSERT(controller.goal_acquired() &&
-                  fsm::foraging_acq_goal::type::ekBLOCK ==
+                  fsm::foraging_acq_goal::ekBLOCK ==
                       controller.acquisition_goal(),
               "Controller not waiting for free block pickup");
     ER_ASSERT(m_penalty_handler->is_serving_penalty(controller),
@@ -171,7 +171,7 @@ class free_block_pickup_interactor
    * preconditions have been satisfied.
    */
   void perform_free_block_pickup(T& controller,
-                                 const tv::temporal_penalty& penalty,
+                                 const ctv::temporal_penalty& penalty,
                                  const rtypes::timestep& t) {
     /* Holding block mutex not necessary here, but does not hurt */
     auto it =

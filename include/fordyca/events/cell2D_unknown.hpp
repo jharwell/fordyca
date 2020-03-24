@@ -27,7 +27,7 @@
 #include "rcppsw/er/client.hpp"
 #include "rcppsw/math/vector2.hpp"
 
-#include "cosm/events/cell2D_unknown.hpp"
+#include "cosm/ds/operations/cell2D_unknown.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,11 +53,11 @@ NS_START(fordyca, events, detail);
  * 1. After its relevance expires.
  * 2. Before the robot sees it for the first time (ala Fog of War).
  */
-class cell2D_unknown : public cevents::cell2D_unknown,
+class cell2D_unknown : public cdops::cell2D_unknown,
                        public rer::client<cell2D_unknown> {
  private:
   struct visit_typelist_impl {
-    using inherited = cevents::cell2D_unknown::visit_typelist;
+    using inherited = cdops::cell2D_unknown::visit_typelist;
     using others = rmpl::typelist<ds::occupancy_grid>;
     using value = boost::mpl::joint_view<inherited::type, others::type>;
   };
@@ -66,10 +66,10 @@ class cell2D_unknown : public cevents::cell2D_unknown,
   using visit_typelist = visit_typelist_impl::value;
 
   /* parent class visit functions */
-  using cevents::cell2D_unknown::visit;
+  using cdops::cell2D_unknown::visit;
 
   explicit cell2D_unknown(const rmath::vector2u& coord)
-      : cevents::cell2D_unknown(coord),
+      : cdops::cell2D_unknown(coord),
         ER_CLIENT_INIT("fordyca.events.cell2D_unknown") {}
 
   void visit(ds::occupancy_grid& grid);

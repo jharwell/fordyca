@@ -30,6 +30,7 @@
 
 #include "fordyca/fsm/foraging_signal.hpp"
 #include "fordyca/tasks/argument.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -230,8 +231,7 @@ cfsm::metrics::goal_acq_metrics::goal_type block_to_goal_fsm::acquisition_goal(
   } else if (m_goal_fsm->task_running()) {
     return m_goal_fsm->acquisition_goal();
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekNONE);
+  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
 rmath::vector2u block_to_goal_fsm::acquisition_loc(void) const {

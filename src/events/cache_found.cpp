@@ -175,7 +175,7 @@ void cache_found::visit(ds::dpo_semantic_map& map) {
   } /* for(&&b..) */
 
   for (auto&& b : rms) {
-    cevents::cell2D_empty_visitor op(b->dloc());
+    cdops::cell2D_empty_visitor op(b->dloc());
     op.visit(map.access<occupancy_grid::kCell>(b->dloc()));
     map.block_remove(b);
   } /* for(&&b..) */

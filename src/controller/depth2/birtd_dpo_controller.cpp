@@ -29,6 +29,7 @@
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 
 #include "fordyca/config/depth2/controller_repository.hpp"
 #include "fordyca/controller/block_sel_matrix.hpp"

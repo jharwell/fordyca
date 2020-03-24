@@ -43,8 +43,12 @@ env_dynamics::env_dynamics(const config::tv::env_dynamics_config* const config,
       m_fb_pickup(map, &config->block_manip_penalty, "Free Block Pickup"),
       m_nest_drop(map, &config->block_manip_penalty, "Nest Block Pickup"),
       m_existing_cache(map, &config->cache_usage_penalty, "Existing Cache"),
-      m_new_cache(map, &config->block_manip_penalty, "New Cache"),
-      m_cache_site(map, &config->block_manip_penalty, "Cache Site") {}
+      m_new_cache(map,
+                  &config->block_manip_penalty,
+                  "New Cache"),
+      m_cache_site(map,
+                   &config->block_manip_penalty,
+                   "Cache Site") {}
 
 /*******************************************************************************
  * Member Functions
@@ -58,17 +62,17 @@ rtypes::timestep env_dynamics::cache_usage_penalty(void) const {
       ->penalty_calc(m_timestep);
 } /* cache_usage_penalty() */
 
-void env_dynamics::register_controller(const controller::foraging_controller& c) {
+void env_dynamics::register_controller(const cpal::argos_controller2D_adaptor& c) {
   m_rda.register_controller(c.entity_id());
 } /* register_controller() */
 
 void env_dynamics::unregister_controller(
-    const controller::foraging_controller& c) {
+    const cpal::argos_controller2D_adaptor& c) {
   m_rda.unregister_controller(c.entity_id());
   penalties_flush(c);
 } /* unregister_controller() */
 
-bool env_dynamics::penalties_flush(const controller::foraging_controller& c) {
+bool env_dynamics::penalties_flush(const cpal::argos_controller2D_adaptor& c) {
   bool aborted = false;
   for (auto& h : all_penalty_handlers()) {
     if (h->is_serving_penalty(c)) {

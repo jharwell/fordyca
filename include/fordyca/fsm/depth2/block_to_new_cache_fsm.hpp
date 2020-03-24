@@ -65,7 +65,7 @@ class block_to_new_cache_fsm final : public block_to_goal_fsm {
   rtypes::type_uuid entity_acquired_id(void) const override;
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
   /* clang-format off */
   acquire_new_cache_fsm  m_cache_fsm;

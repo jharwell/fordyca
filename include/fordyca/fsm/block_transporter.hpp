@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "rcppsw/common/common.hpp"
 
-#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -53,7 +53,7 @@ class block_transporter {
    * \brief All tasks must define method to determine what they are currently
    * doing with a block (if they are carrying one).
    */
-  virtual foraging_transport_goal::type block_transport_goal(void) const = 0;
+  virtual foraging_transport_goal block_transport_goal(void) const = 0;
 };
 
 NS_END(fsm, fordyca);

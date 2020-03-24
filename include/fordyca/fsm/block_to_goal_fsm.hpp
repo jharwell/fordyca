@@ -32,7 +32,7 @@
 
 #include "fordyca/fordyca.hpp"
 #include "fordyca/fsm/block_transporter.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces

@@ -30,7 +30,7 @@
 
 #include "fordyca/fordyca.hpp"
 #include "rcppsw/er/client.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "rcppsw/math/rng.hpp"
 
 /*******************************************************************************

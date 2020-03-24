@@ -25,6 +25,7 @@
 
 #include "fordyca/fsm/expstrat/foraging_expstrat.hpp"
 #include "fordyca/fsm/foraging_signal.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -193,9 +194,9 @@ RCPPSW_WRAP_OVERRIDE_DEF(cached_block_to_nest_fsm,
                          const);
 
 bool cached_block_to_nest_fsm::goal_acquired(void) const {
-  if (foraging_acq_goal::type::ekEXISTING_CACHE == acquisition_goal()) {
+  if (foraging_acq_goal::ekEXISTING_CACHE == acquisition_goal()) {
     return current_state() == ekST_WAIT_FOR_PICKUP;
-  } else if (foraging_transport_goal::type::ekNEST == block_transport_goal()) {
+  } else if (foraging_transport_goal::ekNEST == block_transport_goal()) {
     return current_state() == ekST_WAIT_FOR_DROP;
   }
   return false;
@@ -205,27 +206,24 @@ cfsm::metrics::goal_acq_metrics::goal_type cached_block_to_nest_fsm::acquisition
     void) const {
   if (ekST_ACQUIRE_BLOCK == current_state() ||
       ekST_WAIT_FOR_PICKUP == current_state()) {
-    return cfsm::metrics::goal_acq_metrics::goal_type(
-        foraging_acq_goal::type::ekEXISTING_CACHE);
+    return fsm::to_goal_type(foraging_acq_goal::ekEXISTING_CACHE);
   } else if (ekST_ACQUIRE_BLOCK == current_state() ||
              ekST_WAIT_FOR_PICKUP == current_state()) {
-    return cfsm::metrics::goal_acq_metrics::goal_type(
-        foraging_acq_goal::type::ekEXISTING_CACHE);
+    return fsm::to_goal_type(foraging_acq_goal::ekEXISTING_CACHE);
   }
-  return cfsm::metrics::goal_acq_metrics::goal_type(
-      foraging_acq_goal::type::ekNONE);
+  return fsm::to_goal_type(foraging_acq_goal::ekNONE);
 } /* acquisition_goal() */
 
 /*******************************************************************************
  * General Member Functions
  ******************************************************************************/
-foraging_transport_goal::type cached_block_to_nest_fsm::block_transport_goal(
+foraging_transport_goal cached_block_to_nest_fsm::block_transport_goal(
     void) const {
   if (ekST_TRANSPORT_TO_NEST == current_state() ||
       ekST_WAIT_FOR_DROP == current_state()) {
-    return foraging_transport_goal::type::ekNEST;
+    return foraging_transport_goal::ekNEST;
   }
-  return foraging_transport_goal::type::ekNONE;
+  return foraging_transport_goal::ekNONE;
 } /* block_transport_goal() */
 
 void cached_block_to_nest_fsm::init(void) {

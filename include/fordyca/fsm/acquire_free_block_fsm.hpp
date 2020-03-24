@@ -30,9 +30,10 @@
 #include "cosm/ta/taskable.hpp"
 
 #include "fordyca/controller/block_sel_matrix.hpp"
-#include "fordyca/fsm/foraging_goal_type.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
+#include "fordyca/fsm/foraging_transport_goal.hpp"
 #include "fordyca/fsm/fsm_ro_params.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 
 /*******************************************************************************
  * Namespaces

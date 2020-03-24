@@ -28,7 +28,7 @@
 
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/events/cell2D_op.hpp"
+#include "cosm/ds/operations/cell2D_op.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
 
@@ -57,7 +57,7 @@ NS_START(fordyca, events, detail);
  * a robot, but possibly one that it has seen before and whose relevance had
  * expired) is discovered by the robot via it appearing in the robot's LOS.
  */
-class cache_found : public cevents::cell2D_op, public rer::client<cache_found> {
+class cache_found : public cdops::cell2D_op, public rer::client<cache_found> {
  private:
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;

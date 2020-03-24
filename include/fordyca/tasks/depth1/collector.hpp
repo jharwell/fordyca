@@ -86,7 +86,7 @@ class collector : public foraging_task,
   RCPPSW_WRAP_OVERRIDE_DECL(rtypes::type_uuid, entity_acquired_id, const);
 
   /* block transportation */
-  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal::type,
+  RCPPSW_WRAP_OVERRIDE_DECL(fsm::foraging_transport_goal,
                             block_transport_goal,
                             const);
 

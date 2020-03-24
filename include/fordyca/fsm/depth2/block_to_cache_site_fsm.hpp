@@ -70,7 +70,7 @@ class block_to_cache_site_fsm final : public block_to_goal_fsm,
   }
 
   /* block transportation */
-  foraging_transport_goal::type block_transport_goal(void) const override RCSW_PURE;
+  foraging_transport_goal block_transport_goal(void) const override RCSW_PURE;
 
  private:
   /* clang-format off */

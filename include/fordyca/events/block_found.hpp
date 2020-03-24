@@ -28,7 +28,7 @@
 
 #include "rcppsw/er/client.hpp"
 
-#include "cosm/events/cell2D_op.hpp"
+#include "cosm/ds/operations/cell2D_op.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/controller_fwd.hpp"
@@ -56,7 +56,7 @@ NS_START(events, detail);
  * \brief Event that is created whenever a block (possibly known, possibly
  * unknown) appears in a robot's LOS.
  */
-class block_found : public rer::client<block_found>, public cevents::cell2D_op {
+class block_found : public rer::client<block_found>, public cdops::cell2D_op {
  private:
   struct visit_typelist_impl {
     using inherited = cell2D_op::visit_typelist;

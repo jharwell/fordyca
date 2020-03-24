@@ -29,7 +29,7 @@
 #include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/cache_op_filter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
-#include "fordyca/support/tv/temporal_penalty_handler.hpp"
+#include "cosm/tv/temporal_penalty_handler.hpp"
 #include "fordyca/support/utils/event_utils.hpp"
 
 /*******************************************************************************
@@ -42,20 +42,20 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 /**
  * \class cache_op_penalty_handler
- * \ingroup support
+ * \ingroup support tv
  *
  * \brief The handler for block operation penalties for robots (e.g. picking
  * up, dropping in places that do not involve existing caches.
  */
 class cache_op_penalty_handler final
-    : public temporal_penalty_handler,
+    : public ctv::temporal_penalty_handler,
       public rer::client<cache_op_penalty_handler> {
  public:
   cache_op_penalty_handler(carena::arena_map* const map,
                            const rct::config::waveform_config* const config,
                            const std::string& name)
       : temporal_penalty_handler(config, name),
-        ER_CLIENT_INIT("fordyca.support.cache_op_penalty_handler"),
+        ER_CLIENT_INIT("fordyca.support.tv.cache_op_penalty_handler"),
         m_map(map) {}
 
   ~cache_op_penalty_handler(void) override = default;

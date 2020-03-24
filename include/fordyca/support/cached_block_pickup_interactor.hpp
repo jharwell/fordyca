@@ -113,13 +113,13 @@ class cached_block_pickup_interactor
    */
   interactor_status finish_cached_block_pickup(T& controller,
                                                rtypes::timestep t) {
-    const tv::temporal_penalty& p = m_penalty_handler->penalty_next();
+    const ctv::temporal_penalty& p = m_penalty_handler->penalty_next();
     ER_ASSERT(p.controller() == &controller,
               "Out of order cache penalty handling");
     ER_ASSERT(nullptr != dynamic_cast<events::existing_cache_interactor*>(
                              controller.current_task()),
               "Non-cache interface task!");
-    ER_ASSERT(fsm::foraging_acq_goal::type::ekEXISTING_CACHE ==
+    ER_ASSERT(fsm::foraging_acq_goal::ekEXISTING_CACHE ==
                   controller.current_task()->acquisition_goal(),
               "Controller not waiting for cached block pickup");
     ER_ASSERT(!controller.is_carrying_block(),
@@ -206,7 +206,7 @@ class cached_block_pickup_interactor
    */
   interactor_status perform_cached_block_pickup(
       T& controller,
-      const tv::temporal_penalty& penalty,
+      const ctv::temporal_penalty& penalty,
       const rtypes::timestep& t) {
     auto it =
         std::find_if(m_map->caches().begin(),

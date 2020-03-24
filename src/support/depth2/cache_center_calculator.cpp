@@ -24,7 +24,6 @@
 #include "fordyca/support/depth2/cache_center_calculator.hpp"
 
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/events/cell2D_empty.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 

@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include "cosm/fsm/expstrat/base_expstrat.hpp"
 #include "fordyca/fordyca.hpp"
-#include "fordyca/fsm/subsystem_fwd.hpp"
+#include "cosm/robots/footbot/footbot_subsystem_fwd.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "rcppsw/patterns/prototype/clonable.hpp"
 

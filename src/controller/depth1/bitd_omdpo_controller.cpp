@@ -27,6 +27,7 @@
 #include "cosm/repr/base_block2D.hpp"
 #include "cosm/robots/footbot/footbot_saa_subsystem2D.hpp"
 #include "cosm/ta/bi_tdgraph_executive.hpp"
+#include "cosm/fsm/supervisor_fsm.hpp"
 
 #include "fordyca/controller/mdpo_perception_subsystem.hpp"
 #include "fordyca/controller/oracular_info_receptor.hpp"
