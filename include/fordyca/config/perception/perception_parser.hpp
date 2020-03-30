@@ -27,7 +27,7 @@
 #include <string>
 #include <memory>
 
-#include "cosm/ds/config/grid_parser.hpp"
+#include "cosm/ds/config/xml/grid_parser.hpp"
 #include "fordyca/config/perception/perception_config.hpp"
 #include "fordyca/config/perception/pheromone_parser.hpp"
 #include "fordyca/fordyca.hpp"
@@ -70,7 +70,7 @@ class perception_parser final : public rconfig::xml::xml_config_parser {
 
   /* clang-format off */
   std::unique_ptr<config_type> m_config{nullptr};
-  cdconfig::grid_parser        m_occupancy{};
+  cdconfig::xml::grid_parser   m_occupancy{};
   pheromone_parser             m_pheromone{};
   /* clang-format on */
 };

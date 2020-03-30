@@ -99,9 +99,6 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   robot_free_block_drop& operator=(const robot_free_block_drop& op) = delete;
 
   /* depth1 */
-  void visit(class cds::cell2D& cell);
-  void visit(cfsm::cell2D_fsm& fsm);
-  void visit(crepr::base_block2D& block);
   void visit(controller::depth1::bitd_dpo_controller&) {}
   void visit(controller::depth1::bitd_mdpo_controller&) {}
   void visit(controller::depth1::bitd_odpo_controller&) {}
@@ -114,8 +111,6 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
   void visit(controller::depth2::birtd_omdpo_controller&);
   void visit(tasks::depth2::cache_starter&);
   void visit(tasks::depth2::cache_finisher&);
-  void visit(fsm::block_to_goal_fsm&);
-  void visit(ds::dpo_semantic_map& map);
 
   /**
    * \brief Get the handle on the block that has been dropped.
@@ -133,6 +128,12 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
                         const rtypes::discretize_ratio& resolution);
 
  private:
+  void visit(fsm::block_to_goal_fsm&);
+  void visit(ds::dpo_semantic_map& map);
+  void visit(class cds::cell2D& cell);
+  void visit(cfsm::cell2D_fsm& fsm);
+  void visit(crepr::base_block2D& block);
+
   bool dispatch_free_block_interactor(tasks::base_foraging_task* task,
                                       controller::block_sel_matrix* bsel_matrix);
 
@@ -144,8 +145,8 @@ class robot_free_block_drop : public rer::client<robot_free_block_drop>,
 };
 
 /**
- * \brief We use the precise visitor in order to force compile errors if a call to
- * a visitor is made that involves a visitee that is not in our visit set
+ * \brief We use the precise visitor in order to force compile errors if a call
+ * to a visitor is made that involves a visitee that is not in our visit set
  * (i.e. remove the possibility of implicit upcasting performed by the
  * compiler).
  */

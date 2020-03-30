@@ -22,6 +22,9 @@
  * Includes
  ******************************************************************************/
 #include "fordyca/support/tv/block_op_penalty_id_calculator.hpp"
+
+#include "cosm/arena/caching_arena_map.hpp"
+
 #include "fordyca/controller/foraging_controller.hpp"
 
 /*******************************************************************************
@@ -32,6 +35,10 @@ NS_START(fordyca, support, tv);
 /*******************************************************************************
  * Constructors/Destructors
  ******************************************************************************/
+block_op_penalty_id_calculator::block_op_penalty_id_calculator(
+    const carena::caching_arena_map* map)
+    : ER_CLIENT_INIT("fordyca.support.tv.block_op_penalty_id_calculator"),
+      mc_map(map) {}
 
 /*******************************************************************************
  * Member Functions

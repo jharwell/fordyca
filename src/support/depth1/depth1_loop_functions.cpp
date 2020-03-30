@@ -35,7 +35,7 @@
 
 #include "cosm/convergence/convergence_calculator.hpp"
 #include "cosm/foraging/block_dist/base_distributor.hpp"
-#include "cosm/foraging/config/arena_map_config.hpp"
+#include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/foraging/repr/block_cluster.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/oracle/config/oracle_manager_config.hpp"
@@ -125,7 +125,7 @@ struct functor_maps_initializer : public boost::static_visitor<void> {
   template <typename T>
   RCSW_COLD void operator()(const T& controller) const {
     typename robot_arena_interactor<T>::params p{
-        lf->arena_map(),
+      lf->arena_map<carena::caching_arena_map>(),
         lf->m_metrics_agg.get(),
         lf->floor(),
         lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>(),
@@ -216,7 +216,7 @@ void depth1_loop_functions::private_init(void) {
    */
   auto padded_size = rmath::vector2d(arena_map()->xrsize(),
                                      arena_map()->yrsize());
-  auto arena = *config()->config_get<cfconfig::arena_map_config>();
+  auto arena = *config()->config_get<caconfig::arena_map_config>();
   arena.grid.upper = padded_size;
   m_metrics_agg = std::make_unique<depth1_metrics_aggregator>(&output->metrics,
                                                               &arena.grid,
@@ -227,7 +227,7 @@ void depth1_loop_functions::private_init(void) {
   /* initialize cache handling and create initial cache */
   cache_handling_init(
       config()->config_get<config::caches::caches_config>(),
-      &config()->config_get<cfconfig::arena_map_config>()->blocks.dist);
+      &config()->config_get<caconfig::arena_map_config>()->blocks.dist);
 
   /*
    * Initialize convergence calculations to include task distribution (not
@@ -316,13 +316,13 @@ void depth1_loop_functions::cache_handling_init(
       cachep, &arena_map()->decoratee(), calc_cache_locs(distp), rng());
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map()->caches(),
+    .current_caches = arena_map<carena::caching_arena_map>()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   cpal::argos_sm_adaptor::led_medium(crfootbot::config::saa_xml_names().leds_saa);
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this);
+    arena_map<carena::caching_arena_map>()->caches_add(*created, this);
     floor()->SetChanged();
   }
 } /* cache_handling_init() */
@@ -470,7 +470,7 @@ void depth1_loop_functions::post_step(void) {
       nullptr != conv_calculator() ? conv_calculator()->converged() : false);
 
   /* Collect metrics from/about existing caches */
-  for (auto* c : arena_map()->caches()) {
+  for (auto* c : arena_map<carena::caching_arena_map>()->caches()) {
     m_metrics_agg->collect_from_cache(c);
     c->reset_metrics();
   } /* for(&c..) */
@@ -481,11 +481,11 @@ void depth1_loop_functions::post_step(void) {
    * process as they have been depleted and do not exist anymore in the \ref
    * arena_map::cacheso() array.
    */
-  for (auto& c : arena_map()->zombie_caches()) {
+  for (auto& c : arena_map<carena::caching_arena_map>()->zombie_caches()) {
     m_metrics_agg->collect_from_cache(c.get());
     c->reset_metrics();
   } /* for(&c..) */
-  arena_map()->zombie_caches_clear();
+  arena_map<carena::caching_arena_map>()->zombie_caches_clear();
 
   m_metrics_agg->collect_from_cache_manager(m_cache_manager.get());
   m_cache_manager->reset_metrics();
@@ -515,12 +515,12 @@ void depth1_loop_functions::reset() {
   m_metrics_agg->reset_all();
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map()->caches(),
+    .current_caches = arena_map<carena::caching_arena_map>()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
   if (auto created = m_cache_manager->create(ccp, arena_map()->blocks())) {
-    arena_map()->caches_add(*created, this);
+    arena_map<carena::caching_arena_map>()->caches_add(*created, this);
     floor()->SetChanged();
   }
   ndc_pop();
@@ -544,7 +544,7 @@ argos::CColor depth1_loop_functions::GetFloorColor(
    * Blocks are inside caches, so display the cache the point is inside FIRST,
    * so that you don't have blocks render inside of caches.
    */
-  for (auto* cache : arena_map()->caches()) {
+  for (auto* cache : arena_map<carena::caching_arena_map>()->caches()) {
     if (cache->contains_point(tmp)) {
       return argos::CColor(cache->color().red(),
                            cache->color().green(),
@@ -631,7 +631,7 @@ void depth1_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * See #577.
    */
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map());
+    oracle_manager()->update(arena_map<carena::caching_arena_map>());
   }
 
   /*
@@ -658,7 +658,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
   }
 
   cache_create_ro_params ccp = {
-      .current_caches = arena_map()->caches(),
+    .current_caches = arena_map<carena::caching_arena_map>()->caches(),
       .clusters = arena_map()->block_distributor()->block_clusters(),
       .t = rtypes::timestep(GetSpace().GetSimulationClock())};
 
@@ -667,7 +667,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
                                               arena_map()->blocks(),
                                               m_cache_counts.first,
                                               m_cache_counts.second)) {
-    arena_map()->caches_add(*created, this);
+    arena_map<carena::caching_arena_map>()->caches_add(*created, this);
     floor()->SetChanged();
     return;
   }
@@ -677,7 +677,7 @@ void depth1_loop_functions::static_cache_monitor(void) {
 } /* static_cache_monitor() */
 
 bool depth1_loop_functions::caches_depleted(void) const {
-  return arena_map()->caches().size() != m_cache_manager->n_managed();
+  return arena_map<carena::caching_arena_map>()->caches().size() != m_cache_manager->n_managed();
 } /* caches_depleted() */
 
 void depth1_loop_functions::caches_recreation_task_counts_collect(

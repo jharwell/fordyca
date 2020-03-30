@@ -46,7 +46,7 @@ class entity2D;
 } /* namespace cosm::repr */
 
 namespace cosm::arena {
-class arena_map;
+class base_arena_map;
 } /* namespace cosm::foraging::repr */
 
 namespace fordyca::repr {
@@ -72,7 +72,7 @@ struct placement_status_t {
  * Needed to eliminate header dependencies in this file.
  */
 std::unique_ptr<repr::line_of_sight> compute_robot_los(
-    const carena::arena_map& map,
+    const carena::base_arena_map& map,
     uint los_grid_size,
     const rmath::vector2d& pos);
 
@@ -87,7 +87,7 @@ std::unique_ptr<repr::line_of_sight> compute_robot_los(
 template <typename T>
 void set_robot_los(T* const controller,
                    uint los_grid_size,
-                   carena::arena_map& map) {
+                   carena::base_arena_map& map) {
   controller->los(std::move(compute_robot_los(map,
                                               los_grid_size,
                                               controller->pos2D())));

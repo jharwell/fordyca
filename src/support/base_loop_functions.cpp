@@ -32,11 +32,11 @@
 
 #include "cosm/convergence/config/convergence_config.hpp"
 #include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/foraging/config/arena_map_config.hpp"
+#include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/oracle/config/oracle_manager_config.hpp"
 #include "cosm/oracle/oracle_manager.hpp"
 #include "cosm/vis/config/visualization_config.hpp"
-#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/metrics/config/output_config.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
 
@@ -79,9 +79,9 @@ void base_loop_functions::init(ticpp::Element& node) {
   output_init(m_config.config_get<cmconfig::output_config>());
 
   /* initialize arena map and distribute blocks */
-  auto* aconfig = config()->config_get<cfconfig::arena_map_config>();
+  auto* aconfig = config()->config_get<caconfig::arena_map_config>();
   auto* vconfig = config()->config_get<cvconfig::visualization_config>();
-  arena_map_init(aconfig, vconfig);
+  arena_map_init<carena::caching_arena_map>(aconfig, vconfig);
 
   /* initialize convergence calculations */
   convergence_init(
@@ -122,7 +122,7 @@ void base_loop_functions::tv_init(const config::tv::tv_manager_config* tvp) {
   auto envd =
       std::make_unique<tv::env_dynamics>(&tvp->env_dynamics,
                                          this,
-                                         arena_map());
+                                         arena_map<carena::caching_arena_map>());
 
   auto popd = std::make_unique<tv::fordyca_pd_adaptor>(&tvp->population_dynamics,
                                                        this,
@@ -178,7 +178,7 @@ void base_loop_functions::pre_step(void) {
   }
 
   if (nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map());
+    oracle_manager()->update(arena_map<carena::caching_arena_map>());
   }
 } /* pre_step() */
 

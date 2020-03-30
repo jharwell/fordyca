@@ -28,7 +28,7 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/base_arena_map.hpp"
 #include "cosm/arena/operations/free_block_pickup.hpp"
 
 #include "fordyca/events/block_vanished.hpp"
@@ -57,7 +57,7 @@ template <typename T>
 class free_block_pickup_interactor
     : public rer::client<free_block_pickup_interactor<T>> {
  public:
-  free_block_pickup_interactor(carena::arena_map* const map,
+  free_block_pickup_interactor(carena::base_arena_map* const map,
                                argos::CFloorEntity* const floor,
                                tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.free_block_pickup_interactor"),
@@ -214,7 +214,7 @@ class free_block_pickup_interactor
 
   /* clang-format off */
   argos::CFloorEntity*const           m_floor;
-  carena::arena_map* const            m_map;
+  carena::base_arena_map* const       m_map;
   tv::block_op_penalty_handler* const m_penalty_handler;
   /* clang-format on */
 };

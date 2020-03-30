@@ -34,7 +34,7 @@
 #include <boost/mpl/for_each.hpp>
 
 #include "cosm/convergence/convergence_calculator.hpp"
-#include "cosm/foraging/config/arena_map_config.hpp"
+#include "cosm/arena/config/arena_map_config.hpp"
 #include "cosm/metrics/blocks/transport_metrics_collector.hpp"
 #include "cosm/oracle/oracle_manager.hpp"
 #include "cosm/pal/argos_swarm_iterator.hpp"
@@ -83,7 +83,7 @@ struct functor_maps_initializer {
   RCSW_COLD void operator()(const T& controller) const {
     lf->m_interactor_map->emplace(
         typeid(controller),
-        robot_arena_interactor<T>(lf->arena_map(),
+        robot_arena_interactor<T>(lf->arena_map<carena::caching_arena_map>(),
                                   lf->m_metrics_agg.get(),
                                   lf->floor(),
                                   lf->tv_manager()->dynamics<ctv::dynamics_type::ekENVIRONMENT>()));
@@ -152,7 +152,7 @@ void depth0_loop_functions::private_init(void) {
    */
   auto padded_size = rmath::vector2d(arena_map()->xrsize(),
                                      arena_map()->yrsize());
-  auto arena = *config()->config_get<cfconfig::arena_map_config>();
+  auto arena = *config()->config_get<caconfig::arena_map_config>();
   arena.grid.upper = padded_size;
   m_metrics_agg = std::make_unique<depth0_metrics_aggregator>(&output->metrics,
                                                               &arena.grid,
@@ -350,7 +350,7 @@ void depth0_loop_functions::robot_post_step(argos::CFootBotEntity& robot) {
    * timestep. See #577.
    */
   if (interactor_status::ekNO_EVENT != status && nullptr != oracle_manager()) {
-    oracle_manager()->update(arena_map());
+    oracle_manager()->update(arena_map<carena::caching_arena_map>());
   }
   /*
    * Collect metrics from robot, now that it has finished interacting with the

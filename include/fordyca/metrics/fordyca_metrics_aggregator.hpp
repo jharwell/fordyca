@@ -1,5 +1,5 @@
 /**
- * \file depth0_metrics_aggregator.hpp
+ * \file fordyca_metrics_aggregator.hpp
  *
  * \copyright 2018 John Harwell, All rights reserved.
  *
@@ -18,45 +18,54 @@
  * FORDYCA.  If not, see <http://www.gnu.org/licenses/
  */
 
-#ifndef INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_METRICS_AGGREGATOR_HPP_
-#define INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_METRICS_AGGREGATOR_HPP_
+#ifndef INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_AGGREGATOR_HPP_
+#define INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_AGGREGATOR_HPP_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <string>
-#include "fordyca/metrics/fordyca_metrics_aggregator.hpp"
+
+#include "cosm/metrics/config/metrics_config.hpp"
+#include "cosm/metrics/base_metrics_aggregator.hpp"
+
+#include "fordyca/fordyca.hpp"
 
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
-NS_START(fordyca, support, depth0);
+NS_START(fordyca);
+
+namespace support {
+class base_loop_functions;
+}
+namespace controller {
+class foraging_controller;
+} /* namespace controller */
+
+NS_START(metrics);
 
 /*******************************************************************************
  * Class Definitions
  ******************************************************************************/
 /**
- * \class depth0_metrics_aggregator
- * \ingroup support depth0
+ * \class fordyca_metrics_aggregator
+ * \ingroup metrics
  *
- * \brief Aggregates and metrics metric collection for depth0 foraging. That
- * includes:
- *
- * - FSM distance/block acquisition metrics
+ * \brief Extends the \ref cmetrics::base_metrics_aggregator for the FORDYCA
+ * project.
  */
-
-class depth0_metrics_aggregator : public metrics::fordyca_metrics_aggregator,
-                                  public rer::client<depth0_metrics_aggregator> {
+class fordyca_metrics_aggregator : public rer::client<fordyca_metrics_aggregator>,
+                                   public cmetrics::base_metrics_aggregator {
  public:
-  depth0_metrics_aggregator(const cmconfig::metrics_config* mconfig,
-                            const cdconfig::grid_config* const gconfig,
-                            const std::string& output_root);
+  fordyca_metrics_aggregator(const cmconfig::metrics_config* mconfig,
+                          const cdconfig::grid_config* const gconfig,
+                          const std::string& output_root);
+  ~fordyca_metrics_aggregator(void) override = default;
 
-
-  template<class T>
-  void collect_from_controller(const T* controller);
+  void collect_from_loop(const support::base_loop_functions* loop);
 };
 
-NS_END(depth0, support, fordyca);
+NS_END(metrics, fordyca);
 
-#endif /* INCLUDE_FORDYCA_SUPPORT_DEPTH0_DEPTH0_METRICS_AGGREGATOR_HPP_ */
+#endif /* INCLUDE_FORDYCA_METRICS_FORDYCA_METRICS_AGGREGATOR_HPP_ */

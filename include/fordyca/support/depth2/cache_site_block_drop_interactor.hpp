@@ -35,7 +35,7 @@
 #include "fordyca/support/depth2/dynamic_cache_manager.hpp"
 #include "rcppsw/math/vector2.hpp"
 #include "fordyca/support/tv/env_dynamics.hpp"
-#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 #include "fordyca/support/interactor_status.hpp"
 
 /*******************************************************************************
@@ -56,7 +56,7 @@ NS_START(fordyca, support, depth2);
 template <typename T>
 class cache_site_block_drop_interactor : public rer::client<cache_site_block_drop_interactor<T>> {
  public:
-  cache_site_block_drop_interactor(carena::arena_map* const map_in,
+  cache_site_block_drop_interactor(carena::caching_arena_map* const map_in,
                                    argos::CFloorEntity* const floor_in,
                                    tv::env_dynamics* envd,
                                    dynamic_cache_manager* const cache_manager)
@@ -215,7 +215,7 @@ class cache_site_block_drop_interactor : public rer::client<cache_site_block_dro
 
   /* clang-format off */
   argos::CFloorEntity*  const        m_floor;
-  carena::arena_map* const           m_map;
+  carena::caching_arena_map* const   m_map;
   dynamic_cache_manager*const        m_cache_manager;
   tv::block_op_penalty_handler*const m_penalty_handler;
   /* clang-format on */

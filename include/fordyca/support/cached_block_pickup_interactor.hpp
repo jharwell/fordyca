@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/cached_block_pickup.hpp"
 #include "cosm/arena/repr/arena_cache.hpp"
 
@@ -59,7 +59,7 @@ template <typename T>
 class cached_block_pickup_interactor
     : public rer::client<cached_block_pickup_interactor<T>> {
  public:
-  cached_block_pickup_interactor(carena::arena_map* const map_in,
+  cached_block_pickup_interactor(carena::caching_arena_map* const map_in,
                                  argos::CFloorEntity* const floor_in,
                                  tv::env_dynamics* envd,
                                  support::base_cache_manager* cache_manager,
@@ -247,7 +247,7 @@ class cached_block_pickup_interactor
  private:
   /* clang-format off */
   argos::CFloorEntity* const          m_floor;
-  carena::arena_map* const            m_map;
+  carena::caching_arena_map* const    m_map;
   tv::cache_op_penalty_handler* const m_penalty_handler;
   base_cache_manager *                m_cache_manager;
   base_loop_functions*                m_loop;

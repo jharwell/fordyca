@@ -43,7 +43,7 @@
  * Namespaces/Decls
  ******************************************************************************/
 namespace cosm::foraging::ds {
-class arena_map;
+class caching_arena_map;
 } /* namespace cosm::foraging::ds */
 namespace cosm::pal {
 class argos_controller2D_adaptor;
@@ -85,7 +85,7 @@ class env_dynamics final : public rer::client<env_dynamics>,
 
   env_dynamics(const config::tv::env_dynamics_config * config,
                const support::base_loop_functions* lf,
-               carena::arena_map* map);
+               carena::caching_arena_map* map);
 
   env_dynamics(const env_dynamics&) = delete;
   const env_dynamics& operator=(const env_dynamics&) = delete;

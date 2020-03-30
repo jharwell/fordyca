@@ -28,7 +28,7 @@
 
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/free_block_drop.hpp"
 #include "cosm/ta/logical_task.hpp"
 #include "cosm/ta/polled_task.hpp"
@@ -55,7 +55,7 @@ NS_START(fordyca, support);
 template <typename T>
 class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
  public:
-  task_abort_interactor(carena::arena_map* const map,
+  task_abort_interactor(carena::caching_arena_map* const map,
                         tv::env_dynamics* envd,
                         argos::CFloorEntity* const floor)
       : ER_CLIENT_INIT("fordyca.support.task_abort_interactor"),
@@ -136,9 +136,9 @@ class task_abort_interactor : public rer::client<task_abort_interactor<T>> {
   } /* perform_block_drop() */
 
   /* clang-format off */
-  carena::arena_map* const   m_map;
-  tv::env_dynamics* const    m_envd;
-  argos::CFloorEntity* const m_floor;
+  carena::caching_arena_map* const m_map;
+  tv::env_dynamics* const          m_envd;
+  argos::CFloorEntity* const       m_floor;
   /* clang-format on */
 };
 

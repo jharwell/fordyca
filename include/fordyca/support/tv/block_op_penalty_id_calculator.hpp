@@ -35,6 +35,10 @@
 /*******************************************************************************
  * Namespaces/Decls
  ******************************************************************************/
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
+
 namespace fordyca::controller {
 class foraging_controller;
 } /* namespace fordyca::controller */
@@ -55,9 +59,7 @@ NS_START(fordyca, support, tv);
 class block_op_penalty_id_calculator : public rer::client<block_op_penalty_id_calculator>,
                                        public rpdecorator::decorator<cforaging::tv::penalty_id_calculator> {
  public:
-  explicit block_op_penalty_id_calculator(const carena::arena_map* map)
-      : ER_CLIENT_INIT("fordyca.support.tv.block_op_penalty_id_calculator"),
-        mc_map(map) {}
+  explicit block_op_penalty_id_calculator(const carena::caching_arena_map* map);
 
   /* Not copy constructable/assignable by default */
   block_op_penalty_id_calculator(const block_op_penalty_id_calculator&) = delete;
@@ -68,7 +70,7 @@ class block_op_penalty_id_calculator : public rer::client<block_op_penalty_id_ca
 
  private:
   /* clang-formatoff */
-  const carena::arena_map* mc_map;
+  const carena::base_arena_map* mc_map;
   /* clang-format on */
 };
 

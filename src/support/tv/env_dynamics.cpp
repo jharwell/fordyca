@@ -26,6 +26,7 @@
 #include "fordyca/config/tv/env_dynamics_config.hpp"
 #include "fordyca/controller/foraging_controller.hpp"
 #include "fordyca/support/base_loop_functions.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 
 /*******************************************************************************
  * Namespaces/Decls
@@ -37,7 +38,7 @@ NS_START(fordyca, support, tv);
  ******************************************************************************/
 env_dynamics::env_dynamics(const config::tv::env_dynamics_config* const config,
                            const support::base_loop_functions* const lf,
-                           carena::arena_map* const map)
+                           carena::caching_arena_map* const map)
     : ER_CLIENT_INIT("fordyca.support.tv.env_dynamics"),
       m_rda(&config->rda, lf),
       m_fb_pickup(map, &config->block_manip_penalty, "Free Block Pickup"),

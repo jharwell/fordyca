@@ -35,7 +35,7 @@
 
 #include "fordyca/controller/depth2/birtd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/site_selection_metrics_collector.hpp"
-#include "fordyca/metrics/collector_registerer.hpp"
+#include "cosm/metrics/collector_registerer.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
 #include "fordyca/tasks/depth2/foraging_task.hpp"
@@ -45,11 +45,10 @@
  ******************************************************************************/
 NS_START(fordyca, support, depth2, detail);
 using collector_typelist = rmpl::typelist<
-    metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::execution_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        metrics::caches::site_selection_metrics_collector> >;
+    rmpl::identity<ctametrics::bi_tab_metrics_collector>,
+    rmpl::identity<ctametrics::execution_metrics_collector>,
+    rmpl::identity<ctametrics::bi_tdgraph_metrics_collector>,
+    rmpl::identity<metrics::caches::site_selection_metrics_collector> >;
 NS_END(detail);
 
 using task0 = tasks::depth0::foraging_task;
@@ -65,7 +64,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
     const std::string& output_root)
     : depth1_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth2.metrics_aggregator") {
-  metrics::collector_registerer::creatable_set creatable_set = {
+  cmetrics::collector_registerer::creatable_set creatable_set = {
       {typeid(ctametrics::bi_tab_metrics_collector),
        "task_tab_harvester",
        "tasks::tab::harvester",
@@ -102,7 +101,7 @@ depth2_metrics_aggregator::depth2_metrics_aggregator(
   /* Overwrite depth1; we have a deeper decomposition now */
   collector_remove("tasks::distribution");
 
-  metrics::collector_registerer registerer(
+  cmetrics::collector_registerer registerer(
       mconfig, gconfig, creatable_set, this, 2);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
 

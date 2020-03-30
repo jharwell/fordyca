@@ -26,7 +26,7 @@
  ******************************************************************************/
 #include <argos3/core/simulator/entity/floor_entity.h>
 
-#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/caching_arena_map.hpp"
 #include "cosm/arena/operations/cache_block_drop.hpp"
 
 #include "fordyca/events/cache_vanished.hpp"
@@ -55,7 +55,7 @@ template <typename T>
 class existing_cache_block_drop_interactor
     : public rer::client<existing_cache_block_drop_interactor<T>> {
  public:
-  existing_cache_block_drop_interactor(carena::arena_map* const map_in,
+  existing_cache_block_drop_interactor(carena::caching_arena_map* const map_in,
                                        tv::env_dynamics* envd)
       : ER_CLIENT_INIT("fordyca.support.existing_cache_block_drop_interactor"),
         m_map(map_in),
@@ -207,7 +207,7 @@ class existing_cache_block_drop_interactor
   }
 
   /* clang-format off */
-  carena::arena_map* const             m_map;
+  carena::caching_arena_map* const   m_map;
   tv::cache_op_penalty_handler*const m_penalty_handler;
   /* clang-format on */
 };

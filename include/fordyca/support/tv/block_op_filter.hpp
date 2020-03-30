@@ -38,6 +38,10 @@
 /*******************************************************************************
  * Namespaces
  ******************************************************************************/
+namespace cosm::arena {
+class caching_arena_map;
+} /* namespace cosm::arena */
+
 NS_START(fordyca, support, tv);
 
 /*******************************************************************************
@@ -53,7 +57,7 @@ NS_START(fordyca, support, tv);
  */
 class block_op_filter : public rer::client<block_op_filter> {
  public:
-  explicit block_op_filter(const carena::arena_map* const map)
+  explicit block_op_filter(const carena::caching_arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.tv.block_op_filter"),
         mc_map(map) {}
 
@@ -176,7 +180,7 @@ class block_op_filter : public rer::client<block_op_filter> {
   }
 
   /* clang-format off */
-  const carena::arena_map* const mc_map;
+  const carena::caching_arena_map* const mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

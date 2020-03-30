@@ -50,7 +50,7 @@
 
 #include "fordyca/controller/depth1/bitd_mdpo_controller.hpp"
 #include "fordyca/metrics/caches/lifecycle_metrics_collector.hpp"
-#include "fordyca/metrics/collector_registerer.hpp"
+#include "cosm/metrics/collector_registerer.hpp"
 #include "fordyca/support/base_cache_manager.hpp"
 #include "fordyca/tasks/depth0/foraging_task.hpp"
 #include "fordyca/tasks/depth1/foraging_task.hpp"
@@ -61,23 +61,16 @@
 NS_START(fordyca, support, depth1, detail);
 
 using collector_typelist = rmpl::typelist<
-    metrics::collector_registerer::type_wrap<
-        cfsm::metrics::goal_acq_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cfsm::metrics::goal_acq_locs_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cfsm::metrics::current_explore_locs_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cfsm::metrics::current_vector_locs_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::execution_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::bi_tab_metrics_collector>,
-    metrics::collector_registerer::type_wrap<ctametrics::bi_tdgraph_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cametrics::caches::utilization_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        metrics::caches::lifecycle_metrics_collector>,
-    metrics::collector_registerer::type_wrap<
-        cametrics::caches::location_metrics_collector> >;
+    rmpl::identity<cfsm::metrics::goal_acq_metrics_collector>,
+    rmpl::identity<cfsm::metrics::goal_acq_locs_metrics_collector>,
+    rmpl::identity<cfsm::metrics::current_explore_locs_metrics_collector>,
+    rmpl::identity<cfsm::metrics::current_vector_locs_metrics_collector>,
+    rmpl::identity<ctametrics::execution_metrics_collector>,
+    rmpl::identity<ctametrics::bi_tab_metrics_collector>,
+    rmpl::identity<ctametrics::bi_tdgraph_metrics_collector>,
+    rmpl::identity<cametrics::caches::utilization_metrics_collector>,
+    rmpl::identity<metrics::caches::lifecycle_metrics_collector>,
+    rmpl::identity<cametrics::caches::location_metrics_collector> >;
 NS_END(detail);
 
 using task0 = tasks::depth0::foraging_task;
@@ -92,7 +85,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
     const std::string& output_root)
     : depth0_metrics_aggregator(mconfig, gconfig, output_root),
       ER_CLIENT_INIT("fordyca.support.depth1.metrics_aggregator") {
-  metrics::collector_registerer::creatable_set creatable_set = {
+  cmetrics::collector_registerer::creatable_set creatable_set = {
       {typeid(cfsm::metrics::goal_acq_metrics_collector),
        "cache_acq_counts",
        "caches::acq_counts",
@@ -141,7 +134,7 @@ depth1_metrics_aggregator::depth1_metrics_aggregator(
        "cache_locations",
        "caches::locations",
        rmetrics::output_mode::ekTRUNCATE | rmetrics::output_mode::ekCREATE}};
-  metrics::collector_registerer registerer(
+  cmetrics::collector_registerer registerer(
       mconfig, gconfig, creatable_set, this, 1);
   boost::mpl::for_each<detail::collector_typelist>(registerer);
 

@@ -24,7 +24,7 @@
 #include "fordyca/support/tv/fordyca_pd_adaptor.hpp"
 
 #include "cosm/arena/operations/free_block_drop.hpp"
-#include "cosm/arena/arena_map.hpp"
+#include "cosm/arena/base_arena_map.hpp"
 
 #include "fordyca/controller/foraging_controller.hpp"
 

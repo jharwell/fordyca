@@ -26,11 +26,13 @@
  ******************************************************************************/
 #include <string>
 
-#include "fordyca/fsm/block_transporter.hpp"
 #include "cosm/fsm/metrics/goal_acq_metrics.hpp"
+
+#include "fordyca/fsm/block_transporter.hpp"
 #include "fordyca/support/tv/cache_op_src.hpp"
 #include "fordyca/support/utils/event_utils.hpp"
 #include "fordyca/support/tv/op_filter_status.hpp"
+#include "fordyca/fsm/foraging_acq_goal.hpp"
 
 /*******************************************************************************
  * Namespaces
@@ -51,7 +53,7 @@ NS_START(fordyca, support, tv);
 template <typename T>
 class cache_op_filter : public rer::client<cache_op_filter<T>> {
  public:
-  explicit cache_op_filter(const carena::arena_map* const map)
+  explicit cache_op_filter(const carena::caching_arena_map* const map)
       : ER_CLIENT_INIT("fordyca.support.tv.cache_op_filter"), mc_map(map) {}
 
   ~cache_op_filter(void) override = default;
@@ -97,7 +99,7 @@ class cache_op_filter : public rer::client<cache_op_filter<T>> {
   }
 
   /* clang-format off */
-  const carena::arena_map* const mc_map;
+  const carena::caching_arena_map* const mc_map;
   /* clang-format on */
 };
 NS_END(tv, support, fordyca);

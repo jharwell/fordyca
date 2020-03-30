@@ -24,7 +24,6 @@
 #include "fordyca/events/robot_free_block_drop.hpp"
 
 #include "cosm/ds/cell2D.hpp"
-#include "cosm/arena/arena_map.hpp"
 #include "cosm/repr/base_block2D.hpp"
 
 #include "fordyca/controller/base_perception_subsystem.hpp"
@@ -49,7 +48,6 @@
  * Namespaces
  ******************************************************************************/
 NS_START(fordyca, events, detail);
-using cds::arena_grid;
 using ds::occupancy_grid;
 
 /*******************************************************************************

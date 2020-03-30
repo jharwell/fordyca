@@ -65,7 +65,7 @@ class robot_arena_interactor final : public rer::client<robot_arena_interactor<T
   using controller_type = T;
 
   struct params {
-    carena::arena_map* const map;
+    carena::caching_arena_map* const map;
     depth0::depth0_metrics_aggregator *const metrics_agg;
     argos::CFloorEntity* const floor;
     tv::env_dynamics* const envd;
